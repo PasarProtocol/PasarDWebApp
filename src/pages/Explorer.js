@@ -12,15 +12,18 @@ import NewestCollectibles from '../components/explorer/CollectionView/NewestColl
 
 const RootStyle = styled(Page)(({ theme }) => ({
   paddingTop: theme.spacing(8),
-  paddingBottom: theme.spacing(15),
+  paddingBottom: theme.spacing(12),
   [theme.breakpoints.up('md')]: {
     paddingTop: theme.spacing(11)
+  },
+  [theme.breakpoints.down('md')]: {
+    paddingBottom: theme.spacing(3)
   }
 }));
 
 // ----------------------------------------------------------------------
 
-export default function ComponentsOverview() {
+export default function Explorer() {
   const [newestCollectibles, setNewestCollectibles] = React.useState([]);
   const [loadingCollectibles, setLoadingCollectibles] = React.useState(false);
   React.useEffect(async () => {

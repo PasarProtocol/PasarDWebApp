@@ -11,10 +11,10 @@ export default function CollectionView(props) {
   return (
     <Card>
         <Grid container>
-            <Grid item xs={12} md={6} lg={6}>
+            <Grid item xs={8} md={6} lg={6}>
                 <CardHeader title={props.title} />
             </Grid>
-            <Grid item xs={12} md={6} lg={6}>
+            <Grid item xs={4} md={6} lg={6}>
                 <Box sx={{ pt: 3, pr: 2, textAlign: 'right' }}>
                     <Button
                         to="#"

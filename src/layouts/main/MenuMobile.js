@@ -2,16 +2,21 @@ import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import { useState, useEffect } from 'react';
 import menu2Fill from '@iconify/icons-eva/menu-2-fill';
+import twitterIcon from '@iconify/icons-ant-design/twitter';
+// import telegramIcon from '@iconify/icons-ic/outline-telegram';
+import TelegramIcon from '@mui/icons-material/Telegram';
+import discordIcon from '@iconify/icons-ic/baseline-discord';
 import { NavLink as RouterLink, useLocation } from 'react-router-dom';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 // material
 import { alpha, styled } from '@mui/material/styles';
-import { Box, List, Link, Drawer, Collapse, ListItemText, ListItemIcon, ListItemButton } from '@mui/material';
+import { Box, List, Link, Drawer, Typography, Grid, Paper, CardActionArea, ListItemText, ListItemIcon, ListItemButton } from '@mui/material';
 // components
 import Logo from '../../components/Logo';
 import NavSection from '../../components/NavSection';
 import Scrollbar from '../../components/Scrollbar';
+import ModeSwitch from '../../components/mode-switch';
 import { MIconButton } from '../../components/@material-extend';
 
 // ----------------------------------------------------------------------
@@ -52,65 +57,7 @@ function MenuMobileItem({ item, isOpen, onOpen }) {
             sx={{ width: 16, height: 16, ml: 1 }}
           />
         </ListItemStyle>
-
-        <Collapse in={isOpen} timeout="auto" unmountOnExit>
-          <Box sx={{ display: 'flex', flexDirection: 'column-reverse' }}>
-            <NavSection
-              navConfig={children}
-              sx={{
-                '& .MuiList-root:last-of-type .MuiListItemButton-root': {
-                  height: 200,
-                  backgroundSize: '92%',
-                  backgroundPosition: 'center',
-                  bgcolor: 'background.neutral',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundImage: 'url(/static/illustrations/illustration_dashboard.png)',
-                  '& > *:not(.MuiTouchRipple-root)': { display: 'none' }
-                },
-                '& .MuiListSubheader-root': {
-                  pl: PADDING,
-                  display: 'flex',
-                  alignItems: 'center',
-                  '&:before': {
-                    ml: '6px',
-                    mr: '22px',
-                    width: 8,
-                    height: 2,
-                    content: "''",
-                    borderRadius: 2,
-                    bgcolor: 'currentColor'
-                  }
-                },
-                '& .MuiListItemButton-root': {
-                  pl: PADDING,
-                  '&:before': { display: 'none' },
-                  '&.active': { color: 'primary.main', bgcolor: 'transparent' }
-                },
-                '& .MuiListItemIcon-root': {
-                  width: ICON_SIZE,
-                  height: ICON_SIZE,
-                  '&:before': {
-                    width: 4,
-                    height: 4,
-                    content: "''",
-                    borderRadius: '50%',
-                    bgcolor: 'currentColor'
-                  }
-                }
-              }}
-            />
-          </Box>
-        </Collapse>
       </>
-    );
-  }
-
-  if (title === 'Documentation') {
-    return (
-      <ListItemStyle href={path} target="_blank" component={Link}>
-        <ListItemIcon>{icon}</ListItemIcon>
-        <ListItemText disableTypography primary={title} />
-      </ListItemStyle>
     );
   }
 
@@ -132,7 +79,40 @@ function MenuMobileItem({ item, isOpen, onOpen }) {
     </ListItemStyle>
   );
 }
-
+function MessengerItem(props){
+  return (
+    <Paper
+      variant='outlined'
+    >
+      <CardActionArea sx={{ borderRadius: 2 }}>
+        <Box
+          sx={{
+            py: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            color: 'text.secondary'
+          }}
+        >
+          {props.children}
+        </Box>
+      </CardActionArea>
+    </Paper>
+  )
+}
+function CopyRight(prop) {
+  return (
+    <Typography
+      component="p"
+      variant="body2"
+      sx={{
+        color: 'text.secondary',
+        textAlign: 'center'
+      }}
+    >
+      {prop.children}
+    </Typography>
+  );
+}
 MenuMobile.propTypes = {
   isOffset: PropTypes.bool,
   isHome: PropTypes.bool,
@@ -192,8 +172,44 @@ export default function MenuMobile({ isOffset, isHome, navConfig }) {
               <MenuMobileItem key={link.title} item={link} isOpen={open} onOpen={handleOpen} />
             ))}
           </List>
+          <Grid container spacing={2} dir="ltr" sx={{px: 1}}>
+            <Grid item xs={4}>
+              <MessengerItem>
+                <TelegramIcon sx={{ fontSize: 30 }} />
+              </MessengerItem>
+            </Grid>
+            <Grid item xs={4}>
+              <MessengerItem>
+                <Icon icon={twitterIcon} width={30} height={30} />
+              </MessengerItem>
+            </Grid>
+            <Grid item xs={4}>
+              <MessengerItem>
+                <Icon icon={discordIcon} width={30} height={30} />
+              </MessengerItem>
+            </Grid>
+          </Grid>
+          <Box
+            sx={{
+              py: 3,
+              display: 'flex',
+              justifyContent: 'center'
+            }}
+          >
+            <ModeSwitch/>
+          </Box>
+          <CopyRight>
+            Pasar Protocol 2021 | Donate <span role="img" aria-label="">❤️</span>
+          </CopyRight>
+          <CopyRight>
+            Privacy Policy | Disclaimer️
+          </CopyRight>
         </Scrollbar>
       </Drawer>
     </>
   );
 }
+
+/* <IconButton key={social.name} color="inherit" sx={{ p: 0 }}>
+<Icon icon={social.icon} width={40} height={40} />
+</IconButton> */

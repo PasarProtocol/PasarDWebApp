@@ -43,9 +43,9 @@ export default function Router() {
         {
           path: 'explorer',
           children: [
-            { element: <ComponentsOverview /> },
+            { element: <Explorer /> },
             // FOUNDATIONS
-            { path: 'color', element: <Color /> },
+            // { path: 'color', element: <Color /> },
           ]
         }
       ]
@@ -54,5 +54,5 @@ export default function Router() {
   ]);
 }
 
-const ComponentsOverview = Loadable(lazy(() => import('../pages/ComponentsOverview')));
-const Color = Loadable(lazy(() => import('../pages/components-overview/foundations/FoundationColors')));
+const Explorer = Loadable(lazy(() => import('../pages/Explorer')));
+// const Color = Loadable(lazy(() => import('../pages/components-overview/foundations/FoundationColors')));
