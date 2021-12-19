@@ -122,7 +122,7 @@ export default function MainFooter() {
               direction="row"
               justifyContent={{ xs: 'center', md: 'flex-end' }}>
                 <MaterialUISwitch sx={{ mt: 1, mb: 1 }} defaultChecked />
-              </Stack>
+            </Stack>
           </Grid>
         </Grid>
         <Grid
