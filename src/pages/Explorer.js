@@ -26,15 +26,25 @@ const RootStyle = styled(Page)(({ theme }) => ({
 
 export default function Explorer() {
   const [newestCollectibles, setNewestCollectibles] = React.useState([]);
-  const [loadingCollectibles, setLoadingCollectibles] = React.useState(false);
+  const [latestTransactions, setLatestTransactions] = React.useState([]);
+  const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
+  const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
   React.useEffect(async () => {
     setLoadingCollectibles(true);
-    const res = await fetch(
+    const resCollectibles = await fetch(
       'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pagSize=10'
     );
-    const json = await res.json();
-    setNewestCollectibles(json.data.result);
+    const jsonCollectibles = await resCollectibles.json();
+    setNewestCollectibles(jsonCollectibles.data.result);
     setLoadingCollectibles(false);
+
+    setLoadingTransactions(true);
+    const resTransactions = await fetch(
+      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pagSize=10'
+    );
+    const jsonTransactions = await resTransactions.json();
+    setLatestTransactions(jsonTransactions.data.result);
+    setLoadingTransactions(false);
   }, []);
 
   return (
@@ -49,10 +59,11 @@ export default function Explorer() {
         </Stack>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={6}>
-            <NewestCollectibles title="Newest Collectibles" dataList={newestCollectibles}/>
+            
+            <NewestCollectibles title="Newest Collectibles" dataList={newestCollectibles} isLoading={isLoadingCollectibles}/>
           </Grid>
           <Grid item xs={12} md={6} lg={6}>
-            <NewestCollectibles title="Latest Transactions" dataList={newestCollectibles}/>
+            <NewestCollectibles title="Latest Transactions" dataList={latestTransactions} isLoading={isLoadingTransactions}/>
           </Grid>
         </Grid>
       </Container>

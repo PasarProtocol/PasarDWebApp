@@ -1,11 +1,13 @@
 // material
 import CollectionView from './Template'
 import NewsItem from './NewsItem'
+import LoadingScreen from '../../LoadingScreen';
 import { reduceHexAddress, getElapsedTime, getThumbnail } from '../../../utils/common';
 // ----------------------------------------------------------------------
 export default function NewestCollectibles(props) {
   return (
     <CollectionView title={props.title}>
+      {props.isLoading && <LoadingScreen />}
       {props.dataList.map((collectible, index) => (
           <NewsItem 
             key={index}

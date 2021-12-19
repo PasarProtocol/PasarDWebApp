@@ -14,6 +14,7 @@ const RootStyle = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  padding: 40,
   backgroundColor: theme.palette.background.default
 }));
 
