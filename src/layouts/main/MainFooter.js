@@ -75,6 +75,7 @@ function CopyRight(prop) {
       sx={{
         pt: 2,
         pb: 2,
+        color: 'GrayText',
         textAlign: { xs: 'center', md: prop.textAlign }
       }}
     >
@@ -96,7 +97,7 @@ export default function MainFooter() {
             <h3 style={{paddingBottom: 15}}>
               <span role="img" aria-label=''>⚡ </span>Powered by Elastos
             </h3>
-            <Typography variant="body2" sx={{ pr: { md: 5 } }}>
+            <Typography variant="body2" sx={{ pr: { md: 5 }, color: 'GrayText' }}>
               Pasar Explorer is a Collectible Explorer and <br />
               Analytics Platform for Elastos NFTs, on the <br />
               Elastos Smart Chain (ESC).

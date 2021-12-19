@@ -13,7 +13,7 @@ import { Box, Link, Grid, List, Stack, Popover, ListItem, ListSubheader, CardAct
 
 const LinkStyle = styled(Link)(({ theme }) => ({
   ...theme.typography.subtitle2,
-  color: theme.palette.text.primary,
+  color: theme.palette.text.disabled,
   marginRight: theme.spacing(5),
   transition: theme.transitions.create('opacity', {
     duration: theme.transitions.duration.shortest
@@ -185,7 +185,7 @@ function MenuDesktopItem({ item, isHome, isOpen, isOffset, onOpen, onClose }) {
       end={path === '/'}
       sx={{
         ...(isHome && { color: 'common.white' }),
-        ...(isOffset && { color: 'text.primary' }),
+        // ...(isOffset && { color: 'text.primary' }),
         '&.active': {
           color: 'primary.main'
         }

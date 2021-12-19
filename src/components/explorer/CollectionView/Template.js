@@ -4,9 +4,6 @@ import { Link as RouterLink } from 'react-router-dom';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 // material
 import { Box, Stack, Link, Card, Button, Grid, Typography, CardHeader } from '@mui/material';
-// utils
-// import { mockImgCover } from '../../../utils/mockImages';
-//
 import Scrollbar from '../../Scrollbar';
 
 // ----------------------------------------------------------------------
@@ -32,7 +29,7 @@ export default function CollectionView(props) {
             </Grid>
         </Grid>
         <Scrollbar>
-            <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
+            <Stack spacing={2} sx={{ p: 3 }}>
               {props.children}
             </Stack>
         </Scrollbar>

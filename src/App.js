@@ -28,7 +28,7 @@ export default function App() {
           <RtlLayout>
             {/* <NotistackProvider> */}
               <GlobalStyles />
-              {/* <ProgressBarStyle /> */}
+              <ProgressBarStyle />
               {/* <Settings /> */}
               <ScrollToTop />
               <Router />

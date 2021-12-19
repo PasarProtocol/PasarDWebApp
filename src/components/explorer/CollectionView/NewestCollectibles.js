@@ -1,6 +1,4 @@
 // material
-import { styled } from '@mui/material/styles';
-import { Grid, Card } from '@mui/material';
 import CollectionView from './Template'
 import NewsItem from './NewsItem'
 import { reduceHexAddress, getElapsedTime, getThumbnail } from '../../../utils/common';
@@ -13,10 +11,12 @@ export default function NewestCollectibles(props) {
             key={index}
             news={{
               image: getThumbnail(collectible.thumbnail),
-              postedAt: collectible.createTime,
               title: collectible.name,
-              description: reduceHexAddress(collectible.tokenIdHex).concat("Token ID : ")
+              gasFee: collectible.royalties / 10 ** 8,
+              postedAt: collectible.createTime*1000,
+              description: "Token ID : ".concat(reduceHexAddress(collectible.tokenIdHex))
             }}
+            isLast={index===props.dataList.length-1}
           />
       ))}
     </CollectionView>

@@ -8,6 +8,16 @@ import palette from '../theme/palette';
 // ----------------------------------------------------------------------
 
 const PRIMARY_COLOR = [
+  // CUSTOM
+  {
+    name: 'custom',
+    lighter: '#EBD6FD',
+    light: '#B985F4',
+    main: '#212B36',
+    dark: '#000613',
+    darker: '#200A69',
+    contrastText: '#fff'
+  },
   // DEFAULT
   {
     name: 'default',
@@ -103,7 +113,7 @@ function SetColor(themeColor) {
 const initialState = {
   themeMode: 'light',
   themeDirection: 'ltr',
-  themeColor: 'default',
+  themeColor: 'custom',
   themeStretch: false,
   onChangeMode: () => {},
   onChangeDirection: () => {},

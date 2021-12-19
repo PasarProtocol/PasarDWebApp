@@ -1,37 +1,40 @@
 import PropTypes from 'prop-types';
-import { Link as RouterLink } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
 import { Box, Stack, Link, Typography } from '@mui/material';
+import palette from '../../../theme/palette'
 
 NewsItem.propTypes = {
-    news: PropTypes.object.isRequired
+    news: PropTypes.object.isRequired,
+    isLast: PropTypes.bool.isRequired
 };
   
-export default function NewsItem({ news }) {
-    const { image, title, description, postedAt } = news;
-
+export default function NewsItem({ news, isLast }) {
+    const { image, title, description, postedAt, gasFee } = news;
+    const sx = isLast?{}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2};
     return (
-        <Stack direction="row" alignItems="center" spacing={2}>
+        <Stack direction="row" alignItems="center" spacing={2} sx={sx}>
             <Box
                 component="img"
                 alt={title}
                 src={image}
                 sx={{ width: 48, height: 48, borderRadius: 1.5 }}
             />
-            <Box sx={{ minWidth: 240 }}>
-                <Link to="#" color="inherit" underline="hover" component={RouterLink}>
-                <Typography variant="subtitle2" noWrap>
+            <Box sx={{ minWidth: 240, flexGrow: 1 }}>
+                <Typography color="inherit" variant="subtitle2" noWrap>
                     {title}
                 </Typography>
-                </Link>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                {description}
+                    {description}
                 </Typography>
             </Box>
-            <Typography variant="caption" sx={{ pr: 3, flexShrink: 0, color: 'text.secondary' }}>
-                {/* {formatDistance(postedAt, new Date())} */}
-                {postedAt}
-            </Typography>
+            <Box>
+                <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
+                    {formatDistance(postedAt, new Date(), { addSuffix: true })}
+                </Typography>
+                <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
+                    Gas Fee : {gasFee} ELA
+                </Typography>
+            </Box>
         </Stack>
     );
 }
