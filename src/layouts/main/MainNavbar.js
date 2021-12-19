@@ -8,6 +8,7 @@ import useOffSetTop from '../../hooks/useOffSetTop';
 import Logo from '../../components/Logo';
 import Label from '../../components/Label';
 import { MHidden } from '../../components/@material-extend';
+import Searchbar from '../../components/Searchbar';
 //
 import MenuDesktop from './MenuDesktop';
 import MenuMobile from './MenuMobile';
@@ -68,6 +69,9 @@ export default function MainNavbar() {
             justifyContent: 'space-between'
           }}
         >
+          <MHidden width="mdUp">
+            <Searchbar />
+          </MHidden>
 
           <Box sx={{ flexGrow: 1 }} />
 

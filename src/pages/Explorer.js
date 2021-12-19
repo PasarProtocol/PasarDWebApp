@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles';
 import { Container, Stack, Grid } from '@mui/material';
 // components
 import Page from '../components/Page';
+import { MHidden } from '../components/@material-extend';
 import MainLogo from '../components/main-logo';
 import SearchBox from '../components/SearchBox';
 import StatisticPanel from '../components/explorer/StatisticPanel'
@@ -41,7 +42,9 @@ export default function Explorer() {
       <MainLogo />
       <Container maxWidth="lg">
         <Stack spacing={6} sx={{mb:3}}>
-          <SearchBox/>
+          <MHidden width="mdDown">
+            <SearchBox/>
+          </MHidden>
           <StatisticPanel />
         </Stack>
         <Grid container spacing={3}>
