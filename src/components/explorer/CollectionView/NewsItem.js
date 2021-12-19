@@ -19,7 +19,7 @@ export default function NewsItem({ news, isLast }) {
                 src={image}
                 sx={{ width: 48, height: 48, borderRadius: 1.5 }}
             />
-            <Box sx={{ minWidth: 240, flexGrow: 1 }}>
+            <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Typography color="inherit" variant="subtitle2" noWrap>
                     {title}
                 </Typography>
@@ -29,7 +29,7 @@ export default function NewsItem({ news, isLast }) {
             </Box>
             <Box>
                 <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
-                    {formatDistance(postedAt, new Date(), { addSuffix: true })}
+                    {formatDistance(postedAt, new Date(), { addSuffix: true }).replace("about","").trim()}
                 </Typography>
                 <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
                     Gas Fee : {gasFee} ELA
