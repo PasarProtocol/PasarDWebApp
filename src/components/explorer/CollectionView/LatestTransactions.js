@@ -9,7 +9,7 @@ import LoadingScreen from '../../LoadingScreen';
 import { reduceHexAddress, getThumbnail } from '../../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
-  news: PropTypes.object.isRequired,
+  trans: PropTypes.object.isRequired,
   isLast: PropTypes.bool.isRequired
 };
 function TransItem({ trans, isLast }) {

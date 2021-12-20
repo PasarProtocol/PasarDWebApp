@@ -83,6 +83,9 @@ function MessengerItem(props){
   return (
     <Paper
       variant='outlined'
+      sx={{
+        borderRadius: 2
+      }}
     >
       <CardActionArea sx={{ borderRadius: 2 }}>
         <Box
