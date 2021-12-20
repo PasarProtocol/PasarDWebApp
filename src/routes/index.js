@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react';
 import { Navigate, useRoutes, useLocation } from 'react-router-dom';
 // layouts
 import MainLayout from '../layouts/main';
+import LogoOnlyLayout from '../layouts/LogoOnlyLayout';
 // components
 import LoadingScreen from '../components/LoadingScreen';
 
@@ -36,6 +37,14 @@ const Loadable = (Component) => (props) => {
 export default function Router() {
   return useRoutes([
     {
+      path: '*',
+      element: <LogoOnlyLayout />,
+      children: [
+        { path: '404', element: <NotFound /> },
+        { path: '*', element: <Navigate to="/404" replace /> }
+      ]
+    },
+    {
       path: '/',
       element: <MainLayout />,
       children: [
@@ -44,8 +53,7 @@ export default function Router() {
           path: 'explorer',
           children: [
             { element: <Explorer /> },
-            // FOUNDATIONS
-            // { path: 'color', element: <Color /> },
+            { path: 'collectible', element: <Collectible /> },
           ]
         }
       ]
@@ -55,4 +63,5 @@ export default function Router() {
 }
 
 const Explorer = Loadable(lazy(() => import('../pages/Explorer')));
-// const Color = Loadable(lazy(() => import('../pages/components-overview/foundations/FoundationColors')));
+const Collectible = Loadable(lazy(() => import('../pages/explorer/Collectible')));
+const NotFound = Loadable(lazy(() => import('../pages/Page404')));

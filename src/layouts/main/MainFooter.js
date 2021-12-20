@@ -17,7 +17,10 @@ const SOCIALS = [
 ];
 
 const RootStyle = styled('div')(({ theme }) => ({
-  position: 'relative',
+  position: 'absolute',
+  bottom: 0,
+  width: '100%',
+  // position: 'relative',
   backgroundColor: "#c4c4c4",
   [theme.breakpoints.down('md')]: {
     display: 'none'

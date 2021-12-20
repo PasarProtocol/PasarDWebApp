@@ -34,14 +34,14 @@ export default function Explorer() {
     setLoadingCollectibles(true);
     setLoadingTransactions(true);
     const resCollectibles = await fetch(
-      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pagSize=5'
+      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pageSize=5'
     );
     const jsonCollectibles = await resCollectibles.json();
     setNewestCollectibles(jsonCollectibles.data.result);
     setLoadingCollectibles(false);
 
     const resTransactions = await fetch(
-      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pagSize=5'
+      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pageSize=5'
     );
     const jsonTransactions = await resTransactions.json();
     setLatestTransactions(jsonTransactions.data.result);

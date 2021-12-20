@@ -1,5 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import { styled } from '@mui/material/styles';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import Fab from '@mui/material/Fab';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -45,6 +46,12 @@ ScrollTop.propTypes = {
   children: PropTypes.element.isRequired
 };
 
+const BodyStyle = styled('div')(({ theme }) => ({
+  [theme.breakpoints.up('md')]: {
+    paddingBottom: 200
+  }
+}));
+
 export default function MainLayout() {
   const { pathname } = useLocation();
   const isHome = pathname === '/';
@@ -52,9 +59,9 @@ export default function MainLayout() {
   return (
     <>
       <MainNavbar />
-      <div>
+      <BodyStyle>
         <Outlet />
-      </div>
+      </BodyStyle>
       <MainFooter />
       <ScrollTop>
           {/* <Button variant="contained" target="_blank" href="#"> */}
