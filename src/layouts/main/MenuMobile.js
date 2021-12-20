@@ -11,7 +11,7 @@ import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 // material
 import { alpha, styled } from '@mui/material/styles';
-import { Box, List, Link, Drawer, Typography, Grid, Paper, CardActionArea, ListItemText, ListItemIcon, ListItemButton } from '@mui/material';
+import { Box, List, Link, Drawer, Typography, Grid, Paper, CardActionArea, ListItemText, ListItemIcon, ListItemButton, Container } from '@mui/material';
 // components
 import Logo from '../../components/Logo';
 import NavSection from '../../components/NavSection';
@@ -162,7 +162,7 @@ export default function MenuMobile({ isOffset, isHome, navConfig }) {
         ModalProps={{ keepMounted: true }}
         PaperProps={{ sx: { pb: 5, width: 260 } }}
       >
-        <Scrollbar>
+        <Scrollbar sx={{minHeight: 250}}>
           <Link component={RouterLink} to="/" sx={{ display: 'inline-flex' }}>
             <Logo sx={{ mx: PADDING, my: 3 }} />
           </Link>
@@ -172,6 +172,9 @@ export default function MenuMobile({ isOffset, isHome, navConfig }) {
               <MenuMobileItem key={link.title} item={link} isOpen={open} onOpen={handleOpen} />
             ))}
           </List>
+        </Scrollbar>
+        <Box sx={{ flexGrow: 1 }} />
+        <Container>
           <Grid container spacing={2} dir="ltr" sx={{px: 1}}>
             <Grid item xs={4}>
               <MessengerItem>
@@ -204,7 +207,7 @@ export default function MenuMobile({ isOffset, isHome, navConfig }) {
           <CopyRight>
             Privacy Policy | Disclaimer️
           </CopyRight>
-        </Scrollbar>
+        </Container>
       </Drawer>
     </>
   );
