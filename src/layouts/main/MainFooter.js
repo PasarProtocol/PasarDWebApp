@@ -5,7 +5,7 @@ import discordIcon from '@iconify/icons-ic/round-discord';
 
 // material
 import { styled } from '@mui/material/styles';
-import { Grid, Link, Divider, Container, Typography, IconButton, Stack, Switch } from '@mui/material';
+import { Grid, Link, Divider, Container, Typography, IconButton, Stack, Box } from '@mui/material';
 import palette from '../../theme/palette'
 import ModeSwitch from '../../components/mode-switch'
 // ----------------------------------------------------------------------
@@ -57,6 +57,7 @@ export default function MainFooter() {
           <Grid item xs={12} md={6}>
             <h3 style={{paddingBottom: 15}}>
               <span role="img" aria-label=''>⚡ </span>Powered by Elastos
+              <Box component="img" src="/static/elastos.svg" sx={{ width: 21, display: 'inline', pl: .5 }} />
             </h3>
             <Typography variant="body2" sx={{ pr: { md: 5 }, color: 'GrayText' }}>
               Pasar Explorer is a Collectible Explorer and <br />

@@ -19,13 +19,13 @@ const RootStyle = styled('div')(({ theme, index }) => {
     [theme.breakpoints.down('sm')]: sm
   }
 });
-export default function StatisticItem({title, value, index}) {
+export default function StatisticItem(props) {
   return (
-    <RootStyle index={index}>
+    <RootStyle index={props.index}>
         <Stack spacing={2}>
-            <h2>{value}</h2>
+            <h2>{props.value}</h2>
             <Typography variant="body" sx={{ color: 'text.secondary' }}>
-                {title}
+                {props.children} {props.title}
             </Typography>
         </Stack>
     </RootStyle>
