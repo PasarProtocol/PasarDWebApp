@@ -8,6 +8,7 @@ import useOffSetTop from '../../hooks/useOffSetTop';
 import Logo from '../../components/Logo';
 import Label from '../../components/Label';
 import { MHidden } from '../../components/@material-extend';
+import SearchBox from '../../components/SearchBox';
 import Searchbar from '../../components/Searchbar';
 //
 import MenuDesktop from './MenuDesktop';
@@ -48,7 +49,7 @@ const ToolbarShadowStyle = styled('div')(({ theme }) => ({
 export default function MainNavbar() {
   const isOffset = useOffSetTop(100);
   const { pathname } = useLocation();
-  const isHome = pathname === '/';
+  const isHome = pathname === '/explorer';
 
   return (
     <AppBar sx={{ boxShadow: 0, bgcolor: 'transparent' }}>
@@ -72,7 +73,15 @@ export default function MainNavbar() {
           <MHidden width="mdUp">
             <Searchbar />
           </MHidden>
-
+          {
+            !isHome&&
+            <MHidden width="mdDown">
+              <RouterLink to="/">
+                <Box component="img" src="/static/logo.svg" sx={{ minWidth: 140, width: 140 }} />
+              </RouterLink>
+              <SearchBox sx={{width: 400}}/>
+            </MHidden>
+          }
           <Box sx={{ flexGrow: 1 }} />
 
           <MHidden width="mdDown">

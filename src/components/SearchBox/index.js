@@ -11,9 +11,9 @@ const ContentStyle = styled('div')(({ theme }) => ({
   textAlign: 'center',
 }));
 
-const SearchStyle = styled(OutlinedInput)(({ theme }) => ({
+const SearchStyle = styled(OutlinedInput)(({ theme, sx }) => ({
     [theme.breakpoints.up('md')]: {
-        width: 550,
+        width: sx.width,
     },
     [theme.breakpoints.down('md')]: {
         width: '90%',
@@ -46,9 +46,9 @@ const SearchStyle = styled(OutlinedInput)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function SearchBox({placeholder}) {
+export default function SearchBox({placeholder, sx}) {
   return (
-      <Container maxWidth="lg" sx={{ height: '100%' }}>
+      <Container maxWidth="lg" sx={{ height: '100%', width: 'auto'}}>
         <ContentStyle>
             <SearchStyle
               placeholder={placeholder}
@@ -57,6 +57,7 @@ export default function SearchBox({placeholder}) {
                   <Box component={Icon} icon={searchFill} sx={{ color: 'text.disabled' }} />
                 </InputAdornment>
               }
+              sx = {sx}
             />
         </ContentStyle>
       </Container>
@@ -66,7 +67,9 @@ export default function SearchBox({placeholder}) {
 SearchBox.propTypes = {
     onChange: PropTypes.func,
     placeholder: PropTypes.string,
+    sx: PropTypes.object
 };
 SearchBox.defaultProps = {
-    placeholder: "Search by name/contract/address/token ID"
+    placeholder: "Search by name/contract/address/token ID",
+    sx: {width: 550}
 };
