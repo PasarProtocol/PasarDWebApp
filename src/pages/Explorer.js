@@ -9,6 +9,7 @@ import MainLogo from '../components/main-logo';
 import SearchBox from '../components/SearchBox';
 import StatisticPanel from '../components/explorer/StatisticPanel'
 import NewestCollectibles from '../components/explorer/CollectionView/NewestCollectibles'
+import LatestTransactions from '../components/explorer/CollectionView/LatestTransactions'
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -31,16 +32,16 @@ export default function Explorer() {
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
   React.useEffect(async () => {
     setLoadingCollectibles(true);
+    setLoadingTransactions(true);
     const resCollectibles = await fetch(
-      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pagSize=10'
+      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pagSize=5'
     );
     const jsonCollectibles = await resCollectibles.json();
     setNewestCollectibles(jsonCollectibles.data.result);
     setLoadingCollectibles(false);
 
-    setLoadingTransactions(true);
     const resTransactions = await fetch(
-      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pagSize=10'
+      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pagSize=5'
     );
     const jsonTransactions = await resTransactions.json();
     setLatestTransactions(jsonTransactions.data.result);
@@ -59,11 +60,10 @@ export default function Explorer() {
         </Stack>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={6}>
-            
             <NewestCollectibles title="Newest Collectibles" dataList={newestCollectibles} isLoading={isLoadingCollectibles}/>
           </Grid>
           <Grid item xs={12} md={6} lg={6}>
-            <NewestCollectibles title="Latest Transactions" dataList={latestTransactions} isLoading={isLoadingTransactions}/>
+            <LatestTransactions title="Latest Transactions" dataList={latestTransactions} isLoading={isLoadingTransactions}/>
           </Grid>
         </Grid>
       </Container>
