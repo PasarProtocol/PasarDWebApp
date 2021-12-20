@@ -26,10 +26,18 @@ const SearchStyle = styled(OutlinedInput)(({ theme }) => ({
     }),
     '&.Mui-focused': {
         backgroundColor: alpha(theme.palette.common.white, 0.04),
+        boxShadow: 'rgb(190 190 190 / 50%) 0px 4px 8px 0px'
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#e0e0e0 !important',
+      borderWidth: `2px !important`
+    },
+    '&.MuiOutlinedInput-root:hover fieldset': {
+      borderColor: '#e0e0e0 !important',
+      borderWidth: `2px !important`
     },
     '& fieldset': {
-        borderWidth: `1px !important`,
-        borderColor: `${theme.palette.grey[500_32]} !important`
+        borderWidth: `1px !important`
     },
     input: {
         padding: 10
