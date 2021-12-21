@@ -10,6 +10,11 @@ const RootStyle = styled('div')(({ theme }) => ({
     flexDirection: 'row',
     padding: theme.spacing(2)
 }));
+const TypographyStyle = styled(Typography)(({ theme }) => ({
+    [theme.breakpoints.down('sm')]: {
+        textAlign: "right"
+    }
+}));
 export default function CollectibleListItem({ item }) {
     const { image, name, value, timestamp, gasFee, tokenIdHex } = item;
     return (
@@ -31,12 +36,12 @@ export default function CollectibleListItem({ item }) {
                     </Typography>
                 </Grid>
                 <Grid item xs={5} sm={2}>
-                    <Typography color="inherit" variant="subtitle2" noWrap>
+                    <TypographyStyle color="inherit" variant="subtitle2" noWrap>
                         Token ID
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                    </TypographyStyle>
+                    <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap>
                         {tokenIdHex}
-                    </Typography>
+                    </TypographyStyle>
                 </Grid>
                 <Grid item xs={4} sm={3}>
                     <Typography color="inherit" variant="subtitle2" noWrap align="left">
@@ -55,12 +60,12 @@ export default function CollectibleListItem({ item }) {
                     </Typography>
                 </Grid>
                 <Grid item xs={4} sm={2}>
-                    <Typography color="inherit" variant="subtitle2" noWrap>
+                    <TypographyStyle color="inherit" variant="subtitle2" noWrap>
                         Timestamp
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                    </TypographyStyle>
+                    <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap>
                         {timestamp.date}<br/>{timestamp.time}
-                    </Typography>
+                    </TypographyStyle>
                 </Grid>
             </Grid>
         </RootStyle>
