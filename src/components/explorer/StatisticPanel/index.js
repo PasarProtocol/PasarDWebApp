@@ -10,13 +10,13 @@ const RootStyle = styled(Card)(({ theme }) => ({
   alignItems: 'center',
   flexDirection: 'column',
   padding: theme.spacing(4),
-  borderWidth: 1,
-  borderStyle: 'solid',
-  borderColor: `${theme.palette.grey[500_32]} !important`,
-  boxShadow: 'none',
   [theme.breakpoints.down('sm')]: {
     padding: theme.spacing(3),
   }
+  // borderWidth: 1,
+  // borderStyle: 'solid',
+  // borderColor: `${theme.palette.grey[500_32]} !important`,
+  // boxShadow: 'none',
 }));
 
 export default function StatisticPanel() {
