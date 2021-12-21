@@ -17,7 +17,7 @@ export default function CollectionView(props) {
             <Grid item xs={4} md={6} lg={6}>
                 <Box sx={{ pt: 3, pr: 2, textAlign: 'right' }}>
                     <Button
-                        to="collectible"
+                        to={props.to}
                         size="small"
                         color="inherit"
                         component={RouterLink}

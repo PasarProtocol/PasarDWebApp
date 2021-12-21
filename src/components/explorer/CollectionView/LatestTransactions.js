@@ -58,7 +58,7 @@ function MethodLabel({description}){
 }
 export default function LatestTransactions(props) {
   return (
-    <CollectionView title={props.title}>
+    <CollectionView title={props.title} to="transaction">
       {props.isLoading && <LoadingScreen />}
       {props.dataList.map((collectible, index) => (
           <TransItem 

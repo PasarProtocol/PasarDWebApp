@@ -14,7 +14,6 @@ import { alpha, styled } from '@mui/material/styles';
 import { Box, List, Link, Drawer, Typography, Grid, Paper, CardActionArea, ListItemText, ListItemIcon, ListItemButton, Container } from '@mui/material';
 // components
 import Logo from '../../components/Logo';
-import NavSection from '../../components/NavSection';
 import Scrollbar from '../../components/Scrollbar';
 import ModeSwitch from '../../components/mode-switch';
 import { MIconButton } from '../../components/@material-extend';
@@ -152,7 +151,7 @@ export default function MenuMobile({ isOffset, isHome, navConfig }) {
         onClick={handleDrawerOpen}
         sx={{
           ml: 1,
-          ...(isHome && { color: 'common.white' }),
+          // ...(isHome && { color: 'common.white' }),
           ...(isOffset && { color: 'text.primary' })
         }}
       >

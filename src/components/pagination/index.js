@@ -10,10 +10,18 @@ const ArrowButton = styled(Button)(({ theme }) => ({
   padding: '6px 8px',
   margin: theme.spacing(.7)
 }));
+const DivStyle = styled('div')(({ theme }) => ({
+  [theme.breakpoints.up('md')]: {
+    float: 'right'
+  },
+  [theme.breakpoints.down('md')]: {
+    float: 'none'
+  }
+}));
 
-export default function Pagination({ pages, page, onChange }) {
+export default function Pagination({ pages, page, onChange, sx }) {
   return (
-    <div>
+    <DivStyle sx={sx}>
       <Button
         variant="contained"
         style={{textTransform: 'none'}}
@@ -59,7 +67,7 @@ export default function Pagination({ pages, page, onChange }) {
       >
         Last
       </Button>
-    </div>
+    </DivStyle>
   );
 }
 
@@ -67,4 +75,5 @@ Pagination.propTypes = {
   pages: PropTypes.number,
   page: PropTypes.number,
   onChange: PropTypes.func,
+  sx: PropTypes.object,
 };

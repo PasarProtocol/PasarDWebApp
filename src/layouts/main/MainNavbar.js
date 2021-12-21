@@ -5,8 +5,6 @@ import { Box, Button, AppBar, Toolbar, Container } from '@mui/material';
 // hooks
 import useOffSetTop from '../../hooks/useOffSetTop';
 // components
-import Logo from '../../components/Logo';
-import Label from '../../components/Label';
 import { MHidden } from '../../components/@material-extend';
 import SearchBox from '../../components/SearchBox';
 import Searchbar from '../../components/Searchbar';
@@ -79,7 +77,7 @@ export default function MainNavbar() {
               <RouterLink to="/">
                 <Box component="img" src="/static/logo.svg" sx={{ minWidth: 140, width: 140 }} />
               </RouterLink>
-              <SearchBox sx={{width: 400}}/>
+              <SearchBox sx={{width: 360}}/>
             </MHidden>
           }
           <Box sx={{ flexGrow: 1 }} />

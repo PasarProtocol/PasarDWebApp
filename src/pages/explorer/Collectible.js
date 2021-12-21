@@ -9,6 +9,7 @@ import Scrollbar from '../../components/Scrollbar';
 import CollectibleListItem from '../../components/explorer/CollectibleList/CollectibleListItem'
 import ShowSelect from '../../components/pagination/ShowSelect';
 import Pagination from '../../components/pagination';
+import LoadingWrapper from '../../components/LoadingWrapper';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -23,15 +24,12 @@ const RootStyle = styled(Page)(({ theme }) => ({
   }
 }));
 
-const LoadingWrapper = styled('div')(({ theme }) => ({
-    position: 'fixed',
-    left: '50%',
-    top: '50%',
-    webkitTransform: 'translateX(-50%) translateY(-50%)',
-    transform: 'translateX(-50%) translateY(-50%)',
-    'z-index': 1
+const StackStyle = styled(Stack)(({ theme }) => ({
+  flexDirection: 'row',
+  [theme.breakpoints.down('md')]: {
+    flexDirection: 'column',
+  }
 }));
-
 // ----------------------------------------------------------------------
 
 export default function Collectible() {
@@ -55,12 +53,12 @@ export default function Collectible() {
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">
-        <Stack sx={{flexDirection: 'row', mb: 2}}>
+        <StackStyle sx={{ mb: 2 }}>
             <Typography variant="h4" sx={{flex:1}}>
                 Newest Collectibles
             </Typography>
             <Pagination page={page} pages={pages} onChange={setPage} />
-        </Stack>
+        </StackStyle>
         {isLoadingCollectibles && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
         <Scrollbar>
             <Grid container spacing={2}>
@@ -91,10 +89,10 @@ export default function Collectible() {
         </Scrollbar>
         {
             collectibles.length>0&&
-            <Stack sx={{flexDirection: 'row', mt: 2}}>
+            <StackStyle  sx={{ mt: 2, display: 'block' }}>
+                <Pagination page={page} pages={pages} onChange={setPage}/>
                 <ShowSelect count={showCount} onChange={changeShowCount} sx={{flex:1}}/>
-                <Pagination page={page} pages={pages} onChange={setPage} />
-            </Stack>
+            </StackStyle>
         }
         
       </Container>

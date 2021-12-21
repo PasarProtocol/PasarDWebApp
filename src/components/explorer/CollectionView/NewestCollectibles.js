@@ -6,7 +6,7 @@ import { reduceHexAddress, getElapsedTime, getThumbnail } from '../../../utils/c
 // ----------------------------------------------------------------------
 export default function NewestCollectibles(props) {
   return (
-    <CollectionView title={props.title}>
+    <CollectionView title={props.title} to="collectible">
       {props.isLoading && <LoadingScreen />}
       {props.dataList.map((collectible, index) => (
           <NewsItem 
