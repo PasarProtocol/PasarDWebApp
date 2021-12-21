@@ -91,10 +91,9 @@ export default function Collectible() {
             collectibles.length>0&&
             <StackStyle  sx={{ mt: 2, display: 'block' }}>
                 <Pagination page={page} pages={pages} onChange={setPage}/>
-                <ShowSelect count={showCount} onChange={changeShowCount} sx={{flex:1}}/>
+                <ShowSelect count={showCount} onChange={changeShowCount}/>
             </StackStyle>
         }
-        
       </Container>
     </RootStyle>
   );

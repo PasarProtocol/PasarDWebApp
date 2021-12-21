@@ -1,11 +1,16 @@
 import React from 'react';
+import { styled } from '@mui/material/styles';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import PropTypes from 'prop-types';
 
-export default function ShowSelect({ showCount, onChange, sx }) {
+const DivStyle = styled('div')(({ theme }) => ({
+  flex: 1,
+  marginTop: theme.spacing(1)
+}));
+export default function ShowSelect({ showCount, onChange }) {
   return (
-    <div style={sx}>
+    <DivStyle>
       <span>Show</span>
       <Select
         defaultValue={10}
@@ -21,7 +26,7 @@ export default function ShowSelect({ showCount, onChange, sx }) {
         <MenuItem value={100}>100</MenuItem>
       </Select>
       <span>Records</span>
-    </div>
+    </DivStyle>
   );
 }
 
