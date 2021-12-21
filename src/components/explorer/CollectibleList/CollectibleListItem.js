@@ -12,13 +12,13 @@ const RootStyle = styled('div')(({ theme }) => ({
 }));
 export default function CollectibleListItem({ item }) {
     const { image, name, value, timestamp, gasFee, tokenIdHex } = item;
-    
     return (
         <RootStyle>
             <Box
                 component="img"
                 alt={name}
                 src={image}
+                onError={(e) => e.target.src = '/static/broken-image.svg'}
                 sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
             />
             <Grid container spacing={2}>
