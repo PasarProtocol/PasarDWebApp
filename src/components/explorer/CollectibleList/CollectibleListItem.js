@@ -22,7 +22,7 @@ export default function CollectibleListItem({ item }) {
                 sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
             />
             <Grid container spacing={2}>
-                <Grid item xs={3}>
+                <Grid item xs={7} sm={3}>
                     <Typography color="inherit" variant="subtitle2" align="left" noWrap>
                         Collectible
                     </Typography>
@@ -30,7 +30,7 @@ export default function CollectibleListItem({ item }) {
                         {name}
                     </Typography>
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={5} sm={2}>
                     <Typography color="inherit" variant="subtitle2" noWrap>
                         Token ID
                     </Typography>
@@ -38,7 +38,7 @@ export default function CollectibleListItem({ item }) {
                         {tokenIdHex}
                     </Typography>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={4} sm={3}>
                     <Typography color="inherit" variant="subtitle2" noWrap align="left">
                         Value
                     </Typography>
@@ -46,7 +46,7 @@ export default function CollectibleListItem({ item }) {
                         {value}&nbsp;ELA
                     </Typography>
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={4} sm={2}>
                     <Typography color="inherit" variant="subtitle2" noWrap align="left">
                         Gas Fee
                     </Typography>
@@ -54,7 +54,7 @@ export default function CollectibleListItem({ item }) {
                         {gasFee}&nbsp;ELA
                     </Typography>
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={4} sm={2}>
                     <Typography color="inherit" variant="subtitle2" noWrap>
                         Timestamp
                     </Typography>
