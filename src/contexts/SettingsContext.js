@@ -12,7 +12,7 @@ const PRIMARY_COLOR = [
   {
     name: 'custom',
     lighter: '#EBD6FD',
-    light: '#B985F4',
+    light: '#919eab',
     main: '#212B36',
     dark: '#000613',
     darker: '#200A69',

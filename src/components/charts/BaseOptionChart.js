@@ -80,7 +80,7 @@ export default function BaseOptionChart() {
   return {
     // Colors
     colors: [
-      theme.palette.primary.main,
+      theme.palette.primary.light,
       theme.palette.chart.yellow[0],
       theme.palette.chart.blue[0],
       theme.palette.chart.violet[0],
@@ -130,7 +130,7 @@ export default function BaseOptionChart() {
 
     // Stroke
     stroke: {
-      width: 3,
+      width: 1,
       curve: 'smooth',
       lineCap: 'round'
     },

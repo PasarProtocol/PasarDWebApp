@@ -1,7 +1,8 @@
 // material
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Grid, Paper, Typography } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { Container, Stack, Grid, Paper, Typography, Link } from '@mui/material';
 // components
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
@@ -64,12 +65,17 @@ export default function Collectible() {
             <Grid container spacing={2}>
             {collectibles.map((item, key) => (
                 <Grid key={key} item xs={12}>
+                  <Link href={"/explorer/collectible/".concat(item.tokenId)} underline="none" >
                     <Paper
                         sx={{
                             textAlign: 'center',
                             border: '1px solid',
                             borderColor: 'action.disabledBackground',
-                            boxShadow: (theme) => theme.customShadows.z1
+                            cursor: 'pointer',
+                            boxShadow: (theme) => theme.customShadows.z1,
+                            '&:hover': {
+                              boxShadow: (theme) => theme.customShadows.z16
+                            },
                         }}
                     >
                         <CollectibleListItem
@@ -83,6 +89,7 @@ export default function Collectible() {
                             }}
                         />
                     </Paper>
+                  </Link>
                 </Grid>
             ))}
             </Grid>

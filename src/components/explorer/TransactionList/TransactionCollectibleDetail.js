@@ -24,7 +24,7 @@ export default function TransactionCollectibleDetail({ item }) {
                 component="img"
                 alt=""
                 src='/static/hammer.svg'
-                sx={{ width: 48, height: 48, borderRadius: 1, mr: 2, background: '#424242', filter: 'invert(1)', padding: '14px' }}
+                sx={{ width: 48, height: 48, borderRadius: 1, mr: 2, background: '#bdbdbd', padding: '14px' }}
             />
             <Grid container spacing={2}>
                 <Grid item xs={7} sm={4}>

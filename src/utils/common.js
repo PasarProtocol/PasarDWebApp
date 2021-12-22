@@ -18,7 +18,12 @@ export const getTime = timestamp => {
   return {'date':dateStr, 'time':timeStr};
 };
 // Get thumbnail url //
-export const getThumbnail = id => `https://ipfs0.trinity-feeds.app/ipfs/${id.substring(12, id.length)}`;
+export const getThumbnail = id => {
+  if(id===undefined)
+    return "";
+  return `https://ipfs0.trinity-feeds.app/ipfs/${id.substring(12, id.length)}`;
+}
+  
 
 export const getElapsedTime = createdtimestamp => {
   const currentTimestamp = new Date().getTime() / 1000;
