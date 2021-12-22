@@ -79,9 +79,7 @@ export default function Searchbar({placeholder}) {
               }
               sx={{ mr: 1 }}
             />
-            <Button variant="contained" onClick={handleClose}>
-              Search
-            </Button>
+            {/* <Button variant="contained" onClick={handleClose}> Search </Button> */}
           </SearchbarStyle>
         </Slide>
       </div>
