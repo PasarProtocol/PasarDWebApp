@@ -6,6 +6,7 @@ CollectibleListItem.propTypes = {
     item: PropTypes.object.isRequired
 };
 const RootStyle = styled('div')(({ theme }) => ({
+    width: '100%',
     display: 'flex',
     flexDirection: 'row',
     padding: theme.spacing(2)
