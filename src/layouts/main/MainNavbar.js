@@ -45,7 +45,7 @@ const ToolbarShadowStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function MainNavbar() {
-  const isOffset = useOffSetTop(100);
+  const isOffset = useOffSetTop(40);
   const { pathname } = useLocation();
   const isHome = pathname === '/explorer';
 
