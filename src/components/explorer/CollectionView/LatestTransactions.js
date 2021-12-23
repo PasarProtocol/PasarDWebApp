@@ -22,7 +22,7 @@ function TransItem({ trans, isLast }) {
               component="img"
               alt={title}
               src={image}
-              sx={{ width: 48, height: 48, borderRadius: 1.5 }}
+              sx={{ width: 48, height: 48, borderRadius: 1 }}
           />
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Typography variant="body2" color='text.secondary' noWrap>
