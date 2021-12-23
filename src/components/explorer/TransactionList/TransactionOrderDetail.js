@@ -153,7 +153,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                             <tr>
                                 <td>
                                     <Typography color="inherit" variant="subtitle2" noWrap>
-                                        ▸ Platform free
+                                        ▸ Platform fee
                                     </Typography>
                                 </td>
                                 <td align="right">

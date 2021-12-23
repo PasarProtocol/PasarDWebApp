@@ -9,7 +9,7 @@ import { varFadeInUp, varWrapEnter, varFadeInDown } from '../animate';
 //
 
 const RootStyle = styled('div')(({ theme }) => ({
-  padding: theme.spacing(6, 0),
+  padding: theme.spacing(3, 0, 6),
 //   backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800]
 }));
 
@@ -28,7 +28,7 @@ export default function MainLogo() {
           }}
         >
             <motion.div variants={varFadeInDown} style={{margin:'auto', display:'table'}}>
-              <Box component="img" src="/static/logo.svg" sx={{ width: 360 }} />
+              <Box component="img" src="/static/logo.svg" sx={{ width: 220 }} />
             </motion.div>
         </Container>
       </motion.div>
