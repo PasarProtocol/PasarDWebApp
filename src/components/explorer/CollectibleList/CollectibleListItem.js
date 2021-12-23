@@ -54,7 +54,7 @@ export default function CollectibleListItem({ item }) {
                 </Grid>
                 <Grid item xs={4} sm={2}>
                     <Typography color="inherit" variant="subtitle2" noWrap align="left">
-                        Gas Fee
+                        Tx Fee
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap align="left">
                         {gasFee}&nbsp;ELA

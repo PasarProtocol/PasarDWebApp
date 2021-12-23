@@ -32,7 +32,7 @@ export default function NewsItem({ news, isLast }) {
                     {formatDistance(postedAt, new Date(), { addSuffix: true }).replace("about","").trim()}
                 </Typography>
                 <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
-                    Gas Fee : {gasFee} ELA
+                    Tx Fee : {gasFee} ELA
                 </Typography>
             </Box>
         </Stack>

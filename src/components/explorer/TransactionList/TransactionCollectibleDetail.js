@@ -45,7 +45,7 @@ export default function TransactionCollectibleDetail({ item }) {
                 </Grid>
                 <Grid item xs={6} sm={3}>
                     <TypographyStyle color="inherit" variant="subtitle2" noWrap align="center" alignsm="left">
-                        Gas Fee
+                        Tx Fee
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="left">
                         {gasFee}&nbsp;ELA

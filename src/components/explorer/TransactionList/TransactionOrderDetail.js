@@ -90,7 +90,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                             </StackRowStyle>
                             <StackRowStyle>
                                 <Typography color="inherit" variant="subtitle2" noWrap>
-                                    And gas fee of &nbsp;
+                                    And tx fee of &nbsp;
                                 </Typography>
                                 <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
                                     {gasFee}&nbsp;ELA
