@@ -10,6 +10,7 @@ import Scrollbar from '../../components/Scrollbar';
 import CollectibleListItem from '../../components/explorer/CollectibleList/CollectibleListItem'
 import ShowSelect from '../../components/pagination/ShowSelect';
 import Pagination from '../../components/pagination';
+import PaperRecord from '../../components/PaperRecord';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 // ----------------------------------------------------------------------
@@ -66,17 +67,12 @@ export default function Collectible() {
             {collectibles.map((item, key) => (
                 <Grid key={key} item xs={12}>
                   <Link href={"/explorer/collectible/".concat(item.tokenId)} underline="none" >
-                    <Paper
-                        sx={{
-                            textAlign: 'center',
-                            border: '1px solid',
-                            borderColor: 'action.disabledBackground',
-                            cursor: 'pointer',
-                            boxShadow: (theme) => theme.customShadows.z1,
-                            '&:hover': {
-                              boxShadow: (theme) => theme.customShadows.z16
-                            },
-                        }}
+                    <PaperRecord sx={{
+                      textAlign: 'center',
+                      cursor: 'pointer', 
+                      '&:hover': {
+                          boxShadow: (theme) => theme.customShadows.z16
+                      },}}
                     >
                         <CollectibleListItem
                             item={{
@@ -88,7 +84,7 @@ export default function Collectible() {
                                 value: item.value!==undefined?item.value:0
                             }}
                         />
-                    </Paper>
+                    </PaperRecord>
                   </Link>
                 </Grid>
             ))}

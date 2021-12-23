@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Box, Button, Link, Typography, Grid } from '@mui/material';
+import { Box, Button, Link, Typography, Grid, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
+import MethodLabel from '../../MethodLabel';
+import { reduceHexAddress } from '../../../utils/common';
 
 TransactionOrderDetail.propTypes = {
     item: PropTypes.object.isRequired
@@ -24,14 +26,29 @@ const TypographyStyle = styled(Typography)(({ theme, alignsm }) => ({
 }));
 const FirstGridStyle = styled(Grid)(({ theme, alignsm }) => ({
     [theme.breakpoints.up('md')]: {
+        paddingTop: '0 !important',
+        paddingRight: theme.spacing(2),
+        marginTop: theme.spacing(2),
         borderRight: '1px solid #ddd'
     },
     [theme.breakpoints.down('md')]: {
         borderBottom: '1px solid #ddd'
     }
 }));
+const StackRowStyle = styled(Stack)(({ theme }) => ({
+    flexDirection: 'row',
+    // [theme.breakpoints.down('md')]: {
+    //   flexDirection: 'column',
+    // }
+}));
+const StackColStyle = styled(Stack)(({ theme }) => ({
+    flexDirection: 'column',
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'row',
+    }
+}));
 export default function TransactionOrderDetail({ item }) {
-    const { value, timestamp, gasFee, tokenIdHex } = item;
+    const { from, to, value, method, timestamp, gasFee, tokenIdHex } = item;
     return (
         <RootStyle>
             <Box
@@ -43,48 +60,68 @@ export default function TransactionOrderDetail({ item }) {
             <Grid container spacing={2}>
                 <FirstGridStyle item xs={12} sm={12} md={8} sx={{}}>
                     <Grid container>
-                        <Grid item xs={4} sm={3}>
-                            <Typography color="inherit" variant="subtitle2" noWrap>
-                                Value
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                {value}&nbsp;ELA
-                            </Typography>
+                        <Grid item xs={12} sm={8}>
+                            <StackRowStyle>
+                                <Typography color="inherit" variant="subtitle2" noWrap>
+                                    Collectible transferred to&nbsp;
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
+                                    {reduceHexAddress(to)}
+                                </Typography>
+                            </StackRowStyle>
+                            <StackRowStyle>
+                                <Typography color="inherit" variant="subtitle2" noWrap>
+                                    By&nbsp;
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
+                                    {reduceHexAddress(from)}
+                                </Typography>
+                            </StackRowStyle>
+                            <StackRowStyle>
+                                <Typography color="inherit" variant="subtitle2" noWrap>
+                                    For a value of &nbsp;
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
+                                    {value}&nbsp;ELA
+                                </Typography>
+                            </StackRowStyle>
+                            <StackRowStyle>
+                                <Typography color="inherit" variant="subtitle2" noWrap>
+                                    And gas fee of &nbsp;
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
+                                    {gasFee}&nbsp;ELA
+                                </Typography>
+                            </StackRowStyle>
+                            <StackRowStyle>
+                                <Typography color="inherit" variant="subtitle2" noWrap>
+                                    On &nbsp;
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
+                                    {timestamp.date} {timestamp.time}
+                                </Typography>
+                            </StackRowStyle>
                         </Grid>
-                        <Grid item xs={4} sm={3}>
-                            <Typography color="inherit" variant="subtitle2" noWrap align="center">
-                                From
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center">
-                                {tokenIdHex}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={4} sm={3}>
-                            <TypographyStyle color="inherit" variant="subtitle2" noWrap align="center" alignsm="right">
-                                To
-                            </TypographyStyle>
-                            <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="right">
-                                {tokenIdHex}
-                            </TypographyStyle>
-                        </Grid>
-                        <Grid item xs={6} sm={3}>
-                            <TypographyStyle color="inherit" variant="subtitle2" noWrap align="center" alignsm="left">
-                                Timestamp
-                            </TypographyStyle>
-                            <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="left">
-                                {timestamp.date}<br/>{timestamp.time}
-                            </TypographyStyle>
-                        </Grid>
-                        <Grid item xs={6} sm={4}>
-                            <TypographyStyle color="inherit" variant="subtitle2" noWrap alignsm="right">
-                                Tx Hash
-                            </TypographyStyle>
-                            <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap alignsm="right">
-                                {tokenIdHex}
-                                <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
-                                    <Icon icon={externalLinkFill} width="17px"/>
-                                </IconButton>
-                            </TypographyStyle>
+                        <Grid item xs={12} sm={4}>
+                            <StackColStyle sx={{pb:1}}>
+                                <TypographyStyle color="inherit" variant="subtitle2" noWrap align="right" alignsm="left" sx={{pr:.6}}>
+                                    Method
+                                </TypographyStyle>
+                                <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
+                                    <MethodLabel description={method}/>
+                                </TypographyStyle>
+                            </StackColStyle>
+                            <StackColStyle>
+                                <TypographyStyle color="inherit" variant="subtitle2" noWrap align="right" alignsm="left">
+                                    Tx Hash&nbsp;
+                                </TypographyStyle>
+                                <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
+                                    {reduceHexAddress(tokenIdHex)}
+                                    <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
+                                        <Icon icon={externalLinkFill} width="17px"/>
+                                    </IconButton>
+                                </TypographyStyle>
+                            </StackColStyle>
                         </Grid>
                     </Grid>
                 </FirstGridStyle>

@@ -60,7 +60,6 @@ CarouselItem.propTypes = {
 };
 
 function CarouselItem({ page, detail }) {
-  console.log(detail);
   return (
     <Stack spacing={2} sx={{ py: 3 }}>
       {page.map((item, index) => {

@@ -123,11 +123,13 @@ export default function Transaction() {
                         key%2===0?(
                         <TransactionOrderDetail
                             item={{
-                                timestamp: getTime(item.createTime),
-                                name: item.name,
-                                tokenIdHex: reduceHexAddress(item.tokenIdHex),
+                                from: item.tokenIdHex,
+                                to: item.tokenIdHex,
+                                tokenIdHex: item.tokenIdHex,
+                                value: item.value!==undefined?item.value:0,
                                 gasfee: (item.royalties / 10 ** 8).toFixed(7),
-                                value: item.value!==undefined?item.value:0
+                                method: 'transfer',
+                                timestamp: getTime(item.createTime)
                             }}
                         />
                         ):(

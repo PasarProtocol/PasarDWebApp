@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
-import { Card, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Typography, Box } from '@mui/material';
+import { Card, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Typography, Box, Select, MenuItem } from '@mui/material';
 // components
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
@@ -12,6 +12,9 @@ import Scrollbar from '../../components/Scrollbar';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import { ChartArea } from '../../components/charts';
 import { CarouselCustom } from '../../components/carousel';
+import PaperRecord from '../../components/PaperRecord';
+import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail'
+import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -91,7 +94,7 @@ export default function CollectibleDetail() {
           </Grid>
           <Grid item xs={12}>
             <Accordion
-              defaultExpanded={1&&1}
+              defaultExpanded={1&&true}
               sx={{
                 border: '1px solid',
                 borderColor: 'action.disabledBackground',
@@ -105,6 +108,63 @@ export default function CollectibleDetail() {
                 <ChartArea />
               </AccordionDetails>
             </Accordion>
+          </Grid>
+          <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Typography variant="h4" sx={{flex:1}}>
+                  Transaction Record
+                  <Select
+                    defaultValue={1}
+                    value={1}
+                    onChange={()=>{}}
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    size="small"
+                    sx={{mx: 1}}
+                  >
+                    <MenuItem value={1}>All</MenuItem>
+                  </Select>
+                  <Select
+                    defaultValue={1}
+                    value={1}
+                    onChange={()=>{}}
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    size="small"
+                    sx={{mx: 1}}
+                  >
+                    <MenuItem value={1}>Oldest</MenuItem>
+                    <MenuItem value={2}>Newest</MenuItem>
+                  </Select>
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <PaperRecord>
+                  <TransactionCollectibleDetail
+                    item={{
+                        timestamp: getTime(new Date()/1000),
+                        tokenIdHex: reduceHexAddress("0x44016ed8638f5B517a5beC7a722A56d1DEBefef7"),
+                        gasfee: (1000 / 10 ** 8).toFixed(7),
+                        value: 10
+                    }}
+                  />
+                </PaperRecord>
+              </Grid>
+              <Grid item xs={12}>
+                <PaperRecord>
+                  <TransactionOrderDetail
+                    item={{
+                        from: "0x22016ed8638f5B517a5beC7a722A56d1DEBefef7",
+                        to: "0x33016ed8638f5B517a5beC7a722A56d1DEBefef7",
+                        tokenIdHex: "0x44016ed8638f5B517a5beC7a722A56d1DEBefef7",
+                        value: 100,
+                        gasfee: (1000 / 10 ** 8).toFixed(7),
+                        method: 'transfer',
+                        timestamp: getTime(new Date()/1000)
+                    }}
+                  />
+                </PaperRecord>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </Container>

@@ -6,6 +6,7 @@ import palette from '../../../theme/palette'
 // material
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
+import MethodLabel from '../../MethodLabel';
 import { reduceHexAddress, getThumbnail } from '../../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
@@ -41,20 +42,6 @@ function TransItem({ trans, isLast }) {
           </Box>
       </Stack>
   );
-}
-function MethodLabel({description}){
-  return(
-    <Typography variant="body2" component="span" color='text.secondary' noWrap sx={{
-      px: 1,
-      background: '#25CD7C',
-      color: '#E3F8EF',
-      borderRadius: 10,
-      display: 'inline-block',
-      verticalAlign: 'top'
-    }}>
-        {description}
-    </Typography>
-  )
 }
 export default function LatestTransactions(props) {
   return (
