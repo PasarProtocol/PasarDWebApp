@@ -6,7 +6,7 @@ export default function Accordion(theme) {
       styleOverrides: {
         root: {
           '&.Mui-expanded': {
-            boxShadow: theme.customShadows.z8,
+            // boxShadow: theme.customShadows.z8,
             borderRadius: theme.shape.borderRadius
           },
           '&.Mui-disabled': {
