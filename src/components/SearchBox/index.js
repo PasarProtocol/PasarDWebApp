@@ -16,7 +16,7 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx }) => ({
         width: sx.width,
     },
     [theme.breakpoints.down('md')]: {
-        width: '90%',
+        width: '100%',
     },
     borderRadius: theme.shape.borderRadiusMd,
     color: theme.palette.common.black,
@@ -46,10 +46,10 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function SearchBox({placeholder, sx}) {
+export default function SearchBox({placeholder, sx, outersx, rootsx}) {
   return (
-      <Container maxWidth="lg" sx={{ height: '100%', width: 'auto'}}>
-        <ContentStyle>
+      <Container maxWidth="lg" sx={{ height: '100%', width: 'auto', ...rootsx}}>
+        <ContentStyle sx={{...outersx}}>
             <SearchStyle
               placeholder={placeholder}
               startAdornment={

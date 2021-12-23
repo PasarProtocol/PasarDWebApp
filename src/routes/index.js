@@ -56,6 +56,7 @@ export default function Router() {
             { path: 'collectible', element: <Collectible /> },
             { path: 'collectible/:collection', element: <CollectibleDetail /> },
             { path: 'transaction', element: <Transaction /> },
+            { path: 'transaction/:transaction', element: <AddressDetail /> },
           ]
         }
       ]
@@ -68,4 +69,5 @@ const Explorer = Loadable(lazy(() => import('../pages/Explorer')));
 const Collectible = Loadable(lazy(() => import('../pages/explorer/Collectible')));
 const CollectibleDetail = Loadable(lazy(() => import('../pages/explorer/CollectibleDetail')));
 const Transaction = Loadable(lazy(() => import('../pages/explorer/Transaction')));
+const AddressDetail = Loadable(lazy(() => import('../pages/explorer/AddressDetail')));
 const NotFound = Loadable(lazy(() => import('../pages/Page404')));

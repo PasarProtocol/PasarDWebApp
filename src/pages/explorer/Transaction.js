@@ -3,8 +3,7 @@ import React from 'react';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Grid, Paper, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import { Container, Stack, Grid, Paper, Typography, Accordion, AccordionSummary, AccordionDetails, FormControlLabel } from '@mui/material';
 // components
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
@@ -113,8 +112,7 @@ export default function Transaction() {
                               postedAt: item.createTime*1000,
                               name: item.name,
                               tokenIdHex: reduceHexAddress(item.tokenIdHex),
-                              gasfee: (item.royalties / 10 ** 8).toFixed(7),
-                              value: item.value!==undefined?item.value:0
+                              method: 'transfer',
                           }}
                       />
                     </AccordionSummary>
@@ -122,6 +120,7 @@ export default function Transaction() {
                       {
                         key%2===0?(
                         <TransactionOrderDetail
+                            isAlone={false}
                             item={{
                                 from: item.tokenIdHex,
                                 to: item.tokenIdHex,

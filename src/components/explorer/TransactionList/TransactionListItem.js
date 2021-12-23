@@ -1,7 +1,11 @@
 import PropTypes from 'prop-types';
 import { formatDistance } from 'date-fns';
-import { Box, Stack, Link, Typography, Grid } from '@mui/material';
+import { Icon } from '@iconify/react';
+import { Box, Stack, Link, Typography, Grid, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import externalLinkFill from '@iconify/icons-eva/external-link-fill';
+import MethodLabel from '../../MethodLabel';
+import { reduceHexAddress } from '../../../utils/common';
 
 TransactionListItem.propTypes = {
     item: PropTypes.object.isRequired
@@ -18,7 +22,7 @@ const TypographyStyle = styled(Typography)(({ theme, alignsm }) => ({
     }
 }));
 export default function TransactionListItem({ item }) {
-    const { image, name, value, postedAt, tokenIdHex } = item;
+    const { image, name, method, postedAt, tokenIdHex } = item;
     return (
         <RootStyle>
             <Box
@@ -29,7 +33,7 @@ export default function TransactionListItem({ item }) {
                 sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
             />
             <Grid container spacing={2}>
-                <Grid item xs={6} sm={3}>
+                <Grid item xs={6} sm={4}>
                     <Typography color="inherit" variant="subtitle2" noWrap>
                         Name
                     </Typography>
@@ -37,23 +41,26 @@ export default function TransactionListItem({ item }) {
                         {name}
                     </Typography>
                 </Grid>
-                <Grid item xs={6} sm={5}>
+                <Grid item xs={6} sm={2}>
                     <TypographyStyle color="inherit" variant="subtitle2" noWrap align="center" alignsm="right">
-                        Description
+                        Method
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="right">
-                        {tokenIdHex}
+                        <MethodLabel description={method}/>
                     </TypographyStyle>
                 </Grid>
-                <Grid item xs={6} sm={2}>
+                <Grid item xs={6} sm={3}>
                     <TypographyStyle color="inherit" variant="subtitle2" noWrap align="center" alignsm="left">
-                        Owner
+                        Tx Hash
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="left">
-                        {tokenIdHex}
+                        {reduceHexAddress(tokenIdHex)}
+                        <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
+                            <Icon icon={externalLinkFill} width="17px"/>
+                        </IconButton>
                     </TypographyStyle>
                 </Grid>
-                <Grid item xs={6} sm={2}>
+                <Grid item xs={6} sm={3}>
                     <TypographyStyle color="inherit" variant="subtitle2" noWrap align="center" alignsm="right">
                         Date
                     </TypographyStyle>

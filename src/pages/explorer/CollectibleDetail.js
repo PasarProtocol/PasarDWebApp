@@ -152,6 +152,7 @@ export default function CollectibleDetail() {
               <Grid item xs={12}>
                 <PaperRecord>
                   <TransactionOrderDetail
+                    isAlone={1&&true}
                     item={{
                         from: "0x22016ed8638f5B517a5beC7a722A56d1DEBefef7",
                         to: "0x33016ed8638f5B517a5beC7a722A56d1DEBefef7",

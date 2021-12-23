@@ -8,6 +8,7 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import MethodLabel from '../../MethodLabel';
+import CopyButton from '../../CopyButton';
 import { reduceHexAddress } from '../../../utils/common';
 
 TransactionOrderDetail.propTypes = {
@@ -47,7 +48,7 @@ const StackColStyle = styled(Stack)(({ theme }) => ({
       flexDirection: 'row',
     }
 }));
-export default function TransactionOrderDetail({ item }) {
+export default function TransactionOrderDetail({ isAlone, item }) {
     const { from, to, value, method, timestamp, gasFee, tokenIdHex } = item;
     return (
         <RootStyle>
@@ -60,13 +61,14 @@ export default function TransactionOrderDetail({ item }) {
             <Grid container spacing={2}>
                 <FirstGridStyle item xs={12} sm={12} md={8} sx={{}}>
                     <Grid container>
-                        <Grid item xs={12} sm={8}>
+                        <Grid item xs={12} sm={isAlone?8:12}>
                             <StackRowStyle>
                                 <Typography color="inherit" variant="subtitle2" noWrap>
                                     Collectible transferred to&nbsp;
                                 </Typography>
                                 <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
                                     {reduceHexAddress(to)}
+                                    <CopyButton/>
                                 </Typography>
                             </StackRowStyle>
                             <StackRowStyle>
@@ -75,6 +77,7 @@ export default function TransactionOrderDetail({ item }) {
                                 </Typography>
                                 <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
                                     {reduceHexAddress(from)}
+                                    <CopyButton/>
                                 </Typography>
                             </StackRowStyle>
                             <StackRowStyle>
@@ -102,27 +105,31 @@ export default function TransactionOrderDetail({ item }) {
                                 </Typography>
                             </StackRowStyle>
                         </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <StackColStyle sx={{pb:1}}>
-                                <TypographyStyle color="inherit" variant="subtitle2" noWrap align="right" alignsm="left" sx={{pr:.6}}>
-                                    Method
-                                </TypographyStyle>
-                                <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
-                                    <MethodLabel description={method}/>
-                                </TypographyStyle>
-                            </StackColStyle>
-                            <StackColStyle>
-                                <TypographyStyle color="inherit" variant="subtitle2" noWrap align="right" alignsm="left">
-                                    Tx Hash&nbsp;
-                                </TypographyStyle>
-                                <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
-                                    {reduceHexAddress(tokenIdHex)}
-                                    <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
-                                        <Icon icon={externalLinkFill} width="17px"/>
-                                    </IconButton>
-                                </TypographyStyle>
-                            </StackColStyle>
-                        </Grid>
+                        {
+                            isAlone&&(
+                                <Grid item xs={12} sm={4}>
+                                    <StackColStyle sx={{pb:1}}>
+                                        <TypographyStyle color="inherit" variant="subtitle2" noWrap align="right" alignsm="left" sx={{pr:.6}}>
+                                            Method
+                                        </TypographyStyle>
+                                        <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
+                                            <MethodLabel description={method}/>
+                                        </TypographyStyle>
+                                    </StackColStyle>
+                                    <StackColStyle>
+                                        <TypographyStyle color="inherit" variant="subtitle2" noWrap align="right" alignsm="left">
+                                            Tx Hash&nbsp;
+                                        </TypographyStyle>
+                                        <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
+                                            {reduceHexAddress(tokenIdHex)}
+                                            <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
+                                                <Icon icon={externalLinkFill} width="17px"/>
+                                            </IconButton>
+                                        </TypographyStyle>
+                                    </StackColStyle>
+                                </Grid>
+                            )
+                        }
                     </Grid>
                 </FirstGridStyle>
                 <Grid item xs={12} sm={12} md={4} align="right">
@@ -178,7 +185,7 @@ export default function TransactionOrderDetail({ item }) {
                         </tbody>
                     </table>
                     <Button
-                        to='#'
+                        to={'/explorer/transaction/'.concat(to)}
                         size="small"
                         color="inherit"
                         component={RouterLink}
