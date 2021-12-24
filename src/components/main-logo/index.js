@@ -5,12 +5,12 @@ import roundArrowRightAlt from '@iconify/icons-ic/round-arrow-right-alt';
 import { useTheme, styled } from '@mui/material/styles';
 import { Box, Link, Container, Typography, Stack } from '@mui/material';
 // components
-import { varFadeInUp, varWrapEnter, varFadeInDown } from '../animate';
+import { varFadeInUp, varWrapEnter, varFadeInDown, varFadeIn } from '../animate';
 //
 
 const RootStyle = styled('div')(({ theme }) => ({
-  padding: theme.spacing(3, 0, 6),
-//   backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800]
+  padding: theme.spacing(3, 0, 1)
+  //   backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800]
 }));
 
 export default function MainLogo() {
@@ -27,9 +27,9 @@ export default function MainLogo() {
             justifyContent: { md: 'space-between' }
           }}
         >
-            <motion.div variants={varFadeInDown} style={{margin:'auto', display:'table'}}>
-              <Box component="img" src="/static/logo.svg" sx={{ width: 220 }} />
-            </motion.div>
+          <motion.div variants={varFadeIn} style={{ margin: 'auto', display: 'table' }}>
+            <Box component="img" src="/static/logo-gif.gif" sx={{ width: 220 }} />
+          </motion.div>
         </Container>
       </motion.div>
     </RootStyle>
