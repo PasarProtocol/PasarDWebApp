@@ -40,7 +40,8 @@ export default function StatisticPanel() {
                   transition: '0.8s ease-out'
                 }}
                 duration={1000}
-                formatValue={(n) => n.toFixed(0).toLocaleString('en') + plusSign('+')}
+                formatValue={(n) => n.toLocaleString('en') + plusSign('+')}
+                stepPrecision={0}
               />
             }
             index={1}
@@ -63,7 +64,8 @@ export default function StatisticPanel() {
                   transition: '0.8s ease-out'
                 }}
                 duration={1000}
-                formatValue={(n) => n.toFixed(0).toLocaleString('en') + plusSign('+')}
+                formatValue={(n) => n.toLocaleString('en') + plusSign('+')}
+                stepPrecision={0}
               />
             }
             index={2}
@@ -80,7 +82,8 @@ export default function StatisticPanel() {
                   transition: '0.8s ease-out'
                 }}
                 duration={1000}
-                formatValue={(n) => n.toFixed(0).toLocaleString('en') + plusSign('+')}
+                formatValue={(n) => n.toLocaleString('en') + plusSign('+')}
+                stepPrecision={0}
               />
             }
             index={3}
@@ -98,6 +101,7 @@ export default function StatisticPanel() {
                 }}
                 duration={1000}
                 formatValue={(n) => n.toLocaleString('en') + plusSign('+')}
+                stepPrecision={0}
               />
             }
             index={4}
