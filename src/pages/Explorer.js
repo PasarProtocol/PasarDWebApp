@@ -7,9 +7,9 @@ import Page from '../components/Page';
 import { MHidden } from '../components/@material-extend';
 import MainLogo from '../components/main-logo';
 import SearchBox from '../components/SearchBox';
-import StatisticPanel from '../components/explorer/StatisticPanel'
-import NewestCollectibles from '../components/explorer/CollectionView/NewestCollectibles'
-import LatestTransactions from '../components/explorer/CollectionView/LatestTransactions'
+import StatisticPanel from '../components/explorer/StatisticPanel';
+import NewestCollectibles from '../components/explorer/CollectionView/NewestCollectibles';
+import LatestTransactions from '../components/explorer/CollectionView/LatestTransactions';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -52,18 +52,26 @@ export default function Explorer() {
     <RootStyle title="Explorer | PASAR">
       <MainLogo />
       <Container maxWidth="lg">
-        <Stack spacing={6} sx={{mb:3}}>
+        <Stack spacing={6} sx={{ mb: 3 }}>
           <MHidden width="mdDown">
-            <SearchBox/>
+            <SearchBox />
           </MHidden>
           <StatisticPanel />
         </Stack>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={6}>
-            <NewestCollectibles title="Newest Collectibles" dataList={newestCollectibles} isLoading={isLoadingCollectibles}/>
+            <NewestCollectibles
+              title="Newest Collectibles"
+              dataList={newestCollectibles}
+              isLoading={isLoadingCollectibles}
+            />
           </Grid>
           <Grid item xs={12} md={6} lg={6}>
-            <LatestTransactions title="Latest Transactions" dataList={latestTransactions} isLoading={isLoadingTransactions}/>
+            <LatestTransactions
+              title="Latest Transactions"
+              dataList={latestTransactions}
+              isLoading={isLoadingTransactions}
+            />
           </Grid>
         </Grid>
       </Container>
