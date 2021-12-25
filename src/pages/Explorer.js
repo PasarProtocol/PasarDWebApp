@@ -34,14 +34,14 @@ export default function Explorer() {
     setLoadingCollectibles(true);
     setLoadingTransactions(true);
     const resCollectibles = await fetch(
-      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pageSize=5'
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=1&pageSize=10`
     );
     const jsonCollectibles = await resCollectibles.json();
     setNewestCollectibles(jsonCollectibles.data.result);
     setLoadingCollectibles(false);
 
     const resTransactions = await fetch(
-      'https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=1&pageSize=5'
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=1&pageSize=10`
     );
     const jsonTransactions = await resTransactions.json();
     setLatestTransactions(jsonTransactions.data.result);
@@ -60,10 +60,20 @@ export default function Explorer() {
         </Stack>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={6}>
-            <NewestCollectibles title="Newest Collectibles" dataList={newestCollectibles} isLoading={isLoadingCollectibles}/>
+            <MHidden width="mdDown">
+              <NewestCollectibles title="Newest Collectibles" dataList={[...newestCollectibles]} isLoading={isLoadingCollectibles}/>
+            </MHidden>
+            <MHidden width="mdUp">
+              <NewestCollectibles title="Newest Collectibles" dataList={[...newestCollectibles].splice(0,5)} isLoading={isLoadingCollectibles}/>
+            </MHidden>
           </Grid>
           <Grid item xs={12} md={6} lg={6}>
-            <LatestTransactions title="Latest Transactions" dataList={latestTransactions} isLoading={isLoadingTransactions}/>
+            <MHidden width="mdDown">
+              <LatestTransactions title="Latest Transactions" dataList={[...latestTransactions]} isLoading={isLoadingTransactions}/>
+            </MHidden>
+            <MHidden width="mdUp">
+              <LatestTransactions title="Latest Transactions" dataList={[...latestTransactions].splice(0,5)} isLoading={isLoadingTransactions}/>
+            </MHidden>
           </Grid>
         </Grid>
       </Container>

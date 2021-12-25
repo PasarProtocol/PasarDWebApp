@@ -8,11 +8,11 @@ NewsItem.propTypes = {
     isLast: PropTypes.bool.isRequired
 };
   
-export default function NewsItem({ news, isLast }) {
+export default function NewsItem({ news, isLast, sx }) {
     const { image, title, description, postedAt, creator } = news;
-    const sx = isLast?{}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2};
+    const style = isLast?{...sx}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2, ...sx};
     return (
-        <Stack direction="row" alignItems="center" spacing={2} sx={sx}>
+        <Stack direction="row" alignItems="center" spacing={2} sx={style}>
             <Box
                 component="img"
                 alt={title}

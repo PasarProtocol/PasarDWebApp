@@ -33,7 +33,17 @@ const FirstGridStyle = styled(Grid)(({ theme, alignsm }) => ({
         borderRight: '1px solid #ddd'
     },
     [theme.breakpoints.down('md')]: {
+        paddingLeft: '0 !important',
+        marginLeft: theme.spacing(2),
         borderBottom: '1px solid #ddd'
+    }
+}));
+const SummaryGridStyle = styled(Grid)(({ theme }) => ({
+    [theme.breakpoints.up('md')]: {
+        textAlign: '-webkit-right'
+    },
+    [theme.breakpoints.down('md')]: {
+        textAlign: '-webkit-left'
     }
 }));
 const StackRowStyle = styled(Stack)(({ theme }) => ({
@@ -59,7 +69,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                 sx={{ width: 48, height: 48, borderRadius: 1, mr: 2, background: '#da3283', filter: 'invert(1)', p: 2 }}
             />
             <Grid container spacing={2}>
-                <FirstGridStyle item xs={12} sm={12} md={8} sx={{}}>
+                <FirstGridStyle item xs={12} sm={12} md={8}>
                     <Grid container>
                         <Grid item xs={12} sm={isAlone?8:12}>
                             <StackRowStyle>
@@ -132,7 +142,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                         }
                     </Grid>
                 </FirstGridStyle>
-                <Grid item xs={12} sm={12} md={4} align="right">
+                <SummaryGridStyle item xs={12} sm={12} md={4}>
                     <Typography variant="h4" sx={{lineHeight: 1}}>
                         Transaction Summary
                     </Typography>
@@ -193,7 +203,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                     >
                         See more
                     </Button>
-                </Grid>
+                </SummaryGridStyle>
             </Grid>
         </RootStyle>
     );
