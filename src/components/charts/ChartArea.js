@@ -42,8 +42,8 @@ export default function ChartArea() {
   };
   return (
     <div>
-      <StackStyle sx={{ mb: 2 }}>
-          <CardHeader title="964 ELA" subheader="Nov 12th, 2021" sx={{p: 0, pl: 2}}
+      <StackStyle>
+          <CardHeader title="964 ELA" subheader="Nov 12th, 2021" sx={{p: 0, px: 2}}
             action={
               <Select
                 defaultValue={1}
@@ -57,7 +57,7 @@ export default function ChartArea() {
               </Select>
             }
           />
-          <div style={{flex:1, textAlign: 'right'}}>
+          <div style={{flex:1, textAlign: 'right', paddingRight: 16}}>
             <ToggleButtonGroup value={period} exclusive onChange={handlePeriod}>
               <ToggleButton value="d">1D</ToggleButton>
               <ToggleButton value="w">1W</ToggleButton>

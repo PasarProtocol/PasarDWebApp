@@ -19,6 +19,7 @@ import ShowSelect from '../../components/pagination/ShowSelect';
 import TransactionListItem from '../../components/explorer/TransactionList/TransactionListItem'
 import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail'
 import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
+import CopyButton from '../../components/CopyButton';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -55,7 +56,7 @@ export default function AddressDetail() {
   React.useEffect(async () => {
     setLoadingTransactions(true);
     const resTransactions = await fetch(
-      `https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}`
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}`
     );
     const jsonTransactions = await resTransactions.json();
     setPages(Math.ceil(jsonTransactions.data.total/showCount));
@@ -88,9 +89,12 @@ export default function AddressDetail() {
   return (
     <RootStyle title="Transaction | PASAR">
       <Container maxWidth="lg">
-        <Typography variant="h4" sx={{ mb: 2, overflowWrap: 'break-word' }}>
-            {params.transaction}
-        </Typography>
+        <Stack sx={{mb: 2, flexDirection: 'row'}}>
+          <Typography variant="h4" sx={{ width: "auto" }} noWrap>
+              {params.transaction}
+          </Typography>
+          <CopyButton/>
+        </Stack>
         {isLoadingTransactions && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
         <Grid container spacing={2}>
           <Grid item xs={12}>

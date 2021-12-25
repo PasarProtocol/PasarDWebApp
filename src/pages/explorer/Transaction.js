@@ -48,7 +48,7 @@ export default function Transaction() {
   React.useEffect(async () => {
     setLoadingTransactions(true);
     const resTransactions = await fetch(
-      `https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}`
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}`
     );
     const jsonTransactions = await resTransactions.json();
     setPages(Math.ceil(jsonTransactions.data.total/showCount));

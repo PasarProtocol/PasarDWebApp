@@ -8,6 +8,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import mockData from '../../utils/mock-data';
 //
 import { CarouselControlsPaging2 } from './controls';
+import { getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -91,12 +92,14 @@ export default function CarouselCustom({detail}) {
       sx: { mt: 3 }
     })
   };
-
+  const creatimestamp = getTime(detail.createTime)
+  const updatimestamp = getTime(detail.updateTime)
+  const detailInfo = {...detail, createTime: `${creatimestamp.date} ${creatimestamp.time}`, updateTime: `${updatimestamp.date} ${updatimestamp.time}`}
   return (
     <RootStyle>
       <Slider ref={carouselRef} {...settings}>
         {DETAIL_CAROUSELS.map((page, index) => (
-          <CarouselItem key={index} page={page} detail={detail}/>
+          <CarouselItem key={index} page={page} detail={detailInfo}/>
         ))}
       </Slider>
     </RootStyle>

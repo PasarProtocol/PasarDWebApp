@@ -43,7 +43,7 @@ export default function Collectible() {
   React.useEffect(async () => {
     setLoadingCollectibles(true);
     const resCollectibles = await fetch(
-      `https://assist.trinity-feeds.app/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}`
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}`
     );
     const jsonCollectibles = await resCollectibles.json();
     setPages(Math.ceil(jsonCollectibles.data.total/showCount));
@@ -51,7 +51,7 @@ export default function Collectible() {
     setLoadingCollectibles(false);
   }, [page, showCount]);
   const changeShowCount = (event) => {setShowCount(event.target.value)};
-
+  
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">
@@ -77,11 +77,10 @@ export default function Collectible() {
                         <CollectibleListItem
                             item={{
                                 image: getThumbnail(item.thumbnail),
-                                timestamp: getTime(item.createTime),
+                                createTime: item.createTime,
                                 name: item.name,
-                                tokenIdHex: reduceHexAddress(item.tokenIdHex),
-                                gasfee: (item.royalties / 10 ** 8).toFixed(7),
-                                value: item.value!==undefined?item.value:0
+                                tokenIdHex: item.tokenIdHex,
+                                holder: item.holder
                             }}
                         />
                     </PaperRecord>

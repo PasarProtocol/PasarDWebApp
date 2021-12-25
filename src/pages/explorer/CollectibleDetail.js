@@ -58,7 +58,7 @@ export default function CollectibleDetail() {
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   React.useEffect(async () => {
     const resCollectible = await fetch(
-      `https://assist.trinity-feeds.app/sticker/api/v1/search?key=${params.collection}`
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/search?key=${params.collection}`
     );
     const jsonCollectible = await resCollectible.json();
     if(jsonCollectible.data.result.length){
@@ -87,7 +87,7 @@ export default function CollectibleDetail() {
             </PaperStyle>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <PaperStyle sm={{height: '100%'}}>
+            <PaperStyle sm={{height: '100%', p: '15px 32px'}}>
               <Typography variant="h5" sx={{ my: 1 }}>Collectible Detail</Typography>
               <CarouselCustom detail={collectible}/>
             </PaperStyle>
@@ -101,7 +101,7 @@ export default function CollectibleDetail() {
                 boxShadow: (theme) => theme.customShadows.z1
               }}
             >
-              <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
+              <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
                 <Typography variant="h5">Analytics</Typography>
               </AccordionSummary>
               <AccordionDetails>
