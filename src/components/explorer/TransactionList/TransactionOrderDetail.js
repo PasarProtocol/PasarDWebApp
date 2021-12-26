@@ -39,11 +39,10 @@ const FirstGridStyle = styled(Grid)(({ theme, alignsm }) => ({
     }
 }));
 const SummaryGridStyle = styled(Grid)(({ theme }) => ({
-    [theme.breakpoints.up('md')]: {
-        textAlign: '-webkit-right'
-    },
-    [theme.breakpoints.down('md')]: {
-        textAlign: '-webkit-left'
+    '& .MuiButton-root': {
+        [theme.breakpoints.up('md')]: {
+            float: 'right'
+        },
     }
 }));
 const StackRowStyle = styled(Stack)(({ theme }) => ({
@@ -146,7 +145,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                     <Typography variant="h4" sx={{lineHeight: 1}}>
                         Transaction Summary
                     </Typography>
-                    <table style={{marginTop: 5}}>
+                    <table style={{marginTop: 5, width: '100%'}}>
                         <tbody>
                             <tr>
                                 <td>

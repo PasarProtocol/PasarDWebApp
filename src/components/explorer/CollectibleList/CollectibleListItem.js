@@ -32,7 +32,7 @@ export default function CollectibleListItem({ item }) {
                         <Typography variant="body2" sx={{ color: 'text.secondary', width: "auto" }} align="left" noWrap>
                             Creator : {holder}
                         </Typography>
-                        <CopyButton/>
+                        <CopyButton text={holder}/>
                     </Stack>
                 </Grid>
                 <Grid item xs={6}>

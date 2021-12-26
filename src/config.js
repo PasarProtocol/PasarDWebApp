@@ -22,3 +22,5 @@ export const auth0Config = {
 export const mapConfig = process.env.REACT_APP_MAP_MAPBOX;
 
 export const googleAnalyticsConfig = process.env.REACT_APP_GA_MEASUREMENT_ID;
+
+export const defaultContract = "0x020c7303664bc88ae92cE3D380BF361E03B78B81";

@@ -15,6 +15,7 @@ import { CarouselCustom } from '../../components/carousel';
 import PaperRecord from '../../components/PaperRecord';
 import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail'
 import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
+import DateOrderSelect from '../../components/DateOrderSelect';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -124,17 +125,7 @@ export default function CollectibleDetail() {
                   >
                     <MenuItem value={1}>All</MenuItem>
                   </Select>
-                  <Select
-                    defaultValue={1}
-                    value={1}
-                    onChange={()=>{}}
-                    inputProps={{ 'aria-label': 'Without label' }}
-                    size="small"
-                    sx={{mx: 1}}
-                  >
-                    <MenuItem value={1}>Oldest</MenuItem>
-                    <MenuItem value={2}>Newest</MenuItem>
-                  </Select>
+                  <DateOrderSelect/>
                 </Typography>
               </Grid>
               <Grid item xs={12}>

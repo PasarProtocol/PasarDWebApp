@@ -12,6 +12,7 @@ import ShowSelect from '../../components/pagination/ShowSelect';
 import Pagination from '../../components/pagination';
 import PaperRecord from '../../components/PaperRecord';
 import LoadingWrapper from '../../components/LoadingWrapper';
+import DateOrderSelect from '../../components/DateOrderSelect';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -57,7 +58,8 @@ export default function Collectible() {
       <Container maxWidth="lg">
         <StackStyle sx={{ mb: 2 }}>
             <Typography variant="h4" sx={{flex:1}}>
-                Newest Collectibles
+                All Collectibles
+                <DateOrderSelect/>
             </Typography>
             <Pagination page={page} pages={pages} onChange={setPage} />
         </StackStyle>
