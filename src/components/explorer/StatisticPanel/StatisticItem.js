@@ -1,8 +1,11 @@
+import React from 'react';
 // material
+import AnimatedNumber from 'react-animated-number';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Typography, Grid, Card, Stack } from '@mui/material';
 // ----------------------------------------------------------------------
+const apikey = ['gettv', 'nftnumber', 'relatednftnum', 'walletaddressnum']
 const RootStyle = styled('div')(({ theme, index }) => {
   let sm = {};
   if(index%2===0)
@@ -20,10 +23,26 @@ const RootStyle = styled('div')(({ theme, index }) => {
   }
 });
 export default function StatisticItem(props) {
+  const [realData, setRealData] = React.useState(0);
+  const api = apikey[props.index-1];
+  React.useEffect(async () => {
+    const resRealData = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/${api}`
+    );
+    const jsonData = await resRealData.json();
+    setTimeout(()=>{setRealData(jsonData.data)}, 100)
+  }, []);
+
   return (
     <RootStyle index={props.index}>
         <Stack spacing={2}>
-            <h2>{props.value}</h2>
+            <AnimatedNumber
+                component="h2"
+                value={realData}
+                duration={1000}
+                formatValue={(n) => n.toLocaleString('en').concat(' +')}
+                stepPrecision={0}
+            />
             <Typography variant="body" sx={{ color: 'text.secondary' }}>
                 {props.children} {props.title}
             </Typography>
