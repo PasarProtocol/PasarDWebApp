@@ -6,6 +6,7 @@ import GlobalStyles from './theme/globalStyles';
 // hooks
 import useAuth from './hooks/useAuth';
 // components
+import NotistackProvider from './components/NotistackProvider';
 import ThemePrimaryColor from './components/ThemePrimaryColor';
 import ThemeLocalization from './components/ThemeLocalization';
 import LoadingScreen, { ProgressBarStyle } from './components/LoadingScreen';
@@ -19,10 +20,12 @@ export default function App() {
     <ThemeConfig>
       <ThemePrimaryColor>
         <ThemeLocalization>
-          <GlobalStyles />
-          <ProgressBarStyle />
-          <Router />
-          {/* {isInitialized ? <Router /> : <LoadingScreen />} */}
+            <NotistackProvider>
+              <GlobalStyles />
+              <ProgressBarStyle />
+              <Router />
+              {/* {isInitialized ? <Router /> : <LoadingScreen />} */}
+            </NotistackProvider>
         </ThemeLocalization>
       </ThemePrimaryColor>
     </ThemeConfig>

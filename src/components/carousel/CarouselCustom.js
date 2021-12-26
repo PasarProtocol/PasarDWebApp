@@ -9,12 +9,13 @@ import mockData from '../../utils/mock-data';
 //
 import { CarouselControlsPaging2 } from './controls';
 import { getTime } from '../../utils/common';
+import {defaultContract} from '../../config'
 
 // ----------------------------------------------------------------------
 
 const CAROUSEL_ICONS = ['user', 'description', 'hammer', 'diamond', 'hash', 'cash-hand', 'basket', 'tag', 'calendar-hammer', 'calendar-market', 'contract-address', 'blockchain', 'marketplace']
 const CAROUSEL_TITLE = ['Name', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Sale Type', 'Created Date', 'Date on Market', 'Contract Address', 'Blockchain', 'Marketplace']
-const CAROUSEL_KEYS = ['name', 'description', 'holder', 'royaltyOwner', 'tokenIdHex', 'royalties', 'quantity', 'type', 'createTime', 'updateTime', '', '', '']
+const CAROUSEL_KEYS = ['name', 'description', 'holder', 'royaltyOwner', 'tokenIdHex', 'royalties', 'quantity', 'type', 'createTime', 'updateTime', 'contractAddr', 'blockchain', '']
 
 const DETAIL_CAROUSELS = [...Array(3)].map((_, index1) => {
   const pageSize = index1<2?5:3;
@@ -94,7 +95,12 @@ export default function CarouselCustom({detail}) {
   };
   const creatimestamp = getTime(detail.createTime)
   const updatimestamp = getTime(detail.updateTime)
-  const detailInfo = {...detail, createTime: `${creatimestamp.date} ${creatimestamp.time}`, updateTime: `${updatimestamp.date} ${updatimestamp.time}`}
+  const detailInfo = {
+    ...detail,
+    createTime: `${creatimestamp.date} ${creatimestamp.time}`,
+    updateTime: `${updatimestamp.date} ${updatimestamp.time}`,
+    contractAddr: defaultContract,
+    blockchain: 'Elastos Smart Chain (ESC)'}
   return (
     <RootStyle>
       <Slider ref={carouselRef} {...settings}>
