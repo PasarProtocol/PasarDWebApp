@@ -22,6 +22,7 @@ import TransactionCollectibleDetail from '../../components/explorer/TransactionL
 import CopyButton from '../../components/CopyButton';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
+import InlineBox from '../../components/InlineBox';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -41,6 +42,9 @@ const StackStyle = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
+    '& .top-pagination': {
+      marginTop: theme.spacing(2)
+    }
   }
 }));
 
@@ -117,25 +121,31 @@ export default function AddressDetail() {
             </Accordion>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="h4" sx={{py: 2}}>
-              Collectible Record
-              <MethodSelect/>
-              <DateOrderSelect/>
+            <Typography sx={{py: 2}}>
+              <Typography variant="h4" sx={{py: 1, pr:1, display: 'inline-block'}}>
+                Collectible Record
+              </Typography>
+              <InlineBox>
+                <MethodSelect/>
+                <DateOrderSelect/>
+              </InlineBox>
               <FormControlLabel
                 control={<CustomSwitch onChange={handleChange}/>}
                 label="Show Details"
                 labelPlacement="start"
+                sx={{ml:0}}
               />
             </Typography>
             <StackStyle sx={{ mb: 2 }}>
               <div style={{flex:1}}>
-              <SearchBox sx={{width: 400}} outersx={{textAlign: 'left', flex: 1}} rootsx={{px: '0 !important'}} placeholder="Search record"/>
+                <SearchBox sx={{width: 400}} outersx={{textAlign: 'left', flex: 1}} rootsx={{px: '0 !important'}} placeholder="Search record"/>
               </div>
-              <Pagination page={page} pages={pages} onChange={setPage} />
+              <div className="top-pagination">
+                <Pagination page={page} pages={pages} onChange={setPage} />
+              </div>
             </StackStyle>
             {isLoadingTransactions && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
-            <Scrollbar>
-                <Grid container spacing={2}>
+            <Grid container spacing={2}>
                 {transactions.map((item, key) => (
                     <Grid key={key} item xs={12}>
                       <Accordion 
@@ -189,8 +199,7 @@ export default function AddressDetail() {
                       </Accordion>
                     </Grid>
                 ))}
-                </Grid>
-            </Scrollbar>
+            </Grid>
             {
               transactions.length>0&&
               <StackStyle sx={{ mt: 2, display: 'block' }}>

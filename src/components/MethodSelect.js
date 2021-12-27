@@ -36,14 +36,14 @@ export default function MethodSelect() {
   };
 
   return (
-    <FormControl sx={{ml: (theme)=>theme.spacing(1)}}>
+    <FormControl>
       <Select
         labelId="mutiple-select-label"
         multiple
         value={selected}
         onChange={handleChange}
         displayEmpty={1&&true}
-        renderValue={(selected) => "method"}
+        renderValue={(selected) => "Method"}
         size="small"
         MenuProps={MenuProps}
       >

@@ -16,6 +16,7 @@ import TransactionOrderDetail from '../../components/explorer/TransactionList/Tr
 import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
+import InlineBox from '../../components/InlineBox';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -113,10 +114,14 @@ export default function CollectibleDetail() {
           <Grid item xs={12}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Typography variant="h4" sx={{flex:1}}>
-                  Transaction Record
-                  <MethodSelect/>
-                  <DateOrderSelect/>
+                <Typography sx={{flex:1}}>
+                  <Typography variant="h4" sx={{py: 1, pr:1, display: 'inline-block'}}>
+                      Transaction Record
+                  </Typography>
+                  <InlineBox>
+                    <MethodSelect/>
+                    <DateOrderSelect/>
+                  </InlineBox>
                 </Typography>
               </Grid>
               <Grid item xs={12}>

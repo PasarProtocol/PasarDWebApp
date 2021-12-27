@@ -40,7 +40,7 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx }) => ({
         borderWidth: `1px !important`
     },
     input: {
-        padding: 10
+        padding: 8
     }
 }));
 

@@ -17,6 +17,7 @@ import LoadingWrapper from '../../components/LoadingWrapper';
 import CustomSwitch from '../../components/custom-switch';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
+import InlineBox from '../../components/InlineBox';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -35,6 +36,9 @@ const StackStyle = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
+    '& .top-pagination': {
+      marginTop: theme.spacing(2)
+    }
   }
 }));
 // ----------------------------------------------------------------------
@@ -84,16 +88,23 @@ export default function Transaction() {
       <Container maxWidth="lg">
         <StackStyle sx={{ mb: 2 }}>
             <Typography variant="h4" sx={{flex:1}}>
-                All Transactions
-                <MethodSelect/>
-                <DateOrderSelect/>
+                <Typography variant="h4" sx={{pb: 1, pr:1, display: 'inline-block'}}>
+                  All Transactions
+                </Typography>
+                <InlineBox>
+                  <MethodSelect/>
+                  <DateOrderSelect/>
+                </InlineBox>
                 <FormControlLabel
                   control={<CustomSwitch onChange={handleChange}/>}
                   label="Show Details"
                   labelPlacement="start"
+                  sx={{ml:0}}
                 />
             </Typography>
-            <Pagination page={page} pages={pages} onChange={setPage} />
+            <div className="top-pagination">
+              <Pagination page={page} pages={pages} onChange={setPage} />
+            </div>
         </StackStyle>
         {isLoadingTransactions && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
         <Scrollbar>
