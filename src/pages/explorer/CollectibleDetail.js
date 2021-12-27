@@ -45,7 +45,7 @@ const PaperStyle = (props) => (
         border: '1px solid',
         borderColor: 'action.disabledBackground',
         boxShadow: (theme) => theme.customShadows.z1,
-        p: '1.2vw',
+        p: '20px',
         ...props.sm
     }}
   >
@@ -53,11 +53,13 @@ const PaperStyle = (props) => (
   </Paper>
 )
 // ----------------------------------------------------------------------
-
+const DefaultPageSize = 5;
 export default function CollectibleDetail() {
   const params = useParams(); // params.collection
   const [collectible, setCollectible] = React.useState({});
+  const [detailPageSize, setDetailPageSize] = React.useState(DefaultPageSize);
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
+  const imageRef = React.useRef();
   React.useEffect(async () => {
     const resCollectible = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/search?key=${params.collection}`
@@ -67,8 +69,28 @@ export default function CollectibleDetail() {
       setCollectible(jsonCollectible.data.result[0]);
     }
     setLoadingCollectible(false);
-  }, []);
 
+    
+    function handleResize() {
+      const { innerWidth: width } = window;
+      if(width<600) // in case of xs
+        setDetailPageSize(DefaultPageSize)
+      else {
+        const pgsize = Math.floor((imageRef.current.clientHeight - 42 - 48) / 81)
+        // if(pgsize>DefaultPageSize)
+          setDetailPageSize(pgsize)
+      }
+    }
+    window.addEventListener('resize', handleResize);
+  }, []);
+  const onImgLoad = ({target:img}) => {
+    const { innerWidth: width } = window;
+    if(width<600) // in case of xs
+      return;
+    const pgsize = Math.floor((img.offsetHeight - 42 - 48) / 81)
+    // if(pgsize>DefaultPageSize)
+      setDetailPageSize(pgsize)
+  }
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">
@@ -83,15 +105,17 @@ export default function CollectibleDetail() {
                   component="img"
                   alt={collectible.name}
                   src={getThumbnail(collectible.thumbnail)}
+                  onLoad={onImgLoad}
                   onError={(e) => e.target.src = '/static/circle-loading.svg'}
                   sx={{ width: '100%', borderRadius: 1, mr: 2 }}
+                  ref={imageRef}
               />
             </PaperStyle>
           </Grid>
           <Grid item xs={12} sm={6}>
             <PaperStyle sm={{height: '100%', p: '15px 32px'}}>
               <Typography variant="h5" sx={{ my: 1 }}>Collectible Detail</Typography>
-              <CarouselCustom detail={collectible}/>
+              <CarouselCustom pgsize={detailPageSize} detail={collectible}/>
             </PaperStyle>
           </Grid>
           <Grid item xs={12}>
@@ -114,7 +138,7 @@ export default function CollectibleDetail() {
           <Grid item xs={12}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Typography sx={{flex:1}}>
+                <Typography component="div" sx={{flex:1}}>
                   <Typography variant="h4" sx={{py: 1, pr:1, display: 'inline-block'}}>
                       Transaction Record
                   </Typography>
