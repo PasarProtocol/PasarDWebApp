@@ -43,7 +43,7 @@ function TransItem({ trans, isLast }) {
               </Typography>
           </Box>
           <Box>
-              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
+              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary', pb: '5px' }} align="right" noWrap>
                   {formatDistance(postedAt, new Date(), { addSuffix: true }).replace("about","").trim()}
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>

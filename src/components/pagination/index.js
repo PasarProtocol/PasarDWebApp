@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 const ArrowButton = styled(Button)(({ theme }) => ({
   minWidth: 20,
   padding: '6px 8px',
-  margin: theme.spacing(.7)
+  margin: '1.5px 6px'
 }));
 const DivStyle = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
