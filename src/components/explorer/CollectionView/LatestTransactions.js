@@ -26,10 +26,7 @@ function TransItem({ trans, isLast }) {
                 alt=""
                 src={image}
                 onError={(e) => e.target.src = '/static/broken-image.svg'}
-                sx={{
-                  width: 48, height: 48, borderRadius: 1, cursor: 'pointer', transition: 'transform .5s ease-out',
-                  '&:hover': { transform: 'scale(1.2)' }
-                }}
+                sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer' }}
             />
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>

@@ -25,15 +25,14 @@ function CollectibleItem({ news, isLast, sx }) {
                 alt={title}
                 src={image}
                 onError={(e) => e.target.src = '/static/broken-image.svg'}
-                sx={{
-                  width: 48, height: 48, borderRadius: 1, cursor: 'pointer', transition: 'transform .5s ease-out',
-                  '&:hover': { transform: 'scale(1.2)' }
-                }}
+                sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer' }}
             />
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Typography color="inherit" variant="subtitle2" noWrap>
+                <Link href={`/explorer/collectible/detail/${tokenId}`} sx={{borderRadius: 1}} >
                   {title}
+                </Link>
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
                 <Link href={`/explorer/transaction/${creator}`} sx={{borderRadius: 1}} >
