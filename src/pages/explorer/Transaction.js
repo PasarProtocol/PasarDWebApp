@@ -15,6 +15,8 @@ import ShowSelect from '../../components/pagination/ShowSelect';
 import Pagination from '../../components/pagination';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import CustomSwitch from '../../components/custom-switch';
+import DateOrderSelect from '../../components/DateOrderSelect';
+import MethodSelect from '../../components/MethodSelect';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -82,7 +84,9 @@ export default function Transaction() {
       <Container maxWidth="lg">
         <StackStyle sx={{ mb: 2 }}>
             <Typography variant="h4" sx={{flex:1}}>
-                Latest Transactions
+                All Transactions
+                <MethodSelect/>
+                <DateOrderSelect/>
                 <FormControlLabel
                   control={<CustomSwitch onChange={handleChange}/>}
                   label="Show Details"
@@ -132,7 +136,7 @@ export default function Transaction() {
                             }}
                         />
                         ):(
-                          <TransactionCollectibleDetail
+                        <TransactionCollectibleDetail
                             item={{
                                 timestamp: getTime(item.createTime),
                                 tokenIdHex: reduceHexAddress(item.tokenIdHex),

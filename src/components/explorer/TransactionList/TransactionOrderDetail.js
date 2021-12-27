@@ -194,7 +194,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                         </tbody>
                     </table>
                     <Button
-                        to={'/explorer/transaction/'.concat(to)}
+                        to={'/explorer/transaction/detail/'.concat(to)}
                         size="small"
                         color="inherit"
                         component={RouterLink}

@@ -53,7 +53,9 @@ export default function ChartArea() {
                 size="small"
                 sx={{mx: 1}}
               >
-                <MenuItem value={1}>Transaction Volume</MenuItem>
+                <MenuItem value={1}>Royalties Volume</MenuItem>
+                <MenuItem value={2}>Sales Volume</MenuItem>
+                <MenuItem value={3}>Transaction Volume</MenuItem>
               </Select>
             }
           />

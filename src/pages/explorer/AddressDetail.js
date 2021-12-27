@@ -21,6 +21,7 @@ import TransactionOrderDetail from '../../components/explorer/TransactionList/Tr
 import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
 import CopyButton from '../../components/CopyButton';
 import DateOrderSelect from '../../components/DateOrderSelect';
+import MethodSelect from '../../components/MethodSelect';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -118,19 +119,7 @@ export default function AddressDetail() {
           <Grid item xs={12}>
             <Typography variant="h4" sx={{py: 2}}>
               Collectible Record
-              <Select
-                defaultValue={1}
-                value={1}
-                onChange={()=>{}}
-                inputProps={{ 'aria-label': 'Without label' }}
-                size="small"
-                sx={{mx: 1}}
-              >
-                <MenuItem value={1}>All</MenuItem>
-                <MenuItem value={2}>Create</MenuItem>
-                <MenuItem value={3}>Transfer</MenuItem>
-                <MenuItem value={4}>Delete</MenuItem>
-              </Select>
+              <MethodSelect/>
               <DateOrderSelect/>
               <FormControlLabel
                 control={<CustomSwitch onChange={handleChange}/>}

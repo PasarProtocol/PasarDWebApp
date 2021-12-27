@@ -8,7 +8,6 @@ import { Card, Container, Accordion, AccordionSummary, AccordionDetails, Stack, 
 // components
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
-import Scrollbar from '../../components/Scrollbar';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import { ChartArea } from '../../components/charts';
 import { CarouselCustom } from '../../components/carousel';
@@ -16,6 +15,7 @@ import PaperRecord from '../../components/PaperRecord';
 import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail'
 import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
 import DateOrderSelect from '../../components/DateOrderSelect';
+import MethodSelect from '../../components/MethodSelect';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -115,16 +115,7 @@ export default function CollectibleDetail() {
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{flex:1}}>
                   Transaction Record
-                  <Select
-                    defaultValue={1}
-                    value={1}
-                    onChange={()=>{}}
-                    inputProps={{ 'aria-label': 'Without label' }}
-                    size="small"
-                    sx={{mx: 1}}
-                  >
-                    <MenuItem value={1}>All</MenuItem>
-                  </Select>
+                  <MethodSelect/>
                   <DateOrderSelect/>
                 </Typography>
               </Grid>
