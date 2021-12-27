@@ -17,15 +17,6 @@ const CAROUSEL_ICONS = ['user', 'description', 'hammer', 'diamond', 'hash', 'cas
 const CAROUSEL_TITLE = ['Name', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Sale Type', 'Created Date', 'Date on Market', 'Contract Address', 'Blockchain', 'Marketplace']
 const CAROUSEL_KEYS = ['name', 'description', 'holder', 'royaltyOwner', 'tokenIdHex', 'royalties', 'quantity', 'type', 'createTime', 'updateTime', 'contractAddr', 'blockchain', '']
 
-const DETAIL_CAROUSELS = [...Array(3)].map((_, index1) => {
-  const pageSize = index1<2?5:3;
-  return [...Array(pageSize)].map((_, index2) => ({
-    icon: CAROUSEL_ICONS[index1*5+index2],
-    title: CAROUSEL_TITLE[index1*5+index2],
-    key: CAROUSEL_KEYS[index1*5+index2]
-  }))
-});
-
 const RootStyle = styled('div')(({ theme }) => ({
   position: 'relative',
   '& .slick-list': {
@@ -78,7 +69,17 @@ function CarouselItem({ page, detail }) {
   )
 }
 
-export default function CarouselCustom({detail}) {
+export default function CarouselCustom({pgsize, detail}) {
+  const pgcount = Math.floor(CAROUSEL_ICONS.length/pgsize)+1
+  const DETAIL_CAROUSELS = [...Array(pgcount)].map((_, index1) => {
+    const pageSize = index1===(pgcount-1)?CAROUSEL_ICONS.length%pgsize:pgsize;
+    return [...Array(pageSize)].map((_, index2) => ({
+      icon: CAROUSEL_ICONS[index1*pgsize+index2],
+      title: CAROUSEL_TITLE[index1*pgsize+index2],
+      key: CAROUSEL_KEYS[index1*pgsize+index2]
+    }))
+  });
+
   const theme = useTheme();
   const carouselRef = useRef();
 

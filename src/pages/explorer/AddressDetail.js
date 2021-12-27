@@ -121,7 +121,7 @@ export default function AddressDetail() {
             </Accordion>
           </Grid>
           <Grid item xs={12}>
-            <Typography sx={{py: 2}}>
+            <Typography component="div" sx={{py: 2}}>
               <Typography variant="h4" sx={{py: 1, pr:1, display: 'inline-block'}}>
                 Collectible Record
               </Typography>

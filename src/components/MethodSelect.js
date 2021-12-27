@@ -15,9 +15,11 @@ const options = [
 const MenuProps = {
     anchorOrigin: {
       vertical: "bottom",
+      horizontal: "left"
     },
     transformOrigin: {
       vertical: "top",
+      horizontal: "left"
     },
     variant: "menu"
 };
