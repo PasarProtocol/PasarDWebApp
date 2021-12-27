@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 export default function CopyButton({text}){
     const { enqueueSnackbar } = useSnackbar();
     const onCopy = () => {
-        enqueueSnackbar('Copied', { variant: 'success' });
+        enqueueSnackbar('Copied to clipboard', { variant: 'success' });
     };
     return (
         <CopyToClipboard text={text} onCopy={onCopy}>
