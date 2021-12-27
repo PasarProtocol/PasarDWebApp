@@ -54,9 +54,11 @@ export default function Router() {
           children: [
             { element: <Explorer /> },
             { path: 'collectible', element: <Collectible /> },
-            { path: 'collectible/:collection', element: <CollectibleDetail /> },
+            { path: 'collectible/:collection', element: <Collectible /> },
+            { path: 'collectible/detail/:collection', element: <CollectibleDetail /> },
             { path: 'transaction', element: <Transaction /> },
-            { path: 'transaction/:transaction', element: <AddressDetail /> },
+            { path: 'transaction/:transaction', element: <Transaction /> },
+            { path: 'transaction/detail/:transaction', element: <AddressDetail /> },
           ]
         }
       ]
