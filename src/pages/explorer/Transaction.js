@@ -45,23 +45,25 @@ const StackStyle = styled(Stack)(({ theme }) => ({
 
 export default function Transaction() {
   const [transactions, setTransactions] = React.useState([]);
-  const [page, setPage] = React.useState(1);
   const [isExpanded, setExpandFlag] = React.useState(false);
   const [expanded, setExpandedList] = React.useState([]);
+  const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
   const [showCount, setShowCount] = React.useState(10);
+  const [methods, setMethods] = React.useState("");
+  const [isLatest, setLatest] = React.useState(1);
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
   React.useEffect(async () => {
     setLoadingTransactions(true);
     const resTransactions = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}`
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&latest=${isLatest}`
     );
     const jsonTransactions = await resTransactions.json();
     setPages(Math.ceil(jsonTransactions.data.total/showCount));
-    setTransactions(jsonTransactions.data.result);
+    setTransactions(jsonTransactions.data.results);
     expandAllIf(isExpanded);
     setLoadingTransactions(false);
-  }, [page, showCount]);
+  }, [page, showCount, methods, isLatest]);
 
   const changeShowCount = (event) => {setShowCount(event.target.value)};
 
@@ -83,17 +85,23 @@ export default function Transaction() {
       temp.push(key)
     setExpandedList(temp)
   }
+  const handleMethod = (selected)=>{
+    setMethods(selected)
+  }
+  const handleDateOrder = (selected)=>{
+    setLatest(selected)
+  }
   return (
     <RootStyle title="Transaction | PASAR">
       <Container maxWidth="lg">
         <StackStyle sx={{ mb: 2 }}>
-            <Typography variant="h4" sx={{flex:1}}>
+            <Typography component="div" sx={{flex:1}}>
                 <Typography variant="h4" sx={{pb: 1, pr:1, display: 'inline-block'}}>
                   All Transactions
                 </Typography>
                 <InlineBox>
-                  <MethodSelect/>
-                  <DateOrderSelect/>
+                  <MethodSelect onChange={handleMethod}/>
+                  <DateOrderSelect onChange={handleDateOrder}/>
                 </InlineBox>
                 <FormControlLabel
                   control={<CustomSwitch onChange={handleChange}/>}
@@ -107,63 +115,39 @@ export default function Transaction() {
             </div>
         </StackStyle>
         {isLoadingTransactions && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
-        <Scrollbar>
-            <Grid container spacing={2}>
-            {transactions.map((item, key) => (
-                <Grid key={key} item xs={12}>
-                  <Accordion 
-                    expanded={expanded.includes(key)}
-                    onClick={(e) => handleAccordClick(key)}
-                    sx={{
-                      border: '1px solid',
-                      borderColor: 'action.disabledBackground',
-                      boxShadow: (theme) => theme.customShadows.z1
-                    }}
-                  >
-                    <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
-                      <TransactionListItem
-                          item={{
-                              image: getThumbnail(item.thumbnail),
-                              postedAt: item.createTime*1000,
-                              name: item.name,
-                              tokenIdHex: reduceHexAddress(item.tokenIdHex),
-                              method: 'transfer',
-                          }}
-                      />
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {
-                        key%2===0?(
-                        <TransactionOrderDetail
-                            isAlone={false}
-                            item={{
-                                from: item.tokenIdHex,
-                                to: item.tokenIdHex,
-                                tokenIdHex: item.tokenIdHex,
-                                value: item.value!==undefined?item.value:0,
-                                gasfee: (item.royalties / 10 ** 8).toFixed(7),
-                                method: 'transfer',
-                                timestamp: getTime(item.createTime)
-                            }}
-                        />
-                        ):(
-                        <TransactionCollectibleDetail
-                            item={{
-                                timestamp: getTime(item.createTime),
-                                tokenIdHex: reduceHexAddress(item.tokenIdHex),
-                                gasfee: (item.royalties / 10 ** 8).toFixed(7),
-                                value: item.value!==undefined?item.value:0
-                            }}
-                        />
-                        )
-                      }
-                      
+        <Grid container spacing={2}>
+          {transactions.map((item, key) => (
+              <Grid key={key} item xs={12}>
+                <Accordion 
+                  expanded={expanded.includes(key)}
+                  onClick={(e) => handleAccordClick(key)}
+                  sx={{
+                    border: '1px solid',
+                    borderColor: 'action.disabledBackground',
+                    boxShadow: (theme) => theme.customShadows.z1
+                  }}
+                >
+                  <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
+                    <TransactionListItem
+                        item={{
+                            image: getThumbnail(item.asset),
+                            postedAt: item.timestamp*1000,
+                            name: item.name,
+                            txHash: item.tHash,
+                            method: item.event,
+                        }}
+                    />
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <TransactionOrderDetail
+                        isAlone={false}
+                        item={ item }
+                    />
                     </AccordionDetails>
-                  </Accordion>
-                </Grid>
-            ))}
-            </Grid>
-        </Scrollbar>
+                </Accordion>
+              </Grid>
+          ))}
+        </Grid>
         {
             transactions.length>0&&
             <StackStyle  sx={{ mt: 2, display: 'block' }}>

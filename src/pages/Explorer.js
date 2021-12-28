@@ -41,10 +41,10 @@ export default function Explorer() {
     setLoadingCollectibles(false);
 
     const resTransactions = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=1&pageSize=10`
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listTrans?pageNum=1&pageSize=10`
     );
     const jsonTransactions = await resTransactions.json();
-    setLatestTransactions(jsonTransactions.data.result);
+    setLatestTransactions(jsonTransactions.data.results);
     setLoadingTransactions(false);
   }, []);
 

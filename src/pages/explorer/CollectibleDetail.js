@@ -150,12 +150,16 @@ export default function CollectibleDetail() {
               </Grid>
               <Grid item xs={12}>
                 <PaperRecord>
-                  <TransactionCollectibleDetail
+                  <TransactionOrderDetail
+                    isAlone={1&&true}
                     item={{
-                        timestamp: getTime(new Date()/1000),
-                        tokenIdHex: reduceHexAddress("0x44016ed8638f5B517a5beC7a722A56d1DEBefef7"),
+                        from: "0x22016ed8638f5B517a5beC7a722A56d1DEBefef7",
+                        to: "0x33016ed8638f5B517a5beC7a722A56d1DEBefef7",
+                        txHash: "0x44016ed8638f5B517a5beC7a722A56d1DEBefef7",
+                        value: 100,
                         gasfee: (1000 / 10 ** 8).toFixed(7),
-                        value: 10
+                        method: 'Mint',
+                        timestamp: new Date()
                     }}
                   />
                 </PaperRecord>
@@ -167,11 +171,11 @@ export default function CollectibleDetail() {
                     item={{
                         from: "0x22016ed8638f5B517a5beC7a722A56d1DEBefef7",
                         to: "0x33016ed8638f5B517a5beC7a722A56d1DEBefef7",
-                        tokenIdHex: "0x44016ed8638f5B517a5beC7a722A56d1DEBefef7",
+                        txHash: "0x44016ed8638f5B517a5beC7a722A56d1DEBefef7",
                         value: 100,
                         gasfee: (1000 / 10 ** 8).toFixed(7),
-                        method: 'transfer',
-                        timestamp: getTime(new Date()/1000)
+                        method: 'CreateOrderForSale',
+                        timestamp: new Date()/1000
                     }}
                   />
                 </PaperRecord>

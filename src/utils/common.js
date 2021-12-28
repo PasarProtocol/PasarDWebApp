@@ -1,5 +1,5 @@
 // Get Abbrevation of hex addres //
-export const reduceHexAddress = strAddress => `${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`;
+export const reduceHexAddress = strAddress => strAddress?`${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`:'';
 
 // Get time from timestamp //
 export const getTime = timestamp => {
@@ -39,3 +39,91 @@ export const getElapsedTime = createdtimestamp => {
   strDate += ' ago';
   return strDate;
 };
+
+export const MethodList = [
+  {
+    method: 'Mint', 
+    color: '#C4C4C4', 
+    icon: 'hammer', 
+    detail: [
+      {description: 'New collectible created', field: null, copyable: false},
+      {description: 'By', field: 'from', copyable: true, ellipsis: true},
+    ]
+  },
+  {
+    method: 'SafeTransferFromWithMemo', 
+    color: '#2B86DA', 
+    icon: 'exchange', 
+    detail: [
+      {description: 'Collectible transferred to', field: 'to', copyable: true, ellipsis: true},
+      {description: 'By', field: 'from', copyable: true, ellipsis: true},
+    ]
+  },
+  {
+    method: 'SafeTransferFrom', 
+    color: '#789AB9', 
+    icon: 'exchange', 
+    detail: [
+      {description: 'Collectible transferred to', field: 'to', copyable: true, ellipsis: true},
+      {description: 'By', field: 'from', copyable: true, ellipsis: true},
+    ]
+  },
+  {
+    method: 'SetApprovalForAll', 
+    color: '#17E9C3', 
+    icon: 'stamp', 
+    detail: [
+      {description: 'Marketplace contract approved →', field: 'to', copyable: true, ellipsis: true},
+      {description: 'By', field: 'from', copyable: true, ellipsis: true},
+    ]
+  },
+  {
+    method: 'Burn', 
+    color: '#E96317', 
+    icon: 'trashcan', 
+    detail: [
+      {description: 'Collectible deleted from contract', field: 'from', copyable: true, ellipsis: true},
+      {description: 'By', field: 'to', copyable: true, ellipsis: true},
+    ]
+  },
+  {
+    method: 'CreateOrderForSale', 
+    color: '#5B25CD', 
+    icon: 'marketplace', 
+    detail: [
+      {description: 'Collectible listed on marketplace →', field: 'to', copyable: true, ellipsis: true},
+      {description: 'By', field: 'from', copyable: true, ellipsis: true},
+      {description: 'For a value of', field: 'price', copyable: false},
+    ]
+  },
+  {
+    method: 'BuyOrder', 
+    color: '#25CD7C', 
+    icon: 'basket', 
+    detail: [
+      {description: 'Collectible purchased from', field: 'from', copyable: true, ellipsis: true},
+      {description: 'By', field: 'to', copyable: true, ellipsis: true},
+      {description: 'For a value of', field: 'price', copyable: false},
+      {description: 'With a total tx fee of', field: 'totalfee', copyable: false},
+    ]
+  },
+  {
+    method: 'CancelOrder', 
+    color: '#D60000', 
+    icon: 'remove', 
+    detail: [
+      {description: 'Collectible removed from marketplace →', field: 'from', copyable: true, ellipsis: true},
+      {description: 'By', field: 'to', copyable: true, ellipsis: true},
+    ]
+  },
+  {
+    method: 'ChangeOrderPrice', 
+    color: '#CD6B25', 
+    icon: 'tag', 
+    detail: [
+      {description: 'Collectible value updated to', field: 'data.new', copyable: false},
+      {description: 'By', field: 'from', copyable: true, ellipsis: true},
+      {description: 'From initial value of', field: 'data.old', copyable: false},
+    ]
+  }
+]
