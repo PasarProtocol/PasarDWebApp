@@ -25,13 +25,13 @@ export default function StatisticPanel() {
           </StatisticItem>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="🖼 ️Collective Assets" value="1,000 +" index={2}/>
+          <StatisticItem title="🖼 ️Collective Assets" index={2}/>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="✉️ Transactions" value="2,000 +" index={3}/>
+          <StatisticItem title="✉️ Transactions" index={3}/>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="👛 Wallet Address" value="50 +" index={4}/>
+          <StatisticItem title="👛 Wallet Address" index={4}/>
         </Grid>
       </Grid>
     </RootStyle>
