@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import MethodLabel from '../../MethodLabel';
 import CopyButton from '../../CopyButton';
-import { reduceHexAddress } from '../../../utils/common';
+import { MethodList, reduceHexAddress, getTime } from '../../../utils/common';
 
 TransactionOrderDetail.propTypes = {
     item: PropTypes.object.isRequired
@@ -58,53 +58,54 @@ const StackColStyle = styled(Stack)(({ theme }) => ({
     }
 }));
 export default function TransactionOrderDetail({ isAlone, item }) {
-    const { from, to, value, method, timestamp, gasFee, tokenIdHex } = item;
+    const { event: method, tHash } = item
+    const timestamp = getTime(item.timestamp)
+    const price = parseFloat((item.price/ 10 ** 18).toFixed(2))
+    const royalties = parseFloat((item.royalties/ 10 ** 18).toFixed(7))
+    const royaltyFee = item.royaltyFee?parseFloat((item.royaltyFee/ 10 ** 18).toFixed(7)):0
+    let methodItem = MethodList.find((item)=>item.method===method)
+    if(!methodItem)
+        methodItem = {color: 'grey', icon: 'tag', detail: []}
     return (
         <RootStyle>
             <Box
                 component="img"
                 alt=""
-                src='/static/exchange.svg'
-                sx={{ width: 48, height: 48, borderRadius: 1, mr: 2, background: '#da3283', filter: 'invert(1)', p: 2 }}
+                src={`/static/${methodItem.icon}.svg`}
+                sx={{ width: 48, height: 48, borderRadius: 1, mr: 2, background: methodItem.color, p: 2 }}
             />
             <Grid container spacing={2}>
                 <FirstGridStyle item xs={12} sm={12} md={8}>
                     <Grid container>
                         <Grid item xs={12} sm={isAlone?8:12}>
-                            <StackRowStyle>
-                                <Typography color="inherit" variant="subtitle2" noWrap>
-                                    Collectible transferred to&nbsp;
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
-                                    {reduceHexAddress(to)}
-                                    <CopyButton/>
-                                </Typography>
-                            </StackRowStyle>
-                            <StackRowStyle>
-                                <Typography color="inherit" variant="subtitle2" noWrap>
-                                    By&nbsp;
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
-                                    {reduceHexAddress(from)}
-                                    <CopyButton/>
-                                </Typography>
-                            </StackRowStyle>
-                            <StackRowStyle>
-                                <Typography color="inherit" variant="subtitle2" noWrap>
-                                    For a value of &nbsp;
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
-                                    {value}&nbsp;ELA
-                                </Typography>
-                            </StackRowStyle>
-                            <StackRowStyle>
-                                <Typography color="inherit" variant="subtitle2" noWrap>
-                                    And tx fee of &nbsp;
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
-                                    {gasFee}&nbsp;ELA
-                                </Typography>
-                            </StackRowStyle>
+                        {
+                            methodItem.detail.map((el, index)=>{
+                                let value = item[el.field]
+                                if(el.field.startsWith("data.")&&item.data)
+                                    value = item.data[el.field.substring(5)]
+                                if(el.field==="totalfee")
+                                    value = item.royalties * 2
+                                if(el.field&&!el.copyable)
+                                    value = parseFloat((value / 10 ** 18).toFixed(7))
+                                return (
+                                    <StackRowStyle key={index}>
+                                        <Typography color="inherit" variant="subtitle2" noWrap>
+                                            {el.description}&nbsp;
+                                        </Typography>
+                                        {
+                                            el.field&&(
+                                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
+                                                    {el.ellipsis?reduceHexAddress(value):value}
+                                                    {
+                                                        el.copyable?<CopyButton text={value}/>:' ELA'
+                                                    }
+                                                </Typography>
+                                            )
+                                        }
+                                    </StackRowStyle>
+                                )
+                            })
+                        }
                             <StackRowStyle>
                                 <Typography color="inherit" variant="subtitle2" noWrap>
                                     On &nbsp;
@@ -122,7 +123,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                             Method
                                         </TypographyStyle>
                                         <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
-                                            <MethodLabel description={method}/>
+                                            <MethodLabel methodName={method}/>
                                         </TypographyStyle>
                                     </StackColStyle>
                                     <StackColStyle>
@@ -130,7 +131,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                             Tx Hash&nbsp;
                                         </TypographyStyle>
                                         <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
-                                            {reduceHexAddress(tokenIdHex)}
+                                            {reduceHexAddress(tHash)}
                                             <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                                                 <Icon icon={externalLinkFill} width="17px"/>
                                             </IconButton>
@@ -145,48 +146,68 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                     <Typography variant="h4" sx={{lineHeight: 1}}>
                         Transaction Summary
                     </Typography>
-                    <table style={{marginTop: 5, width: '100%'}}>
+                    <table style={{marginTop: 10, width: '100%'}}>
                         <tbody>
-                            <tr>
-                                <td>
-                                    <Typography color="inherit" variant="subtitle2" noWrap>
-                                        ▸ Seller
-                                    </Typography>
-                                </td>
-                                <td align="right">
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                        98 ELA + 0.001 ELA
-                                    </Typography>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <Typography color="inherit" variant="subtitle2" noWrap>
-                                        ▸ Platform fee
-                                    </Typography>
-                                </td>
-                                <td align="right">
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                        2 ELA + 0.001 ELA
-                                    </Typography>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <Typography color="inherit" variant="subtitle2" noWrap>
-                                        ▸ Royalties
-                                    </Typography>
-                                </td>
-                                <td align="right">
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                        0 ELA
-                                    </Typography>
-                                </td>
-                            </tr>
+                            {
+                                method==="BuyOrder"?(
+                                    <>
+                                        <tr>
+                                            <td>
+                                                <Typography color="inherit" variant="subtitle2" noWrap>
+                                                    ▸ Seller
+                                                </Typography>
+                                            </td>
+                                            <td align="right">
+                                                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                                    {(price*98/100)} ELA + {royalties} ELA
+                                                </Typography>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <Typography color="inherit" variant="subtitle2" noWrap>
+                                                    ▸ Platform fee
+                                                </Typography>
+                                            </td>
+                                            <td align="right">
+                                                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                                    {(price*2/100)} ELA + {royalties} ELA
+                                                </Typography>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <Typography color="inherit" variant="subtitle2" noWrap>
+                                                    ▸ Royalties
+                                                </Typography>
+                                            </td>
+                                            <td align="right">
+                                                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                                    {royaltyFee} ELA
+                                                </Typography>
+                                            </td>
+                                        </tr>
+                                    </>
+                                ):(
+                                    <tr>
+                                        <td>
+                                            <Typography color="inherit" variant="subtitle2" noWrap>
+                                                ▸ Tx fee
+                                            </Typography>
+                                        </td>
+                                        <td align="right">
+                                            <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                                {royalties} ELA
+                                            </Typography>
+                                        </td>
+                                    </tr>
+                                )
+                            }
+                            
                             <tr>
                                 <td colSpan={2} align="right">
                                     <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderBottom: "1px solid", borderColor: 'text.secondary'}}>
-                                        100.006 ELA
+                                        {method==="BuyOrder"?(price + royalties*2 + royaltyFee):royalties} ELA
                                     </Typography>
                                     <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderColor: 'text.secondary', marginTop: '1px'}}/>
                                 </td>

@@ -40,26 +40,31 @@ export default function Collectible() {
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
   const [showCount, setShowCount] = React.useState(10);
+  const [isLatest, setLatest] = React.useState(1);
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
   React.useEffect(async () => {
     setLoadingCollectibles(true);
     const resCollectibles = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}`
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&latest=${isLatest}`
     );
     const jsonCollectibles = await resCollectibles.json();
     setPages(Math.ceil(jsonCollectibles.data.total/showCount));
     setCollectibles(jsonCollectibles.data.result);
     setLoadingCollectibles(false);
-  }, [page, showCount]);
-  const changeShowCount = (event) => {setShowCount(event.target.value)};
-  
+  }, [page, showCount, isLatest]);
+  const changeShowCount = (event) => {
+    setShowCount(event.target.value)
+  };
+  const handleDateOrder = (selected)=>{
+    setLatest(selected)
+  }
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">
         <StackStyle sx={{ mb: 2 }}>
             <Typography variant="h4" sx={{flex:1}}>
                 All Collectibles
-                <DateOrderSelect/>
+                <DateOrderSelect onChange={handleDateOrder}/>
             </Typography>
             <Pagination page={page} pages={pages} onChange={setPage} />
         </StackStyle>
@@ -70,11 +75,9 @@ export default function Collectible() {
                 <Grid key={key} item xs={12}>
                   <Link href={"/explorer/collectible/detail/".concat(item.tokenId)} underline="none" >
                     <PaperRecord sx={{
-                      textAlign: 'center',
-                      cursor: 'pointer', 
-                      '&:hover': {
-                          boxShadow: (theme) => theme.customShadows.z16
-                      },}}
+                        textAlign: 'center',
+                        cursor: 'pointer'
+                      }}
                     >
                         <CollectibleListItem
                             item={{

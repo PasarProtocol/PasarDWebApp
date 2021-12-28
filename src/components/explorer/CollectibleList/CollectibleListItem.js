@@ -24,7 +24,7 @@ export default function CollectibleListItem({ item }) {
                 sx={{ width: 48, height: 48, borderRadius: 1 }}
             />
             <Grid container sx={{ width: (theme) => `calc(100% - ${theme.spacing(2)} - 48px)` }}>
-                <Grid item xs={6}>
+                <Grid item xs={8}>
                     <Typography color="inherit" variant="subtitle2" align="left" noWrap>
                         {name}
                     </Typography>
@@ -34,13 +34,13 @@ export default function CollectibleListItem({ item }) {
                         </Typography>
                         <CopyButton text={holder}/>
                     </Stack>
+                    <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} align="left" noWrap>
+                        Token ID : {tokenIdHex}
+                    </TypographyStyle>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={4}>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} align="right" noWrap>
                         {formatDistance(createTime*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
-                    </TypographyStyle>
-                    <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} align="right" noWrap>
-                        Token ID : {tokenIdHex}
                     </TypographyStyle>
                 </Grid>
             </Grid>

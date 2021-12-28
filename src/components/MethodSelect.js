@@ -23,7 +23,7 @@ const MenuProps = {
     },
     variant: "menu"
 };
-export default function MethodSelect() {
+export default function MethodSelect({onChange}) {
   const [selected, setSelected] = useState([]);
   const isAllSelected =
     options.length > 0 && selected.length === options.length;
@@ -31,10 +31,13 @@ export default function MethodSelect() {
   const handleChange = (event) => {
     const value = [...event.target.value];
     if (value[value.length - 1] === "all") {
-      setSelected(selected.length === options.length ? [] : options);
+      const selectedOptions = selected.length === options.length ? [] : options;
+      setSelected(selectedOptions);
+      onChange(selectedOptions.join(','));
       return;
     }
     setSelected(value);
+    onChange(value.join(','));
   };
 
   return (

@@ -22,7 +22,7 @@ const TypographyStyle = styled(Typography)(({ theme, alignsm }) => ({
     }
 }));
 export default function TransactionListItem({ item }) {
-    const { image, name, method, postedAt, tokenIdHex } = item;
+    const { image, name, method, postedAt, txHash } = item;
     return (
         <RootStyle>
             <Box
@@ -46,7 +46,7 @@ export default function TransactionListItem({ item }) {
                         Method
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="right">
-                        <MethodLabel description={method}/>
+                        <MethodLabel methodName={method}/>
                     </TypographyStyle>
                 </Grid>
                 <Grid item xs={6} sm={3}>
@@ -54,7 +54,7 @@ export default function TransactionListItem({ item }) {
                         Tx Hash
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="left">
-                        {reduceHexAddress(tokenIdHex)}
+                        {reduceHexAddress(txHash)}
                         <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                             <Icon icon={externalLinkFill} width="17px"/>
                         </IconButton>
