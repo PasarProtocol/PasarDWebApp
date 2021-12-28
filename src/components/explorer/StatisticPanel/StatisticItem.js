@@ -40,7 +40,7 @@ export default function StatisticItem(props) {
                 component="h2"
                 value={realData}
                 duration={1000}
-                formatValue={(n) => n.toLocaleString('en').concat(' +')}
+                formatValue={(n) => props.havePlusSymbol ? n.toLocaleString('en').concat(' +') : n.toLocaleString('en')}
                 stepPrecision={0}
             />
             <Typography variant="body" sx={{ color: 'text.secondary' }}>
@@ -52,8 +52,8 @@ export default function StatisticItem(props) {
 }
 
 StatisticItem.propTypes = {
-    borderRight: PropTypes.number,
+    havePlusSymbol: PropTypes.bool,
 };
 StatisticItem.defaultProps = {
-    borderRight: 1
+    havePlusSymbol: true
 };

@@ -193,7 +193,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                             </tr>
                         </tbody>
                     </table>
-                    <Button
+                    {/* <Button
                         to={'/explorer/transaction/detail/'.concat(to)}
                         size="small"
                         color="inherit"
@@ -201,7 +201,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                         endIcon={<Icon icon={arrowIosForwardFill} />}
                     >
                         See more
-                    </Button>
+                    </Button> */}
                 </SummaryGridStyle>
             </Grid>
         </RootStyle>

@@ -45,7 +45,7 @@ function CollectibleItem({ news, isLast, sx }) {
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
                   {formatDistance(postedAt, new Date(), { addSuffix: true }).replace("about","").trim()}
               </Typography>
-              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
+              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary', pb: '5px' }} align="right" noWrap>
                   Token ID : {reduceHexAddress(tokenId)}
               </Typography>
           </Box>

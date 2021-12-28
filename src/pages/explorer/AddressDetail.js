@@ -116,7 +116,7 @@ export default function AddressDetail() {
                 <Typography variant="h5">Analytics</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <ChartArea />
+                <ChartArea involveLivePanel={1&&true}/>
               </AccordionDetails>
             </Accordion>
           </Grid>
