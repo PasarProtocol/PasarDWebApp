@@ -81,7 +81,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                         {
                             methodItem.detail.map((el, index)=>{
                                 let value = item[el.field]
-                                if(el.field.startsWith("data.")&&item.data)
+                                if(el.field&&el.field.startsWith("data.")&&item.data)
                                     value = item.data[el.field.substring(5)]
                                 if(el.field==="totalfee")
                                     value = item.royalties * 2

@@ -52,13 +52,21 @@ export default function Transaction() {
   const [showCount, setShowCount] = React.useState(10);
   const [methods, setMethods] = React.useState("");
   const [isLatest, setLatest] = React.useState(1);
+  const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
   React.useEffect(async () => {
+    controller.abort(); // cancel the previous request
+    const newController = new AbortController();
+    const {signal} = newController;
+    setAbortController(newController);
+
     setLoadingTransactions(true);
     const resTransactions = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&latest=${isLatest}`
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${isLatest}`,
+      { signal }
     );
     const jsonTransactions = await resTransactions.json();
+    // console.log(jsonTransactions)
     setPages(Math.ceil(jsonTransactions.data.total/showCount));
     setTransactions(jsonTransactions.data.results);
     expandAllIf(isExpanded);
@@ -86,9 +94,11 @@ export default function Transaction() {
     setExpandedList(temp)
   }
   const handleMethod = (selected)=>{
+    setPage(1)
     setMethods(selected)
   }
   const handleDateOrder = (selected)=>{
+    setPage(1)
     setLatest(selected)
   }
   return (

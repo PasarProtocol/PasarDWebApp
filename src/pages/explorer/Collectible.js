@@ -45,7 +45,7 @@ export default function Collectible() {
   React.useEffect(async () => {
     setLoadingCollectibles(true);
     const resCollectibles = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&latest=${isLatest}`
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${isLatest}`
     );
     const jsonCollectibles = await resCollectibles.json();
     setPages(Math.ceil(jsonCollectibles.data.total/showCount));

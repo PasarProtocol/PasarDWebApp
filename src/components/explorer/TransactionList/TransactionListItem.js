@@ -33,7 +33,7 @@ export default function TransactionListItem({ item }) {
                 sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
             />
             <Grid container spacing={2}>
-                <Grid item xs={6} sm={4}>
+                <Grid item xs={5} sm={3}>
                     <Typography color="inherit" variant="subtitle2" noWrap>
                         Name
                     </Typography>
@@ -41,7 +41,7 @@ export default function TransactionListItem({ item }) {
                         {name}
                     </Typography>
                 </Grid>
-                <Grid item xs={6} sm={2}>
+                <Grid item xs={7} sm={3}>
                     <TypographyStyle color="inherit" variant="subtitle2" noWrap align="center" alignsm="right">
                         Method
                     </TypographyStyle>
