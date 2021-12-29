@@ -131,10 +131,12 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                             Tx Hash&nbsp;
                                         </TypographyStyle>
                                         <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
-                                            {reduceHexAddress(tHash)}
-                                            <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
-                                                <Icon icon={externalLinkFill} width="17px"/>
-                                            </IconButton>
+                                            <Link href={`https://esc.elastos.io/tx/${tHash}`} sx={{borderRadius: 1}} target="_blank">
+                                                {reduceHexAddress(tHash)}
+                                                <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
+                                                    <Icon icon={externalLinkFill} width="17px"/>
+                                                </IconButton>
+                                            </Link>
                                         </TypographyStyle>
                                     </StackColStyle>
                                 </Grid>
@@ -159,7 +161,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                             </td>
                                             <td align="right">
                                                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {(price*98/100)} ELA + {royalties} ELA
+                                                    {(price*98/100 - royaltyFee)} ELA + {royalties} ELA
                                                 </Typography>
                                             </td>
                                         </tr>
@@ -207,7 +209,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                             <tr>
                                 <td colSpan={2} align="right">
                                     <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderBottom: "1px solid", borderColor: 'text.secondary'}}>
-                                        {method==="BuyOrder"?(price + royalties*2 + royaltyFee):royalties} ELA
+                                        {method==="BuyOrder"?(price + royalties*2):royalties} ELA
                                     </Typography>
                                     <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderColor: 'text.secondary', marginTop: '1px'}}/>
                                 </td>
