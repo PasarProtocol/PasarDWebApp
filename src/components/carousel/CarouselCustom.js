@@ -15,7 +15,7 @@ import {defaultContract} from '../../config'
 
 const CAROUSEL_ICONS = ['user', 'description', 'hammer', 'diamond', 'hash', 'cash-hand', 'basket', 'tag', 'calendar-hammer', 'calendar-market', 'contract-address', 'blockchain', 'marketplace']
 const CAROUSEL_TITLE = ['Name', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Sale Type', 'Created Date', 'Date on Market', 'Contract Address', 'Blockchain', 'Marketplace']
-const CAROUSEL_KEYS = ['name', 'description', 'holder', 'royaltyOwner', 'tokenIdHex', 'royalties', 'quantity', 'type', 'createTime', 'updateTime', 'contractAddr', 'blockchain', '']
+const CAROUSEL_KEYS = ['name', 'description', 'holder', 'royaltyOwner', 'tokenIdHex', 'royalties', 'quantity', 'type', 'createTime', 'updateTime', 'contractAddr', 'blockchain', 'marketplace']
 
 const RootStyle = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -101,7 +101,8 @@ export default function CarouselCustom({pgsize, detail}) {
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
     updateTime: `${updatimestamp.date} ${updatimestamp.time}`,
     contractAddr: defaultContract,
-    blockchain: 'Elastos Smart Chain (ESC)'}
+    blockchain: 'Elastos Smart Chain (ESC)',
+    marketplace: 'PASAR'}
   return (
     <RootStyle>
       <Slider ref={carouselRef} {...settings}>

@@ -32,13 +32,6 @@ const RootStyle = styled(Page)(({ theme }) => ({
   }
 }));
 
-const StackStyle = styled(Stack)(({ theme }) => ({
-  flexDirection: 'row',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-  }
-}));
-
 const PaperStyle = (props) => (
   <Paper
     sx={{
@@ -62,12 +55,10 @@ export default function CollectibleDetail() {
   const imageRef = React.useRef();
   React.useEffect(async () => {
     const resCollectible = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/search?key=${params.collection}`
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`
     );
     const jsonCollectible = await resCollectible.json();
-    if(jsonCollectible.data.result.length){
-      setCollectible(jsonCollectible.data.result[0]);
-    }
+    setCollectible(jsonCollectible.data);
     setLoadingCollectible(false);
 
     
@@ -104,7 +95,7 @@ export default function CollectibleDetail() {
               <Box
                   component="img"
                   alt={collectible.name}
-                  src={getThumbnail(collectible.thumbnail)}
+                  src={getThumbnail(collectible.asset)}
                   onLoad={onImgLoad}
                   onError={(e) => e.target.src = '/static/circle-loading.svg'}
                   sx={{ width: '100%', borderRadius: 1, mr: 2 }}
