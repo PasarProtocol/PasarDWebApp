@@ -58,7 +58,7 @@ export default function Router() {
             { path: 'collectible/detail/:collection', element: <CollectibleDetail /> },
             { path: 'transaction', element: <Transaction /> },
             { path: 'transaction/:transaction', element: <Transaction /> },
-            { path: 'transaction/detail/:transaction', element: <AddressDetail /> },
+            { path: 'transaction/detail/:address', element: <AddressDetail /> },
           ]
         }
       ]

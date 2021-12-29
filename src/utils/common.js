@@ -1,3 +1,5 @@
+import { subDays, differenceInDays  } from 'date-fns';
+
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = strAddress => strAddress?`${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`:'';
 
@@ -39,6 +41,11 @@ export const getElapsedTime = createdtimestamp => {
   strDate += ' ago';
   return strDate;
 };
+
+
+export function dateRangeBeforeDays(days) {
+  return [...Array(days).keys()].map((i) => subDays(new Date(), i).toISOString().slice(0, 10));
+}
 
 export const MethodList = [
   {

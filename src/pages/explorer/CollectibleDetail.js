@@ -50,8 +50,13 @@ const DefaultPageSize = 5;
 export default function CollectibleDetail() {
   const params = useParams(); // params.collection
   const [collectible, setCollectible] = React.useState({});
+  const [transRecord, setTransRecord] = React.useState([]);
   const [detailPageSize, setDetailPageSize] = React.useState(DefaultPageSize);
+  const [methods, setMethods] = React.useState("");
+  const [timeOrder, setTimeOrder] = React.useState(-1);
+  const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
+  const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
   const imageRef = React.useRef();
   React.useEffect(async () => {
     const resCollectible = await fetch(
@@ -64,22 +69,46 @@ export default function CollectibleDetail() {
     
     function handleResize() {
       const { innerWidth: width } = window;
-      if(width<600) // in case of xs
+      if(width<600||!imageRef.current) // in case of xs
         setDetailPageSize(DefaultPageSize)
       else {
         const pgsize = Math.floor((imageRef.current.clientHeight - 42 - 48) / 81)
-        // if(pgsize>DefaultPageSize)
+        console.log(pgsize)
+        if(pgsize<1)
+          setDetailPageSize(DefaultPageSize)
+        else
           setDetailPageSize(pgsize)
       }
     }
     window.addEventListener('resize', handleResize);
   }, []);
+  
+  React.useEffect(async () => {
+    controller.abort(); // cancel the previous request
+    const newController = new AbortController();
+    const {signal} = newController;
+    setAbortController(newController);
+
+    setLoadingTransRecord(true);
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
+      response.json().then(jsonTransactions => {
+        setTransRecord(jsonTransactions.data);
+        setLoadingTransRecord(false);
+      })
+    }).catch(e => {
+      if(e.code !== e.ABORT_ERR)
+        setLoadingTransRecord(false);
+    });
+  }, [methods, timeOrder]);
+
   const onImgLoad = ({target:img}) => {
     const { innerWidth: width } = window;
     if(width<600) // in case of xs
       return;
     const pgsize = Math.floor((img.offsetHeight - 42 - 48) / 81)
-    // if(pgsize>DefaultPageSize)
+    if(pgsize<1)
+      setDetailPageSize(DefaultPageSize)
+    else
       setDetailPageSize(pgsize)
   }
   return (
@@ -122,7 +151,7 @@ export default function CollectibleDetail() {
                 <Typography variant="h5">Analytics</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <ChartArea />
+                <ChartArea by="collectible"/>
               </AccordionDetails>
             </Accordion>
           </Grid>
@@ -134,43 +163,25 @@ export default function CollectibleDetail() {
                       Transaction Record
                   </Typography>
                   <InlineBox>
-                    <MethodSelect/>
-                    <DateOrderSelect/>
+                    <MethodSelect onChange={setMethods}/>
+                    <DateOrderSelect onChange={setTimeOrder}/>
                   </InlineBox>
                 </Typography>
               </Grid>
-              <Grid item xs={12}>
-                <PaperRecord>
-                  <TransactionOrderDetail
-                    isAlone={1&&true}
-                    item={{
-                        from: "0x22016ed8638f5B517a5beC7a722A56d1DEBefef7",
-                        to: "0x33016ed8638f5B517a5beC7a722A56d1DEBefef7",
-                        txHash: "0x44016ed8638f5B517a5beC7a722A56d1DEBefef7",
-                        value: 100,
-                        gasfee: (1000 / 10 ** 8).toFixed(7),
-                        method: 'Mint',
-                        timestamp: new Date()
-                    }}
-                  />
-                </PaperRecord>
-              </Grid>
-              <Grid item xs={12}>
-                <PaperRecord>
-                  <TransactionOrderDetail
-                    isAlone={1&&true}
-                    item={{
-                        from: "0x22016ed8638f5B517a5beC7a722A56d1DEBefef7",
-                        to: "0x33016ed8638f5B517a5beC7a722A56d1DEBefef7",
-                        txHash: "0x44016ed8638f5B517a5beC7a722A56d1DEBefef7",
-                        value: 100,
-                        gasfee: (1000 / 10 ** 8).toFixed(7),
-                        method: 'CreateOrderForSale',
-                        timestamp: new Date()/1000
-                    }}
-                  />
-                </PaperRecord>
-              </Grid>
+              {isLoadingTransRecord?(
+                <Grid item xs={12}><LoadingScreen sx={{background: 'transparent'}}/></Grid>
+              ):(
+                transRecord.map((item, key) => (
+                  <Grid key={key} item xs={12}>
+                    <PaperRecord>
+                      <TransactionOrderDetail
+                        isAlone={1&&true}
+                        item={ item }
+                      />
+                    </PaperRecord>
+                  </Grid>
+                ))
+              )}
             </Grid>
           </Grid>
         </Grid>

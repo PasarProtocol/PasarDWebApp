@@ -51,7 +51,7 @@ export default function Transaction() {
   const [pages, setPages] = React.useState(0);
   const [showCount, setShowCount] = React.useState(10);
   const [methods, setMethods] = React.useState("");
-  const [isLatest, setLatest] = React.useState(-1);
+  const [timeOrder, setTimeOrder] = React.useState(-1);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
   React.useEffect(() => {
@@ -61,7 +61,7 @@ export default function Transaction() {
     setAbortController(newController);
 
     setLoadingTransactions(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${isLatest}`, { signal }).then(response => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
         setPages(Math.ceil(jsonTransactions.data.total/showCount));
         setTransactions(jsonTransactions.data.results);
@@ -72,7 +72,7 @@ export default function Transaction() {
       if(e.code !== e.ABORT_ERR)
         setLoadingTransactions(false);
     });
-  }, [page, showCount, methods, isLatest]);
+  }, [page, showCount, methods, timeOrder]);
 
   const changeShowCount = (event) => {setShowCount(event.target.value)};
 
@@ -100,7 +100,7 @@ export default function Transaction() {
   }
   const handleDateOrder = (selected)=>{
     setPage(1)
-    setLatest(selected)
+    setTimeOrder(selected)
   }
   return (
     <RootStyle title="Transaction | PASAR">
