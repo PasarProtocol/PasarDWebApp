@@ -13,10 +13,6 @@ import { dateRangeBeforeDays } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
-const CHART_DATA = [
-  { name: 'volume', data: [31, 40, 28, 51, 42, 109, 100] },
-];
-
 const StackStyle = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   [theme.breakpoints.down('md')]: {
@@ -36,6 +32,8 @@ export default function ChartArea({by, involveLivePanel}) {
   const [volumeType, setType] = useState(0);
   const [volumeList, setVolumeList] = useState([]);
   const [chartValueArray, setChartValueArray] = useState([]);
+  const [statisData, setStatisData] = useState([0,0,0,0]);
+  const [isLoadingStatisData, setLoadingStatisData] = useState(false);
   const [isLoadingVolumeChart, setLoadingVolumeChart] = useState(true);
   const [controller, setAbortController] = useState(new AbortController());
   const baseOptionChart = BaseOptionChart()
@@ -49,6 +47,20 @@ export default function ChartArea({by, involveLivePanel}) {
     });
   const [chartOptions, setChartOptions] = useState(mergeChartOption([]));
   
+  useEffect(async () => {
+    if(by!=="address")
+      return
+    setLoadingStatisData(true)
+
+    const resRealData = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getStastisDataByWalletAddr?walletAddr=${params.address}`
+    )
+    const jsonData = await resRealData.json()
+    const statisData = [jsonData.data.assets, jsonData.data.sold, jsonData.data.purchased, jsonData.data.transactions]
+    setStatisData(statisData)
+    setLoadingStatisData(false)
+  }, []);
+
   useEffect(async () => {
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
@@ -65,13 +77,16 @@ export default function ChartArea({by, involveLivePanel}) {
       response.json().then(jsonVolume => {
         setVolumeList(jsonVolume.data);
         setLoadingVolumeChart(false);
-        updateChart(period, jsonVolume.data);
       })
     }).catch(e => {
       if(e.code !== e.ABORT_ERR)
         setLoadingVolumeChart(false);
     });
   }, [volumeType]);
+  
+  useEffect(() => {
+    updateChart(period, volumeList);
+  }, [volumeList]);
   
   const updateChart = (period, volumeList) => {
     let days = 0;
@@ -116,21 +131,28 @@ export default function ChartArea({by, involveLivePanel}) {
       {
         involveLivePanel&&(
           <Stack direction="row" sx={{mb:4}}>
-            <Grid container>
-              {/* <Grid item xs={12}><LoadingScreen sx={{background: 'transparent'}}/></Grid> */}
-              <Grid item xs={6} sm={3} md={3}>
-                <StatisticItem havePlusSymbol={false} title="🖼 ️Collective Assets" index={1}/>
+            {
+              isLoadingStatisData?
+              <Grid container>
+                <Grid item xs={12}>
+                  <LoadingScreen sx={{background: 'transparent'}}/>
+                </Grid>
+              </Grid>:
+              <Grid container>
+                <Grid item xs={6} sm={3} md={3}>
+                  <StatisticItem forAddress={1&&true} title="🖼 ️Collective Assets" index={1} value={statisData[0]}/>
+                </Grid>
+                <Grid item xs={6} sm={3} md={3}>
+                  <StatisticItem forAddress={1&&true} title="📈 Sold" index={2} value={statisData[1]}/>
+                </Grid>
+                <Grid item xs={6} sm={3} md={3}>
+                  <StatisticItem forAddress={1&&true} title="🛒 Purchased" index={3} value={statisData[2]}/>
+                </Grid>
+                <Grid item xs={6} sm={3} md={3}>
+                  <StatisticItem forAddress={1&&true} title="✉️ Transactions" index={4} value={statisData[3]}/>
+                </Grid>
               </Grid>
-              <Grid item xs={6} sm={3} md={3}>
-                <StatisticItem havePlusSymbol={false} title="📈 Sold" index={2}/>
-              </Grid>
-              <Grid item xs={6} sm={3} md={3}>
-                <StatisticItem havePlusSymbol={false} title="🛒 Purchased" index={3}/>
-              </Grid>
-              <Grid item xs={6} sm={3} md={3}>
-                <StatisticItem havePlusSymbol={false} title="✉️ Transactions" index={4}/>
-              </Grid>
-            </Grid>
+            }
           </Stack>
         )
       }
@@ -148,7 +170,7 @@ export default function ChartArea({by, involveLivePanel}) {
               <MenuItem value={0}>Transaction Volume</MenuItem>
               <MenuItem value={1}>Royalties Volume</MenuItem>
               {
-                by==="transaction"&&
+                by==="address"&&
                 <MenuItem value={2}>Sales Volume</MenuItem>
               }
             </Select>
@@ -165,7 +187,7 @@ export default function ChartArea({by, involveLivePanel}) {
         </div>
       </StackStyle>
       {
-        isLoadingVolumeChart?
+        !isLoadingStatisData&&isLoadingVolumeChart?
         (<Grid container>
           <Grid item xs={12}>
             <LoadingScreen sx={{background: 'transparent'}}/>
