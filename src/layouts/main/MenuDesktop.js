@@ -7,7 +7,7 @@ import arrowIosUpwardFill from '@iconify/icons-eva/arrow-ios-upward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 // material
 import { styled } from '@mui/material/styles';
-import { Box, Link, Grid, List, Stack, Popover, ListItem, ListSubheader, CardActionArea } from '@mui/material';
+import { Box, Link, Grid, List, Stack, Popover, ListItem, ListSubheader, CardActionArea, Tooltip } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -179,20 +179,31 @@ function MenuDesktopItem({ item, isHome, isOpen, isOffset, onOpen, onClose }) {
   }
 
   return (
-    <LinkStyle
-      to={path}
-      component={RouterLink}
-      end={path === '/'}
-      sx={{
-        // ...(isHome && { color: 'common.white' }),
-        // ...(isOffset && { color: 'text.primary' }),
-        '&.active': {
-          color: 'primary.main'
-        }
-      }}
-    >
-      {title}
-    </LinkStyle>
+    !item.disable?
+      <LinkStyle
+        to={path}
+        component={RouterLink}
+        end={path === '/'}
+        sx={{
+          // ...(isHome && { color: 'common.white' }),
+          // ...(isOffset && { color: 'text.primary' }),
+          '&.active': {
+            color: 'primary.main'
+          }
+        }}
+      >
+        {title}
+      </LinkStyle>:
+      <Tooltip title="Coming Soon" arrow>
+        <LinkStyle
+          disabled={1}
+          sx={{
+            cursor: "default",
+          }}
+        >
+          {title}
+        </LinkStyle>
+      </Tooltip>
   );
 }
 

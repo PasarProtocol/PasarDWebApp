@@ -54,7 +54,7 @@ export const MethodList = [
     icon: 'hammer', 
     detail: [
       {description: 'New collectible created', field: null, copyable: false},
-      {description: 'By', field: 'from', copyable: true, ellipsis: true},
+      {description: 'By', field: 'to', copyable: true, ellipsis: true},
     ]
   },
   {
@@ -89,8 +89,8 @@ export const MethodList = [
     color: '#E96317', 
     icon: 'trashcan', 
     detail: [
-      {description: 'Collectible deleted from contract', field: 'from', copyable: true, ellipsis: true},
-      {description: 'By', field: 'to', copyable: true, ellipsis: true},
+      {description: 'Collectible deleted from contract', field: 'to', copyable: true, ellipsis: true},
+      {description: 'By', field: 'from', copyable: true, ellipsis: true},
     ]
   },
   {

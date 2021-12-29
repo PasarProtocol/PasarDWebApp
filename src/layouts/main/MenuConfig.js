@@ -17,17 +17,20 @@ const menuConfig = [
   {
     title: 'Explorer',
     icon: <Icon icon={roundGrain} {...ICON_SIZE} />,
-    path: PATH_PAGE.explorer
+    path: PATH_PAGE.explorer,
+    disable: false
   },
   {
     title: 'Marketplace',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
-    path: '1'
+    path: '1',
+    disable: true
   },
   {
     title: 'Create',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
-    path: '2'
+    path: '2',
+    disable: true
   }
 ];
 
