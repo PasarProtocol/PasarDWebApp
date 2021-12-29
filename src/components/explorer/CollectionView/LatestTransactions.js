@@ -9,7 +9,7 @@ import palette from '../../../theme/palette'
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
 import MethodLabel from '../../MethodLabel';
-import { reduceHexAddress, getThumbnail } from '../../../utils/common';
+import { MethodList, reduceHexAddress, getThumbnail } from '../../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,
@@ -17,15 +17,17 @@ TransItem.propTypes = {
 };
 function TransItem({ trans, isLast }) {
   const sx = isLast?{}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2};
+  let methodItem = MethodList.find((item)=>item.method===trans.event)
+    if(!methodItem)
+        methodItem = {color: 'grey', icon: 'tag', detail: []}
   return (
       <Stack direction="row" alignItems="center" spacing={2} sx={sx}>
           <Link href={`/explorer/transaction/${trans.tHash}`} underline="none" sx={{borderRadius: 1}} >
             <Box
                 component="img"
                 alt=""
-                src={getThumbnail(trans.asset)}
-                onError={(e) => e.target.src = '/static/broken-image.svg'}
-                sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer' }}
+                src={`/static/${methodItem.icon}.svg`}
+                sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
             />
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
@@ -37,16 +39,13 @@ function TransItem({ trans, isLast }) {
                   </IconButton>
                 </Link>
               </Typography>
-              <Typography variant="body2" color='text.secondary'>
-                  Method: <MethodLabel methodName={trans.event}/>
+              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
+                  Tx Fee : {(trans.royalties / 10 ** 18).toFixed(7)} ELA
               </Typography>
           </Box>
           <Box>
-              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary', pb: '5px' }} align="right" noWrap>
-                  {formatDistance(trans.timestamp*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
-              </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
-                  Tx Fee : {(trans.royalties / 10 ** 18).toFixed(7)} ELA
+                  {formatDistance(trans.timestamp*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
               </Typography>
           </Box>
       </Stack>

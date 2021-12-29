@@ -35,7 +35,7 @@ function CollectibleItem({ news, isLast, sx }) {
                 </Link>
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                <Link href={`/explorer/transaction/${creator}`} sx={{borderRadius: 1}} >
+                <Link href={`/explorer/transaction/detail/${creator}`} sx={{borderRadius: 1}} >
                   Creator : {reduceHexAddress(creator)}
                 </Link>
                 <CopyButton text={creator}/>
