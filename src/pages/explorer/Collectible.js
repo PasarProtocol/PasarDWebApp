@@ -82,7 +82,7 @@ export default function Collectible() {
             <Grid container spacing={2}>
             {collectibles.map((item, key) => (
                 <Grid key={key} item xs={12}>
-                  <Link href={"/explorer/collectible/detail/".concat(item.tokenId)} underline="none" >
+                  <Link href={`/explorer/collectible/detail/${item.tokenId}`} underline="none" >
                     <PaperRecord sx={{
                         textAlign: 'center',
                         cursor: 'pointer'
