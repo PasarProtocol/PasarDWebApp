@@ -51,7 +51,7 @@ const StackStyle = styled(Stack)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function AddressDetail() {
-  const params = useParams(); // params.collection
+  const params = useParams(); // params.address
   const [transactions, setTransactions] = React.useState([]);
   const [page, setPage] = React.useState(1);
   const [isExpanded, setExpandFlag] = React.useState(false);
@@ -220,9 +220,9 @@ export default function AddressDetail() {
       <Container maxWidth="lg">
         <Stack sx={{mb: 2, flexDirection: 'row'}}>
           <Typography variant="h4" sx={{ width: "auto" }} noWrap>
-              {params.transaction}
+              {params.address}
           </Typography>
-          <CopyButton text={params.transaction}/>
+          <CopyButton text={params.address}/>
         </Stack>
         {isLoadingTransactions && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
         <Grid container spacing={2}>
@@ -239,7 +239,7 @@ export default function AddressDetail() {
                 <Typography variant="h5">Analytics</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <ChartArea involveLivePanel={1&&true}/>
+                <ChartArea by="address" involveLivePanel={1&&true}/>
               </AccordionDetails>
             </Accordion>
           </Grid>

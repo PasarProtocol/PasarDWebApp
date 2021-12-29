@@ -40,7 +40,7 @@ export default function Collectible() {
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
   const [showCount, setShowCount] = React.useState(10);
-  const [isLatest, setLatest] = React.useState(-1);
+  const [timeOrder, setTimeOrder] = React.useState(-1);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
   React.useEffect(async () => {
@@ -50,7 +50,7 @@ export default function Collectible() {
     setAbortController(newController);
 
     setLoadingCollectibles(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${isLatest}`, { signal }).then(response => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonCollectibles => {
         setPages(Math.ceil(jsonCollectibles.data.total/showCount));
         setCollectibles(jsonCollectibles.data.result);
@@ -60,12 +60,13 @@ export default function Collectible() {
       if(e.code !== e.ABORT_ERR)
         setLoadingCollectibles(false);
     });
-  }, [page, showCount, isLatest]);
+  }, [page, showCount, timeOrder]);
+  
   const changeShowCount = (event) => {
     setShowCount(event.target.value)
   };
   const handleDateOrder = (selected)=>{
-    setLatest(selected)
+    setTimeOrder(selected)
   }
   return (
     <RootStyle title="Collectible | PASAR">
