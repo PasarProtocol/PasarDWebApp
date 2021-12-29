@@ -61,21 +61,29 @@ function MenuMobileItem({ item, isOpen, onOpen }) {
   }
 
   return (
-    <ListItemStyle
-      to={path}
-      component={RouterLink}
-      end={path === '/'}
-      sx={{
-        '&.active': {
-          color: 'primary.main',
-          fontWeight: 'fontWeightMedium',
-          bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
-        }
-      }}
-    >
-      <ListItemIcon>{icon}</ListItemIcon>
-      <ListItemText disableTypography primary={title} />
-    </ListItemStyle>
+    !item.disable?
+      <ListItemStyle
+        to={path}
+        component={RouterLink}
+        end={path === '/'}
+        sx={{
+          '&.active': {
+            color: 'primary.main',
+            fontWeight: 'fontWeightMedium',
+            bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+          }
+        }}
+      >
+        <ListItemIcon>{icon}</ListItemIcon>
+        <ListItemText disableTypography primary={title} />
+      </ListItemStyle>:
+      
+      <ListItemStyle
+        disabled={1}
+      >
+        <ListItemIcon>{icon}</ListItemIcon>
+        <ListItemText disableTypography primary={title} />
+      </ListItemStyle>
   );
 }
 function MessengerItem(props){
@@ -171,7 +179,7 @@ export default function MenuMobile({ isOffset, isHome, navConfig }) {
 
           <List disablePadding>
             {navConfig.map((link) => (
-              <MenuMobileItem key={link.title} item={link} isOpen={open} onOpen={handleOpen} />
+              <MenuMobileItem key={link.title} item={link} isOpen={open} onOpen={handleOpen}/>
             ))}
           </List>
         </Scrollbar>
@@ -214,7 +222,3 @@ export default function MenuMobile({ isOffset, isHome, navConfig }) {
     </>
   );
 }
-
-/* <IconButton key={social.name} color="inherit" sx={{ p: 0 }}>
-<Icon icon={social.icon} width={40} height={40} />
-</IconButton> */
