@@ -17,6 +17,7 @@ export default function CollectibleListItem({ item }) {
     return (
         <Stack direction="row" alignItems="center" spacing={2} sx={{p:2}}>
             <Box
+                draggable = {false}
                 component="img"
                 alt={name}
                 src={image}

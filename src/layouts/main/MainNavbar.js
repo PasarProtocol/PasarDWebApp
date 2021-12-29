@@ -75,7 +75,7 @@ export default function MainNavbar() {
             !isHome&&
             <MHidden width="mdDown">
               <RouterLink to="/">
-                <Box component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
+                <Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
               </RouterLink>
               <SearchBox sx={{width: 360}}/>
             </MHidden>

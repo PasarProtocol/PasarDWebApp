@@ -26,6 +26,7 @@ export default function TransactionListItem({ item }) {
     return (
         <RootStyle>
             <Box
+                draggable = {false}
                 component="img"
                 alt={name}
                 src={image}

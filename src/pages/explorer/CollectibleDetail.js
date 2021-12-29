@@ -122,6 +122,7 @@ export default function CollectibleDetail() {
           <Grid item xs={12} sm={6}>
             <PaperStyle>
               <Box
+                  draggable = {false}
                   component="img"
                   alt={collectible.name}
                   src={getThumbnail(collectible.asset)}

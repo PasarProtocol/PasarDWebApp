@@ -57,7 +57,7 @@ export default function MainFooter() {
           <Grid item xs={12} md={6}>
             <h3 style={{paddingBottom: 15}}>
               <span role="img" aria-label=''>⚡ </span>Powered by Elastos
-              <Box component="img" src="/static/elastos.svg" sx={{ width: 21, display: 'inline', pl: .5 }} />
+              <Box draggable = {false} component="img" src="/static/elastos.svg" sx={{ width: 21, display: 'inline', pl: .5 }} />
             </h3>
             <Typography variant="body2" sx={{ pr: { md: 5 }, color: 'GrayText' }}>
               Pasar Explorer is a Collectible Explorer and <br />

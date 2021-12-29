@@ -21,6 +21,7 @@ function CollectibleItem({ news, isLast, sx }) {
       <Stack direction="row" alignItems="center" spacing={2} sx={style}>
           <Link href={`/explorer/collectible/detail/${tokenId}`} underline="none" sx={{borderRadius: 1}} >
             <Box
+                draggable = {false}
                 component="img"
                 alt={title}
                 src={image}
