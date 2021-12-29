@@ -54,10 +54,12 @@ export default function TransactionListItem({ item }) {
                         Tx Hash
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="left">
-                        {reduceHexAddress(txHash)}
-                        <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
-                            <Icon icon={externalLinkFill} width="17px"/>
-                        </IconButton>
+                        <Link href={`https://esc.elastos.io/tx/${txHash}`} sx={{borderRadius: 1}} target="_blank">
+                            {reduceHexAddress(txHash)}
+                            <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
+                                <Icon icon={externalLinkFill} width="17px"/>
+                            </IconButton>
+                        </Link>
                     </TypographyStyle>
                 </Grid>
                 <Grid item xs={6} sm={3}>
