@@ -45,13 +45,17 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx }) => ({
 }));
 
 // ----------------------------------------------------------------------
-
-export default function SearchBox({placeholder, sx, outersx, rootsx}) {
+export default function SearchBox({placeholder, sx, outersx, rootsx, onChange}) {
+  const handleChange = (e)=>{
+    if(e.which===13) // press enter
+      onChange(e.target.value)
+  }
   return (
       <Container maxWidth="lg" sx={{ height: '100%', width: 'auto', ...rootsx}}>
         <ContentStyle sx={{...outersx}}>
             <SearchStyle
               placeholder={placeholder}
+              onKeyPress={handleChange}
               startAdornment={
                 <InputAdornment position="start">
                   <Box component={Icon} icon={searchFill} sx={{ color: 'text.disabled' }} />
