@@ -40,17 +40,26 @@ export default function Collectible() {
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
   const [showCount, setShowCount] = React.useState(10);
-  const [isLatest, setLatest] = React.useState(1);
+  const [isLatest, setLatest] = React.useState(-1);
+  const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
   React.useEffect(async () => {
+    controller.abort(); // cancel the previous request
+    const newController = new AbortController();
+    const {signal} = newController;
+    setAbortController(newController);
+
     setLoadingCollectibles(true);
-    const resCollectibles = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${isLatest}`
-    );
-    const jsonCollectibles = await resCollectibles.json();
-    setPages(Math.ceil(jsonCollectibles.data.total/showCount));
-    setCollectibles(jsonCollectibles.data.result);
-    setLoadingCollectibles(false);
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${isLatest}`, { signal }).then(response => {
+      response.json().then(jsonCollectibles => {
+        setPages(Math.ceil(jsonCollectibles.data.total/showCount));
+        setCollectibles(jsonCollectibles.data.result);
+        setLoadingCollectibles(false);
+      })
+    }).catch(e => {
+      if(e.code !== e.ABORT_ERR)
+        setLoadingCollectibles(false);
+    });
   }, [page, showCount, isLatest]);
   const changeShowCount = (event) => {
     setShowCount(event.target.value)

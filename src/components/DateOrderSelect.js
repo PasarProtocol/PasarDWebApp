@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import PropTypes from 'prop-types';
 
 export default function DateOrderSelect({ onChange }) {
-  const [selected, setSelected] = useState(1);
+  const [selected, setSelected] = useState(-1);
   const handleChange = (event) => {
     setSelected(event.target.value);
     onChange(event.target.value);
@@ -18,8 +18,8 @@ export default function DateOrderSelect({ onChange }) {
       size="small"
       sx={{mx: 1}}
     >
-      <MenuItem value={1}>Latest</MenuItem>
-      <MenuItem value={-1}>Oldest</MenuItem>
+      <MenuItem value={-1}>Latest</MenuItem>
+      <MenuItem value={1}>Oldest</MenuItem>
     </Select>
   );
 }
