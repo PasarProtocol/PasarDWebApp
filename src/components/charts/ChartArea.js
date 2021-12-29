@@ -96,7 +96,9 @@ export default function ChartArea({by, involveLivePanel}) {
     const dates = dateRangeBeforeDays(days)
     const tempValueArray = Array(days).fill(0)
     volumeList.forEach(item=>{
-      tempValueArray[1] = parseFloat((item.price/10**18).toFixed(7));
+      const indexOfDate = dates.indexOf(item.onlyDate);
+      if(indexOfDate>=0)
+        tempValueArray[indexOfDate] = parseFloat((item.price/10**18).toFixed(7));
     })
     setChartOptions(mergeChartOption(dates))
     setChartValueArray(tempValueArray)
