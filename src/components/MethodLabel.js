@@ -11,9 +11,12 @@ export default function MethodLabel({methodName}){
             px: 1,
             background: methodColor,
             color: '#E3F8EF',
-            borderRadius: 10,
+            borderRadius: 1,
             display: 'inline-block',
-            verticalAlign: 'top'
+            verticalAlign: 'top',
+            wordWrap: 'break-word',
+            whiteSpace: 'break-spaces',
+            maxWidth: '100%'
         }}
     >
         {methodName}

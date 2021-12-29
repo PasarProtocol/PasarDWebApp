@@ -37,7 +37,7 @@ function TransItem({ trans, isLast }) {
                   </IconButton>
                 </Link>
               </Typography>
-              <Typography variant="body2" color='text.secondary' noWrap>
+              <Typography variant="body2" color='text.secondary'>
                   Method: <MethodLabel methodName={trans.event}/>
               </Typography>
           </Box>
