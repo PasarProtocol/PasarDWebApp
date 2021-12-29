@@ -25,11 +25,14 @@ const RootStyle = styled('div')(({ theme, index }) => {
 export default function StatisticItem(props) {
   const [realData, setRealData] = React.useState(0);
   const api = apikey[props.index-1];
+  
   React.useEffect(async () => {
+    if(props.forAddress)
+      return
     const resRealData = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/${api}`
-    );
-    const jsonData = await resRealData.json();
+    )
+    const jsonData = await resRealData.json()
     setTimeout(()=>{setRealData(jsonData.data)}, 100)
   }, []);
 
@@ -38,9 +41,9 @@ export default function StatisticItem(props) {
         <Stack spacing={2}>
             <AnimatedNumber
                 component="h2"
-                value={realData}
+                value={props.forAddress ? props.value: realData}
                 duration={1000}
-                formatValue={(n) => props.havePlusSymbol ? n.toLocaleString('en').concat(' +') : n.toLocaleString('en')}
+                formatValue={(n) => props.forAddress ? n.toLocaleString('en') : n.toLocaleString('en').concat(' +')}
                 stepPrecision={0}
             />
             <Typography variant="body" sx={{ color: 'text.secondary' }}>
@@ -52,8 +55,8 @@ export default function StatisticItem(props) {
 }
 
 StatisticItem.propTypes = {
-    havePlusSymbol: PropTypes.bool,
+    forAddress: PropTypes.bool,
 };
 StatisticItem.defaultProps = {
-    havePlusSymbol: true
+    forAddress: false
 };
