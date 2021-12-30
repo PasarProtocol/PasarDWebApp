@@ -79,7 +79,7 @@ function MenuMobileItem({ item, isOpen, onOpen }) {
       </ListItemStyle>:
       
       <ListItemStyle
-        disabled={1}
+        disabled={1&&true}
       >
         <ListItemIcon>{icon}</ListItemIcon>
         <ListItemText disableTypography primary={title} />
