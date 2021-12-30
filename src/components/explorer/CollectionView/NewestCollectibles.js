@@ -15,7 +15,7 @@ CollectibleItem.propTypes = {
 };
 
 function CollectibleItem({ news, isLast, sx }) {
-  const { image, title, tokenId, postedAt, creator } = news;
+  const { image, title, tokenId, tokenIdHex, postedAt, creator } = news;
   const style = isLast?{...sx}:{borderBottom: '1px solid', borderColor: 'grey.300', pb: 2, ...sx};
   return (
       <Stack direction="row" alignItems="center" spacing={2} sx={style}>
@@ -47,7 +47,7 @@ function CollectibleItem({ news, isLast, sx }) {
                   {formatDistance(postedAt, new Date(), { addSuffix: true }).replace("about","").trim()}
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary', pb: '5px' }} align="right" noWrap>
-                  Token ID : {reduceHexAddress(tokenId)}
+                  Token ID : {reduceHexAddress(tokenIdHex)}
               </Typography>
           </Box>
       </Stack>
@@ -66,7 +66,8 @@ export default function NewestCollectibles(props) {
               title: collectible.name,
               creator: collectible.holder,
               postedAt: collectible.createTime*1000,
-              tokenId: collectible.tokenIdHex
+              tokenId: collectible.tokenId,
+              tokenIdHex: collectible.tokenIdHex
             }}
             isLast={index===props.dataList.length-1}
           />
