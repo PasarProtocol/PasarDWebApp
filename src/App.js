@@ -31,10 +31,11 @@ export default function App() {
       event.preventDefault();
       return;  
     }
-    // Prevent Ctrl+a = disable select all
     // Prevent Ctrl+u = disable view page source
     // Prevent Ctrl+s = disable save
-    if (event.ctrlKey && (event.keyCode === 85 || event.keyCode === 83 || event.keyCode ===65 )){
+    // Prevent Ctrl+a = disable select all
+    // Prevent Ctrl+d = disable bookmark
+    if (event.ctrlKey && (event.keyCode === 85 || event.keyCode === 83 || event.keyCode ===65 || event.keyCode ===68 )){
       event.preventDefault();
       return;
     }
