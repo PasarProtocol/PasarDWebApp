@@ -26,6 +26,11 @@ ChartArea.propTypes = {
 ChartArea.defaultProps = {
   involveLivePanel: false
 };
+const getUTCdate = (date)=>{
+  const piecesDate = new Date(date).toUTCString().split(" ");
+  const [wd, d, m, y] = piecesDate;
+  return [m, d, y].join("-");
+}
 export default function ChartArea({by, involveLivePanel}) {
   const params = useParams();
   const [period, setPeriod] = useState('a');
@@ -33,6 +38,7 @@ export default function ChartArea({by, involveLivePanel}) {
   const [volumeList, setVolumeList] = useState([]);
   const [chartValueArray, setChartValueArray] = useState([]);
   const [statisData, setStatisData] = useState([0,0,0,0]);
+  const [clickedDataPoint, setDataPoint] = useState([0,'']);
   const [isLoadingStatisData, setLoadingStatisData] = useState(false);
   const [isLoadingVolumeChart, setLoadingVolumeChart] = useState(true);
   const [controller, setAbortController] = useState(new AbortController());
@@ -42,6 +48,15 @@ export default function ChartArea({by, involveLivePanel}) {
       xaxis: {
         type: 'datetime',
         categories: dates
+      },
+      chart: {
+        events: {
+          click: (event, chartContext, config) => {
+            const pointIndex = config.dataPointIndex;
+            const pointDate = config.config.xaxis.categories[pointIndex];
+            setDataPoint([config.config.series[0].data[pointIndex], getUTCdate(pointDate)]);
+          }
+        }
       },
       tooltip: { x: { format: 'dd/MM/yy HH:mm' } }
     });
@@ -111,12 +126,13 @@ export default function ChartArea({by, involveLivePanel}) {
     const dates = dateRangeBeforeDays(days)
     const tempValueArray = Array(days).fill(0)
     volumeList.forEach(item=>{
-      const indexOfDate = dates.indexOf(item.onlyDate);
+      const indexOfDate = dates.indexOf(item.onlyDate.substring(0,10));
       if(indexOfDate>=0)
         tempValueArray[indexOfDate] = parseFloat((item.price/10**18).toFixed(7));
     })
     setChartOptions(mergeChartOption(dates))
     setChartValueArray(tempValueArray)
+    setDataPoint([tempValueArray[0], getUTCdate(dates[0])]);
   };
 
   const handlePeriod = (event, newPeriod) => {
@@ -157,7 +173,14 @@ export default function ChartArea({by, involveLivePanel}) {
         )
       }
       <StackStyle>
-        <CardHeader title="964 ELA" subheader="Nov 12th, 2021" sx={{p: 0, px: 2}}
+        <CardHeader title={`${clickedDataPoint[0]} ELA`} subheader={clickedDataPoint[1]}
+          sx={{
+            p: 0,
+            px: 2,
+            '& .css-sgoict-MuiCardHeader-action': {
+              mt: 0
+            }
+          }}
           action={
             <Select
               defaultValue={0}
