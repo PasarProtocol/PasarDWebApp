@@ -197,7 +197,7 @@ function MenuDesktopItem({ item, isHome, isOpen, isOffset, onOpen, onClose }) {
       
       <Tooltip title="Coming Soon" arrow>
         <LinkStyle
-          disabled={1}
+          disabled={1&&true}
           sx={{
             cursor: "default",
           }}
