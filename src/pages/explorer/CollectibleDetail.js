@@ -73,7 +73,6 @@ export default function CollectibleDetail() {
         setDetailPageSize(DefaultPageSize)
       else {
         const pgsize = Math.floor((imageRef.current.clientHeight - 42 - 48) / 81)
-        console.log(pgsize)
         if(pgsize<1)
           setDetailPageSize(DefaultPageSize)
         else
