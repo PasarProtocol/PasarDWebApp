@@ -177,13 +177,7 @@ export default function AddressDetail() {
                       >
                         <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
                           <TransactionListItem
-                              item={{
-                                  image: getThumbnail(item.asset),
-                                  postedAt: item.timestamp*1000,
-                                  name: item.name,
-                                  txHash: item.tHash,
-                                  method: item.event,
-                              }}
+                              item={item}
                           />
                         </AccordionSummary>
                         <AccordionDetails>

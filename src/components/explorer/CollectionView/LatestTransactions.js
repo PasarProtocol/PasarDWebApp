@@ -32,7 +32,7 @@ function TransItem({ trans, isLast }) {
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Typography variant="body2" color='text.secondary' noWrap>
-                <Link href={`https://esc.elastos.io/tx/${trans.tHash}`} sx={{borderRadius: 1}} target="_blank">
+                <Link href={`https://esc.elastos.io/tx/${trans.tHash}`} target="_blank">
                   Tx Hash : {reduceHexAddress(trans.tHash)}
                   <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                       <Icon icon={externalLinkFill} width="17px"/>

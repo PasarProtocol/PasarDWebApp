@@ -89,7 +89,7 @@ export const MethodList = [
     color: '#E96317', 
     icon: 'trashcan', 
     detail: [
-      {description: 'Collectible deleted from contract', field: 'to', copyable: true, ellipsis: true},
+      {description: 'Collectible sent to burn address', field: 'to', copyable: true, ellipsis: true},
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
     ]
   },
@@ -127,9 +127,9 @@ export const MethodList = [
     color: '#CD6B25', 
     icon: 'tag', 
     detail: [
-      {description: 'Collectible value updated to', field: 'data.new', copyable: false},
+      {description: 'Collectible value updated to', field: 'data.newPrice', copyable: false},
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
-      {description: 'From initial value of', field: 'data.old', copyable: false},
+      {description: 'From initial value of', field: 'data.oldPrice', copyable: false},
     ]
   }
 ]
