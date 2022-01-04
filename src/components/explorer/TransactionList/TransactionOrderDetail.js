@@ -88,6 +88,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                     value = parseFloat((value / 10 ** 18).toFixed(7))
                                 if(el.field==="marketplace")
                                     value = defaultContract
+                                const displayValue = el.ellipsis?reduceHexAddress(value):value
                                 return (
                                     <StackRowStyle key={index}>
                                         <Typography color="inherit" variant="subtitle2" noWrap>
@@ -96,10 +97,14 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                         {
                                             el.field&&(
                                                 <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
-                                                    {el.ellipsis?reduceHexAddress(value):value}
                                                     {
-                                                        el.copyable?<CopyButton text={value}/>:' ELA'
+                                                        el.copyable?
+                                                        <Link href={`/explorer/transaction/detail/${value}`}>
+                                                            {displayValue}
+                                                        </Link>:
+                                                        displayValue
                                                     }
+                                                    {el.copyable?<CopyButton text={value}/>:' ELA'}
                                                 </Typography>
                                             )
                                         }
@@ -162,7 +167,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                             </td>
                                             <td align="right">
                                                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {(price*98/100 - royaltyFee)} ELA
+                                                    {parseFloat((price*98/100 - royaltyFee).toFixed(7))} ELA
                                                 </Typography>
                                             </td>
                                         </tr>

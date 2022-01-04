@@ -31,12 +31,12 @@ function CollectibleItem({ news, isLast, sx }) {
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Typography color="inherit" variant="subtitle2" noWrap>
-                <Link href={`/explorer/collectible/detail/${tokenId}`} sx={{borderRadius: 1}} >
+                <Link href={`/explorer/collectible/detail/${tokenId}`}>
                   {title}
                 </Link>
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                <Link href={`/explorer/transaction/detail/${creator}`} sx={{borderRadius: 1}} >
+                <Link href={`/explorer/transaction/detail/${creator}`}>
                   Creator : {reduceHexAddress(creator)}
                 </Link>
                 <CopyButton text={creator}/>

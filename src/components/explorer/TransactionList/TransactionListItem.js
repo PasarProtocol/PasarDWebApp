@@ -5,7 +5,7 @@ import { Box, Stack, Link, Typography, Grid, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import MethodLabel from '../../MethodLabel';
-import { reduceHexAddress } from '../../../utils/common';
+import { reduceHexAddress, getThumbnail } from '../../../utils/common';
 
 TransactionListItem.propTypes = {
     item: PropTypes.object.isRequired
@@ -22,24 +22,27 @@ const TypographyStyle = styled(Typography)(({ theme, alignsm }) => ({
     }
 }));
 export default function TransactionListItem({ item }) {
-    const { image, name, method, postedAt, txHash } = item;
     return (
         <RootStyle>
-            <Box
-                draggable = {false}
-                component="img"
-                alt={name}
-                src={image}
-                onError={(e) => e.target.src = '/static/broken-image.svg'}
-                sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
-            />
+            <Link href={`/explorer/collectible/detail/${item.tokenId}`} underline="none" sx={{borderRadius: 1}} >
+                <Box
+                    draggable = {false}
+                    component="img"
+                    alt={item.name}
+                    src={getThumbnail(item.asset)}
+                    onError={(e) => e.target.src = '/static/broken-image.svg'}
+                    sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
+                />
+            </Link>
             <Grid container spacing={2}>
                 <Grid item xs={5} sm={3}>
                     <Typography color="inherit" variant="subtitle2" noWrap>
                         Name
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        {name}
+                        <Link href={`/explorer/collectible/detail/${item.tokenId}`}>
+                            {item.name}
+                        </Link>
                     </Typography>
                 </Grid>
                 <Grid item xs={7} sm={3}>
@@ -47,7 +50,7 @@ export default function TransactionListItem({ item }) {
                         Method
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="right">
-                        <MethodLabel methodName={method}/>
+                        <MethodLabel methodName={item.event}/>
                     </TypographyStyle>
                 </Grid>
                 <Grid item xs={6} sm={3}>
@@ -55,8 +58,8 @@ export default function TransactionListItem({ item }) {
                         Tx Hash
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="left">
-                        <Link href={`https://esc.elastos.io/tx/${txHash}`} sx={{borderRadius: 1}} target="_blank">
-                            {reduceHexAddress(txHash)}
+                        <Link href={`https://esc.elastos.io/tx/${item.tHash}`} sx={{borderRadius: 1}} target="_blank">
+                            {reduceHexAddress(item.tHash)}
                             <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                                 <Icon icon={externalLinkFill} width="17px"/>
                             </IconButton>
@@ -68,7 +71,7 @@ export default function TransactionListItem({ item }) {
                         Date
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="right">
-                        {formatDistance(postedAt, new Date(), { addSuffix: true }).replace("about","").trim()}
+                        {formatDistance(item.timestamp*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
                     </TypographyStyle>
                 </Grid>
             </Grid>

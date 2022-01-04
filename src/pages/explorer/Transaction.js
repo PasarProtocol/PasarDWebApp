@@ -7,7 +7,6 @@ import { Container, Stack, Grid, Paper, Typography, Accordion, AccordionSummary,
 // components
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
-import Scrollbar from '../../components/Scrollbar';
 import TransactionListItem from '../../components/explorer/TransactionList/TransactionListItem'
 import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail'
 import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
@@ -18,7 +17,6 @@ import CustomSwitch from '../../components/custom-switch';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -140,19 +138,13 @@ export default function Transaction() {
                 >
                   <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
                     <TransactionListItem
-                        item={{
-                            image: getThumbnail(item.asset),
-                            postedAt: item.timestamp*1000,
-                            name: item.name,
-                            txHash: item.tHash,
-                            method: item.event,
-                        }}
+                        item={item}
                     />
                   </AccordionSummary>
                   <AccordionDetails>
                     <TransactionOrderDetail
                         isAlone={false}
-                        item={ item }
+                        item={item}
                     />
                     </AccordionDetails>
                 </Accordion>
