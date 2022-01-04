@@ -77,7 +77,7 @@ export default function MainNavbar() {
               <RouterLink to="/">
                 <Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
               </RouterLink>
-              <SearchBox sx={{width: 360}}/>
+              <SearchBox sx={{width: 370}}/>
             </MHidden>
           }
           <Box sx={{ flexGrow: 1 }} />
