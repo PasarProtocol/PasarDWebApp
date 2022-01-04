@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import searchFill from '@iconify/icons-eva/search-fill';
@@ -41,30 +42,34 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx }) => ({
     },
     input: {
         padding: 8,
-        paddingLeft: 0
+        paddingLeft: 3
     }
 }));
 
 // ----------------------------------------------------------------------
-export default function SearchBox({placeholder, sx, outersx, rootsx, onChange}) {
+export default function SearchBox({placeholder, sx, outersx, rootsx}) {
+  const params = useParams(); // params.key
+  const navigate = useNavigate();
   const handleChange = (e)=>{
-    if(e.which===13) // press enter
-      onChange(e.target.value)
+    if(e.which===13) { // press enter
+      navigate(`/explorer/search/${e.target.value}`);
+    }
   }
   return (
       <Container maxWidth="lg" sx={{ height: '100%', width: 'auto', ...rootsx}}>
-        <ContentStyle sx={{...outersx}}>
-            <SearchStyle
-              placeholder={placeholder}
-              onKeyPress={handleChange}
-              startAdornment={
-                <InputAdornment position="start">
-                  <Box component={Icon} icon={searchFill} sx={{ color: 'text.disabled' }} />
-                </InputAdornment>
-              }
-              sx = {sx}
-            />
-        </ContentStyle>
+          <ContentStyle sx={{...outersx}}>
+              <SearchStyle
+                placeholder={placeholder}
+                onKeyPress={handleChange}
+                defaultValue={params.key}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <Box component={Icon} icon={searchFill} sx={{ color: 'text.disabled' }} />
+                  </InputAdornment>
+                }
+                sx = {sx}
+              />
+          </ContentStyle>
       </Container>
   );
 }
