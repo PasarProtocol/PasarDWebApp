@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { formatDistance } from 'date-fns';
+import { Link as RouterLink } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { Box, Stack, Link, Typography, Grid, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -24,7 +25,7 @@ const TypographyStyle = styled(Typography)(({ theme, alignsm }) => ({
 export default function TransactionListItem({ item }) {
     return (
         <RootStyle>
-            <Link href={`/explorer/collectible/detail/${item.tokenId}`} underline="none" sx={{borderRadius: 1}} >
+            <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink} sx={{borderRadius: 1}} >
                 <Box
                     draggable = {false}
                     component="img"
@@ -40,7 +41,7 @@ export default function TransactionListItem({ item }) {
                         Name
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        <Link href={`/explorer/collectible/detail/${item.tokenId}`}>
+                        <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink}>
                             {item.name}
                         </Link>
                     </Typography>

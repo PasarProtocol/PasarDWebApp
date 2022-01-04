@@ -99,7 +99,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                                 <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
                                                     {
                                                         el.copyable?
-                                                        <Link href={`/explorer/transaction/detail/${value}`}>
+                                                        <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
                                                             {displayValue}
                                                         </Link>:
                                                         displayValue
