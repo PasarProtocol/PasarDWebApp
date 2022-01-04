@@ -104,7 +104,7 @@ export default function CarouselCustom({pgsize, detail}) {
     updateTime: `${updatimestamp.date} ${updatimestamp.time}`,
     contractAddr: stickerContract,
     blockchain: 'Elastos Smart Chain (ESC)',
-    marketplace: 'PASAR'}
+    marketplace: 'Pasar'}
   return (
     <RootStyle>
       <Slider ref={carouselRef} {...settings}>

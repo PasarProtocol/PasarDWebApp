@@ -21,7 +21,7 @@ function TransItem({ trans, isLast }) {
     if(!methodItem)
         methodItem = {color: 'grey', icon: 'tag', detail: []}
   return (
-      <Stack direction="row" alignItems="center" spacing={2} sx={sx}>
+      <Stack direction="row" spacing={2} sx={sx}>
           <Link href={`/explorer/transaction/${trans.tHash}`} underline="none" sx={{borderRadius: 1}} >
             <Box
                 component="img"
