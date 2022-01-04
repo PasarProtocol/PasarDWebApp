@@ -9,7 +9,7 @@ import mockData from '../../utils/mock-data';
 //
 import { CarouselControlsPaging2 } from './controls';
 import { getTime } from '../../utils/common';
-import {defaultContract} from '../../config'
+import {stickerContract} from '../../config'
 
 // ----------------------------------------------------------------------
 
@@ -98,11 +98,11 @@ export default function CarouselCustom({pgsize, detail}) {
   const updatimestamp = getTime(detail.updateTime)
   const detailInfo = {
     ...detail,
-    royalties: `${detail.royalties*100/10**7} %`,
+    royalties: `${detail.royalties*100/10**6} %`,
     type: detail.holder===detail.royaltyOwner?'Primary Sale':'Secondary Sale',
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
     updateTime: `${updatimestamp.date} ${updatimestamp.time}`,
-    contractAddr: defaultContract,
+    contractAddr: stickerContract,
     blockchain: 'Elastos Smart Chain (ESC)',
     marketplace: 'PASAR'}
   return (

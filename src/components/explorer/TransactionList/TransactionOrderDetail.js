@@ -10,6 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import MethodLabel from '../../MethodLabel';
 import CopyButton from '../../CopyButton';
 import { MethodList, reduceHexAddress, getTime } from '../../../utils/common';
+import {defaultContract} from '../../../config'
 
 TransactionOrderDetail.propTypes = {
     item: PropTypes.object.isRequired
@@ -61,7 +62,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
     const { event: method, tHash } = item
     const timestamp = getTime(item.timestamp)
     const price = parseFloat((item.price/ 10 ** 18).toFixed(2))
-    const royalties = parseFloat((item.royalties/ 10 ** 18).toFixed(7))
+    const royalties = item.royalties!==undefined?parseFloat((item.royalties/ 10 ** 18).toFixed(7)):0
     const royaltyFee = item.royaltyFee?parseFloat((item.royaltyFee/ 10 ** 18).toFixed(7)):0
     let methodItem = MethodList.find((item)=>item.method===method)
     if(!methodItem)
@@ -83,10 +84,10 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                 let value = item[el.field]
                                 if(el.field&&el.field.startsWith("data.")&&item.data)
                                     value = item.data[el.field.substring(5)]
-                                if(el.field==="totalfee")
-                                    value = item.royalties * 2
                                 if(el.field&&!el.copyable)
                                     value = parseFloat((value / 10 ** 18).toFixed(7))
+                                if(el.field==="marketplace")
+                                    value = defaultContract
                                 return (
                                     <StackRowStyle key={index}>
                                         <Typography color="inherit" variant="subtitle2" noWrap>
@@ -161,7 +162,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                             </td>
                                             <td align="right">
                                                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {(price*98/100 - royaltyFee)} ELA + {royalties} ELA
+                                                    {(price*98/100 - royaltyFee)} ELA
                                                 </Typography>
                                             </td>
                                         </tr>
@@ -173,7 +174,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                             </td>
                                             <td align="right">
                                                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {(price*2/100)} ELA + {royalties} ELA
+                                                    {(price*2/100)} ELA
                                                 </Typography>
                                             </td>
                                         </tr>
@@ -186,6 +187,18 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                             <td align="right">
                                                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
                                                     {royaltyFee} ELA
+                                                </Typography>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <Typography color="inherit" variant="subtitle2" noWrap>
+                                                    ▸ Tx fee
+                                                </Typography>
+                                            </td>
+                                            <td align="right">
+                                                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                                    {royalties} ELA
                                                 </Typography>
                                             </td>
                                         </tr>
@@ -209,7 +222,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                             <tr>
                                 <td colSpan={2} align="right">
                                     <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderBottom: "1px solid", borderColor: 'text.secondary'}}>
-                                        {method==="BuyOrder"?(price + royalties*2):royalties} ELA
+                                        {method==="BuyOrder"?(price + royalties):royalties} ELA
                                     </Typography>
                                     <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderColor: 'text.secondary', marginTop: '1px'}}/>
                                 </td>
