@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { formatDistance } from 'date-fns';
+import { Link as RouterLink } from 'react-router-dom';
 // material
 import { Box, Stack, Link, Typography } from '@mui/material';
 import CollectionView from './Template'
@@ -19,7 +20,7 @@ function CollectibleItem({ news, isLast, sx }) {
   const style = isLast?{...sx}:{borderBottom: '1px solid', borderColor: 'grey.300', pb: 2, ...sx};
   return (
       <Stack direction="row" alignItems="center" spacing={2} sx={style}>
-          <Link href={`/explorer/collectible/detail/${tokenId}`} underline="none" sx={{borderRadius: 1}} >
+          <Link to={`/explorer/collectible/detail/${tokenId}`} component={RouterLink} sx={{borderRadius: 1}} >
             <Box
                 draggable = {false}
                 component="img"
@@ -31,12 +32,12 @@ function CollectibleItem({ news, isLast, sx }) {
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Typography color="inherit" variant="subtitle2" noWrap>
-                <Link href={`/explorer/collectible/detail/${tokenId}`}>
+                <Link to={`/explorer/collectible/detail/${tokenId}`} component={RouterLink}>
                   {title}
                 </Link>
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                <Link href={`/explorer/transaction/detail/${creator}`}>
+                <Link to={`/explorer/transaction/detail/${creator}`} component={RouterLink}>
                   Creator : {reduceHexAddress(creator)}
                 </Link>
                 <CopyButton text={creator}/>
