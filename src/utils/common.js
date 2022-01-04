@@ -53,7 +53,7 @@ export const MethodList = [
     color: '#C4C4C4', 
     icon: 'hammer', 
     detail: [
-      {description: 'New collectible created', field: null, copyable: false},
+      {description: 'Collectible created from mint address', field: 'from', copyable: true, ellipsis: true},
       {description: 'By', field: 'to', copyable: true, ellipsis: true},
     ]
   },
@@ -98,7 +98,7 @@ export const MethodList = [
     color: '#5B25CD', 
     icon: 'marketplace', 
     detail: [
-      {description: 'Collectible listed on marketplace →', field: 'to', copyable: true, ellipsis: true},
+      {description: 'Collectible listed on marketplace →', field: 'marketplace', copyable: true, ellipsis: true},
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
       {description: 'For a value of', field: 'price', copyable: false},
     ]
@@ -111,7 +111,6 @@ export const MethodList = [
       {description: 'Collectible purchased from', field: 'from', copyable: true, ellipsis: true},
       {description: 'By', field: 'to', copyable: true, ellipsis: true},
       {description: 'For a value of', field: 'price', copyable: false},
-      {description: 'With a total tx fee of', field: 'totalfee', copyable: false},
     ]
   },
   {
@@ -119,8 +118,8 @@ export const MethodList = [
     color: '#D60000', 
     icon: 'remove', 
     detail: [
-      {description: 'Collectible removed from marketplace →', field: 'from', copyable: true, ellipsis: true},
-      {description: 'By', field: 'to', copyable: true, ellipsis: true},
+      {description: 'Collectible removed from marketplace →', field: 'marketplace', copyable: true, ellipsis: true},
+      {description: 'By', field: 'from', copyable: true, ellipsis: true},
     ]
   },
   {
