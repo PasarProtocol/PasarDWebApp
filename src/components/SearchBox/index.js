@@ -47,12 +47,15 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx }) => ({
 }));
 
 // ----------------------------------------------------------------------
-export default function SearchBox({placeholder, sx, outersx, rootsx}) {
+export default function SearchBox({placeholder, sx, outersx, rootsx, onChange}) {
   const params = useParams(); // params.key
   const navigate = useNavigate();
   const handleChange = (e)=>{
     if(e.which===13) { // press enter
-      navigate(`/explorer/search/${e.target.value}`);
+      if(onChange)
+        onChange(e.target.value)
+      else
+        navigate(`/explorer/search/${e.target.value}`);
     }
   }
   return (
