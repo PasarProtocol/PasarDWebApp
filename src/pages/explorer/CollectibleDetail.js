@@ -17,7 +17,6 @@ import TransactionCollectibleDetail from '../../components/explorer/TransactionL
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import CanvasImg from '../../components/CanvasImg';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
