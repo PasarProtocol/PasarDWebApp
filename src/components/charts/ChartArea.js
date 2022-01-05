@@ -21,17 +21,17 @@ const StackStyle = styled(Stack)(({ theme }) => ({
 }));
 
 ChartArea.propTypes = {
-  involveLivePanel: PropTypes.bool
+  is4Address: PropTypes.bool
 };
 ChartArea.defaultProps = {
-  involveLivePanel: false
+  is4Address: false
 };
 const getUTCdate = (date)=>{
   const piecesDate = new Date(date).toUTCString().split(" ");
   const [wd, d, m, y] = piecesDate;
   return [m, d, y].join("-");
 }
-export default function ChartArea({by, involveLivePanel}) {
+export default function ChartArea({by, is4Address}) {
   const params = useParams();
   const [period, setPeriod] = useState('a');
   const [volumeType, setType] = useState(0);
@@ -145,7 +145,7 @@ export default function ChartArea({by, involveLivePanel}) {
   return (
     <div>
       {
-        involveLivePanel&&(
+        is4Address&&(
           <Stack direction="row" sx={{mb:4}}>
             {
               isLoadingStatisData?
@@ -190,11 +190,14 @@ export default function ChartArea({by, involveLivePanel}) {
               size="small"
               sx={{mx: 1}}
             >
-              <MenuItem value={0}>Transaction Volume</MenuItem>
-              <MenuItem value={1}>Royalties Volume</MenuItem>
+              {
+                by==="collectible"?
+                <MenuItem value={0}>Price</MenuItem>:
+                <MenuItem value={0}>Total Royalties</MenuItem>
+              }
               {
                 by==="address"&&
-                <MenuItem value={2}>Sales Volume</MenuItem>
+                <MenuItem value={1}>Total Sales</MenuItem>
               }
             </Select>
           }
