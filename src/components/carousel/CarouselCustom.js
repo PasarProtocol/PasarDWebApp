@@ -1,11 +1,10 @@
 import Slider from 'react-slick';
 import PropTypes from 'prop-types';
 import { useRef } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 // material
 import { useTheme, styled } from '@mui/material/styles';
-import { Box, Stack, Typography } from '@mui/material';
-// utils
-import mockData from '../../utils/mock-data';
+import { Box, Stack, Typography, Link } from '@mui/material';
 //
 import { CarouselControlsPaging2 } from './controls';
 import { getTime } from '../../utils/common';
@@ -41,7 +40,13 @@ const DetailItem = ({ item, isLast, value })=>{
                 {title}
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                {value}
+                {
+                  (title==="Creator" || title==="Owner")?
+                  <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
+                    {value}
+                  </Link>:
+                  value
+                }
               </Typography>
           </Box>
       </Stack>
