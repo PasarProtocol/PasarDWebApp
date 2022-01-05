@@ -132,7 +132,7 @@ export default function AddressDetail() {
                 <Typography variant="h5">Analytics</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <ChartArea by="address" involveLivePanel={1&&true}/>
+                <ChartArea by="address" is4Address={1&&true}/>
               </AccordionDetails>
             </Accordion>
           </Grid>
