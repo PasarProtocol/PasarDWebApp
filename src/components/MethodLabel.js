@@ -4,7 +4,8 @@ import { MethodList } from '../utils/common'
 export default function MethodLabel({methodName}){
     const methodItem = MethodList.find((item)=>item.method===methodName)
     const methodColor = methodItem?methodItem.color:'grey'
-
+    const camelCaseArr = methodName.split(/(?=[A-Z])/g)
+    camelCaseArr.forEach((w,i)=>{camelCaseArr.splice(i*2+1,0,<wbr key={i}/>)})
     return (
     <Typography variant="body2" component="span" color='text.secondary' noWrap
         sx={{
@@ -19,6 +20,6 @@ export default function MethodLabel({methodName}){
             maxWidth: '100%'
         }}
     >
-        {methodName}
+        {camelCaseArr}
     </Typography>)
 }
