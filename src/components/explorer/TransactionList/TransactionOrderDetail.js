@@ -91,23 +91,23 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                 const displayValue = el.ellipsis?reduceHexAddress(value):value
                                 return (
                                     <StackRowStyle key={index}>
-                                        <Typography color="inherit" variant="subtitle2" noWrap>
+                                        <Typography color="inherit" variant="subtitle2">
                                             {el.description}&nbsp;
+                                            {
+                                                el.field&&(
+                                                    <Typography variant="span" sx={{ color: 'text.secondary', fontWeight: 'normal', display: 'inline-block' }}>
+                                                        {
+                                                            el.copyable?
+                                                            <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
+                                                                {displayValue}
+                                                            </Link>:
+                                                            displayValue
+                                                        }
+                                                        {el.copyable?<CopyButton text={value}/>:' ELA'}
+                                                    </Typography>
+                                                )
+                                            }
                                         </Typography>
-                                        {
-                                            el.field&&(
-                                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
-                                                    {
-                                                        el.copyable?
-                                                        <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
-                                                            {displayValue}
-                                                        </Link>:
-                                                        displayValue
-                                                    }
-                                                    {el.copyable?<CopyButton text={value}/>:' ELA'}
-                                                </Typography>
-                                            )
-                                        }
                                     </StackRowStyle>
                                 )
                             })
