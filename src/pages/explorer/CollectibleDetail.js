@@ -17,6 +17,7 @@ import TransactionCollectibleDetail from '../../components/explorer/TransactionL
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
+import CanvasImg from '../../components/CanvasImg';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -39,7 +40,7 @@ const PaperStyle = (props) => (
         borderColor: 'action.disabledBackground',
         boxShadow: (theme) => theme.customShadows.z1,
         p: '20px',
-        ...props.sm
+        ...props.sx
     }}
   >
     {props.children}
@@ -57,6 +58,7 @@ export default function CollectibleDetail() {
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
+  const [isLoadedImage, setLoadedImage] = React.useState(false);
   const imageRef = React.useRef();
   React.useEffect(async () => {
     const resCollectible = await fetch(
@@ -101,9 +103,11 @@ export default function CollectibleDetail() {
   }, [methods, timeOrder]);
 
   const onImgLoad = ({target:img}) => {
-    const { innerWidth: width } = window;
+    if(img.alt)
+      setLoadedImage(true)
+    const { innerWidth: width } = window
     if(width<600) // in case of xs
-      return;
+      return
     const pgsize = Math.floor((img.offsetHeight - 42 - 48) / 81)
     if(pgsize<1)
       setDetailPageSize(DefaultPageSize)
@@ -119,21 +123,31 @@ export default function CollectibleDetail() {
         {isLoadingCollectible && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <PaperStyle>
+            <PaperStyle sx={{position: 'relative'}}>
               <Box
                   draggable = {false}
                   component="img"
                   alt={collectible.name}
                   src={getThumbnail(collectible.asset)}
                   onLoad={onImgLoad}
-                  onError={(e) => e.target.src = '/static/circle-loading.svg'}
+                  onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
                   sx={{ width: '100%', borderRadius: 1, mr: 2 }}
                   ref={imageRef}
               />
+              {
+                isLoadedImage&&
+                <Box
+                    draggable = {false}
+                    component="img"
+                    src='/static/logo-xs-round.svg'
+                    sx={{ position: 'absolute', width: 30, left: 40, bottom: 40 }}
+                    ref={imageRef}
+                />
+              }
             </PaperStyle>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <PaperStyle sm={{height: '100%', p: '15px 32px'}}>
+            <PaperStyle sx={{height: '100%', p: '15px 32px'}}>
               <Typography variant="h5" sx={{ my: 1 }}>Collectible Detail</Typography>
               <CarouselCustom pgsize={detailPageSize} detail={collectible}/>
             </PaperStyle>
