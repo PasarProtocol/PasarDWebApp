@@ -103,5 +103,5 @@ Searchbar.propTypes = {
   placeholder: PropTypes.string,
 };
 Searchbar.defaultProps = {
-  placeholder: "Search by name/creator/owner/token ID"
+  placeholder: "Search name, description, address and token ID"
 };

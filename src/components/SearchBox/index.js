@@ -83,6 +83,6 @@ SearchBox.propTypes = {
     sx: PropTypes.object
 };
 SearchBox.defaultProps = {
-    placeholder: "Search by name/creator/owner/token ID",
+    placeholder: "Search name, description, address and token ID",
     sx: {width: 550}
 };

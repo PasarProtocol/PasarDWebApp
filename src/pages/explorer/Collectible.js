@@ -87,7 +87,6 @@ export default function Collectible() {
             <Grid container spacing={2}>
             {collectibles.map((item, key) => (
                 <Grid key={key} item xs={12}>
-                  {/* <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink} style={{ textDecoration: 'none' }} > */}
                     <PaperRecord sx={{
                         textAlign: 'center',
                         cursor: 'pointer'
@@ -104,7 +103,6 @@ export default function Collectible() {
                             }}
                         />
                     </PaperRecord>
-                  {/* </Link> */}
                 </Grid>
             ))}
             </Grid>
