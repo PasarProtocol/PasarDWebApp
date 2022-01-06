@@ -1,7 +1,7 @@
 // material
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { Link as RouterLink, useParams } from 'react-router-dom';
+import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { Container, Stack, Grid, Paper, Typography, Link } from '@mui/material';
 // components
 import Page from '../../components/Page';
@@ -35,6 +35,7 @@ const StackStyle = styled(Stack)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function SearchResult() {
+  const navigate = useNavigate();
   const params = useParams(); // params.key
   const [collectibles, setCollectibles] = React.useState([]);
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
@@ -51,6 +52,9 @@ export default function SearchResult() {
     });
   }, [params.key]);
   
+  const link2Detail = (tokenId)=>{
+    navigate(`/explorer/collectible/detail/${tokenId}`);
+  }
   return (
     <RootStyle title="Search | PASAR">
       <Container maxWidth="lg">
@@ -64,11 +68,11 @@ export default function SearchResult() {
         {!collectibles.length&&<Grid item xs={12} align="center"><h3>No matching collectible found!</h3></Grid>}
         {collectibles.map((item, key) => (
           <Grid key={key} item xs={12}>
-            <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink} style={{ textDecoration: 'none' }} >
               <PaperRecord sx={{
                   textAlign: 'center',
                   cursor: 'pointer'
                 }}
+                onClick={()=>link2Detail(item.tokenId)}
               >
                 <CollectibleListItem
                     item={{
@@ -80,7 +84,6 @@ export default function SearchResult() {
                     }}
                 />
               </PaperRecord>
-            </Link>
           </Grid>
         ))}
         </Grid>

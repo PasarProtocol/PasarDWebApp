@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import searchFill from '@iconify/icons-eva/search-fill';
@@ -43,6 +44,8 @@ const SearchbarStyle = styled('div')(({ theme }) => ({
 
 export default function Searchbar({placeholder}) {
   const [isOpen, setOpen] = useState(false);
+  const params = useParams(); // params.key
+  const navigate = useNavigate();
 
   const handleOpen = () => {
     setOpen((prev) => !prev);
@@ -51,6 +54,12 @@ export default function Searchbar({placeholder}) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleChange = (e)=>{
+    if(e.which===13) { // press enter
+        navigate(`/explorer/search/${e.target.value}`);
+    }
+  }
 
   return (
     <ClickAwayListener onClickAway={handleClose}>
@@ -62,12 +71,15 @@ export default function Searchbar({placeholder}) {
         )}
 
         <Slide direction="down" in={isOpen} mountOnEnter unmountOnExit>
-          <SearchbarStyle>
+          <SearchbarStyle
+            onKeyPress={handleChange}
+          >
             <Input
               autoFocus
               fullWidth
               disableUnderline
               placeholder={placeholder}
+              defaultValue={params.key}
               startAdornment={
                 <InputAdornment position="start">
                   <Box

@@ -156,7 +156,7 @@ export default function ChartArea({by, is4Address}) {
               </Grid>:
               <Grid container>
                 <Grid item xs={6} sm={3} md={3}>
-                  <StatisticItem forAddress={1&&true} title="🖼 ️Collective Assets" index={1} value={statisData[0]}/>
+                  <StatisticItem forAddress={1&&true} title="🔨 Created" index={1} value={statisData[0]}/>
                 </Grid>
                 <Grid item xs={6} sm={3} md={3}>
                   <StatisticItem forAddress={1&&true} title="📈 Sold" index={2} value={statisData[1]}/>

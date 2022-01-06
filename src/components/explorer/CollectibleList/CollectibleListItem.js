@@ -32,7 +32,7 @@ export default function CollectibleListItem({ item }) {
                     </Typography>
                     <Stack sx={{flexDirection: 'row'}}>
                         <Typography variant="body2" sx={{ color: 'text.secondary', width: "auto", pt: '2px' }} align="left" noWrap>
-                            Creator : <Link to={`/explorer/transaction/detail/${holder}`} component={RouterLink} sx={{ color: 'text.secondary'}}>{holder}</Link>
+                            Creator : <Link to={`/explorer/transaction/detail/${holder}`} component={RouterLink} sx={{ color: 'text.secondary'}} onClick={(e)=>{e.stopPropagation()}}>{holder}</Link>
                         </Typography>
                         <CopyButton text={holder}/>
                     </Stack>
