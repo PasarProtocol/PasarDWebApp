@@ -60,6 +60,15 @@ function MenuMobileItem({ item, isOpen, onOpen }) {
     );
   }
 
+  if (title === 'Docs') {
+    return (
+      <ListItemStyle href={path} target="_blank" component={Link}>
+        <ListItemIcon>{icon}</ListItemIcon>
+        <ListItemText disableTypography primary={title} />
+      </ListItemStyle>
+    );
+  }
+
   return (
     !item.disable?
       <ListItemStyle
