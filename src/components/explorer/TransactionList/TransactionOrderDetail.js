@@ -59,7 +59,8 @@ const StackColStyle = styled(Stack)(({ theme }) => ({
     }
 }));
 export default function TransactionOrderDetail({ isAlone, item }) {
-    const { event: method, tHash } = item
+    const { event, tHash } = item
+    const method = event!==undefined?event:item.method
     const timestamp = getTime(item.timestamp)
     const price = parseFloat((item.price/ 10 ** 18).toFixed(2))
     const platformFee = item.platformfee!==undefined?parseFloat((item.platformfee/ 10 ** 18).toFixed(7)):0
