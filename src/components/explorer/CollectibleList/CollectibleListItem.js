@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { Link as RouterLink } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
 import { Box, Stack, Link, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -30,8 +31,8 @@ export default function CollectibleListItem({ item }) {
                         {name}
                     </Typography>
                     <Stack sx={{flexDirection: 'row'}}>
-                        <Typography variant="body2" sx={{ color: 'text.secondary', width: "auto" }} align="left" noWrap>
-                            Creator : {holder}
+                        <Typography variant="body2" sx={{ color: 'text.secondary', width: "auto", pt: '2px' }} align="left" noWrap>
+                            Creator : <Link to={`/explorer/transaction/detail/${holder}`} component={RouterLink} sx={{ color: 'text.secondary'}}>{holder}</Link>
                         </Typography>
                         <CopyButton text={holder}/>
                     </Stack>
