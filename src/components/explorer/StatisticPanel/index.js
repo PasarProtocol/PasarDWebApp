@@ -25,7 +25,7 @@ export default function StatisticPanel() {
           </StatisticItem>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="🖼 ️Collectible Assets" index={2}/>
+          <StatisticItem title="🖼 ️Collectibles" index={2}/>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
           <StatisticItem title="✉️ Transactions" index={3}/>

@@ -1,6 +1,6 @@
 import { Paper } from '@mui/material';
 
-const LoadingWrapper = (props)=>(
+const PaperRecord = (props)=>(
     <Paper
         sx={{
             border: '1px solid',
@@ -8,8 +8,9 @@ const LoadingWrapper = (props)=>(
             boxShadow: (theme) => theme.customShadows.z1,
             ...props.sx
         }}
-        >
+        onClick={props.onClick}
+    >
         {props.children}
     </Paper>
 )
-export default LoadingWrapper;
+export default PaperRecord;

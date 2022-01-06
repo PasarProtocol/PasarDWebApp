@@ -1,7 +1,7 @@
 // material
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Container, Stack, Grid, Paper, Typography, Link } from '@mui/material';
 // components
 import Page from '../../components/Page';
@@ -36,6 +36,7 @@ const StackStyle = styled(Stack)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function Collectible() {
+  const navigate = useNavigate();
   const [collectibles, setCollectibles] = React.useState([]);
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
@@ -68,6 +69,9 @@ export default function Collectible() {
   const handleDateOrder = (selected)=>{
     setTimeOrder(selected)
   }
+  const link2Detail = (tokenId)=>{
+    navigate(`/explorer/collectible/detail/${tokenId}`);
+  }
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">
@@ -83,11 +87,12 @@ export default function Collectible() {
             <Grid container spacing={2}>
             {collectibles.map((item, key) => (
                 <Grid key={key} item xs={12}>
-                  <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink} style={{ textDecoration: 'none' }} >
+                  {/* <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink} style={{ textDecoration: 'none' }} > */}
                     <PaperRecord sx={{
                         textAlign: 'center',
                         cursor: 'pointer'
                       }}
+                      onClick={()=>link2Detail(item.tokenId)}
                     >
                         <CollectibleListItem
                             item={{
@@ -99,7 +104,7 @@ export default function Collectible() {
                             }}
                         />
                     </PaperRecord>
-                  </Link>
+                  {/* </Link> */}
                 </Grid>
             ))}
             </Grid>
