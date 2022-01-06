@@ -62,6 +62,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
     const { event: method, tHash } = item
     const timestamp = getTime(item.timestamp)
     const price = parseFloat((item.price/ 10 ** 18).toFixed(2))
+    const platformFee = item.platformfee!==undefined?parseFloat((item.platformfee/ 10 ** 18).toFixed(7)):0
     const royalties = item.royalties!==undefined?parseFloat((item.royalties/ 10 ** 18).toFixed(7)):0
     const royaltyFee = item.royaltyFee?parseFloat((item.royaltyFee/ 10 ** 18).toFixed(7)):0
     let methodItem = MethodList.find((item)=>item.method===method)
@@ -167,7 +168,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                             </td>
                                             <td align="right">
                                                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {parseFloat((price*98/100 - royaltyFee).toFixed(7))} ELA
+                                                    {parseFloat((price - platformFee - royaltyFee).toFixed(7))} ELA
                                                 </Typography>
                                             </td>
                                         </tr>
@@ -179,7 +180,7 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                             </td>
                                             <td align="right">
                                                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {(price*2/100)} ELA
+                                                    {platformFee} ELA
                                                 </Typography>
                                             </td>
                                         </tr>

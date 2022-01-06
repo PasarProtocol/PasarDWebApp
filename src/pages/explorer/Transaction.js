@@ -65,7 +65,6 @@ export default function Transaction() {
         setTotalCount(jsonTransactions.data.total)
         setPages(Math.ceil(jsonTransactions.data.total/showCount));
         setTransactions(jsonTransactions.data.results);
-        expandAllIf(isExpanded);
         setLoadingTransactions(false);
       })
     }).catch(e => {
@@ -73,6 +72,10 @@ export default function Transaction() {
         setLoadingTransactions(false);
     });
   }, [page, showCount, methods, timeOrder]);
+
+  React.useEffect(() => {
+    expandAllIf(isExpanded);
+  }, [transactions]);
 
   const changeShowCount = (event) => {setShowCount(event.target.value)};
 
