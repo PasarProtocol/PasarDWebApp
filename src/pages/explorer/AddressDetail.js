@@ -6,6 +6,7 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
 import { Box, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Typography, FormControlLabel, Select, MenuItem } from '@mui/material';
 // components
+import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
 import LoadingWrapper from '../../components/LoadingWrapper';
@@ -41,7 +42,10 @@ const StackStyle = styled(Stack)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
     '& .top-pagination': {
-      marginTop: theme.spacing(2)
+      marginTop: theme.spacing(2),
+      [theme.breakpoints.down('md')]: {
+        display: 'flex'
+      }
     }
   }
 }));
@@ -55,6 +59,7 @@ export default function AddressDetail() {
   const [isExpanded, setExpandFlag] = React.useState(false);
   const [expanded, setExpandedList] = React.useState([]);
   const [pages, setPages] = React.useState(0);
+  const [totalCount, setTotalCount] = React.useState(0);
   const [showCount, setShowCount] = React.useState(10);
   const [methods, setMethods] = React.useState("");
   const [timeOrder, setTimeOrder] = React.useState(-1);
@@ -70,6 +75,7 @@ export default function AddressDetail() {
     setLoadingTransactions(true);
     fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByWalletAddr?walletAddr=${params.address}&pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}&keyword=${keyword}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
+        setTotalCount(jsonTransactions.data.total)
         setPages(Math.ceil(jsonTransactions.data.total/showCount));
         setTransactions(jsonTransactions.data.results);
         expandAllIf(isExpanded);
@@ -154,10 +160,19 @@ export default function AddressDetail() {
             </Typography>
             <StackStyle sx={{ mb: 2 }}>
               <div style={{flex:1}}>
-                <SearchBox sx={{width: 400}} outersx={{textAlign: 'left', flex: 1}} rootsx={{px: '0 !important'}} placeholder="Search record" onChange={setKeyword}/>
+                <MHidden width="mdDown">
+                  <SearchBox sx={{width: 400}} outersx={{textAlign: 'left'}} rootsx={{px: '0 !important', display: 'inline-block'}} placeholder="Search record" onChange={setKeyword}/>
+                  <Typography variant="body2" sx={{ display: 'inline-block', pl: 1 }}>{totalCount.toLocaleString('en')} items</Typography>
+                </MHidden>
+                <MHidden width="mdUp">
+                  <SearchBox sx={{width: 400}} outersx={{textAlign: 'left'}} rootsx={{px: '0 !important'}} placeholder="Search record" onChange={setKeyword}/>
+                </MHidden>
               </div>
               <div className="top-pagination">
-                <Pagination page={page} pages={pages} onChange={setPage} />
+                <Pagination page={page} pages={pages} onChange={setPage} sx={{flex:1}}/>
+                <MHidden width="mdUp">
+                  <Typography variant="body2" sx={{ display: 'inline-block', pt: 1 }}>{totalCount.toLocaleString('en')} items</Typography>
+                </MHidden>
               </div>
             </StackStyle>
             <Grid container spacing={2}>

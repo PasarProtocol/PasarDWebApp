@@ -57,6 +57,7 @@ export default function CollectibleDetail() {
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
+  const [totalCount, setTotalCount] = React.useState(0);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const imageRef = React.useRef();
   React.useEffect(async () => {
@@ -92,6 +93,7 @@ export default function CollectibleDetail() {
     setLoadingTransRecord(true);
     fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
+        setTotalCount(jsonTransactions.data.length)
         setTransRecord(jsonTransactions.data);
         setLoadingTransRecord(false);
       })
@@ -179,6 +181,7 @@ export default function CollectibleDetail() {
                     <MethodSelect onChange={setMethods}/>
                     <DateOrderSelect onChange={setTimeOrder}/>
                   </InlineBox>
+                  <Typography variant="body2" sx={{ display: 'inline-block' }}>{totalCount.toLocaleString('en')} transactions</Typography>
                 </Typography>
               </Grid>
               {isLoadingTransRecord?(
