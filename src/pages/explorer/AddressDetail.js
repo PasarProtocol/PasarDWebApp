@@ -78,7 +78,6 @@ export default function AddressDetail() {
         setTotalCount(jsonTransactions.data.total)
         setPages(Math.ceil(jsonTransactions.data.total/showCount));
         setTransactions(jsonTransactions.data.results);
-        expandAllIf(isExpanded);
         setLoadingTransactions(false);
       })
     }).catch(e => {
@@ -86,6 +85,10 @@ export default function AddressDetail() {
         setLoadingTransactions(false);
     });
   }, [page, showCount, methods, timeOrder, keyword]);
+
+  React.useEffect(() => {
+    expandAllIf(isExpanded);
+  }, [transactions]);
 
   const changeShowCount = (event) => {setShowCount(event.target.value)};
 
