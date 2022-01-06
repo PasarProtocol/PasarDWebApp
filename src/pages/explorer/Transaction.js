@@ -47,6 +47,7 @@ export default function Transaction() {
   const [expanded, setExpandedList] = React.useState([]);
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
+  const [totalCount, setTotalCount] = React.useState(0);
   const [showCount, setShowCount] = React.useState(10);
   const [methods, setMethods] = React.useState("");
   const [timeOrder, setTimeOrder] = React.useState(-1);
@@ -61,6 +62,7 @@ export default function Transaction() {
     setLoadingTransactions(true);
     fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
+        setTotalCount(jsonTransactions.data.total)
         setPages(Math.ceil(jsonTransactions.data.total/showCount));
         setTransactions(jsonTransactions.data.results);
         expandAllIf(isExpanded);
@@ -116,8 +118,9 @@ export default function Transaction() {
                   control={<CustomSwitch onChange={handleChange}/>}
                   label="Show Details"
                   labelPlacement="start"
-                  sx={{ml:0}}
+                  sx={{ml:0, pr:2}}
                 />
+                <Typography variant="body2" sx={{ display: 'inline-block' }}>{totalCount.toLocaleString('en')} transactions</Typography>
             </Typography>
             <div className="top-pagination">
               <Pagination page={page} pages={pages} onChange={setPage} />

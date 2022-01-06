@@ -40,6 +40,7 @@ export default function Collectible() {
   const [collectibles, setCollectibles] = React.useState([]);
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
+  const [totalCount, setTotalCount] = React.useState(0);
   const [showCount, setShowCount] = React.useState(10);
   const [timeOrder, setTimeOrder] = React.useState(-1);
   const [controller, setAbortController] = React.useState(new AbortController());
@@ -53,6 +54,7 @@ export default function Collectible() {
     setLoadingCollectibles(true);
     fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonCollectibles => {
+        setTotalCount(jsonCollectibles.data.total)
         setPages(Math.ceil(jsonCollectibles.data.total/showCount));
         setCollectibles(jsonCollectibles.data.result);
         setLoadingCollectibles(false);
@@ -79,6 +81,7 @@ export default function Collectible() {
             <Typography variant="h4" sx={{flex:1}}>
                 All Collectibles
                 <DateOrderSelect onChange={handleDateOrder}/>
+                <Typography variant="body2" sx={{ display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
             </Typography>
             <Pagination page={page} pages={pages} onChange={setPage} />
         </StackStyle>

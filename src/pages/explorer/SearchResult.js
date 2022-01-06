@@ -37,12 +37,14 @@ const StackStyle = styled(Stack)(({ theme }) => ({
 export default function SearchResult() {
   const navigate = useNavigate();
   const params = useParams(); // params.key
+  const [totalCount, setTotalCount] = React.useState(0);
   const [collectibles, setCollectibles] = React.useState([]);
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
   React.useEffect(async () => {
     setLoadingCollectibles(true);
     fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/search?key=${params.key}`, {}).then(response => {
       response.json().then(jsonCollectibles => {
+        setTotalCount(jsonCollectibles.data.result.length)
         setCollectibles(jsonCollectibles.data.result);
         setLoadingCollectibles(false);
       })
@@ -60,7 +62,8 @@ export default function SearchResult() {
       <Container maxWidth="lg">
         <StackStyle sx={{ mb: 2 }}>
           <Typography variant="h4" sx={{flex:1}}>
-              Search Result
+              Search Results
+              <Typography variant="body2" sx={{ display: 'inline-block', pl: 1 }}>{totalCount.toLocaleString('en')} items</Typography>
           </Typography>
         </StackStyle>
         {isLoadingCollectibles && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}

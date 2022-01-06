@@ -9,13 +9,13 @@ import { Box, Stack, Typography, Link } from '@mui/material';
 import { CarouselControlsPaging2 } from './controls';
 import CopyButton from '../CopyButton';
 import { getTime } from '../../utils/common';
-import {stickerContract} from '../../config'
+import {stickerContract, defaultContract} from '../../config'
 
 // ----------------------------------------------------------------------
 
 const CAROUSEL_ICONS = ['user', 'description', 'hammer', 'diamond', 'hash', 'cash-hand', 'basket', 'collection', 'contract-address', 'calendar-hammer', 'ethereum', 'blockchain', 'marketplace']
-const CAROUSEL_TITLE = ['Name', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Collection', 'Contract Address', 'Created Date', 'Token Standard', 'Blockchain', 'Marketplace']
-const CAROUSEL_KEYS = ['name', 'description', 'royaltyOwner', 'holder', 'tokenIdHex', 'royalties', 'quantity', 'collection', 'contractAddr', 'createTime', 'tokenStandard', 'blockchain', 'marketplace']
+const CAROUSEL_TITLE = ['Name', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Collection', 'Contract Address', 'Created Date', 'Token Standard', 'Blockchain', 'Status']
+const CAROUSEL_KEYS = ['name', 'description', 'royaltyOwner', 'holder', 'tokenIdHex', 'royalties', 'quantity', 'collection', 'contractAddr', 'createTime', 'tokenStandard', 'blockchain', 'status']
 const CAROUSEL_COPYABLE = [false, false, true, true, true, false, false, false, true, false, false, false, false]
 
 const RootStyle = styled('div')(({ theme }) => ({
@@ -113,10 +113,11 @@ export default function CarouselCustom({pgsize, detail}) {
     royalties: `${detail.royalties*100/10**6} %`,
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
     contractAddr: stickerContract,
+    holder: detail.holder===defaultContract?detail.royaltyOwner:detail.holder,
     collection: 'Feeds NFT Sticker - FSTK',
     tokenStandard: 'ERC-1155',
     blockchain: 'Elastos Smart Chain (ESC)',
-    marketplace: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?'Not on sale':'Pasar'}
+    status: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?'Not on sale':'Listed on Pasar'}
   return (
     <RootStyle>
       <Slider ref={carouselRef} {...settings}>
