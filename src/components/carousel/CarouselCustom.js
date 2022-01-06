@@ -7,14 +7,16 @@ import { useTheme, styled } from '@mui/material/styles';
 import { Box, Stack, Typography, Link } from '@mui/material';
 //
 import { CarouselControlsPaging2 } from './controls';
+import CopyButton from '../CopyButton';
 import { getTime } from '../../utils/common';
 import {stickerContract} from '../../config'
 
 // ----------------------------------------------------------------------
 
-const CAROUSEL_ICONS = ['user', 'description', 'hammer', 'diamond', 'hash', 'cash-hand', 'basket', 'tag', 'calendar-hammer', 'calendar-market', 'contract-address', 'blockchain', 'marketplace']
-const CAROUSEL_TITLE = ['Name', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Sale Type', 'Created Date', 'Date on Market', 'Contract Address', 'Blockchain', 'Marketplace']
-const CAROUSEL_KEYS = ['name', 'description', 'royaltyOwner', 'holder', 'tokenIdHex', 'royalties', 'quantity', 'type', 'createTime', 'DateOnMarket', 'contractAddr', 'blockchain', 'marketplace']
+const CAROUSEL_ICONS = ['user', 'description', 'hammer', 'diamond', 'hash', 'cash-hand', 'basket', 'collection', 'contract-address', 'calendar-hammer', 'ethereum', 'blockchain', 'marketplace']
+const CAROUSEL_TITLE = ['Name', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Collection', 'Contract Address', 'Created Date', 'Token Standard', 'Blockchain', 'Marketplace']
+const CAROUSEL_KEYS = ['name', 'description', 'royaltyOwner', 'holder', 'tokenIdHex', 'royalties', 'quantity', 'collection', 'contractAddr', 'createTime', 'tokenStandard', 'blockchain', 'marketplace']
+const CAROUSEL_COPYABLE = [false, false, true, true, true, false, false, false, true, false, false, false, false]
 
 const RootStyle = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -24,7 +26,7 @@ const RootStyle = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 const DetailItem = ({ item, isLast, value })=>{
-  const { icon, title, key } = item;
+  const { icon, title, copyable } = item;
   const sx = isLast?{}:{borderBottom: '1px solid', borderColor: (theme) => `${theme.palette.grey[500_32]}`, pb: 2};
   const iconSrc = `/static/${icon}.svg`;
   return (
@@ -39,15 +41,20 @@ const DetailItem = ({ item, isLast, value })=>{
               <Typography color="inherit" variant="subtitle2" noWrap>
                 {title}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+              <Stack sx={{flexDirection: 'row'}}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                  {
+                    (title==="Creator" || title==="Owner")?
+                    <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
+                      {value}
+                    </Link>:
+                    value
+                  }
+                </Typography>
                 {
-                  (title==="Creator" || title==="Owner")?
-                  <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
-                    {value}
-                  </Link>:
-                  value
+                  copyable&&<CopyButton text={value}/>
                 }
-              </Typography>
+              </Stack>
           </Box>
       </Stack>
   );
@@ -81,7 +88,8 @@ export default function CarouselCustom({pgsize, detail}) {
     return [...Array(pageSize)].map((_, index2) => ({
       icon: CAROUSEL_ICONS[index1*pgsize+index2],
       title: CAROUSEL_TITLE[index1*pgsize+index2],
-      key: CAROUSEL_KEYS[index1*pgsize+index2]
+      key: CAROUSEL_KEYS[index1*pgsize+index2],
+      copyable: CAROUSEL_COPYABLE[index1*pgsize+index2]
     }))
   });
 
@@ -100,16 +108,15 @@ export default function CarouselCustom({pgsize, detail}) {
     })
   };
   const creatimestamp = getTime(detail.createTime)
-  const updatimestamp = getTime(detail.updateTime)
   const detailInfo = {
     ...detail,
     royalties: `${detail.royalties*100/10**6} %`,
-    type: detail.holder===detail.royaltyOwner?'Primary Sale':detail.SaleType,
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
-    updateTime: `${updatimestamp.date} ${updatimestamp.time}`,
     contractAddr: stickerContract,
+    collection: 'Feeds NFT Sticker - FSTK',
+    tokenStandard: 'ERC-1155',
     blockchain: 'Elastos Smart Chain (ESC)',
-    marketplace: 'Pasar'}
+    marketplace: detail.SaleType==='Not on Sale'?'Not on Sale':'Pasar'}
   return (
     <RootStyle>
       <Slider ref={carouselRef} {...settings}>
