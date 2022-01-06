@@ -12,6 +12,7 @@ import LoadingScreen from '../../components/LoadingScreen';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import { ChartArea } from '../../components/charts';
 
+import PaperRecord from '../../components/PaperRecord';
 import SearchBox from '../../components/SearchBox';
 import CustomSwitch from '../../components/custom-switch';
 import Pagination from '../../components/pagination';
@@ -184,6 +185,14 @@ export default function AddressDetail() {
                 ):(
                   transactions.map((item, key) => (
                     <Grid key={key} item xs={12}>
+                    {
+                      item.method&&item.method==="SetApprovalForAll"?
+                      <PaperRecord sx={{p:2}}>
+                        <TransactionOrderDetail
+                            isAlone={1&&true}
+                            item={item}
+                        />
+                      </PaperRecord>:
                       <Accordion 
                         expanded={expanded.includes(key)}
                         onClick={(e) => handleAccordClick(key)}
@@ -205,6 +214,7 @@ export default function AddressDetail() {
                           />
                         </AccordionDetails>
                       </Accordion>
+                    }
                     </Grid>
                   ))
                 )}
