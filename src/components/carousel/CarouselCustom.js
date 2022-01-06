@@ -52,7 +52,7 @@ const DetailItem = ({ item, isLast, value })=>{
                   }
                 </Typography>
                 {
-                  copyable&&<CopyButton text={value}/>
+                  value&&copyable&&<CopyButton text={value}/>
                 }
               </Stack>
           </Box>
@@ -116,7 +116,7 @@ export default function CarouselCustom({pgsize, detail}) {
     collection: 'Feeds NFT Sticker - FSTK',
     tokenStandard: 'ERC-1155',
     blockchain: 'Elastos Smart Chain (ESC)',
-    marketplace: detail.SaleType==='Not on Sale'?'Not on Sale':'Pasar'}
+    marketplace: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?'Not on sale':'Pasar'}
   return (
     <RootStyle>
       <Slider ref={carouselRef} {...settings}>
