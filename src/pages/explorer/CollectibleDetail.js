@@ -94,7 +94,15 @@ export default function CollectibleDetail() {
     fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
         setTotalCount(jsonTransactions.data.length)
-        setTransRecord(jsonTransactions.data);
+        const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {
+            if (id>0 && item.tHash === arr[id - 1].tHash) {
+                res[res.length - 1].push(item);
+            } else {
+                res.push(id<arr.length-1&&item.tHash === arr[id + 1].tHash ? [item] : item);
+            }
+            return res;
+        }, []);
+        setTransRecord(grouped);
         setLoadingTransRecord(false);
       })
     }).catch(e => {
@@ -189,12 +197,38 @@ export default function CollectibleDetail() {
               ):(
                 transRecord.map((item, key) => (
                   <Grid key={key} item xs={12}>
-                    <PaperRecord>
+                  {
+                    Array.isArray(item)?
+                    <Accordion 
+                      defaultExpanded={1&&true}
+                      sx={{
+                        border: '1px solid',
+                        borderColor: 'action.disabledBackground',
+                        boxShadow: (theme) => theme.customShadows.z1
+                      }}
+                    >
+                      <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
+                        <TransactionOrderDetail
+                            isAlone={1&&true}
+                            item={item[0]}
+                        />
+                      </AccordionSummary>
+                      <AccordionDetails sx={{pr: '28px'}}>
+                        <TransactionOrderDetail
+                            isAlone={1&&true}
+                            item={item[1]}
+                            noSummary={1&&true}
+                        />
+                      </AccordionDetails>
+                    </Accordion>:
+                    
+                    <PaperRecord sx={{p:2}}>
                       <TransactionOrderDetail
                         isAlone={1&&true}
                         item={ item }
                       />
                     </PaperRecord>
+                  }
                   </Grid>
                 ))
               )}

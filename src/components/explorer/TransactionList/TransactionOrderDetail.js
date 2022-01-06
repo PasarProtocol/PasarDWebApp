@@ -58,7 +58,7 @@ const StackColStyle = styled(Stack)(({ theme }) => ({
       flexDirection: 'row',
     }
 }));
-export default function TransactionOrderDetail({ isAlone, item }) {
+export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
     const { event, tHash } = item
     const method = event!==undefined?event:item.method
     const timestamp = getTime(item.timestamp)
@@ -152,51 +152,66 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                         }
                     </Grid>
                 </FirstGridStyle>
-                <SummaryGridStyle item xs={12} sm={12} md={4}>
-                    <Typography variant="h4" sx={{lineHeight: 1}}>
-                        Transaction Summary
-                    </Typography>
-                    <table style={{marginTop: 10, width: '100%'}}>
-                        <tbody>
-                            {
-                                method==="BuyOrder"?(
-                                    <>
-                                        <tr>
-                                            <td>
-                                                <Typography color="inherit" variant="subtitle2" noWrap>
-                                                    ▸ Seller
-                                                </Typography>
-                                            </td>
-                                            <td align="right">
-                                                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {parseFloat((price - platformFee - royaltyFee).toFixed(7))} ELA
-                                                </Typography>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <Typography color="inherit" variant="subtitle2" noWrap>
-                                                    ▸ Platform fee
-                                                </Typography>
-                                            </td>
-                                            <td align="right">
-                                                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {platformFee} ELA
-                                                </Typography>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <Typography color="inherit" variant="subtitle2" noWrap>
-                                                    ▸ Royalties
-                                                </Typography>
-                                            </td>
-                                            <td align="right">
-                                                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {royaltyFee} ELA
-                                                </Typography>
-                                            </td>
-                                        </tr>
+                {!noSummary&&
+                    <SummaryGridStyle item xs={12} sm={12} md={4}>
+                        <Typography variant="h4" sx={{lineHeight: 1}}>
+                            Transaction Summary
+                        </Typography>
+                        <table style={{marginTop: 10, width: '100%'}}>
+                            <tbody>
+                                {
+                                    method==="BuyOrder"?(
+                                        <>
+                                            <tr>
+                                                <td>
+                                                    <Typography color="inherit" variant="subtitle2" noWrap>
+                                                        ▸ Seller
+                                                    </Typography>
+                                                </td>
+                                                <td align="right">
+                                                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                                        {parseFloat((price - platformFee - royaltyFee).toFixed(7))} ELA
+                                                    </Typography>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <Typography color="inherit" variant="subtitle2" noWrap>
+                                                        ▸ Platform fee
+                                                    </Typography>
+                                                </td>
+                                                <td align="right">
+                                                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                                        {platformFee} ELA
+                                                    </Typography>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <Typography color="inherit" variant="subtitle2" noWrap>
+                                                        ▸ Royalties
+                                                    </Typography>
+                                                </td>
+                                                <td align="right">
+                                                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                                        {royaltyFee} ELA
+                                                    </Typography>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <Typography color="inherit" variant="subtitle2" noWrap>
+                                                        ▸ Tx fee
+                                                    </Typography>
+                                                </td>
+                                                <td align="right">
+                                                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                                        {royalties} ELA
+                                                    </Typography>
+                                                </td>
+                                            </tr>
+                                        </>
+                                    ):(
                                         <tr>
                                             <td>
                                                 <Typography color="inherit" variant="subtitle2" noWrap>
@@ -209,43 +224,30 @@ export default function TransactionOrderDetail({ isAlone, item }) {
                                                 </Typography>
                                             </td>
                                         </tr>
-                                    </>
-                                ):(
-                                    <tr>
-                                        <td>
-                                            <Typography color="inherit" variant="subtitle2" noWrap>
-                                                ▸ Tx fee
-                                            </Typography>
-                                        </td>
-                                        <td align="right">
-                                            <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                {royalties} ELA
-                                            </Typography>
-                                        </td>
-                                    </tr>
-                                )
-                            }
-                            
-                            <tr>
-                                <td colSpan={2} align="right">
-                                    <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderBottom: "1px solid", borderColor: 'text.secondary'}}>
-                                        {method==="BuyOrder"?(price + royalties):royalties} ELA
-                                    </Typography>
-                                    <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderColor: 'text.secondary', marginTop: '1px'}}/>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    {/* <Button
-                        to={'/explorer/transaction/detail/'.concat(to)}
-                        size="small"
-                        color="inherit"
-                        component={RouterLink}
-                        endIcon={<Icon icon={arrowIosForwardFill} />}
-                    >
-                        See more
-                    </Button> */}
-                </SummaryGridStyle>
+                                    )
+                                }
+                                
+                                <tr>
+                                    <td colSpan={2} align="right">
+                                        <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderBottom: "1px solid", borderColor: 'text.secondary'}}>
+                                            {method==="BuyOrder"?(price + royalties):royalties} ELA
+                                        </Typography>
+                                        <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderColor: 'text.secondary', marginTop: '1px'}}/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        {/* <Button
+                            to={'/explorer/transaction/detail/'.concat(to)}
+                            size="small"
+                            color="inherit"
+                            component={RouterLink}
+                            endIcon={<Icon icon={arrowIosForwardFill} />}
+                        >
+                            See more
+                        </Button> */}
+                    </SummaryGridStyle>
+                }
             </Grid>
         </RootStyle>
     );
