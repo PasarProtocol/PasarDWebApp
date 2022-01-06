@@ -34,7 +34,7 @@ const getUTCdate = (date)=>{
 export default function ChartArea({by, is4Address}) {
   const params = useParams();
   const [period, setPeriod] = useState('a');
-  const [volumeType, setType] = useState(0);
+  const [volumeType, setType] = useState(by==="address"?1:0);
   const [volumeList, setVolumeList] = useState([]);
   const [chartValueArray, setChartValueArray] = useState([]);
   const [statisData, setStatisData] = useState([0,0,0,0]);
@@ -85,9 +85,9 @@ export default function ChartArea({by, is4Address}) {
     setLoadingVolumeChart(true);
     let suburl = '';
     if(by==="collectible")
-      suburl = `getTranVolumeByTokenId?tokenId=${params.collection}&type=${volumeType}`
+      suburl = `getNftPriceByTokenId?tokenId=${params.collection}`
     else if(by==="address")
-      suburl = `getTranvolumeTotalRoyaltySaleVolumeByWalletAddr?walletAddr=${params.address}&type=${volumeType}`
+      suburl = `getTotalRoyaltyandTotalSaleByWalletAddr?walletAddr=${params.address}&type=${volumeType}`
     fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/${suburl}`, { signal }).then(response => {
       response.json().then(jsonVolume => {
         setVolumeList(jsonVolume.data);
