@@ -127,8 +127,9 @@ export default function ChartArea({by, is4Address}) {
     const tempValueArray = Array(days).fill(0)
     volumeList.forEach(item=>{
       const indexOfDate = dates.indexOf(item.onlyDate.substring(0,10));
+      const value = item.price!==undefined?item.price:item.value;
       if(indexOfDate>=0)
-        tempValueArray[indexOfDate] = parseFloat((item.price/10**18).toFixed(7));
+        tempValueArray[indexOfDate] = parseFloat((value/10**18).toFixed(7));
     })
     setChartOptions(mergeChartOption(dates))
     setChartValueArray(tempValueArray)
