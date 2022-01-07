@@ -206,7 +206,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                                 </td>
                                                 <td align="right">
                                                     <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                        {royalties} ELA
+                                                        {item.gasFee} ELA
                                                     </Typography>
                                                 </td>
                                             </tr>
@@ -220,7 +220,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                             </td>
                                             <td align="right">
                                                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {royalties} ELA
+                                                    {item.gasFee} ELA
                                                 </Typography>
                                             </td>
                                         </tr>
@@ -230,7 +230,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                 <tr>
                                     <td colSpan={2} align="right">
                                         <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderBottom: "1px solid", borderColor: 'text.secondary'}}>
-                                            {method==="BuyOrder"?(price + royalties):royalties} ELA
+                                            {method==="BuyOrder"?(price + item.gasFee):item.gasFee} ELA
                                         </Typography>
                                         <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderColor: 'text.secondary', marginTop: '1px'}}/>
                                     </td>

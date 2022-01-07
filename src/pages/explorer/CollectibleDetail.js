@@ -149,7 +149,7 @@ export default function CollectibleDetail() {
                     draggable = {false}
                     component="img"
                     src='/static/logo-xs-round.svg'
-                    sx={{ position: 'absolute', width: 30, left: 40, bottom: 40 }}
+                    sx={{ position: 'absolute', width: '6%', left: 40, bottom: 40 }}
                     ref={imageRef}
                 />
               }

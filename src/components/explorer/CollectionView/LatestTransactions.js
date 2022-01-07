@@ -40,7 +40,7 @@ function TransItem({ trans, isLast }) {
                 </Link>
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
-                  Tx Fee : {(trans.royalties / 10 ** 18).toFixed(7)} ELA
+                  Tx Fee : {trans.gasFee} ELA
               </Typography>
           </Box>
           <Box>
