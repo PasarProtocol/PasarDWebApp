@@ -163,7 +163,7 @@ function MenuDesktopItem({ item, isHome, isOpen, isOffset, onOpen, onClose }) {
     );
   }
 
-  if (title === 'Docs') {
+  if (!item.disable&&title === 'Docs') {
     return (
       <LinkStyle
         href={path}

@@ -36,7 +36,7 @@ const menuConfig = [
     title: 'Docs',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
     path: 'https://docs.pasarprotocol.io',
-    disable: false
+    disable: true
   }
 ];
 
