@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Typography, Grid, Card, Stack } from '@mui/material';
 // ----------------------------------------------------------------------
-const apikey = ['gettv', 'nftnumber', 'relatednftnum', 'walletaddressnum']
+const apikey = ['gettv', 'nftnumber', 'relatednftnum', 'owneraddressnum']
 const RootStyle = styled('div')(({ theme, index }) => {
   let sm = {};
   if(index%2===0)
