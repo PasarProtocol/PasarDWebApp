@@ -16,7 +16,8 @@ import { Box, List, Link, Drawer, Typography, Grid, Paper, CardActionArea, ListI
 import Logo from '../../components/Logo';
 import Scrollbar from '../../components/Scrollbar';
 import ModeSwitch from '../../components/mode-switch';
-import { MIconButton } from '../../components/@material-extend';
+import { MIconButton, MFab } from '../../components/@material-extend';
+
 
 // ----------------------------------------------------------------------
 
@@ -95,29 +96,7 @@ function MenuMobileItem({ item, isOpen, onOpen }) {
       </ListItemStyle>
   );
 }
-function MessengerItem(props){
-  return (
-    <Paper
-      variant='outlined'
-      sx={{
-        borderRadius: 2
-      }}
-    >
-      <CardActionArea sx={{ borderRadius: 2 }}>
-        <Box
-          sx={{
-            py: 1,
-            display: 'flex',
-            justifyContent: 'center',
-            color: 'text.secondary'
-          }}
-        >
-          {props.children}
-        </Box>
-      </CardActionArea>
-    </Paper>
-  )
-}
+
 function CopyRight(prop) {
   return (
     <Typography
@@ -194,24 +173,24 @@ export default function MenuMobile({ isOffset, isHome, navConfig }) {
         </Scrollbar>
         <Box sx={{ flexGrow: 1 }} />
         <Container>
-          <Grid container spacing={2} dir="ltr" sx={{px: 1}}>
-            <Grid item xs={4}>
-              <MessengerItem>
+          <Grid container dir="ltr" sx={{pb: 3}}>
+            <Grid item xs={4} align="center">
+              {/* <MFab color="info" size="medium">
                 <TelegramIcon sx={{ fontSize: 30 }} />
-              </MessengerItem>
+              </MFab> */}
             </Grid>
-            <Grid item xs={4}>
-              <MessengerItem>
-                <Icon icon={twitterIcon} width={30} height={30} />
-              </MessengerItem>
-            </Grid>
-            <Grid item xs={4}>
-              <MessengerItem>
+            <Grid item xs={4} align="center">
+              <MFab color="info" size="medium" href="https://discord.gg/RPbcBv8ckh" component={Link} target="_blank">
                 <Icon icon={discordIcon} width={30} height={30} />
-              </MessengerItem>
+              </MFab>
+            </Grid>
+            <Grid item xs={4} align="center">
+              {/* <MFab color="info" size="medium">
+                <Icon icon={twitterIcon} width={30} height={30} />
+              </MFab> */}
             </Grid>
           </Grid>
-          <Box
+          {/* <Box
             sx={{
               py: 3,
               display: 'flex',
@@ -219,7 +198,7 @@ export default function MenuMobile({ isOffset, isHome, navConfig }) {
             }}
           >
             <ModeSwitch/>
-          </Box>
+          </Box> */}
           <CopyRight>
             Pasar Protocol 2021 | Donate <span role="img" aria-label="">❤️</span>
           </CopyRight>
