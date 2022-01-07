@@ -45,9 +45,9 @@ const StackStyle = styled(Stack)(({ theme }) => ({
     flexDirection: 'column',
     '& .top-pagination': {
       marginTop: theme.spacing(2),
-      [theme.breakpoints.down('md')]: {
-        display: 'flex'
-      }
+      // [theme.breakpoints.down('md')]: {
+      //   display: 'flex'
+      // }
     }
   }
 }));
@@ -181,9 +181,9 @@ export default function AddressDetail() {
                 </MHidden>
               </div>
               <div className="top-pagination">
-                <Pagination page={page} pages={pages} onChange={setPage} sx={{flex:1}}/>
+                <Pagination page={page} pages={pages} onChange={setPage} sx={{flex:1, display: 'inline-block'}}/>
                 <MHidden width="mdUp">
-                  <Typography variant="body2" sx={{ display: 'inline-block', pt: 1 }}>{totalCount.toLocaleString('en')} items</Typography>
+                  <Typography variant="body2" sx={{ display: 'inline-block', pt: 1, pl: 1 }}>{totalCount.toLocaleString('en')} items</Typography>
                 </MHidden>
               </div>
             </StackStyle>
