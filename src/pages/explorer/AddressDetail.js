@@ -20,6 +20,7 @@ import ShowSelect from '../../components/pagination/ShowSelect';
 import TransactionListItem from '../../components/explorer/TransactionList/TransactionListItem'
 import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail'
 import CopyButton from '../../components/CopyButton';
+import ByToSelect from '../../components/ByToSelect';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
@@ -64,6 +65,7 @@ export default function AddressDetail() {
   const [showCount, setShowCount] = React.useState(10);
   const [methods, setMethods] = React.useState("");
   const [timeOrder, setTimeOrder] = React.useState(-1);
+  const [byto, setByTo] = React.useState(0);
   const [keyword, setKeyword] = React.useState("");
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
@@ -74,7 +76,8 @@ export default function AddressDetail() {
     setAbortController(newController);
 
     setLoadingTransactions(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByWalletAddr?walletAddr=${params.address}&pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}&keyword=${keyword}`, { signal }).then(response => {
+    const bytoKey = byto===0?"By":"To"
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByWalletAddr?walletAddr=${params.address}&pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}&performer=${bytoKey}&keyword=${keyword}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
         setTotalCount(jsonTransactions.data.total)
         setPages(Math.ceil(jsonTransactions.data.total/showCount));
@@ -85,7 +88,7 @@ export default function AddressDetail() {
       if(e.code !== e.ABORT_ERR)
         setLoadingTransactions(false);
     });
-  }, [page, showCount, methods, timeOrder, keyword, params.address]);
+  }, [page, showCount, methods, byto, timeOrder, keyword, params.address]);
 
   React.useEffect(() => {
     expandAllIf(isExpanded);
@@ -118,6 +121,10 @@ export default function AddressDetail() {
   const handleDateOrder = (selected)=>{
     setPage(1)
     setTimeOrder(selected)
+  }
+  const handleByTo = (selected)=>{
+    setPage(1)
+    setByTo(selected)
   }
   return (
     <RootStyle title="Transaction | PASAR">
@@ -153,6 +160,7 @@ export default function AddressDetail() {
               </Typography>
               <InlineBox>
                 <MethodSelect onChange={handleMethod}/>
+                <ByToSelect onChange={handleByTo}/>
                 <DateOrderSelect onChange={handleDateOrder}/>
               </InlineBox>
               <FormControlLabel
