@@ -74,7 +74,7 @@ export default function ChartArea({by, is4Address}) {
     const statisData = [jsonData.data.assets, jsonData.data.sold, jsonData.data.purchased, jsonData.data.transactions]
     setStatisData(statisData)
     setLoadingStatisData(false)
-  }, []);
+  }, [params.address]);
 
   useEffect(async () => {
     controller.abort(); // cancel the previous request
@@ -97,7 +97,7 @@ export default function ChartArea({by, is4Address}) {
       if(e.code !== e.ABORT_ERR)
         setLoadingVolumeChart(false);
     });
-  }, [volumeType]);
+  }, [volumeType, params.address]);
   
   useEffect(() => {
     updateChart(period, volumeList);

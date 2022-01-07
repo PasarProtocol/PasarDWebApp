@@ -85,7 +85,7 @@ export default function AddressDetail() {
       if(e.code !== e.ABORT_ERR)
         setLoadingTransactions(false);
     });
-  }, [page, showCount, methods, timeOrder, keyword]);
+  }, [page, showCount, methods, timeOrder, keyword, params.address]);
 
   React.useEffect(() => {
     expandAllIf(isExpanded);
