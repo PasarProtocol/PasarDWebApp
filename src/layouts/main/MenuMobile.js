@@ -61,7 +61,7 @@ function MenuMobileItem({ item, isOpen, onOpen }) {
     );
   }
 
-  if (title === 'Docs') {
+  if (!item.disable&&title === 'Docs') {
     return (
       <ListItemStyle href={path} target="_blank" component={Link}>
         <ListItemIcon>{icon}</ListItemIcon>
