@@ -112,8 +112,8 @@ export const MethodList = [
     color: '#25CD7C', 
     icon: 'basket', 
     detail: [
-      {description: 'Collectible purchased from', field: 'to', copyable: true, ellipsis: true},
-      {description: 'By', field: 'from', copyable: true, ellipsis: true},
+      {description: 'Collectible purchased from', field: 'from', copyable: true, ellipsis: true},
+      {description: 'By', field: 'to', copyable: true, ellipsis: true},
       {description: 'For a value of', field: 'price', copyable: false},
     ]
   },
