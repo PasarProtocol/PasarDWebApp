@@ -200,7 +200,7 @@ export default function CollectibleDetail() {
                   {
                     Array.isArray(item)?
                     <Accordion 
-                      defaultExpanded={1&&true}
+                      // defaultExpanded={1&&true}
                       sx={{
                         border: '1px solid',
                         borderColor: 'action.disabledBackground',
