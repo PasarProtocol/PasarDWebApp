@@ -4,6 +4,7 @@ import { formatDistance } from 'date-fns';
 import { Box, Stack, Link, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CopyButton from '../../CopyButton';
+import { getThumbnail } from '../../../utils/common';
 
 CollectibleListItem.propTypes = {
     item: PropTypes.object.isRequired
@@ -14,14 +15,14 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
     }
 }));
 export default function CollectibleListItem({ item }) {
-    const { image, name, createTime, holder, tokenIdHex } = item;
+    const { thumbnail, name, createTime, royaltyOwner, tokenIdHex } = item;
     return (
         <Stack direction="row" alignItems="center" spacing={2} sx={{p:2}}>
             <Box
                 draggable = {false}
                 component="img"
                 alt={name}
-                src={image}
+                src={getThumbnail(thumbnail)}
                 onError={(e) => e.target.src = '/static/broken-image.svg'}
                 sx={{ width: 48, height: 48, borderRadius: 1 }}
             />
@@ -32,9 +33,9 @@ export default function CollectibleListItem({ item }) {
                     </Typography>
                     <Stack sx={{flexDirection: 'row'}}>
                         <Typography variant="body2" sx={{ color: 'text.secondary', width: "auto", pt: '2px' }} align="left" noWrap>
-                            Creator : <Link to={`/explorer/transaction/detail/${holder}`} component={RouterLink} sx={{ color: 'text.secondary'}} onClick={(e)=>{e.stopPropagation()}}>{holder}</Link>
+                            Creator : <Link to={`/explorer/transaction/detail/${royaltyOwner}`} component={RouterLink} sx={{ color: 'text.secondary'}} onClick={(e)=>{e.stopPropagation()}}>{royaltyOwner}</Link>
                         </Typography>
-                        <CopyButton text={holder}/>
+                        <CopyButton text={royaltyOwner}/>
                     </Stack>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} align="left" noWrap>
                         Token ID : {tokenIdHex}
