@@ -63,6 +63,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
     const method = event!==undefined?event:item.method
     const timestamp = getTime(item.timestamp)
     const price = parseFloat((item.price/ 10 ** 18).toFixed(2))
+    const gasFee = item.gasFee?item.gasFee:0
     const platformFee = item.platformfee!==undefined?parseFloat((item.platformfee/ 10 ** 18).toFixed(7)):0
     const royalties = item.royalties!==undefined?parseFloat((item.royalties/ 10 ** 18).toFixed(7)):0
     const royaltyFee = item.royaltyFee?parseFloat((item.royaltyFee/ 10 ** 18).toFixed(7)):0
@@ -206,7 +207,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                                 </td>
                                                 <td align="right">
                                                     <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                        {item.gasFee} ELA
+                                                        {gasFee} ELA
                                                     </Typography>
                                                 </td>
                                             </tr>
@@ -220,7 +221,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                             </td>
                                             <td align="right">
                                                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                    {item.gasFee} ELA
+                                                    {gasFee} ELA
                                                 </Typography>
                                             </td>
                                         </tr>
@@ -230,7 +231,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                 <tr>
                                     <td colSpan={2} align="right">
                                         <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderBottom: "1px solid", borderColor: 'text.secondary'}}>
-                                            {method==="BuyOrder"?(price + item.gasFee):item.gasFee} ELA
+                                            {method==="BuyOrder"?(price + gasFee):gasFee} ELA
                                         </Typography>
                                         <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderColor: 'text.secondary', marginTop: '1px'}}/>
                                     </td>

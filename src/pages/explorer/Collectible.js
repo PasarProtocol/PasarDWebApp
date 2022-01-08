@@ -13,7 +13,6 @@ import Pagination from '../../components/pagination';
 import PaperRecord from '../../components/PaperRecord';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import DateOrderSelect from '../../components/DateOrderSelect';
-import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -97,13 +96,7 @@ export default function Collectible() {
                       onClick={()=>link2Detail(item.tokenId)}
                     >
                         <CollectibleListItem
-                            item={{
-                                image: getThumbnail(item.thumbnail),
-                                createTime: item.createTime,
-                                name: item.name,
-                                tokenIdHex: item.tokenIdHex,
-                                holder: item.holder
-                            }}
+                            item={item}
                         />
                     </PaperRecord>
                 </Grid>
