@@ -4,7 +4,7 @@ import fileFill from '@iconify/icons-eva/file-fill';
 import roundGrain from '@iconify/icons-ic/round-grain';
 import bookOpenFill from '@iconify/icons-eva/book-open-fill';
 // routes
-import { PATH_AUTH, PATH_DOCS, PATH_PAGE, PATH_DASHBOARD } from '../../routes/paths';
+import { PATH_DOCS, PATH_PAGE } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -23,8 +23,8 @@ const menuConfig = [
   {
     title: 'Marketplace',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
-    path: '1',
-    disable: true
+    path: PATH_PAGE.marketplace,
+    disable: false
   },
   {
     title: 'Create',
@@ -35,7 +35,7 @@ const menuConfig = [
   {
     title: 'Docs',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
-    path: 'https://docs.pasarprotocol.io',
+    path: PATH_DOCS,
     disable: true
   }
 ];
