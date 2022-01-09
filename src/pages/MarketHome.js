@@ -77,26 +77,7 @@ const TitleStyle = styled(Typography)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function MarketHome() {
-  const [newestCollectibles, setNewestCollectibles] = React.useState([]);
-  const [latestTransactions, setLatestTransactions] = React.useState([]);
-  const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
-  const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
-  React.useEffect(async () => {
-    setLoadingCollectibles(true);
-    setLoadingTransactions(true);
-    const resCollectibles = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=1&pageSize=10`
-    );
-    const jsonCollectibles = await resCollectibles.json();
-    setNewestCollectibles(jsonCollectibles.data.result);
-    setLoadingCollectibles(false);
-
-    const resTransactions = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listTrans?pageNum=1&pageSize=10`
-    );
-    const jsonTransactions = await resTransactions.json();
-    setLatestTransactions(jsonTransactions.data.results);
-    setLoadingTransactions(false);
+  React.useEffect(() => {
   }, []);
 
   return (
