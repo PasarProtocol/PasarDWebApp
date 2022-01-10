@@ -52,7 +52,7 @@ export default function Router() {
         {
           path: 'explorer',
           children: [
-            { element: <Explorer /> },
+            { path: '', element: <Explorer /> },
             { path: 'collectible', element: <Collectible /> },
             { path: 'collectible/:collection', element: <Collectible /> },
             { path: 'collectible/detail/:collection', element: <CollectibleDetail /> },
@@ -66,7 +66,7 @@ export default function Router() {
         {
           path: 'marketplace',
           children: [
-            { element: <MarketHome /> },
+            { path: '', element: <MarketHome /> },
             // { path: 'collectible', element: <Collectible /> }
           ]
         }
