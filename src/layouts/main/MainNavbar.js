@@ -8,6 +8,7 @@ import useOffSetTop from '../../hooks/useOffSetTop';
 import { MHidden } from '../../components/@material-extend';
 import SearchBox from '../../components/SearchBox';
 import Searchbar from '../../components/Searchbar';
+import SignInDialog from '../../components/SignInDialog';
 //
 import MenuDesktop from './MenuDesktop';
 import MenuMobile from './MenuMobile';
@@ -86,13 +87,7 @@ export default function MainNavbar() {
             <MenuDesktop isOffset={isOffset} isHome={isHome} navConfig={navConfig} />
           </MHidden>
 
-          <Tooltip title="Coming Soon" arrow>
-            <div>
-              <Button variant="contained" target="_blank" href="" disabled>
-                Sign In
-              </Button>
-            </div>
-          </Tooltip>
+          <SignInDialog/>
 
           <MHidden width="mdUp">
             <MenuMobile isOffset={isOffset} isHome={isHome} navConfig={navConfig} />
