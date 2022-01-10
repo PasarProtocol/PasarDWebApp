@@ -49,10 +49,11 @@ export default function Router() {
       element: <MainLayout />,
       children: [
         { path: '/', element: <Navigate to="/explorer" /> },
+        { path: 'explorer', element: <Explorer /> },
         {
           path: 'explorer',
           children: [
-            { path: '', element: <Explorer /> },
+            // { path: '', element: <Explorer /> },
             { path: 'collectible', element: <Collectible /> },
             { path: 'collectible/:collection', element: <Collectible /> },
             { path: 'collectible/detail/:collection', element: <CollectibleDetail /> },
@@ -63,10 +64,11 @@ export default function Router() {
             { path: 'search/:key', element: <SearchResult /> },
           ]
         },
+        { path: 'marketplace', element: <MarketHome /> },
         {
           path: 'marketplace',
           children: [
-            { path: '', element: <MarketHome /> },
+            // { path: '', element: <MarketHome /> },
             // { path: 'collectible', element: <Collectible /> }
           ]
         }
