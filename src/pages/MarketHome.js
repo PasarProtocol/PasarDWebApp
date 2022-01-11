@@ -1,5 +1,6 @@
 // material
 import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { Box, Container, Stack, Grid, Typography, Button, Card } from '@mui/material';
 import AdbIcon from '@mui/icons-material/Adb';
@@ -93,10 +94,10 @@ export default function MarketHome() {
               Pasar is the largest NFT marketplace<br/>on Elastos
             </Typography>
             <Stack spacing={1} direction="row">
-              <Button variant="contained" href="#">
+              <Button to="explorer" variant="contained" href="#" component={RouterLink}>
                 Explorer
               </Button>
-              <Button variant="outlined" href="#">
+              <Button variant="outlined" href="#" >
                 Create
               </Button>
             </Stack>
