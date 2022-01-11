@@ -6,9 +6,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import Imgix from "react-imgix";
 
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Container, Stack, Grid, Paper, Typography, Link, Card, Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import { Container, Stack, Grid, Paper, Typography, Link, Card, Button, Box, ToggleButtonGroup, ToggleButton, IconButton, Menu, MenuItem } from '@mui/material';
 import AppsIcon from '@mui/icons-material/Apps';
 import GridViewSharpIcon from '@mui/icons-material/GridViewSharp';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
+import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 
 // components
 import Page from '../../components/Page';
@@ -19,6 +22,7 @@ import ShowSelect from '../../components/pagination/ShowSelect';
 import AssetSortSelect from '../../components/AssetSortSelect';
 import Pagination from '../../components/pagination';
 import PaperRecord from '../../components/PaperRecord';
+import Badge from '../../components/Badge';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import { getThumbnail } from '../../utils/common';
@@ -51,12 +55,9 @@ const StackedGrid = ({
     {children}
   </Box>
 );
-const GridItems = (props) => {
-  const { items, ratio, rowGap, url } = props;
-
-  return (
+const GridItems = (props) => (
     <AnimatePresence>
-      {items.map((item, index) => (
+      {props.items.map((item, index) => (
         <motion.div
           key={index}
           initial={{ opacity: 0 }}
@@ -64,84 +65,103 @@ const GridItems = (props) => {
           exit={{ opacity: 0 }}
         >
           <GridItem
-            ratio={ratio}
+            ratio={props.ratio}
             key={index}
             id={item}
             index={index}
-            mb={rowGap}
+            mb={props.rowGap}
             thumbnail={getThumbnail(item.asset)}
             title={item.name && item.name}
-            subheader={item.subheader && item.subheader}
-            url={url}
+            url={props.url}
             {...props}
           />
         </motion.div>
       ))}
     </AnimatePresence>
-  );
-};
+);
 
-const GridItem = function ({
-  variant,
-  thumbnail,
-  title,
-  subheader,
-  type,
-  index,
-  rowGap,
-  url,
-  ...props
-})  {
-  // const location = useLocation();
-  // const [isHovered, setIsHovered] = React.useState(false);
+const GridItem = (props) => {
+  const [isOpenPopup, setOpenPopup] = React.useState(null);
+
+  const openPopupMenu = (event) => {
+    setOpenPopup(event.currentTarget);
+  };
+  const handleClosePopup = () => {
+    setOpenPopup(null);
+  };
 
   return (
-    /*
-    <RouterLink alt={title} to={url}>
-    */
-    <RouterLink
+    <Link
+      component={RouterLink}
       to="#"
-      alt={title}
+      alt={props.title}
+      underline="none"
     >
       <motion.div
-        // onHoverStart={() => setIsHovered(true)}
-        // onHoverEnd={() => setIsHovered(false)}
         animate={{ scale: 1 }}
       >
-        <Grid
-          as={Grid}
-          alignItems="start"
-          mb={rowGap}
-          {...props}
-        >
+        <PaperRecord sx={{p:1}}>
+          <Grid container>
+            <Grid item xs="6">
+              <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
+            </Grid>
+            <Grid item xs="6" align="right">
+              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={openPopupMenu}>
+                <MoreHorizIcon />
+              </IconButton>
+              <Menu 
+                keepMounted
+                id="simple-menu"
+                anchorEl={isOpenPopup}
+                onClose={handleClosePopup}
+                open={Boolean(isOpenPopup)} 
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              >
+                <MenuItem onClick={handleClosePopup}>
+                  <ThumbDownOffAltIcon/>&nbsp;Report Creator
+                </MenuItem>
+                <MenuItem onClick={handleClosePopup}>
+                  <ThumbDownOffAltIcon/>&nbsp;Report Owner
+                </MenuItem>
+                <MenuItem onClick={handleClosePopup}>
+                  <ShareOutlinedIcon/>&nbsp;Share
+                </MenuItem>
+              </Menu>
+            </Grid>
+          </Grid>
           <SizeMe>
             {({ size }) => (
               <Thumbnail
-                src={thumbnail}
+                src={props.thumbnail}
                 width={size.width}
-                variant={variant}
                 // hovered={isHovered}
                 {...props}
               />
             )}
           </SizeMe>
-        </Grid>
+          <Typography variant="h5">Ph-1157</Typography>
+          <Typography variant="body2" display="block" sx={{lineHeight: 1}}>Phantz</Typography>
+          <Typography variant="body2" display="block" sx={{lineHeight: 1, color: 'text.secondary'}}>Quantity: 1/2</Typography>
+          <Typography variant="h5" sx={{color: "origin.main"}}>
+            <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
+            &nbsp;28.22 ELA
+          </Typography>
+          <Stack direction = "row">
+          <Badge name="diamond"/>
+          <Badge name="user"/>
+          </Stack>
+        </PaperRecord>
       </motion.div>
-    </RouterLink>
+    </Link>
   );
 };
 
 const Thumbnail = (props) => {
-  const {
-    variant,
-    width,
-    src,
-    ratio,
-    hovered
-  } = props;
+  const { width, src, ratio } = props;
 
   return (
-    <Grid as={Card}>
+    <Grid as={Card} sx={{mt: .5}}>
       <Imgix
         src={src}
         width={width}

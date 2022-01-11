@@ -50,6 +50,7 @@ const createCustomShadow = (color) => {
     z16: `0 0 2px 0 ${transparent}, 0 16px 32px -4px ${transparent}`,
     z20: `0 0 2px 0 ${transparent}, 0 20px 40px -4px ${transparent}`,
     z24: `0 0 4px 0 ${transparent}, 0 24px 48px 0 ${transparent}`,
+    origin: `0 2px 4px 0 ${color}`,
     primary: `0 8px 16px 0 ${alpha(palette.light.primary.main, 0.24)}`,
     secondary: `0 8px 16px 0 ${alpha(palette.light.secondary.main, 0.24)}`,
     info: `0 8px 16px 0 ${alpha(palette.light.info.main, 0.24)}`,
