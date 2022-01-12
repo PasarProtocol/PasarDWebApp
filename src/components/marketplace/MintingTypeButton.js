@@ -1,7 +1,7 @@
 import { Paper, Typography, ButtonBase, Box, } from '@mui/material';
 import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActualOutlined';
 
-const PaperRecord = (props)=>{
+const MintingTypeButton = (props)=>{
     const {type, description, current} = props
     return(
         <Paper
@@ -45,4 +45,4 @@ const PaperRecord = (props)=>{
         </Paper>
     )
 }
-export default PaperRecord;
+export default MintingTypeButton;
