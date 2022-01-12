@@ -4,6 +4,7 @@ import { Container, Stack, Grid, Typography, Link } from '@mui/material';
 // components
 import Page from '../../components/Page';
 import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
+import ItemTypeButton from '../../components/marketplace/ItemTypeButton';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -27,7 +28,8 @@ const StackStyle = styled(Stack)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function Collectible() {
-  const [type, setType] = React.useState("Single");
+  const [mintype, setMintType] = React.useState("Single");
+  const [itemtype, setItemType] = React.useState("General");
   React.useEffect(async () => {
     
   }, []);
@@ -44,9 +46,18 @@ export default function Collectible() {
           </Grid>
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
-              <MintingTypeButton type="Single" description="Single item" onClick={()=>{setType("Single")}} current={type}/>
-              <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setType("Multiple")}} current={type}/>
-              <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setType("Batch")}} current={type}/>
+              <MintingTypeButton type="Single" description="Single item" onClick={()=>{setMintType("Single")}} current={mintype}/>
+              <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype}/>
+              <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
+            </Stack>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h4" sx={{fontWeight: 'normal'}}>Item Type</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Stack spacing={1} direction="row">
+              <ItemTypeButton type="General" description="Single item" onClick={()=>{setItemType("General")}} current={itemtype}/>
+              <ItemTypeButton type="Avatar" description="Multiple identical items" onClick={()=>{setItemType("Avatar")}} current={itemtype}/>
             </Stack>
           </Grid>
         </Grid>
