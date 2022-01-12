@@ -1,20 +1,13 @@
 // material
 import React from 'react';
-import { SizeMe } from "react-sizeme";
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
-import { motion, AnimatePresence } from "framer-motion";
-import Imgix from "react-imgix";
 
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Container, Stack, Grid, Paper, Typography, Accordion, AccordionSummary, AccordionDetails, Drawer, Divider, AppBar, Toolbar, TextField, FormControlLabel,
-  Link, Card, Button, Box, ToggleButtonGroup, ToggleButton, IconButton, Menu, MenuItem, List, ListItemButton, ListItemIcon, ListItemText, Select } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Container, Stack, Typography, AppBar, Toolbar, 
+  Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import AppsIcon from '@mui/icons-material/Apps';
 import GridViewSharpIcon from '@mui/icons-material/GridViewSharp';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
-import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
-import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosBackFill from '@iconify/icons-eva/arrow-ios-back-fill';
 import CloseIcon from '@mui/icons-material/Close';
@@ -22,19 +15,11 @@ import CloseIcon from '@mui/icons-material/Close';
 // components
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
-import Scrollbar from '../../components/Scrollbar';
-import CollectibleListItem from '../../components/explorer/CollectibleList/CollectibleListItem'
-import ShowSelect from '../../components/pagination/ShowSelect';
 import AssetSortSelect from '../../components/AssetSortSelect';
-import Pagination from '../../components/pagination';
-import PaperRecord from '../../components/PaperRecord';
-import Badge from '../../components/Badge';
 import LoadingWrapper from '../../components/LoadingWrapper';
-import DateOrderSelect from '../../components/DateOrderSelect';
-import { getThumbnail } from '../../utils/common';
 import useOffSetTop from '../../hooks/useOffSetTop';
-import CustomSwitch from '../../components/custom-switch';
-import SearchBox from '../../components/SearchBox';
+import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
+import AssetGrid from '../../components/marketplace/AssetGrid';
 
 // ----------------------------------------------------------------------
 
@@ -56,135 +41,7 @@ const StackStyle = styled(Stack)(({ theme }) => ({
   }
 }));
 
-const StackedGrid = ({
-  gridItemWidth = "280px",
-  children,
-  ...props
-}) => (
-  <Box display="grid" gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={1.5}>
-    {children}
-  </Box>
-);
-const GridItems = (props) => (
-    <AnimatePresence>
-      {props.items.map((item, index) => (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <GridItem
-            ratio={props.ratio}
-            key={index}
-            id={item}
-            index={index}
-            mb={props.rowGap}
-            thumbnail={getThumbnail(item.asset)}
-            title={item.name && item.name}
-            url={props.url}
-            {...props}
-          />
-        </motion.div>
-      ))}
-    </AnimatePresence>
-);
 
-const GridItem = (props) => {
-  const [isOpenPopup, setOpenPopup] = React.useState(null);
-
-  const openPopupMenu = (event) => {
-    setOpenPopup(event.currentTarget);
-  };
-  const handleClosePopup = () => {
-    setOpenPopup(null);
-  };
-
-  return (
-    <Link
-      component={RouterLink}
-      to="#"
-      alt={props.title}
-      underline="none"
-    >
-      <motion.div
-        animate={{ scale: 1 }}
-      >
-        <PaperRecord sx={{p:1}}>
-          <Grid container>
-            <Grid item md={6}>
-              <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
-            </Grid>
-            <Grid item md={6} align="right">
-              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={openPopupMenu}>
-                <MoreHorizIcon />
-              </IconButton>
-              <Menu 
-                keepMounted
-                id="simple-menu"
-                anchorEl={isOpenPopup}
-                onClose={handleClosePopup}
-                open={Boolean(isOpenPopup)} 
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-              >
-                <MenuItem onClick={handleClosePopup}>
-                  <ThumbDownOffAltIcon/>&nbsp;Report Creator
-                </MenuItem>
-                <MenuItem onClick={handleClosePopup}>
-                  <ThumbDownOffAltIcon/>&nbsp;Report Owner
-                </MenuItem>
-                <MenuItem onClick={handleClosePopup}>
-                  <ShareOutlinedIcon/>&nbsp;Share
-                </MenuItem>
-              </Menu>
-            </Grid>
-          </Grid>
-          <SizeMe>
-            {({ size }) => (
-              <Thumbnail
-                src={props.thumbnail}
-                width={size.width}
-                // hovered={isHovered}
-                {...props}
-              />
-            )}
-          </SizeMe>
-          <Typography variant="h4">Ph-1157</Typography>
-          <Typography variant="body2" display="block" sx={{lineHeight: 1}}>Phantz</Typography>
-          <Typography variant="body2" display="block" sx={{lineHeight: 1, color: 'text.secondary'}}>Quantity: 1/2</Typography>
-          <Typography variant="h4" sx={{color: "origin.main"}}>
-            <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
-            &nbsp;28.22 ELA
-          </Typography>
-          <Stack direction="row">
-            <Badge name="diamond"/>
-            <Badge name="user"/>
-          </Stack>
-        </PaperRecord>
-      </motion.div>
-    </Link>
-  );
-};
-
-const Thumbnail = (props) => {
-  const { width, src, ratio } = props;
-
-  return (
-    <Grid as={Card} sx={{mt: .5}}>
-      <Imgix
-        src={src}
-        width={width}
-        height={width}
-        imgixParams={{
-          fit: "crop",
-          crop: "edges, entropy, faces, center",
-          ar: `${ratio}`
-        }}
-      />
-    </Grid>
-  );
-};
 const APP_BAR_MOBILE = 64;
 const APP_BAR_DESKTOP = 88;
 const AppBarStyle = styled(AppBar)(({ theme }) => ({
@@ -206,18 +63,6 @@ const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
   // },
   [theme.breakpoints.down('md')]: {
     display: 'none'
-  }
-}));
-const DrawerStyle = styled(Drawer)(({ theme }) => ({
-  [theme.breakpoints.down('sm')]: {
-    display: 'none'
-  },
-  '& .MuiDrawer-paper': {
-    boxSizing: 'border-box',
-    transition: theme.transitions.create(['top'], {
-      easing: theme.transitions.easing.easeInOut,
-      duration: theme.transitions.duration.standard
-    }),
   }
 }));
 const ToolbarShadowStyle = styled('div')(({ theme }) => ({
@@ -361,163 +206,22 @@ export default function MarketExplorer() {
               sx={{ width: drawerWidth*isFilterView, flexShrink: 0, display: {xs: 'none', sm: 'none', md: 'block'} }}
               aria-label="mailbox folders"
             >
-              <DrawerStyle
-                variant="persistent"
-                open
+              <AssetFilterPan 
                 sx={{
                   pt: 3,
                   '& .MuiDrawer-paper': { width: drawerWidth*isFilterView, top: isOffset?APP_BAR_MOBILE+48:APP_BAR_DESKTOP+48 },
                 }}
-              >
-                <Scrollbar sx={{maxHeight: `calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}}>
-                  <Grid container width="100%">
-                    <Grid item md={12}>
-                      <Accordion
-                        defaultExpanded={1&&true}
-                      >
-                        <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-                          <Typography variant="body2">Status</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          {
-                            [...btnNames].splice(0,3).map((name, index)=>(
-                              <Button key={index} variant={selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleBtns(index)}>
-                                {name}
-                              </Button>
-                            ))
-                          }
-                        </AccordionDetails>
-                      </Accordion>
-                      <Divider />
-                    </Grid>
-                    <Grid item md={12}>
-                      <Accordion
-                        defaultExpanded={1&&true}
-                      >
-                        <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-                          <Typography variant="body2">Price Range</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <Stack spacing={1}>
-                            <Select
-                              defaultValue={0}
-                              // value={selected}
-                              // onChange={handleChange}
-                              inputProps={{ 'aria-label': 'Without label' }}
-                              size="small"
-                              sx={{
-                                mr: 1,
-                                width: '100%',
-                                '& .MuiListItemText-root, & .MuiListItemText-root>span': {
-                                  display: 'inline'
-                                }
-                              }}
-                            >
-                              <MenuItem value={0}>
-                                <ListItemIcon>
-                                  <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
-                                </ListItemIcon>
-                                <ListItemText primary="Elastos (ELA)" />
-                              </MenuItem>
-                            </Select>
-                            <Grid container>
-                              <Grid item md={5}>
-                                <TextField label="Min" size="small"/>
-                              </Grid>
-                              <Grid item md={2} align="center">
-                                <Typography variant="body2" sx={{pt: 1}}>to</Typography>
-                              </Grid>
-                              <Grid item md={5}>
-                                <TextField label="Max" size="small"/>
-                              </Grid>
-                            </Grid>
-                            <Button variant="contained" color="primary" width="100%">
-                              Apply
-                            </Button>
-                          </Stack>
-                        </AccordionDetails>
-                      </Accordion>
-                      <Divider />
-                    </Grid>
-                    <Grid item md={12}>
-                      <Accordion
-                        defaultExpanded={1&&true}
-                      >
-                        <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-                          <Typography variant="body2">Collections</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <SearchBox sx={{width: '100%'}} rootsx={{px: '0 !important', mb: 1}} placeholder="Search collections"/>
-                          <Scrollbar sx={{maxHeight: 200}}>
-                            <List
-                              sx={{ width: '100%', bgcolor: 'background.paper' }}
-                              component="nav"
-                              aria-labelledby="nested-list-subheader"
-                            >
-                              {
-                                [...Array(10)].map((value, id)=>(
-                                    <ListItemButton key={id}>
-                                      <ListItemIcon>
-                                        <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
-                                      </ListItemIcon>
-                                      <ListItemText primary="Feeds NFT Sticker" />
-                                    </ListItemButton>
-                                ))
-                              }
-                            </List>
-                          </Scrollbar>
-                        </AccordionDetails>
-                      </Accordion>
-                      <Divider />
-                    </Grid>
-                  </Grid>
-                  <Grid item md={12}>
-                      <Accordion
-                        defaultExpanded={1&&true}
-                      >
-                        <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-                          <Typography variant="body2">Item Type</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          {
-                            [...btnNames].splice(3).map((name, index)=>(
-                              <Button key={index} variant={selectedBtns.includes(index+3)?"contained":"outlined"} color="primary" onClick={()=>handleBtns(index+3)}>
-                                {name}
-                              </Button>
-                            ))
-                          }
-                        </AccordionDetails>
-                      </Accordion>
-                      <Divider />
-                    </Grid>
-                  <Grid item md={12}>
-                    <Accordion
-                      defaultExpanded={1&&true}
-                    >
-                      <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-                        <Typography variant="body2">Explicit & Sensitive Content</Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <FormControlLabel
-                          control={<CustomSwitch onChange={()=>{}}/>}
-                          label="Off"
-                          labelPlacement="end"
-                          sx={{ml:2, pr:2}}
-                        />
-                      </AccordionDetails>
-                    </Accordion>
-                    <Divider />
-                  </Grid>
-                </Scrollbar>
-              </DrawerStyle>
+                scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
+                btnNames = {btnNames}
+                selectedBtns = {selectedBtns}
+                handleBtnFunc = {handleBtns}
+              />
             </Box>
             <Box
               component="main"
               sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth*isFilterView}px)` } }}
             >
-              <StackedGrid>
-                <GridItems items={assets} ratio="3:2" />
-              </StackedGrid>
+              <AssetGrid assets={assets}/>
             </Box>
           </Box>
         </Container>
