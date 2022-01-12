@@ -17,7 +17,7 @@ import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosBackFill from '@iconify/icons-eva/arrow-ios-back-fill';
-
+import CloseIcon from '@mui/icons-material/Close';
 
 // components
 import Page from '../../components/Page';
@@ -235,9 +235,12 @@ const ToolbarShadowStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
   const drawerWidth = 360;
+  const btnNames = ["All", "Listed on Market", "On Auction", "All", "General", "Avatar"]
+
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([]);
+  const [selectedBtns, setSelectedBtns] = React.useState([]);
   const [dispmode, setDispmode] = React.useState(0);
   const [isFilterView, setFilterView] = React.useState(0);
   const [totalCount, setTotalCount] = React.useState(0);
@@ -270,8 +273,17 @@ export default function MarketExplorer() {
   
   const handleDispmode = (event, mode) => {
     setDispmode(mode)
-    // setShowCount(event.target.value)
   };
+  const handleBtns = (num)=>{
+    const tempBtns = [...selectedBtns]
+    if(tempBtns.includes(num)){
+      const findIndex = tempBtns.indexOf(num)
+      tempBtns.splice(findIndex, 1)
+    }
+    else
+      tempBtns.push(num)
+    setSelectedBtns(tempBtns);
+  }
   const handleDateOrder = (selected)=>{
     setTimeOrder(selected)
   }
@@ -291,7 +303,7 @@ export default function MarketExplorer() {
               }}
             >
               <StackStyle width="100%">
-                <Typography variant="h4" sx={{flex:1}}>
+                <Box sx={{flex:1}}>
                   <Button
                     variant="contained"
                     color="origin"
@@ -302,7 +314,31 @@ export default function MarketExplorer() {
                     Filters
                   </Button>
                   <Typography variant="body2" sx={{ ml: 1, display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
-                </Typography>
+                  <Stack spacing={1} sx={{display: 'inline', pl: 1}} direction="row">
+                    {
+                      selectedBtns.map((nameId, index)=>(
+                        <Button
+                          key={index}
+                          variant="outlined"
+                          color="origin"
+                          endIcon={<CloseIcon />}
+                          onClick={()=>{handleBtns(nameId)}}
+                        >
+                          {btnNames[nameId]}
+                        </Button>
+                      ))
+                    }
+                    {
+                      selectedBtns.length>0&&
+                      <Button
+                        color="inherit"
+                        onClick={()=>{setSelectedBtns([])}}
+                      >
+                        Clear All
+                      </Button>
+                    }
+                  </Stack>
+                </Box>
                 <Box sx={{display: 'flex'}}>
                   <AssetSortSelect/>
                   <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
@@ -343,15 +379,13 @@ export default function MarketExplorer() {
                           <Typography variant="body2">Status</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                          <Button variant="outlined" color="primary">
-                            All
-                          </Button>
-                          <Button variant="outlined" color="primary">
-                            Listed on Market
-                          </Button>
-                          <Button variant="outlined" color="primary">
-                            On Auction
-                          </Button>
+                          {
+                            [...btnNames].splice(0,3).map((name, index)=>(
+                              <Button key={index} variant={selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleBtns(index)}>
+                                {name}
+                              </Button>
+                            ))
+                          }
                         </AccordionDetails>
                       </Accordion>
                       <Divider />
@@ -391,7 +425,7 @@ export default function MarketExplorer() {
                                 <TextField label="Min" size="small"/>
                               </Grid>
                               <Grid item md={2} align="center">
-                                <Typography variant="body2" sx={{pt: 1}}>~</Typography>
+                                <Typography variant="body2" sx={{pt: 1}}>to</Typography>
                               </Grid>
                               <Grid item md={5}>
                                 <TextField label="Max" size="small"/>
@@ -437,6 +471,25 @@ export default function MarketExplorer() {
                       <Divider />
                     </Grid>
                   </Grid>
+                  <Grid item md={12}>
+                      <Accordion
+                        defaultExpanded={1&&true}
+                      >
+                        <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                          <Typography variant="body2">Item Type</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          {
+                            [...btnNames].splice(3).map((name, index)=>(
+                              <Button key={index} variant={selectedBtns.includes(index+3)?"contained":"outlined"} color="primary" onClick={()=>handleBtns(index+3)}>
+                                {name}
+                              </Button>
+                            ))
+                          }
+                        </AccordionDetails>
+                      </Accordion>
+                      <Divider />
+                    </Grid>
                   <Grid item md={12}>
                     <Accordion
                       defaultExpanded={1&&true}
