@@ -391,10 +391,10 @@ export default function MarketExplorer() {
                                 <TextField label="Min" size="small"/>
                               </Grid>
                               <Grid item md={2} align="center">
-                                <Typography variant="body2">~</Typography>
+                                <Typography variant="body2" sx={{pt: 1}}>~</Typography>
                               </Grid>
                               <Grid item md={5}>
-                                <TextField label="Max" size="small" sx={{pt: 1}}/>
+                                <TextField label="Max" size="small"/>
                               </Grid>
                             </Grid>
                             <Button variant="contained" color="primary" width="100%">
