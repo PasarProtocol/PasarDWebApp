@@ -150,10 +150,10 @@ const GridItem = (props) => {
               />
             )}
           </SizeMe>
-          <Typography variant="h5">Ph-1157</Typography>
+          <Typography variant="h4">Ph-1157</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1}}>Phantz</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1, color: 'text.secondary'}}>Quantity: 1/2</Typography>
-          <Typography variant="h5" sx={{color: "origin.main"}}>
+          <Typography variant="h4" sx={{color: "origin.main"}}>
             <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
             &nbsp;28.22 ELA
           </Typography>
@@ -322,7 +322,7 @@ export default function MarketExplorer() {
           <Box sx={{ display: 'flex' }}>
             <Box
               component="nav"
-              sx={{ width: drawerWidth*isFilterView, flexShrink: 0 }}
+              sx={{ width: drawerWidth*isFilterView, flexShrink: 0, display: {xs: 'none', sm: 'none', md: 'block'} }}
               aria-label="mailbox folders"
             >
               <DrawerStyle
@@ -413,7 +413,7 @@ export default function MarketExplorer() {
                           <Typography variant="body2">Collections</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                          <SearchBox sx={{width: '100%'}} rootsx={{px: '0 !important'}} placeholder="Search collections"/>
+                          <SearchBox sx={{width: '100%'}} rootsx={{px: '0 !important', mb: 1}} placeholder="Search collections"/>
                           <Scrollbar sx={{maxHeight: 200}}>
                             <List
                               sx={{ width: '100%', bgcolor: 'background.paper' }}
@@ -455,12 +455,12 @@ export default function MarketExplorer() {
                     </Accordion>
                     <Divider />
                   </Grid>
-                  </Scrollbar>
-                </DrawerStyle>
+                </Scrollbar>
+              </DrawerStyle>
             </Box>
             <Box
               component="main"
-              sx={{ flexGrow: 1, width: { sm: `calc(100% - ${drawerWidth*isFilterView}px)` } }}
+              sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth*isFilterView}px)` } }}
             >
               <StackedGrid>
                 <GridItems items={assets} ratio="3:2" />
