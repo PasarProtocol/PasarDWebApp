@@ -1,17 +1,23 @@
 // material
 import React from 'react';
 import { SizeMe } from "react-sizeme";
+import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
 import { motion, AnimatePresence } from "framer-motion";
 import Imgix from "react-imgix";
 
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Container, Stack, Grid, Paper, Typography, Link, Card, Button, Box, ToggleButtonGroup, ToggleButton, IconButton, Menu, MenuItem } from '@mui/material';
+import { Container, Stack, Grid, Paper, Typography, Accordion, AccordionSummary, AccordionDetails, Drawer, Divider, AppBar, Toolbar, TextField, FormControlLabel,
+  Link, Card, Button, Box, ToggleButtonGroup, ToggleButton, IconButton, Menu, MenuItem, List, ListItemButton, ListItemIcon, ListItemText, Select } from '@mui/material';
 import AppsIcon from '@mui/icons-material/Apps';
 import GridViewSharpIcon from '@mui/icons-material/GridViewSharp';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
+import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
+import arrowIosBackFill from '@iconify/icons-eva/arrow-ios-back-fill';
+
 
 // components
 import Page from '../../components/Page';
@@ -26,13 +32,17 @@ import Badge from '../../components/Badge';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import { getThumbnail } from '../../utils/common';
+import useOffSetTop from '../../hooks/useOffSetTop';
+import CustomSwitch from '../../components/custom-switch';
+import SearchBox from '../../components/SearchBox';
+
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
   paddingTop: theme.spacing(10),
   paddingBottom: theme.spacing(12),
   [theme.breakpoints.up('md')]: {
-    paddingTop: theme.spacing(13)
+    paddingTop: theme.spacing(19)
   },
   [theme.breakpoints.down('md')]: {
     paddingBottom: theme.spacing(3)
@@ -51,7 +61,7 @@ const StackedGrid = ({
   children,
   ...props
 }) => (
-  <Box display="grid" gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))" gap={1.5}>
+  <Box display="grid" gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={1.5}>
     {children}
   </Box>
 );
@@ -102,10 +112,10 @@ const GridItem = (props) => {
       >
         <PaperRecord sx={{p:1}}>
           <Grid container>
-            <Grid item xs="6">
+            <Grid item md={6}>
               <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
             </Grid>
-            <Grid item xs="6" align="right">
+            <Grid item md={6} align="right">
               <IconButton color="inherit" size="small" sx={{p: 0}} onClick={openPopupMenu}>
                 <MoreHorizIcon />
               </IconButton>
@@ -147,9 +157,9 @@ const GridItem = (props) => {
             <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
             &nbsp;28.22 ELA
           </Typography>
-          <Stack direction = "row">
-          <Badge name="diamond"/>
-          <Badge name="user"/>
+          <Stack direction="row">
+            <Badge name="diamond"/>
+            <Badge name="user"/>
           </Stack>
         </PaperRecord>
       </motion.div>
@@ -175,18 +185,69 @@ const Thumbnail = (props) => {
     </Grid>
   );
 };
+const APP_BAR_MOBILE = 64;
+const APP_BAR_DESKTOP = 88;
+const AppBarStyle = styled(AppBar)(({ theme }) => ({
+  color: 'inherit',
+  transition: theme.transitions.create(['top'], {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.standard
+  }),
+}));
+const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
+  height: '48px',
+  minHeight: '48px !important',
+  transition: theme.transitions.create(['height', 'background-color'], {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.standard
+  }),
+  // [theme.breakpoints.up('md')]: {
+  //   height: APP_BAR_MOBILE
+  // },
+  [theme.breakpoints.down('md')]: {
+    display: 'none'
+  }
+}));
+const DrawerStyle = styled(Drawer)(({ theme }) => ({
+  [theme.breakpoints.down('sm')]: {
+    display: 'none'
+  },
+  '& .MuiDrawer-paper': {
+    boxSizing: 'border-box',
+    transition: theme.transitions.create(['top'], {
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.standard
+    }),
+  }
+}));
+const ToolbarShadowStyle = styled('div')(({ theme }) => ({
+  left: 0,
+  right: 0,
+  bottom: 0,
+  height: 24,
+  zIndex: -1,
+  margin: 'auto',
+  borderRadius: '50%',
+  position: 'absolute',
+  width: `calc(100% - 48px)`,
+  boxShadow: theme.customShadows.z8
+}));
 // ----------------------------------------------------------------------
-export default function Collectible() {
+export default function MarketExplorer() {
+  const drawerWidth = 360;
+  const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([]);
-  const [page, setPage] = React.useState(1);
   const [dispmode, setDispmode] = React.useState(0);
-  const [pages, setPages] = React.useState(0);
+  const [isFilterView, setFilterView] = React.useState(0);
   const [totalCount, setTotalCount] = React.useState(0);
-  const [showCount, setShowCount] = React.useState(10);
   const [timeOrder, setTimeOrder] = React.useState(-1);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
+
+  const [page, setPage] = React.useState(1);
+  const [pages, setPages] = React.useState(0);
+  const [showCount, setShowCount] = React.useState(10);
   React.useEffect(async () => {
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
@@ -219,33 +280,195 @@ export default function Collectible() {
   }
   return (
     <RootStyle title="Marketplace | PASAR">
-      <Container maxWidth="lg">
-        <StackStyle sx={{ mb: 2 }}>
-          <Typography variant="h4" sx={{flex:1}}>
-            <Button variant="contained" color="origin">
-              Filters
-            </Button>
-            <Typography variant="body2" sx={{ ml: 1, display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
-          </Typography>
-          <Box sx={{display: 'flex'}}>
-            <AssetSortSelect/>
-            <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-              <ToggleButton value={0}>
-                <GridViewSharpIcon />
-              </ToggleButton>
-              <ToggleButton value={1}>
-                <AppsIcon />
-              </ToggleButton>
-            </ToggleButtonGroup>
+      <Stack direction="row">
+        <Container maxWidth={false}>
+          <AppBarStyle sx={{ boxShadow: 0, bgcolor: 'transparent', top: isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP }}>
+            <ToolbarStyle
+              sx={{
+                ...(isOffset && {
+                  bgcolor: 'background.default',
+                })
+              }}
+            >
+              <StackStyle width="100%">
+                <Typography variant="h4" sx={{flex:1}}>
+                  <Button
+                    variant="contained"
+                    color="origin"
+                    startIcon={isFilterView?<Icon icon={arrowIosBackFill} />:''}
+                    endIcon={isFilterView?'':<Icon icon={arrowIosForwardFill} />}
+                    onClick={()=>{setFilterView(!isFilterView&&1)}}
+                  >
+                    Filters
+                  </Button>
+                  <Typography variant="body2" sx={{ ml: 1, display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
+                </Typography>
+                <Box sx={{display: 'flex'}}>
+                  <AssetSortSelect/>
+                  <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                    <ToggleButton value={0}>
+                      <GridViewSharpIcon />
+                    </ToggleButton>
+                    <ToggleButton value={1}>
+                      <AppsIcon />
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Box>
+              </StackStyle>
+            </ToolbarStyle>
+            {isOffset && <ToolbarShadowStyle />}
+          </AppBarStyle>
+          {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
+          <Box sx={{ display: 'flex' }}>
+            <Box
+              component="nav"
+              sx={{ width: drawerWidth*isFilterView, flexShrink: 0 }}
+              aria-label="mailbox folders"
+            >
+              <DrawerStyle
+                variant="persistent"
+                open
+                sx={{
+                  pt: 3,
+                  '& .MuiDrawer-paper': { width: drawerWidth*isFilterView, top: isOffset?APP_BAR_MOBILE+48:APP_BAR_DESKTOP+48 },
+                }}
+              >
+                <Scrollbar sx={{maxHeight: `calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}}>
+                  <Grid container width="100%">
+                    <Grid item md={12}>
+                      <Accordion
+                        defaultExpanded={1&&true}
+                      >
+                        <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                          <Typography variant="body2">Status</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Button variant="outlined" color="primary">
+                            All
+                          </Button>
+                          <Button variant="outlined" color="primary">
+                            Listed on Market
+                          </Button>
+                          <Button variant="outlined" color="primary">
+                            On Auction
+                          </Button>
+                        </AccordionDetails>
+                      </Accordion>
+                      <Divider />
+                    </Grid>
+                    <Grid item md={12}>
+                      <Accordion
+                        defaultExpanded={1&&true}
+                      >
+                        <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                          <Typography variant="body2">Price Range</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Stack spacing={1}>
+                            <Select
+                              defaultValue={0}
+                              // value={selected}
+                              // onChange={handleChange}
+                              inputProps={{ 'aria-label': 'Without label' }}
+                              size="small"
+                              sx={{
+                                mr: 1,
+                                width: '100%',
+                                '& .MuiListItemText-root, & .MuiListItemText-root>span': {
+                                  display: 'inline'
+                                }
+                              }}
+                            >
+                              <MenuItem value={0}>
+                                <ListItemIcon>
+                                  <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
+                                </ListItemIcon>
+                                <ListItemText primary="Elastos (ELA)" />
+                              </MenuItem>
+                            </Select>
+                            <Grid container>
+                              <Grid item md={5}>
+                                <TextField label="Min" size="small"/>
+                              </Grid>
+                              <Grid item md={2} align="center">
+                                <Typography variant="body2">~</Typography>
+                              </Grid>
+                              <Grid item md={5}>
+                                <TextField label="Max" size="small" sx={{pt: 1}}/>
+                              </Grid>
+                            </Grid>
+                            <Button variant="contained" color="primary" width="100%">
+                              Apply
+                            </Button>
+                          </Stack>
+                        </AccordionDetails>
+                      </Accordion>
+                      <Divider />
+                    </Grid>
+                    <Grid item md={12}>
+                      <Accordion
+                        defaultExpanded={1&&true}
+                      >
+                        <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                          <Typography variant="body2">Collections</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <SearchBox sx={{width: '100%'}} rootsx={{px: '0 !important'}} placeholder="Search collections"/>
+                          <Scrollbar sx={{maxHeight: 200}}>
+                            <List
+                              sx={{ width: '100%', bgcolor: 'background.paper' }}
+                              component="nav"
+                              aria-labelledby="nested-list-subheader"
+                            >
+                              {
+                                [...Array(10)].map((value, id)=>(
+                                    <ListItemButton key={id}>
+                                      <ListItemIcon>
+                                        <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
+                                      </ListItemIcon>
+                                      <ListItemText primary="Feeds NFT Sticker" />
+                                    </ListItemButton>
+                                ))
+                              }
+                            </List>
+                          </Scrollbar>
+                        </AccordionDetails>
+                      </Accordion>
+                      <Divider />
+                    </Grid>
+                  </Grid>
+                  <Grid item md={12}>
+                    <Accordion
+                      defaultExpanded={1&&true}
+                    >
+                      <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                        <Typography variant="body2">Explicit & Sensitive Content</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <FormControlLabel
+                          control={<CustomSwitch onChange={()=>{}}/>}
+                          label="Off"
+                          labelPlacement="end"
+                          sx={{ml:2, pr:2}}
+                        />
+                      </AccordionDetails>
+                    </Accordion>
+                    <Divider />
+                  </Grid>
+                  </Scrollbar>
+                </DrawerStyle>
+            </Box>
+            <Box
+              component="main"
+              sx={{ flexGrow: 1, width: { sm: `calc(100% - ${drawerWidth*isFilterView}px)` } }}
+            >
+              <StackedGrid>
+                <GridItems items={assets} ratio="3:2" />
+              </StackedGrid>
+            </Box>
           </Box>
-        </StackStyle>
-        {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
-        <Scrollbar>
-          <StackedGrid>
-            <GridItems items={assets} ratio="3:2" />
-          </StackedGrid>
-        </Scrollbar>
-      </Container>
+        </Container>
+      </Stack>
     </RootStyle>
   );
 }
