@@ -2,7 +2,7 @@ import React from 'react';
 import Imgix from "react-imgix";
 import { SizeMe } from "react-sizeme";
 import { Link as RouterLink } from 'react-router-dom';
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 // material
 import { Icon } from '@iconify/react';
 import { Box, Grid, Card, Link, IconButton, Menu, MenuItem, Typography, Stack } from '@mui/material';
@@ -20,7 +20,8 @@ const Thumbnail = (props) => {
 
   return (
     <Grid as={Card} sx={{mt: .5}}>
-      <Imgix
+      <Box draggable = {false} component="img" src={src} width={width} height={width}/>
+      {/* <Imgix
         src={src}
         width={width}
         height={width}
@@ -29,12 +30,13 @@ const Thumbnail = (props) => {
           crop: "edges, entropy, faces, center",
           ar: `${ratio}`
         }}
-      />
+      /> */}
     </Grid>
   );
 };
 
 export default function AssetCard(props) {
+  
   const [isOpenPopup, setOpenPopup] = React.useState(null);
 
   const openPopupMenu = (event) => {
