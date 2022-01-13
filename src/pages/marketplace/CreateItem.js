@@ -1,7 +1,7 @@
 import React from 'react';
 import { isString } from 'lodash';
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Grid, Typography, Link } from '@mui/material';
+import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel } from '@mui/material';
 // components
 import Page from '../../components/Page';
 import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
@@ -9,6 +9,7 @@ import ItemTypeButton from '../../components/marketplace/ItemTypeButton';
 import { UploadMultiFile, UploadSingleFile } from '../../components/upload';
 import AssetCard from '../../components/marketplace/AssetCard';
 import PaperRecord from '../../components/PaperRecord';
+import CustomSwitch from '../../components/custom-switch';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -29,13 +30,20 @@ const StackStyle = styled(Stack)(({ theme }) => ({
   }
 }));
 
+const InputStyle = styled(Input)(({ theme }) => ({
+  '&:before': {
+    borderWidth: 0
+  }
+}));
 // ----------------------------------------------------------------------
 
-export default function Collectible() {
+export default function CreateItem() {
   const [mintype, setMintType] = React.useState("Single");
   const [itemtype, setItemType] = React.useState("General");
+  const [saletype, setSaleType] = React.useState("");
   const [files, setFiles] = React.useState([]);
   const [file, setFile] = React.useState(null);
+  const [isPutOnSale, setPutOnSale] = React.useState(false);
   React.useEffect(async () => {
     
   }, []);
@@ -76,6 +84,11 @@ export default function Collectible() {
     const filteredItems = files.filter((_file) => _file !== file);
     setFiles(filteredItems);
   };
+
+  const handlePutOnSale = (event) => {
+    setPutOnSale(event.target.checked);
+  };
+
   return (
     <RootStyle title="CreateItem | PASAR">
       <Container maxWidth="lg">
@@ -98,8 +111,8 @@ export default function Collectible() {
           </Grid>
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
-              <ItemTypeButton type="General" description="Single item" onClick={()=>{setItemType("General")}} current={itemtype}/>
-              <ItemTypeButton type="Avatar" description="Multiple identical items" onClick={()=>{setItemType("Avatar")}} current={itemtype}/>
+              <ItemTypeButton type="General" onClick={()=>{setItemType("General")}} current={itemtype}/>
+              <ItemTypeButton type="Avatar" onClick={()=>{setItemType("Avatar")}} current={itemtype}/>
             </Stack>
           </Grid>
           <Grid item xs={12} sm={8}>
@@ -111,6 +124,74 @@ export default function Collectible() {
                 <Stack spacing={1} direction="row">
                   <UploadSingleFile file={file} onDrop={handleDropSingleFile} onRemove={handleSingleRemove} accept=".jpg, .png, .jpeg, .gif"/>
                 </Stack>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Name</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl variant="standard" sx={{width: '100%'}}>
+                  <InputLabel htmlFor="input-with-name">
+                    Add item name
+                  </InputLabel>
+                  <InputStyle
+                    id="input-with-name"
+                    startAdornment={' '}
+                  />
+                </FormControl>
+                <Divider/>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Description</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl variant="standard" sx={{width: '100%'}}>
+                  <InputLabel htmlFor="input-with-description">
+                    Add item description
+                  </InputLabel>
+                  <InputStyle
+                    id="input-with-description"
+                    startAdornment={' '}
+                  />
+                </FormControl>
+                <Divider/>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Explicit & Sensitive Content</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Stack direction="row">
+                  <InputLabel sx={{ fontSize: 12, flex: 1 }}>
+                    Set this item as explicit and sensitive content
+                  </InputLabel>
+                  <FormControlLabel
+                    control={<CustomSwitch onChange={()=>{}}/>}
+                    sx={{mt:-1, mr: 0}}
+                    label=""
+                  />
+                </Stack>
+                <Divider/>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Put on Sale</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Stack direction="row">
+                  <InputLabel sx={{ fontSize: 12, flex: 1 }}>
+                    List on market
+                  </InputLabel>
+                  <FormControlLabel
+                    control={<CustomSwitch onChange={handlePutOnSale}/>}
+                    sx={{mt:-1, mr: 0}}
+                    label=""
+                  />
+                </Stack>
+                {
+                  isPutOnSale&&
+                  <Stack spacing={1} direction="row">
+                    <ItemTypeButton type="FixedPrice" onClick={()=>{setSaleType("FixedPrice")}} current={saletype}/>
+                    <ItemTypeButton type="Auction" onClick={()=>{setSaleType("Auction")}} current={saletype}/>
+                  </Stack>
+                }
               </Grid>
             </Grid>
           </Grid>
