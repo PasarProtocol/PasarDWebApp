@@ -2,7 +2,7 @@ import React from 'react';
 import { isString } from 'lodash';
 import * as math from 'mathjs';
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button  } from '@mui/material';
+import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip  } from '@mui/material';
 import { Icon } from '@iconify/react';
 // components
 import Page from '../../components/Page';
@@ -134,7 +134,7 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <Stack spacing={1} direction="row">
-                  <UploadSingleFile file={file} onDrop={handleDropSingleFile} onRemove={handleSingleRemove} accept=".jpg, .png, .jpeg, .gif"/>
+                  <UploadSingleFile file={file} onDrop={handleDropSingleFile} isAvatar={itemtype==="Avatar"} onRemove={handleSingleRemove} accept=".jpg, .png, .jpeg, .gif"/>
                 </Stack>
               </Grid>
               <Grid item xs={12}>
@@ -257,6 +257,7 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{width: '100%'}}>
                   <InputStyle
+                    disabled={mintype==="Single"}
                     type="number"
                     id="input-with-quantity"
                     defaultValue="1"
@@ -270,8 +271,16 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <Stack spacing={1} direction="row">
                   <MintingTypeButton type="FSTK" description="Single item" onClick={()=>{setCollection("FSTK")}} current={collection}/>
-                  <MintingTypeButton type="Choose existing" description="collection" onClick={()=>{setCollection("Choose existing")}} current={collection} disabled={1}/>
-                  <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1}/>
+                  <Tooltip title="Coming Soon" arrow>
+                    <div>
+                      <MintingTypeButton type="Choose existing" description="collection" onClick={()=>{setCollection("Choose existing")}} current={collection} disabled={1&&true}/>
+                    </div>
+                  </Tooltip>
+                  <Tooltip title="Coming Soon" arrow>
+                    <div>
+                      <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
+                    </div>
+                  </Tooltip>
                 </Stack>
               </Grid>
               <Grid item xs={12}>

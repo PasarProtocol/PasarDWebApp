@@ -43,7 +43,7 @@ UploadSingleFile.propTypes = {
   sx: PropTypes.object
 };
 
-export default function UploadSingleFile({ error, file, onRemove, sx, ...other }) {
+export default function UploadSingleFile({ error, file, onRemove, isAvatar, sx, ...other }) {
   const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
     multiple: false,
     ...other
@@ -98,6 +98,12 @@ export default function UploadSingleFile({ error, file, onRemove, sx, ...other }
           !file && <Box sx={{ p: 3 }}>
             <Typography variant="body2" align="center">
               File types supported:PNG, JPEG, JPG, GIF
+              {isAvatar&&(
+                <>
+                  <br/>Canvas size must be 600x600 pixels<br/>Max. size:5 MB<br/>Recommended GIF animation length: Less than 10 seconds
+                </>
+                )
+              }
             </Typography>
             <Stack sx={{p: 3}} spacing={1} align="center">
               <Typography variant="body2">

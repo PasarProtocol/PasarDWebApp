@@ -3,7 +3,7 @@ import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSele
 import AddIcon from '@mui/icons-material/Add';
 
 const MintingTypeButton = (props)=>{
-    const {type, description, current, disabled=0} = props
+    const {type, description, current, disabled=false} = props
 
     return(
         <Paper
@@ -45,19 +45,19 @@ const MintingTypeButton = (props)=>{
             }
             {
                 type==="FSTK"&&
-                <Box sx={{ width: 50, height: 50, borderRadius: 2, p: 1.5, backgroundColor: 'black', m: 'auto' }}>
+                <Box sx={{ width: 50, height: 50, borderRadius: 2, p: 1.5, m: 'auto', backgroundColor: current===type?'text.primary':'text.disabled' }}>
                     <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 26, height: 26 }} />
                 </Box>
             }
             {
                 type==="Choose existing"&&
-                <Box sx={{ width: 50, height: 50, borderRadius: 2, p: 1.5, backgroundColor: 'black', m: 'auto' }}>
+                <Box sx={{ width: 50, height: 50, borderRadius: 2, p: 1.5, m: 'auto', backgroundColor: current===type?'text.primary':'text.disabled' }}>
                     <Box draggable = {false} component="img" src="/static/collection.svg" sx={{ width: 26, height: 26 }} />
                 </Box>
             }
             {
                 type==="ERC-1155"&&
-                <Box sx={{ width: 50, height: 50, borderRadius: 2, p: 1, backgroundColor: 'black', m: 'auto' }}>
+                <Box sx={{ width: 50, height: 50, borderRadius: 2, p: 1, m: 'auto', backgroundColor: current===type?'text.primary':'text.disabled' }}>
                     <AddIcon sx={{ fontSize: 34, color: 'white' }} />
                 </Box>
             }
