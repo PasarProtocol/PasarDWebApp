@@ -51,6 +51,8 @@ export default function CreateItem() {
   const [isPutOnSale, setPutOnSale] = React.useState(false);
   const [price, setPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
+  const [properties, setProperties] = React.useState([{type: '', name: ''}]);
+
   React.useEffect(async () => {
     
   }, []);
@@ -101,6 +103,24 @@ export default function CreateItem() {
     setRcvPrice(math.round(event.target.value*98/100, 3))
   };
 
+  const handleProperties = (key, index, e) => {
+    const temp = [...properties]
+    temp[index][key] = e.target.value
+    if(!temp[index].type.length&&!temp[index].name.length){
+      if(temp.length>1&&index<temp.length-1)
+        temp.splice(index, 1)
+    }
+    else if(!temp[index].type.length||!temp[index].name.length){
+      if(!temp[temp.length-1].type.length&&!temp[temp.length-1].name.length)
+        temp.splice(temp.length-1, 1)
+    }
+    else if(temp[index].type.length&&temp[index].name.length){
+      if(temp.findIndex((item)=>(!item.type.length||!item.name.length))<0)
+        temp.push({type: '', name: ''})
+    }
+    setProperties(temp)
+  };
+  
   return (
     <RootStyle title="CreateItem | PASAR">
       <Container maxWidth="lg">
@@ -293,13 +313,23 @@ export default function CreateItem() {
                 <Grid container spacing={1}>
                   <Grid item md={6}>
                     <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Type</Typography>
-                    <TextField label="Example: Size" size="small" fullWidth/>
                   </Grid>
                   <Grid item md={6}>
                     <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Name</Typography>
-                    <TextField label="Example: Big" size="small" fullWidth/>
                   </Grid>
                 </Grid>
+                {
+                  properties.map((property, index)=>(
+                    <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
+                      <Grid item md={6}>
+                        <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleProperties('type', index, e)}}/>
+                      </Grid>
+                      <Grid item md={6}>
+                        <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleProperties('name', index, e)}}/>
+                      </Grid>
+                    </Grid>
+                  ))
+                }
               </Grid>
               <Grid item xs={12}>
                 <Button variant="contained" fullWidth>
