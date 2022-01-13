@@ -2,7 +2,7 @@ import React from 'react';
 import { isString } from 'lodash';
 import * as math from 'mathjs';
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField  } from '@mui/material';
+import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button  } from '@mui/material';
 import { Icon } from '@iconify/react';
 // components
 import Page from '../../components/Page';
@@ -45,6 +45,7 @@ export default function CreateItem() {
   const [mintype, setMintType] = React.useState("Single");
   const [itemtype, setItemType] = React.useState("General");
   const [saletype, setSaleType] = React.useState("");
+  const [collection, setCollection] = React.useState("FSTK");
   const [files, setFiles] = React.useState([]);
   const [file, setFile] = React.useState(null);
   const [isPutOnSale, setPutOnSale] = React.useState(false);
@@ -230,6 +231,71 @@ export default function CreateItem() {
                   <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}> {rcvprice} ELA </Typography>
                   per item
                 </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Royalties&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/></Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl variant="standard" sx={{width: '100%'}}>
+                  <InputLabel htmlFor="input-with-royalties">
+                    Enter royalties (Suggested: 10%)
+                  </InputLabel>
+                  <InputStyle
+                    type="number"
+                    id="input-with-royalties"
+                    defaultValue="10"
+                    startAdornment={' '}
+                    endAdornment='%'
+                  />
+                </FormControl>
+                <Divider/>
+                <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>You will receive royalties for every secondary sales on Pasar</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Quantity</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl variant="standard" sx={{width: '100%'}}>
+                  <InputStyle
+                    type="number"
+                    id="input-with-quantity"
+                    defaultValue="1"
+                  />
+                </FormControl>
+                <Divider/>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Collection</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Stack spacing={1} direction="row">
+                  <MintingTypeButton type="FSTK" description="Single item" onClick={()=>{setCollection("FSTK")}} current={collection}/>
+                  <MintingTypeButton type="Choose existing" description="collection" onClick={()=>{setCollection("Choose existing")}} current={collection} disabled={1}/>
+                  <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1}/>
+                </Stack>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
+                  Properties&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/>&nbsp;
+                  <Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Grid container spacing={1}>
+                  <Grid item md={6}>
+                    <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Type</Typography>
+                    <TextField label="Example: Size" size="small" fullWidth/>
+                  </Grid>
+                  <Grid item md={6}>
+                    <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Name</Typography>
+                    <TextField label="Example: Big" size="small" fullWidth/>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid item xs={12}>
+                <Button variant="contained" fullWidth>
+                  Create
+                </Button>
               </Grid>
             </Grid>
           </Grid>
