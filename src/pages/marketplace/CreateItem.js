@@ -1,7 +1,9 @@
 import React from 'react';
 import { isString } from 'lodash';
+import * as math from 'mathjs';
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel } from '@mui/material';
+import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField  } from '@mui/material';
+import { Icon } from '@iconify/react';
 // components
 import Page from '../../components/Page';
 import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
@@ -10,6 +12,7 @@ import { UploadMultiFile, UploadSingleFile } from '../../components/upload';
 import AssetCard from '../../components/marketplace/AssetCard';
 import PaperRecord from '../../components/PaperRecord';
 import CustomSwitch from '../../components/custom-switch';
+import CoinSelect from '../../components/marketplace/CoinSelect';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -35,6 +38,7 @@ const InputStyle = styled(Input)(({ theme }) => ({
     borderWidth: 0
   }
 }));
+
 // ----------------------------------------------------------------------
 
 export default function CreateItem() {
@@ -44,6 +48,8 @@ export default function CreateItem() {
   const [files, setFiles] = React.useState([]);
   const [file, setFile] = React.useState(null);
   const [isPutOnSale, setPutOnSale] = React.useState(false);
+  const [price, setPrice] = React.useState('');
+  const [rcvprice, setRcvPrice] = React.useState(0);
   React.useEffect(async () => {
     
   }, []);
@@ -87,6 +93,11 @@ export default function CreateItem() {
 
   const handlePutOnSale = (event) => {
     setPutOnSale(event.target.checked);
+  };
+
+  const handleChangePrice = (event) => {
+    setPrice(event.target.value)
+    setRcvPrice(math.round(event.target.value*98/100, 3))
   };
 
   return (
@@ -156,7 +167,7 @@ export default function CreateItem() {
                 <Divider/>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Explicit & Sensitive Content</Typography>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Explicit & Sensitive Content&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/></Typography>
               </Grid>
               <Grid item xs={12}>
                 <Stack direction="row">
@@ -193,6 +204,33 @@ export default function CreateItem() {
                   </Stack>
                 }
               </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Price</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl variant="standard" sx={{width: '100%'}}>
+                  <InputLabel htmlFor="input-with-price">
+                    Enter a fixed price of each item
+                  </InputLabel>
+                  <InputStyle
+                    type="number"
+                    id="input-with-price"
+                    value={price}
+                    onChange={handleChangePrice}
+                    startAdornment={' '}
+                    endAdornment={
+                      <CoinSelect/>
+                    }
+                  />
+                </FormControl>
+                <Divider/>
+                <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Platform fee 2%&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4, fontSize: 18}}/></Typography>
+                <Typography variant="body2" component="div" sx={{fontWeight: 'normal'}}>
+                  You will receive
+                  <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}> {rcvprice} ELA </Typography>
+                  per item
+                </Typography>
+              </Grid>
             </Grid>
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -219,10 +257,8 @@ export default function CreateItem() {
                       thumbnail={isString(file) ? file : file.preview}
                       title={file.name && file.name}
                     />
-                    // <span>ss</span>
                   )
                 }
-
                 {/* <AssetGrid assets={assets}/> */}
               </Grid>
             </Grid>
