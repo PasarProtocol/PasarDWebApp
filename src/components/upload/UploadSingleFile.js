@@ -1,13 +1,15 @@
 import { isString } from 'lodash';
 import PropTypes from 'prop-types';
+import { Icon } from '@iconify/react';
 import { useDropzone } from 'react-dropzone';
 // material
 import { alpha, styled } from '@mui/material/styles';
-import { Paper, Box, Typography } from '@mui/material';
+import { Paper, Box, Typography, Button, Stack } from '@mui/material';
+import closeFill from '@iconify/icons-eva/close-fill';
 // utils
+import { MIconButton } from '../@material-extend';
 import { fData } from '../../utils/formatNumber';
 //
-import { UploadIllustration } from '../../assets';
 
 // ----------------------------------------------------------------------
 
@@ -23,24 +25,25 @@ const DropZoneStyle = styled('div')(({ theme }) => ({
   padding: theme.spacing(5, 0),
   borderRadius: theme.shape.borderRadius,
   transition: theme.transitions.create('padding'),
-  backgroundColor: theme.palette.background.neutral,
-  border: `1px dashed ${theme.palette.grey[500_32]}`,
-  '&:hover': {
-    opacity: 0.72,
-    cursor: 'pointer'
-  },
+  border: `2px dashed ${theme.palette.grey[500_32]}`,
   [theme.breakpoints.up('md')]: { textAlign: 'left', flexDirection: 'row' }
+  // backgroundColor: theme.palette.background.neutral,
+  // '&:hover': {
+  //   opacity: 0.72,
+  //   cursor: 'pointer'
+  // },
 }));
 
 // ----------------------------------------------------------------------
 
 UploadSingleFile.propTypes = {
   error: PropTypes.bool,
+  onRemove: PropTypes.func,
   file: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   sx: PropTypes.object
 };
 
-export default function UploadSingleFile({ error, file, sx, ...other }) {
+export default function UploadSingleFile({ error, file, onRemove, sx, ...other }) {
   const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
     multiple: false,
     ...other
@@ -78,7 +81,7 @@ export default function UploadSingleFile({ error, file, sx, ...other }) {
   return (
     <Box sx={{ width: '100%', ...sx }}>
       <DropZoneStyle
-        {...getRootProps()}
+        // {...getRootProps()}
         sx={{
           ...(isDragActive && { opacity: 0.72 }),
           ...((isDragReject || error) && {
@@ -86,41 +89,84 @@ export default function UploadSingleFile({ error, file, sx, ...other }) {
             borderColor: 'error.light',
             bgcolor: 'error.lighter'
           }),
-          ...(file && { padding: '12% 0' })
+          ...(file && { p: 1 })
         }}
       >
         <input {...getInputProps()} />
 
-        <UploadIllustration sx={{ width: 220 }} />
-
-        <Box sx={{ p: 3, ml: { md: 2 } }}>
-          <Typography gutterBottom variant="h5">
-            Drop or Select file
-          </Typography>
-
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Drop files here or click&nbsp;
-            <Typography variant="body2" component="span" sx={{ color: 'primary.main', textDecoration: 'underline' }}>
-              browse
+        {
+          !file && <Box sx={{ p: 3 }}>
+            <Typography variant="body2" align="center">
+              File types supported:PNG, JPEG, JPG, GIF
             </Typography>
-            &nbsp;thorough your machine
-          </Typography>
-        </Box>
-
+            <Stack sx={{p: 3}} spacing={1} align="center">
+              <Typography variant="body2">
+                <Box draggable = {false} component="img" src="/static/upload.svg" sx={{width: 60}}/>
+              </Typography>
+              <Typography variant="body2">
+                Drag and drop your file here
+              </Typography>
+              <Typography variant="body2">
+                or
+              </Typography>
+              <Button variant="contained" {...getRootProps()}>
+                Choose File
+              </Button>
+            </Stack>
+          </Box>
+        }
         {file && (
-          <Box
-            component="img"
-            alt="file preview"
-            src={isString(file) ? file : file.preview}
-            sx={{
-              top: 8,
-              borderRadius: 1,
-              objectFit: 'cover',
-              position: 'absolute',
-              width: 'calc(100% - 16px)',
-              height: 'calc(100% - 16px)'
-            }}
-          />
+          <>
+            <Box
+              draggable = {false}
+              component="img"
+              alt="file preview"
+              src={isString(file) ? file : file.preview}
+              sx={{
+                top: 8,
+                borderRadius: 1,
+                objectFit: 'cover',
+              }}
+            />
+            <Box sx={{
+                top: 8,
+                left: 8,
+                width: 'calc(100% - 16px)',
+                height: 'calc(100% - 16px)',
+                bgcolor: 'action.focus',
+                position: 'absolute',
+                opacity: 0,
+                cursor: 'pointer',
+                borderRadius: 1,
+
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+
+                '&:hover': {
+                  opacity: 1
+                }
+              }}
+              {...getRootProps()}
+            >
+              <Box draggable = {false} component="img" src="/static/upload.svg" sx={{width: 60}}/>
+            </Box>
+            <Box sx={{ top: 16, right: 16, position: 'absolute' }}>
+              <MIconButton
+                onClick={() => onRemove(file)}
+                sx={{
+                  p: '2px',
+                  color: 'common.white',
+                  bgcolor: (theme) => alpha(theme.palette.grey[900], 0.72),
+                  '&:hover': {
+                    bgcolor: (theme) => alpha(theme.palette.grey[900], 0.48)
+                  }
+                }}
+              >
+                <Icon icon={closeFill} />
+              </MIconButton>
+            </Box>
+          </>
         )}
       </DropZoneStyle>
 

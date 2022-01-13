@@ -24,7 +24,6 @@ import { fData } from '../../utils/formatNumber';
 //
 import { MIconButton } from '../@material-extend';
 import { varFadeInRight } from '../animate';
-import { UploadIllustration } from '../../assets';
 
 // ----------------------------------------------------------------------
 
@@ -104,8 +103,6 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
         }}
       >
         <input {...getInputProps()} />
-
-        <UploadIllustration sx={{ width: 220 }} />
 
         <Box sx={{ p: 3, ml: { md: 2 } }}>
           <Typography gutterBottom variant="h5">
