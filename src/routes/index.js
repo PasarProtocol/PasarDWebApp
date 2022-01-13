@@ -69,9 +69,10 @@ export default function Router() {
           path: 'marketplace',
           children: [
             { path: 'explorer', element: <MarketExplorer /> },
-            { path: 'create', element: <CreateItem /> }
+            // { path: 'create', element: <CreateItem /> }
           ]
-        }
+        },
+        { path: 'create', element: <CreateItem /> },
       ]
     },
     { path: '*', element: <Navigate to="/404" replace /> }

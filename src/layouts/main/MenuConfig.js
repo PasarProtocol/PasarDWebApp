@@ -29,8 +29,8 @@ const menuConfig = [
   {
     title: 'Create',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
-    path: '2',
-    disable: true
+    path: PATH_PAGE.create,
+    disable: false
   },
   {
     title: 'Docs',

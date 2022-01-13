@@ -97,7 +97,7 @@ export default function MarketHome() {
               <Button to="explorer" variant="contained" component={RouterLink}>
                 Explorer
               </Button>
-              <Button to="create" variant="outlined" component={RouterLink}>
+              <Button to="/create" variant="outlined" component={RouterLink}>
                 Create
               </Button>
             </Stack>
