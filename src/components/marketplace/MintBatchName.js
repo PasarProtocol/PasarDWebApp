@@ -42,7 +42,7 @@ export default function MintBatchName(props) {
   return (
     <>
       <Grid container direction="row" spacing={1}>
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6}>
           <Stack direction="row">
             <Box sx={{flex: 1}}>
               <TypographyStyle variant="caption">Fixed Name Variable</TypographyStyle>
@@ -68,11 +68,11 @@ export default function MintBatchName(props) {
             </Box>
           </Stack>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={6} sm={3}>
           <TypographyStyle variant="caption">From (Number)<br/>Leave blank if not needed</TypographyStyle>
           <TextField type="number" label="Example: 1" size="small" fullWidth onChange={(e)=>{setFromNumber(e.target.value)}}/>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={6} sm={3}>
           <TypographyStyle variant="caption">Total Uploaded Items</TypographyStyle>
           <TextField type="number" size="small" fullWidth disabled value={uploadedCount}/>
         </Grid>
