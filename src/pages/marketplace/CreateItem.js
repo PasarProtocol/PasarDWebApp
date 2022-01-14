@@ -2,8 +2,10 @@ import React from 'react';
 import { isString } from 'lodash';
 import * as math from 'mathjs';
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip, Box  } from '@mui/material';
+import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip, Box,
+  Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Icon } from '@iconify/react';
+import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 // components
 import Page from '../../components/Page';
 import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
@@ -59,7 +61,8 @@ export default function CreateItem() {
   const [price, setPrice] = React.useState(0);
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [uploadedCount, setUploadedCount] = React.useState(0);
-  const [properties, setProperties] = React.useState([{type: '', name: ''}]);
+  const [singleProperties, setSingleProperties] = React.useState([{type: '', name: ''}]);
+  const [multiProperties, setMultiProperties] = React.useState([]);
   
   const quantityRef = React.useRef();
 
@@ -81,6 +84,8 @@ export default function CreateItem() {
       return isString(file) ? file : preview
     }))
     setUploadedCount(files.length)
+    if(files.length)
+      setMultiProperties([...Array(files.length)].map(el=>({type: '', name: ''})))
   }, [files]);
 
   const handleDropSingleFile = React.useCallback((acceptedFiles) => {
@@ -130,21 +135,29 @@ export default function CreateItem() {
   };
 
   const handleProperties = (key, index, e) => {
-    const temp = [...properties]
-    temp[index][key] = e.target.value
-    if(!temp[index].type.length&&!temp[index].name.length){
-      if(temp.length>1&&index<temp.length-1)
-        temp.splice(index, 1)
+    if(mintype==="Batch"){
+      const temp = [...multiProperties]
+      temp[index][key] = e.target.value
+      setMultiProperties(temp)
+    } else {
+      const temp = [...singleProperties]
+      temp[index][key] = e.target.value
+      if(!temp[index].type.length&&!temp[index].name.length){
+        if(temp.length>1&&index<temp.length-1)
+          temp.splice(index, 1)
+        if(temp.findIndex((item)=>(!item.type.length||!item.name.length))<0)
+          temp.push({type: '', name: ''})
+      }
+      else if(!temp[index].type.length||!temp[index].name.length){
+        if(!temp[temp.length-1].type.length&&!temp[temp.length-1].name.length)
+          temp.splice(temp.length-1, 1)
+      }
+      else if(temp[index].type.length&&temp[index].name.length){
+        if(temp.findIndex((item)=>(!item.type.length||!item.name.length))<0)
+          temp.push({type: '', name: ''})
+      }
+      setSingleProperties(temp)
     }
-    else if(!temp[index].type.length||!temp[index].name.length){
-      if(!temp[temp.length-1].type.length&&!temp[temp.length-1].name.length)
-        temp.splice(temp.length-1, 1)
-    }
-    else if(temp[index].type.length&&temp[index].name.length){
-      if(temp.findIndex((item)=>(!item.type.length||!item.name.length))<0)
-        temp.push({type: '', name: ''})
-    }
-    setProperties(temp)
   };
   
   return (
@@ -366,34 +379,75 @@ export default function CreateItem() {
                   </Tooltip>
                 </Stack>
               </Grid>
-              <Grid item xs={12}>
-                <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
-                  Properties&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/>&nbsp;
-                  <Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={1}>
-                  <Grid item xs={6}>
-                    <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Type</Typography>
+              {
+                mintype!=="Batch"?
+                <>
+                  <Grid item xs={12}>
+                    <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
+                      Properties&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/>&nbsp;
+                      <Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
+                    </Typography>
                   </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Name</Typography>
-                  </Grid>
-                </Grid>
-                {
-                  properties.map((property, index)=>(
-                    <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
+                  <Grid item xs={12}>
+                    <Grid container spacing={1}>
                       <Grid item xs={6}>
-                        <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleProperties('type', index, e)}}/>
+                        <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Type</Typography>
                       </Grid>
                       <Grid item xs={6}>
-                        <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleProperties('name', index, e)}}/>
+                        <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Name</Typography>
                       </Grid>
                     </Grid>
-                  ))
-                }
-              </Grid>
+                    {
+                      singleProperties.map((property, index)=>(
+                        <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
+                          <Grid item xs={6}>
+                            <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleProperties('type', index, e)}}/>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleProperties('name', index, e)}}/>
+                          </Grid>
+                        </Grid>
+                      ))
+                    }
+                  </Grid>
+                </>:
+                <Grid item xs={12}>
+                  <Accordion>
+                    <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{pl: 0}}>
+                      <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
+                        Properties&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/>&nbsp;
+                        <Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                    {
+                      multiProperties.map((property, index)=>(
+                        <div key={index}>
+                          <Typography variant="h5" sx={{display: 'block', color: 'origin.main'}}>{multiNames[index]}</Typography>
+                          <Grid container spacing={1}>
+                            <Grid item xs={6}>
+                              <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Type</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Name</Typography>
+                            </Grid>
+                          </Grid>
+                          <Grid container spacing={1} key={index} sx={{pb:1}}>
+                            <Grid item xs={6}>
+                              <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleProperties('type', index, e)}}/>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleProperties('name', index, e)}}/>
+                            </Grid>
+                          </Grid>
+                        </div>
+                      ))
+                    }
+                    </AccordionDetails>
+                  </Accordion>
+                </Grid>
+              }
+              
               <Grid item xs={12}>
                 <Button variant="contained" fullWidth>
                   Create
