@@ -36,10 +36,10 @@ const DropZoneStyle = styled('div')(({ theme }) => ({
   justifyContent: 'center',
   padding: theme.spacing(5, 1),
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: theme.palette.background.neutral,
   border: `1px dashed ${theme.palette.grey[500_32]}`,
-  '&:hover': { opacity: 0.72, cursor: 'pointer' },
   [theme.breakpoints.up('md')]: { textAlign: 'left', flexDirection: 'row' }
+  // backgroundColor: theme.palette.background.neutral,
+  // '&:hover': { opacity: 0.72, cursor: 'pointer' },
 }));
 
 // ----------------------------------------------------------------------
@@ -53,7 +53,7 @@ UploadMultiFile.propTypes = {
   sx: PropTypes.object
 };
 
-export default function UploadMultiFile({ error, showPreview = false, files, onRemove, onRemoveAll, sx, ...other }) {
+export default function UploadMultiFile({ error, showPreview = false, files, onRemove, onRemoveAll, isAvatar, sx, ...other }) {
   const hasFile = files.length > 0;
 
   const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
@@ -93,6 +93,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
     <Box sx={{ width: '100%', ...sx }}>
       <DropZoneStyle
         {...getRootProps()}
+        // isFileDialogActive={false}
         sx={{
           ...(isDragActive && { opacity: 0.72 }),
           ...((isDragReject || error) && {
@@ -101,21 +102,35 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
             bgcolor: 'error.lighter'
           })
         }}
+        onClick={(e)=>e.preventDefault()}
       >
         <input {...getInputProps()} />
 
-        <Box sx={{ p: 3, ml: { md: 2 } }}>
-          <Typography gutterBottom variant="h5">
-            Drop or Select file
+        <Box>
+          <Typography variant="body2" align="center">
+            File types supported:PNG, JPEG, JPG, GIF<br/>
+            Range: 2~20 items per batch
+            {isAvatar&&(
+              <>
+                <br/>Canvas size must be 600x600 pixels<br/>Max. size:5 MB<br/>Recommended GIF animation length: Less than 10 seconds
+              </>
+              )
+            }
           </Typography>
-
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Drop files here or click&nbsp;
-            <Typography variant="body2" component="span" sx={{ color: 'primary.main', textDecoration: 'underline' }}>
-              browse
+          <Stack sx={{p: 3}} spacing={1} align="center">
+            <Typography variant="body2">
+              <Box draggable = {false} component="img" src="/static/upload.svg" sx={{width: 60}}/>
             </Typography>
-            &nbsp;thorough your machine
-          </Typography>
+            <Typography variant="body2">
+              Drag and drop your file here
+            </Typography>
+            <Typography variant="body2">
+              or
+            </Typography>
+            <Button variant="contained" {...getRootProps()}>
+              Choose File
+            </Button>
+          </Stack>
         </Box>
       </DropZoneStyle>
 
@@ -209,7 +224,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
           <Button onClick={onRemoveAll} sx={{ mr: 1.5 }}>
             Remove all
           </Button>
-          <Button variant="contained">Upload files</Button>
+          {/* <Button variant="contained">Upload files</Button> */}
         </Stack>
       )}
     </Box>
