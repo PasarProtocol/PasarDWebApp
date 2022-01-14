@@ -81,7 +81,7 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, sx, 
   return (
     <Box sx={{ width: '100%', ...sx }}>
       <DropZoneStyle
-        // {...getRootProps()}
+        {...getRootProps()}
         sx={{
           ...(isDragActive && { opacity: 0.72 }),
           ...((isDragReject || error) && {
@@ -91,6 +91,7 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, sx, 
           }),
           ...(file && { p: 1 })
         }}
+        onClick={(e)=>e.preventDefault()}
       >
         <input {...getInputProps()} />
 

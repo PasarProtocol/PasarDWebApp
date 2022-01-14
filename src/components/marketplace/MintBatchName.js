@@ -23,6 +23,7 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
 }));
 
 export default function MintBatchName(props) {
+  const {handleNameGroup, uploadedCount} = props
   const [padNum, setPadNum] = useState(1);
   const [nameResult, setNameResult] = useState("");
   const [namePrefix, setNamePrefix] = useState("");
@@ -30,12 +31,13 @@ export default function MintBatchName(props) {
   
   React.useEffect(async () => {
     const fnum = fromNumber!==""?parseInt(fromNumber, 10):0
-    const nameArr = [...Array(props.uploadedCount)].map((el, id)=>`${namePrefix}${(fnum+id).toString().padStart(padNum, "0")}`)
+    const nameArr = [...Array(uploadedCount)].map((el, id)=>`${namePrefix}${(fnum+id).toString().padStart(padNum, "0")}`)
+    handleNameGroup([...nameArr])
     if(nameArr.length>3){
       nameArr.splice(2, nameArr.length-3, "...")
     }
     setNameResult(nameArr.join(", "))
-  }, [namePrefix, padNum, fromNumber]);
+  }, [namePrefix, padNum, fromNumber, uploadedCount]);
 
   return (
     <>
@@ -72,7 +74,7 @@ export default function MintBatchName(props) {
         </Grid>
         <Grid item xs={3}>
           <TypographyStyle variant="caption">Total Uploaded Items</TypographyStyle>
-          <TextField type="number" size="small" fullWidth disabled value={props.uploadedCount}/>
+          <TextField type="number" size="small" fullWidth disabled value={uploadedCount}/>
         </Grid>
       </Grid>
       <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', pt: 1}}>Result: {nameResult}</Typography>

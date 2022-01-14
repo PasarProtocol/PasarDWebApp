@@ -36,7 +36,7 @@ const Thumbnail = (props) => {
 };
 
 export default function AssetCard(props) {
-  
+  const {title="???", description, quantity=1, price=0} = props
   const [isOpenPopup, setOpenPopup] = React.useState(null);
 
   const openPopupMenu = (event) => {
@@ -47,12 +47,12 @@ export default function AssetCard(props) {
   };
 
   return (
-    <Link
-      component={RouterLink}
-      to="#"
-      alt={props.title}
-      underline="none"
-    >
+    // <Link
+    //   component={RouterLink}
+    //   to="#"
+    //   alt={props.title}
+    //   underline="none"
+    // >
       <motion.div
         animate={{ scale: 1 }}
       >
@@ -96,12 +96,12 @@ export default function AssetCard(props) {
               />
             )}
           </SizeMe>
-          <Typography variant="h4">Ph-1157</Typography>
-          <Typography variant="body2" display="block" sx={{lineHeight: 1}}>Phantz</Typography>
-          <Typography variant="body2" display="block" sx={{lineHeight: 1, color: 'text.secondary'}}>Quantity: 1/2</Typography>
+          <Typography variant="h4">{title}</Typography>
+          <Typography variant="body2" display="block" sx={{lineHeight: 1}}>{description}</Typography>
+          <Typography variant="body2" display="block" sx={{lineHeight: 1, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
           <Typography variant="h4" sx={{color: "origin.main"}}>
             <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
-            &nbsp;28.22 ELA
+            &nbsp;{price} ELA
           </Typography>
           <Stack direction="row">
             <Badge name="diamond"/>
@@ -109,6 +109,6 @@ export default function AssetCard(props) {
           </Stack>
         </PaperRecord>
       </motion.div>
-    </Link>
+    // </Link>
   );
 };

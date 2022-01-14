@@ -2,7 +2,7 @@ import React from 'react';
 import { isString } from 'lodash';
 import * as math from 'mathjs';
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip  } from '@mui/material';
+import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip, Box  } from '@mui/material';
 import { Icon } from '@iconify/react';
 // components
 import Page from '../../components/Page';
@@ -10,6 +10,7 @@ import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
 import ItemTypeButton from '../../components/marketplace/ItemTypeButton';
 import { UploadMultiFile, UploadSingleFile } from '../../components/upload';
 import AssetCard from '../../components/marketplace/AssetCard';
+import MultiMintGrid from '../../components/marketplace/MultiMintGrid';
 import PaperRecord from '../../components/PaperRecord';
 import CustomSwitch from '../../components/custom-switch';
 import CoinSelect from '../../components/marketplace/CoinSelect';
@@ -47,18 +48,41 @@ export default function CreateItem() {
   const [itemtype, setItemType] = React.useState("General");
   const [saletype, setSaleType] = React.useState("");
   const [collection, setCollection] = React.useState("FSTK");
-  const [files, setFiles] = React.useState([]);
   const [file, setFile] = React.useState(null);
+  const [files, setFiles] = React.useState([]);
+  const [singleName, setSingleName] = React.useState("");
+  const [multiNames, setMultiNames] = React.useState([]);
+  const [previewFiles, setPreviewFiles] = React.useState([]);
   const [isPutOnSale, setPutOnSale] = React.useState(false);
-  const [price, setPrice] = React.useState('');
+  const [description, setDescription] = React.useState('');
+  const [quantity, setQuantity] = React.useState(1);
+  const [price, setPrice] = React.useState(0);
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [uploadedCount, setUploadedCount] = React.useState(0);
   const [properties, setProperties] = React.useState([{type: '', name: ''}]);
+  
+  const quantityRef = React.useRef();
+
+  document.addEventListener("wheel", (event) => {  
+    if (document.activeElement.type === "number") {  
+      document.activeElement.blur();  
+    }  
+  });
 
   React.useEffect(async () => {
-    
-  }, []);
+    if(mintype==="Single")
+      quantityRef.current.value = 1
+  }, [mintype]);
   
+  React.useEffect(async () => {
+    const tempArr = [...files]
+    setPreviewFiles(tempArr.map((file, i)=>{
+      const { name, size, preview } = file;
+      return isString(file) ? file : preview
+    }))
+    setUploadedCount(files.length)
+  }, [files]);
+
   const handleDropSingleFile = React.useCallback((acceptedFiles) => {
     const file = acceptedFiles[0];
     if (file) {
@@ -71,6 +95,7 @@ export default function CreateItem() {
 
   const handleDropMultiFile = React.useCallback(
     (acceptedFiles) => {
+      acceptedFiles.splice(20)
       setFiles(
         acceptedFiles.map((file) =>
           Object.assign(file, {
@@ -154,9 +179,27 @@ export default function CreateItem() {
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Upload file</Typography>
               </Grid>
               <Grid item xs={12}>
-                <Stack spacing={1} direction="row">
-                  <UploadSingleFile file={file} onDrop={handleDropSingleFile} isAvatar={itemtype==="Avatar"} onRemove={handleSingleRemove} accept=".jpg, .png, .jpeg, .gif"/>
-                </Stack>
+              {
+                mintype!=="Batch"?
+                <UploadSingleFile
+                  file={file}
+                  onDrop={handleDropSingleFile}
+                  isAvatar={itemtype==="Avatar"}
+                  onRemove={handleSingleRemove}
+                  accept=".jpg, .png, .jpeg, .gif"/>:
+                <>
+                  <UploadMultiFile
+                    showPreview={1&&true}
+                    files={files}
+                    onDrop={handleDropMultiFile}
+                    isAvatar={itemtype==="Avatar"}
+                    onRemove={handleRemove}
+                    onRemoveAll={handleRemoveAll}
+                    accept=".jpg, .png, .jpeg, .gif"
+                    sx={{pb:1}}/>
+                  {files.length>0&&<Divider/>}
+                </>
+              }
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Name</Typography>
@@ -165,7 +208,7 @@ export default function CreateItem() {
                 {
                   mintype==="Batch"?(
                     <>
-                      <MintBatchName uploadedCount={uploadedCount}/>
+                      <MintBatchName uploadedCount={uploadedCount} handleNameGroup={setMultiNames}/>
                     </>
                   ):(
                     <FormControl variant="standard" sx={{width: '100%'}}>
@@ -175,6 +218,8 @@ export default function CreateItem() {
                       <InputStyle
                         id="input-with-name"
                         startAdornment={' '}
+                        value={singleName}
+                        onChange={(e)=>{setSingleName(e.target.value)}}
                       />
                     </FormControl>
                   )
@@ -196,6 +241,8 @@ export default function CreateItem() {
                   <InputStyle
                     id="input-with-description"
                     startAdornment={' '}
+                    value={description}
+                    onChange={(e)=>setDescription(e.target.value)}
                   />
                 </FormControl>
                 <Divider/>
@@ -292,10 +339,11 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{width: '100%'}}>
                   <InputStyle
-                    disabled={mintype!=="Multiple"}
+                    disabled={mintype==="Single"}
                     type="number"
-                    id="input-with-quantity"
-                    defaultValue="1"
+                    inputRef={quantityRef}
+                    value={quantity}
+                    onChange={(e)=>setQuantity(e.target.value)}
                   />
                 </FormControl>
                 <Divider/>
@@ -358,28 +406,35 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Preview</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sx={{width: '100%'}}>
                 {
-                  !file?(
-                    <PaperRecord sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: 500
-                      }}
-                    >
-                      <Typography variant="body2" align="center">
-                        Upload file<br/>to preview<br/>item
-                      </Typography>
-                    </PaperRecord>
-                  ):(
-                    <AssetCard
-                      thumbnail={isString(file) ? file : file.preview}
-                      title={file.name && file.name}
-                    />
+                  mintype!=="Batch"&&(
+                    !file?(
+                      <PaperRecord sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          height: 500
+                        }}
+                      >
+                        <Typography variant="body2" align="center">
+                          Upload file<br/>to preview<br/>item
+                        </Typography>
+                      </PaperRecord>
+                    ):(
+                      <AssetCard
+                        thumbnail={isString(file) ? file : file.preview}
+                        title={singleName}
+                        description={description}
+                        price={price}
+                        quantity={quantity}
+                      />
+                    )
                   )
                 }
-                {/* <AssetGrid assets={assets}/> */}
+                {
+                  mintype==="Batch"&&<MultiMintGrid assets={previewFiles} multiNames={multiNames} description={description} quantity={quantity} price={price}/>
+                }
               </Grid>
             </Grid>
           </Grid>
