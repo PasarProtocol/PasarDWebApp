@@ -70,7 +70,7 @@ export default function AssetCard(props) {
                 id="simple-menu"
                 anchorEl={isOpenPopup}
                 onClose={handleClosePopup}
-                open={Boolean(isOpenPopup)} 
+                open={Boolean(isOpenPopup)}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
