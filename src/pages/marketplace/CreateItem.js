@@ -13,6 +13,7 @@ import AssetCard from '../../components/marketplace/AssetCard';
 import PaperRecord from '../../components/PaperRecord';
 import CustomSwitch from '../../components/custom-switch';
 import CoinSelect from '../../components/marketplace/CoinSelect';
+import MintBatchName from '../../components/marketplace/MintBatchName';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -51,6 +52,7 @@ export default function CreateItem() {
   const [isPutOnSale, setPutOnSale] = React.useState(false);
   const [price, setPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
+  const [uploadedCount, setUploadedCount] = React.useState(0);
   const [properties, setProperties] = React.useState([{type: '', name: ''}]);
 
   React.useEffect(async () => {
@@ -59,7 +61,6 @@ export default function CreateItem() {
   
   const handleDropSingleFile = React.useCallback((acceptedFiles) => {
     const file = acceptedFiles[0];
-    console.log(file)
     if (file) {
       setFile({
         ...file,
@@ -161,15 +162,23 @@ export default function CreateItem() {
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Name</Typography>
               </Grid>
               <Grid item xs={12}>
-                <FormControl variant="standard" sx={{width: '100%'}}>
-                  <InputLabel htmlFor="input-with-name">
-                    Add item name
-                  </InputLabel>
-                  <InputStyle
-                    id="input-with-name"
-                    startAdornment={' '}
-                  />
-                </FormControl>
+                {
+                  mintype==="Batch"?(
+                    <>
+                      <MintBatchName uploadedCount={uploadedCount}/>
+                    </>
+                  ):(
+                    <FormControl variant="standard" sx={{width: '100%'}}>
+                      <InputLabel htmlFor="input-with-name">
+                        Add item name
+                      </InputLabel>
+                      <InputStyle
+                        id="input-with-name"
+                        startAdornment={' '}
+                      />
+                    </FormControl>
+                  )
+                }
                 <Divider/>
               </Grid>
               <Grid item xs={12}>
@@ -178,7 +187,11 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{width: '100%'}}>
                   <InputLabel htmlFor="input-with-description">
-                    Add item description
+                    {
+                      mintype!=="Batch"?
+                      "Add item description":
+                      "Fixed Description (Leave blank if you want to manually edit each item description on the preview cards)"
+                    }
                   </InputLabel>
                   <InputStyle
                     id="input-with-description"
@@ -221,7 +234,9 @@ export default function CreateItem() {
                   isPutOnSale&&
                   <Stack spacing={1} direction="row">
                     <ItemTypeButton type="FixedPrice" onClick={()=>{setSaleType("FixedPrice")}} current={saletype}/>
-                    <ItemTypeButton type="Auction" onClick={()=>{setSaleType("Auction")}} current={saletype}/>
+                    {
+                      mintype!=="Batch"&&<ItemTypeButton type="Auction" onClick={()=>{setSaleType("Auction")}} current={saletype}/>
+                    }
                   </Stack>
                 }
               </Grid>
@@ -277,7 +292,7 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{width: '100%'}}>
                   <InputStyle
-                    disabled={mintype==="Single"}
+                    disabled={mintype!=="Multiple"}
                     type="number"
                     id="input-with-quantity"
                     defaultValue="1"
