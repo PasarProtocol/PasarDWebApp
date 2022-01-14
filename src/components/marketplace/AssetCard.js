@@ -56,12 +56,12 @@ export default function AssetCard(props) {
       <motion.div
         animate={{ scale: 1 }}
       >
-        <PaperRecord sx={{p:1}}>
+        <PaperRecord sx={{p:2}}>
           <Grid container>
-            <Grid item md={6}>
+            <Grid item xs={6}>
               <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
             </Grid>
-            <Grid item md={6} align="right">
+            <Grid item xs={6} align="right">
               <IconButton color="inherit" size="small" sx={{p: 0}} onClick={openPopupMenu}>
                 <MoreHorizIcon />
               </IconButton>

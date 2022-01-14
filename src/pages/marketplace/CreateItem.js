@@ -356,7 +356,7 @@ export default function CreateItem() {
                   <MintingTypeButton type="FSTK" description="Single item" onClick={()=>{setCollection("FSTK")}} current={collection}/>
                   <Tooltip title="Coming Soon" arrow>
                     <div>
-                      <MintingTypeButton type="Choose existing" description="collection" onClick={()=>{setCollection("Choose existing")}} current={collection} disabled={1&&true}/>
+                      <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose")}} current={collection} disabled={1&&true}/>
                     </div>
                   </Tooltip>
                   <Tooltip title="Coming Soon" arrow>
@@ -374,20 +374,20 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <Grid container spacing={1}>
-                  <Grid item md={6}>
+                  <Grid item xs={6}>
                     <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Type</Typography>
                   </Grid>
-                  <Grid item md={6}>
+                  <Grid item xs={6}>
                     <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Name</Typography>
                   </Grid>
                 </Grid>
                 {
                   properties.map((property, index)=>(
                     <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
-                      <Grid item md={6}>
+                      <Grid item xs={6}>
                         <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleProperties('type', index, e)}}/>
                       </Grid>
-                      <Grid item md={6}>
+                      <Grid item xs={6}>
                         <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleProperties('name', index, e)}}/>
                       </Grid>
                     </Grid>
@@ -433,7 +433,23 @@ export default function CreateItem() {
                   )
                 }
                 {
-                  mintype==="Batch"&&<MultiMintGrid assets={previewFiles} multiNames={multiNames} description={description} quantity={quantity} price={price}/>
+                  mintype==="Batch"&&(
+                    !files.length?(
+                      <PaperRecord sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          height: 500
+                        }}
+                      >
+                        <Typography variant="body2" align="center">
+                          Upload file<br/>to preview<br/>item
+                        </Typography>
+                      </PaperRecord>
+                    ):(
+                      <MultiMintGrid assets={previewFiles} multiNames={multiNames} description={description} quantity={quantity} price={price}/>
+                    )
+                  )
                 }
               </Grid>
             </Grid>

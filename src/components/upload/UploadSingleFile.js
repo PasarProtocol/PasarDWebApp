@@ -89,7 +89,7 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, sx, 
             borderColor: 'error.light',
             bgcolor: 'error.lighter'
           }),
-          ...(file && { p: 1 })
+          ...(file && { p: 8 })
         }}
         onClick={(e)=>e.preventDefault()}
       >
@@ -136,10 +136,10 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, sx, 
               }}
             />
             <Box sx={{
-                top: 8,
-                left: 8,
-                width: 'calc(100% - 16px)',
-                height: 'calc(100% - 16px)',
+                top: 64,
+                left: 64,
+                width: 'calc(100% - 128px)',
+                height: 'calc(100% - 128px)',
                 bgcolor: 'action.focus',
                 position: 'absolute',
                 opacity: 0,
