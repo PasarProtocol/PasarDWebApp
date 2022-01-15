@@ -247,11 +247,11 @@ export default function CollectibleDetail() {
                   <AvatarStyle draggable = {false} component="img" src="/static/glide.png"/>
                   <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>
                     {reduceHexAddress(collectible.royaltyOwner)}
-                    {/* <Badge name="pasar" sx={{ml: 2}}/>
+                    <Badge name="pasar" sx={{ml: 2}}/>
                     <Badge name="diamond"/>
                     <Badge name="user"/>
                     <Badge name="thumbup" value="5"/>
-                    <Badge name="custom" value="100 ELA"/> */}
+                    <Badge name="custom" value="100 ELA"/>
                   </Typography>
                 </Stack>
                 <Typography variant="body2">Owner</Typography>
@@ -259,7 +259,7 @@ export default function CollectibleDetail() {
                   <AvatarStyle draggable = {false} component="img" src="/static/glide.png"/>
                   <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>
                     {reduceHexAddress(collectible.holder)}
-                    {/* <Badge name="thumbdown" value="13" sx={{ml: 2}}/> */}
+                    <Badge name="thumbdown" value="13" sx={{ml: 2}}/>
                   </Typography>
                 </Stack>
                 <Typography variant="body2">Collection</Typography>
@@ -271,7 +271,7 @@ export default function CollectibleDetail() {
             </PaperStyle>
             <PaperStyle sx={{mt: 2}}>
               <Typography variant="h4">On sale for a fixed price of</Typography>
-              <Typography variant="h3">100 ELA</Typography>
+              <Typography variant="h3" color="origin.main">100 ELA</Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD 300.26</Typography>
               <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2}}>
                 Buy
