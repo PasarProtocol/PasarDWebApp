@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 // material
 import { useTheme } from '@mui/material/styles';
-import { Box } from '@mui/material';
+import { Stack, Box, Typography } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -9,14 +9,32 @@ Badge.propTypes = {
   name: PropTypes.string
 };
 const backColor = {"pasar": "#FF5082", "diamond": "#E5E5E5", "user": "#E8EC21", "thumbup": "#25CD7C", "thumbdown": "#D60000", "custom": "#2B86DA"}
-export default function Badge({ name }) {
+export default function Badge({ name, value="", sx }) {
   const src = `/static/badges/${name}.svg`
   const color = backColor[name]
   return (
-    <Box 
-      component="img"
-      alt=""
-      src={src}
-      sx={{ width: 24, height: 24, backgroundColor: color, borderRadius: 2, p: .5, mr: .5, boxShadow: (theme)=>theme.customShadows.origin }}/>
+    <Stack
+      direction='row'
+      sx={{
+        height: 30,
+        backgroundColor: color,
+        borderRadius: 2,
+        p: value.length?'7px 10px':'5px',
+        mr: '5px',
+        boxShadow: (theme)=>theme.customShadows.origin,
+        ...sx
+      }}
+    >
+      <Box 
+        draggable = {false}
+        component="img"
+        alt=""
+        src={src}
+        sx={{ width: value.length?16:20, height: value.length?16:20 }}
+      />
+      {
+        value.length>0 && <Typography variant="body2" sx={{display: 'flex', alignItems: 'center', color: 'white', pl: .5}}>{value}</Typography>
+      }
+    </Stack>
   );
 }
