@@ -29,6 +29,7 @@ const GridItems = (props) => (
             description={props.description}
             price={props.price}
             quantity={props.quantity}
+            isLink={false}
           />
         </motion.div>
       ))}

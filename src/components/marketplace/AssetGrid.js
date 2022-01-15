@@ -25,17 +25,13 @@ const GridItems = (props) => (
           exit={{ opacity: 0 }}
         >
           <AssetCard
-            // ratio={props.ratio}
-            // key={index}
-            // id={item}
-            // index={index}
-            // mb={props.rowGap}
             thumbnail={getThumbnail(item.asset)}
             title={item.name && item.name}
             description={item.description}
             price={item.price}
             quantity={item.quantity}
-            url={props.url}
+            tokenId={item.tokenId}
+            isLink={1&&true}
             {...props}
           />
         </motion.div>
