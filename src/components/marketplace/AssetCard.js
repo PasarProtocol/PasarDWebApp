@@ -36,7 +36,7 @@ const Thumbnail = (props) => {
 };
 
 export default function AssetCard(props) {
-  const {title="???", description, quantity=1, price=0} = props
+  const {title="???", description, quantity=1, price=0, isLink, tokenId} = props
   const [isOpenPopup, setOpenPopup] = React.useState(null);
 
   const openPopupMenu = (event) => {
@@ -47,12 +47,6 @@ export default function AssetCard(props) {
   };
 
   return (
-    // <Link
-    //   component={RouterLink}
-    //   to="#"
-    //   alt={props.title}
-    //   underline="none"
-    // >
       <motion.div
         animate={{ scale: 1 }}
       >
@@ -86,16 +80,38 @@ export default function AssetCard(props) {
               </Menu>
             </Grid>
           </Grid>
-          <SizeMe>
-            {({ size }) => (
-              <Thumbnail
-                src={props.thumbnail}
-                width={size.width}
-                // hovered={isHovered}
-                {...props}
-              />
-            )}
-          </SizeMe>
+          {
+            isLink?(
+              <Link
+                component={RouterLink}
+                to={`/marketplace/explorer/detail/${tokenId}`}
+                alt=""
+                underline="none"
+              >
+                <SizeMe>
+                  {({ size }) => (
+                    <Thumbnail
+                      src={props.thumbnail}
+                      width={size.width}
+                      // hovered={isHovered}
+                      {...props}
+                    />
+                  )}
+                </SizeMe>
+              </Link>
+            ):(
+              <SizeMe>
+                {({ size }) => (
+                  <Thumbnail
+                    src={props.thumbnail}
+                    width={size.width}
+                    // hovered={isHovered}
+                    {...props}
+                  />
+                )}
+              </SizeMe>
+            )
+          }
           <Typography variant="h4">{title}</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1}}>{description}</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
