@@ -4,13 +4,14 @@ import { Link as RouterLink, useParams } from 'react-router-dom';
 import Lightbox from 'react-image-lightbox';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
-import { Card, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Typography, Box, Select, Menu, MenuItem, Button } from '@mui/material';
+import { Link, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Typography, Box, Select, Menu, MenuItem, Button } from '@mui/material';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 // components
 import { MFab } from '../../components/@material-extend';
@@ -18,6 +19,7 @@ import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import AssetDetailInfo from '../../components/marketplace/AssetDetailInfo';
+import CollectibleHistory from '../../components/marketplace/CollectibleHistory';
 import PaperRecord from '../../components/PaperRecord';
 import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail'
 import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
@@ -90,13 +92,11 @@ export default function CollectibleDetail() {
 
   const [collectible, setCollectible] = React.useState({});
   const [transRecord, setTransRecord] = React.useState([]);
-  const [detailPageSize, setDetailPageSize] = React.useState(DefaultPageSize);
   const [methods, setMethods] = React.useState("");
   const [timeOrder, setTimeOrder] = React.useState(-1);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
-  const [totalCount, setTotalCount] = React.useState(0);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const imageRef = React.useRef();
   React.useEffect(async () => {
@@ -106,61 +106,24 @@ export default function CollectibleDetail() {
     const jsonCollectible = await resCollectible.json();
     setCollectible(jsonCollectible.data);
     setLoadingCollectible(false);
-
-    
-    function handleResize() {
-      const { innerWidth: width } = window;
-      if(width<600||!imageRef.current) // in case of xs
-        setDetailPageSize(DefaultPageSize)
-      else {
-        const pgsize = Math.floor((imageRef.current.clientHeight - 42 - 48) / 81)
-        if(pgsize<1)
-          setDetailPageSize(DefaultPageSize)
-        else
-          setDetailPageSize(pgsize)
-      }
-    }
-    window.addEventListener('resize', handleResize);
   }, []);
   
   React.useEffect(async () => {
-    controller.abort(); // cancel the previous request
-    const newController = new AbortController();
-    const {signal} = newController;
-    setAbortController(newController);
-
     setLoadingTransRecord(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=&timeOrder=-1`, {}).then(response => {
       response.json().then(jsonTransactions => {
-        setTotalCount(jsonTransactions.data.length)
-        const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {
-            if (id>0 && item.tHash === arr[id - 1].tHash) {
-                res[res.length - 1].push(item);
-            } else {
-                res.push(id<arr.length-1&&item.tHash === arr[id + 1].tHash ? [item] : item);
-            }
-            return res;
-        }, []);
-        setTransRecord(grouped);
+        setTransRecord(jsonTransactions.data);
         setLoadingTransRecord(false);
       })
     }).catch(e => {
       if(e.code !== e.ABORT_ERR)
         setLoadingTransRecord(false);
     });
-  }, [methods, timeOrder]);
+  }, []);
 
   const onImgLoad = ({target:img}) => {
     if(img.alt)
       setLoadedImage(true)
-    const { innerWidth: width } = window
-    if(width<600) // in case of xs
-      return
-    const pgsize = Math.floor((img.offsetHeight - 42 - 48) / 81)
-    if(pgsize<1)
-      setDetailPageSize(DefaultPageSize)
-    else
-      setDetailPageSize(pgsize)
   }
   
   const openPopupMenu = (event) => {
@@ -331,62 +294,34 @@ export default function CollectibleDetail() {
               </AccordionDetails>
             </Accordion>
           </Grid>
-          {/* <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Typography component="div" sx={{flex:1}}>
-                  <Typography variant="h4" sx={{py: 1, pr:1, display: 'inline-block'}}>
-                      Transaction Record
-                  </Typography>
-                  <InlineBox>
-                    <MethodSelect onChange={setMethods}/>
-                    <DateOrderSelect onChange={setTimeOrder}/>
-                  </InlineBox>
-                  <Typography variant="body2" sx={{ display: 'inline-block' }}>{totalCount.toLocaleString('en')} transactions</Typography>
+          <Grid item xs={12}>
+            <PaperStyle sx={{position: 'relative'}}>
+              <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>History</Typography>
+              <CollectibleHistory isLoading={isLoadingTransRecord} dataList={transRecord}/>
+              <Button
+                to={`/explorer/collectible/detail/${collectible.tokenId}`}
+                size="small"
+                color="inherit"
+                component={RouterLink}
+                endIcon={<Icon icon={arrowIosForwardFill} />}
+                sx={{position: 'absolute', right: 20, top: 20}}
+              >
+                See more details on Pasar Explorer
+              </Button>
+            </PaperStyle>
+          </Grid>
+          <Grid item xs={12}>
+            <PaperStyle sx={{position: 'relative'}}>
+              <Stack direction="row" sx={{alignItems: 'center'}}>
+                <Typography variant="h5" sx={{ mt: 1, mb: 2, flex: 1 }}>
+                  <Link to={`/explorer/collectible/detail/${collectible.tokenId}`} component={RouterLink}>
+                    Collectible analytics and transaction record
+                  </Link>
                 </Typography>
-              </Grid>
-              {isLoadingTransRecord?(
-                <Grid item xs={12}><LoadingScreen sx={{background: 'transparent'}}/></Grid>
-              ):(
-                transRecord.map((item, key) => (
-                  <Grid key={key} item xs={12}>
-                  {
-                    Array.isArray(item)?
-                    <Accordion 
-                      // defaultExpanded={1&&true}
-                      sx={{
-                        border: '1px solid',
-                        borderColor: 'action.disabledBackground',
-                        boxShadow: (theme) => theme.customShadows.z1
-                      }}
-                    >
-                      <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
-                        <TransactionOrderDetail
-                            isAlone={1&&true}
-                            item={item[0]}
-                        />
-                      </AccordionSummary>
-                      <AccordionDetails sx={{pr: '28px'}}>
-                        <TransactionOrderDetail
-                            isAlone={1&&true}
-                            item={item[1]}
-                            noSummary={1&&true}
-                        />
-                      </AccordionDetails>
-                    </Accordion>:
-                    
-                    <PaperRecord sx={{p:2}}>
-                      <TransactionOrderDetail
-                        isAlone={1&&true}
-                        item={ item }
-                      />
-                    </PaperRecord>
-                  }
-                  </Grid>
-                ))
-              )}
-            </Grid>
-          </Grid> */}
+                <ArrowForwardIcon/>
+              </Stack>
+            </PaperStyle>
+          </Grid>
         </Grid>
       </Container>
     </RootStyle>

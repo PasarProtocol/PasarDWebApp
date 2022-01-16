@@ -59,7 +59,8 @@ export const MethodList = [
     detail: [
       {description: 'Collectible created from mint address', field: 'from', copyable: true, ellipsis: true},
       {description: 'By', field: 'to', copyable: true, ellipsis: true},
-    ]
+    ],
+    verb: {description: 'Minted', withPrice: false}
   },
   {
     method: 'SafeTransferFromWithMemo', 
@@ -68,7 +69,8 @@ export const MethodList = [
     detail: [
       {description: 'Collectible transferred to', field: 'to', copyable: true, ellipsis: true},
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
-    ]
+    ],
+    verb: {description: 'Transferred', withPrice: false}
   },
   {
     method: 'SafeTransferFrom', 
@@ -77,7 +79,8 @@ export const MethodList = [
     detail: [
       {description: 'Collectible transferred to', field: 'to', copyable: true, ellipsis: true},
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
-    ]
+    ],
+    verb: {description: 'Transferred', withPrice: false}
   },
   {
     method: 'SetApprovalForAll', 
@@ -95,7 +98,8 @@ export const MethodList = [
     detail: [
       {description: 'Collectible sent to burn address', field: 'to', copyable: true, ellipsis: true},
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
-    ]
+    ],
+    verb: {description: 'Burnt', withPrice: false}
   },
   {
     method: 'CreateOrderForSale', 
@@ -105,7 +109,8 @@ export const MethodList = [
       {description: 'Collectible listed on marketplace →', field: 'marketplace', copyable: true, ellipsis: true},
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
       {description: 'For a value of', field: 'price', copyable: false},
-    ]
+    ],
+    verb: {description: 'Listed for', withPrice: true}
   },
   {
     method: 'BuyOrder', 
@@ -115,7 +120,8 @@ export const MethodList = [
       {description: 'Collectible purchased from', field: 'from', copyable: true, ellipsis: true},
       {description: 'By', field: 'to', copyable: true, ellipsis: true},
       {description: 'For a value of', field: 'price', copyable: false},
-    ]
+    ],
+    verb: {description: 'Purchased for', withPrice: true}
   },
   {
     method: 'CancelOrder', 
@@ -124,7 +130,8 @@ export const MethodList = [
     detail: [
       {description: 'Collectible removed from marketplace →', field: 'marketplace', copyable: true, ellipsis: true},
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
-    ]
+    ],
+    verb: {description: 'Removed', withPrice: false}
   },
   {
     method: 'ChangeOrderPrice', 
@@ -134,6 +141,13 @@ export const MethodList = [
       {description: 'Collectible value updated to', field: 'data.newPrice', copyable: false},
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
       {description: 'From initial value of', field: 'data.oldPrice', copyable: false},
-    ]
+    ],
+    verb: {description: 'Updated for', withPrice: true}
+  },
+  {
+    method: 'Bid', 
+    color: '#CD25BC', 
+    icon: 'auction',
+    verb: {description: 'Bid', withPrice: true}
   }
 ]
