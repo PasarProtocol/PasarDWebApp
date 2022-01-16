@@ -126,6 +126,7 @@ export default function CollectibleDetail() {
     setOpenPopup(null);
   };
 
+  const tempDeadLine = getTime(new Date('2022-01-25').getTime()/1000)
   return (
     <RootStyle title="Collectible | PASAR">
       <Box
@@ -250,7 +251,7 @@ export default function CollectibleDetail() {
                     <Grid item xs={6}>
                       <Stack direction="row">
                         <AccessTimeIcon/>&nbsp;
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>Ends July 1, 2022 at 4:04am JST</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>Ends {tempDeadLine.date} {tempDeadLine.time}</Typography>
                       </Stack>
                       <Countdown deadline="2022-01-25"/>
                     </Grid>
