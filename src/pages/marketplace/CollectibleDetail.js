@@ -68,6 +68,19 @@ const AvatarStyle = styled(Box)(({ theme }) => ({
   backgroundColor: 'black',
   marginRight: 8
 }));
+const Property = ({type, name}) => (
+  <Paper
+    sx={{
+        border: '1px solid',
+        borderColor: 'action.disabledBackground',
+        p: '20px',
+        display: 'inline-block'
+    }}
+  >
+    <Typography variant="body2" color="origin.main">{type}</Typography>
+    <Typography variant="body2">{name}</Typography>
+  </Paper>
+)
 // ----------------------------------------------------------------------
 const DefaultPageSize = 5;
 export default function CollectibleDetail() {
@@ -294,7 +307,7 @@ export default function CollectibleDetail() {
               </Button>
             </PaperStyle>
           </Grid>
-          {/* <Grid item xs={12}>
+          <Grid item xs={12}>
             <Accordion
               defaultExpanded={1&&true}
               sx={{
@@ -304,14 +317,21 @@ export default function CollectibleDetail() {
               }}
             >
               <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-                <Typography variant="h5">Analytics</Typography>
+                <Typography variant="h5">Properties</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <ChartArea by="collectible"/>
+                <Grid container spacing={1}>
+                  <Grid item>
+                    <Property type="Arms" name="OG Trooper A2"/>
+                  </Grid>
+                  <Grid item>
+                    <Property type="Chest" name="OG Trooper C1"/>
+                  </Grid>
+                </Grid>
               </AccordionDetails>
             </Accordion>
           </Grid>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography component="div" sx={{flex:1}}>
