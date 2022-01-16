@@ -12,20 +12,15 @@ import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 // components
 import { MFab } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
-import LoadingWrapper from '../../components/LoadingWrapper';
+import Countdown from '../../components/Countdown';
 import AssetDetailInfo from '../../components/marketplace/AssetDetailInfo';
 import CollectibleHistory from '../../components/marketplace/CollectibleHistory';
-import PaperRecord from '../../components/PaperRecord';
-import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail'
-import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
-import DateOrderSelect from '../../components/DateOrderSelect';
-import MethodSelect from '../../components/MethodSelect';
-import InlineBox from '../../components/InlineBox';
 import Badge from '../../components/Badge';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
@@ -84,17 +79,14 @@ const Property = ({type, name}) => (
   </Paper>
 )
 // ----------------------------------------------------------------------
-const DefaultPageSize = 5;
 export default function CollectibleDetail() {
   const params = useParams(); // params.collection
   const [isFullScreen, setFullScreen] = React.useState(false);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
 
   const [collectible, setCollectible] = React.useState({});
+  const [isForAuction, setForAuction] = React.useState(false);
   const [transRecord, setTransRecord] = React.useState([]);
-  const [methods, setMethods] = React.useState("");
-  const [timeOrder, setTimeOrder] = React.useState(-1);
-  const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
@@ -106,6 +98,7 @@ export default function CollectibleDetail() {
     const jsonCollectible = await resCollectible.json();
     setCollectible(jsonCollectible.data);
     setLoadingCollectible(false);
+    setForAuction(true);
   }, []);
   
   React.useEffect(async () => {
@@ -209,7 +202,7 @@ export default function CollectibleDetail() {
         </Container>
       </Box>
       <Container maxWidth="lg">
-        {isLoadingCollectible && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
+        {/* {isLoadingCollectible && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>} */}
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <PaperStyle>
@@ -245,14 +238,45 @@ export default function CollectibleDetail() {
                 </Stack>
               </Stack>
             </PaperStyle>
-            <PaperStyle sx={{mt: 2}}>
-              <Typography variant="h4">On sale for a fixed price of</Typography>
-              <Typography variant="h3" color="origin.main">100 ELA</Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD 300.26</Typography>
-              <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2}}>
-                Buy
-              </Button>
-            </PaperStyle>
+            {
+              isForAuction?(
+                <PaperStyle sx={{mt: 2}}>
+                  <Grid container direction="row">
+                    <Grid item xs={6}>
+                      <Typography variant="h4">Current bid</Typography>
+                      <Typography variant="h3" color="origin.main">50 ELA</Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD 150.11</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Stack direction="row">
+                        <AccessTimeIcon/>&nbsp;
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>Ends July 1, 2022 at 4:04am JST</Typography>
+                      </Stack>
+                      <Countdown deadline="2022-01-25"/>
+                    </Grid>
+                  </Grid>
+                  <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2, textTransform: 'none'}}>
+                    Place a bid
+                  </Button>
+                </PaperStyle>
+              ):(
+                <PaperStyle sx={{mt: 2, minHeight: 200}}>
+                {
+                  isLoadingCollectible?
+                  <LoadingScreen/>:
+                  <>
+                    <Typography variant="h4">On sale for a fixed price of</Typography>
+                    <Typography variant="h3" color="origin.main">100 ELA</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD 300.26</Typography>
+                    <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2}}>
+                      Buy
+                    </Button>
+                  </>
+                }
+                </PaperStyle>
+              )
+            }
+
           </Grid>
           <Grid item xs={12} sm={6}>
             <PaperStyle sx={{height: '100%', p: '15px 32px', position: 'relative'}}>
