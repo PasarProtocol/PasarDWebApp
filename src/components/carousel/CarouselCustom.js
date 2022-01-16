@@ -69,7 +69,6 @@ function CarouselItem({ page, detail }) {
     <Stack spacing={2} sx={{ py: 3 }}>
       {page.map((item, index) => {
         const value = item.key.length?detail[item.key]:"";
-        // const value=1;
         return <DetailItem 
           key={index}
           item={item}
