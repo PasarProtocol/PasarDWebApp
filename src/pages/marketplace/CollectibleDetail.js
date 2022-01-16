@@ -21,6 +21,7 @@ import LoadingScreen from '../../components/LoadingScreen';
 import Countdown from '../../components/Countdown';
 import AssetDetailInfo from '../../components/marketplace/AssetDetailInfo';
 import CollectibleHistory from '../../components/marketplace/CollectibleHistory';
+import BidList from '../../components/marketplace/BidList';
 import Badge from '../../components/Badge';
 import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
 
@@ -87,8 +88,10 @@ export default function CollectibleDetail() {
   const [collectible, setCollectible] = React.useState({});
   const [isForAuction, setForAuction] = React.useState(false);
   const [transRecord, setTransRecord] = React.useState([]);
+  const [bidList, setBidList] = React.useState([]);
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
+  const [isLoadingBidList, setLoadingBid] = React.useState(true);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const imageRef = React.useRef();
   React.useEffect(async () => {
@@ -98,7 +101,15 @@ export default function CollectibleDetail() {
     const jsonCollectible = await resCollectible.json();
     setCollectible(jsonCollectible.data);
     setLoadingCollectible(false);
-    setForAuction(true);
+    // setForAuction(true);
+
+    const tempBidArr = [
+      {'price': 50000000000000000000, 'to': '0x504342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431},
+      {'price': 60000000000000000000, 'to': '0x604342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431},
+      {'price': 70000000000000000000, 'to': '0x704342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431}
+    ]
+    setBidList(tempBidArr)
+    setLoadingBid(false)
   }, []);
   
   React.useEffect(async () => {
@@ -295,6 +306,16 @@ export default function CollectibleDetail() {
               </Button>
             </PaperStyle>
           </Grid>
+          {
+            isForAuction&&(
+              <Grid item xs={12}>
+                <PaperStyle>
+                  <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>Bids</Typography>
+                  <BidList isLoading={isLoadingBidList} dataList={bidList}/>
+                </PaperStyle>
+              </Grid>
+            )
+          }
           <Grid item xs={12}>
             <Accordion
               defaultExpanded={1&&true}
