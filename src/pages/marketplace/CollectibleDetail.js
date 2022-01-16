@@ -1,23 +1,23 @@
 // material
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { Link as RouterLink, useParams } from 'react-router-dom';
 import Lightbox from 'react-image-lightbox';
 import { Icon } from '@iconify/react';
-import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
 import { Card, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Typography, Box, Select, Menu, MenuItem, Button } from '@mui/material';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
+import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 
 // components
 import { MFab } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
 import LoadingWrapper from '../../components/LoadingWrapper';
-import { ChartArea } from '../../components/charts';
-import { CarouselCustom } from '../../components/carousel';
+import AssetDetailInfo from '../../components/marketplace/AssetDetailInfo';
 import PaperRecord from '../../components/PaperRecord';
 import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail'
 import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
@@ -245,7 +245,7 @@ export default function CollectibleDetail() {
                 <Typography variant="body2">Creator</Typography>
                 <Stack direction='row'>
                   <AvatarStyle draggable = {false} component="img" src="/static/glide.png"/>
-                  <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>
+                  <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     {reduceHexAddress(collectible.royaltyOwner)}
                     <Badge name="pasar" sx={{ml: 2}}/>
                     <Badge name="diamond"/>
@@ -257,7 +257,7 @@ export default function CollectibleDetail() {
                 <Typography variant="body2">Owner</Typography>
                 <Stack direction='row'>
                   <AvatarStyle draggable = {false} component="img" src="/static/glide.png"/>
-                  <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>
+                  <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     {reduceHexAddress(collectible.holder)}
                     <Badge name="thumbdown" value="13" sx={{ml: 2}}/>
                   </Typography>
@@ -279,9 +279,19 @@ export default function CollectibleDetail() {
             </PaperStyle>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <PaperStyle sx={{height: '100%', p: '15px 32px'}}>
+            <PaperStyle sx={{height: '100%', p: '15px 32px', position: 'relative'}}>
               <Typography variant="h5" sx={{ my: 1 }}>Collectible Detail</Typography>
-              <CarouselCustom pgsize={detailPageSize} detail={collectible}/>
+              <AssetDetailInfo detail={collectible}/>
+              <Button
+                to={`/explorer/collectible/detail/${collectible.tokenId}`}
+                size="small"
+                color="inherit"
+                component={RouterLink}
+                endIcon={<Icon icon={arrowIosForwardFill} />}
+                sx={{position: 'absolute', right: 32, bottom: 15}}
+              >
+                See more details on Pasar Explorer
+              </Button>
             </PaperStyle>
           </Grid>
           {/* <Grid item xs={12}>
