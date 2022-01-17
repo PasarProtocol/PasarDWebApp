@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Dialog, TextField, DialogTitle, DialogContent, DialogActions,
+import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions,
   DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
 import { Icon } from '@iconify/react';
 import { makeStyles } from "@mui/styles";
@@ -19,6 +19,7 @@ import { MIconButton, MFab } from '../@material-extend';
 import { injected, walletconnect, walletlink } from "./connectors";
 import { useEagerConnect, useInactiveListener } from "./hook";
 import CopyButton from '../CopyButton';
+import PaperRecord from '../PaperRecord';
 import { reduceHexAddress } from '../../utils/common';
 
 const useStyles = makeStyles({
@@ -140,17 +141,56 @@ export default function SignInDialog({ onChange }) {
           <Box sx={{px: 2, py: '6px'}}>
             <Typography variant="h6">{reduceHexAddress(walletAddress)} <CopyButton text={walletAddress} sx={{mt: '-3px'}}/></Typography>
             <Typography variant="body2" color="text.secondary">did:elastos:xxx..xxxx <CopyButton text={walletAddress}/></Typography>
-            {/* <PaperRecord sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 500
-              }}
-            >
-              <Typography variant="h6">{reduceHexAddress(walletAddress)} <CopyButton text={walletAddress} sx={{mt: '-3px'}}/></Typography>
-              <Typography variant="h6">{reduceHexAddress(walletAddress)} <CopyButton text={walletAddress} sx={{mt: '-3px'}}/></Typography>
-                
-            </PaperRecord> */}
+            <Stack spacing={1}>
+              <PaperRecord sx={{
+                  p:1.5,
+                  textAlign: 'center',
+                  minWidth: 300
+                }}
+              >
+                <Typography variant="h6">Total Balance</Typography>
+                <Typography variant="h3" color="origin.main">USD 400</Typography>
+                <Button variant="outlined" fullWidth sx={{textTransform: 'none'}}>Add funds</Button>
+              </PaperRecord>
+              <PaperRecord sx={{ p:1.5 }}>
+                <Stack direction="row" alignItems="center" spacing={2} >
+                  <Box
+                      draggable = {false}
+                      component="img"
+                      alt=""
+                      src='/static/elastos.svg'
+                      sx={{ width: 24, height: 24 }}
+                  />
+                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                      <Typography variant="body2"> ELA </Typography>
+                      <Typography variant="body2" color='text.secondary'> Elastos (ESC) </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" align="right"> 100 </Typography>
+                    <Typography variant="body2" align="right" color='text.secondary'> USD 400 </Typography>
+                  </Box>
+                </Stack>
+              </PaperRecord>
+              <PaperRecord sx={{ p:1.5 }}>
+                <Stack direction="row" alignItems="center" spacing={2} >
+                  <Box
+                      draggable = {false}
+                      component="img"
+                      alt=""
+                      src='/static/badges/diamond.svg'
+                      sx={{ width: 24, height: 24 }}
+                  />
+                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                      <Typography variant="body2"> DIA </Typography>
+                      <Typography variant="body2" color='text.secondary'> Diamond (ESC) </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" align="right"> 0 </Typography>
+                    <Typography variant="body2" align="right" color='text.secondary'> 0 </Typography>
+                  </Box>
+                </Stack>
+              </PaperRecord>
+            </Stack>
           </Box>
           <MenuItem onClick={closeAccountMenu}>
             <BookOutlinedIcon/>&nbsp;My Items
