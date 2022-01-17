@@ -117,6 +117,8 @@ export default function MarketExplorer() {
   }, [page, showCount, timeOrder]);
   
   const handleDispmode = (event, mode) => {
+    if(mode===null)
+      return
     setDispmode(mode)
   };
   const handleBtns = (num)=>{
@@ -221,7 +223,7 @@ export default function MarketExplorer() {
               component="main"
               sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth*isFilterView}px)` } }}
             >
-              <AssetGrid assets={assets}/>
+              <AssetGrid assets={assets} dispmode={dispmode}/>
             </Box>
           </Box>
         </Container>

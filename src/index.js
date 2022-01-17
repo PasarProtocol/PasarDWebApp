@@ -32,6 +32,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Provider as ReduxProvider } from 'react-redux';
 import { PersistGate } from 'redux-persist/lib/integration/react';
+import { Web3ReactProvider } from '@web3-react/core'
+import { Web3Provider } from "@ethersproject/providers";
 // material
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -54,12 +56,19 @@ import App from './App';
 // import reportWebVitals from './reportWebVitals';
 
 // ----------------------------------------------------------------------
+const getLibrary = (provider) => {
+  const library = new Web3Provider(provider);
+  library.pollingInterval = 12000;
+  return library;
+};
 
 ReactDOM.render(
   <HelmetProvider>
     <ReduxProvider store={store}>
       <BrowserRouter>
-        <App />
+        <Web3ReactProvider getLibrary={getLibrary}>
+          <App />
+        </Web3ReactProvider>
       </BrowserRouter>
     </ReduxProvider>
   </HelmetProvider>,

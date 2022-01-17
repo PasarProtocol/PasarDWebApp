@@ -7,11 +7,11 @@ import AssetCard from './AssetCard';
 import { getThumbnail } from '../../utils/common';
 // ----------------------------------------------------------------------
 const StackedGrid = ({
-  gridItemWidth = "280px",
+  // gridItemWidth = "250px",
   children,
   ...props
 }) => (
-  <Box display="grid" gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))" gap={1.5}>
+  <Box display="grid" gridTemplateColumns={`repeat(auto-fill, minmax(${props.itemWidth}px, 1fr))`} gap={1.5}>
     {children}
   </Box>
 );
@@ -39,9 +39,10 @@ const GridItems = (props) => (
     </AnimatePresence>
 );
 export default function AssetGrid(props){
+  const itemWidth = props.dispmode===0?270:200
   return(
-    <StackedGrid>
-      <GridItems items={props.assets} ratio="3:2" />
+    <StackedGrid itemWidth={itemWidth}>
+      <GridItems items={props.assets} />
     </StackedGrid>
   )
 }
