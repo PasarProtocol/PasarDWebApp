@@ -4,14 +4,14 @@ import { Icon } from '@iconify/react';
 import { useSnackbar } from 'notistack';
 import IconButton from '@mui/material/IconButton';
 
-export default function CopyButton({text}){
+export default function CopyButton({text, sx}){
     const { enqueueSnackbar } = useSnackbar();
     const onCopy = () => {
         enqueueSnackbar('Copied to clipboard', { variant: 'success' });
     };
     return (
         <CopyToClipboard text={text} onCopy={onCopy}>
-            <IconButton type="button" sx={{ p: '5px' }} aria-label="link" onClick={(e)=>{e.preventDefault(); e.stopPropagation()}}>
+            <IconButton type="button" sx={{ p: '5px', ...sx }} aria-label="link" onClick={(e)=>{e.preventDefault(); e.stopPropagation()}}>
                 <Icon icon={sharpContentCopy} width="17px"/>
             </IconButton>
         </CopyToClipboard>
