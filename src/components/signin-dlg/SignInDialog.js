@@ -14,7 +14,6 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import PropTypes from 'prop-types';
 import { useWeb3React } from "@web3-react/core";
-import { Web3Provider } from "@ethersproject/providers";
 import { ethers } from "ethers";
 import { MIconButton, MFab } from '../@material-extend';
 import { injected, walletconnect, walletlink } from "./connectors";
@@ -48,9 +47,8 @@ const useStyles = makeStyles({
   }
 });
 
-
-
 export default function SignInDialog({ onChange }) {
+  const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
   const context = useWeb3React()
   const { connector, activate, active, error, library, chainId, account } = context;
   const [openSignin, setOpenSigninDlg] = useState(false);
@@ -61,8 +59,11 @@ export default function SignInDialog({ onChange }) {
 
   const classes = useStyles();
 
-  // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  const triedEager = useEagerConnect();
+  if(sessionLinkFlag&&!activatingConnector){
+    setActivatingConnector(injected);
+    activate(injected);
+  }
+
   React.useEffect(() => {
     setWalletAddress(account)
   }, [account])
@@ -75,6 +76,7 @@ export default function SignInDialog({ onChange }) {
     else if(wallet === 'walletconnect') currentConnector = walletconnect;
     setActivatingConnector(currentConnector);
     await activate(currentConnector);
+    sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
     setOpenSigninDlg(false);
   };
 
@@ -121,8 +123,13 @@ export default function SignInDialog({ onChange }) {
   const openAccountMenu = (event) => {
     setOpenAccountPopup(event.currentTarget);
   };
-  const closeAccountMenu = () => {
+  const closeAccountMenu = async (e) => {
     setOpenAccountPopup(null);
+    if(e.target.getAttribute("value")==="signout"){
+      await activate(null);
+      sessionStorage.removeItem('PASAR_LINK_ADDRESS')
+      setActivatingConnector(null);
+    }
   };
   return (
     walletAddress?(
@@ -199,7 +206,7 @@ export default function SignInDialog({ onChange }) {
           <MenuItem onClick={closeAccountMenu}>
             <SettingsOutlinedIcon/>&nbsp;Settings
           </MenuItem>
-          <MenuItem onClick={closeAccountMenu}>
+          <MenuItem value='signout' onClick={closeAccountMenu}>
             <LogoutOutlinedIcon/>&nbsp;Sign Out
           </MenuItem>
         </Menu>
