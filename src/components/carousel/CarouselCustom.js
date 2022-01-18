@@ -67,7 +67,7 @@ const DetailItem = ({ item, isLast, value })=>{
                   }
                 </Typography>
                 {
-                  value&&value!==''&&copyable&&<CopyButton text={value}/>
+                  value!=null&&value!==''&&copyable&&<CopyButton text={value}/>
                 }
               </Stack>
           </Box>
