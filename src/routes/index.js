@@ -69,6 +69,7 @@ export default function Router() {
           children: [
             { path: 'explorer', element: <MarketExplorer /> },
             { path: 'explorer/detail/:collection', element: <MarketCollectibleDetail /> },
+            { path: 'myitem', element: <MyItems /> },
           ]
         },
         { path: 'create', element: <CreateItem /> },
@@ -90,5 +91,6 @@ const AddressDetail = Loadable(lazy(() => import('../pages/explorer/AddressDetai
 const MarketHome = Loadable(lazy(() => import('../pages/MarketHome')));
 const MarketExplorer = Loadable(lazy(() => import('../pages/marketplace/Explorer')));
 const CreateItem = Loadable(lazy(() => import('../pages/marketplace/CreateItem')));
+const MyItems = Loadable(lazy(() => import('../pages/marketplace/MyItems')));
 
 const NotFound = Loadable(lazy(() => import('../pages/Page404')));
