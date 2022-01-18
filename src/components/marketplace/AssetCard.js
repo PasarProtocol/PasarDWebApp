@@ -112,7 +112,7 @@ export default function AssetCard(props) {
               </SizeMe>
             )
           }
-          <Typography variant="h4">{title}</Typography>
+          <Typography variant="h4" noWrap>{title}</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1}}>{description}</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
           <Typography variant="h4" sx={{color: "origin.main"}}>

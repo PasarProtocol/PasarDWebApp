@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link as RouterLink } from 'react-router-dom';
 import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions,
   DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
 import { Icon } from '@iconify/react';
@@ -192,7 +193,7 @@ export default function SignInDialog({ onChange }) {
               </PaperRecord>
             </Stack>
           </Box>
-          <MenuItem onClick={closeAccountMenu}>
+          <MenuItem to='/marketplace/myitem' onClick={closeAccountMenu} component={RouterLink}>
             <BookOutlinedIcon/>&nbsp;My Items
           </MenuItem>
           <MenuItem onClick={closeAccountMenu}>
