@@ -1,10 +1,12 @@
 import Slider from 'react-slick';
 import PropTypes from 'prop-types';
 import { useRef } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useParams } from 'react-router-dom';
 // material
 import { useTheme, styled } from '@mui/material/styles';
 import { Box, Stack, Typography, Link } from '@mui/material';
+import { Icon } from '@iconify/react';
+import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 //
 import { CarouselControlsPaging2 } from './controls';
 import CopyButton from '../CopyButton';
@@ -26,6 +28,7 @@ const RootStyle = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 const DetailItem = ({ item, isLast, value })=>{
+  const params = useParams(); // params.collection
   const { icon, title, copyable } = item;
   const sx = isLast?{}:{borderBottom: '1px solid', borderColor: (theme) => `${theme.palette.grey[500_32]}`, pb: 2};
   const iconSrc = `/static/${icon}.svg`;
@@ -44,15 +47,27 @@ const DetailItem = ({ item, isLast, value })=>{
               <Stack sx={{flexDirection: 'row'}}>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
                   {
-                    (title==="Creator" || title==="Owner")?
-                    <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
-                      {value}
-                    </Link>:
-                    value
+                    title==="Status"&&(
+                      value===0?
+                      "Not on sale":(
+                        <Link to={`/marketplace/explorer/detail/${params.collection}`} component={RouterLink} sx={{display: 'flex', alignItems: 'center'}}>
+                          Listed on Pasar&nbsp;<Icon icon={externalLinkFill} width="17px"/>
+                        </Link>
+                      )
+                    )
+                  }
+                  {
+                    title!=="Status"&&(
+                      (title==="Creator" || title==="Owner")?
+                      <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
+                        {value}
+                      </Link>:
+                      value
+                    )
                   }
                 </Typography>
                 {
-                  value&&copyable&&<CopyButton text={value}/>
+                  value&&value!==''&&copyable&&<CopyButton text={value}/>
                 }
               </Stack>
           </Box>
@@ -116,7 +131,9 @@ export default function CarouselCustom({pgsize, detail}) {
     collection: 'Feeds NFT Sticker - FSTK',
     tokenStandard: 'ERC-1155',
     blockchain: 'Elastos Smart Chain (ESC)',
-    status: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?'Not on sale':'Listed on Pasar'}
+    // status: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?'Not on sale':'Listed on Pasar'
+    status: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?0:1
+  }
   return (
     <RootStyle>
       <Slider ref={carouselRef} {...settings}>
