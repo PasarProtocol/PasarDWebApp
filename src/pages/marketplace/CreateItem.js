@@ -6,6 +6,10 @@ import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Inpu
   Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
+import { create, urlSource } from 'ipfs-http-client'
+import { useSnackbar } from 'notistack';
+import { LoadingButton } from '@mui/lab';
+
 // components
 import Page from '../../components/Page';
 import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
@@ -19,6 +23,7 @@ import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
 // ----------------------------------------------------------------------
 
+const client = create('http://ipfs-test.trinity-feeds.app/')
 const RootStyle = styled(Page)(({ theme }) => ({
   paddingTop: theme.spacing(10),
   paddingBottom: theme.spacing(12),
@@ -63,6 +68,8 @@ export default function CreateItem() {
   const [uploadedCount, setUploadedCount] = React.useState(0);
   const [singleProperties, setSingleProperties] = React.useState([{type: '', name: ''}]);
   const [multiProperties, setMultiProperties] = React.useState([]);
+  const [onProgress, setOnProgress] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
   
   const quantityRef = React.useRef();
 
@@ -88,12 +95,13 @@ export default function CreateItem() {
       setMultiProperties([...Array(files.length)].map(el=>({type: '', name: ''})))
   }, [files]);
 
-  const handleDropSingleFile = React.useCallback((acceptedFiles) => {
-    const file = acceptedFiles[0];
-    if (file) {
+  const handleDropSingleFile = React.useCallback(async (acceptedFiles) => {
+    const accepted = acceptedFiles[0];
+    if (accepted) {
       setFile({
-        ...file,
-        preview: URL.createObjectURL(file)
+        ...accepted,
+        object: accepted,
+        preview: URL.createObjectURL(accepted)
       });
     }
   }, []);
@@ -160,6 +168,55 @@ export default function CreateItem() {
     }
   };
   
+  const mintAction = (e) => {
+    if(!file)
+      return
+    setOnProgress(true)
+    const reader = new window.FileReader();
+    reader.readAsArrayBuffer(file.object);
+    reader.onloadend = async () => {
+      try {
+        const fileContent = Buffer.from(reader.result)
+        const added = await client.add(fileContent)
+        const cid = added.path;
+        
+        // create the metadata object we'll be storing
+        const metaObj = {
+          "version":"1",
+          "type":"general",
+          "name":"testname",
+          "description":"Test description",
+          "image":`feeds:image:${cid}`,
+          "kind":"png",
+          "size":"135121",
+          "thumbnail":`feeds:image:${cid}`,
+          "properties": {
+            "key1": "name1",
+            "key2": "name2",
+          },
+        }
+        const jsonMetaObj = JSON.stringify(metaObj);
+
+        // add the metadata itself as well
+        const metaRecv = await client.add(jsonMetaObj);
+
+        // create the did object we'll be storing
+        const didObj = {
+          "version":"1",
+          "did": "did:elastos:you_did_string"
+        }
+        const jsonDidObj = JSON.stringify(didObj);
+
+        // add the did file itself as well
+        const didRecv = await client.add(jsonDidObj);
+        // const (metaRecv.path)
+
+        setOnProgress(false)
+      } catch (error) {
+        enqueueSnackbar('Error uploading file', { variant: 'error' });
+      }
+    }
+  }
   return (
     <RootStyle title="CreateItem | PASAR">
       <Container maxWidth="lg">
@@ -447,11 +504,10 @@ export default function CreateItem() {
                   </Accordion>
                 </Grid>
               }
-              
               <Grid item xs={12}>
-                <Button variant="contained" fullWidth>
+                <LoadingButton loading={onProgress} variant="contained" onClick={mintAction} fullWidth>
                   Create
-                </Button>
+                </LoadingButton>
               </Grid>
             </Grid>
           </Grid>
