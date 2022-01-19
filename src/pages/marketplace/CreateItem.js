@@ -6,6 +6,7 @@ import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Inpu
   Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
+import { ethers } from 'ethers';
 import { create, urlSource } from 'ipfs-http-client'
 import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
@@ -21,6 +22,10 @@ import PaperRecord from '../../components/PaperRecord';
 import CustomSwitch from '../../components/custom-switch';
 import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
+import {stickerContract as CONTRACT_ADDRESS} from '../../config'
+import {hash} from '../../utils/common';
+import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
+import ProgressBar from '../../components/ProgressBar'
 // ----------------------------------------------------------------------
 
 const client = create('http://ipfs-test.trinity-feeds.app/')
@@ -69,10 +74,12 @@ export default function CreateItem() {
   const [singleProperties, setSingleProperties] = React.useState([{type: '', name: ''}]);
   const [multiProperties, setMultiProperties] = React.useState([]);
   const [onProgress, setOnProgress] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
   const { enqueueSnackbar } = useSnackbar();
   
   const quantityRef = React.useRef();
-
+  const royaltiesRef = React.useRef();
+  
   document.addEventListener("wheel", (event) => {  
     if (document.activeElement.type === "number") {  
       document.activeElement.blur();  
@@ -83,6 +90,11 @@ export default function CreateItem() {
     if(mintype==="Single")
       quantityRef.current.value = 1
   }, [mintype]);
+
+  React.useEffect(() => {
+    if(progress===100)
+      setTimeout(()=>{setProgress(0)}, 110)
+  }, [progress]);
   
   React.useEffect(async () => {
     const tempArr = [...files]
@@ -168,57 +180,150 @@ export default function CreateItem() {
     }
   };
   
+  const mint2net = (paramObj)=>(
+    new Promise((resolve, reject) => {
+      const _tokenSupply = quantityRef.current.value
+      const _royaltyFee = royaltiesRef.current.value*10000
+      try {
+        const { ethereum } = window
+
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum)
+          const signer = provider.getSigner()
+          const stickerContract = new ethers.Contract(CONTRACT_ADDRESS, STICKER_CONTRACT_ABI, signer)
+
+          // Initialize payment
+          setProgress(50)
+          
+          stickerContract.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).then((nftTxn)=>{
+            setProgress(70)
+            // console.log("Mining... please wait")
+            nftTxn.wait().then(()=>{
+              // console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`)
+              resolve(true)
+            }).catch((error) => {
+              reject(error);
+            })
+          }).catch((error) => {
+            reject(error);
+          })
+        } else {
+          resolve(false)
+          // console.log("Ethereum object does not exist")
+        }
+      } catch (err) {
+        reject(err)
+      }
+    })
+  )
+  const sendIpfsImage = ()=>(
+    new Promise((resolve, reject) => {
+      const reader = new window.FileReader();
+      reader.readAsArrayBuffer(file.object);
+      reader.onloadend = async () => {
+        try {
+          const fileContent = Buffer.from(reader.result)
+          const added = await client.add(fileContent)
+          resolve({...added, 'type':file.object.type})
+        } catch (error) {
+          reject(error);
+        }
+      }
+    })
+  )
+  const sendIpfsMetaJson = (added)=>(
+    new Promise((resolve, reject) => {
+      // create the metadata object we'll be storing
+      const propertiesObj = singleProperties.reduce((obj, item) => {
+        if(item.type!=='')
+          obj[item.type] = item.name
+        return obj
+      }, {})
+      const metaObj = {
+        "version": "1",
+        "type": itemtype.toLowerCase(),
+        "name": singleName,
+        "description": description,
+        "image": `feeds:image:${added.path}`,
+        "kind": added.type.replace('image/', ''),
+        "size": added.size,
+        "thumbnail": `feeds:image:${added.path}`,
+        "properties": propertiesObj,
+      }
+      try {
+        const jsonMetaObj = JSON.stringify(metaObj);
+        // add the metadata itself as well
+        const metaRecv = Promise.resolve(client.add(jsonMetaObj))
+        resolve(metaRecv)
+      } catch (error) {
+        reject(error);
+      }
+    })
+  )
+  const sendIpfsDidJson = ()=>(
+    new Promise((resolve, reject) => {
+      // create the metadata object we'll be storing
+      const didObj = {
+        "version":"1",
+        "did": "did:elastos:you_did_string"
+      }
+      try {
+        const jsonDidObj = JSON.stringify(didObj);
+        // add the metadata itself as well
+        const didRecv = Promise.resolve(client.add(jsonDidObj))
+        resolve(didRecv)
+      } catch (error) {
+        reject(error);
+      }
+    })
+  )
+  const uploadData = ()=>(
+    new Promise((resolve, reject) => {
+      let _id = ''
+      let _uri = ''
+      let _didUri = ''
+      if (!file)
+        return;
+      setProgress(5)
+      sendIpfsImage().then((added) => {
+        _id = `0x${hash(added.path)}`
+        setProgress(15)
+        return sendIpfsMetaJson(added)
+      }).then((metaRecv) => {
+        setProgress(30)
+        _uri = `feeds:json:${metaRecv.path}`
+        return sendIpfsDidJson()
+      }).then((didRecv) => {
+        setProgress(45)
+        _didUri = `feeds:json:${didRecv.path}`
+        resolve({ _id, _uri, _didUri })
+      }).catch((error) => {
+        reject(error);
+      })
+    })
+  )
   const mintAction = (e) => {
     if(!file)
       return
     setOnProgress(true)
-    const reader = new window.FileReader();
-    reader.readAsArrayBuffer(file.object);
-    reader.onloadend = async () => {
-      try {
-        const fileContent = Buffer.from(reader.result)
-        const added = await client.add(fileContent)
-        const cid = added.path;
-        
-        // create the metadata object we'll be storing
-        const metaObj = {
-          "version":"1",
-          "type":"general",
-          "name":"testname",
-          "description":"Test description",
-          "image":`feeds:image:${cid}`,
-          "kind":"png",
-          "size":"135121",
-          "thumbnail":`feeds:image:${cid}`,
-          "properties": {
-            "key1": "name1",
-            "key2": "name2",
-          },
-        }
-        const jsonMetaObj = JSON.stringify(metaObj);
-
-        // add the metadata itself as well
-        const metaRecv = await client.add(jsonMetaObj);
-
-        // create the did object we'll be storing
-        const didObj = {
-          "version":"1",
-          "did": "did:elastos:you_did_string"
-        }
-        const jsonDidObj = JSON.stringify(didObj);
-
-        // add the did file itself as well
-        const didRecv = await client.add(jsonDidObj);
-        // const (metaRecv.path)
-
-        setOnProgress(false)
-      } catch (error) {
-        enqueueSnackbar('Error uploading file', { variant: 'error' });
-      }
-    }
+    uploadData().then((paramObj) => 
+      mint2net(paramObj)
+    ).then((success) => {
+      setProgress(100)
+      if(success)
+        enqueueSnackbar('Mint token success!', { variant: 'success' });
+      else
+        enqueueSnackbar('Mint token error!', { variant: 'warning' });
+      setOnProgress(false)
+    }).catch((error) => {
+      setProgress(100)
+      enqueueSnackbar('Mint token error!', { variant: 'error' });
+      setOnProgress(false)
+    });
   }
   return (
     <RootStyle title="CreateItem | PASAR">
+      <ProgressBar isFinished={(progress===0||progress===100)} progress={progress} />
       <Container maxWidth="lg">
         <Typography variant="h2" component="h2" align="center" sx={{mb: 3}}>
           <span role="img" aria-label="">🔨</span> Create Item 
@@ -395,6 +500,7 @@ export default function CreateItem() {
                   <InputStyle
                     type="number"
                     id="input-with-royalties"
+                    inputRef={royaltiesRef}
                     defaultValue="10"
                     startAdornment={' '}
                     endAdornment='%'
