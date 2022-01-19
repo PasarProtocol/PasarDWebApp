@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { subDays, differenceInDays  } from 'date-fns';
 
 // Get Abbrevation of hex addres //
@@ -49,6 +50,10 @@ export const getElapsedTime = createdtimestamp => {
 
 export function dateRangeBeforeDays(days) {
   return [...Array(days).keys()].map((i) => subDays(new Date(), i).toISOString().slice(0, 10));
+}
+
+export function hash(string) {
+  return createHash('sha256').update(string).digest('hex');
 }
 
 export const MethodList = [
