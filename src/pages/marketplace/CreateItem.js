@@ -107,19 +107,18 @@ export default function CreateItem() {
       setMultiProperties([...Array(files.length)].map(el=>({type: '', name: ''})))
   }, [files]);
 
-  const handleDropSingleFile = React.useCallback(async (acceptedFiles) => {
+  const handleDropSingleFile = React.useCallback((acceptedFiles) => {
     const accepted = acceptedFiles[0];
     if (accepted) {
-      setFile({
-        ...accepted,
-        object: accepted,
-        preview: URL.createObjectURL(accepted)
-      });
+      setFile(
+        Object.assign(accepted, {
+          preview: URL.createObjectURL(accepted)
+        })
+      )
     }
   }, []);
 
-  const handleDropMultiFile = React.useCallback(
-    (acceptedFiles) => {
+  const handleDropMultiFile = React.useCallback((acceptedFiles) => {
       acceptedFiles.splice(20)
       setFiles(
         acceptedFiles.map((file) =>
@@ -179,8 +178,12 @@ export default function CreateItem() {
       setSingleProperties(temp)
     }
   };
-  
-  const mint2net = (paramObj)=>(
+  const progressStep = (pos, index)=>{
+    if(mintype!=="Batch")
+      return pos
+    return pos/files.length + 100*index/files.length
+  }
+  const mint2net = (paramObj, index=0)=>(
     new Promise((resolve, reject) => {
       const _tokenSupply = quantityRef.current.value
       const _royaltyFee = royaltiesRef.current.value*10000
@@ -192,20 +195,20 @@ export default function CreateItem() {
           const signer = provider.getSigner()
           const stickerContract = new ethers.Contract(CONTRACT_ADDRESS, STICKER_CONTRACT_ABI, signer)
 
-          // Initialize payment
-          setProgress(50)
+          console.log("Initialize payment")
+          setProgress(progressStep(50, index))
           
           stickerContract.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).then((nftTxn)=>{
-            setProgress(70)
-            // console.log("Mining... please wait")
+            setProgress(progressStep(70, index))
+            console.log("Mining... please wait")
             nftTxn.wait().then(()=>{
-              // console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`)
+              console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`)
               resolve(true)
             }).catch((error) => {
-              reject(error);
+              reject(error)
             })
           }).catch((error) => {
-            reject(error);
+            reject(error)
           })
         } else {
           resolve(false)
@@ -216,33 +219,39 @@ export default function CreateItem() {
       }
     })
   )
-  const sendIpfsImage = ()=>(
+  const sendIpfsImage = (f)=>(
     new Promise((resolve, reject) => {
       const reader = new window.FileReader();
-      reader.readAsArrayBuffer(file.object);
-      reader.onloadend = async () => {
+      reader.readAsArrayBuffer(f);
+      reader.onloadend = async() => {
         try {
           const fileContent = Buffer.from(reader.result)
           const added = await client.add(fileContent)
-          resolve({...added, 'type':file.object.type})
+          resolve({...added, 'type':f.type})
         } catch (error) {
           reject(error);
         }
       }
     })
   )
-  const sendIpfsMetaJson = (added)=>(
+  const sendIpfsMetaJson = (added, index=0)=>(
     new Promise((resolve, reject) => {
-      // create the metadata object we'll be storing
-      const propertiesObj = singleProperties.reduce((obj, item) => {
+      let collectibleName = singleName;
+      let propertiesObj = singleProperties.reduce((obj, item) => {
         if(item.type!=='')
-          obj[item.type] = item.name
+        obj[item.type] = item.name
         return obj
       }, {})
+      if(mintype==="Batch"){
+        collectibleName = multiNames[index]
+        propertiesObj = {}
+        propertiesObj[multiProperties[index].type] = multiProperties[index].name
+      }
+      // create the metadata object we'll be storing
       const metaObj = {
         "version": "1",
         "type": itemtype.toLowerCase(),
-        "name": singleName,
+        "name": collectibleName,
         "description": description,
         "image": `feeds:image:${added.path}`,
         "kind": added.type.replace('image/', ''),
@@ -285,7 +294,7 @@ export default function CreateItem() {
       if (!file)
         return;
       setProgress(5)
-      sendIpfsImage().then((added) => {
+      sendIpfsImage(file).then((added) => {
         _id = `0x${hash(added.path)}`
         setProgress(15)
         return sendIpfsMetaJson(added)
@@ -302,13 +311,31 @@ export default function CreateItem() {
       })
     })
   )
-  const mintAction = (e) => {
+  const uploadOneOfBatch = (f, _didUri, index)=>(
+    new Promise((resolve, reject) => {
+      let _id = ''
+      let _uri = ''
+      if (!f)
+        return;
+      setProgress(progressStep(10, index))
+      sendIpfsImage(f).then((added) => {
+        _id = `0x${hash(added.path)}`
+        setProgress(progressStep(20, index))
+        return sendIpfsMetaJson(added, index)
+      }).then((metaRecv) => {
+        setProgress(progressStep(40, index))
+        _uri = `feeds:json:${metaRecv.path}`
+        resolve({ _id, _uri, _didUri })
+      }).catch((error) => {
+        reject(error);
+      })
+    })
+  )
+  const mintSingle = () => {
     if(!file)
       return
     setOnProgress(true)
-    uploadData().then((paramObj) => 
-      mint2net(paramObj)
-    ).then((success) => {
+    uploadData().then((paramObj) => mint2net(paramObj)).then((success) => {
       setProgress(100)
       if(success)
         enqueueSnackbar('Mint token success!', { variant: 'success' });
@@ -320,6 +347,50 @@ export default function CreateItem() {
       enqueueSnackbar('Mint token error!', { variant: 'error' });
       setOnProgress(false)
     });
+  }
+  const mintBatch = () => {
+    if(!files.length)
+      return
+    setOnProgress(true)
+    setProgress(3)
+    sendIpfsDidJson().then((didRecv) => {
+      setProgress(6)
+      const _didUri = `feeds:json:${didRecv.path}`
+      mintBatchMain(_didUri)
+    }).catch((error) => {
+      setProgress(100)
+      enqueueSnackbar('Mint token error!', { variant: 'error' });
+      setOnProgress(false)
+    })
+  }
+  const mintBatchMain = (_didUri) => {
+    // const delay = file => new Promise(resolve => setTimeout(resolve, ms));
+    files.reduce( (p, f, i) => 
+      p.then(() => 
+        uploadOneOfBatch(f, _didUri, i)
+      ).then((paramObj) => 
+        mint2net(paramObj, i)
+      ).then((success) => {
+        setProgress(progressStep(100, i))
+        if(success)
+          enqueueSnackbar(`Mint token_${(i+1)} success!`, { variant: 'success' });
+        else
+          enqueueSnackbar(`Mint token_${(i+1)} error!`, { variant: 'warning' });
+        if((i+1)===files.length)
+          setOnProgress(false)
+      }).catch((error) => {
+        setProgress(progressStep(100, i))
+        enqueueSnackbar(`Mint token_${(i+1)} error!`, { variant: 'error' });
+        if((i+1)===files.length)
+          setOnProgress(false)
+      })
+    , Promise.resolve() );
+  }
+  const handleMintAction = (e) => {
+    if(mintype!=="Batch")
+      mintSingle()
+    else
+      mintBatch()
   }
   return (
     <RootStyle title="CreateItem | PASAR">
@@ -611,7 +682,7 @@ export default function CreateItem() {
                 </Grid>
               }
               <Grid item xs={12}>
-                <LoadingButton loading={onProgress} variant="contained" onClick={mintAction} fullWidth>
+                <LoadingButton loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
                   Create
                 </LoadingButton>
               </Grid>
