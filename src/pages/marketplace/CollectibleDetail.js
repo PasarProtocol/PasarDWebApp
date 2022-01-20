@@ -15,7 +15,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 // components
-import { MFab } from '../../components/@material-extend';
+import { MFab, MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
 import Countdown from '../../components/Countdown';
@@ -65,6 +65,14 @@ const AvatarStyle = styled(Box)(({ theme }) => ({
   borderRadius: '100%',
   backgroundColor: 'black',
   marginRight: 8
+}));
+const StickyPaperStyle = styled(Paper)(({ theme }) => ({
+  position: 'sticky',
+  bottom: 0,
+  boxShadow: 'rgb(230 230 230) 0px -5px 12px',
+  marginTop: theme.spacing(2),
+  padding: theme.spacing(2),
+  borderRadius: '16px 16px 0 0'
 }));
 const Property = ({type, name}) => (
   <Paper
@@ -252,7 +260,7 @@ export default function CollectibleDetail() {
             </PaperStyle>
             {
               isForAuction?(
-                <PaperStyle sx={{mt: 2}}>
+                <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
                   <Grid container direction="row">
                     <Grid item xs={6}>
                       <Typography variant="h4">Current bid</Typography>
@@ -267,12 +275,14 @@ export default function CollectibleDetail() {
                       <Countdown deadline="2022-01-25"/>
                     </Grid>
                   </Grid>
-                  <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2, textTransform: 'none'}}>
-                    Place a bid
-                  </Button>
+                  <MHidden width="smDown">
+                    <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2, textTransform: 'none'}}>
+                      Place a bid
+                    </Button>
+                  </MHidden>
                 </PaperStyle>
               ):(
-                <PaperStyle sx={{mt: 2, minHeight: 200}}>
+                <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
                 {
                   isLoadingCollectible?
                   <LoadingScreen/>:
@@ -280,9 +290,11 @@ export default function CollectibleDetail() {
                     <Typography variant="h4">On sale for a fixed price of</Typography>
                     <Typography variant="h3" color="origin.main">100 ELA</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD 300.26</Typography>
-                    <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2}}>
-                      Buy
-                    </Button>
+                    <MHidden width="smDown">
+                      <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2}}>
+                        Buy
+                      </Button>
+                    </MHidden>
                   </>
                 }
                 </PaperStyle>
@@ -380,6 +392,20 @@ export default function CollectibleDetail() {
             </PaperStyle>
           </Grid>
         </Grid>
+        <MHidden width="smUp">
+          <StickyPaperStyle fullWidth>
+            {
+              isForAuction?
+              <Button variant="contained" fullWidth onClick={()=>{}}>
+                Place a bid
+              </Button>:
+
+              <Button variant="contained" fullWidth onClick={()=>{}}>
+                Buy
+              </Button>
+            }
+          </StickyPaperStyle>
+        </MHidden>
       </Container>
     </RootStyle>
   );
