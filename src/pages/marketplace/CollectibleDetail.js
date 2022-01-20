@@ -380,20 +380,20 @@ export default function CollectibleDetail() {
             </Accordion>
           </Grid>
           <Grid item xs={12}>
-            <PaperStyle sx={{position: 'relative'}}>
-              <Stack direction="row" sx={{alignItems: 'center'}}>
-                <Typography variant="h5" sx={{ mt: 1, mb: 2, flex: 1 }}>
-                  <Link to={`/explorer/collectible/detail/${collectible.tokenId}`} component={RouterLink}>
-                    Collectible analytics and transaction record
-                  </Link>
-                </Typography>
-                <ArrowForwardIcon/>
-              </Stack>
-            </PaperStyle>
+            <Link to={`/explorer/collectible/detail/${collectible.tokenId}`} component={RouterLink} underline="none">
+              <PaperStyle sx={{position: 'relative'}}>
+                <Stack direction="row" sx={{alignItems: 'center'}}>
+                  <Typography variant="h5" sx={{ my: 1, flex: 1 }}>
+                      Collectible analytics and transaction record
+                  </Typography>
+                  <ArrowForwardIcon/>
+                </Stack>
+              </PaperStyle>
+            </Link>
           </Grid>
         </Grid>
         <MHidden width="smUp">
-          <StickyPaperStyle fullWidth>
+          <StickyPaperStyle>
             {
               isForAuction?
               <Button variant="contained" fullWidth onClick={()=>{}}>

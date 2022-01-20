@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {isMobile} from 'react-device-detect';
 import { Link as RouterLink } from 'react-router-dom';
 import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions,
   DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
@@ -121,7 +122,9 @@ export default function SignInDialog({ onChange }) {
   };
   
   const openAccountMenu = (event) => {
-    setOpenAccountPopup(event.currentTarget);
+    if(isMobile&&event.type==="mouseenter")
+      return
+    setOpenAccountPopup(event.currentTarget)
   };
   const closeAccountMenu = async (e) => {
     setOpenAccountPopup(null);
@@ -134,7 +137,7 @@ export default function SignInDialog({ onChange }) {
   return (
     walletAddress?(
       <>
-        <MFab size="small" onClick={openAccountMenu}>
+        <MFab size="small" onClick={openAccountMenu} onMouseEnter={openAccountMenu}>
           <AccountCircleOutlinedIcon />
         </MFab>
         <Menu 
