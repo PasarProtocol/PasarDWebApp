@@ -195,14 +195,14 @@ export default function CreateItem() {
           const signer = provider.getSigner()
           const stickerContract = new ethers.Contract(CONTRACT_ADDRESS, STICKER_CONTRACT_ABI, signer)
 
-          console.log("Initialize payment")
+          // console.log("Initialize payment")
           setProgress(progressStep(50, index))
           
           stickerContract.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).then((nftTxn)=>{
             setProgress(progressStep(70, index))
-            console.log("Mining... please wait")
+            // console.log("Mining... please wait")
             nftTxn.wait().then(()=>{
-              console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`)
+              // console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`)
               resolve(true)
             }).catch((error) => {
               reject(error)
@@ -249,7 +249,7 @@ export default function CreateItem() {
       }
       // create the metadata object we'll be storing
       const metaObj = {
-        "version": "1",
+        "version": "2",
         "type": itemtype.toLowerCase(),
         "name": collectibleName,
         "description": description,
@@ -273,7 +273,7 @@ export default function CreateItem() {
     new Promise((resolve, reject) => {
       // create the metadata object we'll be storing
       const didObj = {
-        "version":"1",
+        "version":"2",
         "did": "did:elastos:you_did_string"
       }
       try {
