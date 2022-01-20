@@ -341,20 +341,31 @@ export default function CollectibleDetail() {
             </Accordion>
           </Grid>
           <Grid item xs={12}>
-            <PaperStyle sx={{position: 'relative'}}>
-              <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>History</Typography>
-              <CollectibleHistory isLoading={isLoadingTransRecord} dataList={transRecord}/>
-              <Button
-                to={`/explorer/collectible/detail/${collectible.tokenId}`}
-                size="small"
-                color="inherit"
-                component={RouterLink}
-                endIcon={<Icon icon={arrowIosForwardFill} />}
-                sx={{position: 'absolute', right: 20, top: 20}}
+            <Accordion
+                defaultExpanded={1&&true}
+                sx={{
+                  border: '1px solid',
+                  borderColor: 'action.disabledBackground',
+                  boxShadow: (theme) => theme.customShadows.z1
+                }}
               >
-                See more details on Pasar Explorer
-              </Button>
-            </PaperStyle>
+              <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                <Typography variant="h5">History</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{pb: '50px', position: 'relative', px: 4}}>
+                <CollectibleHistory isLoading={isLoadingTransRecord} dataList={transRecord}/>
+                <Button
+                  to={`/explorer/collectible/detail/${collectible.tokenId}`}
+                  size="small"
+                  color="inherit"
+                  component={RouterLink}
+                  endIcon={<Icon icon={arrowIosForwardFill} />}
+                  sx={{position: 'absolute', right: 32, bottom: 16}}
+                >
+                  See more details on Pasar Explorer
+                </Button>
+              </AccordionDetails>
+            </Accordion>
           </Grid>
           <Grid item xs={12}>
             <PaperStyle sx={{position: 'relative'}}>
