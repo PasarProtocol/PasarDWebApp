@@ -518,7 +518,7 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <Stack direction="row">
                   <InputLabel sx={{ fontSize: 12, flex: 1 }}>
-                    List on market
+                    List on market directly after minting
                   </InputLabel>
                   <FormControlLabel
                     control={<CustomSwitch onChange={handlePutOnSale}/>}

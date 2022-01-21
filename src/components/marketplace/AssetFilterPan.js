@@ -42,7 +42,7 @@ export default function AssetFilterPan(props){
               </AccordionSummary>
               <AccordionDetails>
                 {
-                  [...btnNames].splice(0,3).map((name, index)=>(
+                  [...btnNames].splice(0,2).map((name, index)=>(
                     <Button key={index} variant={selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleBtnFunc(index)}>
                       {name}
                     </Button>
@@ -142,8 +142,8 @@ export default function AssetFilterPan(props){
               </AccordionSummary>
               <AccordionDetails>
                 {
-                  [...btnNames].splice(3).map((name, index)=>(
-                    <Button key={index} variant={selectedBtns.includes(index+3)?"contained":"outlined"} color="primary" onClick={()=>handleBtnFunc(index+3)}>
+                  [...btnNames].splice(2).map((name, index)=>(
+                    <Button key={index} variant={selectedBtns.includes(index+2)?"contained":"outlined"} color="primary" onClick={()=>handleBtnFunc(index+2)}>
                       {name}
                     </Button>
                   ))

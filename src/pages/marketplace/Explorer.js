@@ -80,7 +80,7 @@ const ToolbarShadowStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
   const drawerWidth = 360;
-  const btnNames = ["All", "Listed on Market", "On Auction", "All", "General", "Avatar"]
+  const btnNames = ["Listed on Market", "On Auction", "General", "Avatar"]
 
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
