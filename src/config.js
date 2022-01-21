@@ -24,4 +24,5 @@ export const mapConfig = process.env.REACT_APP_MAP_MAPBOX;
 export const googleAnalyticsConfig = process.env.REACT_APP_GA_MEASUREMENT_ID;
 
 export const stickerContract = "0x020c7303664bc88ae92cE3D380BF361E03B78B81";
+export const testStickerContract = "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961"; // same with stickerContract when it is product
 export const defaultContract = "0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0";
