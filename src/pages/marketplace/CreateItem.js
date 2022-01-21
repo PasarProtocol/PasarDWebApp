@@ -22,7 +22,7 @@ import PaperRecord from '../../components/PaperRecord';
 import CustomSwitch from '../../components/custom-switch';
 import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
-import {stickerContract as CONTRACT_ADDRESS} from '../../config'
+import {testStickerContract as CONTRACT_ADDRESS} from '../../config'
 import {hash} from '../../utils/common';
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import ProgressBar from '../../components/ProgressBar'
@@ -79,6 +79,7 @@ export default function CreateItem() {
   
   const quantityRef = React.useRef();
   const royaltiesRef = React.useRef();
+  const explicitRef = React.useRef();
   
   document.addEventListener("wheel", (event) => {  
     if (document.activeElement.type === "number") {  
@@ -237,15 +238,14 @@ export default function CreateItem() {
   const sendIpfsMetaJson = (added, index=0)=>(
     new Promise((resolve, reject) => {
       let collectibleName = singleName;
-      let propertiesObj = singleProperties.reduce((obj, item) => {
-        if(item.type!=='')
-        obj[item.type] = item.name
-        return obj
-      }, {})
+      let attributesObj = singleProperties.reduce((res, item) => {
+        if(item.type!=='' && item.name!=='')
+          res.push({'type': item.type, 'value': item.name})
+        return res
+      }, [])
       if(mintype==="Batch"){
         collectibleName = multiNames[index]
-        propertiesObj = {}
-        propertiesObj[multiProperties[index].type] = multiProperties[index].name
+        attributesObj = [{'type': multiProperties[index].type, 'value': multiProperties[index].name}]
       }
       // create the metadata object we'll be storing
       const metaObj = {
@@ -253,11 +253,14 @@ export default function CreateItem() {
         "type": itemtype.toLowerCase(),
         "name": collectibleName,
         "description": description,
-        "image": `feeds:image:${added.path}`,
-        "kind": added.type.replace('image/', ''),
-        "size": added.size,
-        "thumbnail": `feeds:image:${added.path}`,
-        "properties": propertiesObj,
+        "data": {
+          "image": `pasar:image:${added.path}`,
+          "kind": added.type.replace('image/', ''),
+          "size": added.size,
+          "thumbnail": `feeds:image:${added.path}`
+        },
+        "adult": explicitRef.current.checked,
+        "attributes": attributesObj,
       }
       try {
         const jsonMetaObj = JSON.stringify(metaObj);
@@ -502,7 +505,7 @@ export default function CreateItem() {
                     Set this item as explicit and sensitive content
                   </InputLabel>
                   <FormControlLabel
-                    control={<CustomSwitch onChange={()=>{}}/>}
+                    control={<CustomSwitch inputRef={explicitRef}/>}
                     sx={{mt:-1, mr: 0}}
                     label=""
                   />
@@ -533,33 +536,38 @@ export default function CreateItem() {
                   </Stack>
                 }
               </Grid>
-              <Grid item xs={12}>
-                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Price</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl variant="standard" sx={{width: '100%'}}>
-                  <InputLabel htmlFor="input-with-price">
-                    Enter a fixed price of each item
-                  </InputLabel>
-                  <InputStyle
-                    type="number"
-                    id="input-with-price"
-                    value={price}
-                    onChange={handleChangePrice}
-                    startAdornment={' '}
-                    endAdornment={
-                      <CoinSelect/>
-                    }
-                  />
-                </FormControl>
-                <Divider/>
-                <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Platform fee 2%&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4, fontSize: 18}}/></Typography>
-                <Typography variant="body2" component="div" sx={{fontWeight: 'normal'}}>
-                  You will receive
-                  <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}> {rcvprice} ELA </Typography>
-                  per item
-                </Typography>
-              </Grid>
+              {
+                isPutOnSale&&
+                <>
+                  <Grid item xs={12}>
+                    <Typography variant="h4" sx={{fontWeight: 'normal'}}>Price</Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControl variant="standard" sx={{width: '100%'}}>
+                      <InputLabel htmlFor="input-with-price">
+                        Enter a fixed price of each item
+                      </InputLabel>
+                      <InputStyle
+                        type="number"
+                        id="input-with-price"
+                        value={price}
+                        onChange={handleChangePrice}
+                        startAdornment={' '}
+                        endAdornment={
+                          <CoinSelect/>
+                        }
+                      />
+                    </FormControl>
+                    <Divider/>
+                    <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Platform fee 2%&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4, fontSize: 18}}/></Typography>
+                    <Typography variant="body2" component="div" sx={{fontWeight: 'normal'}}>
+                      You will receive
+                      <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}> {rcvprice} ELA </Typography>
+                      per item
+                    </Typography>
+                  </Grid>
+                </>
+              }
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Royalties&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/></Typography>
               </Grid>
