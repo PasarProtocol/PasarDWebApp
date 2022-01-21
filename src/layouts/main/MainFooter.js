@@ -58,9 +58,8 @@ export default function MainFooter() {
               <Box draggable = {false} component="img" src="/static/elastos.svg" sx={{ width: 21, display: 'inline', pl: .5 }} />
             </h3>
             <Typography variant="body2" sx={{ pr: { md: 5 }, color: 'GrayText' }}>
-              Pasar Explorer is a Collectible Explorer and <br />
-              Analytics Platform for Elastos NFTs, on the <br />
-              Elastos Smart Chain (ESC).
+              Pasar Protocol is a truly decentralized Web3.0 Marketplace, Collectible Explorer
+              and Analytics Platform for NFTs created on the Elastos Smart Chain (ESC)
             </Typography>
           </Grid>
 

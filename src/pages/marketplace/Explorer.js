@@ -205,13 +205,18 @@ export default function MarketExplorer() {
           <Box sx={{ display: 'flex' }}>
             <Box
               component="nav"
-              sx={{ width: drawerWidth*isFilterView, flexShrink: 0, display: {xs: 'none', sm: 'none', md: 'block'} }}
+              sx={{ width: drawerWidth*isFilterView, flexShrink: 0, display: {xs: 'none', sm: 'none', md: 'block'}, transition: 'width ease .5s' }}
               aria-label="mailbox folders"
             >
               <AssetFilterPan 
                 sx={{
                   pt: 3,
-                  '& .MuiDrawer-paper': { width: drawerWidth*isFilterView, top: isOffset?APP_BAR_MOBILE+48:APP_BAR_DESKTOP+48 },
+                  '& .MuiDrawer-paper': {
+                    transition: 'all ease .5s',
+                    width: drawerWidth,
+                    top: isOffset?APP_BAR_MOBILE+48:APP_BAR_DESKTOP+48,
+                    left: drawerWidth*(isFilterView-1) 
+                  },
                 }}
                 scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
                 btnNames = {btnNames}
