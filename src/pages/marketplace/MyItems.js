@@ -12,6 +12,7 @@ import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import { Icon } from '@iconify/react';
 import { useWeb3React } from "@web3-react/core";
 // components
+import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
 import MyItemsSortSelect from '../../components/MyItemsSortSelect';
@@ -124,25 +125,42 @@ export default function MyItems() {
               See more details
             </Button>
           </Box>
+          <MHidden width="smUp">
+            <Box fullWidth sx={{justifyContent: 'right', display: 'flex'}}>
+              <ToolGroupStyle>
+                <MyItemsSortSelect onChange={()=>{}}/>
+                <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                  <ToggleButton value={0}>
+                    <GridViewSharpIcon />
+                  </ToggleButton>
+                  <ToggleButton value={1}>
+                    <AppsIcon />
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </ToolGroupStyle>
+            </Box>
+          </MHidden>
         </Box>
         <TabContext value={tabValue}>
-          <Box sx={{display: {xs: 'block', sm: 'flex'}, position: 'relative', mb: 2, justifyContent: {sm: 'left', md: 'center'}}} align="center">
+          <Box sx={{display: 'flex', position: 'relative', mb: 2, justifyContent: 'center'}} align="center">
             <TabList onChange={handleSwitchTab} TabIndicatorProps={{style: {background:'#FF5082'}}}>
               <Tab label="Listed" value='1' />
               <Tab label="Owned" value='2' />
               <Tab label="Created" value='3' />
             </TabList>
-            <ToolGroupStyle>
-              <MyItemsSortSelect onChange={()=>{}}/>
-              <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-                <ToggleButton value={0}>
-                  <GridViewSharpIcon />
-                </ToggleButton>
-                <ToggleButton value={1}>
-                  <AppsIcon />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </ToolGroupStyle>
+            <MHidden width="smDown">
+              <ToolGroupStyle>
+                <MyItemsSortSelect onChange={()=>{}}/>
+                <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                  <ToggleButton value={0}>
+                    <GridViewSharpIcon />
+                  </ToggleButton>
+                  <ToggleButton value={1}>
+                    <AppsIcon />
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </ToolGroupStyle>
+            </MHidden>
           </Box>
           <Box
             sx={{
