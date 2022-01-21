@@ -4,7 +4,8 @@ import { Link as RouterLink, useParams } from 'react-router-dom';
 import Lightbox from 'react-image-lightbox';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
-import { Link, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Typography, Box, Select, Menu, MenuItem, Button } from '@mui/material';
+import { Link, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, 
+  Typography, Box, Modal, Backdrop, Menu, MenuItem, Button, IconButton, Toolbar } from '@mui/material';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
@@ -13,6 +14,7 @@ import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CloseIcon from '@mui/icons-material/Close';
 
 // components
 import { MFab, MHidden } from '../../components/@material-extend';
@@ -87,6 +89,9 @@ const Property = ({type, name}) => (
     <Typography variant="body2">{name}</Typography>
   </Paper>
 )
+const BackdropStyle = styled(Backdrop)(({ theme }) => ({
+  background: 'rgba(0, 0, 0, 0.8)'
+}));
 // ----------------------------------------------------------------------
 export default function CollectibleDetail() {
   const params = useParams(); // params.collection
@@ -102,6 +107,7 @@ export default function CollectibleDetail() {
   const [isLoadingBidList, setLoadingBid] = React.useState(true);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const imageRef = React.useRef();
+  const imageBoxRef = React.useRef();
   React.useEffect(async () => {
     const resCollectible = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`
@@ -136,6 +142,7 @@ export default function CollectibleDetail() {
   const onImgLoad = ({target:img}) => {
     if(img.alt)
       setLoadedImage(true)
+    handleResize()
   }
   
   const openPopupMenu = (event) => {
@@ -144,6 +151,22 @@ export default function CollectibleDetail() {
   const handleClosePopup = () => {
     setOpenPopup(null);
   };
+  
+  function handleResize() {
+    const { innerWidth: winWidth, innerHeight: winHeight } = window;
+    const { clientWidth: imgWidth, clientHeight: imgHeight } = imageRef.current;
+    if(imageBoxRef.current){
+      if(imgWidth/winWidth > imgHeight/winHeight){
+        imageBoxRef.current.style.width = 'calc(100% - 24px)'
+        imageBoxRef.current.style.height = ''
+      }
+      else {
+        imageBoxRef.current.style.width = 'fit-content'
+        imageBoxRef.current.style.height = 'calc(100% - 24px)'
+      }
+    }
+  }
+  window.addEventListener('resize', handleResize);
 
   const tempDeadLine = getTime(new Date('2022-01-25').getTime()/1000)
   return (
@@ -174,7 +197,6 @@ export default function CollectibleDetail() {
                   component="img"
                   src='/static/logo-xs-round.svg'
                   sx={{ position: 'absolute', width: '6%', left: '8%', bottom: '8%' }}
-                  ref={imageRef}
               />
             }
           </Box>
@@ -205,20 +227,60 @@ export default function CollectibleDetail() {
               </MenuItem>
             </Menu>
           </ToolGroupStyle>
-          {
-            isFullScreen&&(
-              <Lightbox
-                animationDuration={120}
-                mainSrc={getThumbnail(collectible.asset)}
-                reactModalStyle={{
-                  overlay: {
-                    zIndex: 9999
-                  }
-                }}
-                onCloseRequest={()=>{setFullScreen(false)}}
-              />
-            )
-          }
+
+          <Modal
+            open={isFullScreen}
+            onClose={()=>setFullScreen(false)}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+            BackdropComponent={BackdropStyle}
+          >
+            <Box>
+              <Toolbar sx={{
+                  position: 'fixed',
+                  top: 0,
+                  width: '100vw',
+                  backgroundColor: 'rgba(0,0,0,.5)',
+                  zIndex: 1
+                }}>
+                <Box sx={{ flexGrow: 1 }}/>
+                <IconButton
+                  edge="start"
+                  aria-label="menu"
+                  sx={{color: "white"}}
+                  onClick={()=>setFullScreen(false)}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Toolbar>
+              <Box sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+              }}
+                ref={imageBoxRef}>
+                <Box
+                    draggable = {false}
+                    component="img"
+                    alt={collectible.name}
+                    src={getThumbnail(collectible.asset)}
+                    onLoad={onImgLoad}
+                    onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
+                    sx={{ width: '100%', height: '100%' }}
+                />
+                {
+                  isLoadedImage&&
+                  <Box
+                      draggable = {false}
+                      component="img"
+                      src='/static/logo-xs-round.svg'
+                      sx={{ position: 'absolute', width: '6%', left: '8%', bottom: '8%' }}
+                  />
+                }
+              </Box>
+            </Box>
+          </Modal>
         </Container>
       </Box>
       <Container maxWidth="lg">

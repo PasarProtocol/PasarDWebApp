@@ -150,7 +150,6 @@ export default function CollectibleDetail() {
                     component="img"
                     src='/static/logo-xs-round.svg'
                     sx={{ position: 'absolute', width: '6%', left: 40, bottom: 40 }}
-                    ref={imageRef}
                 />
               }
             </PaperStyle>
