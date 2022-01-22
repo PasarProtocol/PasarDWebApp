@@ -16,22 +16,27 @@ import PaperRecord from '../PaperRecord';
 // ----------------------------------------------------------------------
 
 const Thumbnail = (props) => {
-  const { width, src, ratio } = props;
-
+  const { src } = props;
+  const imageStyle = {
+    borderRadius: 1,
+    boxShadow: (theme)=>theme.customShadows.z16,
+    position: 'relative',
+    alignItems: 'center',
+    height: 'auto',
+    maxHeight: '100%',
+    maxWidth: '100%'
+  }
   return (
-    <Grid as={Card} sx={{mt: .5}}>
-      <Box draggable = {false} component="img" src={src} width={width} height={width}/>
-      {/* <Imgix
-        src={src}
-        width={width}
-        height={width}
-        imgixParams={{
-          fit: "crop",
-          crop: "edges, entropy, faces, center",
-          ar: `${ratio}`
-        }}
-      /> */}
-    </Grid>
+    <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        aspectRatio: '1 / 1',
+        width: '100%',
+      }}>
+      <Box sx={{mt: .5, alignItems: 'center', display: 'flex'}}>
+        <Box draggable = {false} component="img" src={src} sx={imageStyle}/>
+      </Box>
+    </Box>
   );
 };
 
@@ -88,28 +93,16 @@ export default function AssetCard(props) {
                 alt=""
                 underline="none"
               >
-                <SizeMe>
-                  {({ size }) => (
-                    <Thumbnail
-                      src={props.thumbnail}
-                      width={size.width}
-                      // hovered={isHovered}
-                      {...props}
-                    />
-                  )}
-                </SizeMe>
+                <Thumbnail
+                  src={props.thumbnail}
+                  {...props}
+                />
               </Link>
             ):(
-              <SizeMe>
-                {({ size }) => (
-                  <Thumbnail
-                    src={props.thumbnail}
-                    width={size.width}
-                    // hovered={isHovered}
-                    {...props}
-                  />
-                )}
-              </SizeMe>
+              <Thumbnail
+                src={props.thumbnail}
+                {...props}
+              />
             )
           }
           <Typography variant="h4" noWrap>{title}</Typography>

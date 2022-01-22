@@ -46,17 +46,23 @@ const CardStyle = styled(Card)(({ theme }) => ({
     flexDirection: 'row',
     '& img': {
       width: '25%',
-      height: '100%'
+      height: '100%',
     }
   },
   [theme.breakpoints.down('sm')]: {
-    flexDirection: 'column'
+    flexDirection: 'column',
+    '& img': {
+      maxWidth: 300,
+      margin: '0 auto 32px'
+    }
   },
   '& div.MuiBox-root': {
     minWidth: 0,
     flexGrow: 1,
     position: 'relative',
-    paddingBottom: theme.spacing(6)
+    [theme.breakpoints.up('sm')]: {
+      paddingBottom: 48
+    }
   }
 }));
 
@@ -107,7 +113,7 @@ export default function MarketHome() {
       </Container>
       <Container maxWidth="md">
         <CardStyle>
-          <Box component="div">
+          <Box component="div" sx={{pb:'0 !important'}}>
             <TitleStyle component="h1">
               Get started with Essentials
             </TitleStyle>
@@ -121,7 +127,7 @@ export default function MarketHome() {
               Decentralized Autonomous Organization (DAO) and
               so much more!
             </Typography>
-            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 0}}>
+            <Stack spacing={1} direction="row" sx={{mt: 2}}>
               <Button variant="contained" href="#" startIcon={<AdbIcon />}>
                 Google Play
               </Button>
@@ -144,16 +150,16 @@ export default function MarketHome() {
               app from Glide Finance, a decentralized exchange (DEX) also built
               on the Elastos Smart Chain (ESC).
             </Typography>
-            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 0}}>
-              <Button variant="contained" href="#">
-                Get ELA on Glide Finance
-              </Button>
-              <Button variant="outlined" href="#">
-                Learn more about ESC
-              </Button>
-            </Stack>
           </Box>
-          <Box draggable = {false} component="img" src="/static/glide.png" />
+          <Box draggable = {false} component="img" src="/static/glide.png" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
+          <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
+            <Button variant="contained" href="#">
+              Get ELA on Glide Finance
+            </Button>
+            <Button variant="outlined" href="#">
+              Learn more about ESC
+            </Button>
+          </Stack>
         </CardStyle>
         <CardStyle>
           <Box component="div">
@@ -166,16 +172,16 @@ export default function MarketHome() {
             Choose how you want to set up your work on Pasar and
             you’re done! We’ll do the rest of the selling for you!
             </Typography>
-            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 0}}>
-              <Button variant="contained" href="#">
-                Sign in with DID
-              </Button>
-              <Button variant="outlined" href="#">
-                Create
-              </Button>
-            </Stack>
           </Box>
           <Box draggable = {false} component="img" src="/static/logo.svg" sx={{p: 3}}/>
+          <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32}}>
+            <Button variant="contained" href="#">
+              Sign in with DID
+            </Button>
+            <Button variant="outlined" href="#">
+              Create
+            </Button>
+          </Stack>
         </CardStyle>
       </Container>
     </RootStyle>
