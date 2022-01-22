@@ -104,7 +104,7 @@ export default function CreateItem() {
     }))
     setUploadedCount(files.length)
     if(files.length)
-      setMultiProperties([...Array(files.length)].map(el=>({type: '', name: ''})))
+      setMultiProperties([...Array(files.length)].map(el=>([{type: '', name: ''}])))
   }, [files]);
 
   const handleDropSingleFile = React.useCallback((acceptedFiles) => {
@@ -153,31 +153,34 @@ export default function CreateItem() {
     setRcvPrice(math.round(event.target.value*98/100, 3))
   };
 
-  const handleProperties = (key, index, e) => {
-    if(mintype==="Batch"){
-      const temp = [...multiProperties]
-      temp[index][key] = e.target.value
-      setMultiProperties(temp)
-    } else {
-      const temp = [...singleProperties]
-      temp[index][key] = e.target.value
-      if(!temp[index].type.length&&!temp[index].name.length){
-        if(temp.length>1&&index<temp.length-1)
-          temp.splice(index, 1)
-        if(temp.findIndex((item)=>(!item.type.length||!item.name.length))<0)
-          temp.push({type: '', name: ''})
-      }
-      else if(!temp[index].type.length||!temp[index].name.length){
-        if(!temp[temp.length-1].type.length&&!temp[temp.length-1].name.length)
-          temp.splice(temp.length-1, 1)
-      }
-      else if(temp[index].type.length&&temp[index].name.length){
-        if(temp.findIndex((item)=>(!item.type.length||!item.name.length))<0)
-          temp.push({type: '', name: ''})
-      }
-      setSingleProperties(temp)
+  const handleProperties = (properties, key, index, e) => {
+    const temp = [...properties]
+    temp[index][key] = e.target.value
+    if(!temp[index].type.length&&!temp[index].name.length){
+      if(temp.length>1&&index<temp.length-1)
+        temp.splice(index, 1)
+      if(temp.findIndex((item)=>(!item.type.length||!item.name.length))<0)
+        temp.push({type: '', name: ''})
     }
+    else if(!temp[index].type.length||!temp[index].name.length){
+      if(!temp[temp.length-1].type.length&&!temp[temp.length-1].name.length)
+        temp.splice(temp.length-1, 1)
+    }
+    else if(temp[index].type.length&&temp[index].name.length){
+      if(temp.findIndex((item)=>(!item.type.length||!item.name.length))<0)
+        temp.push({type: '', name: ''})
+    }
+    return temp
   };
+  const handleSingleProperties = (key, index, e) => {
+    const tempSingleProperties = handleProperties(singleProperties, key, index, e)
+    setSingleProperties(tempSingleProperties)
+  }
+  const handleMultiProperties = (key, multindex, index, e) => {
+    const tempMultiProperties = [...multiProperties]
+    tempMultiProperties[multindex] = handleProperties(multiProperties[multindex], key, index, e)
+    setMultiProperties(tempMultiProperties)
+  }
   const progressStep = (pos, index)=>{
     if(mintype!=="Batch")
       return pos
@@ -244,7 +247,11 @@ export default function CreateItem() {
       }, [])
       if(mintype==="Batch"){
         collectibleName = multiNames[index]
-        attributesObj = [{'type': multiProperties[index].type, 'value': multiProperties[index].name}]
+        attributesObj = multiProperties[index].reduce((res, item) => {
+          if(item.type!=='' && item.name!=='')
+            res.push({'type': item.type, 'value': item.name})
+          return res
+        }, [])
       }
       // create the metadata object we'll be storing
       const metaObj = {
@@ -641,10 +648,10 @@ export default function CreateItem() {
                       singleProperties.map((property, index)=>(
                         <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
                           <Grid item xs={6}>
-                            <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleProperties('type', index, e)}}/>
+                            <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleSingleProperties('type', index, e)}}/>
                           </Grid>
                           <Grid item xs={6}>
-                            <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleProperties('name', index, e)}}/>
+                            <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleSingleProperties('name', index, e)}}/>
                           </Grid>
                         </Grid>
                       ))
@@ -661,9 +668,9 @@ export default function CreateItem() {
                     </AccordionSummary>
                     <AccordionDetails>
                     {
-                      multiProperties.map((property, index)=>(
-                        <div key={index}>
-                          <Typography variant="h5" sx={{display: 'block', color: 'origin.main'}}>{multiNames[index]}</Typography>
+                      multiProperties.map((properties, multiIndex)=>(
+                        <div key={multiIndex}>
+                          <Typography variant="h5" sx={{display: 'block', color: 'origin.main'}}>{multiNames[multiIndex]}</Typography>
                           <Grid container spacing={1}>
                             <Grid item xs={6}>
                               <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Type</Typography>
@@ -672,14 +679,18 @@ export default function CreateItem() {
                               <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Name</Typography>
                             </Grid>
                           </Grid>
-                          <Grid container spacing={1} key={index} sx={{pb:1}}>
-                            <Grid item xs={6}>
-                              <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleProperties('type', index, e)}}/>
-                            </Grid>
-                            <Grid item xs={6}>
-                              <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleProperties('name', index, e)}}/>
-                            </Grid>
-                          </Grid>
+                          {
+                            properties.map((property, index)=>(
+                              <Grid container spacing={1} key={index} sx={{pb:1}}>
+                                <Grid item xs={6}>
+                                  <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleMultiProperties('type', multiIndex, index, e)}}/>
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleMultiProperties('name', multiIndex, index, e)}}/>
+                                </Grid>
+                              </Grid>
+                            ))
+                          }
                         </div>
                       ))
                     }
