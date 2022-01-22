@@ -71,7 +71,7 @@ const MintingTypeButton = (props)=>{
                     <AddIcon sx={{ fontSize: {xs: 24.5, sm: 34}, color: 'white' }} />
                 </Box>
             }
-            <Typography variant="body2" sx={{ fontSize: {xs: 12, sm: ''} }}>{type}</Typography>
+            <Typography variant="body2" sx={{ fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1.6, sm: 3} }}>{type}</Typography>
             <Typography variant="body2" sx={{ height: 30, fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1, sm: ''} }}>{description}</Typography>
         </Paper>
     )
