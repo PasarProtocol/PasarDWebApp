@@ -18,7 +18,7 @@ export default function CoinSelect({ onChange }) {
   return (
     <>
       <Button color="inherit" size="small" sx={{px: 1, py: .5}} onClick={openPopupMenu}>
-        <Box component="img" src={`/static/${coins[selected].icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;${coins[selected].name}
+        <Box component="img" src={`/static/${coins[selected].icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coins[selected].name}
         <Icon icon={arrowIosDownwardFill} width={20} height={20}/>
       </Button>
       <Menu 
@@ -32,7 +32,7 @@ export default function CoinSelect({ onChange }) {
       >
         {coins.map((coin, index)=>(
           <MenuItem key={index} onClick={()=>{handleClosePopup(); setSelected(index)}}>
-            <Box component="img" src={`/static/${coin.icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;${coin.name}
+            <Box component="img" src={`/static/${coin.icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coin.name}
           </MenuItem>
         ))}
       </Menu>

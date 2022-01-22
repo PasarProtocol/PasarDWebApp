@@ -77,7 +77,6 @@ export default function CreateItem() {
   const [progress, setProgress] = React.useState(0);
   const { enqueueSnackbar } = useSnackbar();
   
-  const quantityRef = React.useRef();
   const royaltiesRef = React.useRef();
   const explicitRef = React.useRef();
   
@@ -88,8 +87,8 @@ export default function CreateItem() {
   });
 
   React.useEffect(async () => {
-    if(mintype==="Single")
-      quantityRef.current.value = 1
+    if(mintype!=="Multiple")
+      setQuantity(1)
   }, [mintype]);
 
   React.useEffect(() => {
@@ -186,7 +185,7 @@ export default function CreateItem() {
   }
   const mint2net = (paramObj, index=0)=>(
     new Promise((resolve, reject) => {
-      const _tokenSupply = quantityRef.current.value
+      const _tokenSupply = quantity
       const _royaltyFee = royaltiesRef.current.value*10000
       try {
         const { ethereum } = window
@@ -480,7 +479,7 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{width: '100%'}}>
-                  <InputLabel htmlFor="input-with-description">
+                  <InputLabel htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)' }}>
                     {
                       mintype!=="Batch"?
                       "Add item description":
@@ -594,9 +593,8 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{width: '100%'}}>
                   <InputStyle
-                    disabled={mintype==="Single"}
+                    disabled={mintype!=="Multiple"}
                     type="number"
-                    inputRef={quantityRef}
                     value={quantity}
                     onChange={(e)=>setQuantity(e.target.value)}
                   />
