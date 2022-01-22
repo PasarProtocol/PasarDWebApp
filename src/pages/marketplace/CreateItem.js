@@ -120,6 +120,10 @@ export default function CreateItem() {
 
   const handleDropMultiFile = React.useCallback((acceptedFiles) => {
       acceptedFiles.splice(20)
+      if(acceptedFiles.length<2){
+        enqueueSnackbar('Allow at least 2 items!', { variant: 'warning' });
+        return
+      }
       setFiles(
         acceptedFiles.map((file) =>
           Object.assign(file, {
@@ -141,6 +145,10 @@ export default function CreateItem() {
 
   const handleRemove = (file) => {
     const filteredItems = files.filter((_file) => _file !== file);
+    if(filteredItems.length<2){
+      enqueueSnackbar('Allow at least 2 items!', { variant: 'warning' });
+      return
+    }
     setFiles(filteredItems);
   };
 

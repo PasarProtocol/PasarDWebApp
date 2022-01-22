@@ -61,7 +61,7 @@ export default function AssetCard(props) {
               <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
             </Grid>
             <Grid item xs={6} align="right">
-              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={openPopupMenu}>
+              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}}>
                 <MoreHorizIcon />
               </IconButton>
               <Menu 
