@@ -12,6 +12,7 @@ import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
 
 // components
+import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
 import ItemTypeButton from '../../components/marketplace/ItemTypeButton';
@@ -621,7 +622,7 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <Stack spacing={1} direction="row">
-                  <MintingTypeButton type="FSTK" description="Single item" onClick={()=>{setCollection("FSTK")}} current={collection}/>
+                  <MintingTypeButton type="FSTK" description="Feeds NFT Sticker" onClick={()=>{setCollection("FSTK")}} current={collection}/>
                   <Tooltip title="Coming Soon" arrow>
                     <div>
                       <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose")}} current={collection} disabled={1&&true}/>
@@ -706,11 +707,13 @@ export default function CreateItem() {
                   </Accordion>
                 </Grid>
               }
-              <Grid item xs={12}>
-                <LoadingButton loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
-                  Create
-                </LoadingButton>
-              </Grid>
+              <MHidden width="smDown">
+                <Grid item xs={12}>
+                  <LoadingButton loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
+                    Create
+                  </LoadingButton>
+                </Grid>
+              </MHidden>
             </Grid>
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -766,6 +769,13 @@ export default function CreateItem() {
               </Grid>
             </Grid>
           </Grid>
+          <MHidden width="smUp">
+            <Grid item xs={12}>
+              <LoadingButton loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
+                Create
+              </LoadingButton>
+            </Grid>
+          </MHidden>
         </Grid>
       </Container>
     </RootStyle>
