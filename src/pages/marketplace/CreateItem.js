@@ -81,12 +81,6 @@ export default function CreateItem() {
   const royaltiesRef = React.useRef();
   const explicitRef = React.useRef();
   
-  document.addEventListener("wheel", (event) => {  
-    if (document.activeElement.type === "number") {  
-      document.activeElement.blur();  
-    }  
-  });
-
   React.useEffect(async () => {
     if(mintype!=="Multiple")
       setQuantity(1)

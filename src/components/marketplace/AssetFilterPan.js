@@ -86,13 +86,13 @@ export default function AssetFilterPan(props){
                   </Select>
                   <Grid container>
                     <Grid item xs={5} md={5}>
-                      <TextField label="Min" size="small"/>
+                      <TextField label="Min" size="small" type="number"/>
                     </Grid>
                     <Grid item xs={2} md={2} align="center">
                       <Typography variant="body2" sx={{pt: 1}}>to</Typography>
                     </Grid>
                     <Grid item xs={5} md={5}>
-                      <TextField label="Max" size="small"/>
+                      <TextField label="Max" size="small" type="number"/>
                     </Grid>
                   </Grid>
                   <Button variant="contained" color="primary" width="100%">

@@ -45,6 +45,13 @@ export default function App() {
       return false;
     }
   });
+  
+  document.addEventListener("wheel", (event) => {  
+    if (document.activeElement.type === "number") {  
+      document.activeElement.blur();  
+    }  
+  });
+  
   return (
     <ThemeConfig>
       <ThemePrimaryColor>
