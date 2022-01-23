@@ -49,7 +49,7 @@ const useStyles = makeStyles({
 });
 
 export default function SignInDialog({ onChange }) {
-  const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
+  let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
   const context = useWeb3React()
   const { connector, activate, active, error, library, chainId, account } = context;
   const [openSignin, setOpenSigninDlg] = useState(false);
@@ -66,7 +66,9 @@ export default function SignInDialog({ onChange }) {
   }
 
   React.useEffect(() => {
-    setWalletAddress(account)
+    sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
+    if(sessionLinkFlag)
+      setWalletAddress(account)
   }, [account])
 
   // ------------ Connect Wallet ------------
@@ -77,6 +79,7 @@ export default function SignInDialog({ onChange }) {
     else if(wallet === 'walletconnect') currentConnector = walletconnect;
     setActivatingConnector(currentConnector);
     await activate(currentConnector);
+    setWalletAddress(account)
     sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
     setOpenSigninDlg(false);
   };
@@ -339,17 +342,15 @@ export default function SignInDialog({ onChange }) {
             <Typography variant="h3" component="div" sx={{color: 'text.primary'}} align="center">
               Download Essentials
             </Typography>
-            <Box component="div" sx={{ px: 12 }}>
-              <Typography variant="p" component="div" sx={{color: 'text.secondary'}} align="center">
-                Get Elastos Essentials now to kickstart your journey! 
-                It is your gateway to Web3.0!
-              </Typography>
-              <Grid container spacing={2} sx={{my: 4}}>
-                <Grid item xs={12} sx={{pt: '0 !important'}}>
-                  <Typography variant="body2" display="block" gutterBottom align="center">
-                    Web3.0 super wallet with Decentralized Identifier (DID)
-                  </Typography>
-                </Grid>
+            <Typography variant="p" component="div" sx={{color: 'text.secondary'}} align="center">
+              Get Elastos Essentials now to kickstart your journey! 
+              It is your gateway to Web3.0!
+            </Typography>
+            <Typography variant="body2" display="block" gutterBottom align="center" sx={{mt: 4}}>
+              Web3.0 super wallet with Decentralized Identifier (DID)
+            </Typography>
+            <Box component="div" sx={{ maxWidth: 300, m: 'auto' }}>
+              <Grid container spacing={2} sx={{mt: 2, mb: 4}}>
                 <Grid item xs={12} sx={{pt: '8px !important'}}>
                   <Button variant="contained" href="#" startIcon={<AdbIcon />} className={classes.iconAbsolute2} fullWidth>
                     Google Play
