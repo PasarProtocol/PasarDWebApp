@@ -1,4 +1,5 @@
 import React from 'react';
+import {isMobile} from 'react-device-detect';
 import { motion, AnimatePresence } from "framer-motion";
 // material
 import { Box } from '@mui/material';
@@ -39,7 +40,10 @@ const GridItems = (props) => (
     </AnimatePresence>
 );
 export default function AssetGrid(props){
-  const itemWidth = props.dispmode===0?270:200
+  let itemWidth = 200
+  if(props.dispmode===0)
+    itemWidth = isMobile?230:270
+  else itemWidth = isMobile?150:200
   return(
     <StackedGrid itemWidth={itemWidth}>
       <GridItems items={props.assets} />

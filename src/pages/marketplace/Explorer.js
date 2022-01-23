@@ -7,11 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Stack, Typography, AppBar, Toolbar, Paper, Divider, Backdrop, 
   Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import AppsIcon from '@mui/icons-material/Apps';
+import SquareIcon from '@mui/icons-material/Square';
 import GridViewSharpIcon from '@mui/icons-material/GridViewSharp';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosBackFill from '@iconify/icons-eva/arrow-ios-back-fill';
 import CloseIcon from '@mui/icons-material/Close';
-import closeFill from '@iconify/icons-eva/close-fill';
 import CheckIcon from '@mui/icons-material/Check';
 
 // components
@@ -23,12 +23,11 @@ import LoadingWrapper from '../../components/LoadingWrapper';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
-import Scrollbar from '../../components/Scrollbar';
 
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
-  paddingTop: theme.spacing(10),
+  paddingTop: theme.spacing(11),
   paddingBottom: theme.spacing(12),
   [theme.breakpoints.up('md')]: {
     paddingTop: theme.spacing(19)
@@ -38,7 +37,7 @@ const RootStyle = styled(Page)(({ theme }) => ({
   }
 }));
 
-const APP_BAR_MOBILE = 64;
+const APP_BAR_MOBILE = 72;
 const APP_BAR_DESKTOP = 88;
 const AppBarStyle = styled(AppBar)(({ theme }) => ({
   color: 'inherit',
@@ -90,8 +89,8 @@ export default function MarketExplorer() {
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([]);
   const [selectedBtns, setSelectedBtns] = React.useState([]);
-  const [dispmode, setDispmode] = React.useState(0);
-  const [isFilterView, setFilterView] = React.useState(0);
+  const [dispmode, setDispmode] = React.useState(1);
+  const [isFilterView, setFilterView] = React.useState(1);
   const [totalCount, setTotalCount] = React.useState(0);
   const [timeOrder, setTimeOrder] = React.useState(-1);
   const [controller, setAbortController] = React.useState(new AbortController());
@@ -235,6 +234,19 @@ export default function MarketExplorer() {
               component="main"
               sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth*isFilterView}px)` } }}
             >
+              <MHidden width="mdUp">
+                <Box sx={{display: 'flex', pb: 1}}>
+                  <AssetSortSelect sx={{flex: 1}}/>
+                  <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                    <ToggleButton value={0}>
+                      <SquareIcon />
+                    </ToggleButton>
+                    <ToggleButton value={1}>
+                      <GridViewSharpIcon />
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Box>
+              </MHidden>
               <AssetGrid assets={assets} dispmode={dispmode}/>
             </Box>
           </Box>
@@ -252,7 +264,7 @@ export default function MarketExplorer() {
           </Button>
         </FilterBtnContainerStyle>
         
-        <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isFilterView===1} onClick={closeFilter} />
+        <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isFilterView!==1} onClick={closeFilter} />
         <Box
           sx={{
             top: 12,
@@ -260,7 +272,7 @@ export default function MarketExplorer() {
             right: 0,
             position: 'fixed',
             zIndex: 1210,
-            ...(isFilterView && { right: 12 })
+            ...(!isFilterView && { right: 12 })
           }}
         >
           <Paper
@@ -271,7 +283,7 @@ export default function MarketExplorer() {
               overflow: 'hidden',
               boxShadow: (theme) => theme.customShadows.z24,
               transition: (theme) => theme.transitions.create('width'),
-              ...(isFilterView && { width: 'calc(100vw - 24px)' })
+              ...(!isFilterView && { width: 'calc(100vw - 24px)' })
             }}
           >
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>

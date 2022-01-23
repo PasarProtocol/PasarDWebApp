@@ -14,7 +14,7 @@ const MenuProps = {
   },
   variant: "menu"
 };
-export default function AssetSortSelect({ onChange }) {
+export default function AssetSortSelect({ onChange, sx={} }) {
   const [selected, setSelected] = useState(0);
   const handleChange = (event) => {
     setSelected(event.target.value);
@@ -27,7 +27,7 @@ export default function AssetSortSelect({ onChange }) {
       onChange={handleChange}
       inputProps={{ 'aria-label': 'Without label' }}
       size="small"
-      sx={{mr: 1}}
+      sx={{mr: 1, ...sx}}
       MenuProps={MenuProps}
     >
       <MenuItem value={0}>Latest: Listed</MenuItem>
