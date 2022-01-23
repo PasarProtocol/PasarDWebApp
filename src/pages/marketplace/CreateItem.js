@@ -489,7 +489,7 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{width: '100%'}}>
-                  <InputLabel htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)' }}>
+                  <InputLabel htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
                     {
                       mintype!=="Batch"?
                       "Add item description":
@@ -501,6 +501,7 @@ export default function CreateItem() {
                     startAdornment={' '}
                     value={description}
                     onChange={(e)=>setDescription(e.target.value)}
+                    sx={{mt: '-5px !important'}}
                   />
                 </FormControl>
                 <Divider/>

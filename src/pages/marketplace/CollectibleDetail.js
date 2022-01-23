@@ -153,6 +153,8 @@ export default function CollectibleDetail() {
   };
   
   function handleResize() {
+    if(!imageRef.current)
+      return
     const { innerWidth: winWidth, innerHeight: winHeight } = window;
     const { clientWidth: imgWidth, clientHeight: imgHeight } = imageRef.current;
     if(imageBoxRef.current){
