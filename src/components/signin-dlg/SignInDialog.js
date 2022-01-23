@@ -240,7 +240,7 @@ export default function SignInDialog({ onChange }) {
             <Typography variant="h3" component="div" sx={{color: 'text.primary'}} align="center">
               Sign in with your DID
             </Typography>
-            <Box component="div" sx={{ px: 12 }}>
+            <Box component="div" sx={{ maxWidth: 350, m: 'auto' }}>
               <Typography variant="p" component="div" sx={{color: 'text.secondary'}} align="center">
                 Sign in with one of the available providers or
                 create a new one. <Link href="#" underline="hover" color="red">What is a DID?</Link>
