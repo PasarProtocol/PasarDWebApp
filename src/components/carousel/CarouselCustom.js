@@ -50,7 +50,7 @@ const DetailItem = ({ item, isLast, value })=>{
                     title==="Status"&&(
                       value===0?
                       "Not on sale":(
-                        <Link to={`/marketplace/explorer/detail/${params.collection}`} component={RouterLink} sx={{display: 'flex', alignItems: 'center'}}>
+                        <Link to={`/marketplace/detail/${params.collection}`} component={RouterLink} sx={{display: 'flex', alignItems: 'center'}}>
                           Listed on Pasar&nbsp;<Icon icon={externalLinkFill} width="17px"/>
                         </Link>
                       )

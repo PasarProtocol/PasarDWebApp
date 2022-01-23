@@ -89,7 +89,7 @@ export default function AssetCard(props) {
             isLink?(
               <Link
                 component={RouterLink}
-                to={`/marketplace/explorer/detail/${tokenId}`}
+                to={`/marketplace/detail/${tokenId}`}
                 alt=""
                 underline="none"
               >

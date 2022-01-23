@@ -48,7 +48,7 @@ export default function Router() {
       path: '/',
       element: <MainLayout />,
       children: [
-        { path: '/', element: <Navigate to="/explorer" /> },
+        { path: '/', element: <MarketHome /> },
         { path: 'explorer', element: <Explorer /> },
         {
           path: 'explorer',
@@ -63,12 +63,11 @@ export default function Router() {
             { path: 'search/:key', element: <SearchResult /> },
           ]
         },
-        { path: 'marketplace', element: <MarketHome /> },
+        { path: 'marketplace', element: <MarketExplorer /> },
         {
           path: 'marketplace',
           children: [
-            { path: 'explorer', element: <MarketExplorer /> },
-            { path: 'explorer/detail/:collection', element: <MarketCollectibleDetail /> },
+            { path: 'detail/:collection', element: <MarketCollectibleDetail /> },
             { path: 'myitem', element: <MyItems /> },
           ]
         },

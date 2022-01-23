@@ -12,8 +12,8 @@ const ContentStyle = styled('div')(({ theme }) => ({
   textAlign: 'center',
 }));
 
-const SearchStyle = styled(OutlinedInput)(({ theme, sx, needBgColor }) => {
-  const bgColor = needBgColor?{backgroundColor: theme.palette.background.default}:{}
+const SearchStyle = styled(OutlinedInput)(({ theme, sx, needbgcolor }) => {
+  const bgColor = needbgcolor?{backgroundColor: theme.palette.background.default}:{}
   return({
     ...bgColor,
     [theme.breakpoints.up('md')]: {
@@ -30,6 +30,7 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx, needBgColor }) => {
     }),
     '&.Mui-focused': {
         backgroundColor: alpha(theme.palette.common.white, 0.04),
+        ...bgColor,
         boxShadow: 'rgb(190 190 190 / 50%) 0px 4px 8px 0px'
     },
     '&.Mui-focused fieldset': {
@@ -51,7 +52,7 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx, needBgColor }) => {
 });
 
 // ----------------------------------------------------------------------
-export default function SearchBox({placeholder, sx, outersx, rootsx, onChange, needBgColor=false}) {
+export default function SearchBox({placeholder, sx, outersx, rootsx, onChange, needbgcolor=false}) {
   const params = useParams(); // params.key
   const navigate = useNavigate();
   const handleChange = (e)=>{
@@ -75,7 +76,7 @@ export default function SearchBox({placeholder, sx, outersx, rootsx, onChange, n
                   </InputAdornment>
                 }
                 sx = {sx}
-                needBgColor = {needBgColor}
+                needbgcolor = {needbgcolor?1:0}
               />
           </ContentStyle>
       </Container>
