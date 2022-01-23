@@ -1,11 +1,12 @@
 // material
 import React from 'react';
-import { styled } from '@mui/material/styles';
-
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { Container, Stack, Typography, AppBar, Toolbar, Tab,
+import SwipeableViews from "react-swipeable-views";
+
+import { styled } from '@mui/material/styles';
+import { Container, Stack, Typography, Tab, Tabs, 
   Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
+// import { TabContext, TabList, TabPanel } from '@mui/lab';
 import AppsIcon from '@mui/icons-material/Apps';
 import GridViewSharpIcon from '@mui/icons-material/GridViewSharp';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
@@ -16,7 +17,6 @@ import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
 import MyItemsSortSelect from '../../components/MyItemsSortSelect';
-import LoadingWrapper from '../../components/LoadingWrapper';
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from "../../components/signin-dlg/hook";
 
@@ -61,7 +61,7 @@ export default function MyItems() {
   const [timeOrder, setTimeOrder] = React.useState(-1);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
-  const [tabValue, setTabValue] = React.useState('1');
+  const [tabValue, setTabValue] = React.useState(0);
   const [walletAddress, setWalletAddress] = React.useState(null);
 
 
@@ -77,6 +77,10 @@ export default function MyItems() {
 
   const handleSwitchTab = (event, newValue) => {
     setTabValue(newValue);
+  };
+
+  const handleSwitchSwiper = (value) => {
+    setTabValue(value);
   };
 
   React.useEffect(async () => {
@@ -141,52 +145,58 @@ export default function MyItems() {
             </Box>
           </MHidden>
         </Box>
-        <TabContext value={tabValue}>
-          <Box sx={{display: 'flex', position: 'relative', mb: 2, justifyContent: 'center'}} align="center">
-            <TabList onChange={handleSwitchTab} TabIndicatorProps={{style: {background:'#FF5082'}}}>
-              <Tab label="Listed" value='1' />
-              <Tab label="Owned" value='2' />
-              <Tab label="Created" value='3' />
-            </TabList>
-            <MHidden width="smDown">
-              <ToolGroupStyle>
-                <MyItemsSortSelect onChange={()=>{}}/>
-                <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-                  <ToggleButton value={0}>
-                    <GridViewSharpIcon />
-                  </ToggleButton>
-                  <ToggleButton value={1}>
-                    <AppsIcon />
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              </ToolGroupStyle>
-            </MHidden>
-          </Box>
-          <Box
-            sx={{
-              width: '100%',
+        <Box sx={{display: 'flex', position: 'relative', mb: 2, justifyContent: 'center'}} align="center">
+          <Tabs value={tabValue} onChange={handleSwitchTab} TabIndicatorProps={{style: {background:'#FF5082'}}}>
+            <Tab label="Listed" value={0} />
+            <Tab label="Owned" value={1} />
+            <Tab label="Created" value={2} />
+          </Tabs>
+          <MHidden width="smDown">
+            <ToolGroupStyle>
+              <MyItemsSortSelect onChange={()=>{}}/>
+              <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                <ToggleButton value={0}>
+                  <GridViewSharpIcon />
+                </ToggleButton>
+                <ToggleButton value={1}>
+                  <AppsIcon />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </ToolGroupStyle>
+          </MHidden>
+        </Box>
+        <Box
+          sx={{
+            width: '100%',
+          }}
+        >
+          <SwipeableViews
+            index={tabValue}
+            onChangeIndex={handleSwitchSwiper}
+            containerStyle={{
+              transition: 'transform 0.35s cubic-bezier(0.15, 0.3, 0.25, 1) 0s'
             }}
           >
-            <TabPanel value='1'>
-              {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
+            <Box>
+              {isLoadingAssets && <LoadingScreen sx={{background: 'transparent'}}/>}
               <Box component="main">
                 <AssetGrid assets={assets} dispmode={dispmode}/>
               </Box>
-            </TabPanel>
-            <TabPanel value='2'>
-              {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
+            </Box>
+            <Box>
+              {isLoadingAssets && <LoadingScreen sx={{background: 'transparent'}}/>}
               <Box component="main">
                 <Typography variant="subtitle2" align="center" sx={{mb: 3}}>No owned collectible found!</Typography>
               </Box>
-            </TabPanel>
-            <TabPanel value='3'>
-              {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
+            </Box>
+            <Box>
+              {isLoadingAssets && <LoadingScreen sx={{background: 'transparent'}}/>}
               <Box component="main">
                 <Typography variant="subtitle2" align="center" sx={{mb: 3}}>No created collectible found!</Typography>
               </Box>
-            </TabPanel>
-          </Box>
-        </TabContext>
+            </Box>
+          </SwipeableViews>
+        </Box>
       </Container>
     </RootStyle>
   );
