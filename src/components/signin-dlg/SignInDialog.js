@@ -148,6 +148,7 @@ export default function SignInDialog({ onChange }) {
           open={Boolean(isOpenAccountPopup)}
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          MenuListProps={{ onMouseLeave: closeAccountMenu }}
         >
           <Box sx={{px: 2, py: '6px'}}>
             <Typography variant="h6">{reduceHexAddress(walletAddress)} <CopyButton text={walletAddress} sx={{mt: '-3px'}}/></Typography>
