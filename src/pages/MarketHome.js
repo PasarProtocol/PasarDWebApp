@@ -100,8 +100,8 @@ export default function MarketHome() {
               Pasar is the largest NFT marketplace<br/>on Elastos
             </Typography>
             <Stack spacing={1} direction="row">
-              <Button to="explorer" variant="contained" component={RouterLink}>
-                Explorer
+              <Button to="/marketplace" variant="contained" component={RouterLink}>
+                Marketplace
               </Button>
               <Button to="/create" variant="outlined" component={RouterLink}>
                 Create
