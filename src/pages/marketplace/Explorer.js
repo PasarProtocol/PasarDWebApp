@@ -83,7 +83,7 @@ const FilterBtnContainerStyle = styled(Box)(({ theme }) => ({
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
   const drawerWidth = 360;
-  const btnNames = ["Listed on Market", "On Auction", "General", "Avatar"]
+  const btnNames = ["Listed", "On Auction", "General", "Avatar"]
 
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
@@ -286,6 +286,15 @@ export default function MarketExplorer() {
               ...(!isFilterView && { width: 'calc(100vw - 24px)' })
             }}
           >
+            <AssetFilterPan 
+              sx={{
+              }}
+              scrollMaxHeight = 'calc(100vh - 24px - 68px)'
+              btnNames = {btnNames}
+              selectedBtns = {selectedBtns}
+              handleBtnFunc = {handleBtns}
+            />
+            <Divider />
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>
               <Typography variant="subtitle1">Filters</Typography>
               <Button
@@ -295,15 +304,6 @@ export default function MarketExplorer() {
                 Done
               </Button>
             </Stack>
-            <Divider />
-            <AssetFilterPan 
-              sx={{
-              }}
-              scrollMaxHeight = 'calc(100vh - 24px - 68px)'
-              btnNames = {btnNames}
-              selectedBtns = {selectedBtns}
-              handleBtnFunc = {handleBtns}
-            />
           </Paper>
         </Box>
       </MHidden>
