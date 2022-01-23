@@ -14,7 +14,8 @@ const SOCIALS = [
   { name: 'Twitter', icon: twitterFill },
 ];
 
-const RootStyle = styled('div')(({ theme }) => ({
+const RootStyle = styled('div')(({ theme, sx }) => ({
+  ...sx,
   position: 'absolute',
   bottom: 0,
   width: '100%',
@@ -42,9 +43,10 @@ function CopyRight(prop) {
     </Typography>
   );
 }
-export default function MainFooter() {
+export default function MainFooter({hidden}) {
+  const sx=hidden?{display: 'none'}:{}
   return (
-    <RootStyle>
+    <RootStyle sx={sx}>
       <Divider />
       <Container maxWidth="lg" sx={{ pt: 6 }}>
         <Grid

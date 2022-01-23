@@ -46,25 +46,27 @@ ScrollTop.propTypes = {
   children: PropTypes.element.isRequired
 };
 
-const BodyStyle = styled('div')(({ theme }) => ({
-  [theme.breakpoints.up('md')]: {
-    paddingBottom: 200
+const BodyStyle = styled('div')(({ theme, footerhidden }) => (
+  footerhidden?{}:
+  {
+    [theme.breakpoints.up('md')]: {
+      paddingBottom: 200
+    }
   }
-}));
+));
 
 export default function MainLayout() {
   const { pathname } = useLocation();
   const isHome = pathname === '/';
-
+  const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create' || pathname === '/create/';
   return (
     <>
       <MainNavbar />
-      <BodyStyle>
+      <BodyStyle footerhidden={isFooterHiddenPage}>
         <Outlet />
       </BodyStyle>
-      <MainFooter />
+      <MainFooter hidden={isFooterHiddenPage}/>
       <ScrollTop>
-          {/* <Button variant="contained" target="_blank" href="#"> */}
         <Fab variant="contained" size="small" aria-label="scroll back to top">
           <KeyboardArrowUpIcon />
         </Fab>
