@@ -1,18 +1,21 @@
 // material
 import React from 'react';
 import { Icon } from '@iconify/react';
-import { styled } from '@mui/material/styles';
+import { alpha, styled } from '@mui/material/styles';
 
 import { useNavigate } from 'react-router-dom';
-import { Container, Stack, Typography, AppBar, Toolbar, 
+import { Container, Stack, Typography, AppBar, Toolbar, Paper, Divider, Backdrop, 
   Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import AppsIcon from '@mui/icons-material/Apps';
 import GridViewSharpIcon from '@mui/icons-material/GridViewSharp';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosBackFill from '@iconify/icons-eva/arrow-ios-back-fill';
 import CloseIcon from '@mui/icons-material/Close';
+import closeFill from '@iconify/icons-eva/close-fill';
+import CheckIcon from '@mui/icons-material/Check';
 
 // components
+import { MHidden, MIconButton } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
 import AssetSortSelect from '../../components/AssetSortSelect';
@@ -20,6 +23,7 @@ import LoadingWrapper from '../../components/LoadingWrapper';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
+import Scrollbar from '../../components/Scrollbar';
 
 // ----------------------------------------------------------------------
 
@@ -30,17 +34,9 @@ const RootStyle = styled(Page)(({ theme }) => ({
     paddingTop: theme.spacing(19)
   },
   [theme.breakpoints.down('md')]: {
-    paddingBottom: theme.spacing(3)
+    paddingBottom: theme.spacing(8)
   }
 }));
-
-const StackStyle = styled(Stack)(({ theme }) => ({
-  flexDirection: 'row',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-  }
-}));
-
 
 const APP_BAR_MOBILE = 64;
 const APP_BAR_DESKTOP = 88;
@@ -50,6 +46,10 @@ const AppBarStyle = styled(AppBar)(({ theme }) => ({
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.standard
   }),
+  [theme.breakpoints.down('md')]: {
+    top: 64,
+    display: 'none'
+  }
 }));
 const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
   height: '48px',
@@ -57,13 +57,7 @@ const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
   transition: theme.transitions.create(['height', 'background-color'], {
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.standard
-  }),
-  // [theme.breakpoints.up('md')]: {
-  //   height: APP_BAR_MOBILE
-  // },
-  [theme.breakpoints.down('md')]: {
-    display: 'none'
-  }
+  })
 }));
 const ToolbarShadowStyle = styled('div')(({ theme }) => ({
   left: 0,
@@ -76,6 +70,16 @@ const ToolbarShadowStyle = styled('div')(({ theme }) => ({
   position: 'absolute',
   width: `calc(100% - 48px)`,
   boxShadow: theme.customShadows.z8
+}));
+const FilterBtnContainerStyle = styled(Box)(({ theme }) => ({
+  position: 'fixed',
+  bottom: 0,
+  display: 'flex',
+  width: '100%',
+  padding: theme.spacing(1),
+  justifyContent: 'center',
+  backdropFilter: 'blur(6px)',
+  background: alpha(theme.palette.background.default, 0.5)
 }));
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
@@ -137,6 +141,9 @@ export default function MarketExplorer() {
   const link2Detail = (tokenId)=>{
     navigate(`/explorer/collectible/detail/${tokenId}`);
   }
+  const closeFilter = (e)=>{
+    setFilterView(!isFilterView&&1)
+  }
   return (
     <RootStyle title="Marketplace | PASAR">
       <Stack direction="row">
@@ -149,14 +156,14 @@ export default function MarketExplorer() {
                 })
               }}
             >
-              <StackStyle width="100%">
+              <Stack width="100%" direction="row">
                 <Box sx={{flex:1}}>
                   <Button
                     variant="contained"
                     color="origin"
                     startIcon={isFilterView?<Icon icon={arrowIosBackFill} />:''}
                     endIcon={isFilterView?'':<Icon icon={arrowIosForwardFill} />}
-                    onClick={()=>{setFilterView(!isFilterView&&1)}}
+                    onClick={closeFilter}
                   >
                     Filters
                   </Button>
@@ -197,7 +204,7 @@ export default function MarketExplorer() {
                     </ToggleButton>
                   </ToggleButtonGroup>
                 </Box>
-              </StackStyle>
+              </Stack>
             </ToolbarStyle>
             {isOffset && <ToolbarShadowStyle />}
           </AppBarStyle>
@@ -233,6 +240,61 @@ export default function MarketExplorer() {
           </Box>
         </Container>
       </Stack>
+      <MHidden width="mdUp">
+        <FilterBtnContainerStyle>
+          <Button
+            size="large"
+            variant="contained"
+            color="origin"
+            onClick={closeFilter}
+          >
+            Filters
+          </Button>
+        </FilterBtnContainerStyle>
+        
+        <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isFilterView===1} onClick={closeFilter} />
+        <Box
+          sx={{
+            top: 12,
+            bottom: 12,
+            right: 0,
+            position: 'fixed',
+            zIndex: 1210,
+            ...(isFilterView && { right: 12 })
+          }}
+        >
+          <Paper
+            sx={{
+              height: 1,
+              width: '0px',
+              maxWidth: 400,
+              overflow: 'hidden',
+              boxShadow: (theme) => theme.customShadows.z24,
+              transition: (theme) => theme.transitions.create('width'),
+              ...(isFilterView && { width: 'calc(100vw - 24px)' })
+            }}
+          >
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>
+              <Typography variant="subtitle1">Filters</Typography>
+              <Button
+                endIcon={<CheckIcon/>}
+                onClick={closeFilter}
+              >
+                Done
+              </Button>
+            </Stack>
+            <Divider />
+            <AssetFilterPan 
+              sx={{
+              }}
+              scrollMaxHeight = 'calc(100vh - 24px - 68px)'
+              btnNames = {btnNames}
+              selectedBtns = {selectedBtns}
+              handleBtnFunc = {handleBtns}
+            />
+          </Paper>
+        </Box>
+      </MHidden>
     </RootStyle>
   );
 }

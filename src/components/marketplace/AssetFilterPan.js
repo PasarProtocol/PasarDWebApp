@@ -11,8 +11,10 @@ import SearchBox from '../SearchBox';
 import Scrollbar from '../Scrollbar';
 // ----------------------------------------------------------------------
 const DrawerStyle = styled(Drawer)(({ theme }) => ({
-  [theme.breakpoints.down('sm')]: {
-    display: 'none'
+  [theme.breakpoints.down('md')]: {
+    '& .MuiPaper-root': {
+      position: 'initial'
+    }
   },
   '& .MuiDrawer-paper': {
     boxSizing: 'border-box',
@@ -31,9 +33,9 @@ export default function AssetFilterPan(props){
       open
       sx={sx}
     >
-      <Scrollbar sx={{maxHeight: scrollMaxHeight}}>
+      <Scrollbar sx={{maxHeight: scrollMaxHeight, px: 1}}>
         <Grid container width="100%">
-          <Grid item md={12}>
+          <Grid item xs={12} md={12}>
             <Accordion
               defaultExpanded={1&&true}
             >
@@ -52,7 +54,7 @@ export default function AssetFilterPan(props){
             </Accordion>
             <Divider />
           </Grid>
-          <Grid item md={12}>
+          <Grid item xs={12} md={12}>
             <Accordion
               defaultExpanded={1&&true}
             >
@@ -83,13 +85,13 @@ export default function AssetFilterPan(props){
                     </MenuItem>
                   </Select>
                   <Grid container>
-                    <Grid item md={5}>
+                    <Grid item xs={5} md={5}>
                       <TextField label="Min" size="small"/>
                     </Grid>
-                    <Grid item md={2} align="center">
+                    <Grid item xs={2} md={2} align="center">
                       <Typography variant="body2" sx={{pt: 1}}>to</Typography>
                     </Grid>
-                    <Grid item md={5}>
+                    <Grid item xs={5} md={5}>
                       <TextField label="Max" size="small"/>
                     </Grid>
                   </Grid>
@@ -101,7 +103,7 @@ export default function AssetFilterPan(props){
             </Accordion>
             <Divider />
           </Grid>
-          <Grid item md={12}>
+          <Grid item xs={12} md={12}>
             <Accordion
               defaultExpanded={1&&true}
             >
@@ -132,8 +134,7 @@ export default function AssetFilterPan(props){
             </Accordion>
             <Divider />
           </Grid>
-        </Grid>
-        <Grid item md={12}>
+          <Grid item xs={12} md={12}>
             <Accordion
               defaultExpanded={1&&true}
             >
@@ -152,23 +153,24 @@ export default function AssetFilterPan(props){
             </Accordion>
             <Divider />
           </Grid>
-        <Grid item md={12}>
-          <Accordion
-            defaultExpanded={1&&true}
-          >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-              <Typography variant="body2">Explicit & Sensitive Content</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <FormControlLabel
-                control={<CustomSwitch onChange={()=>{}}/>}
-                label="Off"
-                labelPlacement="end"
-                sx={{ml:2, pr:2}}
-              />
-            </AccordionDetails>
-          </Accordion>
-          <Divider />
+          <Grid item xs={12} md={12}>
+            <Accordion
+              defaultExpanded={1&&true}
+            >
+              <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                <Typography variant="body2">Explicit & Sensitive Content</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <FormControlLabel
+                  control={<CustomSwitch onChange={()=>{}}/>}
+                  label="Off"
+                  labelPlacement="end"
+                  sx={{ml:2, pr:2}}
+                />
+              </AccordionDetails>
+            </Accordion>
+            <Divider />
+          </Grid>
         </Grid>
       </Scrollbar>
     </DrawerStyle>
