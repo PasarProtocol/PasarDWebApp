@@ -12,7 +12,10 @@ const ContentStyle = styled('div')(({ theme }) => ({
   textAlign: 'center',
 }));
 
-const SearchStyle = styled(OutlinedInput)(({ theme, sx }) => ({
+const SearchStyle = styled(OutlinedInput)(({ theme, sx, needBgColor }) => {
+  const bgColor = needBgColor?{backgroundColor: theme.palette.background.default}:{}
+  return({
+    ...bgColor,
     [theme.breakpoints.up('md')]: {
         width: sx.width,
     },
@@ -44,10 +47,11 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx }) => ({
         padding: 8,
         paddingLeft: 3
     }
-}));
+  })
+});
 
 // ----------------------------------------------------------------------
-export default function SearchBox({placeholder, sx, outersx, rootsx, onChange}) {
+export default function SearchBox({placeholder, sx, outersx, rootsx, onChange, needBgColor=false}) {
   const params = useParams(); // params.key
   const navigate = useNavigate();
   const handleChange = (e)=>{
@@ -71,6 +75,7 @@ export default function SearchBox({placeholder, sx, outersx, rootsx, onChange}) 
                   </InputAdornment>
                 }
                 sx = {sx}
+                needBgColor = {needBgColor}
               />
           </ContentStyle>
       </Container>
