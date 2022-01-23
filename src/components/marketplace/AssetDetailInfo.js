@@ -74,7 +74,7 @@ export default function AssetDetailInfo({ detail }) {
   }
 
   return (
-    <Stack spacing={1} sx={{ pt: 1, pb: 2 }}>
+    <Stack spacing={1} sx={{ pt: 1, pb: '35px' }}>
     {
       infoItems.map((item, index) => (
         <DetailItem 

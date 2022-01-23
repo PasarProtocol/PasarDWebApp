@@ -62,7 +62,7 @@ export default function MainLayout() {
   return (
     <>
       <MainNavbar />
-      <BodyStyle footerhidden={isFooterHiddenPage}>
+      <BodyStyle footerhidden={isFooterHiddenPage?1:0}>
         <Outlet />
       </BodyStyle>
       <MainFooter hidden={isFooterHiddenPage}/>
