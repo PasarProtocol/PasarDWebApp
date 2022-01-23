@@ -43,6 +43,7 @@ export default function AssetFilterPan(props){
                 <Typography variant="body2">Status</Typography>
               </AccordionSummary>
               <AccordionDetails>
+                <Stack spacing={1} direction='row'>
                 {
                   [...btnNames].splice(0,2).map((name, index)=>(
                     <Button key={index} variant={selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleBtnFunc(index)}>
@@ -50,6 +51,7 @@ export default function AssetFilterPan(props){
                     </Button>
                   ))
                 }
+                </Stack>
               </AccordionDetails>
             </Accordion>
             <Divider />
@@ -142,6 +144,7 @@ export default function AssetFilterPan(props){
                 <Typography variant="body2">Item Type</Typography>
               </AccordionSummary>
               <AccordionDetails>
+                <Stack spacing={1} direction='row'>
                 {
                   [...btnNames].splice(2).map((name, index)=>(
                     <Button key={index} variant={selectedBtns.includes(index+2)?"contained":"outlined"} color="primary" onClick={()=>handleBtnFunc(index+2)}>
@@ -149,6 +152,7 @@ export default function AssetFilterPan(props){
                     </Button>
                   ))
                 }
+                </Stack>
               </AccordionDetails>
             </Accordion>
             <Divider />

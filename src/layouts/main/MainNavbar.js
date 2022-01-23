@@ -49,6 +49,7 @@ export default function MainNavbar() {
   const isOffset = useOffSetTop(40);
   const { pathname } = useLocation();
   const isHome = pathname === '/explorer';
+  const isMarketHome = pathname === '/marketplace' || pathname === '/marketplace/';
 
   return (
     <AppBar sx={{ boxShadow: 0, bgcolor: 'transparent' }}>
@@ -78,7 +79,7 @@ export default function MainNavbar() {
               <RouterLink to="/">
                 <Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
               </RouterLink>
-              <SearchBox sx={{width: 440}}/>
+              <SearchBox sx={{width: 440}} needBgColor={!isOffset && isMarketHome}/>
             </MHidden>
           }
           <Box sx={{ flexGrow: 1 }} />
