@@ -64,12 +64,11 @@ export default function SignInDialog({ onChange }) {
     setActivatingConnector(injected);
     activate(injected);
   }
-
   React.useEffect(() => {
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
     if(sessionLinkFlag)
       setWalletAddress(account)
-  }, [account])
+  }, [sessionLinkFlag, account])
 
   // ------------ Connect Wallet ------------
   const handleChooseWallet = async (wallet) => {
@@ -79,8 +78,8 @@ export default function SignInDialog({ onChange }) {
     else if(wallet === 'walletconnect') currentConnector = walletconnect;
     setActivatingConnector(currentConnector);
     await activate(currentConnector);
-    setWalletAddress(account)
     sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
+    sessionLinkFlag = '1'
     setOpenSigninDlg(false);
   };
 
@@ -135,6 +134,7 @@ export default function SignInDialog({ onChange }) {
       await activate(null);
       sessionStorage.removeItem('PASAR_LINK_ADDRESS')
       setActivatingConnector(null);
+      setWalletAddress(null)
     }
   };
   return (

@@ -15,9 +15,9 @@ import {stickerContract, defaultContract} from '../../config'
 
 // ----------------------------------------------------------------------
 
-const CAROUSEL_ICONS = ['user', 'description', 'hammer', 'diamond', 'hash', 'cash-hand', 'basket', 'collection', 'contract-address', 'calendar-hammer', 'ethereum', 'blockchain', 'marketplace']
-const CAROUSEL_TITLE = ['Name', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Collection', 'Contract Address', 'Created Date', 'Token Standard', 'Blockchain', 'Status']
-const CAROUSEL_KEYS = ['name', 'description', 'royaltyOwner', 'holder', 'tokenIdHex', 'royalties', 'quantity', 'collection', 'contractAddr', 'createTime', 'tokenStandard', 'blockchain', 'status']
+const CAROUSEL_ICONS = ['marketplace', 'description', 'hammer', 'diamond', 'hash', 'cash-hand', 'basket', 'collection', 'contract-address', 'calendar-hammer', 'ethereum', 'blockchain']
+const CAROUSEL_TITLE = ['Status', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Collection', 'Contract Address', 'Created Date', 'Token Standard', 'Blockchain']
+const CAROUSEL_KEYS = ['status', 'description', 'royaltyOwner', 'holder', 'tokenIdHex', 'royalties', 'quantity', 'collection', 'contractAddr', 'createTime', 'tokenStandard', 'blockchain']
 const CAROUSEL_COPYABLE = [false, false, true, true, true, false, false, false, true, false, false, false, false]
 
 const RootStyle = styled('div')(({ theme }) => ({
