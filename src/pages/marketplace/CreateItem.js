@@ -243,33 +243,33 @@ export default function CreateItem() {
   const sendIpfsMetaJson = (added, index=0)=>(
     new Promise((resolve, reject) => {
       let collectibleName = singleName;
-      let attributesObj = singleProperties.reduce((res, item) => {
+      let propertiesObj = singleProperties.reduce((obj, item) => {
         if(item.type!=='' && item.name!=='')
-          res.push({'type': item.type, 'value': item.name})
-        return res
-      }, [])
+          obj[item.type] = item.name
+        return obj
+      }, {})
       if(mintype==="Batch"){
         collectibleName = multiNames[index]
-        attributesObj = multiProperties[index].reduce((res, item) => {
+        propertiesObj = multiProperties[index].reduce((obj, item) => {
           if(item.type!=='' && item.name!=='')
-            res.push({'type': item.type, 'value': item.name})
-          return res
-        }, [])
+            obj[item.type] = item.name
+          return obj
+        }, {})
       }
       // create the metadata object we'll be storing
       const metaObj = {
         "version": "2",
-        "type": itemtype.toLowerCase(),
+        "type": itemtype==="General"?'image':itemtype.toLowerCase(),
         "name": collectibleName,
         "description": description,
         "data": {
           "image": `pasar:image:${added.path}`,
           "kind": added.type.replace('image/', ''),
           "size": added.size,
-          "thumbnail": `feeds:image:${added.path}`
+          "thumbnail": `pasar:image:${added.path}`
         },
         "adult": explicitRef.current.checked,
-        "attributes": attributesObj,
+        "properties": propertiesObj,
       }
       try {
         const jsonMetaObj = JSON.stringify(metaObj);
