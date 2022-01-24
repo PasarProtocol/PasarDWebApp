@@ -34,7 +34,7 @@ const Thumbnail = (props) => {
         width: '100%',
       }}>
       <Box sx={{mt: .5, alignItems: 'center', display: 'flex'}}>
-        <Box draggable = {false} component="img" src={src} sx={imageStyle}/>
+        <Box draggable = {false} component="img" src={src} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
       </Box>
     </Box>
   );
