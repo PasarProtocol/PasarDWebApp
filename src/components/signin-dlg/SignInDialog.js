@@ -16,12 +16,16 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import PropTypes from 'prop-types';
 import { useWeb3React } from "@web3-react/core";
 import { ethers } from "ethers";
+import jwtDecode from 'jwt-decode';
+import { DID } from "@elastosfoundation/elastos-connectivity-sdk-js";
+import { essentialsConnector, useConnectivitySDK } from './EssentialConnectivity';
 import { MIconButton, MFab } from '../@material-extend';
 import { injected, walletconnect, walletlink } from "./connectors";
 import { useEagerConnect, useInactiveListener } from "./hook";
 import CopyButton from '../CopyButton';
 import PaperRecord from '../PaperRecord';
 import { reduceHexAddress } from '../../utils/common';
+
 
 const useStyles = makeStyles({
   iconAbsolute1: {
@@ -82,6 +86,64 @@ export default function SignInDialog({ onChange }) {
     sessionLinkFlag = '1'
     setOpenSigninDlg(false);
   };
+  useConnectivitySDK();
+
+  const connectWithEssential = async () => {
+        const didAccess = new DID.DIDAccess();
+        let presentation;
+        console.log("Trying to sign in using the connectivity SDK");
+        try {
+          presentation = await didAccess.requestCredentials({
+            claims: [
+              DID.simpleIdClaim("Your name", "name", false)
+            ]
+          });
+        } catch (e) {
+          // Possible exception while using wallet connect (i.e. not an identity wallet)
+          // Kill the wallet connect session
+          console.warn("Error while getting credentials", e);
+
+          try {
+            await essentialsConnector.getWalletConnectProvider().disconnect();
+          }
+          catch (e) {
+            console.error("Error while trying to disconnect wallet connect session", e);
+          }
+
+          return;
+        }
+
+        if (presentation) {
+            const did = presentation.getHolder().getMethodSpecificId() || "";
+            fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/api/v1/login`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify(presentation.toJSON())
+              }).then(response => response.json()).then(data => {
+                if (data.code === 200) {
+                  const {token} = data;
+
+                  sessionStorage("token", token);
+                  sessionStorage("did", did);
+  
+                  const user = jwtDecode(token);
+                  console.log("Sign in: setting user to:", user);
+                  // setUser(user);
+                  sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
+                  sessionLinkFlag = '1'
+                  setOpenSigninDlg(false);
+                } else {
+                  console.log(data);
+                }
+              }).catch((error) => {
+                console.log(error);
+                alert(`Failed to call the backend API. Check your connectivity and make sure ${process.env.REACT_APP_BACKEND_URL} is reachable`);
+            });
+        }
+  };
 
   // ------------ Handle Transaction ------------
   const handleTransaction = async (to, value) => {
@@ -133,6 +195,8 @@ export default function SignInDialog({ onChange }) {
     if(e.target.getAttribute("value")==="signout"){
       await activate(null);
       sessionStorage.removeItem('PASAR_LINK_ADDRESS')
+      sessionStorage.removeItem('token')
+      sessionStorage.removeItem('did')
       setActivatingConnector(null);
       setWalletAddress(null)
     }
@@ -270,6 +334,7 @@ export default function SignInDialog({ onChange }) {
                     }
                     className={classes.iconAbsolute1}
                     fullWidth
+                    onClick={()=>{connectWithEssential()}}
                   >
                     Elastos Essentials
                   </Button>
