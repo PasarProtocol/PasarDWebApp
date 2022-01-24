@@ -29,7 +29,7 @@ const GridItems = (props) => (
             thumbnail={getThumbnail(item.asset)}
             title={item.name && item.name}
             description={item.description}
-            price={item.price}
+            price={item.price/1e18}
             quantity={item.quantity}
             tokenId={item.tokenId}
             isLink={1&&true}

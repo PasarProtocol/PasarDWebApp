@@ -89,10 +89,12 @@ export default function MarketExplorer() {
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([]);
   const [selectedBtns, setSelectedBtns] = React.useState([]);
+  const [range, setRange] = React.useState({min:'', max:''});
+  const [adult, setAdult] = React.useState(false);
   const [dispmode, setDispmode] = React.useState(1);
   const [isFilterView, setFilterView] = React.useState(1);
   const [totalCount, setTotalCount] = React.useState(0);
-  const [timeOrder, setTimeOrder] = React.useState(-1);
+  const [order, setOrder] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
 
@@ -104,9 +106,23 @@ export default function MarketExplorer() {
     const newController = new AbortController();
     const {signal} = newController;
     setAbortController(newController);
-
+    let statusFilter = [...btnNames].splice(0, 2).filter((name, index)=>selectedBtns.indexOf(index)>=0)
+    statusFilter = (statusFilter.length===2 || statusFilter.length===0)?'All':statusFilter[0]
+    let itemTypeFilter = [...btnNames].splice(2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
+    itemTypeFilter = (itemTypeFilter.length===2 || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
+    if(itemTypeFilter==='general')
+      itemTypeFilter = itemTypeFilter.concat(',image')
     setLoadingAssets(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getDetailedCollectibles?`+
+      `collectionType=&`+
+      `status=${statusFilter}&`+
+      `itemType=${itemTypeFilter}&`+
+      `adult=${adult}&`+
+      `minPrice=${range.min===''?0:range.min}&`+
+      `maxPrice=${range.max===''?9999999999999999:range.max}&`+
+      `order=${order}&`+
+      `pageNum=${page}&`+
+      `pageSize=${showCount}`, { signal }).then(response => {
       response.json().then(jsonAssets => {
         setTotalCount(jsonAssets.data.total)
         setPages(Math.ceil(jsonAssets.data.total/showCount));
@@ -117,7 +133,7 @@ export default function MarketExplorer() {
       if(e.code !== e.ABORT_ERR)
         setLoadingAssets(false);
     });
-  }, [page, showCount, timeOrder]);
+  }, [page, showCount, selectedBtns, adult, range, order]);
   
   const handleDispmode = (event, mode) => {
     if(mode===null)
@@ -134,8 +150,20 @@ export default function MarketExplorer() {
       tempBtns.push(num)
     setSelectedBtns(tempBtns);
   }
-  const handleDateOrder = (selected)=>{
-    setTimeOrder(selected)
+  const handleFilter = (key, value)=>{
+    switch(key){
+      case 'statype':
+        handleBtns(value)
+        break
+      case 'range':
+        setRange(value)
+        break
+      case 'adult':
+        setAdult(value)
+        break
+      default:
+        break
+    }
   }
   const link2Detail = (tokenId)=>{
     navigate(`/explorer/collectible/detail/${tokenId}`);
@@ -193,7 +221,7 @@ export default function MarketExplorer() {
                   </Stack>
                 </Box>
                 <Box sx={{display: 'flex'}}>
-                  <AssetSortSelect/>
+                  <AssetSortSelect onChange={setOrder}/>
                   <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                     <ToggleButton value={0}>
                       <GridViewSharpIcon />
@@ -227,7 +255,8 @@ export default function MarketExplorer() {
                 scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
                 btnNames = {btnNames}
                 selectedBtns = {selectedBtns}
-                handleBtnFunc = {handleBtns}
+                // handleBtnFunc = {handleBtns}
+                handleFilter = {handleFilter}
               />
             </Box>
             <Box

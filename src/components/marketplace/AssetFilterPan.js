@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 // material
 import { styled } from '@mui/material/styles';
 import { Box, Accordion, AccordionSummary, AccordionDetails, Grid, MenuItem, List, TextField, FormControlLabel, Typography, Stack, 
@@ -26,7 +26,15 @@ const DrawerStyle = styled(Drawer)(({ theme }) => ({
 }));
 
 export default function AssetFilterPan(props){
-  const {sx, scrollMaxHeight, btnNames, selectedBtns, handleBtnFunc} = props
+  const {sx, scrollMaxHeight, btnNames, selectedBtns, handleFilter} = props
+  const minRef = useRef();
+  const maxRef = useRef();
+
+  const applyRange = (e)=>{
+    const range = {min: minRef.current.value, max: maxRef.current.value}
+    handleFilter('range', range)
+  }
+
   return(
     <DrawerStyle
       variant="persistent"
@@ -46,7 +54,7 @@ export default function AssetFilterPan(props){
                 <Stack spacing={1} direction='row'>
                 {
                   [...btnNames].splice(0,2).map((name, index)=>(
-                    <Button key={index} variant={selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleBtnFunc(index)}>
+                    <Button key={index} variant={selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index)}>
                       {name}
                     </Button>
                   ))
@@ -88,16 +96,16 @@ export default function AssetFilterPan(props){
                   </Select>
                   <Grid container>
                     <Grid item xs={5} md={5}>
-                      <TextField label="Min" size="small" type="number"/>
+                      <TextField label="Min" size="small" type="number" inputRef={minRef}/>
                     </Grid>
                     <Grid item xs={2} md={2} align="center">
                       <Typography variant="body2" sx={{pt: 1}}>to</Typography>
                     </Grid>
                     <Grid item xs={5} md={5}>
-                      <TextField label="Max" size="small" type="number"/>
+                      <TextField label="Max" size="small" type="number" inputRef={maxRef}/>
                     </Grid>
                   </Grid>
-                  <Button variant="contained" color="primary" width="100%">
+                  <Button variant="contained" color="primary" width="100%" onClick={applyRange}>
                     Apply
                   </Button>
                 </Stack>
@@ -120,16 +128,12 @@ export default function AssetFilterPan(props){
                     component="nav"
                     aria-labelledby="nested-list-subheader"
                   >
-                    {
-                      [...Array(10)].map((value, id)=>(
-                          <ListItemButton key={id}>
-                            <ListItemIcon>
-                              <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
-                            </ListItemIcon>
-                            <ListItemText primary="Feeds NFT Sticker" />
-                          </ListItemButton>
-                      ))
-                    }
+                    <ListItemButton>
+                      <ListItemIcon>
+                        <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
+                      </ListItemIcon>
+                      <ListItemText primary="Feeds NFT Sticker" />
+                    </ListItemButton>
                   </List>
                 </Scrollbar>
               </AccordionDetails>
@@ -147,7 +151,7 @@ export default function AssetFilterPan(props){
                 <Stack spacing={1} direction='row'>
                 {
                   [...btnNames].splice(2).map((name, index)=>(
-                    <Button key={index} variant={selectedBtns.includes(index+2)?"contained":"outlined"} color="primary" onClick={()=>handleBtnFunc(index+2)}>
+                    <Button key={index} variant={selectedBtns.includes(index+2)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index+2)}>
                       {name}
                     </Button>
                   ))
@@ -166,7 +170,7 @@ export default function AssetFilterPan(props){
               </AccordionSummary>
               <AccordionDetails>
                 <FormControlLabel
-                  control={<CustomSwitch onChange={()=>{}}/>}
+                  control={<CustomSwitch onChange={(e)=>{handleFilter('adult', e.target.checked)}}/>}
                   label="Off"
                   labelPlacement="end"
                   sx={{ml:2, pr:2}}
