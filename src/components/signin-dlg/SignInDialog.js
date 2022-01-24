@@ -65,28 +65,47 @@ export default function SignInDialog({ onChange }) {
   const classes = useStyles();
 
   if(sessionLinkFlag&&!activatingConnector){
-    setActivatingConnector(injected);
-    activate(injected);
+    if(activatingConnector === injected) {
+      setActivatingConnector(injected);
+      activate(injected);
+    }
+    else if(activatingConnector === walletconnect) {
+      setActivatingConnector(walletconnect);
+      activate(walletconnect);
+    }
+    
   }
   React.useEffect(() => {
+    if (active) sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
+
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
     if(sessionLinkFlag)
       setWalletAddress(account)
-  }, [sessionLinkFlag, account])
+  }, [sessionLinkFlag, account, active, chainId])
+
+  useConnectivitySDK();
 
   // ------------ Connect Wallet ------------
   const handleChooseWallet = async (wallet) => {
+    // alert(wallet);
+    // console.log("active:", active);
+    // console.log("account:", account);
+    // console.log("chainId:", chainId);
+    // console.log("sessionLinkFlag:", sessionLinkFlag);
+    // console.log("seeeion:", sessionStorage.getItem('PASAR_LINK_ADDRESS'));
     let currentConnector = null;
     if(wallet === 'metamask') currentConnector = injected;
     else if(wallet === 'elastos') currentConnector = walletlink;
     else if(wallet === 'walletconnect') currentConnector = walletconnect;
+    // console.log("current connector", currentConnector);
     setActivatingConnector(currentConnector);
+    // console.log("acivating connector", activatingConnector);
     await activate(currentConnector);
-    sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
+    // sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
     sessionLinkFlag = '1'
     setOpenSigninDlg(false);
   };
-  useConnectivitySDK();
+
 
   const connectWithEssential = async () => {
         const didAccess = new DID.DIDAccess();
@@ -364,13 +383,14 @@ export default function SignInDialog({ onChange }) {
                   <Button variant="contained" 
                     startIcon={
                       <Avatar
-                        alt="metamask"
+                        alt="walletconnect"
                         src="/static/walletconnect.svg"
                         sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
                       />
                     }
                     className={classes.iconAbsolute2}
                     fullWidth
+                    onClick={()=>{handleChooseWallet('walletconnect')}}
                   >
                     Wallet Connect
                   </Button>
