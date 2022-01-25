@@ -87,21 +87,12 @@ export default function SignInDialog({ onChange }) {
 
   // ------------ Connect Wallet ------------
   const handleChooseWallet = async (wallet) => {
-    // alert(wallet);
-    // console.log("active:", active);
-    // console.log("account:", account);
-    // console.log("chainId:", chainId);
-    // console.log("sessionLinkFlag:", sessionLinkFlag);
-    // console.log("seeeion:", sessionStorage.getItem('PASAR_LINK_ADDRESS'));
     let currentConnector = null;
     if(wallet === 'metamask') currentConnector = injected;
     else if(wallet === 'elastos') currentConnector = walletlink;
     else if(wallet === 'walletconnect') currentConnector = walletconnect;
-    // console.log("current connector", currentConnector);
     setActivatingConnector(currentConnector);
-    // console.log("acivating connector", activatingConnector);
     await activate(currentConnector);
-    // sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
     sessionLinkFlag = '1'
     setOpenSigninDlg(false);
   };

@@ -1,4 +1,5 @@
 import React from 'react';
+import {round} from 'mathjs'
 import {isMobile} from 'react-device-detect';
 import { motion, AnimatePresence } from "framer-motion";
 // material
@@ -29,7 +30,7 @@ const GridItems = (props) => (
             thumbnail={getThumbnail(item.asset)}
             title={item.name && item.name}
             description={item.description}
-            price={item.price/1e18}
+            price={round(item.price/1e18, 3)}
             quantity={item.quantity}
             tokenId={item.tokenId}
             isLink={1&&true}
