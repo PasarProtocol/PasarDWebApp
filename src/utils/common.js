@@ -23,10 +23,10 @@ export const getTime = timestamp => {
 // Get thumbnail url //
 export const getThumbnail = id => {
   if(id===undefined)
-  return ""
+    return ""
   const prefixLen = id.split(':', 2).join(':').length
   if(prefixLen>=id.length)
-  return ""
+    return ""
   const uri = id.substring(prefixLen+1)
   return `https://ipfs0.trinity-feeds.app/ipfs/${uri}`
 }
@@ -54,6 +54,15 @@ export function dateRangeBeforeDays(days) {
 
 export function hash(string) {
   return createHash('sha256').update(string).digest('hex');
+}
+
+export async function getCoinUSD() {
+  const resCoinPrice = await fetch('https://esc.elastos.io/api?module=stats&action=coinprice')
+  const jsonData = await resCoinPrice.json()
+  console.log(jsonData)
+  if(jsonData&&jsonData.result.coin_usd)
+    return jsonData.result.coin_usd
+  return 0
 }
 
 export const MethodList = [

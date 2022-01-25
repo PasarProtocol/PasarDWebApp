@@ -25,6 +25,8 @@ const RootStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 const DetailItem = ({ item, isLast, value })=>{
   const { icon, title } = item;
+  if(item.key==='type'&&value)
+    value = value.charAt(0).toUpperCase().concat(value.substring(1))
   const sx = isLast?{}:{borderBottom: '1px solid', borderColor: (theme) => `${theme.palette.grey[500_32]}`, pb: 1};
   const iconSrc = `/static/${icon}.svg`;
   return (
