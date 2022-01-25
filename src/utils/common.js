@@ -57,12 +57,15 @@ export function hash(string) {
 }
 
 export async function getCoinUSD() {
-  const resCoinPrice = await fetch('https://esc.elastos.io/api?module=stats&action=coinprice')
-  const jsonData = await resCoinPrice.json()
-  console.log(jsonData)
-  if(jsonData&&jsonData.result.coin_usd)
-    return jsonData.result.coin_usd
-  return 0
+  try {
+    const resCoinPrice = await fetch('https://esc.elastos.io/api?module=stats&action=coinprice')
+    const jsonData = await resCoinPrice.json()
+    if(jsonData&&jsonData.result.coin_usd)
+      return jsonData.result.coin_usd
+    return 0
+  } catch (error) {
+    return 0
+  }
 }
 
 export const MethodList = [
