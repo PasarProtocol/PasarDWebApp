@@ -59,11 +59,12 @@ export default function NewestCollectibles(props) {
   return (
     <CollectionView title={props.title} to="collectible">
       {props.isLoading && <LoadingScreen />}
-      {props.dataList.map((collectible, index) => (
-          <CollectibleItem 
+      {props.dataList.map((collectible, index) => {
+          const thumbnail = collectible.tokenJsonVersion==='1'?collectible.thumbnail:collectible.data.thumbnail
+          return <CollectibleItem 
             key={index}
             news={{
-              image: getThumbnail(collectible.thumbnail),
+              image: getThumbnail(thumbnail),
               title: collectible.name,
               creator: collectible.holder,
               postedAt: collectible.createTime*1000,
@@ -72,7 +73,7 @@ export default function NewestCollectibles(props) {
             }}
             isLast={index===props.dataList.length-1}
           />
-      ))}
+      })}
     </CollectionView>
   );
 }

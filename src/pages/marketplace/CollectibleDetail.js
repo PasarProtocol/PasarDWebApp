@@ -1,6 +1,7 @@
 // material
 import React from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
+import {round} from 'mathjs'
 import Lightbox from 'react-image-lightbox';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
@@ -106,6 +107,8 @@ export default function CollectibleDetail() {
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
   const [isLoadingBidList, setLoadingBid] = React.useState(true);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
+  const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
+
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
   React.useEffect(async () => {
@@ -114,6 +117,8 @@ export default function CollectibleDetail() {
     );
     const jsonCollectible = await resCollectible.json();
     setCollectible(jsonCollectible.data);
+    if(jsonCollectible.data.properties!==undefined && Object.keys(jsonCollectible.data.properties).length>0)
+      setPropertiesAccordionOpen(true)
     setLoadingCollectible(false);
     // setForAuction(true);
 
@@ -169,6 +174,7 @@ export default function CollectibleDetail() {
     }
   }
   window.addEventListener('resize', handleResize);
+  const properties = collectible.properties!==undefined?collectible.properties:{}
 
   const tempDeadLine = getTime(new Date('2022-01-25').getTime()/1000)
   return (
@@ -301,10 +307,10 @@ export default function CollectibleDetail() {
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     {reduceHexAddress(collectible.royaltyOwner)}
                     <Badge name="pasar" sx={{ml: 2}}/>
-                    <Badge name="diamond"/>
+                    {/* <Badge name="diamond"/>
                     <Badge name="user"/>
                     <Badge name="thumbup" value="5"/>
-                    <Badge name="custom" value="100 ELA"/>
+                    <Badge name="custom" value="100 ELA"/> */}
                   </Typography>
                 </Stack>
                 <Typography variant="body2">Owner</Typography>
@@ -312,7 +318,7 @@ export default function CollectibleDetail() {
                   <AvatarStyle draggable = {false} component="img" src="/static/glide.png"/>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     {reduceHexAddress(collectible.holder)}
-                    <Badge name="thumbdown" value="13" sx={{ml: 2}}/>
+                    {/* <Badge name="thumbdown" value="13" sx={{ml: 2}}/> */}
                   </Typography>
                 </Stack>
                 <Typography variant="body2">Collection</Typography>
@@ -352,7 +358,7 @@ export default function CollectibleDetail() {
                   <LoadingScreen/>:
                   <>
                     <Typography variant="h4">On sale for a fixed price of</Typography>
-                    <Typography variant="h3" color="origin.main">100 ELA</Typography>
+                    <Typography variant="h3" color="origin.main">{round(collectible.Price/1e18, 3)} ELA</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD 300.26</Typography>
                     <MHidden width="smDown">
                       <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2}}>
@@ -395,23 +401,27 @@ export default function CollectibleDetail() {
           <Grid item xs={12}>
             <Accordion
               defaultExpanded={1&&true}
+              expanded={isPropertiesAccordionOpen}
               sx={{
                 border: '1px solid',
                 borderColor: 'action.disabledBackground',
                 boxShadow: (theme) => theme.customShadows.z1
               }}
             >
-              <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+              <AccordionSummary 
+                onClick={(e) => setPropertiesAccordionOpen(!isPropertiesAccordionOpen)}
+                expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
                 <Typography variant="h5">Properties</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={1}>
-                  <Grid item>
-                    <Property type="Arms" name="OG Trooper A2"/>
-                  </Grid>
-                  <Grid item>
-                    <Property type="Chest" name="OG Trooper C1"/>
-                  </Grid>
+                  {
+                    Object.keys(properties).map((type, index)=>(
+                      <Grid item key={index}>
+                        <Property type={type} name={properties[type]}/>
+                      </Grid>
+                    ))
+                  }
                 </Grid>
               </AccordionDetails>
             </Accordion>

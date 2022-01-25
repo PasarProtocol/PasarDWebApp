@@ -304,7 +304,7 @@ export default function MarketExplorer() {
                         <b>You have seen it all</b>
                       </p>
                     </>:
-                    <Typography variant="h4" fullWidth align='center'>No matching collectible found!</Typography>
+                    <Typography variant="h4" align='center'>No matching collectible found!</Typography>
                   )
                 }
               >

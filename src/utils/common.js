@@ -23,10 +23,10 @@ export const getTime = timestamp => {
 // Get thumbnail url //
 export const getThumbnail = id => {
   if(id===undefined)
-    return ""
+  return ""
   const prefixLen = id.split(':', 2).join(':').length
   if(prefixLen>=id.length)
-    return ""
+  return ""
   const uri = id.substring(prefixLen+1)
   return `https://ipfs0.trinity-feeds.app/ipfs/${uri}`
 }
