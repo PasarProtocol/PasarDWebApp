@@ -26,7 +26,7 @@ import AssetDetailInfo from '../../components/marketplace/AssetDetailInfo';
 import CollectibleHistory from '../../components/marketplace/CollectibleHistory';
 import BidList from '../../components/marketplace/BidList';
 import Badge from '../../components/Badge';
-import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
+import { reduceHexAddress, getThumbnail, getTime, getCoinUSD } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -98,6 +98,7 @@ export default function CollectibleDetail() {
   const params = useParams(); // params.collection
   const [isFullScreen, setFullScreen] = React.useState(false);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
+  const [coinUSD, setCoinUSD] = React.useState(0);
 
   const [collectible, setCollectible] = React.useState({});
   const [isForAuction, setForAuction] = React.useState(false);
@@ -112,6 +113,7 @@ export default function CollectibleDetail() {
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
   React.useEffect(async () => {
+    setCoinUSD(await getCoinUSD())
     const resCollectible = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`
     );
@@ -135,7 +137,7 @@ export default function CollectibleDetail() {
     setLoadingTransRecord(true);
     fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=&timeOrder=-1`, {}).then(response => {
       response.json().then(jsonTransactions => {
-        setTransRecord(jsonTransactions.data);
+        setTransRecord(jsonTransactions.data.slice(0,10));
         setLoadingTransRecord(false);
       })
     }).catch(e => {
@@ -299,7 +301,7 @@ export default function CollectibleDetail() {
               <Typography variant="h4">
                   {collectible.name}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>2822 unique collectibles on the blockchain</Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>{collectible.description}</Typography>
               <Stack sx={{mt: 2}} spacing={1}>
                 <Typography variant="body2">Creator</Typography>
                 <Stack direction='row'>
@@ -359,7 +361,7 @@ export default function CollectibleDetail() {
                   <>
                     <Typography variant="h4">On sale for a fixed price of</Typography>
                     <Typography variant="h3" color="origin.main">{round(collectible.Price/1e18, 3)} ELA</Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD 300.26</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*collectible.Price/1e18, 3)}</Typography>
                     <MHidden width="smDown">
                       <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2}}>
                         Buy
