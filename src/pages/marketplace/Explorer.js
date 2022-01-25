@@ -1,11 +1,11 @@
 // material
 import React from 'react';
-import { Icon } from '@iconify/react';
-import { alpha, styled } from '@mui/material/styles';
-
+import InfiniteScroll from "react-infinite-scroll-component";
 import { useNavigate } from 'react-router-dom';
 import { Container, Stack, Typography, AppBar, Toolbar, Paper, Divider, Backdrop, 
   Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import { Icon } from '@iconify/react';
+import { alpha, styled } from '@mui/material/styles';
 import AppsIcon from '@mui/icons-material/Apps';
 import SquareIcon from '@mui/icons-material/Square';
 import GridViewSharpIcon from '@mui/icons-material/GridViewSharp';
@@ -98,9 +98,17 @@ export default function MarketExplorer() {
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
 
+  const [loadNext, setLoadNext] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
-  const [showCount, setShowCount] = React.useState(10);
+  const [showCount, setShowCount] = React.useState(50);
+
+  const fetchMoreData = () => {
+    if(!loadNext){
+      setLoadNext(true)
+      setPage(page+1)
+    }
+  }
   React.useEffect(async () => {
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
@@ -118,15 +126,21 @@ export default function MarketExplorer() {
       `status=${statusFilter}&`+
       `itemType=${itemTypeFilter}&`+
       `adult=${adult}&`+
-      `minPrice=${range.min===''?0:range.min}&`+
-      `maxPrice=${range.max===''?9999999999999999:range.max}&`+
+      `minPrice=${range.min!==''?range.min*1e18:''}&`+
+      `maxPrice=${range.max!==''?range.max*1e18:''}&`+
       `order=${order}&`+
       `pageNum=${page}&`+
       `pageSize=${showCount}`, { signal }).then(response => {
       response.json().then(jsonAssets => {
         setTotalCount(jsonAssets.data.total)
         setPages(Math.ceil(jsonAssets.data.total/showCount));
-        setAssets(jsonAssets.data.result);
+        if(loadNext)
+          setAssets([...assets, ...jsonAssets.data.result]);
+        else {
+          setAssets(jsonAssets.data.result);
+          window.scrollTo(0,0)
+        }
+        setLoadNext(false)
         setLoadingAssets(false);
       })
     }).catch(e => {
@@ -151,6 +165,7 @@ export default function MarketExplorer() {
     setSelectedBtns(tempBtns);
   }
   const handleFilter = (key, value)=>{
+    setPage(1)
     switch(key){
       case 'statype':
         handleBtns(value)
@@ -255,7 +270,6 @@ export default function MarketExplorer() {
                 scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
                 btnNames = {btnNames}
                 selectedBtns = {selectedBtns}
-                // handleBtnFunc = {handleBtns}
                 handleFilter = {handleFilter}
               />
             </Box>
@@ -276,7 +290,26 @@ export default function MarketExplorer() {
                   </ToggleButtonGroup>
                 </Box>
               </MHidden>
-              <AssetGrid assets={assets} dispmode={dispmode}/>
+              <InfiniteScroll
+                dataLength={assets.length}
+                next={fetchMoreData}
+                hasMore={page<pages}
+                loader={<h4>Loading...</h4>}
+                endMessage={
+                  !isLoadingAssets&&(
+                    assets.length>0?
+                    <>
+                      <Divider sx={{my: '12px'}}/>
+                      <p style={{ textAlign: "center" }}>
+                        <b>You have seen it all</b>
+                      </p>
+                    </>:
+                    <Typography variant="h4" fullWidth align='center'>No matching collectible found!</Typography>
+                  )
+                }
+              >
+                <AssetGrid assets={assets} dispmode={dispmode}/>
+              </InfiniteScroll>
             </Box>
           </Box>
         </Container>
