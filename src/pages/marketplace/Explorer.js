@@ -93,6 +93,7 @@ export default function MarketExplorer() {
   const [adult, setAdult] = React.useState(false);
   const [dispmode, setDispmode] = React.useState(1);
   const [isFilterView, setFilterView] = React.useState(1);
+  const [filterForm, setFilterForm] = React.useState({selectedBtns:[]});
   const [totalCount, setTotalCount] = React.useState(0);
   const [order, setOrder] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
@@ -179,6 +180,25 @@ export default function MarketExplorer() {
       default:
         break
     }
+  }
+  const handleFilterMobile = (key, value)=>{
+    const tempForm = {...filterForm}
+    tempForm[key] = value
+    if(key==='statype'){
+      const tempBtns = [...filterForm.selectedBtns]
+      if(tempBtns.includes(value)){
+        const findIndex = tempBtns.indexOf(value)
+        tempBtns.splice(findIndex, 1)
+      }
+      else
+        tempBtns.push(value)
+      tempForm.selectedBtns = tempBtns
+    }
+    setFilterForm(tempForm)
+  }
+  const applyFilterForm = (e)=>{
+    Object.keys(filterForm).forEach(key => handleFilter(key, filterForm[key]))
+    closeFilter(e)
   }
   const link2Detail = (tokenId)=>{
     navigate(`/explorer/collectible/detail/${tokenId}`);
@@ -353,15 +373,15 @@ export default function MarketExplorer() {
               }}
               scrollMaxHeight = 'calc(100vh - 24px - 68px)'
               btnNames = {btnNames}
-              selectedBtns = {selectedBtns}
-              handleBtnFunc = {handleBtns}
+              selectedBtns = {filterForm.selectedBtns}
+              handleFilter = {handleFilterMobile}
             />
             <Divider />
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>
               <Typography variant="subtitle1">Filters</Typography>
               <Button
                 endIcon={<CheckIcon/>}
-                onClick={closeFilter}
+                onClick={applyFilterForm}
               >
                 Done
               </Button>
