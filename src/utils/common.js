@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 import { subDays, differenceInDays  } from 'date-fns';
+import Jazzicon from "@metamask/jazzicon";
 
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = strAddress => strAddress?`${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`:'';
@@ -30,7 +31,12 @@ export const getThumbnail = id => {
   const uri = id.substring(prefixLen+1)
   return `https://ipfs0.trinity-feeds.app/ipfs/${uri}`
 }
-  
+
+export const generateJazzicon = address => {
+  if(!address)
+    return Jazzicon(40, 0)
+  return Jazzicon(40, parseInt(address.slice(2, 12), 16))
+}
 
 export const getElapsedTime = createdtimestamp => {
   const currentTimestamp = new Date().getTime() / 1000;
