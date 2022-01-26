@@ -405,34 +405,35 @@ export default function CollectibleDetail() {
               </Grid>
             )
           }
-          <Grid item xs={12}>
-            <Accordion
-              defaultExpanded={1&&true}
-              expanded={isPropertiesAccordionOpen}
-              sx={{
-                border: '1px solid',
-                borderColor: 'action.disabledBackground',
-                boxShadow: (theme) => theme.customShadows.z1
-              }}
-            >
-              <AccordionSummary 
-                onClick={(e) => setPropertiesAccordionOpen(!isPropertiesAccordionOpen)}
-                expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-                <Typography variant="h5">Properties</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={1}>
-                  {
-                    Object.keys(properties).map((type, index)=>(
-                      <Grid item key={index}>
-                        <Property type={type} name={properties[type]}/>
-                      </Grid>
-                    ))
-                  }
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-          </Grid>
+          {
+            isPropertiesAccordionOpen&&
+            <Grid item xs={12}>
+              <Accordion
+                defaultExpanded={1&&true}
+                sx={{
+                  border: '1px solid',
+                  borderColor: 'action.disabledBackground',
+                  boxShadow: (theme) => theme.customShadows.z1
+                }}
+              >
+                <AccordionSummary 
+                  expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                  <Typography variant="h5">Properties</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container spacing={1}>
+                    {
+                      Object.keys(properties).map((type, index)=>(
+                        <Grid item key={index}>
+                          <Property type={type} name={properties[type]}/>
+                        </Grid>
+                      ))
+                    }
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
+          }
           <Grid item xs={12}>
             <Accordion
                 defaultExpanded={1&&true}
