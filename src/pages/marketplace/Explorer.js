@@ -23,6 +23,7 @@ import LoadingWrapper from '../../components/LoadingWrapper';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
+import Scrollbar from '../../components/Scrollbar';
 
 // ----------------------------------------------------------------------
 
@@ -171,6 +172,9 @@ export default function MarketExplorer() {
       case 'statype':
         handleBtns(value)
         break
+      case 'clear_all':
+        setSelectedBtns([])
+        break
       case 'range':
         setRange(value)
         break
@@ -184,6 +188,11 @@ export default function MarketExplorer() {
   const handleFilterMobile = (key, value)=>{
     const tempForm = {...filterForm}
     tempForm[key] = value
+    if(key==='clear_all'){
+      tempForm.selectedBtns = []
+      setFilterForm(tempForm)
+      return
+    }
     if(key==='statype'){
       const tempBtns = [...filterForm.selectedBtns]
       if(tempBtns.includes(value)){
@@ -198,6 +207,10 @@ export default function MarketExplorer() {
   }
   const applyFilterForm = (e)=>{
     Object.keys(filterForm).forEach(key => handleFilter(key, filterForm[key]))
+    const tempForm = {...filterForm}
+    delete tempForm.statype
+    delete tempForm.clear_all
+    setFilterForm(tempForm)
     closeFilter(e)
   }
   const link2Detail = (tokenId)=>{
@@ -363,19 +376,53 @@ export default function MarketExplorer() {
               width: '0px',
               maxWidth: 400,
               overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
               boxShadow: (theme) => theme.customShadows.z24,
               transition: (theme) => theme.transitions.create('width'),
               ...(!isFilterView && { width: 'calc(100vw - 24px)' })
             }}
           >
-            <AssetFilterPan 
-              sx={{
-              }}
-              scrollMaxHeight = 'calc(100vh - 24px - 68px)'
-              btnNames = {btnNames}
-              selectedBtns = {filterForm.selectedBtns}
-              handleFilter = {handleFilterMobile}
-            />
+            {
+              filterForm.selectedBtns&&filterForm.selectedBtns.length>0&&
+              <>
+                <Box sx={{ pt: 2, pb: 1, pr: 1, pl: 2.5 }}>
+                  {
+                    filterForm.selectedBtns.map((nameId, index)=>(
+                      <Button
+                        key={index}
+                        variant="outlined"
+                        color="origin"
+                        endIcon={<CloseIcon />}
+                        onClick={()=>{handleFilterMobile('statype', nameId)}}
+                        sx={{mr: 1, mb: 1}}
+                      >
+                        {btnNames[nameId]}
+                      </Button>
+                    ))
+                  }
+                  <Button
+                    color="inherit"
+                    onClick={()=>{handleFilterMobile('clear_all', null)}}
+                    sx={{mb: 1}}
+                  >
+                    Clear All
+                  </Button>
+                </Box>
+                <Divider />
+              </>
+            }
+            <Box style={{display: 'contents'}}>
+              <Scrollbar>
+                <AssetFilterPan 
+                  sx={{
+                  }}
+                  btnNames = {btnNames}
+                  selectedBtns = {filterForm.selectedBtns}
+                  handleFilter = {handleFilterMobile}
+                />
+              </Scrollbar>
+            </Box>
             <Divider />
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>
               <Typography variant="subtitle1">Filters</Typography>
