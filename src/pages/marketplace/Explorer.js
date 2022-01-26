@@ -321,7 +321,7 @@ export default function MarketExplorer() {
                     <>
                       <Divider sx={{my: '12px'}}/>
                       <p style={{ textAlign: "center" }}>
-                        <b>You have seen it all</b>
+                        <b>All items loaded</b>
                       </p>
                     </>:
                     <Typography variant="h4" align='center'>No matching collectible found!</Typography>
