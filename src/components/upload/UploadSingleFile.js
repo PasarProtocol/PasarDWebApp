@@ -133,6 +133,7 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, sx, 
                 top: 8,
                 borderRadius: 1,
                 objectFit: 'cover',
+                maxHeight: 500
               }}
             />
             <Box sx={{

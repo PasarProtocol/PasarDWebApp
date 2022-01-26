@@ -69,6 +69,7 @@ export default function Router() {
           children: [
             { path: 'detail/:collection', element: <MarketCollectibleDetail /> },
             { path: 'myitem', element: <MyItems /> },
+            { path: 'others/:address', element: <MyItems /> },
           ]
         },
         { path: 'create', element: <CreateItem /> },
