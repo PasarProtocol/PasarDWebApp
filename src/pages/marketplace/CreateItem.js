@@ -471,7 +471,7 @@ export default function CreateItem() {
                       isAvatar={itemtype==="Avatar"}
                       onRemove={handleSingleRemove}
                       accept=".jpg, .png, .jpeg, .gif"/>
-                    <FormHelperText error={isOnValidation&&!file} hidden={isOnValidation&&file!==null}>Image file is required</FormHelperText>
+                    <FormHelperText error={isOnValidation&&!file} hidden={!isOnValidation||(isOnValidation&&file!==null)}>Image file is required</FormHelperText>
                   </>:
                   <>
                     <UploadMultiFile
@@ -484,7 +484,7 @@ export default function CreateItem() {
                       onRemoveAll={handleRemoveAll}
                       accept=".jpg, .png, .jpeg, .gif"
                       sx={{pb:1}}/>
-                    <FormHelperText error={isOnValidation&&!files.length} hidden={isOnValidation&&files.length>0}>Image files are required</FormHelperText>
+                    <FormHelperText error={isOnValidation&&!files.length} hidden={!isOnValidation||(isOnValidation&&files.length>0)}>Image files are required</FormHelperText>
                     {files.length>0&&<Divider/>}
                   </>
                 }
@@ -510,7 +510,7 @@ export default function CreateItem() {
                         onChange={(e)=>{setSingleName(e.target.value)}}
                         aria-describedby="name-error-text"
                       />
-                      <FormHelperText id="name-error-text" hidden={isOnValidation&&singleName.length>0}>Item name is required</FormHelperText>
+                      <FormHelperText id="name-error-text" hidden={!isOnValidation||(isOnValidation&&singleName.length>0)}>Item name is required</FormHelperText>
                     </FormControl>
                   )
                 }
@@ -536,7 +536,7 @@ export default function CreateItem() {
                     aria-describedby="description-error-text"
                     sx={{mt: '-5px !important'}}
                   />
-                  <FormHelperText id="description-error-text" hidden={isOnValidation&&description.length>0}>Description is required</FormHelperText>
+                  <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
                 </FormControl>
                 <Divider/>
               </Grid>
@@ -746,7 +746,7 @@ export default function CreateItem() {
             </Grid>
           </Grid>
           <Grid item xs={12} sm={4}>
-            <Grid container direction="column" spacing={2}>
+            <Grid container direction="column" spacing={2} sx={{position: 'sticky', top: isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP}}>
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Preview</Typography>
               </Grid>
