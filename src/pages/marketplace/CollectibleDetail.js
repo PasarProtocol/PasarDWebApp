@@ -312,7 +312,9 @@ export default function CollectibleDetail() {
                 <Stack direction='row'>
                   <Jazzicon address={collectible.royaltyOwner}/>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    {reduceHexAddress(collectible.royaltyOwner)}
+                    <Link to={`/marketplace/others/${collectible.royaltyOwner}`} component={RouterLink}>
+                      {reduceHexAddress(collectible.royaltyOwner)}
+                    </Link>
                     <Badge name="pasar" sx={{ml: 2}}/>
                     {/* <Badge name="diamond"/>
                     <Badge name="user"/>
@@ -324,7 +326,9 @@ export default function CollectibleDetail() {
                 <Stack direction='row'>
                   <Jazzicon address={collectible.holder}/>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    {reduceHexAddress(collectible.holder)}
+                    <Link to={`/marketplace/others/${collectible.holder}`} component={RouterLink}>
+                      {reduceHexAddress(collectible.holder)}
+                    </Link>
                     {/* <Badge name="thumbdown" value="13" sx={{ml: 2}}/> */}
                   </Typography>
                 </Stack>
