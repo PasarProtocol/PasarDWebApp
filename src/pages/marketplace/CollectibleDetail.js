@@ -113,13 +113,14 @@ export default function CollectibleDetail() {
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
   React.useEffect(async () => {
+    window.scrollTo(0,0)
     setCoinUSD(await getCoinUSD())
     const resCollectible = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`
     );
     const jsonCollectible = await resCollectible.json();
     setCollectible(jsonCollectible.data);
-    if(jsonCollectible.data.properties!==undefined && Object.keys(jsonCollectible.data.properties).length>0)
+    if(jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0)
       setPropertiesAccordionOpen(true)
     setLoadingCollectible(false);
     // setForAuction(true);
@@ -176,7 +177,7 @@ export default function CollectibleDetail() {
     }
   }
   window.addEventListener('resize', handleResize);
-  const properties = collectible.properties!==undefined?collectible.properties:{}
+  const properties = collectible.properties?collectible.properties:{}
 
   const tempDeadLine = getTime(new Date('2022-01-25').getTime()/1000)
   return (
