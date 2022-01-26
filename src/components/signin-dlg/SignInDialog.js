@@ -113,8 +113,6 @@ export default function SignInDialog({ onChange }) {
             ]
           });
         } catch (e) {
-          // Possible exception while using wallet connect (i.e. not an identity wallet)
-          // Kill the wallet connect session
           console.warn("Error while getting credentials", e);
 
           try {
@@ -146,7 +144,6 @@ export default function SignInDialog({ onChange }) {
                   console.log(token, "--------", did);
                   const user = jwtDecode(token);
                   console.log("Sign in: setting user to:", user);
-                  // setUser(user);
                   sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
                   sessionLinkFlag = '1'
                   setOpenSigninDlg(false);
