@@ -18,7 +18,7 @@ import { useWeb3React } from "@web3-react/core";
 import { ethers } from "ethers";
 import jwtDecode from 'jwt-decode';
 import { DID } from "@elastosfoundation/elastos-connectivity-sdk-js";
-import { essentialsConnector, useConnectivitySDK } from './EssentialConnectivity';
+import { essentialsConnector, useConnectivitySDK, isUsingEssentialsConnector } from './EssentialConnectivity';
 import { MIconButton, MFab } from '../@material-extend';
 import { injected, walletconnect, walletlink } from "./connectors";
 import { useEagerConnect, useInactiveListener } from "./hook";
@@ -73,15 +73,19 @@ export default function SignInDialog({ onChange }) {
       setActivatingConnector(walletconnect);
       activate(walletconnect);
     }
-    
   }
+
+  if ((sessionStorage.getItem('token') === undefined || sessionStorage.getItem('did') === undefined || sessionLinkFlag === 0) && isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
+    essentialsConnector.disconnectWalletConnect();
+  }
+
   React.useEffect(() => {
     if (active) sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
 
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
     if(sessionLinkFlag)
       setWalletAddress(account)
-  }, [sessionLinkFlag, account, active, chainId])
+  }, [sessionLinkFlag, account, active, chainId]);
 
   useConnectivitySDK();
 
@@ -109,8 +113,6 @@ export default function SignInDialog({ onChange }) {
             ]
           });
         } catch (e) {
-          // Possible exception while using wallet connect (i.e. not an identity wallet)
-          // Kill the wallet connect session
           console.warn("Error while getting credentials", e);
 
           try {
@@ -134,17 +136,18 @@ export default function SignInDialog({ onChange }) {
                 body: JSON.stringify(presentation.toJSON())
               }).then(response => response.json()).then(data => {
                 if (data.code === 200) {
-                  const {token} = data;
-
-                  sessionStorage("token", token);
-                  sessionStorage("did", did);
-  
+                  console.log(data);
+                  const token = data.data;
+                  console.log(token);
+                  sessionStorage.setItem("token", token);
+                  sessionStorage.setItem("did", did);
+                  console.log(token, "--------", did);
                   const user = jwtDecode(token);
                   console.log("Sign in: setting user to:", user);
-                  // setUser(user);
                   sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
                   sessionLinkFlag = '1'
                   setOpenSigninDlg(false);
+                  setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
                 } else {
                   console.log(data);
                 }
@@ -212,6 +215,8 @@ export default function SignInDialog({ onChange }) {
       setWalletAddress(null)
     }
   };
+
+  
   return (
     walletAddress?(
       <>
