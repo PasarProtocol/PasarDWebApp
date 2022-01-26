@@ -22,7 +22,7 @@ export const getTime = timestamp => {
 };
 // Get thumbnail url //
 export const getThumbnail = id => {
-  if(id===undefined)
+  if(!id)
     return ""
   const prefixLen = id.split(':', 2).join(':').length
   if(prefixLen>=id.length)

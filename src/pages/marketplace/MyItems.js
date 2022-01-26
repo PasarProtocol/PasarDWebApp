@@ -7,6 +7,7 @@ import { styled } from '@mui/material/styles';
 import { Container, Stack, Typography, Tab, Tabs, 
   Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 // import { TabContext, TabList, TabPanel } from '@mui/lab';
+import SquareIcon from '@mui/icons-material/Square';
 import AppsIcon from '@mui/icons-material/Apps';
 import GridViewSharpIcon from '@mui/icons-material/GridViewSharp';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
@@ -118,32 +119,32 @@ export default function MyItems() {
             <span role="img" aria-label="">🗂️</span> My Items
           </Typography>
           <Box fullWidth sx={{justifyContent: {xs: 'right', md: 'normal'}, display: 'flex'}}>
+            <MHidden width="smUp">
+              <Box fullWidth sx={{display: 'flex', flex: 1}}>
+                <ToolGroupStyle>
+                  <MyItemsSortSelect onChange={()=>{}}/>
+                  <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                    <ToggleButton value={0}>
+                      <SquareIcon />
+                    </ToggleButton>
+                    <ToggleButton value={1}>
+                      <GridViewSharpIcon />
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </ToolGroupStyle>
+              </Box>
+            </MHidden>
             <Button
                 to={`/explorer/transaction/detail/${walletAddress}`}
                 size="small"
                 color="inherit"
                 component={RouterLink}
                 endIcon={<Icon icon={arrowIosForwardFill} />}
-                sx={{position: {xs: 'unset', sm: 'absolute'}, right: 0, bottom: 0}}
+                sx={{position: {xs: 'relative', sm: 'absolute'}, right: 0, bottom: 0}}
             >
-              See more details
+              See more
             </Button>
           </Box>
-          <MHidden width="smUp">
-            <Box fullWidth sx={{justifyContent: 'right', display: 'flex'}}>
-              <ToolGroupStyle>
-                <MyItemsSortSelect onChange={()=>{}}/>
-                <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-                  <ToggleButton value={0}>
-                    <GridViewSharpIcon />
-                  </ToggleButton>
-                  <ToggleButton value={1}>
-                    <AppsIcon />
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              </ToolGroupStyle>
-            </Box>
-          </MHidden>
         </Box>
         <Box sx={{display: 'flex', position: 'relative', mb: 2, justifyContent: 'center'}} align="center">
           <Tabs value={tabValue} onChange={handleSwitchTab} TabIndicatorProps={{style: {background:'#FF5082'}}}>
