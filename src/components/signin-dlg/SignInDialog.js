@@ -105,7 +105,7 @@ export default function SignInDialog({ onChange }) {
   const connectWithEssential = async () => {
         const didAccess = new DID.DIDAccess();
         let presentation;
-        console.log("Trying to sign in using the connectivity SDK");
+        // console.log("Trying to sign in using the connectivity SDK");
         try {
           presentation = await didAccess.requestCredentials({
             claims: [
@@ -113,13 +113,13 @@ export default function SignInDialog({ onChange }) {
             ]
           });
         } catch (e) {
-          console.warn("Error while getting credentials", e);
+          // console.warn("Error while getting credentials", e);
 
           try {
             await essentialsConnector.getWalletConnectProvider().disconnect();
           }
           catch (e) {
-            console.error("Error while trying to disconnect wallet connect session", e);
+            // console.error("Error while trying to disconnect wallet connect session", e);
           }
 
           return;
@@ -136,23 +136,23 @@ export default function SignInDialog({ onChange }) {
                 body: JSON.stringify(presentation.toJSON())
               }).then(response => response.json()).then(data => {
                 if (data.code === 200) {
-                  console.log(data);
+                  // console.log(data);
                   const token = data.data;
-                  console.log(token);
+                  // console.log(token);
                   sessionStorage.setItem("token", token);
                   sessionStorage.setItem("did", did);
-                  console.log(token, "--------", did);
+                  // console.log(token, "--------", did);
                   const user = jwtDecode(token);
-                  console.log("Sign in: setting user to:", user);
+                  // console.log("Sign in: setting user to:", user);
                   sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
                   sessionLinkFlag = '1'
                   setOpenSigninDlg(false);
                   setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
                 } else {
-                  console.log(data);
+                  // console.log(data);
                 }
               }).catch((error) => {
-                console.log(error);
+                // console.log(error);
                 alert(`Failed to call the backend API. Check your connectivity and make sure ${process.env.REACT_APP_BACKEND_URL} is reachable`);
             });
         }
@@ -216,7 +216,6 @@ export default function SignInDialog({ onChange }) {
     }
   };
 
-  
   return (
     walletAddress?(
       <>

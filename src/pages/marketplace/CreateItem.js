@@ -1,9 +1,10 @@
 import React from 'react';
 import { isString } from 'lodash';
+import {isMobile} from 'react-device-detect';
 import * as math from 'mathjs';
 import { styled } from '@mui/material/styles';
 import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip, Box,
-  Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+  Accordion, AccordionSummary, AccordionDetails, FormHelperText } from '@mui/material';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { ethers } from 'ethers';
@@ -13,6 +14,7 @@ import { LoadingButton } from '@mui/lab';
 
 // components
 import { MHidden } from '../../components/@material-extend';
+import useOffSetTop from '../../hooks/useOffSetTop';
 import Page from '../../components/Page';
 import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
 import ItemTypeButton from '../../components/marketplace/ItemTypeButton';
@@ -76,10 +78,17 @@ export default function CreateItem() {
   const [multiProperties, setMultiProperties] = React.useState([]);
   const [onProgress, setOnProgress] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
+  const [isOnValidation, setOnValidation] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   
+  const isOffset = useOffSetTop(40);
+  const APP_BAR_MOBILE = 64;
+  const APP_BAR_DESKTOP = 88;
   const royaltiesRef = React.useRef();
   const explicitRef = React.useRef();
+  const uploadRef = React.useRef();
+  const nameRef = React.useRef();
+  const descriptionRef = React.useRef();
   
   React.useEffect(async () => {
     if(mintype!=="Multiple")
@@ -399,10 +408,25 @@ export default function CreateItem() {
     , Promise.resolve() );
   }
   const handleMintAction = (e) => {
-    if(mintype!=="Batch")
-      mintSingle()
+    setOnValidation(true)
+    if(mintype!=="Batch"&&!file || mintype==="Batch"&&!files.length)
+      scrollToRef(uploadRef)
+    else if(mintype!=="Batch"&&!singleName.length)
+      scrollToRef(nameRef)
+    else if(!description.length)
+      scrollToRef(descriptionRef)
     else
-      mintBatch()
+      if(mintype!=="Batch")
+        mintSingle()
+      else
+        mintBatch()
+  }
+  const scrollToRef = (ref)=>{
+    if(!ref.current)
+      return
+    let fixedHeight = isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP
+    fixedHeight = isMobile?APP_BAR_MOBILE:fixedHeight
+    window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
   }
   return (
     <RootStyle title="CreateItem | PASAR">
@@ -433,33 +457,39 @@ export default function CreateItem() {
           </Grid>
           <Grid item xs={12} sm={8}>
             <Grid container direction="column" spacing={2}>
-              <Grid item xs={12}>
+              <Grid item xs={12} ref={uploadRef}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Upload file</Typography>
               </Grid>
               <Grid item xs={12}>
-              {
-                mintype!=="Batch"?
-                <UploadSingleFile
-                  file={file}
-                  onDrop={handleDropSingleFile}
-                  isAvatar={itemtype==="Avatar"}
-                  onRemove={handleSingleRemove}
-                  accept=".jpg, .png, .jpeg, .gif"/>:
-                <>
-                  <UploadMultiFile
-                    showPreview={1&&true}
-                    files={files}
-                    onDrop={handleDropMultiFile}
-                    isAvatar={itemtype==="Avatar"}
-                    onRemove={handleRemove}
-                    onRemoveAll={handleRemoveAll}
-                    accept=".jpg, .png, .jpeg, .gif"
-                    sx={{pb:1}}/>
-                  {files.length>0&&<Divider/>}
-                </>
-              }
+                {
+                  mintype!=="Batch"?
+                  <>
+                    <UploadSingleFile
+                      file={file}
+                      error={isOnValidation&&!file}
+                      onDrop={handleDropSingleFile}
+                      isAvatar={itemtype==="Avatar"}
+                      onRemove={handleSingleRemove}
+                      accept=".jpg, .png, .jpeg, .gif"/>
+                    <FormHelperText error={isOnValidation&&!file} hidden={isOnValidation&&file!==null}>Image file is required</FormHelperText>
+                  </>:
+                  <>
+                    <UploadMultiFile
+                      showPreview={1&&true}
+                      error={isOnValidation&&!files.length}
+                      files={files}
+                      onDrop={handleDropMultiFile}
+                      isAvatar={itemtype==="Avatar"}
+                      onRemove={handleRemove}
+                      onRemoveAll={handleRemoveAll}
+                      accept=".jpg, .png, .jpeg, .gif"
+                      sx={{pb:1}}/>
+                    <FormHelperText error={isOnValidation&&!files.length} hidden={isOnValidation&&files.length>0}>Image files are required</FormHelperText>
+                    {files.length>0&&<Divider/>}
+                  </>
+                }
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} ref={nameRef}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Name</Typography>
               </Grid>
               <Grid item xs={12}>
@@ -469,7 +499,7 @@ export default function CreateItem() {
                       <MintBatchName uploadedCount={uploadedCount} handleNameGroup={setMultiNames}/>
                     </>
                   ):(
-                    <FormControl variant="standard" sx={{width: '100%'}}>
+                    <FormControl error={isOnValidation&&!singleName.length} variant="standard" sx={{width: '100%'}}>
                       <InputLabel htmlFor="input-with-name">
                         Add item name
                       </InputLabel>
@@ -478,17 +508,19 @@ export default function CreateItem() {
                         startAdornment={' '}
                         value={singleName}
                         onChange={(e)=>{setSingleName(e.target.value)}}
+                        aria-describedby="name-error-text"
                       />
+                      <FormHelperText id="name-error-text" hidden={isOnValidation&&singleName.length>0}>Item name is required</FormHelperText>
                     </FormControl>
                   )
                 }
                 <Divider/>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} ref={descriptionRef}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Description</Typography>
               </Grid>
               <Grid item xs={12}>
-                <FormControl variant="standard" sx={{width: '100%'}}>
+                <FormControl error={isOnValidation&&!description.length} variant="standard" sx={{width: '100%'}}>
                   <InputLabel htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
                     {
                       mintype!=="Batch"?
@@ -501,8 +533,10 @@ export default function CreateItem() {
                     startAdornment={' '}
                     value={description}
                     onChange={(e)=>setDescription(e.target.value)}
+                    aria-describedby="description-error-text"
                     sx={{mt: '-5px !important'}}
                   />
+                  <FormHelperText id="description-error-text" hidden={isOnValidation&&description.length>0}>Description is required</FormHelperText>
                 </FormControl>
                 <Divider/>
               </Grid>
