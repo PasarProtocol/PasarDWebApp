@@ -26,6 +26,7 @@ import AssetDetailInfo from '../../components/marketplace/AssetDetailInfo';
 import CollectibleHistory from '../../components/marketplace/CollectibleHistory';
 import BidList from '../../components/marketplace/BidList';
 import Badge from '../../components/Badge';
+import Jazzicon from '../../components/Jazzicon';
 import { reduceHexAddress, getThumbnail, getTime, getCoinUSD } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -112,6 +113,7 @@ export default function CollectibleDetail() {
 
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
+  
   React.useEffect(async () => {
     window.scrollTo(0,0)
     setCoinUSD(await getCoinUSD())
@@ -119,9 +121,11 @@ export default function CollectibleDetail() {
       `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`
     );
     const jsonCollectible = await resCollectible.json();
-    setCollectible(jsonCollectible.data);
-    if(jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0)
-      setPropertiesAccordionOpen(true)
+    if(jsonCollectible.data){
+      setCollectible(jsonCollectible.data);
+      if(jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0)
+        setPropertiesAccordionOpen(true)
+    }
     setLoadingCollectible(false);
     // setForAuction(true);
 
@@ -177,7 +181,7 @@ export default function CollectibleDetail() {
     }
   }
   window.addEventListener('resize', handleResize);
-  const properties = collectible.properties?collectible.properties:{}
+  const properties = collectible&&collectible.properties?collectible.properties:{}
 
   const tempDeadLine = getTime(new Date('2022-01-25').getTime()/1000)
   return (
@@ -306,7 +310,7 @@ export default function CollectibleDetail() {
               <Stack sx={{mt: 2}} spacing={1}>
                 <Typography variant="body2">Creator</Typography>
                 <Stack direction='row'>
-                  <AvatarStyle draggable = {false} component="img" src="/static/glide.png"/>
+                  <Jazzicon address={collectible.royaltyOwner}/>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     {reduceHexAddress(collectible.royaltyOwner)}
                     <Badge name="pasar" sx={{ml: 2}}/>
@@ -318,7 +322,7 @@ export default function CollectibleDetail() {
                 </Stack>
                 <Typography variant="body2">Owner</Typography>
                 <Stack direction='row'>
-                  <AvatarStyle draggable = {false} component="img" src="/static/glide.png"/>
+                  <Jazzicon address={collectible.holder}/>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     {reduceHexAddress(collectible.holder)}
                     {/* <Badge name="thumbdown" value="13" sx={{ml: 2}}/> */}
