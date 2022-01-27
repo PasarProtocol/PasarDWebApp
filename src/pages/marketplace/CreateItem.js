@@ -25,7 +25,7 @@ import PaperRecord from '../../components/PaperRecord';
 import CustomSwitch from '../../components/custom-switch';
 import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
-import {testStickerContract as CONTRACT_ADDRESS} from '../../config'
+import {stickerContract as CONTRACT_ADDRESS} from '../../config'
 import {hash} from '../../utils/common';
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import ProgressBar from '../../components/ProgressBar'

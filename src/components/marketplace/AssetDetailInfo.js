@@ -8,7 +8,7 @@ import { Box, Stack, Typography, Link } from '@mui/material';
 //
 import CopyButton from '../CopyButton';
 import { getTime } from '../../utils/common';
-import { defaultContract } from '../../config'
+import { marketContract } from '../../config'
 
 // ----------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ export default function AssetDetailInfo({ detail }) {
     'royalties': `${detail.royalties*100/10**6} %`,
     'createTime': `${creatimestamp.date} ${creatimestamp.time}`,
     'dateOnMarket': dateOnMarket,
-    'holder': detail.holder===defaultContract?detail.royaltyOwner:detail.holder
+    'holder': detail.holder===marketContract?detail.royaltyOwner:detail.holder
   }
 
   return (

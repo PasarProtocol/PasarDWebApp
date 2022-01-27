@@ -36,7 +36,7 @@ function TransItem({ trans, isLast }) {
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
                 <Link to={`/explorer/transaction/detail/${trans.to}`} component={RouterLink}>
-                  by {reduceHexAddress(trans.to)}
+                  {methodItem.verb.description==='Transferred'?'to':'by'} {reduceHexAddress(trans[methodItem.verb.subject])}
                 </Link>
               </Typography>
           </Box>

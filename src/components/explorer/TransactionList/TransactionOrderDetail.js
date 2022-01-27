@@ -10,7 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import MethodLabel from '../../MethodLabel';
 import CopyButton from '../../CopyButton';
 import { MethodList, reduceHexAddress, getTime } from '../../../utils/common';
-import {defaultContract} from '../../../config'
+import {marketContract} from '../../../config'
 
 TransactionOrderDetail.propTypes = {
     item: PropTypes.object.isRequired
@@ -90,7 +90,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                 if(el.field&&!el.copyable)
                                     value = parseFloat((value / 10 ** 18).toFixed(7))
                                 if(el.field==="marketplace")
-                                    value = defaultContract
+                                    value = marketContract
                                 const displayValue = el.ellipsis?reduceHexAddress(value):value
                                 return (
                                     <StackRowStyle key={index}>
