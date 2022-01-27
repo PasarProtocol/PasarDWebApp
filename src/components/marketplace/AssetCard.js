@@ -9,6 +9,11 @@ import { Box, Grid, Card, Link, IconButton, Menu, MenuItem, Typography, Stack } 
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import SyncAltSharpIcon from '@mui/icons-material/SyncAltSharp';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 import Badge from '../Badge';
 import PaperRecord from '../PaperRecord';
@@ -41,7 +46,7 @@ const Thumbnail = (props) => {
 };
 
 export default function AssetCard(props) {
-  const {title="???", description, quantity=1, price=0, isLink, tokenId} = props
+  const {title="???", description, quantity=1, price=0, isLink, tokenId, type} = props
   const [isOpenPopup, setOpenPopup] = React.useState(null);
 
   const openPopupMenu = (event) => {
@@ -73,15 +78,56 @@ export default function AssetCard(props) {
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
-                <MenuItem onClick={handleClosePopup}>
-                  <ThumbDownOffAltIcon/>&nbsp;Report Creator
-                </MenuItem>
-                <MenuItem onClick={handleClosePopup}>
-                  <ThumbDownOffAltIcon/>&nbsp;Report Owner
-                </MenuItem>
-                <MenuItem onClick={handleClosePopup}>
-                  <ShareOutlinedIcon/>&nbsp;Share
-                </MenuItem>
+                {
+                  type===0&&
+                  <>
+                    <MenuItem onClick={handleClosePopup}>
+                      <ThumbDownOffAltIcon/>&nbsp;Report Creator
+                    </MenuItem>
+                    <MenuItem onClick={handleClosePopup}>
+                      <ThumbDownOffAltIcon/>&nbsp;Report Owner
+                    </MenuItem>
+                    <MenuItem onClick={handleClosePopup}>
+                      <ShareOutlinedIcon/>&nbsp;Share
+                    </MenuItem>
+                  </>
+                }
+                {
+                  type===1&&
+                  <>
+                    <MenuItem onClick={handleClosePopup}>
+                      <LocalOfferOutlinedIcon/>&nbsp;Update Price
+                    </MenuItem>
+                    <MenuItem onClick={handleClosePopup}>
+                      <CancelOutlinedIcon/>&nbsp;Cancel Sale
+                    </MenuItem>
+                    <MenuItem onClick={handleClosePopup}>
+                      <ShareOutlinedIcon/>&nbsp;Share
+                    </MenuItem>
+                  </>
+                }
+                {
+                  type===2&&
+                  <>
+                    <MenuItem onClick={handleClosePopup}>
+                      <StorefrontIcon/>&nbsp;Sell
+                    </MenuItem>
+                    <MenuItem onClick={handleClosePopup}>
+                      <SyncAltSharpIcon/>&nbsp;Transfer
+                    </MenuItem>
+                    <MenuItem onClick={handleClosePopup}>
+                      <DeleteOutlineIcon/>&nbsp;Delete
+                    </MenuItem>
+                  </>
+                }
+                {
+                  type===3&&
+                  <>
+                    <MenuItem onClick={handleClosePopup}>
+                      <ShareOutlinedIcon/>&nbsp;Share
+                    </MenuItem>
+                  </>
+                }
               </Menu>
             </Grid>
           </Grid>

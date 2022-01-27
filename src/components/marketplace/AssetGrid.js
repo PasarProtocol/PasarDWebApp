@@ -33,6 +33,7 @@ const GridItems = (props) => (
             price={round(item.price/1e18, 3)}
             quantity={item.quantity}
             tokenId={item.tokenId}
+            type={props.type}
             isLink={1&&true}
             {...props}
           />
@@ -47,7 +48,7 @@ export default function AssetGrid(props){
   else itemWidth = isMobile?150:200
   return(
     <StackedGrid itemWidth={itemWidth}>
-      <GridItems items={props.assets} />
+      <GridItems items={props.assets} type={props.type?props.type:0}/>
     </StackedGrid>
   )
 }
