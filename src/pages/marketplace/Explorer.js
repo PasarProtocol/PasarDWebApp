@@ -81,6 +81,17 @@ const FilterBtnContainerStyle = styled(Box)(({ theme }) => ({
   backdropFilter: 'blur(6px)',
   background: alpha(theme.palette.background.default, 0.5)
 }));
+const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.background.default,
+  color: theme.palette.origin.main,
+  width: 30,
+  height: 30,
+  lineHeight: '30px',
+  borderRadius: 15,
+  textAlign: 'center',
+  alignItems: 'center',
+  marginLeft: theme.spacing(1)
+}));
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
   const drawerWidth = 360;
@@ -329,16 +340,7 @@ export default function MarketExplorer() {
                 hasMore={page<pages}
                 loader={<h4>Loading...</h4>}
                 endMessage={
-                  !isLoadingAssets&&(
-                    assets.length>0?
-                    <>
-                      <Divider sx={{my: '12px'}}/>
-                      <p style={{ textAlign: "center" }}>
-                        <b>All items loaded</b>
-                      </p>
-                    </>:
-                    <Typography variant="h4" align='center'>No matching collectible found!</Typography>
-                  )
+                  !isLoadingAssets&&!assets.length&&<Typography variant="h4" align='center'>No matching collectible found!</Typography>
                 }
               >
                 <AssetGrid assets={assets} dispmode={dispmode}/>
@@ -356,6 +358,10 @@ export default function MarketExplorer() {
             onClick={closeFilter}
           >
             Filters
+            {
+              filterForm.selectedBtns&&filterForm.selectedBtns.length>0&&
+              <FilterBtnBadgeStyle>{filterForm.selectedBtns.length}</FilterBtnBadgeStyle>
+            }
           </Button>
         </FilterBtnContainerStyle>
         
