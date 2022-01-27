@@ -28,6 +28,7 @@ import BidList from '../../components/marketplace/BidList';
 import Badge from '../../components/Badge';
 import Jazzicon from '../../components/Jazzicon';
 import { reduceHexAddress, getThumbnail, getTime, getCoinUSD } from '../../utils/common';
+import {blankAddress, marketContract} from '../../config'
 
 // ----------------------------------------------------------------------
 
@@ -142,7 +143,9 @@ export default function CollectibleDetail() {
     setLoadingTransRecord(true);
     fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=&timeOrder=-1`, {}).then(response => {
       response.json().then(jsonTransactions => {
-        setTransRecord(jsonTransactions.data.slice(0,10));
+        setTransRecord(jsonTransactions.data.filter((trans)=>
+          !((trans.event==="SafeTransferFrom"||trans.event==="SafeTransferFromWithMemo") && (trans.to===blankAddress||trans.to===marketContract))
+        ).slice(0,10));
         setLoadingTransRecord(false);
       })
     }).catch(e => {
@@ -308,7 +311,7 @@ export default function CollectibleDetail() {
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>{collectible.description}</Typography>
               <Stack sx={{mt: 2}} spacing={1}>
-                <Typography variant="body2">Creator</Typography>
+                <Typography variant="subtitle2">Creator</Typography>
                 <Stack direction='row'>
                   <Jazzicon address={collectible.royaltyOwner}/>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
@@ -322,7 +325,7 @@ export default function CollectibleDetail() {
                     <Badge name="custom" value="100 ELA"/> */}
                   </Typography>
                 </Stack>
-                <Typography variant="body2">Owner</Typography>
+                <Typography variant="subtitle2">Owner</Typography>
                 <Stack direction='row'>
                   <Jazzicon address={collectible.holder}/>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
@@ -332,7 +335,7 @@ export default function CollectibleDetail() {
                     {/* <Badge name="thumbdown" value="13" sx={{ml: 2}}/> */}
                   </Typography>
                 </Stack>
-                <Typography variant="body2">Collection</Typography>
+                <Typography variant="subtitle2">Collection</Typography>
                 <Stack direction='row'>
                   <AvatarStyle draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ p: 1 }} />
                   <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>Feeds NFT Sticker (FSTK)</Typography>
