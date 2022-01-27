@@ -4,7 +4,7 @@ import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import SwipeableViews from "react-swipeable-views";
 
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Typography, Tab, Tabs, 
+import { Container, Stack, Typography, Tab, Tabs, Link, 
   Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 // import { TabContext, TabList, TabPanel } from '@mui/lab';
 import SquareIcon from '@mui/icons-material/Square';
@@ -50,7 +50,7 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
     bottom: 0
   },
   [theme.breakpoints.down('sm')]: {
-    justifyContent: 'right',
+    marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
   }
 }));
@@ -60,8 +60,7 @@ export default function MyItems() {
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([[],[],[]]);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false,false,false]);
-  const [dispmode, setDispmode] = React.useState(0);
-  const [totalCount, setTotalCount] = React.useState(0);
+  const [dispmode, setDispmode] = React.useState(1);
   const [orderType, setOrderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(0);
@@ -142,39 +141,27 @@ export default function MyItems() {
       <Container maxWidth={false}>
         <Box sx={{display: {xs: 'block', sm: 'flex'}, position: 'relative', mb: {xs: 0, sm: 2}, justifyContent: 'center'}}>
           <Typography variant="h2" component="h2" align="center" sx={{position: 'relative'}}>
-            {
-              !params.address?
-              <span role="img" aria-label="">🗂️ My Items</span>:
-              <span role="img" aria-label="">🖼 {reduceHexAddress(params.address)}</span>
-            }
+            <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink}>
+              {
+                !params.address?
+                <span role="img" aria-label="">🗂️ My Items</span>:
+                <span role="img" aria-label="">🖼 {reduceHexAddress(params.address)}</span>
+              }
+            </Link>
           </Typography>
-          <Box fullWidth sx={{justifyContent: {xs: 'right', md: 'normal'}, display: 'flex'}}>
-            <MHidden width="smUp">
-              <Box fullWidth sx={{display: 'flex', flex: 1}}>
-                <ToolGroupStyle>
-                  <MyItemsSortSelect onChange={setOrderType}/>
-                  <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-                    <ToggleButton value={0}>
-                      <SquareIcon />
-                    </ToggleButton>
-                    <ToggleButton value={1}>
-                      <GridViewSharpIcon />
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </ToolGroupStyle>
-              </Box>
-            </MHidden>
-            <Button
-                to={`/explorer/transaction/detail/${walletAddress}`}
-                size="small"
-                color="inherit"
-                component={RouterLink}
-                endIcon={<Icon icon={arrowIosForwardFill} />}
-                sx={{position: {xs: 'relative', sm: 'absolute'}, right: 0, bottom: 0}}
-            >
-              See more
-            </Button>
-          </Box>
+          <MHidden width="smUp">
+              <ToolGroupStyle>
+                <MyItemsSortSelect onChange={setOrderType} sx={{flex: 1}}/>
+                <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                  <ToggleButton value={0}>
+                    <SquareIcon />
+                  </ToggleButton>
+                  <ToggleButton value={1}>
+                    <GridViewSharpIcon />
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </ToolGroupStyle>
+          </MHidden>
         </Box>
         <Box sx={{display: 'flex', position: 'relative', mb: 2, justifyContent: 'center'}} align="center">
           <Tabs value={tabValue} onChange={handleSwitchTab} TabIndicatorProps={{style: {background:'#FF5082'}}}>
@@ -217,7 +204,7 @@ export default function MyItems() {
                     <Box component="main">
                       {
                         group.length>0?
-                        <AssetGrid assets={group} dispmode={dispmode}/>:
+                        <AssetGrid assets={group} type={i+1} dispmode={dispmode}/>:
                         <Typography variant="subtitle2" align="center" sx={{mb: 3}}>No {typeNames[i]} collectible found!</Typography>
                       }
                     </Box>
