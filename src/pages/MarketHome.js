@@ -132,7 +132,7 @@ export default function MarketHome() {
       <Container maxWidth="md">
         <MotionInView variants={varFadeInUp}>
           <CardStyle>
-            <Box component="div" sx={{pb:'0 !important'}}>
+            <Box component="div">
               <TitleStyle component="h1">
                 Get started with Essentials
               </TitleStyle>
@@ -145,16 +145,16 @@ export default function MarketHome() {
                 (BTC, ETH, ELA ,BSC, etc.), Decentralized Autonomous Organization (DAO)
                 and so much more!
               </Typography>
-              <Stack spacing={1} direction="row" sx={{mt: 2}}>
-                <OutlineBtnStyle variant="outlined" href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app" target="_blank" startIcon={<AdbIcon />}>
-                  Google Play
-                </OutlineBtnStyle>
-                <Button variant="contained" href="https://apps.apple.com/us/app/elastos-essentials/id1568931743" target="_blank" startIcon={<AppleIcon />} color="inherit">
-                  App Store
-                </Button>
-              </Stack>
             </Box>
-            <Box draggable = {false} component="img" src="/static/essentials.png" sx={{mt: '0 !important'}} />
+            <Box draggable = {false} component="img" src="/static/essentials.png" sx={{p: {xs: '0px 32px 32px', sm: 0}, mt: '0 !important'}} />
+            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
+              <OutlineBtnStyle variant="outlined" href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app" target="_blank" startIcon={<AdbIcon />}>
+                Google Play
+              </OutlineBtnStyle>
+              <Button variant="contained" href="https://apps.apple.com/us/app/elastos-essentials/id1568931743" target="_blank" startIcon={<AppleIcon />} color="inherit">
+                App Store
+              </Button>
+            </Stack>
           </CardStyle>
         </MotionInView>
         <MotionInView variants={varFadeInUp}>

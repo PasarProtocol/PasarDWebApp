@@ -56,6 +56,7 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(1)
   }
 }));
+
 // ----------------------------------------------------------------------
 export default function MyItems() {
   const params = useParams(); // params.address
@@ -148,12 +149,13 @@ export default function MyItems() {
               size={isMobile?80:100}
               sx={{
                 mr: 0,
-                border: '3px solid',
                 borderColor: (theme)=>theme.palette.origin.main,
-                width: isMobile?96:116,
-                height: isMobile?96:116,
+                width: isMobile?98:118,
+                height: isMobile?98:118,
                 backgroundColor: (theme)=>theme.palette.background.paper,
-                p: '5px'
+                p: '5px',
+                background: 'linear-gradient(#fff, #fff) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box',
+                border: '4px solid transparent'
               }}/>
           </Box>
           <Typography variant="h2" component="h2" align="center" sx={{position: 'relative'}}>
