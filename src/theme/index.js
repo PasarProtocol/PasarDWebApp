@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useMemo } from 'react';
 // material
@@ -20,8 +21,11 @@ ThemeConfig.propTypes = {
 };
 
 export default function ThemeConfig({ children }) {
+  const { pathname } = useLocation();
+  const isHome = pathname === '/';
+
   const { themeMode, themeDirection } = useSettings();
-  const isLight = themeMode === 'light';
+  const isLight = !isHome && themeMode === 'light';
 
   const themeOptions = useMemo(
     () => ({

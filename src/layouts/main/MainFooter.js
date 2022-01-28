@@ -43,8 +43,10 @@ function CopyRight(prop) {
     </Typography>
   );
 }
-export default function MainFooter({hidden}) {
+export default function MainFooter({hidden, isHome}) {
   const sx=hidden?{display: 'none'}:{}
+  if(isHome)
+    sx.backgroundColor = '#0d0d0d'
   return (
     <RootStyle sx={sx}>
       <Divider />
