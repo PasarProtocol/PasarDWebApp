@@ -1,6 +1,9 @@
+import Web3 from 'web3';
 import { createHash } from 'crypto';
 import { subDays, differenceInDays  } from 'date-fns';
 import Jazzicon from "@metamask/jazzicon";
+import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
+
 
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = strAddress => strAddress?`${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`:'';
@@ -53,6 +56,16 @@ export const getElapsedTime = createdtimestamp => {
   return strDate;
 };
 
+export const getBalance = async (connectProvider) => {
+    if(!connectProvider)
+      return 0
+    // const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
+    const walletConnectWeb3 = new Web3(connectProvider);
+  
+    const accounts = await walletConnectWeb3.eth.getAccounts();
+    const balance = await walletConnectWeb3.eth.getBalance(accounts[0]);
+    return balance
+};
 
 export function dateRangeBeforeDays(days) {
   return [...Array(days).keys()].map((i) => subDays(new Date(), i).toISOString().slice(0, 10));
