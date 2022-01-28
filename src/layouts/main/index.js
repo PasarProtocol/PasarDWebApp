@@ -65,7 +65,7 @@ export default function MainLayout() {
       <BodyStyle footerhidden={isFooterHiddenPage?1:0}>
         <Outlet />
       </BodyStyle>
-      <MainFooter hidden={isFooterHiddenPage}/>
+      <MainFooter hidden={isFooterHiddenPage} isHome={isHome}/>
       <ScrollTop>
         <Fab variant="contained" size="small" aria-label="scroll back to top">
           <KeyboardArrowUpIcon />

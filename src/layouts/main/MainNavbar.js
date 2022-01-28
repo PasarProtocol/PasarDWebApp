@@ -70,18 +70,27 @@ export default function MainNavbar() {
             justifyContent: 'space-between'
           }}
         >
-          <MHidden width="mdUp">
-            <Searchbar />
-          </MHidden>
-          {
-            !isHome&&
-            <MHidden width="mdDown">
-              <RouterLink to="/">
-                <Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
-              </RouterLink>
-              <SearchBox sx={{width: 440}} needbgcolor={!isOffset && isMarketHome}/>
-            </MHidden>
-          }
+        {
+          !isMarketHome&&(
+            <>
+              <MHidden width="mdUp">
+                <Searchbar />
+              </MHidden>
+              {
+                !isHome&&
+                <MHidden width="mdDown">
+                  <RouterLink to="/">
+                    <Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
+                  </RouterLink>
+                  <SearchBox sx={{width: 440}} needbgcolor={!isOffset && isMarketHome}/>
+                </MHidden>
+              }
+            </>
+          )
+        }
+        {
+          isMarketHome&&<Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
+        }
           <Box sx={{ flexGrow: 1 }} />
 
           <MHidden width="mdDown">

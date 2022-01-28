@@ -8,11 +8,11 @@ import AppleIcon from '@mui/icons-material/Apple';
 // components
 import Page from '../components/Page';
 import HomeAssetCard from '../components/HomeAssetCard';
-import { MHidden } from '../components/@material-extend';
+import { MotionInView, varFadeInUp, varFadeInDown } from '../components/animate';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
-  background: 'linear-gradient(#ffe0e0 15%, transparent 25%)',
+  background: 'black',
   paddingTop: theme.spacing(8),
   paddingBottom: theme.spacing(12),
   [theme.breakpoints.up('md')]: {
@@ -28,7 +28,7 @@ const StackStyle = styled(Stack)(({ theme }) => ({
     '& .MuiPaper-root': {
       width: '30%',
       height: '100%',
-      minWidth: '250px'
+      minWidth: '300px'
     }
   },
   [theme.breakpoints.down('sm')]: {
@@ -39,12 +39,15 @@ const StackStyle = styled(Stack)(({ theme }) => ({
   }
 }));
 const CardStyle = styled(Card)(({ theme }) => ({
+  backgroundColor: '#0d0d0d',
   padding: theme.spacing(4),
   marginBottom: theme.spacing(4),
   display: 'flex',
   [theme.breakpoints.up('sm')]: {
     flexDirection: 'row',
     '& img': {
+      marginTop: theme.spacing(8),
+      marginLeft: theme.spacing(2),
       width: '25%',
       height: '100%',
     }
@@ -52,8 +55,7 @@ const CardStyle = styled(Card)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     flexDirection: 'column',
     '& img': {
-      maxWidth: 300,
-      margin: '0 auto 32px'
+      margin: '32px auto 32px'
     }
   },
   '& div.MuiBox-root': {
@@ -81,6 +83,14 @@ const TitleStyle = styled(Typography)(({ theme }) => ({
   }
 }));
 
+const OutlineBtnStyle = styled(Button)(({ theme }) => ({
+  color: theme.palette.origin.main,
+  borderColor: theme.palette.origin.main,
+  "&:hover": {
+    color: 'white',
+    background: theme.palette.origin.main
+  }
+}));
 // ----------------------------------------------------------------------
 
 export default function MarketHome() {
@@ -93,17 +103,20 @@ export default function MarketHome() {
       <Container sx={{pt: 4, mb: '100px', position: 'relative'}}>
         <StackStyle>
           <Box sx={{ flexGrow: 1 }}>
-            <TitleStyle component="h1">
-              Discover Web3.0 marketplace<br/>on Pasar
-            </TitleStyle>
+            <Typography variant="h1">
+              Dawn of the DeMKT
+            </Typography>
             <Typography variant="h4" component="div" sx={{fontWeight: 'normal', pb: 3}}>
-              Pasar is the largest NFT marketplace<br/>on Elastos
+              Pasar is an open-sourced, community-centric, and one
+              of the first truly Web3 decentralized marketplace (DeMKT)
+              for exchanging data and Non-fungible Tokens (NFTs)
+              as valuable assets.
             </Typography>
             <Stack spacing={1} direction="row">
-              <Button to="/marketplace" variant="contained" component={RouterLink}>
-                Marketplace
-              </Button>
-              <Button to="/create" variant="outlined" component={RouterLink}>
+              <OutlineBtnStyle to="/marketplace" variant="outlined" component={RouterLink}>
+                Go to App
+              </OutlineBtnStyle>
+              <Button to="/create" variant="contained" component={RouterLink} color="inherit">
                 Create
               </Button>
             </Stack>
@@ -112,77 +125,113 @@ export default function MarketHome() {
         </StackStyle>
       </Container>
       <Container maxWidth="md">
-        <CardStyle>
-          <Box component="div" sx={{pb:'0 !important'}}>
-            <TitleStyle component="h1">
-              Get started with Essentials
-            </TitleStyle>
-            <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-              Easy onboarding to set up automatically decentralized identifier (DID)
-              and wallet from Elastos Essentials Super Wallet.<br/>
-              <br/>
-              Discover Elastos’ Web3.0 technology stacks all in a single 
-              app such as DID, decentralized personal storage,
-              multiple blockchains support (BTC, ETH, ELA ,BSC, etc.),
-              Decentralized Autonomous Organization (DAO) and
-              so much more!
-            </Typography>
-            <Stack spacing={1} direction="row" sx={{mt: 2}}>
-              <Button variant="contained" href="#" startIcon={<AdbIcon />}>
-                Google Play
-              </Button>
-              <Button variant="outlined" href="#" startIcon={<AppleIcon />}>
-                App Store
+        <MotionInView variants={varFadeInUp}>
+          <CardStyle>
+            <Box component="div" sx={{pb:'0 !important'}}>
+              <TitleStyle component="h1">
+                Get started with Essentials
+              </TitleStyle>
+              <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
+                Easy onboarding to set up decentralized identifier (DID) and wallet from
+                Elastos Essentials Super Wallet.<br/>
+                <br/>
+                Discover Elastos’ Web3.0 technology stacks all in a single app such as
+                DID, decentralized personal storage, multiple blockchains support
+                (BTC, ETH, ELA ,BSC, etc.), Decentralized Autonomous Organization (DAO)
+                and so much more!
+              </Typography>
+              <Stack spacing={1} direction="row" sx={{mt: 2}}>
+                <OutlineBtnStyle variant="outlined" href="#" startIcon={<AdbIcon />}>
+                  Google Play
+                </OutlineBtnStyle>
+                <Button variant="contained" href="#" startIcon={<AppleIcon />} color="inherit">
+                  App Store
+                </Button>
+              </Stack>
+            </Box>
+            <Box draggable = {false} component="img" src="/static/essentials.png" sx={{mt: '0 !important'}} />
+          </CardStyle>
+        </MotionInView>
+        <MotionInView variants={varFadeInUp}>
+          <CardStyle>
+            <Box component="div">
+              <TitleStyle component="h1">
+                Decentralized Marketplace (DeMKT)
+              </TitleStyle>
+              <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
+                Pasar is a truly decentralized marketplace which means there is no centralserver nor entity to facilitate the peer-to-peer trading of data and NFTs.<br/>
+                <br/>
+                Items cannot be censored, blocked nor taken down by Pasar due to
+                it being a decentralized marketplace. The trust based system protocol will
+                accelerate Pasar to become the next leader of Web3 DeMKT.
+              </Typography>
+            </Box>
+            <Box draggable = {false} component="img" src="/static/market-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
+            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
+              <OutlineBtnStyle variant="outlined" href="#">
+                Marketplace
+              </OutlineBtnStyle>
+              <Button variant="contained" href="#" color="inherit">
+                Explorer
               </Button>
             </Stack>
-          </Box>
-          <Box draggable = {false} component="img" src="/static/essentials.png" />
-        </CardStyle>
-        <CardStyle>
-          <Box component="div">
-            <TitleStyle component="h1">
-              Elastos Smart Chain (ESC)
-            </TitleStyle>
-            <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-              We chose to build on ESC because of its fast transactions and super cheap gas fees.<br/>
-              <br/>
-              You can purchase ELA on smart chain through the Essentials
-              app from Glide Finance, a decentralized exchange (DEX) also built
-              on the Elastos Smart Chain (ESC).
-            </Typography>
-          </Box>
-          <Box draggable = {false} component="img" src="/static/glide.png" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
-          <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-            <Button variant="contained" href="#">
-              Get ELA on Glide Finance
-            </Button>
-            <Button variant="outlined" href="#">
-              Learn more about ESC
-            </Button>
-          </Stack>
-        </CardStyle>
-        <CardStyle>
-          <Box component="div">
-            <TitleStyle component="h1">
-              List your work on Pasar
-            </TitleStyle>
-            <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-            Sign in with DID, connect wallet, upload your work, and add other important details.<br/>
-            <br/>
-            Choose how you want to set up your work on Pasar and
-            you’re done! We’ll do the rest of the selling for you!
-            </Typography>
-          </Box>
-          <Box draggable = {false} component="img" src="/static/logo.svg" sx={{p: 3}}/>
-          <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32}}>
-            <Button variant="contained" href="#">
-              Sign in with DID
-            </Button>
-            <Button variant="outlined" href="#">
-              Create
-            </Button>
-          </Stack>
-        </CardStyle>
+          </CardStyle>
+        </MotionInView>
+        <MotionInView variants={varFadeInUp}>
+          <CardStyle>
+            <Box component="div">
+              <TitleStyle component="h1">
+                Decentralized Identity (DID)
+              </TitleStyle>
+              <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
+                DID empowers users to be self-sovereign of our own personal data.Users are required to sign in with DID in order to create or sell items on Pasar.<br/>
+                However, users can still purchase items by just connecting their wallets
+                without a DID.<br/>
+                <br/>
+                A reputation system based on DID will enable a user to be trusted by the
+                community instead of using the traditional verification system through
+                central authorities.
+              </Typography>
+            </Box>
+            <Box draggable = {false} component="img" src="/static/user-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
+            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
+              <OutlineBtnStyle variant="outlined" href="#">
+                Sign in with DID
+              </OutlineBtnStyle>
+              <Button variant="contained" href="#" color="inherit">
+                Learn  more about DID
+              </Button>
+            </Stack>
+          </CardStyle>
+        </MotionInView>
+        <MotionInView variants={varFadeInUp}>
+          <CardStyle>
+            <Box component="div">
+              <TitleStyle component="h1">
+                Elastos Smart Chain (ESC)
+              </TitleStyle>
+              <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
+                ESC is a programmable smart-contract blockhchain component of Elastos. 
+                Pasar is built on ESC because of its ability to conduct fast transactions
+                efficiently with fees next to nothing.<br/>
+                <br/>
+                Users can purchase ELA on smart chain through the Essentials
+                app from Glide Finance, a decentralized exchange (DEX) also
+                built on the Elastos Smart Chain (ESC).
+              </Typography>
+            </Box>
+            <Box draggable = {false} component="img" src="/static/chain-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
+            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
+              <OutlineBtnStyle variant="outlined" href="#">
+                Get ELA 
+              </OutlineBtnStyle>
+              <Button variant="contained" href="#" color="inherit">
+                Learn more about ESC
+              </Button>
+            </Stack>
+          </CardStyle>
+        </MotionInView>
+        <Box draggable = {false} component="img" src="/static/elastos-logo.svg" sx={{m: 'auto', width: '40%'}}/>
       </Container>
     </RootStyle>
   );

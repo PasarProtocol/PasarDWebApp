@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import {isMobile} from 'react-device-detect';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions,
   DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
 import { Icon } from '@iconify/react';
+import { styled } from '@mui/material/styles';
 import { makeStyles } from "@mui/styles";
 import CloseIcon from '@mui/icons-material/Close';
 import AdbIcon from '@mui/icons-material/Adb';
@@ -25,7 +26,7 @@ import { useEagerConnect, useInactiveListener } from "./hook";
 import CopyButton from '../CopyButton';
 import PaperRecord from '../PaperRecord';
 import { reduceHexAddress } from '../../utils/common';
-
+import useSettings from '../../hooks/useSettings';
 
 const useStyles = makeStyles({
   iconAbsolute1: {
@@ -53,6 +54,30 @@ const useStyles = makeStyles({
 });
 
 export default function SignInDialog({ onChange }) {
+  const { pathname } = useLocation();
+  const isHome = pathname === '/';
+
+  const { themeMode } = useSettings();
+  const isLight = !isHome && themeMode === 'light';
+  
+  const ButtonStyle = styled(Button)(({ theme }) => (!isLight&&{
+    backgroundColor: 'white',
+    color: theme.palette.background.default,
+    '&:hover': {
+      backgroundColor: theme.palette.action.active
+    }
+  }))
+
+  const ButtonOutlinedStyle = styled(Button)(({ theme }) => (!isLight&&{
+    borderColor: 'white',
+    color: 'white',
+    '&:hover': {
+      color: theme.palette.background.default,
+      backgroundColor: theme.palette.action.active
+    }
+  }))
+
+
   let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
   const context = useWeb3React()
   const { connector, activate, active, error, library, chainId, account } = context;
@@ -334,7 +359,7 @@ export default function SignInDialog({ onChange }) {
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sx={{pt: '8px !important'}}>
-                  <Button variant="contained" 
+                  <ButtonStyle variant="contained" 
                     startIcon={
                       <Avatar
                         alt="Elastos"
@@ -350,9 +375,10 @@ export default function SignInDialog({ onChange }) {
                     className={classes.iconAbsolute1}
                     fullWidth
                     onClick={()=>{connectWithEssential()}}
+                    sx={!isLight&&{backgroundColor: 'white'}}
                   >
                     Elastos Essentials
-                  </Button>
+                  </ButtonStyle>
                 </Grid>
                 <Grid item xs={12} sx={{pt: '8px !important'}}>
                   <Typography variant="body2" display="block" gutterBottom align="center">
@@ -360,7 +386,7 @@ export default function SignInDialog({ onChange }) {
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sx={{pt: '8px !important'}}>
-                  <Button variant="contained" 
+                  <ButtonStyle variant="contained" 
                     startIcon={
                       <Avatar
                         alt="metamask"
@@ -373,10 +399,10 @@ export default function SignInDialog({ onChange }) {
                     onClick={()=>{handleChooseWallet('metamask')}}
                   >
                     MetaMask
-                  </Button>
+                  </ButtonStyle>
                 </Grid>
                 <Grid item xs={12}>
-                  <Button variant="contained" 
+                  <ButtonStyle variant="contained" 
                     startIcon={
                       <Avatar
                         alt="walletconnect"
@@ -389,12 +415,12 @@ export default function SignInDialog({ onChange }) {
                     onClick={()=>{handleChooseWallet('walletconnect')}}
                   >
                     Wallet Connect
-                  </Button>
+                  </ButtonStyle>
                 </Grid>
                 <Grid item xs={12}>
-                  <Button variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
+                  <ButtonOutlinedStyle variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
                     I don’t have a wallet
-                  </Button>
+                  </ButtonOutlinedStyle>
                 </Grid>
               </Grid>
             </Box>
@@ -433,14 +459,14 @@ export default function SignInDialog({ onChange }) {
             <Box component="div" sx={{ maxWidth: 300, m: 'auto' }}>
               <Grid container spacing={2} sx={{mt: 2, mb: 4}}>
                 <Grid item xs={12} sx={{pt: '8px !important'}}>
-                  <Button variant="contained" href="#" startIcon={<AdbIcon />} className={classes.iconAbsolute2} fullWidth>
+                  <ButtonStyle variant="contained" href="#" startIcon={<AdbIcon />} className={classes.iconAbsolute2} fullWidth>
                     Google Play
-                  </Button>
+                  </ButtonStyle>
                 </Grid>
                 <Grid item xs={12}>
-                  <Button variant="outlined" href="#" startIcon={<AppleIcon />} className={classes.iconAbsolute2} fullWidth>
+                  <ButtonOutlinedStyle variant="outlined" href="#" startIcon={<AppleIcon />} className={classes.iconAbsolute2} fullWidth>
                     App Store
-                  </Button>
+                  </ButtonOutlinedStyle>
                 </Grid>
                 <Grid item xs={12} align="center">
                   <Button
