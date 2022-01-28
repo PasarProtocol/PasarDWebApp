@@ -350,7 +350,7 @@ export default function SignInDialog({ onChange }) {
             <Box component="div" sx={{ maxWidth: 350, m: 'auto' }}>
               <Typography variant="p" component="div" sx={{color: 'text.secondary'}} align="center">
                 Sign in with one of the available providers or
-                create a new one. <Link href="#" underline="hover" color="red">What is a DID?</Link>
+                create a new one. <Link href="https://www.elastos.org/did" underline="hover" color="red" target="_blank">What is a DID?</Link>
               </Typography>
               <Grid container spacing={2} sx={{my: 4}}>
                 <Grid item xs={12} sx={{pt: '0 !important'}}>
