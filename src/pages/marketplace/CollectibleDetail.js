@@ -313,9 +313,9 @@ export default function CollectibleDetail() {
               <Stack sx={{mt: 2}} spacing={1}>
                 <Typography variant="subtitle2">Creator</Typography>
                 <Stack direction='row'>
-                  <Jazzicon address={collectible.royaltyOwner}/>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    <Link to={`/marketplace/others/${collectible.royaltyOwner}`} component={RouterLink}>
+                    <Link to={`/marketplace/others/${collectible.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <Jazzicon address={collectible.royaltyOwner}/>
                       {reduceHexAddress(collectible.royaltyOwner)}
                     </Link>
                     <Badge name="pasar" sx={{ml: 2}}/>
@@ -327,9 +327,9 @@ export default function CollectibleDetail() {
                 </Stack>
                 <Typography variant="subtitle2">Owner</Typography>
                 <Stack direction='row'>
-                  <Jazzicon address={collectible.holder}/>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    <Link to={`/marketplace/others/${collectible.holder}`} component={RouterLink}>
+                    <Link to={`/marketplace/others/${collectible.holder}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <Jazzicon address={collectible.holder}/>
                       {reduceHexAddress(collectible.holder)}
                     </Link>
                     {/* <Badge name="thumbdown" value="13" sx={{ml: 2}}/> */}

@@ -3,7 +3,10 @@ import { Paper, Box, Stack, Typography, Button } from '@mui/material';
 import Jazzicon from './Jazzicon';
 
 const PaperStyle = styled(Paper)(({ theme }) => ({
-    background: 'rgba(255, 255, 255, 0.4)',
+    background: 'rgba(255, 255, 255, 0.1)',
+    backdropFilter: 'blur(35px)',
+    border: '2px solid rgba(255, 255, 255, 0.1)',
+    boxShadow: '0 0 80px rgb(0 0 0 / 25%)',
     padding: theme.spacing(2)
 }));
 const HomeAssetCard = (props)=>(
