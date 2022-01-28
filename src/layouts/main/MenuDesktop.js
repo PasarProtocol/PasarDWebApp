@@ -20,7 +20,7 @@ const LinkStyle = styled(Link)(({ theme }) => ({
   }),
   '&.active': {
     borderBottom: '2px solid',
-    borderColor: theme.palette.text.primary,
+    borderColor: theme.palette.origin.main,
   },
   '&:hover': {
     opacity: 0.48,

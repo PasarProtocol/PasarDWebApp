@@ -141,10 +141,10 @@ export default function MarketHome() {
                 and so much more!
               </Typography>
               <Stack spacing={1} direction="row" sx={{mt: 2}}>
-                <OutlineBtnStyle variant="outlined" href="#" startIcon={<AdbIcon />}>
+                <OutlineBtnStyle variant="outlined" href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app" target="_blank" startIcon={<AdbIcon />}>
                   Google Play
                 </OutlineBtnStyle>
-                <Button variant="contained" href="#" startIcon={<AppleIcon />} color="inherit">
+                <Button variant="contained" href="https://apps.apple.com/us/app/elastos-essentials/id1568931743" target="_blank" startIcon={<AppleIcon />} color="inherit">
                   App Store
                 </Button>
               </Stack>
@@ -159,7 +159,7 @@ export default function MarketHome() {
                 Decentralized Marketplace (DeMKT)
               </TitleStyle>
               <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-                Pasar is a truly decentralized marketplace which means there is no centralserver nor entity to facilitate the peer-to-peer trading of data and NFTs.<br/>
+                Pasar is a truly decentralized marketplace which means there is no central server nor entity to facilitate the peer-to-peer trading of data and NFTs.<br/>
                 <br/>
                 Items cannot be censored, blocked nor taken down by Pasar due to
                 it being a decentralized marketplace. The trust based system protocol will
@@ -168,10 +168,10 @@ export default function MarketHome() {
             </Box>
             <Box draggable = {false} component="img" src="/static/market-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
             <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <OutlineBtnStyle variant="outlined" href="#">
+              <OutlineBtnStyle to="/marketplace" variant="outlined" component={RouterLink}>
                 Marketplace
               </OutlineBtnStyle>
-              <Button variant="contained" href="#" color="inherit">
+              <Button variant="contained" to="/explorer" component={RouterLink} color="inherit">
                 Explorer
               </Button>
             </Stack>
@@ -198,8 +198,8 @@ export default function MarketHome() {
               <OutlineBtnStyle variant="outlined" href="#">
                 Sign in with DID
               </OutlineBtnStyle>
-              <Button variant="contained" href="#" color="inherit">
-                Learn  more about DID
+              <Button variant="contained" href="https://www.elastos.org/did" target="_blank" color="inherit">
+                Learn more about DID
               </Button>
             </Stack>
           </CardStyle>
@@ -222,10 +222,10 @@ export default function MarketHome() {
             </Box>
             <Box draggable = {false} component="img" src="/static/chain-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
             <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <OutlineBtnStyle variant="outlined" href="#">
+              <OutlineBtnStyle variant="outlined" href="https://glidefinance.io/swap" target="_blank">
                 Get ELA 
               </OutlineBtnStyle>
-              <Button variant="contained" href="#" color="inherit">
+              <Button variant="contained" href="https://www.elastos.org/esc" target="_blank" color="inherit">
                 Learn more about ESC
               </Button>
             </Stack>
