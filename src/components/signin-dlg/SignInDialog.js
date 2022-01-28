@@ -3,6 +3,7 @@ import {isMobile} from 'react-device-detect';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, 
   DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
+import * as math from 'mathjs';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
 import { makeStyles } from "@mui/styles";
@@ -26,7 +27,7 @@ import { useEagerConnect, useInactiveListener } from "./hook";
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import { reduceHexAddress } from '../../utils/common';
+import { reduceHexAddress, getBalance, getCoinUSD } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
 
 const useStyles = makeStyles({
@@ -86,17 +87,19 @@ export default function SignInDialog({ onChange }) {
   const [openSignin, setOpenSigninDlg] = useState(false);
   const [openDownload, setOpenDownloadDlg] = useState(false);
   const [activatingConnector, setActivatingConnector] = useState(null);
-  const [isOpenAccountPopup, setOpenAccountPopup] = React.useState(null);
+  const [isOpenAccountPopup, setOpenAccountPopup] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
+  const [balance, setBalance] = useState(0);
+  const [coinUSD, setCoinUSD] = React.useState(0);
 
   const classes = useStyles();
 
   if(sessionLinkFlag&&!activatingConnector){
-    if(activatingConnector === injected) {
+    if(sessionLinkFlag === '1') {
       setActivatingConnector(injected);
       activate(injected);
     }
-    else if(activatingConnector === walletconnect) {
+    else if(sessionLinkFlag === '2') {
       setActivatingConnector(walletconnect);
       activate(walletconnect);
     }
@@ -106,15 +109,21 @@ export default function SignInDialog({ onChange }) {
     essentialsConnector.disconnectWalletConnect();
   }
 
-  React.useEffect(() => {
+  React.useEffect(async() => {
+    getCoinUSD().then(res=>{setCoinUSD(res)})
     if(chainId!==undefined && chainId!==21 && chainId!==20){
       setSnackbarOpen(true)
     }
     if (active) sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
 
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
-    if(sessionLinkFlag)
+    if(sessionLinkFlag){
       setWalletAddress(account)
+      if(sessionLinkFlag==='1' && library)
+        getBalance(library.provider).then((res)=>{setBalance(math.round(res/1e18, 4))})
+      if(sessionLinkFlag==='2' && essentialsConnector.getWalletConnectProvider())
+        getBalance(essentialsConnector.getWalletConnectProvider()).then((res)=>{setBalance(math.round(res/1e18, 4))})
+    }
   }, [sessionLinkFlag, account, active, chainId]);
 
   useConnectivitySDK();
@@ -133,59 +142,59 @@ export default function SignInDialog({ onChange }) {
 
 
   const connectWithEssential = async () => {
-        const didAccess = new DID.DIDAccess();
-        let presentation;
-        // console.log("Trying to sign in using the connectivity SDK");
-        try {
-          presentation = await didAccess.requestCredentials({
-            claims: [
-              DID.simpleIdClaim("Your name", "name", false)
-            ]
-          });
-        } catch (e) {
-          // console.warn("Error while getting credentials", e);
+    const didAccess = new DID.DIDAccess();
+    let presentation;
+    // console.log("Trying to sign in using the connectivity SDK");
+    try {
+      presentation = await didAccess.requestCredentials({
+        claims: [
+          DID.simpleIdClaim("Your name", "name", false)
+        ]
+      });
+    } catch (e) {
+      // console.warn("Error while getting credentials", e);
 
-          try {
-            await essentialsConnector.getWalletConnectProvider().disconnect();
-          }
-          catch (e) {
-            // console.error("Error while trying to disconnect wallet connect session", e);
-          }
+      try {
+        await essentialsConnector.getWalletConnectProvider().disconnect();
+      }
+      catch (e) {
+        // console.error("Error while trying to disconnect wallet connect session", e);
+      }
 
-          return;
-        }
+      return;
+    }
 
-        if (presentation) {
-            const did = presentation.getHolder().getMethodSpecificId() || "";
-            fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/api/v1/login`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify(presentation.toJSON())
-              }).then(response => response.json()).then(data => {
-                if (data.code === 200) {
-                  // console.log(data);
-                  const token = data.data;
-                  // console.log(token);
-                  sessionStorage.setItem("token", token);
-                  sessionStorage.setItem("did", did);
-                  // console.log(token, "--------", did);
-                  const user = jwtDecode(token);
-                  // console.log("Sign in: setting user to:", user);
-                  sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
-                  sessionLinkFlag = '1'
-                  setOpenSigninDlg(false);
-                  setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
-                } else {
-                  // console.log(data);
-                }
-              }).catch((error) => {
-                // console.log(error);
-                alert(`Failed to call the backend API. Check your connectivity and make sure ${process.env.REACT_APP_BACKEND_URL} is reachable`);
-            });
-        }
+    if (presentation) {
+        const did = presentation.getHolder().getMethodSpecificId() || "";
+        fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/api/v1/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(presentation.toJSON())
+          }).then(response => response.json()).then(data => {
+            if (data.code === 200) {
+              // console.log(data);
+              const token = data.data;
+              // console.log(token);
+              sessionStorage.setItem("token", token);
+              sessionStorage.setItem("did", did);
+              // console.log(token, "--------", did);
+              const user = jwtDecode(token);
+              // console.log("Sign in: setting user to:", user);
+              sessionStorage.setItem('PASAR_LINK_ADDRESS', 2)
+              sessionLinkFlag = '1'
+              setOpenSigninDlg(false);
+              setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
+            } else {
+              // console.log(data);
+            }
+          }).catch((error) => {
+            // console.log(error);
+            // alert(`Failed to call the backend API. Check your connectivity and make sure ${process.env.REACT_APP_BACKEND_URL} is reachable`);
+        });
+    }
   };
 
   // ------------ Handle Transaction ------------
@@ -266,7 +275,13 @@ export default function SignInDialog({ onChange }) {
             >
               <Box sx={{px: 2, py: '6px'}}>
                 <Typography variant="h6">{reduceHexAddress(walletAddress)} <CopyButton text={walletAddress} sx={{mt: '-3px'}}/></Typography>
-                <Typography variant="body2" color="text.secondary">did:elastos:xxx..xxxx <CopyButton text={walletAddress}/></Typography>
+                {
+                  sessionStorage.getItem('did')?
+                  <Typography variant="body2" color="text.secondary">did:elastos:{sessionStorage.getItem('did')} <CopyButton text={`did:elastos:${sessionStorage.getItem('did')}`}/></Typography>:
+                  <Link underline="hover" onClick={()=>{setOpenDownloadDlg(true)}} sx={{cursor: 'pointer'}}>
+                    Get DID now!
+                  </Link>
+                }
                 <Stack spacing={1}>
                   <PaperRecord sx={{
                       p:1.5,
@@ -275,8 +290,8 @@ export default function SignInDialog({ onChange }) {
                     }}
                   >
                     <Typography variant="h6">Total Balance</Typography>
-                    <Typography variant="h3" color="origin.main">USD 400</Typography>
-                    <Button variant="outlined" fullWidth sx={{textTransform: 'none'}} color="inherit">Add funds</Button>
+                    <Typography variant="h3" color="origin.main">USD {math.round(coinUSD*balance, 4)}</Typography>
+                    <Button href="https://glidefinance.io/swap" target="_blank" variant="outlined" fullWidth sx={{textTransform: 'none'}} color="inherit">Add funds</Button>
                   </PaperRecord>
                   <PaperRecord sx={{ p:1.5 }}>
                     <Stack direction="row" alignItems="center" spacing={2} >
@@ -292,8 +307,8 @@ export default function SignInDialog({ onChange }) {
                           <Typography variant="body2" color='text.secondary'> Elastos (ESC) </Typography>
                       </Box>
                       <Box>
-                        <Typography variant="body2" align="right"> 100 </Typography>
-                        <Typography variant="body2" align="right" color='text.secondary'> USD 400 </Typography>
+                        <Typography variant="body2" align="right"> {balance} </Typography>
+                        <Typography variant="body2" align="right" color='text.secondary'> USD {math.round(coinUSD*balance, 4)} </Typography>
                       </Box>
                     </Stack>
                   </PaperRecord>
@@ -421,7 +436,7 @@ export default function SignInDialog({ onChange }) {
                         fullWidth
                         onClick={()=>{handleChooseWallet('walletconnect')}}
                       >
-                        Wallet Connect
+                        WalletConnect
                       </ButtonStyle>
                     </Grid>
                     <Grid item xs={12}>
@@ -436,64 +451,64 @@ export default function SignInDialog({ onChange }) {
                 </Typography>
               </DialogContent>
             </Dialog>
-
-            <Dialog open={openDownload} onClose={handleCloseDownloadDlg}>
-              <DialogTitle>
-                <IconButton
-                  aria-label="close"
-                  onClick={handleCloseDownloadDlg}
-                  sx={{
-                    position: 'absolute',
-                    right: 8,
-                    top: 8,
-                    color: (theme) => theme.palette.grey[500],
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </DialogTitle>
-              <DialogContent>
-                <Typography variant="h3" component="div" sx={{color: 'text.primary'}} align="center">
-                  Download Essentials
-                </Typography>
-                <Typography variant="p" component="div" sx={{color: 'text.secondary'}} align="center">
-                  Get Elastos Essentials now to kickstart your journey! 
-                  It is your gateway to Web3.0!
-                </Typography>
-                <Typography variant="body2" display="block" gutterBottom align="center" sx={{mt: 4}}>
-                  Web3.0 super wallet with Decentralized Identifier (DID)
-                </Typography>
-                <Box component="div" sx={{ maxWidth: 300, m: 'auto' }}>
-                  <Grid container spacing={2} sx={{mt: 2, mb: 4}}>
-                    <Grid item xs={12} sx={{pt: '8px !important'}}>
-                      <ButtonStyle variant="contained" href="#" startIcon={<AdbIcon />} className={classes.iconAbsolute2} fullWidth>
-                        Google Play
-                      </ButtonStyle>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <ButtonOutlinedStyle variant="outlined" href="#" startIcon={<AppleIcon />} className={classes.iconAbsolute2} fullWidth>
-                        App Store
-                      </ButtonOutlinedStyle>
-                    </Grid>
-                    <Grid item xs={12} align="center">
-                      <Button
-                        color="inherit"
-                        startIcon={<Icon icon={arrowIosBackFill} />}
-                        onClick={handleGoBack}
-                      >
-                        Go back
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </Box>
-                <Typography variant="caption" display="block" sx={{color: 'text.secondary'}} gutterBottom align="center">
-                  We do not own your private keys and cannot access your funds without your confirmation.
-                </Typography>
-              </DialogContent>
-            </Dialog>
           </div>
         )
+
       }
+      <Dialog open={openDownload} onClose={handleCloseDownloadDlg}>
+        <DialogTitle>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseDownloadDlg}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="h3" component="div" sx={{color: 'text.primary'}} align="center">
+            Download Essentials
+          </Typography>
+          <Typography variant="p" component="div" sx={{color: 'text.secondary'}} align="center">
+            Get Elastos Essentials now to kickstart your journey!<br/>
+            It is your gateway to Web3.0!
+          </Typography>
+          <Typography variant="body2" display="block" gutterBottom align="center" sx={{mt: 4}}>
+            Web3.0 super wallet with Decentralized Identifier (DID)
+          </Typography>
+          <Box component="div" sx={{ maxWidth: 300, m: 'auto' }}>
+            <Grid container spacing={2} sx={{mt: 2, mb: 4}}>
+              <Grid item xs={12} sx={{pt: '8px !important'}}>
+                <ButtonStyle variant="contained" href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app" target="_blank" startIcon={<AdbIcon />} className={classes.iconAbsolute2} fullWidth>
+                  Google Play
+                </ButtonStyle>
+              </Grid>
+              <Grid item xs={12}>
+                <ButtonOutlinedStyle variant="outlined" href="https://apps.apple.com/us/app/elastos-essentials/id1568931743" target="_blank" startIcon={<AppleIcon />} className={classes.iconAbsolute2} fullWidth>
+                  App Store
+                </ButtonOutlinedStyle>
+              </Grid>
+              <Grid item xs={12} align="center">
+                <Button
+                  color="inherit"
+                  startIcon={<Icon icon={arrowIosBackFill} />}
+                  onClick={handleGoBack}
+                >
+                  Go back
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+          <Typography variant="caption" display="block" sx={{color: 'text.secondary'}} gutterBottom align="center">
+            We do not own your private keys and cannot access your funds without your confirmation.
+          </Typography>
+        </DialogContent>
+      </Dialog>
       <SnackbarCustom isOpen={isOpenSnackbar} setOpen={setSnackbarOpen}>
         Wrong network, only Elastos Smart Chain is supported
       </SnackbarCustom>
