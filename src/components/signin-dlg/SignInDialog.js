@@ -232,7 +232,7 @@ export default function SignInDialog({ onChange }) {
     setOpenAccountPopup(null);
     if(e.target.getAttribute("value")==="signout"){
       await activate(null);
-      await essentialsConnector.disconnectWalletConnect();
+      // await essentialsConnector.disconnectWalletConnect();
       sessionStorage.removeItem('PASAR_LINK_ADDRESS')
       sessionStorage.removeItem('token')
       sessionStorage.removeItem('did')
@@ -244,7 +244,7 @@ export default function SignInDialog({ onChange }) {
   return (
     walletAddress?(
       <>
-        <MFab size="small" onClick={openAccountMenu} onMouseEnter={openAccountMenu}>
+        <MFab id="signin" size="small" onClick={openAccountMenu} onMouseEnter={openAccountMenu}>
           <AccountCircleOutlinedIcon />
         </MFab>
         <Menu 
@@ -269,7 +269,7 @@ export default function SignInDialog({ onChange }) {
               >
                 <Typography variant="h6">Total Balance</Typography>
                 <Typography variant="h3" color="origin.main">USD 400</Typography>
-                <Button variant="outlined" fullWidth sx={{textTransform: 'none'}}>Add funds</Button>
+                <Button variant="outlined" fullWidth sx={{textTransform: 'none'}} color="inherit">Add funds</Button>
               </PaperRecord>
               <PaperRecord sx={{ p:1.5 }}>
                 <Stack direction="row" alignItems="center" spacing={2} >
@@ -324,7 +324,7 @@ export default function SignInDialog({ onChange }) {
       </>
     ):(
       <div>
-        <Button variant="contained" onClick={handleClickOpenSinginDlg}>
+        <Button id="signin" variant="contained" onClick={handleClickOpenSinginDlg}>
           Sign In
         </Button>
 

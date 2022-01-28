@@ -97,6 +97,11 @@ export default function MarketHome() {
   React.useEffect(() => {
   }, []);
 
+  const openSignin = (e)=>{
+    if(document.getElementById("signin"))
+      document.getElementById("signin").click()
+  }
+
   return (
     <RootStyle title="Explorer | PASAR">
       <Box draggable = {false} component="img" src="/static/corner-logo.png" sx={{ width: '50%', maxWidth: '550px', position: 'absolute', top: 0, right: 0 }} />
@@ -195,7 +200,7 @@ export default function MarketHome() {
             </Box>
             <Box draggable = {false} component="img" src="/static/user-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
             <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <OutlineBtnStyle variant="outlined" href="#">
+              <OutlineBtnStyle variant="outlined" onClick={openSignin}>
                 Sign in with DID
               </OutlineBtnStyle>
               <Button variant="contained" href="https://www.elastos.org/did" target="_blank" color="inherit">
