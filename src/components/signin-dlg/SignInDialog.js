@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {isMobile} from 'react-device-detect';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions,
+import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, 
   DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
@@ -24,6 +24,7 @@ import { MIconButton, MFab } from '../@material-extend';
 import { injected, walletconnect, walletlink } from "./connectors";
 import { useEagerConnect, useInactiveListener } from "./hook";
 import CopyButton from '../CopyButton';
+import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
 import { reduceHexAddress } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
@@ -81,6 +82,7 @@ export default function SignInDialog({ onChange }) {
   let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
   const context = useWeb3React()
   const { connector, activate, active, error, library, chainId, account } = context;
+  const [isOpenSnackbar, setSnackbarOpen] = useState(false);
   const [openSignin, setOpenSigninDlg] = useState(false);
   const [openDownload, setOpenDownloadDlg] = useState(false);
   const [activatingConnector, setActivatingConnector] = useState(null);
@@ -105,6 +107,9 @@ export default function SignInDialog({ onChange }) {
   }
 
   React.useEffect(() => {
+    if(chainId!==undefined && chainId!==21 && chainId!==20){
+      setSnackbarOpen(true)
+    }
     if (active) sessionStorage.setItem('PASAR_LINK_ADDRESS', 1)
 
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
@@ -242,250 +247,257 @@ export default function SignInDialog({ onChange }) {
   };
 
   return (
-    walletAddress?(
-      <>
-        <MFab id="signin" size="small" onClick={openAccountMenu} onMouseEnter={openAccountMenu}>
-          <AccountCircleOutlinedIcon />
-        </MFab>
-        <Menu 
-          keepMounted
-          id="simple-menu"
-          anchorEl={isOpenAccountPopup}
-          onClose={closeAccountMenu}
-          open={Boolean(isOpenAccountPopup)}
-          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-          MenuListProps={{ onMouseLeave: closeAccountMenu }}
-        >
-          <Box sx={{px: 2, py: '6px'}}>
-            <Typography variant="h6">{reduceHexAddress(walletAddress)} <CopyButton text={walletAddress} sx={{mt: '-3px'}}/></Typography>
-            <Typography variant="body2" color="text.secondary">did:elastos:xxx..xxxx <CopyButton text={walletAddress}/></Typography>
-            <Stack spacing={1}>
-              <PaperRecord sx={{
-                  p:1.5,
-                  textAlign: 'center',
-                  minWidth: 300
-                }}
-              >
-                <Typography variant="h6">Total Balance</Typography>
-                <Typography variant="h3" color="origin.main">USD 400</Typography>
-                <Button variant="outlined" fullWidth sx={{textTransform: 'none'}} color="inherit">Add funds</Button>
-              </PaperRecord>
-              <PaperRecord sx={{ p:1.5 }}>
-                <Stack direction="row" alignItems="center" spacing={2} >
-                  <Box
-                      draggable = {false}
-                      component="img"
-                      alt=""
-                      src='/static/elastos.svg'
-                      sx={{ width: 24, height: 24 }}
-                  />
-                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                      <Typography variant="body2"> ELA </Typography>
-                      <Typography variant="body2" color='text.secondary'> Elastos (ESC) </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="body2" align="right"> 100 </Typography>
-                    <Typography variant="body2" align="right" color='text.secondary'> USD 400 </Typography>
-                  </Box>
-                </Stack>
-              </PaperRecord>
-              <PaperRecord sx={{ p:1.5 }}>
-                <Stack direction="row" alignItems="center" spacing={2} >
-                  <Box
-                      draggable = {false}
-                      component="img"
-                      alt=""
-                      src='/static/badges/diamond.svg'
-                      sx={{ width: 24, height: 24 }}
-                  />
-                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                      <Typography variant="body2"> DIA </Typography>
-                      <Typography variant="body2" color='text.secondary'> Diamond (ESC) </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="body2" align="right"> 0 </Typography>
-                    <Typography variant="body2" align="right" color='text.secondary'> 0 </Typography>
-                  </Box>
-                </Stack>
-              </PaperRecord>
-            </Stack>
-          </Box>
-          <MenuItem to='/marketplace/myitem' onClick={closeAccountMenu} component={RouterLink}>
-            <BookOutlinedIcon/>&nbsp;My Items
-          </MenuItem>
-          <MenuItem onClick={closeAccountMenu}>
-            <SettingsOutlinedIcon/>&nbsp;Settings
-          </MenuItem>
-          <MenuItem value='signout' onClick={closeAccountMenu}>
-            <LogoutOutlinedIcon/>&nbsp;Sign Out
-          </MenuItem>
-        </Menu>
-      </>
-    ):(
-      <div>
-        <Button id="signin" variant="contained" onClick={handleClickOpenSinginDlg}>
-          Sign In
-        </Button>
-
-        <Dialog open={openSignin} onClose={handleCloseSigninDlg}>
-          <DialogTitle>
-            <IconButton
-              aria-label="close"
-              onClick={handleCloseSigninDlg}
-              sx={{
-                position: 'absolute',
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
-              }}
+    <>
+      {
+        walletAddress?(
+          <>
+            <MFab id="signin" size="small" onClick={openAccountMenu} onMouseEnter={openAccountMenu}>
+              <AccountCircleOutlinedIcon />
+            </MFab>
+            <Menu 
+              keepMounted
+              id="simple-menu"
+              anchorEl={isOpenAccountPopup}
+              onClose={closeAccountMenu}
+              open={Boolean(isOpenAccountPopup)}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              MenuListProps={{ onMouseLeave: closeAccountMenu }}
             >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent>
-            <Typography variant="h3" component="div" sx={{color: 'text.primary'}} align="center">
-              Sign in with your DID
-            </Typography>
-            <Box component="div" sx={{ maxWidth: 350, m: 'auto' }}>
-              <Typography variant="p" component="div" sx={{color: 'text.secondary'}} align="center">
-                Sign in with one of the available providers or
-                create a new one. <Link href="https://www.elastos.org/did" underline="hover" color="red" target="_blank">What is a DID?</Link>
-              </Typography>
-              <Grid container spacing={2} sx={{my: 4}}>
-                <Grid item xs={12} sx={{pt: '0 !important'}}>
-                  <Typography variant="body2" display="block" gutterBottom align="center">
-                    Web3.0 super wallet with Decentralized Identifier (DID)
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sx={{pt: '8px !important'}}>
-                  <ButtonStyle variant="contained" 
-                    startIcon={
-                      <Avatar
-                        alt="Elastos"
-                        src="/static/elastos.svg"
-                        sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
+              <Box sx={{px: 2, py: '6px'}}>
+                <Typography variant="h6">{reduceHexAddress(walletAddress)} <CopyButton text={walletAddress} sx={{mt: '-3px'}}/></Typography>
+                <Typography variant="body2" color="text.secondary">did:elastos:xxx..xxxx <CopyButton text={walletAddress}/></Typography>
+                <Stack spacing={1}>
+                  <PaperRecord sx={{
+                      p:1.5,
+                      textAlign: 'center',
+                      minWidth: 300
+                    }}
+                  >
+                    <Typography variant="h6">Total Balance</Typography>
+                    <Typography variant="h3" color="origin.main">USD 400</Typography>
+                    <Button variant="outlined" fullWidth sx={{textTransform: 'none'}} color="inherit">Add funds</Button>
+                  </PaperRecord>
+                  <PaperRecord sx={{ p:1.5 }}>
+                    <Stack direction="row" alignItems="center" spacing={2} >
+                      <Box
+                          draggable = {false}
+                          component="img"
+                          alt=""
+                          src='/static/elastos.svg'
+                          sx={{ width: 24, height: 24 }}
                       />
-                    }
-                    endIcon={
-                      <Typography variant="p" sx={{fontSize: '0.875rem !important'}}>
-                        <span role="img" aria-label="">🔥</span>Popular
+                      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                          <Typography variant="body2"> ELA </Typography>
+                          <Typography variant="body2" color='text.secondary'> Elastos (ESC) </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" align="right"> 100 </Typography>
+                        <Typography variant="body2" align="right" color='text.secondary'> USD 400 </Typography>
+                      </Box>
+                    </Stack>
+                  </PaperRecord>
+                  <PaperRecord sx={{ p:1.5 }}>
+                    <Stack direction="row" alignItems="center" spacing={2} >
+                      <Box
+                          draggable = {false}
+                          component="img"
+                          alt=""
+                          src='/static/badges/diamond.svg'
+                          sx={{ width: 24, height: 24 }}
+                      />
+                      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                          <Typography variant="body2"> DIA </Typography>
+                          <Typography variant="body2" color='text.secondary'> Diamond (ESC) </Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="body2" align="right"> 0 </Typography>
+                        <Typography variant="body2" align="right" color='text.secondary'> 0 </Typography>
+                      </Box>
+                    </Stack>
+                  </PaperRecord>
+                </Stack>
+              </Box>
+              <MenuItem to='/marketplace/myitem' onClick={closeAccountMenu} component={RouterLink}>
+                <BookOutlinedIcon/>&nbsp;My Items
+              </MenuItem>
+              <MenuItem onClick={closeAccountMenu}>
+                <SettingsOutlinedIcon/>&nbsp;Settings
+              </MenuItem>
+              <MenuItem value='signout' onClick={closeAccountMenu}>
+                <LogoutOutlinedIcon/>&nbsp;Sign Out
+              </MenuItem>
+            </Menu>
+          </>
+        ):(
+          <div>
+            <Button id="signin" variant="contained" onClick={handleClickOpenSinginDlg}>
+              Sign In
+            </Button>
+
+            <Dialog open={openSignin} onClose={handleCloseSigninDlg}>
+              <DialogTitle>
+                <IconButton
+                  aria-label="close"
+                  onClick={handleCloseSigninDlg}
+                  sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent>
+                <Typography variant="h3" component="div" sx={{color: 'text.primary'}} align="center">
+                  Sign in with your DID
+                </Typography>
+                <Box component="div" sx={{ maxWidth: 350, m: 'auto' }}>
+                  <Typography variant="p" component="div" sx={{color: 'text.secondary'}} align="center">
+                    Sign in with one of the available providers or
+                    create a new one. <Link href="https://www.elastos.org/did" underline="hover" color="red" target="_blank">What is a DID?</Link>
+                  </Typography>
+                  <Grid container spacing={2} sx={{my: 4}}>
+                    <Grid item xs={12} sx={{pt: '0 !important'}}>
+                      <Typography variant="body2" display="block" gutterBottom align="center">
+                        Web3.0 super wallet with Decentralized Identifier (DID)
                       </Typography>
-                    }
-                    className={classes.iconAbsolute1}
-                    fullWidth
-                    onClick={()=>{connectWithEssential()}}
-                    sx={!isLight&&{backgroundColor: 'white'}}
-                  >
-                    Elastos Essentials
-                  </ButtonStyle>
-                </Grid>
-                <Grid item xs={12} sx={{pt: '8px !important'}}>
-                  <Typography variant="body2" display="block" gutterBottom align="center">
-                    Just basic wallet and no DID
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sx={{pt: '8px !important'}}>
-                  <ButtonStyle variant="contained" 
-                    startIcon={
-                      <Avatar
-                        alt="metamask"
-                        src="/static/metamask.svg"
-                        sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
-                      />
-                    }
-                    className={classes.iconAbsolute2}
-                    fullWidth
-                    onClick={()=>{handleChooseWallet('metamask')}}
-                  >
-                    MetaMask
-                  </ButtonStyle>
-                </Grid>
-                <Grid item xs={12}>
-                  <ButtonStyle variant="contained" 
-                    startIcon={
-                      <Avatar
-                        alt="walletconnect"
-                        src="/static/walletconnect.svg"
-                        sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
-                      />
-                    }
-                    className={classes.iconAbsolute2}
-                    fullWidth
-                    onClick={()=>{handleChooseWallet('walletconnect')}}
-                  >
-                    Wallet Connect
-                  </ButtonStyle>
-                </Grid>
-                <Grid item xs={12}>
-                  <ButtonOutlinedStyle variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
-                    I don’t have a wallet
-                  </ButtonOutlinedStyle>
-                </Grid>
-              </Grid>
-            </Box>
-            <Typography variant="caption" display="block" sx={{color: 'text.secondary'}} gutterBottom align="center">
-              We do not own your private keys and cannot access your funds without your confirmation.
-            </Typography>
-          </DialogContent>
-        </Dialog>
+                    </Grid>
+                    <Grid item xs={12} sx={{pt: '8px !important'}}>
+                      <ButtonStyle variant="contained" 
+                        startIcon={
+                          <Avatar
+                            alt="Elastos"
+                            src="/static/elastos.svg"
+                            sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
+                          />
+                        }
+                        endIcon={
+                          <Typography variant="p" sx={{fontSize: '0.875rem !important'}}>
+                            <span role="img" aria-label="">🔥</span>Popular
+                          </Typography>
+                        }
+                        className={classes.iconAbsolute1}
+                        fullWidth
+                        onClick={()=>{connectWithEssential()}}
+                        sx={!isLight&&{backgroundColor: 'white'}}
+                      >
+                        Elastos Essentials
+                      </ButtonStyle>
+                    </Grid>
+                    <Grid item xs={12} sx={{pt: '8px !important'}}>
+                      <Typography variant="body2" display="block" gutterBottom align="center">
+                        Just basic wallet and no DID
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sx={{pt: '8px !important'}}>
+                      <ButtonStyle variant="contained" 
+                        startIcon={
+                          <Avatar
+                            alt="metamask"
+                            src="/static/metamask.svg"
+                            sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
+                          />
+                        }
+                        className={classes.iconAbsolute2}
+                        fullWidth
+                        onClick={()=>{handleChooseWallet('metamask')}}
+                      >
+                        MetaMask
+                      </ButtonStyle>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <ButtonStyle variant="contained" 
+                        startIcon={
+                          <Avatar
+                            alt="walletconnect"
+                            src="/static/walletconnect.svg"
+                            sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
+                          />
+                        }
+                        className={classes.iconAbsolute2}
+                        fullWidth
+                        onClick={()=>{handleChooseWallet('walletconnect')}}
+                      >
+                        Wallet Connect
+                      </ButtonStyle>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <ButtonOutlinedStyle variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
+                        I don’t have a wallet
+                      </ButtonOutlinedStyle>
+                    </Grid>
+                  </Grid>
+                </Box>
+                <Typography variant="caption" display="block" sx={{color: 'text.secondary'}} gutterBottom align="center">
+                  We do not own your private keys and cannot access your funds without your confirmation.
+                </Typography>
+              </DialogContent>
+            </Dialog>
 
-        <Dialog open={openDownload} onClose={handleCloseDownloadDlg}>
-          <DialogTitle>
-            <IconButton
-              aria-label="close"
-              onClick={handleCloseDownloadDlg}
-              sx={{
-                position: 'absolute',
-                right: 8,
-                top: 8,
-                color: (theme) => theme.palette.grey[500],
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent>
-            <Typography variant="h3" component="div" sx={{color: 'text.primary'}} align="center">
-              Download Essentials
-            </Typography>
-            <Typography variant="p" component="div" sx={{color: 'text.secondary'}} align="center">
-              Get Elastos Essentials now to kickstart your journey! 
-              It is your gateway to Web3.0!
-            </Typography>
-            <Typography variant="body2" display="block" gutterBottom align="center" sx={{mt: 4}}>
-              Web3.0 super wallet with Decentralized Identifier (DID)
-            </Typography>
-            <Box component="div" sx={{ maxWidth: 300, m: 'auto' }}>
-              <Grid container spacing={2} sx={{mt: 2, mb: 4}}>
-                <Grid item xs={12} sx={{pt: '8px !important'}}>
-                  <ButtonStyle variant="contained" href="#" startIcon={<AdbIcon />} className={classes.iconAbsolute2} fullWidth>
-                    Google Play
-                  </ButtonStyle>
-                </Grid>
-                <Grid item xs={12}>
-                  <ButtonOutlinedStyle variant="outlined" href="#" startIcon={<AppleIcon />} className={classes.iconAbsolute2} fullWidth>
-                    App Store
-                  </ButtonOutlinedStyle>
-                </Grid>
-                <Grid item xs={12} align="center">
-                  <Button
-                    color="inherit"
-                    startIcon={<Icon icon={arrowIosBackFill} />}
-                    onClick={handleGoBack}
-                  >
-                    Go back
-                  </Button>
-                </Grid>
-              </Grid>
-            </Box>
-            <Typography variant="caption" display="block" sx={{color: 'text.secondary'}} gutterBottom align="center">
-              We do not own your private keys and cannot access your funds without your confirmation.
-            </Typography>
-          </DialogContent>
-        </Dialog>
-      </div>
-    )
+            <Dialog open={openDownload} onClose={handleCloseDownloadDlg}>
+              <DialogTitle>
+                <IconButton
+                  aria-label="close"
+                  onClick={handleCloseDownloadDlg}
+                  sx={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 8,
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent>
+                <Typography variant="h3" component="div" sx={{color: 'text.primary'}} align="center">
+                  Download Essentials
+                </Typography>
+                <Typography variant="p" component="div" sx={{color: 'text.secondary'}} align="center">
+                  Get Elastos Essentials now to kickstart your journey! 
+                  It is your gateway to Web3.0!
+                </Typography>
+                <Typography variant="body2" display="block" gutterBottom align="center" sx={{mt: 4}}>
+                  Web3.0 super wallet with Decentralized Identifier (DID)
+                </Typography>
+                <Box component="div" sx={{ maxWidth: 300, m: 'auto' }}>
+                  <Grid container spacing={2} sx={{mt: 2, mb: 4}}>
+                    <Grid item xs={12} sx={{pt: '8px !important'}}>
+                      <ButtonStyle variant="contained" href="#" startIcon={<AdbIcon />} className={classes.iconAbsolute2} fullWidth>
+                        Google Play
+                      </ButtonStyle>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <ButtonOutlinedStyle variant="outlined" href="#" startIcon={<AppleIcon />} className={classes.iconAbsolute2} fullWidth>
+                        App Store
+                      </ButtonOutlinedStyle>
+                    </Grid>
+                    <Grid item xs={12} align="center">
+                      <Button
+                        color="inherit"
+                        startIcon={<Icon icon={arrowIosBackFill} />}
+                        onClick={handleGoBack}
+                      >
+                        Go back
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Box>
+                <Typography variant="caption" display="block" sx={{color: 'text.secondary'}} gutterBottom align="center">
+                  We do not own your private keys and cannot access your funds without your confirmation.
+                </Typography>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )
+      }
+      <SnackbarCustom isOpen={isOpenSnackbar} setOpen={setSnackbarOpen}>
+        Wrong network, only Elastos Smart Chain is supported
+      </SnackbarCustom>
+    </>
   );
 }
 
