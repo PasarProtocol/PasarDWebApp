@@ -71,7 +71,7 @@ export default function CreateItem() {
   const [isPutOnSale, setPutOnSale] = React.useState(false);
   const [description, setDescription] = React.useState('');
   const [quantity, setQuantity] = React.useState(1);
-  const [price, setPrice] = React.useState(0);
+  const [price, setPrice] = React.useState('');
   const [royalties, setRoyalties] = React.useState(10);
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [uploadedCount, setUploadedCount] = React.useState(0);
@@ -162,16 +162,18 @@ export default function CreateItem() {
   };
 
   const handleChangePrice = (event) => {
-    if(event.target.value<0)
+    let priceValue = event.target.value
+    if(priceValue<0)
       return
-    setPrice(event.target.value)
-    setRcvPrice(math.round(event.target.value*98/100, 3))
+    priceValue = priceValue.replace(/^0+(?!\.|$)/, '')
+    setPrice(priceValue)
+    setRcvPrice(math.round(priceValue*98/100, 3))
   };
 
   const handleChangeRoyalties = (event) => {
     if(event.target.value<0 || event.target.value>20)
       return
-    setRoyalties(event.target.value)
+    setRoyalties(event.target.value.replace(/^0+(?!\.|$)/, ''))
   };
 
   const handleProperties = (properties, key, index, e) => {
@@ -629,7 +631,11 @@ export default function CreateItem() {
                       />
                     </FormControl>
                     <Divider/>
-                    <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Platform fee 2%&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4, fontSize: 18}}/></Typography>
+                    <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Platform fee 2%&nbsp;
+                      <Tooltip title="We take 2% of every transaction that happens on Pasar for providing the platform to users" arrow disableInteractive>
+                        <Icon icon="eva:info-outline" style={{marginBottom: -4, fontSize: 18}}/>
+                      </Tooltip>
+                    </Typography>
                     <Typography variant="body2" component="div" sx={{fontWeight: 'normal'}}>
                       You will receive
                       <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}> {rcvprice} ELA </Typography>
