@@ -222,7 +222,7 @@ export default function CollectibleDetail() {
             <MFab size="small" onClick={()=>{setFullScreen(!isFullScreen)}}>
               <FullscreenIcon />
             </MFab>
-            <MFab size="small" sx={{ml: 1}} onClick={openPopupMenu}>
+            <MFab size="small" sx={{ml: 1, display: 'none'}} onClick={openPopupMenu}>
               <MoreHorizIcon />
             </MFab>
             <Menu 
