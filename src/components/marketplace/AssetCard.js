@@ -46,7 +46,7 @@ const Thumbnail = (props) => {
 };
 
 export default function AssetCard(props) {
-  const {title="???", description, quantity=1, price=0, isLink, tokenId, type} = props
+  const {title="???", description, quantity=1, price=0, isLink, tokenId, type, isOwner} = props
   const [isOpenPopup, setOpenPopup] = React.useState(null);
 
   const openPopupMenu = (event) => {
@@ -80,7 +80,7 @@ export default function AssetCard(props) {
               >
                 {
                   type===0&&
-                  <>
+                  <div>
                     <MenuItem onClick={handleClosePopup}>
                       <ThumbDownOffAltIcon/>&nbsp;Report Creator
                     </MenuItem>
@@ -90,43 +90,51 @@ export default function AssetCard(props) {
                     <MenuItem onClick={handleClosePopup}>
                       <ShareOutlinedIcon/>&nbsp;Share
                     </MenuItem>
-                  </>
+                  </div>
                 }
                 {
                   type===1&&
-                  <>
-                    <MenuItem onClick={handleClosePopup}>
-                      <LocalOfferOutlinedIcon/>&nbsp;Update Price
-                    </MenuItem>
-                    <MenuItem onClick={handleClosePopup}>
-                      <CancelOutlinedIcon/>&nbsp;Cancel Sale
-                    </MenuItem>
+                  <div>
+                    {
+                      isOwner&&
+                      <div>
+                        <MenuItem onClick={handleClosePopup}>
+                          <LocalOfferOutlinedIcon/>&nbsp;Update Price
+                        </MenuItem>
+                        <MenuItem onClick={handleClosePopup}>
+                          <CancelOutlinedIcon/>&nbsp;Cancel Sale
+                        </MenuItem>
+                      </div>
+                    }
                     <MenuItem onClick={handleClosePopup}>
                       <ShareOutlinedIcon/>&nbsp;Share
                     </MenuItem>
-                  </>
+                  </div>
                 }
                 {
                   type===2&&
-                  <>
+                  <div>
                     <MenuItem onClick={handleClosePopup}>
                       <StorefrontIcon/>&nbsp;Sell
                     </MenuItem>
                     <MenuItem onClick={handleClosePopup}>
                       <SyncAltSharpIcon/>&nbsp;Transfer
                     </MenuItem>
-                    <MenuItem onClick={handleClosePopup}>
-                      <DeleteOutlineIcon/>&nbsp;Delete
-                    </MenuItem>
-                  </>
+                    {
+                      isOwner&&
+                      <MenuItem onClick={handleClosePopup}>
+                        <DeleteOutlineIcon/>&nbsp;Delete
+                      </MenuItem>
+                    }
+                  </div>
                 }
                 {
                   type===3&&
-                  <>
+                  <div>
                     <MenuItem onClick={handleClosePopup}>
                       <ShareOutlinedIcon/>&nbsp;Share
                     </MenuItem>
-                  </>
+                  </div>
                 }
               </Menu>
             </Grid>

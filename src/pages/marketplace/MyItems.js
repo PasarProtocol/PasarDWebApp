@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import SwipeableViews from "react-swipeable-views";
+import {isMobile} from 'react-device-detect';
 
 import { styled } from '@mui/material/styles';
 import { Container, Stack, Typography, Tab, Tabs, Link, 
@@ -20,6 +21,7 @@ import LoadingScreen from '../../components/LoadingScreen';
 import MyItemsSortSelect from '../../components/MyItemsSortSelect';
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from "../../components/signin-dlg/hook";
+import Jazzicon from '../../components/Jazzicon';
 import { reduceHexAddress } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -139,13 +141,27 @@ export default function MyItems() {
   return (
     <RootStyle title="MyItems | PASAR">
       <Container maxWidth={false}>
-        <Box sx={{display: {xs: 'block', sm: 'flex'}, position: 'relative', mb: {xs: 0, sm: 2}, justifyContent: 'center'}}>
+        <Box sx={{position: 'relative', mb: {xs: 0, sm: 2}, justifyContent: 'center'}}>
+          <Box sx={{display: 'flex', justifyContent: 'center'}}>
+            <Jazzicon 
+              address={walletAddress}
+              size={isMobile?80:100}
+              sx={{
+                mr: 0,
+                border: '3px solid',
+                borderColor: (theme)=>theme.palette.origin.main,
+                width: isMobile?96:116,
+                height: isMobile?96:116,
+                backgroundColor: (theme)=>theme.palette.background.paper,
+                p: '5px'
+              }}/>
+          </Box>
           <Typography variant="h2" component="h2" align="center" sx={{position: 'relative'}}>
             <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink}>
               {
                 !params.address?
-                <span role="img" aria-label="">🗂️ My Items</span>:
-                <span role="img" aria-label="">🖼 {reduceHexAddress(params.address)}</span>
+                <span role="img" aria-label="">Me</span>:
+                <span role="img" aria-label="">{reduceHexAddress(params.address)}</span>
               }
             </Link>
           </Typography>
@@ -204,7 +220,7 @@ export default function MyItems() {
                     <Box component="main">
                       {
                         group.length>0?
-                        <AssetGrid assets={group} type={i+1} dispmode={dispmode}/>:
+                        <AssetGrid assets={group} type={i+1} dispmode={dispmode} isOwner={!params.address}/>:
                         <Typography variant="subtitle2" align="center" sx={{mb: 3}}>No {typeNames[i]} collectible found!</Typography>
                       }
                     </Box>

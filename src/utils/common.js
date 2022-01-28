@@ -32,10 +32,10 @@ export const getThumbnail = id => {
   return `https://ipfs0.trinity-feeds.app/ipfs/${uri}`
 }
 
-export const generateJazzicon = address => {
+export const generateJazzicon = (address, size) => {
   if(!address)
-    return Jazzicon(40, 0)
-  return Jazzicon(40, parseInt(address.slice(2, 12), 16))
+    return Jazzicon(size, 0)
+  return Jazzicon(size, parseInt(address.slice(2, 12), 16))
 }
 
 export const getElapsedTime = createdtimestamp => {
