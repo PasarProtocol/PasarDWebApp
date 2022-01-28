@@ -36,7 +36,7 @@ export default function AssetSortSelect({ onChange, sx={} }) {
       <MenuItem value={3}>Oldest: Created</MenuItem>
       <MenuItem value={4}>Price: Low to High</MenuItem>
       <MenuItem value={5}>Price: High to Low</MenuItem>
-      <MenuItem value={6}>Auction Ending Soon</MenuItem>
+      {/* <MenuItem value={6}>Auction Ending Soon</MenuItem> */}
     </Select>
   );
 }

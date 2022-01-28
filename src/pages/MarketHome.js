@@ -171,7 +171,7 @@ export default function MarketHome() {
                 accelerate Pasar to become the next leader of Web3 DeMKT.
               </Typography>
             </Box>
-            <Box draggable = {false} component="img" src="/static/market-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
+            <Box draggable = {false} component="img" src="/static/market-home-1.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
             <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
               <OutlineBtnStyle to="/marketplace" variant="outlined" component={RouterLink}>
                 Marketplace
