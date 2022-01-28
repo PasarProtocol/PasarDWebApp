@@ -72,6 +72,7 @@ export default function CreateItem() {
   const [description, setDescription] = React.useState('');
   const [quantity, setQuantity] = React.useState(1);
   const [price, setPrice] = React.useState(0);
+  const [royalties, setRoyalties] = React.useState(10);
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [uploadedCount, setUploadedCount] = React.useState(0);
   const [singleProperties, setSingleProperties] = React.useState([{type: '', name: ''}]);
@@ -84,7 +85,7 @@ export default function CreateItem() {
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
   const APP_BAR_DESKTOP = 88;
-  const royaltiesRef = React.useRef();
+  // const royaltiesRef = React.useRef();
   const explicitRef = React.useRef();
   const uploadRef = React.useRef();
   const nameRef = React.useRef();
@@ -161,8 +162,16 @@ export default function CreateItem() {
   };
 
   const handleChangePrice = (event) => {
+    if(event.target.value<0)
+      return
     setPrice(event.target.value)
     setRcvPrice(math.round(event.target.value*98/100, 3))
+  };
+
+  const handleChangeRoyalties = (event) => {
+    if(event.target.value<0 || event.target.value>20)
+      return
+    setRoyalties(event.target.value)
   };
 
   const handleProperties = (properties, key, index, e) => {
@@ -201,7 +210,7 @@ export default function CreateItem() {
   const mint2net = (paramObj, index=0)=>(
     new Promise((resolve, reject) => {
       const _tokenSupply = quantity
-      const _royaltyFee = royaltiesRef.current.value*10000
+      const _royaltyFee = royalties*10000
       try {
         const { ethereum } = window
 
@@ -626,13 +635,15 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{width: '100%'}}>
                   <InputLabel htmlFor="input-with-royalties">
-                    Enter royalties (Suggested: 10%)
+                    Enter royalties (Suggested: 10%, Maximum: 20%)
                   </InputLabel>
                   <InputStyle
                     type="number"
                     id="input-with-royalties"
-                    inputRef={royaltiesRef}
-                    defaultValue="10"
+                    // inputRef={royaltiesRef}
+                    // defaultValue="10"
+                    value={royalties}
+                    onChange={handleChangeRoyalties}
                     startAdornment={' '}
                     endAdornment='%'
                   />
