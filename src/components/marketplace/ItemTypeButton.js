@@ -21,11 +21,12 @@ const IconStyle = styled(Icon)(({ theme }) => ({
 }));
 
 const ItemTypeButton = (props)=>{
-    const {type, current} = props
+    const {type, current, disabled=false} = props
     return(
         <Paper
             component={ButtonBase}
             align="center"
+            disabled={1&&disabled}
             sx={{
                 color: current===type?'text.primary':'text.disabled',
                 width: {xs: 100, sm: 130},

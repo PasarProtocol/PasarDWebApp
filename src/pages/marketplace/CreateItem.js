@@ -451,8 +451,16 @@ export default function CreateItem() {
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
               <MintingTypeButton type="Single" description="Single item" onClick={()=>{setMintType("Single")}} current={mintype}/>
-              <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype}/>
-              <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
+              <Tooltip title="Coming Soon" arrow>
+                <div>
+                  <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype} disabled={1&&true}/>
+                </div>
+              </Tooltip>
+              <Tooltip title="Coming Soon" arrow>
+                <div>
+                  <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype} disabled={1&&true}/>
+                </div>
+              </Tooltip>
             </Stack>
           </Grid>
           <Grid item xs={12}>
@@ -588,7 +596,12 @@ export default function CreateItem() {
                   <Stack spacing={1} direction="row">
                     <ItemTypeButton type="FixedPrice" onClick={()=>{setSaleType("FixedPrice")}} current={saletype}/>
                     {
-                      mintype!=="Batch"&&<ItemTypeButton type="Auction" onClick={()=>{setSaleType("Auction")}} current={saletype}/>
+                      mintype!=="Batch"&&
+                      <Tooltip title="Coming Soon" arrow>
+                        <div>
+                          <ItemTypeButton type="Auction" onClick={()=>{setSaleType("Auction")}} current={saletype} disabled={1&&true}/>
+                        </div>
+                      </Tooltip>
                     }
                   </Stack>
                 }
@@ -640,8 +653,6 @@ export default function CreateItem() {
                   <InputStyle
                     type="number"
                     id="input-with-royalties"
-                    // inputRef={royaltiesRef}
-                    // defaultValue="10"
                     value={royalties}
                     onChange={handleChangeRoyalties}
                     startAdornment={' '}
