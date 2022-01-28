@@ -541,7 +541,11 @@ export default function CreateItem() {
                 <Divider/>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Explicit & Sensitive Content&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/></Typography>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Explicit & Sensitive Content&nbsp;
+                  <Tooltip title="Setting your asset as explicit and sensitive content, like pornography and other not safe for work (NSFW) content, will protect users with safe search while browsing Pasar" arrow disableInteractive>
+                    <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
+                  </Tooltip>
+                </Typography>
               </Grid>
               <Grid item xs={12}>
                 <Stack direction="row">
@@ -613,7 +617,11 @@ export default function CreateItem() {
                 </>
               }
               <Grid item xs={12}>
-                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Royalties&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/></Typography>
+                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Royalties&nbsp;
+                  <Tooltip title="Royalties are the percentage cut of the total value of item sold and will be paid to the original creator" arrow disableInteractive>
+                    <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
+                  </Tooltip>
+                </Typography>
               </Grid>
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{width: '100%'}}>
@@ -669,7 +677,10 @@ export default function CreateItem() {
                 <>
                   <Grid item xs={12}>
                     <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
-                      Properties&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/>&nbsp;
+                      Properties&nbsp;
+                      <Tooltip title="Attributes or traits to describe the item" arrow disableInteractive>
+                        <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
+                      </Tooltip>&nbsp;
                       <Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
                     </Typography>
                   </Grid>
@@ -700,7 +711,10 @@ export default function CreateItem() {
                   <Accordion>
                     <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{pl: 0}}>
                       <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
-                        Properties&nbsp;<Icon icon="eva:info-outline" style={{marginBottom: -4}}/>&nbsp;
+                        Properties&nbsp;
+                        <Tooltip title="Attributes or traits to describe the item" arrow disableInteractive>
+                          <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
+                        </Tooltip>&nbsp;
                         <Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
                       </Typography>
                     </AccordionSummary>
