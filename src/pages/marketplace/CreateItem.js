@@ -26,7 +26,7 @@ import CustomSwitch from '../../components/custom-switch';
 import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
 import {stickerContract as CONTRACT_ADDRESS} from '../../config'
-import {hash} from '../../utils/common';
+import {hash, removeLeadingZero} from '../../utils/common';
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import ProgressBar from '../../components/ProgressBar'
 // ----------------------------------------------------------------------
@@ -72,8 +72,8 @@ export default function CreateItem() {
   const [description, setDescription] = React.useState('');
   const [quantity, setQuantity] = React.useState(1);
   const [price, setPrice] = React.useState('');
-  const [royalties, setRoyalties] = React.useState(10);
   const [rcvprice, setRcvPrice] = React.useState(0);
+  const [royalties, setRoyalties] = React.useState(10);
   const [uploadedCount, setUploadedCount] = React.useState(0);
   const [singleProperties, setSingleProperties] = React.useState([{type: '', name: ''}]);
   const [multiProperties, setMultiProperties] = React.useState([]);
@@ -165,7 +165,7 @@ export default function CreateItem() {
     let priceValue = event.target.value
     if(priceValue<0)
       return
-    priceValue = priceValue.replace(/^0+(?!\.|$)/, '')
+    priceValue = removeLeadingZero(priceValue)
     setPrice(priceValue)
     setRcvPrice(math.round(priceValue*98/100, 3))
   };
@@ -173,7 +173,7 @@ export default function CreateItem() {
   const handleChangeRoyalties = (event) => {
     if(event.target.value<0 || event.target.value>20)
       return
-    setRoyalties(event.target.value.replace(/^0+(?!\.|$)/, ''))
+    setRoyalties(removeLeadingZero(event.target.value))
   };
 
   const handleProperties = (properties, key, index, e) => {

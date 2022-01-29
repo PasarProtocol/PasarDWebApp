@@ -17,6 +17,11 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 import Badge from '../Badge';
 import PaperRecord from '../PaperRecord';
+import SellDlg from '../dialog/Sell';
+import UpdateDlg from '../dialog/UpdatePrice';
+import CancelDlg from '../dialog/CancelSale';
+import DeleteDlg from '../dialog/DeleteItem';
+import TransferDlg from '../dialog/Transfer';
 
 // ----------------------------------------------------------------------
 
@@ -48,11 +53,36 @@ const Thumbnail = (props) => {
 export default function AssetCard(props) {
   const {title="???", description, quantity=1, price=0, isLink, tokenId, type, isOwner} = props
   const [isOpenPopup, setOpenPopup] = React.useState(null);
+  const [sellOpen, setOpenSell] = React.useState(false);
+  const [updateOpen, setOpenUpdate] = React.useState(false);
+  const [cancelOpen, setOpenCancel] = React.useState(false);
+  const [deleteOpen, setOpenDelete] = React.useState(false);
+  const [transferOpen, setOpenTransfer] = React.useState(false);
 
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);
   };
-  const handleClosePopup = () => {
+  const handleClosePopup = (e) => {
+    const type = e.target.getAttribute("value")
+    switch(type){
+      case 'sell':
+        setOpenSell(true)
+        break;        
+      case 'update':
+        setOpenUpdate(true)
+        break;
+      case 'cancel':
+        setOpenCancel(true)
+        break;
+      case 'delete':
+        setOpenDelete(true)
+        break;
+      case 'transfer':
+        setOpenTransfer(true)
+        break;
+      default:
+        break;
+    }
     setOpenPopup(null);
   };
 
@@ -66,9 +96,12 @@ export default function AssetCard(props) {
               <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
             </Grid>
             <Grid item xs={6} align="right">
-              <IconButton color="inherit" size="small" sx={{p: 0, display: 'none'}} onClick={isLink ? openPopupMenu : ()=>{}}>
-                <MoreHorizIcon />
-              </IconButton>
+              {
+                type!==0&&
+                <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}}>
+                  <MoreHorizIcon />
+                </IconButton>
+              }
               <Menu 
                 keepMounted
                 id="simple-menu"
@@ -98,10 +131,10 @@ export default function AssetCard(props) {
                     {
                       isOwner&&
                       <div>
-                        <MenuItem onClick={handleClosePopup}>
+                        <MenuItem value='update' onClick={handleClosePopup}>
                           <LocalOfferOutlinedIcon/>&nbsp;Update Price
                         </MenuItem>
-                        <MenuItem onClick={handleClosePopup}>
+                        <MenuItem value='cancel' onClick={handleClosePopup}>
                           <CancelOutlinedIcon/>&nbsp;Cancel Sale
                         </MenuItem>
                       </div>
@@ -114,15 +147,15 @@ export default function AssetCard(props) {
                 {
                   type===2&&
                   <div>
-                    <MenuItem onClick={handleClosePopup}>
+                    <MenuItem value='sell' onClick={handleClosePopup}>
                       <StorefrontIcon/>&nbsp;Sell
                     </MenuItem>
-                    <MenuItem onClick={handleClosePopup}>
+                    <MenuItem value='transfer' onClick={handleClosePopup}>
                       <SyncAltSharpIcon/>&nbsp;Transfer
                     </MenuItem>
                     {
                       isOwner&&
-                      <MenuItem onClick={handleClosePopup}>
+                      <MenuItem value='delete' onClick={handleClosePopup}>
                         <DeleteOutlineIcon/>&nbsp;Delete
                       </MenuItem>
                     }
@@ -171,6 +204,11 @@ export default function AssetCard(props) {
             <Badge name="user"/>
           </Stack> */}
         </PaperRecord>
+        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} title={title}/>
+        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} title={title}/>
+        <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} title={title}/>
+        <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} title={title}/>
+        <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} title={title}/>
       </motion.div>
     // </Link>
   );
