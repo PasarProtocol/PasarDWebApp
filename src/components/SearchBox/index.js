@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import searchFill from '@iconify/icons-eva/search-fill';
@@ -55,12 +55,18 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx, needbgcolor }) => {
 export default function SearchBox({placeholder, sx, outersx, rootsx, onChange, needbgcolor=false}) {
   const params = useParams(); // params.key
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  if(!pathname.startsWith('/explorer'))
+    placeholder = 'Search items, creators and token ID'
   const handleChange = (e)=>{
     if(e.which===13) { // press enter
       if(onChange)
         onChange(e.target.value)
       else
-        navigate(`/explorer/search/${e.target.value}`);
+        if(pathname.startsWith('/explorer'))
+          navigate(`/explorer/search/${e.target.value}`);
+        else
+          navigate(`/marketplace/search/${e.target.value}`);
     }
   }
   return (

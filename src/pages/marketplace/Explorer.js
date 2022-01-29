@@ -1,7 +1,7 @@
 // material
 import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useNavigate } from 'react-router-dom';
 import { Container, Stack, Typography, AppBar, Toolbar, Paper, Divider, Backdrop, 
   Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { Icon } from '@iconify/react';
@@ -94,6 +94,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 }));
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
+  const params = useParams(); // params.key
   const drawerWidth = 360;
   const btnNames = ["Listed", "On Auction", "General", "Avatar"]
 
@@ -142,6 +143,7 @@ export default function MarketExplorer() {
       `minPrice=${range.min!==''?range.min*1e18:''}&`+
       `maxPrice=${range.max!==''?range.max*1e18:''}&`+
       `order=${order}&`+
+      `keyword=${params.key?params.key:''}&`+
       `pageNum=${page}&`+
       `pageSize=${showCount}`, { signal }).then(response => {
       response.json().then(jsonAssets => {
@@ -160,7 +162,7 @@ export default function MarketExplorer() {
       if(e.code !== e.ABORT_ERR)
         setLoadingAssets(false);
     });
-  }, [page, showCount, selectedBtns, adult, range, order]);
+  }, [page, showCount, selectedBtns, adult, range, order, params.key]);
   
   const handleDispmode = (event, mode) => {
     if(mode===null)
