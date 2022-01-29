@@ -27,6 +27,7 @@ import CollectibleHistory from '../../components/marketplace/CollectibleHistory'
 import BidList from '../../components/marketplace/BidList';
 import Badge from '../../components/Badge';
 import Jazzicon from '../../components/Jazzicon';
+import PurchaseDlg from '../../components/dialog/Purchase'
 import { reduceHexAddress, getThumbnail, getTime, getCoinUSD } from '../../utils/common';
 import {blankAddress, marketContract} from '../../config'
 
@@ -111,6 +112,7 @@ export default function CollectibleDetail() {
   const [isLoadingBidList, setLoadingBid] = React.useState(true);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
+  const [isOpenPurchase, setPurchaseOpen] = React.useState(false);
 
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
@@ -375,7 +377,7 @@ export default function CollectibleDetail() {
                     <Typography variant="h3" color="origin.main">{round(collectible.Price/1e18, 3)} ELA</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*collectible.Price/1e18, 3)}</Typography>
                     <MHidden width="smDown">
-                      <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2}}>
+                      <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}} sx={{mt: 2}}>
                         Buy
                       </Button>
                     </MHidden>
@@ -489,13 +491,14 @@ export default function CollectibleDetail() {
                 Place a bid
               </Button>:
 
-              <Button variant="contained" fullWidth onClick={()=>{}}>
+              <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}}>
                 Buy
               </Button>
             }
           </StickyPaperStyle>
         </MHidden>
       </Container>
+      <PurchaseDlg isOpen={isOpenPurchase} setOpen={setPurchaseOpen} info={collectible}/>
     </RootStyle>
   );
 }
