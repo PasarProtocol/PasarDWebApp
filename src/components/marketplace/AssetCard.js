@@ -5,7 +5,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { motion } from "framer-motion";
 // material
 import { Icon } from '@iconify/react';
-import { Box, Grid, Card, Link, IconButton, Menu, MenuItem, Typography, Stack } from '@mui/material';
+import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
@@ -123,9 +123,12 @@ export default function AssetCard(props) {
                 {
                   type===2&&
                   <div>
-                    <MenuItem value='sell' onClick={handleClosePopup}>
-                      <StorefrontIcon/>&nbsp;Sell
-                    </MenuItem>
+                    {
+                      isOwner&&
+                      <MenuItem value='sell' onClick={handleClosePopup}>
+                        <StorefrontIcon/>&nbsp;Sell
+                      </MenuItem>
+                    }
                     <MenuItem value='transfer' onClick={handleClosePopup}>
                       <SyncAltSharpIcon/>&nbsp;Transfer
                     </MenuItem>
@@ -171,10 +174,17 @@ export default function AssetCard(props) {
           <Typography variant="h4" noWrap>{title}</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
-          <Typography variant="h4" sx={{color: "origin.main"}}>
-            <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
-            &nbsp;{price} ELA
-          </Typography>
+          {
+            (type===0||type===1)&&
+            <Typography variant="h4" sx={{color: "origin.main"}}>
+              <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
+              &nbsp;{price} ELA
+            </Typography>
+          }
+          {
+            (type===2&&isOwner)&&
+            <Button variant="contained" size="small" fullWidth sx={{mt: 1}}>Sell</Button>
+          }
           {/* <Stack direction="row">
             <Badge name="diamond"/>
             <Badge name="user"/>
