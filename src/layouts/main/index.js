@@ -58,7 +58,7 @@ const BodyStyle = styled('div')(({ theme, footerhidden }) => (
 export default function MainLayout() {
   const { pathname } = useLocation();
   const isHome = pathname === '/';
-  const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create' || pathname === '/create/';
+  const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create' || pathname === '/create/' || pathname.startsWith('/marketplace/search');
   return (
     <>
       <MainNavbar />

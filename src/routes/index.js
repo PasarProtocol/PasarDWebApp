@@ -70,6 +70,8 @@ export default function Router() {
             { path: 'detail/:collection', element: <MarketCollectibleDetail /> },
             { path: 'myitem', element: <MyItems /> },
             { path: 'others/:address', element: <MyItems /> },
+            { path: 'search', element: <Navigate to="/marketplace" replace /> },
+            { path: 'search/:key', element: <MarketExplorer /> },
           ]
         },
         { path: 'create', element: <CreateItem /> },
