@@ -87,6 +87,11 @@ export async function getCoinUSD() {
   }
 }
 
+export function removeLeadingZero(value) {
+  console.log(value.replace(/-/g, '').replace(/^0+(?!\.|$)/, ''))
+  return value.replace(/-/g, '').replace(/^0+(?!\.|$)/, '')
+}
+
 export const MethodList = [
   {
     method: 'Mint', 
