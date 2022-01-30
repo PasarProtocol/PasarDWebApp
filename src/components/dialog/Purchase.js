@@ -30,7 +30,7 @@ export default function Purchase(props) {
 
     const price = info.Price/1e18
     const platformFee = math.round(price*2/100, 4)
-    const royalties = math.round(price*info.royalties/10**6, 4)
+    const royalties = info.SaleType==="Primary Sale"?0:math.round(price*info.royalties/10**6, 4)
     return (
         <Dialog open={isOpen} onClose={handleClose}>
             <DialogTitle>
