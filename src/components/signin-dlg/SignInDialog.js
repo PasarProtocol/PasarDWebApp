@@ -118,7 +118,7 @@ export default function SignInDialog({ onChange }) {
 
   const classes = useStyles();
 
-  const initializeWalletConnection = React.useCallback(async() => {
+  const initializeWalletConnection = React.useCallback(async () => {
     // console.log('--------------------------sessionLinkFlag: ', sessionLinkFlag);
     // console.log('activating connector: ', activatingConnector);
     if (sessionLinkFlag && !activatingConnector) {
@@ -141,7 +141,6 @@ export default function SignInDialog({ onChange }) {
         setWalletAddress(await essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
       }
     }
-    
   }, [sessionLinkFlag, activatingConnector]);
 
   // if (
@@ -308,8 +307,13 @@ export default function SignInDialog({ onChange }) {
     setOpenAccountPopup(null);
     if (e.target.getAttribute('value') === 'signout') {
       await activate(null);
-      if(sessionStorage.removeItem('PASAR_LINK_ADDRESS') === '2')
-        await essentialsConnector.disconnectWalletConnect();
+      if (sessionStorage.removeItem('PASAR_LINK_ADDRESS') === '2')
+        essentialsConnector
+          .disconnectWalletConnect()
+          .then((res) => {})
+          .catch((e) => {
+            console.log(e);
+          });
       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('did');
@@ -342,7 +346,7 @@ export default function SignInDialog({ onChange }) {
               </Typography>
               {sessionStorage.getItem('did') ? (
                 <Typography variant="body2" color="text.secondary">
-                  did:elastos:{sessionStorage.getItem('did')}{' '}
+                  did:elastos:{sessionStorage.getItem('did')}
                   <CopyButton text={`did:elastos:${sessionStorage.getItem('did')}`} />
                 </Typography>
               ) : (
@@ -402,7 +406,7 @@ export default function SignInDialog({ onChange }) {
                       </Typography>
                       <Typography variant="body2" align="right" color="text.secondary">
                         {' '}
-                        USD {math.round(coinUSD * balance, 4)}{' '}
+                        USD {math.round(coinUSD * balance, 4)}
                       </Typography>
                     </Box>
                   </Stack>
@@ -426,11 +430,11 @@ export default function SignInDialog({ onChange }) {
                     <Box>
                       <Typography variant="body2" align="right">
                         {' '}
-                        0{' '}
+                        0
                       </Typography>
                       <Typography variant="body2" align="right" color="text.secondary">
                         {' '}
-                        0{' '}
+                        0
                       </Typography>
                     </Box>
                   </Stack>
@@ -478,7 +482,7 @@ export default function SignInDialog({ onChange }) {
               </Typography>
               <Box component="div" sx={{ maxWidth: 350, m: 'auto' }}>
                 <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
-                  Sign in with one of the available providers or create a new one.{' '}
+                  Sign in with one of the available providers or create a new one.
                   <Link href="https://www.elastos.org/did" underline="hover" color="red" target="_blank">
                     What is a DID?
                   </Link>
