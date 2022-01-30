@@ -4,6 +4,7 @@ import { Link as RouterLink, useParams } from 'react-router-dom';
 import {round} from 'mathjs'
 import Lightbox from 'react-image-lightbox';
 import { Icon } from '@iconify/react';
+import { useWeb3React } from "@web3-react/core";
 import { styled } from '@mui/material/styles';
 import { Link, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, 
   Typography, Box, Modal, Backdrop, Menu, MenuItem, Button, IconButton, Toolbar } from '@mui/material';
@@ -29,6 +30,7 @@ import Badge from '../../components/Badge';
 import Jazzicon from '../../components/Jazzicon';
 import PurchaseDlg from '../../components/dialog/Purchase'
 import { reduceHexAddress, getThumbnail, getTime, getCoinUSD } from '../../utils/common';
+import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import {blankAddress, marketContract} from '../../config'
 
 // ----------------------------------------------------------------------
@@ -102,6 +104,7 @@ export default function CollectibleDetail() {
   const [isFullScreen, setFullScreen] = React.useState(false);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [coinUSD, setCoinUSD] = React.useState(0);
+  const [address, setAddress] = React.useState('');
 
   const [collectible, setCollectible] = React.useState({});
   const [isForAuction, setForAuction] = React.useState(false);
@@ -117,6 +120,17 @@ export default function CollectibleDetail() {
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
   
+  const context = useWeb3React()
+  const { account } = context;
+  React.useEffect(async() => {
+    const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
+    if(sessionLinkFlag){
+      if(sessionLinkFlag==='1')
+        setAddress(account)
+      if(sessionLinkFlag==='2' && essentialsConnector.getWalletConnectProvider())
+        setAddress(essentialsConnector.getWalletConnectProvider().accounts[0])
+    }
+  }, [account]);
   React.useEffect(async () => {
     window.scrollTo(0,0)
     setCoinUSD(await getCoinUSD())
@@ -211,7 +225,7 @@ export default function CollectibleDetail() {
                 ref={imageRef}
             />
             {
-              isLoadedImage&&
+              address!==collectible.holder&&isLoadedImage&&
               <Box
                   draggable = {false}
                   component="img"
@@ -290,7 +304,7 @@ export default function CollectibleDetail() {
                     sx={{ width: '100%', height: '100%' }}
                 />
                 {
-                  isLoadedImage&&
+                  address!==collectible.holder&&isLoadedImage&&
                   <Box
                       draggable = {false}
                       component="img"
