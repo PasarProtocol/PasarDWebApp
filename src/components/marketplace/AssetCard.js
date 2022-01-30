@@ -5,7 +5,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { motion } from "framer-motion";
 // material
 import { Icon } from '@iconify/react';
-import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack } from '@mui/material';
+import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
@@ -69,7 +69,11 @@ export default function AssetCard(props) {
         <PaperRecord sx={{p:2}}>
           <Grid container>
             <Grid item xs={6}>
-              <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
+              <Tooltip title="Collection: Feeds NFT Sticker" arrow disableInteractive placement="top">
+                <Box sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
+                  <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24 }} />
+                </Box>
+              </Tooltip>
             </Grid>
             <Grid item xs={6} align="right">
               {
