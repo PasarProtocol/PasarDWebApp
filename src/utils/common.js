@@ -1,11 +1,14 @@
 import axios from 'axios';
 import Web3 from 'web3';
 import { createHash } from 'crypto';
+import { create, urlSource } from 'ipfs-http-client'
 import { subDays, differenceInDays  } from 'date-fns';
 import Jazzicon from "@metamask/jazzicon";
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
-import {marketContract as CONTRACT_ADDRESS, diaContract} from '../config'
-import {PASAR_CONTRACT_ABI} from '../abi/pasarABI'
+import {marketContract as CONTRACT_ADDRESS, diaContract} from '../config';
+import {PASAR_CONTRACT_ABI} from '../abi/pasarABI';
+
+const client = create('https://ipfs-test.trinity-feeds.app/');
 
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = strAddress => strAddress?`${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`:'';
@@ -148,6 +151,11 @@ export function callContractMethod(type, paramObj){
           const {_id, _amount, _price, _didUri} = paramObj
           method = marketContract.methods.createOrderForSale(_id, _amount, _price, _didUri)
         }
+        else if(type === 'buyOrder'){
+          console.log("buyOrder");
+          const {_orderId, _didUri} = paramObj
+          method = marketContract.methods.buyOrder(_orderId, _didUri)
+        }
         else{
           reject(new Error)
           return
@@ -271,3 +279,17 @@ export const MethodList = [
     verb: {description: 'Bid', withPrice: true, subject: 'to'}
   }
 ]
+
+export const sendIpfsDidJson = async () => {
+  // create the metadata object we'll be storing
+  const did = sessionStorage.getItem('did') ? sessionStorage.getItem('did') : '';
+  const didObj = {
+    'version': '2',
+    'did': `did:elastos:${did}`
+  };
+  const jsonDidObj = JSON.stringify(didObj);
+  console.log(jsonDidObj);
+  // add the metadata itself as well
+  const didUri = await client.add(jsonDidObj);
+  return `did:elastos:${didUri.path}`;
+};
