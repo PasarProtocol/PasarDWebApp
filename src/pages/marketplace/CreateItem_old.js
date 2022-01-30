@@ -1,5 +1,4 @@
 import React from 'react';
-import Web3 from 'web3';
 import { isString } from 'lodash';
 import {isMobile} from 'react-device-detect';
 import * as math from 'mathjs';
@@ -29,11 +28,10 @@ import MintBatchName from '../../components/marketplace/MintBatchName';
 import {stickerContract as CONTRACT_ADDRESS} from '../../config'
 import {hash, removeLeadingZero} from '../../utils/common';
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
-import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ProgressBar from '../../components/ProgressBar'
 // ----------------------------------------------------------------------
 
-const client = create('https://ipfs-test.trinity-feeds.app/')
+const client = create('http://ipfs-test.trinity-feeds.app/')
 const RootStyle = styled(Page)(({ theme }) => ({
   paddingTop: theme.spacing(10),
   paddingBottom: theme.spacing(12),
@@ -215,45 +213,36 @@ export default function CreateItem() {
     new Promise((resolve, reject) => {
       const _tokenSupply = quantity
       const _royaltyFee = royalties*10000
-      
-      if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
-        reject(new Error)
-        return
-      }
+      try {
+        const { ethereum } = window
 
-      const walletConnectWeb3 = new Web3(essentialsConnector.getWalletConnectProvider())
-      walletConnectWeb3.eth.getAccounts().then((accounts)=>{
-        console.log(accounts)
-        const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
-        setProgress(progressStep(50, index))
-        walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
-          console.log("Gas price:", gasPrice); 
-  
-          const _gasLimit = 5000000;
-          console.log("Sending transaction with account address:", accounts[0]);
-          const transactionParams = {
-            'from': accounts[0],
-            'gasPrice': gasPrice,
-            'gas': _gasLimit,
-            'value': 0
-          };
-          setProgress(progressStep(60, index))
-          stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).send(transactionParams)
-            .on('receipt', (receipt) => {
-                console.log("receipt", receipt);
-                resolve(true)
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum)
+          const signer = provider.getSigner()
+          const stickerContract = new ethers.Contract(CONTRACT_ADDRESS, STICKER_CONTRACT_ABI, signer)
+
+          // console.log("Initialize payment")
+          setProgress(progressStep(50, index))
+          
+          stickerContract.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).then((nftTxn)=>{
+            setProgress(progressStep(70, index))
+            // console.log("Mining... please wait")
+            nftTxn.wait().then(()=>{
+              // console.log(`Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTxn.hash}`)
+              resolve(true)
+            }).catch((error) => {
+              reject(error)
             })
-            .on('error', (error, receipt) => {
-                console.error("error", error);
-                reject(error)
-            });
-
-        }).catch((error) => {
-          reject(error);
-        })
-      }).catch((error) => {
-        reject(error);
-      })
+          }).catch((error) => {
+            reject(error)
+          })
+        } else {
+          resolve(false)
+          // console.log("Ethereum object does not exist")
+        }
+      } catch (err) {
+        reject(err)
+      }
     })
   )
   const sendIpfsImage = (f)=>(
@@ -315,14 +304,12 @@ export default function CreateItem() {
   const sendIpfsDidJson = ()=>(
     new Promise((resolve, reject) => {
       // create the metadata object we'll be storing
-      const did = sessionStorage.getItem('did')?sessionStorage.getItem('did'):''
       const didObj = {
         "version":"2",
-        "did": `did:elastos:${did}`
+        "did": "did:elastos:you_did_string"
       }
       try {
         const jsonDidObj = JSON.stringify(didObj);
-        console.log(jsonDidObj)
         // add the metadata itself as well
         const didRecv = Promise.resolve(client.add(jsonDidObj))
         resolve(didRecv)
