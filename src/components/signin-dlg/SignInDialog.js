@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Button,
   Dialog,
@@ -114,6 +114,7 @@ export default function SignInDialog({ onChange }) {
   const [walletAddress, setWalletAddress] = useState(null);
   const [balance, setBalance] = useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
+  const navigate = useNavigate();
 
   const classes = useStyles();
 
@@ -313,10 +314,9 @@ export default function SignInDialog({ onChange }) {
       sessionStorage.removeItem('did');
       setActivatingConnector(null);
       setWalletAddress(null);
+      navigate('/marketplace');
     }
   };
-
-  // console.log("------------WalletAddress---------------", walletAddress)
 
   return (
     <>

@@ -90,8 +90,13 @@ export default function MyItems() {
   const triedEager = useEagerConnect();
   React.useEffect(async() => {
     if (!params.address) {
-      if(!account) setWalletAddress(await essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
-      else setWalletAddress(account);
+      if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+        const strWalletAddress = await essentialsConnector.getWalletConnectProvider().wc.accounts[0];
+        setWalletAddress(strWalletAddress);
+      }
+      else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
+        setWalletAddress(account);
+      }
     }
     else setWalletAddress(params.address);
     getMyName();
@@ -115,7 +120,6 @@ export default function MyItems() {
 
   const setAssetsOfType = (index, value) => {
     if (!value) return;
-
     setAssets((prevState) => {
       const tempAssets = [...prevState];
       tempAssets[index] = value;
