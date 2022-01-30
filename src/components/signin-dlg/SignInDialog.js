@@ -118,8 +118,8 @@ export default function SignInDialog({ onChange }) {
   const classes = useStyles();
 
   const initializeWalletConnection = React.useCallback(async() => {
-    console.log('--------------------------sessionLinkFlag: ', sessionLinkFlag);
-    console.log('activating connector: ', activatingConnector);
+    // console.log('--------------------------sessionLinkFlag: ', sessionLinkFlag);
+    // console.log('activating connector: ', activatingConnector);
     if (sessionLinkFlag && !activatingConnector) {
       if (sessionLinkFlag === '1') {
         setActivatingConnector(injected);
@@ -315,6 +315,8 @@ export default function SignInDialog({ onChange }) {
       setWalletAddress(null);
     }
   };
+
+  // console.log("------------WalletAddress---------------", walletAddress)
 
   return (
     <>
