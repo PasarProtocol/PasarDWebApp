@@ -27,7 +27,7 @@ import { useEagerConnect, useInactiveListener } from "./hook";
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import { reduceHexAddress, getBalance, getCoinUSD } from '../../utils/common';
+import { reduceHexAddress, getBalance, getCoinUSD, getExchangeInfo } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
 
 const useStyles = makeStyles({
@@ -110,6 +110,7 @@ export default function SignInDialog({ onChange }) {
   }
 
   React.useEffect(async() => {
+    // getExchangeInfo('10724720')
     getCoinUSD().then(res=>{setCoinUSD(res)})
     if(chainId!==undefined && chainId!==21 && chainId!==20){
       setSnackbarOpen(true)

@@ -26,8 +26,8 @@ import PaperRecord from '../../components/PaperRecord';
 import CustomSwitch from '../../components/custom-switch';
 import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
-import {stickerContract as CONTRACT_ADDRESS} from '../../config'
-import {hash, removeLeadingZero} from '../../utils/common';
+import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS} from '../../config'
+import {hash, removeLeadingZero, callContractMethod} from '../../utils/common';
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ProgressBar from '../../components/ProgressBar'
@@ -215,7 +215,7 @@ export default function CreateItem() {
     new Promise((resolve, reject) => {
       const _tokenSupply = quantity
       const _royaltyFee = royalties*10000
-      
+
       if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
         reject(new Error)
         return
@@ -223,7 +223,7 @@ export default function CreateItem() {
 
       const walletConnectWeb3 = new Web3(essentialsConnector.getWalletConnectProvider())
       walletConnectWeb3.eth.getAccounts().then((accounts)=>{
-        console.log(accounts)
+        // console.log(accounts)
         const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
         setProgress(progressStep(50, index))
         walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
@@ -241,7 +241,34 @@ export default function CreateItem() {
           stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).send(transactionParams)
             .on('receipt', (receipt) => {
                 console.log("receipt", receipt);
-                resolve(true)
+                if(isPutOnSale){
+                  setProgress(progressStep(70, index))
+                  stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
+                    console.log("isApprovalForAll=", isApproval);
+                    if (!isApproval)
+                      stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
+                      .on('receipt', (receipt) => {
+                          console.log("setApprovalForAll-receipt", receipt);
+                          callContractMethod('createOrderForSale', {...paramObj, '_amount': _tokenSupply, '_price': parseInt(price, 10)}).then((success) => {
+                            resolve(success)
+                          }).catch(error=>{
+                            reject(error)
+                          })
+                      })
+                      .on('error', (error, receipt) => {
+                          console.error("setApprovalForAll-error", error);
+                          reject(error)
+                      });
+                    else
+                      callContractMethod('createOrderForSale', {...paramObj, '_amount': _tokenSupply, '_price': parseInt(price, 10)}).then((success) => {
+                        resolve(success)
+                      }).catch(error=>{
+                        reject(error)
+                      })
+                  })
+                }
+                else
+                  resolve(true)
             })
             .on('error', (error, receipt) => {
                 console.error("error", error);

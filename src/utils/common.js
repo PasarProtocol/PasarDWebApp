@@ -1,9 +1,11 @@
+import axios from 'axios';
 import Web3 from 'web3';
 import { createHash } from 'crypto';
 import { subDays, differenceInDays  } from 'date-fns';
 import Jazzicon from "@metamask/jazzicon";
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
-
+import {marketContract as CONTRACT_ADDRESS, diaContract} from '../config'
+import {PASAR_CONTRACT_ABI} from '../abi/pasarABI'
 
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = strAddress => strAddress?`${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`:'';
@@ -87,9 +89,87 @@ export async function getCoinUSD() {
   }
 }
 
+export async function getExchangeInfo(blocknum) {
+  const graphQLParams = {
+      "query": `query tokenPriceData {\n  token(id: "${diaContract}", block: {number: ${blocknum}}) {\n    derivedELA\n  }\n  bundle(id: "1", block: {number: ${blocknum}}) {\n    elaPrice\n  }\n}\n`,
+      "variables": null,
+      "operationName": "tokenPriceData"
+  }
+  axios({
+    "method": "POST",
+    "url": 'https://api.glidefinance.io/subgraphs/name/glide/exchange',
+    "headers": {
+        "content-type": "application/json",
+        // "x-rapidapi-host": "reddit-graphql-proxy.p.rapidapi.com",
+        // "x-rapidapi-key": process.env.RAPIDAPI_KEY,
+        "accept": "application/json"
+    },
+    "data": graphQLParams
+  }).then(response=>{
+      try {
+          return response.data.data
+      } catch (error) {
+          return null;
+      }
+  });
+  // console.log(response)
+}
+
 export function removeLeadingZero(value) {
   console.log(value.replace(/-/g, '').replace(/^0+(?!\.|$)/, ''))
   return value.replace(/-/g, '').replace(/^0+(?!\.|$)/, '')
+}
+
+export function callContractMethod(type, paramObj){
+  return new Promise((resolve, reject) => {
+
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
+      reject(new Error)
+      return
+    }
+
+    const walletConnectWeb3 = new Web3(essentialsConnector.getWalletConnectProvider())
+    walletConnectWeb3.eth.getAccounts().then((accounts)=>{
+      // console.log(accounts)
+      const marketContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, CONTRACT_ADDRESS)
+      walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+        console.log("Gas price:", gasPrice); 
+
+        const _gasLimit = 5000000;
+        console.log("Sending transaction with account address:", accounts[0]);
+        const transactionParams = {
+          'from': accounts[0],
+          'gasPrice': gasPrice,
+          'gas': _gasLimit,
+          'value': 0
+        };
+        let method = null
+        if(type === 'createOrderForSale'){
+          console.log("createOrderForSale");
+          const {_id, _amount, _price, _didUri} = paramObj
+          method = marketContract.methods.createOrderForSale(_id, _amount, _price, _didUri)
+        }
+        else{
+          reject(new Error)
+          return
+        }
+        method.send(transactionParams)
+          .on('receipt', (receipt) => {
+              console.log("receipt", receipt);
+              resolve(true)
+          })
+          .on('error', (error, receipt) => {
+              console.error("error", error);
+              reject(error)
+          });
+
+      }).catch((error) => {
+        reject(error);
+      })
+    }).catch((error) => {
+      reject(error);
+    })
+  })
 }
 
 export const MethodList = [
