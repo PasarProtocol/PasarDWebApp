@@ -308,7 +308,8 @@ export default function SignInDialog({ onChange }) {
     setOpenAccountPopup(null);
     if (e.target.getAttribute('value') === 'signout') {
       await activate(null);
-      await essentialsConnector.disconnectWalletConnect();
+      if(sessionStorage.removeItem('PASAR_LINK_ADDRESS') === '2')
+        await essentialsConnector.disconnectWalletConnect();
       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('did');
