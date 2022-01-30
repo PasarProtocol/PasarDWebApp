@@ -88,8 +88,11 @@ export default function MyItems() {
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   const triedEager = useEagerConnect();
-  React.useEffect(() => {
-    if (!params.address) setWalletAddress(account);
+  React.useEffect(async() => {
+    if (!params.address) {
+      if(!account) setWalletAddress(await essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+      else setWalletAddress(account);
+    }
     else setWalletAddress(params.address);
     getMyName();
   }, [account, params.address]);
@@ -157,9 +160,10 @@ export default function MyItems() {
   };
 
   const getMyName = () => {
-    if(essentialsConnector.hasWalletConnectSession()) {
+    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
       const token = sessionStorage.getItem("token");
-      const {name} = jwtDecode(token);
+      const user = jwtDecode(token);
+      const {name} = user;
       setMyName(name);
     }
     else {
