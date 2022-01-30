@@ -27,7 +27,7 @@ import CardImgBox from '../CardImgBox';
 // ----------------------------------------------------------------------
 
 export default function AssetCard(props) {
-  const {title="???", description, quantity=1, price=0, isLink, tokenId, type, isOwner} = props
+  const {title="???", description, quantity=1, price=0, isLink, tokenId, type, isOwner, orderId} = props
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
   const [updateOpen, setOpenUpdate] = React.useState(false);
@@ -194,8 +194,8 @@ export default function AssetCard(props) {
             <Badge name="user"/>
           </Stack> */}
         </PaperRecord>
-        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} title={title}/>
-        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} title={title}/>
+        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} title={title} tokenId={tokenId}/>
+        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} title={title} orderId={orderId}/>
         <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} title={title}/>
         <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} title={title}/>
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} title={title}/>
