@@ -116,7 +116,6 @@ export async function getExchangeInfo(blocknum) {
 }
 
 export function removeLeadingZero(value) {
-  console.log(value.replace(/-/g, '').replace(/^0+(?!\.|$)/, ''))
   return value.replace(/-/g, '').replace(/^0+(?!\.|$)/, '')
 }
 
