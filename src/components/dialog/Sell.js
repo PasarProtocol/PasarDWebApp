@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
+import { useSnackbar } from 'notistack';
+import { LoadingButton } from '@mui/lab';
 
 import CoinSelect from '../marketplace/CoinSelect';
 import { removeLeadingZero, callContractMethod, sendIpfsDidJson } from '../../utils/common';
@@ -32,6 +34,8 @@ export default function Sell(props) {
   const { isOpen, setOpen, title, tokenId } = props;
   const [price, setPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
+  const { enqueueSnackbar } = useSnackbar();
+  const [onProgress, setOnProgress] = React.useState(false);
   const handleClose = () => {
     setOpen(false);
   };
@@ -110,22 +114,26 @@ export default function Sell(props) {
           </Grid>
         </Grid>
         <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-          <Button
+          <LoadingButton
+            loading={onProgress}
             variant="contained"
             fullWidth
             onClick={async () => {
+              setOnProgress(true);
               const didUri = await sendIpfsDidJson();
-              console.log("--------", tokenId, "--", price, "--", didUri, "--")
-              callContractMethod('createOrderForSale', {
+              console.log('--------', tokenId, '--', price, '--', didUri, '--');
+              await callContractMethod('createOrderForSale', {
                 _id: tokenId,
                 _amount: 1,
                 _price: price,
                 _didUri: didUri
               });
+              enqueueSnackbar('Sell NFT success!', { variant: 'success' });
+              setOpen(false);
             }}
           >
             List
-          </Button>
+          </LoadingButton>
         </Box>
         <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
           We do not own your private keys and cannot access your funds

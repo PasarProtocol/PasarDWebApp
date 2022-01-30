@@ -197,8 +197,8 @@ export default function AssetCard(props) {
         <SellDlg isOpen={sellOpen} setOpen={setOpenSell} title={title} tokenId={tokenId}/>
         <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} title={title} orderId={orderId}/>
         <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} title={title} orderId={orderId}/>
-        <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} title={title}/>
-        <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} title={title}/>
+        <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} title={title} tokenId={tokenId}/>
+        <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} title={title} tokenId={tokenId}/>
       </motion.div>
     // </Link>
   );
