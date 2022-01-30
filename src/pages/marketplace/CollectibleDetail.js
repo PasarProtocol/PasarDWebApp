@@ -117,12 +117,18 @@ export default function CollectibleDetail() {
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const [isOpenPurchase, setPurchaseOpen] = React.useState(false);
+  const [didSignin, setSignin] = React.useState(false);
 
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
   
   const context = useWeb3React()
   const { account } = context;
+  React.useEffect(async() => {
+    const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+    setSignin(!!sessionLinkFlag)
+  }, [sessionStorage.getItem('PASAR_LINK_ADDRESS')]);
+
   React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
     if(sessionLinkFlag){
@@ -200,6 +206,12 @@ export default function CollectibleDetail() {
       }
     }
   }
+  
+  const openSignin = (e)=>{
+    if(document.getElementById("signin"))
+      document.getElementById("signin").click()
+  }
+  
   window.addEventListener('resize', handleResize);
   const properties = collectible&&collectible.properties?collectible.properties:{}
 
@@ -393,9 +405,15 @@ export default function CollectibleDetail() {
                     <Typography variant="h3" color="origin.main">{round(collectible.Price/1e18, 3)} ELA</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*collectible.Price/1e18, 3)}</Typography>
                     <MHidden width="smDown">
-                      <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}} sx={{mt: 2}}>
-                        Buy
-                      </Button>
+                      {
+                        didSignin?
+                        <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}} sx={{mt: 2}}>
+                          Buy
+                        </Button>:
+                        <Button variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
+                          Sign in to Buy
+                        </Button>
+                      }
                     </MHidden>
                   </>
                 }
@@ -502,14 +520,21 @@ export default function CollectibleDetail() {
         <MHidden width="smUp">
           <StickyPaperStyle>
             {
-              isForAuction?
+              isForAuction&&
               <Button variant="contained" fullWidth onClick={()=>{}}>
                 Place a bid
-              </Button>:
-
-              <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}}>
-                Buy
               </Button>
+            }
+            {
+              !isForAuction&&(
+                didSignin?
+                <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}}>
+                  Buy
+                </Button>:
+                <Button variant="contained" fullWidth onClick={openSignin}>
+                  Sign in to Buy
+                </Button>
+              )
             }
           </StickyPaperStyle>
         </MHidden>
