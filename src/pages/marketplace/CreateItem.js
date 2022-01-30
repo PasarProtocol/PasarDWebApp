@@ -349,7 +349,7 @@ export default function CreateItem() {
       }
       try {
         const jsonDidObj = JSON.stringify(didObj);
-        console.log(jsonDidObj)
+        // console.log(jsonDidObj)
         // add the metadata itself as well
         const didRecv = Promise.resolve(client.add(jsonDidObj))
         resolve(didRecv)

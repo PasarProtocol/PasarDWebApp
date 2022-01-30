@@ -105,6 +105,7 @@ export default function MarketExplorer() {
   const [selectedBtns, setSelectedBtns] = React.useState([]);
   const [range, setRange] = React.useState({min:'', max:''});
   const [adult, setAdult] = React.useState(false);
+  const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
   const [dispmode, setDispmode] = React.useState(1);
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({selectedBtns:[]});
@@ -156,8 +157,9 @@ export default function MarketExplorer() {
           setAssets(jsonAssets.data.result);
           // window.scrollTo(0,0)
         }
+        setAlreadyMounted(false)
         setLoadNext(false)
-        setLoadingAssets(false);
+        setLoadingAssets(false)
       })
     }).catch(e => {
       if(e.code !== e.ABORT_ERR)
@@ -234,7 +236,7 @@ export default function MarketExplorer() {
     setFilterView(!isFilterView&&1)
   }
   return (
-    <ScrollManager scrollKey="asset-list-key">
+    <ScrollManager scrollKey="asset-list-key" isAlreadyMounted={isAlreadyMounted}>
       {({ connectScrollTarget, ...props }) => 
         <RootStyle title="Marketplace | PASAR">
           <Stack direction="row">
