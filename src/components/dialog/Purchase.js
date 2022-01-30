@@ -16,15 +16,17 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
+import { useSnackbar } from 'notistack';
+import { LoadingButton } from '@mui/lab';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson } from '../../utils/common';
 
-
 export default function Purchase(props) {
   const [balance, setBalance] = useState(0);
-
+  const { enqueueSnackbar } = useSnackbar();
+  const [onProgress, setOnProgress] = React.useState(false);
   const context = useWeb3React();
   const { library, chainId, account } = context;
 
@@ -60,24 +62,29 @@ export default function Purchase(props) {
       })
       .on('receipt', (receipt) => {
         console.log('receipt', receipt);
+        enqueueSnackbar('Buy NFT success!', { variant: 'success' });
+        setOpen(false);
       })
       .on('confirmation', (confirmationNumber, receipt) => {
         console.log('confirmation', confirmationNumber, receipt);
       })
       .on('error', (error, receipt) => {
         console.error('error', error);
+        enqueueSnackbar('Buy NFT error!', { variant: 'warning' });
+        setOnProgress(false);
       });
 
     // callContractMethod('buyOrder', {'_orderId': _orderId, '_didUri': _didUri})
   };
 
   const buyNft = async () => {
+    setOnProgress(true);
     console.log('---------------------------', info);
     console.log('orderId:', info.OrderId);
-    console.log('price:', parseInt(info.Price , 10) / 1e18);
+    console.log('price:', parseInt(info.Price, 10) / 1e18);
     const buyerDidUri = await sendIpfsDidJson();
     console.log('didUri:', buyerDidUri);
-    callBuyOrder(info.OrderId, buyerDidUri, parseInt(info.Price , 10) / 1e18);
+    callBuyOrder(info.OrderId, buyerDidUri, parseInt(info.Price, 10) / 1e18);
   };
 
   React.useEffect(async () => {
@@ -206,9 +213,15 @@ export default function Purchase(props) {
         ) : (
           <>
             <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-              <Button variant="outlined" href="https://glidefinance.io/swap" target="_blank" fullWidth>
+              <LoadingButton
+                loading={onProgress}
+                variant="outlined"
+                href="https://glidefinance.io/swap"
+                target="_blank"
+                fullWidth
+              >
                 Add funds
-              </Button>
+              </LoadingButton>
             </Box>
             <Typography variant="body2" display="block" color="red" gutterBottom align="center">
               Insufficient funds in ELA

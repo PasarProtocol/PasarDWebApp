@@ -36,7 +36,7 @@ const GridItems = (props) => (
             type={props.type}
             isOwner={props.isOwner}
             isLink={1&&true}
-            orderId={item.OrderId}
+            orderId={item.orderId}
             {...props}
           />
         </motion.div>
