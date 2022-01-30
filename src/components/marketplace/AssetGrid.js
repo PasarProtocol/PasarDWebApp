@@ -4,7 +4,6 @@ import {isMobile} from 'react-device-detect';
 import { motion, AnimatePresence } from "framer-motion";
 // material
 import { Box } from '@mui/material';
-
 import AssetCard from './AssetCard';
 import { getThumbnail } from '../../utils/common';
 // ----------------------------------------------------------------------
@@ -33,6 +32,7 @@ const GridItems = (props) => (
             price={round(item.price/1e18, 3)}
             quantity={item.quantity}
             tokenId={item.tokenId}
+            saleType={item.SaleType}
             type={props.type}
             isOwner={props.isOwner}
             isLink={1&&true}

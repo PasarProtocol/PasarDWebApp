@@ -24,6 +24,7 @@ import useOffSetTop from '../../hooks/useOffSetTop';
 import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
+import ScrollManager from '../../components/ScrollManager'
 
 // ----------------------------------------------------------------------
 
@@ -153,7 +154,7 @@ export default function MarketExplorer() {
           setAssets([...assets, ...jsonAssets.data.result]);
         else {
           setAssets(jsonAssets.data.result);
-          window.scrollTo(0,0)
+          // window.scrollTo(0,0)
         }
         setLoadNext(false)
         setLoadingAssets(false);
@@ -233,217 +234,221 @@ export default function MarketExplorer() {
     setFilterView(!isFilterView&&1)
   }
   return (
-    <RootStyle title="Marketplace | PASAR">
-      <Stack direction="row">
-        <Container maxWidth={false}>
-          <AppBarStyle sx={{ boxShadow: 0, bgcolor: 'transparent', top: isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP }}>
-            <ToolbarStyle
+    <ScrollManager scrollKey="asset-list-key">
+      {({ connectScrollTarget, ...props }) => 
+        <RootStyle title="Marketplace | PASAR">
+          <Stack direction="row">
+            <Container maxWidth={false}>
+              <AppBarStyle sx={{ boxShadow: 0, bgcolor: 'transparent', top: isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP }}>
+                <ToolbarStyle
+                  sx={{
+                    ...(isOffset && {
+                      bgcolor: 'background.default',
+                    })
+                  }}
+                >
+                  <Stack width="100%" direction="row">
+                    <Box sx={{flex:1}}>
+                      <Button
+                        variant="contained"
+                        color="origin"
+                        startIcon={isFilterView?<Icon icon={arrowIosBackFill} />:''}
+                        endIcon={isFilterView?'':<Icon icon={arrowIosForwardFill} />}
+                        onClick={closeFilter}
+                      >
+                        Filters
+                      </Button>
+                      <Typography variant="body2" sx={{ ml: 1, display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
+                      <Stack spacing={1} sx={{display: 'inline', pl: 1}} direction="row">
+                        {
+                          selectedBtns.map((nameId, index)=>(
+                            <Button
+                              key={index}
+                              variant="outlined"
+                              color="origin"
+                              endIcon={<CloseIcon />}
+                              onClick={()=>{handleBtns(nameId)}}
+                            >
+                              {btnNames[nameId]}
+                            </Button>
+                          ))
+                        }
+                        {
+                          selectedBtns.length>0&&
+                          <Button
+                            color="inherit"
+                            onClick={()=>{setSelectedBtns([])}}
+                          >
+                            Clear All
+                          </Button>
+                        }
+                      </Stack>
+                    </Box>
+                    <Box sx={{display: 'flex'}}>
+                      <AssetSortSelect onChange={setOrder}/>
+                      <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                        <ToggleButton value={0}>
+                          <GridViewSharpIcon />
+                        </ToggleButton>
+                        <ToggleButton value={1}>
+                          <AppsIcon />
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                    </Box>
+                  </Stack>
+                </ToolbarStyle>
+                {isOffset && <ToolbarShadowStyle />}
+              </AppBarStyle>
+              {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
+              <Box sx={{ display: 'flex' }}>
+                <Box
+                  component="nav"
+                  sx={{ width: drawerWidth*isFilterView, flexShrink: 0, display: {xs: 'none', sm: 'none', md: 'block'}, transition: 'width ease .5s' }}
+                  aria-label="mailbox folders"
+                >
+                  <AssetFilterPan 
+                    sx={{
+                      pt: 3,
+                      '& .MuiDrawer-paper': {
+                        transition: 'all ease .5s',
+                        width: drawerWidth,
+                        top: isOffset?APP_BAR_MOBILE+48:APP_BAR_DESKTOP+48,
+                        left: drawerWidth*(isFilterView-1) 
+                      },
+                    }}
+                    scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
+                    btnNames = {btnNames}
+                    selectedBtns = {selectedBtns}
+                    handleFilter = {handleFilter}
+                  />
+                </Box>
+                <Box
+                  component="main"
+                  sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth*isFilterView}px)` } }}
+                >
+                  <MHidden width="mdUp">
+                    <Box sx={{display: 'flex', pb: 1}}>
+                      <AssetSortSelect sx={{flex: 1}}/>
+                      <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                        <ToggleButton value={0}>
+                          <SquareIcon />
+                        </ToggleButton>
+                        <ToggleButton value={1}>
+                          <GridViewSharpIcon />
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                    </Box>
+                  </MHidden>
+                  <InfiniteScroll
+                    dataLength={assets.length}
+                    next={fetchMoreData}
+                    hasMore={page<pages}
+                    loader={<h4>Loading...</h4>}
+                    endMessage={
+                      !isLoadingAssets&&!assets.length&&<Typography variant="h4" align='center'>No matching collectible found!</Typography>
+                    }
+                  >
+                    <AssetGrid assets={assets} dispmode={dispmode}/>
+                  </InfiniteScroll>
+                </Box>
+              </Box>
+            </Container>
+          </Stack>
+          <MHidden width="mdUp">
+            <FilterBtnContainerStyle>
+              <Button
+                size="large"
+                variant="contained"
+                color="origin"
+                onClick={closeFilter}
+              >
+                Filters
+                {
+                  filterForm.selectedBtns&&filterForm.selectedBtns.length>0&&
+                  <FilterBtnBadgeStyle>{filterForm.selectedBtns.length}</FilterBtnBadgeStyle>
+                }
+              </Button>
+            </FilterBtnContainerStyle>
+            
+            <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isFilterView!==1} onClick={closeFilter} />
+            <Box
               sx={{
-                ...(isOffset && {
-                  bgcolor: 'background.default',
-                })
+                top: 12,
+                bottom: 12,
+                right: 0,
+                position: 'fixed',
+                zIndex: 1210,
+                ...(!isFilterView && { right: 12 })
               }}
             >
-              <Stack width="100%" direction="row">
-                <Box sx={{flex:1}}>
-                  <Button
-                    variant="contained"
-                    color="origin"
-                    startIcon={isFilterView?<Icon icon={arrowIosBackFill} />:''}
-                    endIcon={isFilterView?'':<Icon icon={arrowIosForwardFill} />}
-                    onClick={closeFilter}
-                  >
-                    Filters
-                  </Button>
-                  <Typography variant="body2" sx={{ ml: 1, display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
-                  <Stack spacing={1} sx={{display: 'inline', pl: 1}} direction="row">
-                    {
-                      selectedBtns.map((nameId, index)=>(
-                        <Button
-                          key={index}
-                          variant="outlined"
-                          color="origin"
-                          endIcon={<CloseIcon />}
-                          onClick={()=>{handleBtns(nameId)}}
-                        >
-                          {btnNames[nameId]}
-                        </Button>
-                      ))
-                    }
-                    {
-                      selectedBtns.length>0&&
+              <Paper
+                sx={{
+                  height: 1,
+                  width: '0px',
+                  maxWidth: 400,
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  boxShadow: (theme) => theme.customShadows.z24,
+                  transition: (theme) => theme.transitions.create('width'),
+                  ...(!isFilterView && { width: 'calc(100vw - 24px)' })
+                }}
+              >
+                {
+                  filterForm.selectedBtns&&filterForm.selectedBtns.length>0&&
+                  <>
+                    <Box sx={{ pt: 2, pb: 1, pr: 1, pl: 2.5 }}>
+                      {
+                        filterForm.selectedBtns.map((nameId, index)=>(
+                          <Button
+                            key={index}
+                            variant="outlined"
+                            color="origin"
+                            endIcon={<CloseIcon />}
+                            onClick={()=>{handleFilterMobile('statype', nameId)}}
+                            sx={{mr: 1, mb: 1}}
+                          >
+                            {btnNames[nameId]}
+                          </Button>
+                        ))
+                      }
                       <Button
                         color="inherit"
-                        onClick={()=>{setSelectedBtns([])}}
+                        onClick={()=>{handleFilterMobile('clear_all', null)}}
+                        sx={{mb: 1}}
                       >
                         Clear All
                       </Button>
-                    }
-                  </Stack>
-                </Box>
-                <Box sx={{display: 'flex'}}>
-                  <AssetSortSelect onChange={setOrder}/>
-                  <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-                    <ToggleButton value={0}>
-                      <GridViewSharpIcon />
-                    </ToggleButton>
-                    <ToggleButton value={1}>
-                      <AppsIcon />
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </Box>
-              </Stack>
-            </ToolbarStyle>
-            {isOffset && <ToolbarShadowStyle />}
-          </AppBarStyle>
-          {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
-          <Box sx={{ display: 'flex' }}>
-            <Box
-              component="nav"
-              sx={{ width: drawerWidth*isFilterView, flexShrink: 0, display: {xs: 'none', sm: 'none', md: 'block'}, transition: 'width ease .5s' }}
-              aria-label="mailbox folders"
-            >
-              <AssetFilterPan 
-                sx={{
-                  pt: 3,
-                  '& .MuiDrawer-paper': {
-                    transition: 'all ease .5s',
-                    width: drawerWidth,
-                    top: isOffset?APP_BAR_MOBILE+48:APP_BAR_DESKTOP+48,
-                    left: drawerWidth*(isFilterView-1) 
-                  },
-                }}
-                scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
-                btnNames = {btnNames}
-                selectedBtns = {selectedBtns}
-                handleFilter = {handleFilter}
-              />
-            </Box>
-            <Box
-              component="main"
-              sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth*isFilterView}px)` } }}
-            >
-              <MHidden width="mdUp">
-                <Box sx={{display: 'flex', pb: 1}}>
-                  <AssetSortSelect sx={{flex: 1}}/>
-                  <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-                    <ToggleButton value={0}>
-                      <SquareIcon />
-                    </ToggleButton>
-                    <ToggleButton value={1}>
-                      <GridViewSharpIcon />
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </Box>
-              </MHidden>
-              <InfiniteScroll
-                dataLength={assets.length}
-                next={fetchMoreData}
-                hasMore={page<pages}
-                loader={<h4>Loading...</h4>}
-                endMessage={
-                  !isLoadingAssets&&!assets.length&&<Typography variant="h4" align='center'>No matching collectible found!</Typography>
+                    </Box>
+                    <Divider />
+                  </>
                 }
-              >
-                <AssetGrid assets={assets} dispmode={dispmode}/>
-              </InfiniteScroll>
-            </Box>
-          </Box>
-        </Container>
-      </Stack>
-      <MHidden width="mdUp">
-        <FilterBtnContainerStyle>
-          <Button
-            size="large"
-            variant="contained"
-            color="origin"
-            onClick={closeFilter}
-          >
-            Filters
-            {
-              filterForm.selectedBtns&&filterForm.selectedBtns.length>0&&
-              <FilterBtnBadgeStyle>{filterForm.selectedBtns.length}</FilterBtnBadgeStyle>
-            }
-          </Button>
-        </FilterBtnContainerStyle>
-        
-        <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isFilterView!==1} onClick={closeFilter} />
-        <Box
-          sx={{
-            top: 12,
-            bottom: 12,
-            right: 0,
-            position: 'fixed',
-            zIndex: 1210,
-            ...(!isFilterView && { right: 12 })
-          }}
-        >
-          <Paper
-            sx={{
-              height: 1,
-              width: '0px',
-              maxWidth: 400,
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              boxShadow: (theme) => theme.customShadows.z24,
-              transition: (theme) => theme.transitions.create('width'),
-              ...(!isFilterView && { width: 'calc(100vw - 24px)' })
-            }}
-          >
-            {
-              filterForm.selectedBtns&&filterForm.selectedBtns.length>0&&
-              <>
-                <Box sx={{ pt: 2, pb: 1, pr: 1, pl: 2.5 }}>
-                  {
-                    filterForm.selectedBtns.map((nameId, index)=>(
-                      <Button
-                        key={index}
-                        variant="outlined"
-                        color="origin"
-                        endIcon={<CloseIcon />}
-                        onClick={()=>{handleFilterMobile('statype', nameId)}}
-                        sx={{mr: 1, mb: 1}}
-                      >
-                        {btnNames[nameId]}
-                      </Button>
-                    ))
-                  }
-                  <Button
-                    color="inherit"
-                    onClick={()=>{handleFilterMobile('clear_all', null)}}
-                    sx={{mb: 1}}
-                  >
-                    Clear All
-                  </Button>
+                <Box style={{display: 'contents'}}>
+                  <Scrollbar>
+                    <AssetFilterPan 
+                      sx={{
+                      }}
+                      btnNames = {btnNames}
+                      selectedBtns = {filterForm.selectedBtns}
+                      handleFilter = {handleFilterMobile}
+                    />
+                  </Scrollbar>
                 </Box>
                 <Divider />
-              </>
-            }
-            <Box style={{display: 'contents'}}>
-              <Scrollbar>
-                <AssetFilterPan 
-                  sx={{
-                  }}
-                  btnNames = {btnNames}
-                  selectedBtns = {filterForm.selectedBtns}
-                  handleFilter = {handleFilterMobile}
-                />
-              </Scrollbar>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>
+                  <Typography variant="subtitle1">Filters</Typography>
+                  <Button
+                    endIcon={<CheckIcon/>}
+                    onClick={applyFilterForm}
+                  >
+                    Done
+                  </Button>
+                </Stack>
+              </Paper>
             </Box>
-            <Divider />
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>
-              <Typography variant="subtitle1">Filters</Typography>
-              <Button
-                endIcon={<CheckIcon/>}
-                onClick={applyFilterForm}
-              >
-                Done
-              </Button>
-            </Stack>
-          </Paper>
-        </Box>
-      </MHidden>
-    </RootStyle>
+          </MHidden>
+        </RootStyle>
+      }
+    </ScrollManager>
   );
 }

@@ -31,6 +31,7 @@ import Jazzicon from '../../components/Jazzicon';
 import PurchaseDlg from '../../components/dialog/Purchase'
 import { reduceHexAddress, getThumbnail, getTime, getCoinUSD } from '../../utils/common';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import ScrollManager from '../../components/ScrollManager'
 import {blankAddress, marketContract} from '../../config'
 
 // ----------------------------------------------------------------------
@@ -205,6 +206,7 @@ export default function CollectibleDetail() {
   const tempDeadLine = getTime(new Date('2022-01-25').getTime()/1000)
   return (
     <RootStyle title="Collectible | PASAR">
+      <ScrollManager scrollKey="asset-detail-key"/>
       <Box
         sx={{
           py: 6,
