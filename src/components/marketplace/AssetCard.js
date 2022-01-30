@@ -183,7 +183,7 @@ export default function AssetCard(props) {
           }
           {
             (type===2&&isOwner)&&
-            <Button variant="contained" size="small" fullWidth sx={{mt: 1}}>Sell</Button>
+            <Button variant="contained" size="small" fullWidth sx={{mt: 1}} onClick={(e)=>{setOpenSell(true)}}>Sell</Button>
           }
           {/* <Stack direction="row">
             <Badge name="diamond"/>

@@ -91,6 +91,17 @@ const OutlineBtnStyle = styled(Button)(({ theme }) => ({
     background: theme.palette.origin.main
   }
 }));
+
+const HeadTitleStyle = styled(Typography)(({ theme }) => ({
+  backgroundImage: 'linear-gradient(90deg, #FF5082, #a951f4)',
+  backgroundSize: '100%',
+  backgroundRepeat: 'repeat',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  MozBackgroundClip: 'text',
+  MozTextFillColor: 'transparent',
+  display: 'inline'
+}))
 // ----------------------------------------------------------------------
 
 export default function MarketHome() {
@@ -108,9 +119,9 @@ export default function MarketHome() {
       <Container sx={{pt: 4, mb: '100px', position: 'relative'}}>
         <StackStyle>
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h1">
+            <HeadTitleStyle variant="h1">
               Dawn of the DeMKT
-            </Typography>
+            </HeadTitleStyle>
             <Typography variant="h4" component="div" sx={{fontWeight: 'normal', pb: 3}}>
               Pasar is an open-sourced, community-centric, and one
               of the first truly Web3 decentralized marketplace (DeMKT)
