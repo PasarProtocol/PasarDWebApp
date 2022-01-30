@@ -33,6 +33,7 @@ const GridItems = (props) => (
             price={round(item.price/1e18, 3)}
             quantity={item.quantity}
             tokenId={item.tokenId}
+            saleType={item.SaleType}
             type={props.type}
             isOwner={props.isOwner}
             isLink={1&&true}

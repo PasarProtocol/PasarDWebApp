@@ -27,7 +27,7 @@ import CardImgBox from '../CardImgBox';
 // ----------------------------------------------------------------------
 
 export default function AssetCard(props) {
-  const {title="???", description, quantity=1, price=0, isLink, tokenId, type, isOwner} = props
+  const {title="???", description, quantity=1, price=0, isLink, tokenId, type, isOwner, saleType} = props
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
   const [updateOpen, setOpenUpdate] = React.useState(false);
@@ -179,14 +179,14 @@ export default function AssetCard(props) {
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
           {
-            (type===0||type===1)&&
+            (type===0||type===1||(type===2&&saleType!=="Not on sale"))&&
             <Typography variant="h4" sx={{color: "origin.main"}}>
               <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
               &nbsp;{price} ELA
             </Typography>
           }
           {
-            (type===2&&isOwner)&&
+            (type===2&&isOwner&&saleType==="Not on sale")&&
             <Button variant="contained" size="small" fullWidth sx={{mt: 1}} onClick={(e)=>{setOpenSell(true)}}>Sell</Button>
           }
           {/* <Stack direction="row">
