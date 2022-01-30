@@ -1,15 +1,59 @@
 import React, { useState } from "react";
+import Web3 from 'web3';
 import * as math from 'mathjs';
 import {Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
+import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
+import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
+import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 
 export default function CancelSale(props) {
-    const {isOpen, setOpen, title} = props
+    const {isOpen, setOpen, title, orderId} = props
     const handleClose = () => {
         setOpen(false);
     }
 
+    const callCancelOrder = async (_orderId) => {
+        const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
+        const walletConnectWeb3 = new Web3(walletConnectProvider);
+        const accounts = await walletConnectWeb3.eth.getAccounts();
+    
+        const contractAbi = PASAR_CONTRACT_ABI;
+        const contractAddress = MARKET_CONTRACT_ADDRESS;
+        const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+    
+        const gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    
+        console.log('Sending transaction with account address:', accounts[0]);
+        const transactionParams = {
+          'from': accounts[0],
+          'gasPrice': gasPrice,
+          'gas': 5000000,
+          'value': 0
+        };
+    
+        pasarContract.methods
+          .cancelOrder(_orderId)
+          .send(transactionParams)
+          .on('transactionHash', (hash) => {
+            console.log('transactionHash', hash);
+          })
+          .on('receipt', (receipt) => {
+            console.log('receipt', receipt);
+          })
+          .on('confirmation', (confirmationNumber, receipt) => {
+            console.log('confirmation', confirmationNumber, receipt);
+          })
+          .on('error', (error, receipt) => {
+            console.error('error', error);
+          });  
+      };
+  
+      const cancelSale = async () => {
+        console.log('orderId:', orderId);
+        callCancelOrder(orderId);
+      };
     return (
         <Dialog open={isOpen} onClose={handleClose}>
             <DialogTitle>
@@ -34,7 +78,7 @@ export default function CancelSale(props) {
                   You are about to remove <Typography variant="h5" sx={{display: 'inline', color: 'text.primary'}}>{title}</Typography> from the marketplace
                 </Typography>
                 <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-                    <Button variant="contained" fullWidth>
+                    <Button variant="contained" fullWidth onClick={cancelSale}>
                       Remove Listing
                     </Button>
                 </Box>
