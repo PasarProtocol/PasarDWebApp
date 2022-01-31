@@ -404,17 +404,20 @@ export default function CollectibleDetail() {
                     <Typography variant="h4">On sale for a fixed price of</Typography>
                     <Typography variant="h3" color="origin.main">{round(collectible.Price/1e18, 3)} ELA</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*collectible.Price/1e18, 3)}</Typography>
-                    <MHidden width="smDown">
-                      {
-                        didSignin?
-                        <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}} sx={{mt: 2}}>
-                          Buy
-                        </Button>:
-                        <Button variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
-                          Sign in to Buy
-                        </Button>
-                      }
-                    </MHidden>
+                    {
+                      address!==collectible.holder && address!==collectible.royaltyOwner &&
+                      <MHidden width="smDown">
+                        {
+                          didSignin?
+                          <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}} sx={{mt: 2}}>
+                            Buy
+                          </Button>:
+                          <Button variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
+                            Sign in to Buy
+                          </Button>
+                        }
+                      </MHidden>
+                    }
                   </>
                 }
                 </PaperStyle>

@@ -27,7 +27,7 @@ import CardImgBox from '../CardImgBox';
 // ----------------------------------------------------------------------
 
 export default function AssetCard(props) {
-  const {title="???", description, quantity=1, price=0, isLink, tokenId, type, isOwner, orderId, saleType} = props
+  const {title="???", description, quantity=1, price=0, isLink, tokenId, type, isOwner, orderId, saleType, address, royaltyOwner, holder} = props
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
   const [updateOpen, setOpenUpdate] = React.useState(false);
@@ -128,7 +128,19 @@ export default function AssetCard(props) {
                   type===2&&
                   <div>
                     {
-                      isOwner&&
+                      isOwner&&address===royaltyOwner&&
+                      <MenuItem value='update' onClick={handleClosePopup}>
+                        <LocalOfferOutlinedIcon/>&nbsp;Update Price
+                      </MenuItem>
+                    }
+                    {
+                      isOwner&&address===royaltyOwner&&
+                      <MenuItem value='cancel' onClick={handleClosePopup}>
+                        <CancelOutlinedIcon/>&nbsp;Cancel Sale
+                      </MenuItem>
+                    }
+                    {
+                      isOwner&&address===holder&&
                       <MenuItem value='sell' onClick={handleClosePopup}>
                         <StorefrontIcon/>&nbsp;Sell
                       </MenuItem>
@@ -137,21 +149,21 @@ export default function AssetCard(props) {
                       <SyncAltSharpIcon/>&nbsp;Transfer
                     </MenuItem> */}
                     {
-                      isOwner&&
+                      isOwner&&address===holder&&
                       <MenuItem value='delete' onClick={handleClosePopup}>
                         <DeleteOutlineIcon/>&nbsp;Delete
                       </MenuItem>
                     }
                   </div>
                 }
-                {
+                {/* {
                   type===3&&
                   <div>
                     <MenuItem onClick={handleClosePopup}>
                       <ShareOutlinedIcon/>&nbsp;Share
                     </MenuItem>
                   </div>
-                }
+                } */}
               </Menu>
             </Grid>
           </Grid>
@@ -179,7 +191,7 @@ export default function AssetCard(props) {
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
           {
-            (type===0||(type===1&&saleType!=="Not on sale")||(type===2&&saleType!=="Not on sale"))&&
+            (type===0||type===1)&&
             <Typography variant="h4" sx={{color: "origin.main"}}>
               <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
               &nbsp;{price} ELA
