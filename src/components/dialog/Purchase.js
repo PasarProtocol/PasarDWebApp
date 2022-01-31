@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
 import * as math from 'mathjs';
@@ -25,6 +26,7 @@ import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson } from '../../utils/common';
 
 export default function Purchase(props) {
+  const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
@@ -83,15 +85,19 @@ export default function Purchase(props) {
       })
       .on('receipt', (receipt) => {
         console.log('receipt', receipt);
-        enqueueSnackbar('Buy NFT success!', { variant: 'success' });
+        enqueueSnackbar('Buy NFT Success!', { variant: 'success' });
         setOpen(false);
+        setOnProgress(false);
+        setTimeout(()=>{
+            navigate('/marketplace/myitem/1')
+        }, 3000)
       })
       .on('confirmation', (confirmationNumber, receipt) => {
         console.log('confirmation', confirmationNumber, receipt);
       })
       .on('error', (error, receipt) => {
         console.error('error', error);
-        enqueueSnackbar('Buy NFT error!', { variant: 'warning' });
+        enqueueSnackbar('Buy NFT Error!', { variant: 'error' });
         setOnProgress(false);
       });
 
