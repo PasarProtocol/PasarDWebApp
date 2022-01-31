@@ -79,7 +79,7 @@ export default function MyItems() {
   const [dispmode, setDispmode] = React.useState(1);
   const [orderType, setOrderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
-  const [tabValue, setTabValue] = React.useState(0);
+  const [tabValue, setTabValue] = React.useState(params.type!==undefined?parseInt(params.type, 10):0);
   const [walletAddress, setWalletAddress] = React.useState(null);
   const [myName, setMyName] = React.useState("");
 
