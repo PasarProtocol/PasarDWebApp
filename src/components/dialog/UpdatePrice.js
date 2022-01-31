@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
 import * as math from 'mathjs';
+import { BigNumber } from 'ethers';
 import {
   Dialog,
   DialogTitle,
@@ -94,7 +95,8 @@ export default function UpdatePrice(props) {
   const changePrice = async () => {
     setOnProgress(true);
     console.log('orderId:', orderId);
-    callChangeOrderPrice(orderId, price);
+    const updatedPrice = new BigNumber(price).mul(1e18);
+    callChangeOrderPrice(orderId, updatedPrice);
   };
 
   return (
