@@ -133,9 +133,9 @@ export default function AssetCard(props) {
                         <StorefrontIcon/>&nbsp;Sell
                       </MenuItem>
                     }
-                    <MenuItem value='transfer' onClick={handleClosePopup}>
+                    {/* <MenuItem value='transfer' onClick={handleClosePopup}>
                       <SyncAltSharpIcon/>&nbsp;Transfer
-                    </MenuItem>
+                    </MenuItem> */}
                     {
                       isOwner&&
                       <MenuItem value='delete' onClick={handleClosePopup}>

@@ -348,8 +348,8 @@ export default function CollectibleDetail() {
                       <Jazzicon address={collectible.royaltyOwner}/>
                       {reduceHexAddress(collectible.royaltyOwner)}
                     </Link>
-                    <Badge name="pasar" sx={{ml: 2}}/>
-                    {/* <Badge name="diamond"/>
+                    {/* <Badge name="pasar" sx={{ml: 2}}/>
+                    <Badge name="diamond"/>
                     <Badge name="user"/>
                     <Badge name="thumbup" value="5"/>
                     <Badge name="custom" value="100 ELA"/> */}
