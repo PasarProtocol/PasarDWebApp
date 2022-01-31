@@ -375,7 +375,7 @@ export default function SignInDialog(props) {
                 >
                   <Typography variant="h6">Total Balance</Typography>
                   <Typography variant="h3" color="origin.main">
-                    USD {math.round(coinUSD * balance, 4)}
+                    USD {math.round(coinUSD * balance, 2)}
                   </Typography>
                   <Button
                     href="https://glidefinance.io/swap"
@@ -411,7 +411,7 @@ export default function SignInDialog(props) {
                       </Typography>
                       <Typography variant="body2" align="right" color="text.secondary">
                         {' '}
-                        USD {math.round(coinUSD * balance, 4)}
+                        USD {math.round(coinUSD * balance, 2)}
                       </Typography>
                     </Box>
                   </Stack>
@@ -450,10 +450,10 @@ export default function SignInDialog(props) {
               <BookOutlinedIcon />
               &nbsp;My Items
             </MenuItem>
-            <MenuItem onClick={closeAccountMenu}>
+            {/* <MenuItem onClick={closeAccountMenu}>
               <SettingsOutlinedIcon />
               &nbsp;Settings
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem value="signout" onClick={closeAccountMenu} id="signout">
               <LogoutOutlinedIcon />
               &nbsp;Sign Out
