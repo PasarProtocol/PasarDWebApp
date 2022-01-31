@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
+import { BigNumber, ethers } from 'ethers';
 import * as math from 'mathjs';
 import { useWeb3React } from '@web3-react/core';
 import {
@@ -34,6 +35,26 @@ export default function Purchase(props) {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const callEthBuyOrder = async (_orderId, _didUri, _price) => {
+    try {
+        const { ethereum } = window;
+  
+        if (ethereum) {
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = provider.getSigner();
+          const pasarContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, PASAR_CONTRACT_ABI, signer);
+  
+          const nftTxn = await pasarContract.buyOrder(_orderId, _didUri);
+          await nftTxn.wait();
+    
+        } else {
+          console.log("Ethereum object does not exist");
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
 
   const callBuyOrder = async (_orderId, _didUri, _price) => {
     const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
@@ -81,10 +102,16 @@ export default function Purchase(props) {
     setOnProgress(true);
     console.log('---------------------------', info);
     console.log('orderId:', info.OrderId);
-    console.log('price:', parseInt(info.Price, 10) / 1e18);
+    console.log('price:', new BigNumber(info.Price));
     const buyerDidUri = await sendIpfsDidJson();
     console.log('didUri:', buyerDidUri);
-    callBuyOrder(info.OrderId, buyerDidUri, parseInt(info.Price, 10) / 1e18);
+    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
+        callEthBuyOrder(info.OrderId, buyerDidUri, parseInt(info.Price, 10) / 1e18);
+    }
+    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+        const buyPrice = new BigNumber(info.Price);
+        callBuyOrder(info.OrderId, buyerDidUri, buyPrice);
+    }
   };
 
   React.useEffect(async () => {
