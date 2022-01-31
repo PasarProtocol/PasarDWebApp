@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import * as math from 'mathjs';
-import { BigNumber } from 'ethers';
 import {
   Dialog,
   DialogTitle,
@@ -122,7 +121,7 @@ export default function Sell(props) {
             onClick={async () => {
               setOnProgress(true);
               const didUri = await sendIpfsDidJson();
-              const sellPrice = new BigNumber(price).mul(1e18);
+              const sellPrice = BigInt(price*1e18).toString();
               console.log('--------', tokenId, '--', sellPrice, '--', didUri, '--');
               await callContractMethod('createOrderForSale', {
                 _id: tokenId,
