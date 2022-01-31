@@ -7,6 +7,7 @@ export const essentialsConnector = new EssentialsConnector();
 let connectivityInitialized = false;
 
 export function useConnectivitySDK() {
+  // console.log("initialize:", connectivityInitialized)
   if (connectivityInitialized) return;
 
   console.log('Preparing the Elastos connectivity SDK');
