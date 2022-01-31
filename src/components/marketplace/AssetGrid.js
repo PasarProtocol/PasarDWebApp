@@ -37,6 +37,8 @@ const GridItems = (props) => (
             isOwner={props.isOwner}
             isLink={1&&true}
             orderId={item.orderId}
+            royaltyOwner={item.royaltyOwner}
+            holder={item.holder}
             {...props}
           />
         </motion.div>
@@ -50,7 +52,7 @@ export default function AssetGrid(props){
   else itemWidth = isMobile?150:200
   return(
     <StackedGrid itemWidth={itemWidth}>
-      <GridItems items={props.assets} type={props.type?props.type:0} isOwner={props.isOwner}/>
+      <GridItems items={props.assets} type={props.type?props.type:0} isOwner={props.isOwner} address={props.address}/>
     </StackedGrid>
   )
 }
