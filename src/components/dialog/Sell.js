@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import * as math from 'mathjs';
+import { BigNumber } from 'ethers';
 import {
   Dialog,
   DialogTitle,
@@ -121,11 +122,12 @@ export default function Sell(props) {
             onClick={async () => {
               setOnProgress(true);
               const didUri = await sendIpfsDidJson();
-              console.log('--------', tokenId, '--', price, '--', didUri, '--');
+              const sellPrice = new BigNumber(price).mul(1e18);
+              console.log('--------', tokenId, '--', sellPrice, '--', didUri, '--');
               await callContractMethod('createOrderForSale', {
                 _id: tokenId,
                 _amount: 1,
-                _price: price,
+                _price: sellPrice,
                 _didUri: didUri
               });
               enqueueSnackbar('Sell NFT success!', { variant: 'success' });
