@@ -144,16 +144,6 @@ export default function SignInDialog(props) {
     }
   }, [sessionLinkFlag, activatingConnector]);
 
-  // if (
-  //   (sessionStorage.getItem('token') === undefined ||
-  //     sessionStorage.getItem('did') === undefined ||
-  //     sessionLinkFlag === 0) &&
-  //   isUsingEssentialsConnector() &&
-  //   essentialsConnector.hasWalletConnectSession()
-  // ) {
-  //   essentialsConnector.disconnectWalletConnect();
-  // }
-
   React.useEffect(async () => {
     initializeWalletConnection();
     // getExchangeInfo('10724720')
@@ -193,7 +183,7 @@ export default function SignInDialog(props) {
       }
     }
   }, [sessionLinkFlag, account, active, chainId, activatingConnector]);
-
+  
   useConnectivitySDK();
 
   // ------------ Connect Wallet ------------
