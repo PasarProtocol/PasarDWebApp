@@ -411,7 +411,7 @@ export default function SignInDialog({ onChange }) {
                     </Box>
                   </Stack>
                 </PaperRecord>
-                <PaperRecord sx={{ p: 1.5 }}>
+                {/* <PaperRecord sx={{ p: 1.5 }}>
                   <Stack direction="row" alignItems="center" spacing={2}>
                     <Box
                       draggable={false}
@@ -438,7 +438,7 @@ export default function SignInDialog({ onChange }) {
                       </Typography>
                     </Box>
                   </Stack>
-                </PaperRecord>
+                </PaperRecord> */}
               </Stack>
             </Box>
             <MenuItem to="/marketplace/myitem" onClick={closeAccountMenu} component={RouterLink}>
