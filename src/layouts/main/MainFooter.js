@@ -104,7 +104,7 @@ export default function MainFooter({hidden, isHome}) {
         >
           <Grid item xs={12} md={6}>
             <CopyRight textAlign='left'>
-              Pasar Protocol 2021 | Donate <span role="img" aria-label="">❤️</span>
+              Pasar Protocol 2021 | Donate <span role="img" aria-label="">❤️</span> v1 - 6a13be552a16722f47e8fd575d4b049c3efefc51
             </CopyRight>
           </Grid>
           <Grid item xs={12} md={6}>

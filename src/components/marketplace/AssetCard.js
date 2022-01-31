@@ -128,19 +128,19 @@ export default function AssetCard(props) {
                   type===2&&
                   <div>
                     {
-                      myaddress===royaltyOwner&&
+                      myaddress===royaltyOwner&&saleType!=="Not on sale"&&
                       <MenuItem value='update' onClick={handleClosePopup}>
                         <LocalOfferOutlinedIcon/>&nbsp;Update Price
                       </MenuItem>
                     }
                     {
-                      myaddress===royaltyOwner&&
+                      myaddress===royaltyOwner&&saleType!=="Not on sale"&&
                       <MenuItem value='cancel' onClick={handleClosePopup}>
                         <CancelOutlinedIcon/>&nbsp;Cancel Sale
                       </MenuItem>
                     }
                     {
-                      myaddress!==royaltyOwner&&myaddress===holder&&
+                      myaddress===holder&&saleType==="Not on sale"&&
                       <MenuItem value='sell' onClick={handleClosePopup}>
                         <StorefrontIcon/>&nbsp;Sell
                       </MenuItem>
@@ -149,7 +149,7 @@ export default function AssetCard(props) {
                       <SyncAltSharpIcon/>&nbsp;Transfer
                     </MenuItem> */}
                     {
-                      myaddress!==royaltyOwner&&myaddress===holder&&
+                      myaddress===holder&&saleType==="Not on sale"&&
                       <MenuItem value='delete' onClick={handleClosePopup}>
                         <DeleteOutlineIcon/>&nbsp;Delete
                       </MenuItem>
