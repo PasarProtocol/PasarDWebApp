@@ -261,7 +261,7 @@ export default function CreateItem() {
                           reject(error)
                       });
                     else
-                      callContractMethod('createOrderForSale', {...paramObj, '_amount': _tokenSupply, '_price': parseInt(price, 10)}).then((success) => {
+                      callContractMethod('createOrderForSale', {...paramObj, '_amount': _tokenSupply, '_price': BigInt(price*1e18).toString()}).then((success) => {
                         resolve(success)
                       }).catch(error=>{
                         reject(error)
