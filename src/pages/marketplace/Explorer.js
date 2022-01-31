@@ -97,7 +97,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 export default function MarketExplorer() {
   const params = useParams(); // params.key
   const drawerWidth = 360;
-  const btnNames = ["Listed", "On Auction", "General", "Avatar"]
+  const btnNames = ["Buy Now", "On Auction", "General", "Avatar"]
 
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();

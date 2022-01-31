@@ -1,5 +1,6 @@
 import React from 'react';
 import Web3 from 'web3';
+import { useNavigate } from 'react-router-dom';
 import { isString } from 'lodash';
 import {isMobile} from 'react-device-detect';
 import * as math from 'mathjs';
@@ -92,6 +93,7 @@ export default function CreateItem() {
   const uploadRef = React.useRef();
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
+  const navigate = useNavigate();
   
   React.useEffect(async () => {
     if(mintype!=="Multiple")
@@ -409,8 +411,12 @@ export default function CreateItem() {
     setOnProgress(true)
     uploadData().then((paramObj) => mint2net(paramObj)).then((success) => {
       setProgress(100)
-      if(success)
+      if(success){
         enqueueSnackbar('Mint token success!', { variant: 'success' });
+        setTimeout(()=>{
+          navigate('/marketplace')
+        }, 3000)
+      }
       else
         enqueueSnackbar('Mint token error!', { variant: 'warning' });
       setOnProgress(false)

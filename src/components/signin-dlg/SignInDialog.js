@@ -73,7 +73,8 @@ const useStyles = makeStyles({
   }
 });
 
-export default function SignInDialog({ onChange }) {
+export default function SignInDialog(props) {
+  const {openSigninEssential, setOpenSigninEssentialDlg} = props
   const { pathname } = useLocation();
   const isHome = pathname === '/';
 
@@ -295,6 +296,9 @@ export default function SignInDialog({ onChange }) {
   const handleCloseSigninDlg = () => {
     setOpenSigninDlg(false);
   };
+  const handleCloseSigninEssentialDlg = () => {
+    setOpenSigninEssentialDlg(false);
+  };
   const handleCloseDownloadDlg = () => {
     setOpenDownloadDlg(false);
   };
@@ -307,7 +311,7 @@ export default function SignInDialog({ onChange }) {
     setOpenAccountPopup(null);
     if (e.target.getAttribute('value') === 'signout') {
       await activate(null);
-      if (sessionStorage.removeItem('PASAR_LINK_ADDRESS') === '2')
+      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
         essentialsConnector
           .disconnectWalletConnect()
           .then((res) => {})
@@ -352,6 +356,7 @@ export default function SignInDialog({ onChange }) {
               ) : (
                 <Link
                   underline="hover"
+                  id="getDidNow"
                   onClick={() => {
                     setOpenDownloadDlg(true);
                   }}
@@ -370,7 +375,7 @@ export default function SignInDialog({ onChange }) {
                 >
                   <Typography variant="h6">Total Balance</Typography>
                   <Typography variant="h3" color="origin.main">
-                    USD {math.round(coinUSD * balance, 4)}
+                    USD {math.round(coinUSD * balance, 2)}
                   </Typography>
                   <Button
                     href="https://glidefinance.io/swap"
@@ -406,12 +411,12 @@ export default function SignInDialog({ onChange }) {
                       </Typography>
                       <Typography variant="body2" align="right" color="text.secondary">
                         {' '}
-                        USD {math.round(coinUSD * balance, 4)}
+                        USD {math.round(coinUSD * balance, 2)}
                       </Typography>
                     </Box>
                   </Stack>
                 </PaperRecord>
-                <PaperRecord sx={{ p: 1.5 }}>
+                {/* <PaperRecord sx={{ p: 1.5 }}>
                   <Stack direction="row" alignItems="center" spacing={2}>
                     <Box
                       draggable={false}
@@ -438,18 +443,18 @@ export default function SignInDialog({ onChange }) {
                       </Typography>
                     </Box>
                   </Stack>
-                </PaperRecord>
+                </PaperRecord> */}
               </Stack>
             </Box>
             <MenuItem to="/marketplace/myitem" onClick={closeAccountMenu} component={RouterLink}>
               <BookOutlinedIcon />
               &nbsp;My Items
             </MenuItem>
-            <MenuItem onClick={closeAccountMenu}>
+            {/* <MenuItem onClick={closeAccountMenu}>
               <SettingsOutlinedIcon />
               &nbsp;Settings
-            </MenuItem>
-            <MenuItem value="signout" onClick={closeAccountMenu}>
+            </MenuItem> */}
+            <MenuItem value="signout" onClick={closeAccountMenu} id="signout">
               <LogoutOutlinedIcon />
               &nbsp;Sign Out
             </MenuItem>
@@ -649,13 +654,87 @@ export default function SignInDialog({ onChange }) {
           </Typography>
         </DialogContent>
       </Dialog>
+      <Dialog open={openSigninEssential} onClose={handleCloseSigninEssentialDlg}>
+        <DialogTitle>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseSigninEssentialDlg}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500]
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
+            Sign in with your DID
+          </Typography>
+          <Box component="div" sx={{ maxWidth: 350, m: 'auto' }}>
+            <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
+              Sign in with one of the available providers or create a new one.
+              <Link href="https://www.elastos.org/did" underline="hover" color="red" target="_blank">
+                What is a DID?
+              </Link>
+            </Typography>
+            <Grid container spacing={2} sx={{ my: 4 }}>
+              <Grid item xs={12} sx={{ pt: '0 !important' }}>
+                <Typography variant="body2" display="block" gutterBottom align="center">
+                  Web3.0 super wallet with Decentralized Identifier (DID)
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sx={{ pt: '8px !important' }}>
+                <ButtonStyle
+                  variant="contained"
+                  startIcon={
+                    <Avatar
+                      alt="Elastos"
+                      src="/static/elastos.svg"
+                      sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
+                    />
+                  }
+                  endIcon={
+                    <Typography variant="p" sx={{ fontSize: '0.875rem !important' }}>
+                      <span role="img" aria-label="">
+                        🔥
+                      </span>
+                      Popular
+                    </Typography>
+                  }
+                  className={classes.iconAbsolute1}
+                  fullWidth
+                  onClick={() => {
+                    connectWithEssential();
+                  }}
+                  sx={!isLight && { backgroundColor: 'white' }}
+                >
+                  Elastos Essentials
+                </ButtonStyle>
+              </Grid>
+              <Grid item xs={12}>
+                <ButtonOutlinedStyle variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
+                  I don’t have a wallet
+                </ButtonOutlinedStyle>
+              </Grid>
+            </Grid>
+          </Box>
+          <Typography
+            variant="caption"
+            display="block"
+            sx={{ color: 'text.secondary' }}
+            gutterBottom
+            align="center"
+          >
+            We do not own your private keys and cannot access your funds without your confirmation.
+          </Typography>
+        </DialogContent>
+      </Dialog>
       <SnackbarCustom isOpen={isOpenSnackbar} setOpen={setSnackbarOpen}>
         Wrong network, only Elastos Smart Chain is supported
       </SnackbarCustom>
     </>
   );
 }
-
-SignInDialog.propTypes = {
-  onChange: PropTypes.func
-};
