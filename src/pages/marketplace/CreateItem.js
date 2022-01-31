@@ -9,7 +9,7 @@ import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Inpu
   Accordion, AccordionSummary, AccordionDetails, FormHelperText } from '@mui/material';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { create, urlSource } from 'ipfs-http-client'
 import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
@@ -251,7 +251,7 @@ export default function CreateItem() {
                       stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
                       .on('receipt', (receipt) => {
                           console.log("setApprovalForAll-receipt", receipt);
-                          callContractMethod('createOrderForSale', {...paramObj, '_amount': _tokenSupply, '_price': parseInt(price, 10)}).then((success) => {
+                          callContractMethod('createOrderForSale', {...paramObj, '_amount': _tokenSupply, '_price': new BigNumber(price).mul(1e18)}).then((success) => {
                             resolve(success)
                           }).catch(error=>{
                             reject(error)
