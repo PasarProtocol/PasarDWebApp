@@ -8,6 +8,7 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 // material
 import { styled } from '@mui/material/styles';
 import { Box, Link, Grid, List, Stack, Popover, ListItem, ListSubheader, CardActionArea, Tooltip } from '@mui/material';
+import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 
 // ----------------------------------------------------------------------
 
@@ -63,16 +64,17 @@ function IconBullet({ type = 'item' }) {
   );
 }
 
-MenuDesktopItem.propTypes = {
-  item: PropTypes.object,
-  isHome: PropTypes.bool,
-  isOffset: PropTypes.bool,
-  isOpen: PropTypes.bool,
-  onOpen: PropTypes.func,
-  onClose: PropTypes.func
-};
+// MenuDesktopItem.propTypes = {
+//   item: PropTypes.object,
+//   isHome: PropTypes.bool,
+//   isOffset: PropTypes.bool,
+//   isOpen: PropTypes.bool,
+//   onOpen: PropTypes.func,
+//   onClose: PropTypes.func
+// };
 
-function MenuDesktopItem({ item, isHome, isOpen, isOffset, onOpen, onClose }) {
+function MenuDesktopItem(props) {
+  const { item, isHome, isOpen, isOffset, onOpen, onClose, setOpenSigninEssentialDlg } = props
   const { title, path, children } = item;
 
   if (children) {
@@ -182,6 +184,47 @@ function MenuDesktopItem({ item, isHome, isOpen, isOffset, onOpen, onClose }) {
     );
   }
 
+  const openSignin = (e)=>{
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+      if(document.getElementById("getDidNow"))
+        document.getElementById("getDidNow").click()
+    }
+    else
+      setOpenSigninEssentialDlg(true)
+  }
+
+  if(path.startsWith("/create")){
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && essentialsConnector.hasWalletConnectSession())
+      return <LinkStyle
+        to={path}
+        component={RouterLink}
+        end={path === '/'}
+        sx={{
+          // ...(isHome && { color: 'common.white' }),
+          // ...(isOffset && { color: 'text.primary' }),
+          '&.active': {
+            color: 'primary.main'
+          }
+        }}
+      >
+        {title}
+      </LinkStyle>
+    return <LinkStyle
+        // to={path}
+        // component={RouterLink}
+        end={path === '/'}
+        sx={{
+          cursor: 'pointer',
+          '&.active': {
+            color: 'primary.main'
+          }
+        }}
+        onClick={openSignin}
+      >
+        {title}
+      </LinkStyle>
+  }
+
   return (
     !item.disable?
       <LinkStyle
@@ -218,7 +261,7 @@ MenuDesktop.propTypes = {
   navConfig: PropTypes.array
 };
 
-export default function MenuDesktop({ isOffset, isHome, navConfig }) {
+export default function MenuDesktop({ isOffset, isHome, navConfig, setOpenSigninEssentialDlg }) {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
 
@@ -248,6 +291,7 @@ export default function MenuDesktop({ isOffset, isHome, navConfig }) {
           onClose={handleClose}
           isOffset={isOffset}
           isHome={isHome}
+          setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
         />
       ))}
     </Stack>
