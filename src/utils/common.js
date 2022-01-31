@@ -5,7 +5,7 @@ import { create, urlSource } from 'ipfs-http-client'
 import { subDays, differenceInDays  } from 'date-fns';
 import Jazzicon from "@metamask/jazzicon";
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
-import {marketContract as CONTRACT_ADDRESS, diaContract} from '../config';
+import {marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS} from '../config';
 import {PASAR_CONTRACT_ABI} from '../abi/pasarABI';
 
 const client = create('https://ipfs-test.trinity-feeds.app/');
@@ -92,9 +92,9 @@ export async function getCoinUSD() {
   }
 }
 
-export async function getExchangeInfo(blocknum) {
+export async function getExchangeInfo(blocknum, connectProvider) {
   const graphQLParams = {
-      "query": `query tokenPriceData {\n  token(id: "${diaContract}", block: {number: ${blocknum}}) {\n    derivedELA\n  }\n  bundle(id: "1", block: {number: ${blocknum}}) {\n    elaPrice\n  }\n}\n`,
+      "query": `query tokenPriceData {\n  token(id: "${DIA_CONTRACT_ADDRESS}", block: {number: ${blocknum}}) {\n    derivedELA\n  }\n  bundle(id: "1", block: {number: ${blocknum}}) {\n    elaPrice\n  }\n}\n`,
       "variables": null,
       "operationName": "tokenPriceData"
   }
@@ -115,7 +115,26 @@ export async function getExchangeInfo(blocknum) {
           return null;
       }
   });
-  // console.log(response)
+  
+  if(!connectProvider)
+    return 0
+  const walletConnectWeb3 = new Web3(connectProvider);
+  const diaABI4Balance = [{
+    "inputs": [{
+      "internalType": "address",
+      "name": "owner",
+      "type": "address"
+    }],
+    "name": "balanceOf",
+    "outputs": [{
+      "internalType": "uint256",
+      "name": "balance",
+      "type": "uint256"
+    }],
+    "stateMutability": "view",
+    "type": "function"
+  }]
+  const marketContract = new walletConnectWeb3.eth.Contract(diaABI4Balance, DIA_CONTRACT_ADDRESS)
 }
 
 export function removeLeadingZero(value) {
