@@ -102,14 +102,14 @@ export default function Purchase(props) {
     setOnProgress(true);
     console.log('---------------------------', info);
     console.log('orderId:', info.OrderId);
-    console.log('price:', BigInt(info.price).toString());
+    console.log('price:', BigInt(info.Price).toString());
     const buyerDidUri = await sendIpfsDidJson();
     console.log('didUri:', buyerDidUri);
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
         callEthBuyOrder(info.OrderId, buyerDidUri, parseInt(info.Price, 10) / 1e18);
     }
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-        const buyPrice = BigInt(info.price).toString();
+        const buyPrice = BigInt(info.Price).toString();
         callBuyOrder(info.OrderId, buyerDidUri, buyPrice);
     }
   };

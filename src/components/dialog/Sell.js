@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Web3 from 'web3';
 import * as math from 'mathjs';
 import {
   Dialog,
@@ -20,7 +21,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
-
+import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
+import {
+  stickerContract as CONTRACT_ADDRESS,
+  marketContract as MARKET_CONTRACT_ADDRESS,
+  blankAddress
+} from '../../config';
+import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import CoinSelect from '../marketplace/CoinSelect';
 import { removeLeadingZero, callContractMethod, sendIpfsDidJson } from '../../utils/common';
 
@@ -47,6 +54,66 @@ export default function Sell(props) {
     setPrice(priceValue);
     setRcvPrice(math.round((priceValue * 98) / 100, 3));
   };
+
+  const callSetApprovalForAllAndSell = (_operator, _approved, _price, _didUri) => (
+    new Promise((resolve, reject) => {
+      const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
+      const walletConnectWeb3 = new Web3(walletConnectProvider);
+      // const accounts = await walletConnectWeb3.eth.getAccounts();
+      walletConnectWeb3.eth.getAccounts().then((accounts)=>{
+
+        const contractAbi = STICKER_CONTRACT_ABI;
+        const contractAddress = CONTRACT_ADDRESS; // Elastos Testnet
+        const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+        
+        walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+          console.log("Gas price:", gasPrice);
+          // console.log("Sending transaction with account address:", accounts[0]);
+          const transactionParams = {
+              'from': accounts[0],
+              'gasPrice': gasPrice,
+              'gas': 5000000,
+              'value': 0
+          };
+    
+          stickerContract.methods.isApprovedForAll(accounts[0], _operator).call().then(isApproval=>{
+            console.log("isApprovalForAll=", isApproval);
+            if (!isApproval)
+              stickerContract.methods.setApprovalForAll(_operator, true).send(transactionParams)
+              .on('receipt', (receipt) => {
+                  console.log("setApprovalForAll-receipt", receipt);
+                  callContractMethod('createOrderForSale', {
+                    '_id': tokenId,
+                    '_amount': 1,
+                    '_price': _price,
+                    '_didUri': _didUri
+                  }).then((success) => {
+                    resolve(success)
+                  }).catch(error=>{
+                    reject(error)
+                  })
+              })
+              .on('error', (error, receipt) => {
+                  console.error("setApprovalForAll-error", error);
+                  reject(error)
+              });
+            else
+              callContractMethod('createOrderForSale', {
+                '_id': tokenId,
+                '_amount': 1,
+                '_price': _price,
+                '_didUri': _didUri
+              }).then((success) => {
+                resolve(success)
+              }).catch(error=>{
+                reject(error)
+              })
+          })
+        })
+        
+      })
+  })
+  );
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -123,14 +190,16 @@ export default function Sell(props) {
               const didUri = await sendIpfsDidJson();
               const sellPrice = BigInt(price*1e18).toString();
               console.log('--------', tokenId, '--', sellPrice, '--', didUri, '--');
-              await callContractMethod('createOrderForSale', {
-                _id: tokenId,
-                _amount: 1,
-                _price: sellPrice,
-                _didUri: didUri
+              callSetApprovalForAllAndSell(MARKET_CONTRACT_ADDRESS, true, sellPrice, didUri).then(result=>{
+                if(result){
+                  enqueueSnackbar('Sell NFT success!', { variant: 'success' });
+                  setOpen(false);
+                } else {
+                  enqueueSnackbar('Sell NFT error!', { variant: 'warning' });
+                }
+              }).catch(e=>{
+                console.log(e)
               });
-              enqueueSnackbar('Sell NFT success!', { variant: 'success' });
-              setOpen(false);
             }}
           >
             List
