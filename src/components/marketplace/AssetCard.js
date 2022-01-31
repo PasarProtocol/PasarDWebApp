@@ -27,7 +27,7 @@ import CardImgBox from '../CardImgBox';
 // ----------------------------------------------------------------------
 
 export default function AssetCard(props) {
-  const {title="???", description, quantity=1, price=0, isLink, tokenId, type, isOwner, orderId, saleType, address, royaltyOwner, holder} = props
+  const {title="???", description, quantity=1, price=0, isLink, tokenId, type, orderId, saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate} = props
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
   const [updateOpen, setOpenUpdate] = React.useState(false);
@@ -109,7 +109,7 @@ export default function AssetCard(props) {
                   type===1&&
                   <div>
                     {
-                      isOwner&&
+                      myaddress===royaltyOwner&&
                       <div>
                         <MenuItem value='update' onClick={handleClosePopup}>
                           <LocalOfferOutlinedIcon/>&nbsp;Update Price
@@ -128,19 +128,19 @@ export default function AssetCard(props) {
                   type===2&&
                   <div>
                     {
-                      isOwner&&address===royaltyOwner&&
+                      myaddress===royaltyOwner&&
                       <MenuItem value='update' onClick={handleClosePopup}>
                         <LocalOfferOutlinedIcon/>&nbsp;Update Price
                       </MenuItem>
                     }
                     {
-                      isOwner&&address===royaltyOwner&&
+                      myaddress===royaltyOwner&&
                       <MenuItem value='cancel' onClick={handleClosePopup}>
                         <CancelOutlinedIcon/>&nbsp;Cancel Sale
                       </MenuItem>
                     }
                     {
-                      isOwner&&address===holder&&
+                      myaddress!==royaltyOwner&&myaddress===holder&&
                       <MenuItem value='sell' onClick={handleClosePopup}>
                         <StorefrontIcon/>&nbsp;Sell
                       </MenuItem>
@@ -149,7 +149,7 @@ export default function AssetCard(props) {
                       <SyncAltSharpIcon/>&nbsp;Transfer
                     </MenuItem> */}
                     {
-                      isOwner&&address===holder&&
+                      myaddress!==royaltyOwner&&myaddress===holder&&
                       <MenuItem value='delete' onClick={handleClosePopup}>
                         <DeleteOutlineIcon/>&nbsp;Delete
                       </MenuItem>
@@ -198,7 +198,7 @@ export default function AssetCard(props) {
             </Typography>
           }
           {
-            (type===2&&isOwner&&saleType==="Not on sale")&&
+            (type===2&&((myaddress===royaltyOwner&&saleType==="Not on sale")||(myaddress===holder&&myaddress!==royaltyOwner)))&&
             <Button variant="contained" size="small" fullWidth sx={{mt: 1}} onClick={(e)=>{setOpenSell(true)}}>Sell</Button>
           }
           {/* <Stack direction="row">
@@ -206,10 +206,10 @@ export default function AssetCard(props) {
             <Badge name="user"/>
           </Stack> */}
         </PaperRecord>
-        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} title={title} tokenId={tokenId}/>
-        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} title={title} orderId={orderId}/>
-        <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} title={title} orderId={orderId}/>
-        <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} title={title} tokenId={tokenId}/>
+        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} title={title} tokenId={tokenId} updateCount={updateCount} handleUpdate={handleUpdate}/>
+        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} title={title} orderId={orderId} updateCount={updateCount} handleUpdate={handleUpdate}/>
+        <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} title={title} orderId={orderId} updateCount={updateCount} handleUpdate={handleUpdate}/>
+        <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} title={title} tokenId={tokenId} updateCount={updateCount} handleUpdate={handleUpdate}/>
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} title={title} tokenId={tokenId}/>
       </motion.div>
     // </Link>
