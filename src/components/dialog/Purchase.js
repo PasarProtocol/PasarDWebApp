@@ -40,23 +40,61 @@ export default function Purchase(props) {
 
   const callEthBuyOrder = async (_orderId, _didUri, _price) => {
     try {
-        const { ethereum } = window;
-  
-        if (ethereum) {
-          const provider = new ethers.providers.Web3Provider(ethereum);
-          const signer = provider.getSigner();
-          const pasarContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, PASAR_CONTRACT_ABI, signer);
-  
-          const nftTxn = await pasarContract.buyOrder(_orderId, _didUri);
-          await nftTxn.wait();
-    
-        } else {
-          console.log("Ethereum object does not exist");
-        }
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const pasarContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, PASAR_CONTRACT_ABI, signer);
+        signer.getAddress().then(userAddress=>{
+          provider.getGasPrice().then(gasPrice=>{
+            const transactionParams = {
+              'from': userAddress,
+              'gasPrice': gasPrice.toBigInt(),
+              'value': _price
+            };
+            pasarContract.buyOrder(_orderId, _didUri, transactionParams).then((nftTxn)=>{
+              console.log("Buying... please wait")
+              nftTxn.wait().then(()=>{
+                // console.log("bought")
+                enqueueSnackbar('Buy NFT Success!', { variant: 'success' });
+                setOpen(false);
+                setOnProgress(false);
+                setTimeout(()=>{
+                  navigate('/marketplace/myitem/1')
+                }, 3000)
+              }).catch((error) => {
+                console.log(error)
+                enqueueSnackbar('Buy NFT Error!', { variant: 'error' });
+                setOnProgress(false);
+              })
+            }).catch((error) => {
+              console.log(error)
+              enqueueSnackbar('Buy NFT Error!', { variant: 'error' });
+              setOnProgress(false);
+            })
+          }).catch((error) => {
+            console.log(error)
+            enqueueSnackbar('Buy NFT Error!', { variant: 'error' });
+            setOnProgress(false);
+          })
+        }).catch((error) => {
+          console.log(error)
+          enqueueSnackbar('Buy NFT Error!', { variant: 'error' });
+          setOnProgress(false);
+        })
+        
+      } else {
+        console.log("Ethereum object does not exist");
+        enqueueSnackbar('Buy NFT Error!', { variant: 'error' });
+        setOnProgress(false);
+      }
     } catch (err) {
-        console.log(err);
+      setOnProgress(false);
+      enqueueSnackbar('Buy NFT Error!', { variant: 'error' });
+      console.log(err);
     }
-}
+  }
 
   const callBuyOrder = async (_orderId, _didUri, _price) => {
     const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
@@ -89,7 +127,7 @@ export default function Purchase(props) {
         setOpen(false);
         setOnProgress(false);
         setTimeout(()=>{
-            navigate('/marketplace/myitem/1')
+          navigate('/marketplace/myitem/1')
         }, 3000)
       })
       .on('confirmation', (confirmationNumber, receipt) => {
@@ -111,11 +149,11 @@ export default function Purchase(props) {
     console.log('price:', BigInt(info.Price).toString());
     const buyerDidUri = await sendIpfsDidJson();
     console.log('didUri:', buyerDidUri);
+    const buyPrice = BigInt(info.Price).toString();
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
-        callEthBuyOrder(info.OrderId, buyerDidUri, parseInt(info.Price, 10) / 1e18);
+        callEthBuyOrder(info.OrderId, buyerDidUri, buyPrice);
     }
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-        const buyPrice = BigInt(info.Price).toString();
         callBuyOrder(info.OrderId, buyerDidUri, buyPrice);
     }
   };
@@ -235,9 +273,13 @@ export default function Purchase(props) {
         {price <= balance ? (
           <>
             <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-              <Button variant="contained" fullWidth onClick={buyNft}>
+              <LoadingButton
+                loading={onProgress}
+                variant="contained"
+                fullWidth
+                onClick={buyNft}>
                 Buy
-              </Button>
+              </LoadingButton>
             </Box>
             <Typography variant="body2" display="block" color="red" gutterBottom align="center">
               Please check all item details before making a purchase
@@ -246,15 +288,14 @@ export default function Purchase(props) {
         ) : (
           <>
             <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-              <LoadingButton
-                loading={onProgress}
+              <Button
                 variant="outlined"
                 href="https://glidefinance.io/swap"
                 target="_blank"
                 fullWidth
               >
                 Add funds
-              </LoadingButton>
+              </Button>
             </Box>
             <Typography variant="body2" display="block" color="red" gutterBottom align="center">
               Insufficient funds in ELA
