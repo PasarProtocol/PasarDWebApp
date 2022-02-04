@@ -38,7 +38,7 @@ const InputStyle = styled(Input)(({ theme }) => ({
 }));
 
 export default function Sell(props) {
-  const { isOpen, setOpen, title, tokenId } = props;
+  const { isOpen, setOpen, title, tokenId, updateCount, handleUpdate } = props;
   const [price, setPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
   const { enqueueSnackbar } = useSnackbar();
@@ -192,6 +192,7 @@ export default function Sell(props) {
               console.log('--------', tokenId, '--', sellPrice, '--', didUri, '--');
               callSetApprovalForAllAndSell(MARKET_CONTRACT_ADDRESS, true, sellPrice, didUri).then(result=>{
                 if(result){
+                  setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
                   enqueueSnackbar('Sell NFT success!', { variant: 'success' });
                   setOpen(false);
                 } else {

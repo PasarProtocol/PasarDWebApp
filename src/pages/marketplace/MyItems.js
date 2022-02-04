@@ -79,9 +79,11 @@ export default function MyItems() {
   const [dispmode, setDispmode] = React.useState(1);
   const [orderType, setOrderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
-  const [tabValue, setTabValue] = React.useState(0);
+  const [tabValue, setTabValue] = React.useState(params.type!==undefined?parseInt(params.type, 10):0);
   const [walletAddress, setWalletAddress] = React.useState(null);
+  const [myAddress, setMyAddress] = React.useState(null);
   const [myName, setMyName] = React.useState("");
+  const [updateCount, setUpdateCount] = React.useState(0);
 
   const context = useWeb3React();
   const { account } = context;
@@ -89,16 +91,17 @@ export default function MyItems() {
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   const triedEager = useEagerConnect();
   React.useEffect(async() => {
-    if (!params.address) {
-      if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-        const strWalletAddress = await essentialsConnector.getWalletConnectProvider().wc.accounts[0];
-        setWalletAddress(strWalletAddress);
-      }
-      else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
-        setWalletAddress(account);
-      }
+    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+      const strWalletAddress = await essentialsConnector.getWalletConnectProvider().wc.accounts[0];
+      setMyAddress(strWalletAddress)
+      setWalletAddress(strWalletAddress);
     }
-    else setWalletAddress(params.address);
+    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
+      setMyAddress(account)
+      setWalletAddress(account);
+    }
+    if (params.address)
+      setWalletAddress(params.address);
     getMyName();
   }, [account, params.address]);
 
@@ -147,13 +150,15 @@ export default function MyItems() {
             response.json().then((jsonAssets) => {
               setAssetsOfType(i, jsonAssets.data);
               setLoadingAssetsOfType(i, false);
+            }).catch((e) => {
+              setLoadingAssetsOfType(i, false);
             });
           })
           .catch((e) => {
             if (e.code !== e.ABORT_ERR) setLoadingAssetsOfType(i, false);
           });
       });
-  }, [walletAddress, orderType]);
+  }, [walletAddress, orderType, updateCount]);
 
   const handleDispmode = (event, mode) => {
     if (mode === null) return;
@@ -261,7 +266,7 @@ export default function MyItems() {
                 {!isLoadingAssets[i] && (
                   <Box component="main">
                     {group.length > 0 ? (
-                      <AssetGrid assets={group} type={i + 1} dispmode={dispmode} isOwner={!params.address} />
+                      <AssetGrid assets={group} type={i + 1} dispmode={dispmode} myaddress={myAddress} updateCount={updateCount} handleUpdate={setUpdateCount} />
                     ) : (
                       <Typography variant="subtitle2" align="center" sx={{ mb: 3 }}>
                         No {typeNames[i]} collectible found!

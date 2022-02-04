@@ -17,7 +17,7 @@ import { reduceHexAddress } from '../../utils/common';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 
 export default function DeleteItem(props) {
-  const { isOpen, setOpen, title, tokenId } = props;
+  const { isOpen, setOpen, title, tokenId, updateCount, handleUpdate } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const handleClose = () => {
@@ -51,6 +51,7 @@ export default function DeleteItem(props) {
       })
       .on('receipt', (receipt) => {
         console.log('receipt', receipt);
+        setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
         enqueueSnackbar('Burn NFT success!', { variant: 'success' });
         setOpen(false);
       })
