@@ -95,6 +95,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 }));
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
+  const sessionDispMode = sessionStorage.getItem("disp-mode")
   const params = useParams(); // params.key
   const drawerWidth = 360;
   const btnNames = ["Buy Now", "On Auction", "General", "Avatar"]
@@ -106,7 +107,7 @@ export default function MarketExplorer() {
   const [range, setRange] = React.useState({min:'', max:''});
   const [adult, setAdult] = React.useState(false);
   const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
-  const [dispmode, setDispmode] = React.useState(1);
+  const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):1);
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({selectedBtns:[]});
   const [totalCount, setTotalCount] = React.useState(0);
@@ -170,6 +171,7 @@ export default function MarketExplorer() {
   const handleDispmode = (event, mode) => {
     if(mode===null)
       return
+    sessionStorage.setItem('disp-mode', mode);
     setDispmode(mode)
   };
   const handleBtns = (num)=>{

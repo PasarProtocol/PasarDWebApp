@@ -45,7 +45,6 @@ const GridItems = (props) => (
     </AnimatePresence>
 );
 export default function AssetGrid(props){
-  console.log(props)
   let itemWidth = 200
   if(props.dispmode===0)
     itemWidth = isMobile?230:270
