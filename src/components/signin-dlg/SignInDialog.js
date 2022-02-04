@@ -184,6 +184,26 @@ export default function SignInDialog(props) {
     }
   }, [sessionLinkFlag, account, active, chainId, activatingConnector]);
   
+  React.useEffect(async()=>{
+    if(sessionLinkFlag === '2' && activatingConnector === essentialsConnector && !essentialsConnector.getWalletConnectProvider().wc.connected) {
+      alert(2)
+      setOpenAccountPopup(null);
+        await activate(null);
+        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+          essentialsConnector
+            .disconnectWalletConnect()
+            .then((res) => {})
+            .catch((e) => {
+              console.log(e);
+            });
+        sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('did');
+        setActivatingConnector(null);
+        setWalletAddress(null);
+        navigate('/marketplace');
+      }
+  }, [essentialsConnector.getWalletConnectProvider().wc.connected]);
   useConnectivitySDK();
 
   // ------------ Connect Wallet ------------
