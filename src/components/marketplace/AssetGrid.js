@@ -32,11 +32,12 @@ const GridItems = (props) => (
             price={round(item.price/1e18, 3)}
             quantity={item.quantity}
             tokenId={item.tokenId}
-            saleType={item.SaleType}
+            saleType={item.SaleType?item.SaleType:item.saleType}
             type={props.type}
-            isOwner={props.isOwner}
             isLink={1&&true}
             orderId={item.orderId}
+            royaltyOwner={item.royaltyOwner}
+            holder={item.holder}
             {...props}
           />
         </motion.div>
@@ -44,13 +45,14 @@ const GridItems = (props) => (
     </AnimatePresence>
 );
 export default function AssetGrid(props){
+  console.log(props)
   let itemWidth = 200
   if(props.dispmode===0)
     itemWidth = isMobile?230:270
   else itemWidth = isMobile?150:200
   return(
     <StackedGrid itemWidth={itemWidth}>
-      <GridItems items={props.assets} type={props.type?props.type:0} isOwner={props.isOwner}/>
+      <GridItems items={props.assets} type={props.type?props.type:0} myaddress={props.myaddress} updateCount={props.updateCount} handleUpdate={props.handleUpdate}/>
     </StackedGrid>
   )
 }

@@ -34,7 +34,7 @@ const InputStyle = styled(Input)(({ theme }) => ({
 }));
 
 export default function UpdatePrice(props) {
-  const { isOpen, setOpen, title, orderId } = props;
+  const { isOpen, setOpen, title, orderId, updateCount, handleUpdate } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [price, setPrice] = React.useState('');
@@ -78,6 +78,7 @@ export default function UpdatePrice(props) {
       })
       .on('receipt', (receipt) => {
         console.log('receipt', receipt);
+        setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
         enqueueSnackbar('Update price success!', { variant: 'success' });
         setOpen(false);
       })
