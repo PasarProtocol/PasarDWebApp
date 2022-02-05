@@ -17,6 +17,7 @@ import Logo from '../../components/Logo';
 import Scrollbar from '../../components/Scrollbar';
 import ModeSwitch from '../../components/mode-switch';
 import { MIconButton, MFab } from '../../components/@material-extend';
+import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 
 
 // ----------------------------------------------------------------------
@@ -36,13 +37,13 @@ const ListItemStyle = styled(ListItemButton)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-MenuMobileItem.propTypes = {
-  item: PropTypes.object,
-  isOpen: PropTypes.bool,
-  onOpen: PropTypes.func
-};
+// MenuMobileItem.propTypes = {
+//   item: PropTypes.object,
+//   isOpen: PropTypes.bool,
+//   onOpen: PropTypes.func
+// };
 
-function MenuMobileItem({ item, isOpen, onOpen }) {
+function MenuMobileItem({ item, isOpen, onOpen, setOpenSigninEssentialDlg }) {
   const { title, path, icon, children } = item;
 
   if (children) {
@@ -68,6 +69,49 @@ function MenuMobileItem({ item, isOpen, onOpen }) {
         <ListItemText disableTypography primary={title} />
       </ListItemStyle>
     );
+  }
+
+  const openSignin = (e)=>{
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+      if(document.getElementById("getDidNow"))
+        document.getElementById("getDidNow").click()
+    }
+    else
+      setOpenSigninEssentialDlg(true)
+  }
+
+  if(path.startsWith("/create")) {
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && essentialsConnector.hasWalletConnectSession())
+      return <ListItemStyle
+        to={path}
+        component={RouterLink}
+        end={path === '/'}
+        sx={{
+          '&.active': {
+            color: 'primary.main',
+            fontWeight: 'fontWeightMedium',
+            bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+          }
+        }}
+      >
+        <ListItemIcon>{icon}</ListItemIcon>
+        <ListItemText disableTypography primary={title} />
+      </ListItemStyle>
+    return <ListItemStyle
+        end={path === '/'}
+        sx={{
+          cursor: 'pointer',
+          '&.active': {
+            color: 'primary.main',
+            fontWeight: 'fontWeightMedium',
+            bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+          }
+        }}
+        onClick={openSignin}
+      >
+        <ListItemIcon>{icon}</ListItemIcon>
+        <ListItemText disableTypography primary={title} />
+      </ListItemStyle>
   }
 
   return (
@@ -117,7 +161,7 @@ MenuMobile.propTypes = {
   navConfig: PropTypes.array
 };
 
-export default function MenuMobile({ isOffset, isHome, navConfig }) {
+export default function MenuMobile({ isOffset, isHome, navConfig, setOpenSigninEssentialDlg }) {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -167,7 +211,7 @@ export default function MenuMobile({ isOffset, isHome, navConfig }) {
 
           <List disablePadding>
             {navConfig.map((link) => (
-              <MenuMobileItem key={link.title} item={link} isOpen={open} onOpen={handleOpen}/>
+              <MenuMobileItem key={link.title} item={link} isOpen={open} onOpen={handleOpen} setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}/>
             ))}
           </List>
         </Scrollbar>

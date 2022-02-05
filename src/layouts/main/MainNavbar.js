@@ -102,7 +102,7 @@ export default function MainNavbar() {
           <SignInDialog openSigninEssential={openSigninEssential} setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}/>
 
           <MHidden width="mdUp">
-            <MenuMobile isOffset={isOffset} isHome={isHome} navConfig={navConfig} />
+            <MenuMobile isOffset={isOffset} isHome={isHome} navConfig={navConfig} setOpenSigninEssentialDlg={setOpenSigninEssentialDlg} />
           </MHidden>
         </Container>
       </ToolbarStyle>
