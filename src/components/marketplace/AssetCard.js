@@ -34,6 +34,11 @@ export default function AssetCard(props) {
   const [cancelOpen, setOpenCancel] = React.useState(false);
   const [deleteOpen, setOpenDelete] = React.useState(false);
   const [transferOpen, setOpenTransfer] = React.useState(false);
+  const isCreatedByMe = myaddress===royaltyOwner
+  const isListedOwnedByMe = myaddress===royaltyOwner&&saleType!=="Not on sale"
+  const isUnlistedOwnedByMe = myaddress===holder&&saleType!=="Primary Sale"
+  const isListedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType==="Primary Sale"
+  const isUnlistedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType!=="Primary Sale"
 
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);
@@ -66,7 +71,7 @@ export default function AssetCard(props) {
       <motion.div
         animate={{ scale: 1 }}
       >
-        <PaperRecord sx={{p:2}}>
+        <PaperRecord sx={{p:2, mb: '2px'}}>
           <Grid container>
             <Grid item xs={6}>
               <Tooltip title="Collection: Feeds NFT Sticker" arrow disableInteractive placement="top">
@@ -76,12 +81,9 @@ export default function AssetCard(props) {
               </Tooltip>
             </Grid>
             <Grid item xs={6} align="right">
-              {
-                type!==0&&
-                <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}}>
-                  <MoreHorizIcon />
-                </IconButton>
-              }
+              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}} disabled={!(type===1 || type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))}>
+                <MoreHorizIcon />
+              </IconButton>
               <Menu 
                 keepMounted
                 id="simple-menu"
@@ -109,7 +111,7 @@ export default function AssetCard(props) {
                   type===1&&
                   <div>
                     {
-                      myaddress===royaltyOwner&&
+                      isCreatedByMe&&
                       <div>
                         <MenuItem value='update' onClick={handleClosePopup}>
                           <LocalOfferOutlinedIcon/>&nbsp;Update Price
@@ -128,19 +130,19 @@ export default function AssetCard(props) {
                   type===2&&
                   <div>
                     {
-                      myaddress===royaltyOwner&&saleType!=="Not on sale"&&
+                      isListedOwnedByMe&&
                       <MenuItem value='update' onClick={handleClosePopup}>
                         <LocalOfferOutlinedIcon/>&nbsp;Update Price
                       </MenuItem>
                     }
                     {
-                      myaddress===royaltyOwner&&saleType!=="Not on sale"&&
+                      isListedOwnedByMe&&
                       <MenuItem value='cancel' onClick={handleClosePopup}>
                         <CancelOutlinedIcon/>&nbsp;Cancel Sale
                       </MenuItem>
                     }
                     {
-                      myaddress===holder&&saleType==="Not on sale"&&
+                      isUnlistedOwnedByMe&&
                       <MenuItem value='sell' onClick={handleClosePopup}>
                         <StorefrontIcon/>&nbsp;Sell
                       </MenuItem>
@@ -149,7 +151,7 @@ export default function AssetCard(props) {
                       <SyncAltSharpIcon/>&nbsp;Transfer
                     </MenuItem> */}
                     {
-                      myaddress===holder&&saleType==="Not on sale"&&
+                      isUnlistedOwnedByMe&&
                       <MenuItem value='delete' onClick={handleClosePopup}>
                         <DeleteOutlineIcon/>&nbsp;Delete
                       </MenuItem>
@@ -191,14 +193,20 @@ export default function AssetCard(props) {
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
           {
-            (type===0||type===1)&&
+            (type===0||type===1||type===2&&isListedOwnedByMe||type===2&&isListedByOthers)&&
             <Typography variant="h4" sx={{color: "origin.main"}}>
               <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
               &nbsp;{price} ELA
             </Typography>
           }
           {
-            (type===2&&((myaddress===royaltyOwner&&saleType==="Not on sale")||(myaddress===holder&&myaddress!==royaltyOwner)))&&
+            (type===2&&isUnlistedByOthers)&&
+            <Typography variant="h4" sx={{color: "origin.main"}} align='center'>
+              Not on Sale
+            </Typography>
+          }
+          {
+            (type===2&&isUnlistedOwnedByMe)&&
             <Button variant="contained" size="small" fullWidth sx={{mt: 1}} onClick={(e)=>{setOpenSell(true)}}>Sell</Button>
           }
           {/* <Stack direction="row">
