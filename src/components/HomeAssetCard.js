@@ -39,11 +39,11 @@ export default function HomeAssetCard() {
                 isAssetLoading?<Box draggable = {false} component="img" src="/static/circle-loading.svg" sx={{ width: '100%', borderRadius: 1 }} />:
                 asset!=null&&
                 <>
-                    <Link to={`/marketplace/others/${asset.royaltyOwner}`} component={RouterLink}>
+                    <Link to={`/profile/others/${asset.royaltyOwner}`} component={RouterLink}>
                         <CardImgBox src={getThumbnail(asset.asset)}/>
                     </Link>
                     <Stack direction="row" sx={{py: 2}}>
-                        <Link to={`/marketplace/others/${asset.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'inherit' }}>
+                        <Link to={`/profile/others/${asset.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'inherit' }}>
                             <Jazzicon address='0x123' sx={{mr: 0}}/>
                             <Box sx={{ minWidth: 0, flexGrow: 1, ml: 1 }}>
                                 <Typography color="inherit" variant="subtitle2" noWrap>

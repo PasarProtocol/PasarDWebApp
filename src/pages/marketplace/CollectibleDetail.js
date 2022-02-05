@@ -344,7 +344,7 @@ export default function CollectibleDetail() {
                 <Typography variant="subtitle2">Creator</Typography>
                 <Stack direction='row'>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    <Link to={`/marketplace/others/${collectible.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Link to={`/profile/others/${collectible.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                       <Jazzicon address={collectible.royaltyOwner}/>
                       {reduceHexAddress(collectible.royaltyOwner)}
                     </Link>
@@ -358,7 +358,7 @@ export default function CollectibleDetail() {
                 <Typography variant="subtitle2">Owner</Typography>
                 <Stack direction='row'>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    <Link to={`/marketplace/others/${collectible.holder}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Link to={`/profile/others/${collectible.holder}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                       <Jazzicon address={collectible.holder}/>
                       {reduceHexAddress(collectible.holder)}
                     </Link>

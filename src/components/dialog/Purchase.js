@@ -61,7 +61,7 @@ export default function Purchase(props) {
                 setOpen(false);
                 setOnProgress(false);
                 setTimeout(()=>{
-                  navigate('/marketplace/myitem/1')
+                  navigate('/profile/myitem/1')
                 }, 3000)
               }).catch((error) => {
                 console.log(error)
@@ -127,7 +127,7 @@ export default function Purchase(props) {
         setOpen(false);
         setOnProgress(false);
         setTimeout(()=>{
-          navigate('/marketplace/myitem/1')
+          navigate('/profile/myitem/1')
         }, 3000)
       })
       .on('confirmation', (confirmationNumber, receipt) => {
