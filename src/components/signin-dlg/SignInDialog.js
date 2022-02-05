@@ -431,7 +431,7 @@ export default function SignInDialog(props) {
                 </PaperRecord> */}
               </Stack>
             </Box>
-            <MenuItem to="/marketplace/myitem" onClick={closeAccountMenu} component={RouterLink}>
+            <MenuItem to="/profile/myitem" onClick={closeAccountMenu} component={RouterLink}>
               <BookOutlinedIcon />
               &nbsp;My Items
             </MenuItem>

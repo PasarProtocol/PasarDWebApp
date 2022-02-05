@@ -5,18 +5,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { isMobile } from 'react-device-detect';
 
 import { styled } from '@mui/material/styles';
-import {
-  Container,
-  Stack,
-  Typography,
-  Tab,
-  Tabs,
-  Link,
-  Button,
-  Box,
-  ToggleButtonGroup,
-  ToggleButton
-} from '@mui/material';
+import { Container, Stack, Typography, Tab, Tabs, Link, Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 // import { TabContext, TabList, TabPanel } from '@mui/lab';
 import SquareIcon from '@mui/icons-material/Square';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -99,6 +88,9 @@ export default function MyItems() {
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
       setMyAddress(account)
       setWalletAddress(account);
+    }
+    else {
+      navigate('/marketplace');
     }
     if (params.address)
       setWalletAddress(params.address);
