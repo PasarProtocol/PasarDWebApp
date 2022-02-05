@@ -463,6 +463,27 @@ export default function CreateItem() {
       })
     , Promise.resolve() );
   }
+  const scrollToRef = (ref)=>{
+    if(!ref.current)
+      return
+    let fixedHeight = isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP
+    fixedHeight = isMobile?APP_BAR_MOBILE:fixedHeight
+    window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
+  }
+  let duproperties = {};
+  singleProperties.forEach((item,index) => {
+    if(!item.type.length) return
+    duproperties[item.type] = duproperties[item.type] || [];
+    duproperties[item.type].push(index);
+  });
+  duproperties = Object.keys(duproperties)
+  .filter(key => duproperties[key].length>1)
+  .reduce((obj, key) => {
+    obj.push(key)
+    return obj
+  }, []);
+  // console.log(duproperties)
+
   const handleMintAction = (e) => {
     setOnValidation(true)
     if(mintype!=="Batch"&&!file || mintype==="Batch"&&!files.length)
@@ -472,17 +493,14 @@ export default function CreateItem() {
     else if(!description.length)
       scrollToRef(descriptionRef)
     else
-      if(mintype!=="Batch")
-        mintSingle()
+      if(mintype!=="Batch"){
+        if(duproperties.length || singleProperties.filter(el=>el.type.length>0&&!el.name.length).length)
+          enqueueSnackbar('Properties are invalid.', { variant: 'warning' });
+        else
+          mintSingle()
+      }
       else
         mintBatch()
-  }
-  const scrollToRef = (ref)=>{
-    if(!ref.current)
-      return
-    let fixedHeight = isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP
-    fixedHeight = isMobile?APP_BAR_MOBILE:fixedHeight
-    window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
   }
   return (
     <RootStyle title="CreateItem | PASAR">
@@ -770,10 +788,26 @@ export default function CreateItem() {
                       singleProperties.map((property, index)=>(
                         <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
                           <Grid item xs={6}>
-                            <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleSingleProperties('type', index, e)}}/>
+                            <TextField
+                              label="Example: Size"
+                              size="small"
+                              fullWidth
+                              value={property.type}
+                              onChange={(e)=>{handleSingleProperties('type', index, e)}}
+                              error={isOnValidation&&duproperties.includes(property.type)}
+                              helperText={isOnValidation&&duproperties.includes(property.type)?'Duplicated type':''}
+                            />
                           </Grid>
                           <Grid item xs={6}>
-                            <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleSingleProperties('name', index, e)}}/>
+                            <TextField
+                              label="Example: Big"
+                              size="small"
+                              fullWidth
+                              value={property.name}
+                              onChange={(e)=>{handleSingleProperties('name', index, e)}}
+                              error={isOnValidation&&property.type.length>0&&!property.name.length}
+                              helperText={isOnValidation&&property.type.length>0&&!property.name.length?'Can not be empty.':''}
+                            />
                           </Grid>
                         </Grid>
                       ))
