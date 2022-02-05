@@ -521,15 +521,18 @@ export default function CollectibleDetail() {
           </Grid>
         </Grid>
         <MHidden width="smUp">
-          <StickyPaperStyle>
-            {
-              isForAuction&&
+          {
+            isForAuction&&
+            <StickyPaperStyle>
               <Button variant="contained" fullWidth onClick={()=>{}}>
                 Place a bid
               </Button>
-            }
-            {
-              !isForAuction&&(
+            </StickyPaperStyle>
+          }
+          {
+            !isForAuction && address!==collectible.holder && address!==collectible.royaltyOwner &&
+            <StickyPaperStyle>
+              {
                 didSignin?
                 <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}}>
                   Buy
@@ -537,9 +540,9 @@ export default function CollectibleDetail() {
                 <Button variant="contained" fullWidth onClick={openSignin}>
                   Sign in to Buy
                 </Button>
-              )
-            }
-          </StickyPaperStyle>
+              }
+            </StickyPaperStyle>
+          }
         </MHidden>
       </Container>
       <PurchaseDlg isOpen={isOpenPurchase} setOpen={setPurchaseOpen} info={collectible}/>
