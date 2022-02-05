@@ -120,8 +120,6 @@ export default function SignInDialog(props) {
   const classes = useStyles();
 
   const initializeWalletConnection = React.useCallback(async () => {
-    // console.log('--------------------------sessionLinkFlag: ', sessionLinkFlag);
-    // console.log('activating connector: ', activatingConnector);
     if (sessionLinkFlag && !activatingConnector) {
       if (sessionLinkFlag === '1') {
         setActivatingConnector(injected);
@@ -184,9 +182,9 @@ export default function SignInDialog(props) {
     }
   }, [sessionLinkFlag, account, active, chainId, activatingConnector]);
   
+  // listen for disconnect from essentials
   React.useEffect(async()=>{
     if(sessionLinkFlag === '2' && activatingConnector === essentialsConnector && !essentialsConnector.getWalletConnectProvider().wc.connected) {
-      alert(2)
       setOpenAccountPopup(null);
         await activate(null);
         if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
@@ -204,6 +202,7 @@ export default function SignInDialog(props) {
         navigate('/marketplace');
       }
   }, [essentialsConnector.getWalletConnectProvider().wc.connected]);
+
   useConnectivitySDK();
 
   // ------------ Connect Wallet ------------
@@ -225,14 +224,11 @@ export default function SignInDialog(props) {
   const connectWithEssential = async () => {
     const didAccess = new DID.DIDAccess();
     let presentation;
-    // console.log("Trying to sign in using the connectivity SDK");
     try {
       presentation = await didAccess.requestCredentials({
         claims: [DID.simpleIdClaim('Your name', 'name', false)]
       });
     } catch (e) {
-      // console.warn("Error while getting credentials", e);
-
       try {
         await essentialsConnector.getWalletConnectProvider().disconnect();
       } catch (e) {
@@ -271,27 +267,6 @@ export default function SignInDialog(props) {
     }
   };
 
-  // ------------ Handle Transaction ------------
-  const handleTransaction = async (to, value) => {
-    if (library) {
-      const accounts = await library.listAccounts();
-      if (to.length !== 42) alert('Invalid recipient address.');
-      const params = [
-        {
-          'from': accounts[0],
-          'to': to,
-          'value': ethers.utils.parseUnits(value).toHexString(),
-          'chainId': 21 // 20
-        }
-      ];
-      await library
-        .send('eth_sendTransaction', params)
-        .then()
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
   const handleClickOpenSinginDlg = () => {
     setOpenSigninDlg(true);
   };
