@@ -74,7 +74,7 @@ const useStyles = makeStyles({
 });
 
 export default function SignInDialog(props) {
-  const {openSigninEssential, setOpenSigninEssentialDlg} = props
+  const {openSigninEssential, openDownloadEssential, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, afterSigninPath} = props
   const { pathname } = useLocation();
   const isHome = pathname === '/';
 
@@ -256,9 +256,12 @@ export default function SignInDialog(props) {
             const user = jwtDecode(token);
             sessionLinkFlag = '2';
             sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
+
             setOpenSigninDlg(false);
             setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
             setActivatingConnector(essentialsConnector);
+            if(afterSigninPath)
+              navigate(afterSigninPath)
           } else {
             // console.log(data);
           }
@@ -274,15 +277,26 @@ export default function SignInDialog(props) {
     setOpenSigninDlg(false);
     setOpenDownloadDlg(true);
   };
+  const handleClickOpenDownloadEssentialDlg = () => {
+    setOpenSigninEssentialDlg(false);
+    setOpenDownloadEssentialDlg(true);
+  };
   const handleGoBack = () => {
     setOpenSigninDlg(true);
     setOpenDownloadDlg(false);
+  };
+  const handleGoBackEssential = () => {
+    setOpenSigninEssentialDlg(true);
+    setOpenDownloadEssentialDlg(false);
   };
   const handleCloseSigninDlg = () => {
     setOpenSigninDlg(false);
   };
   const handleCloseSigninEssentialDlg = () => {
     setOpenSigninEssentialDlg(false);
+  };
+  const handleCloseDownloadEssentialDlg = () => {
+    setOpenDownloadEssentialDlg(false);
   };
   const handleCloseDownloadDlg = () => {
     setOpenDownloadDlg(false);
@@ -341,7 +355,6 @@ export default function SignInDialog(props) {
               ) : (
                 <Link
                   underline="hover"
-                  id="getDidNow"
                   onClick={() => {
                     setOpenDownloadDlg(true);
                   }}
@@ -700,7 +713,7 @@ export default function SignInDialog(props) {
                 </ButtonStyle>
               </Grid>
               <Grid item xs={12}>
-                <ButtonOutlinedStyle variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
+                <ButtonOutlinedStyle variant="outlined" fullWidth onClick={handleClickOpenDownloadEssentialDlg}>
                   I don’t have a wallet
                 </ButtonOutlinedStyle>
               </Grid>
@@ -713,6 +726,69 @@ export default function SignInDialog(props) {
             gutterBottom
             align="center"
           >
+            We do not own your private keys and cannot access your funds without your confirmation.
+          </Typography>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={openDownloadEssential} onClose={handleCloseDownloadEssentialDlg}>
+        <DialogTitle>
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseDownloadEssentialDlg}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500]
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
+            Download Essentials
+          </Typography>
+          <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
+            A DID is required in order to create or sell items on Pasar. Get your own DID by downloading the Elastos Essentials mobile app now!
+          </Typography>
+          <Typography variant="body2" display="block" gutterBottom align="center" sx={{ mt: 4 }}>
+            Web3.0 super wallet with Decentralized Identifier (DID)
+          </Typography>
+          <Box component="div" sx={{ maxWidth: 300, m: 'auto' }}>
+            <Grid container spacing={2} sx={{ mt: 2, mb: 4 }}>
+              <Grid item xs={12} sx={{ pt: '8px !important' }}>
+                <ButtonStyle
+                  variant="contained"
+                  href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app"
+                  target="_blank"
+                  startIcon={<AdbIcon />}
+                  className={classes.iconAbsolute2}
+                  fullWidth
+                >
+                  Google Play
+                </ButtonStyle>
+              </Grid>
+              <Grid item xs={12}>
+                <ButtonOutlinedStyle
+                  variant="outlined"
+                  href="https://apps.apple.com/us/app/elastos-essentials/id1568931743"
+                  target="_blank"
+                  startIcon={<AppleIcon />}
+                  className={classes.iconAbsolute2}
+                  fullWidth
+                >
+                  App Store
+                </ButtonOutlinedStyle>
+              </Grid>
+              <Grid item xs={12} align="center">
+                <Button color="inherit" startIcon={<Icon icon={arrowIosBackFill} />} onClick={handleGoBackEssential}>
+                  Go back
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+          <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
             We do not own your private keys and cannot access your funds without your confirmation.
           </Typography>
         </DialogContent>
