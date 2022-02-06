@@ -52,6 +52,9 @@ export default function MainNavbar() {
   const isHome = pathname === '/explorer';
   const isMarketHome = pathname === '' || pathname === '/';
   const [openSigninEssential, setOpenSigninEssentialDlg] = React.useState(false);
+  const [openDownloadEssential, setOpenDownloadEssentialDlg] = React.useState(false);
+  const [afterSigninPath, setAfterSigninPath] = React.useState(null);
+  
 
   return (
     <AppBar sx={{ boxShadow: 0, bgcolor: 'transparent' }}>
@@ -96,13 +99,33 @@ export default function MainNavbar() {
           <Box sx={{ flexGrow: 1 }} />
 
           <MHidden width="mdDown">
-            <MenuDesktop isOffset={isOffset} isHome={isHome} navConfig={navConfig} setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}/>
+            <MenuDesktop
+              isOffset={isOffset}
+              isHome={isHome}
+              navConfig={navConfig}
+              setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
+              setOpenDownloadEssentialDlg={setOpenDownloadEssentialDlg}
+              setAfterSigninPath={setAfterSigninPath}
+            />
           </MHidden>
 
-          <SignInDialog openSigninEssential={openSigninEssential} setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}/>
+          <SignInDialog
+            openSigninEssential={openSigninEssential}
+            openDownloadEssential={openDownloadEssential}
+            setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
+            setOpenDownloadEssentialDlg={setOpenDownloadEssentialDlg}
+            afterSigninPath={afterSigninPath}
+          />
 
           <MHidden width="mdUp">
-            <MenuMobile isOffset={isOffset} isHome={isHome} navConfig={navConfig} setOpenSigninEssentialDlg={setOpenSigninEssentialDlg} />
+            <MenuMobile
+              isOffset={isOffset}
+              isHome={isHome}
+              navConfig={navConfig}
+              setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
+              setOpenDownloadEssentialDlg={setOpenDownloadEssentialDlg}
+              setAfterSigninPath={setAfterSigninPath}
+            />
           </MHidden>
         </Container>
       </ToolbarStyle>

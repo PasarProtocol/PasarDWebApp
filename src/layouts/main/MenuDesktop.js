@@ -74,7 +74,7 @@ function IconBullet({ type = 'item' }) {
 // };
 
 function MenuDesktopItem(props) {
-  const { item, isHome, isOpen, isOffset, onOpen, onClose, setOpenSigninEssentialDlg } = props
+  const { item, isHome, isOpen, isOffset, onOpen, onClose, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = props
   const { title, path, children } = item;
 
   if (children) {
@@ -184,13 +184,13 @@ function MenuDesktopItem(props) {
     );
   }
 
-  const openSignin = (e)=>{
+  const openSignin = (path)=>{
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
-      if(document.getElementById("getDidNow"))
-        document.getElementById("getDidNow").click()
+      setOpenDownloadEssentialDlg(true)
     }
     else
       setOpenSigninEssentialDlg(true)
+    setAfterSigninPath(path)
   }
 
   if(path.startsWith("/create")){
@@ -215,7 +215,7 @@ function MenuDesktopItem(props) {
             color: 'primary.main'
           }
         }}
-        onClick={openSignin}
+        onClick={e=>openSignin(path)}
       >
         {title}
       </LinkStyle>
@@ -257,7 +257,8 @@ MenuDesktop.propTypes = {
   navConfig: PropTypes.array
 };
 
-export default function MenuDesktop({ isOffset, isHome, navConfig, setOpenSigninEssentialDlg }) {
+export default function MenuDesktop(props) {
+  const { isOffset, isHome, navConfig, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = props
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
 
@@ -288,6 +289,8 @@ export default function MenuDesktop({ isOffset, isHome, navConfig, setOpenSignin
           isOffset={isOffset}
           isHome={isHome}
           setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
+          setOpenDownloadEssentialDlg={setOpenDownloadEssentialDlg}
+          setAfterSigninPath={setAfterSigninPath}
         />
       ))}
     </Stack>

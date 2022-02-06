@@ -43,7 +43,8 @@ const ListItemStyle = styled(ListItemButton)(({ theme }) => ({
 //   onOpen: PropTypes.func
 // };
 
-function MenuMobileItem({ item, isOpen, onOpen, setOpenSigninEssentialDlg }) {
+function MenuMobileItem(props) {
+  const { item, isOpen, onOpen, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = props
   const { title, path, icon, children } = item;
 
   if (children) {
@@ -71,13 +72,13 @@ function MenuMobileItem({ item, isOpen, onOpen, setOpenSigninEssentialDlg }) {
     );
   }
 
-  const openSignin = (e)=>{
+  const openSignin = (path)=>{
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
-      if(document.getElementById("getDidNow"))
-        document.getElementById("getDidNow").click()
+      setOpenDownloadEssentialDlg(true)
     }
     else
       setOpenSigninEssentialDlg(true)
+    setAfterSigninPath(path)
   }
 
   if(path.startsWith("/create")) {
@@ -107,7 +108,7 @@ function MenuMobileItem({ item, isOpen, onOpen, setOpenSigninEssentialDlg }) {
             bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
           }
         }}
-        onClick={openSignin}
+        onClick={e=>openSignin(path)}
       >
         <ListItemIcon>{icon}</ListItemIcon>
         <ListItemText disableTypography primary={title} />
@@ -161,7 +162,8 @@ MenuMobile.propTypes = {
   navConfig: PropTypes.array
 };
 
-export default function MenuMobile({ isOffset, isHome, navConfig, setOpenSigninEssentialDlg }) {
+export default function MenuMobile(props) {
+  const { isOffset, isHome, navConfig, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = props
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -211,7 +213,15 @@ export default function MenuMobile({ isOffset, isHome, navConfig, setOpenSigninE
 
           <List disablePadding>
             {navConfig.map((link) => (
-              <MenuMobileItem key={link.title} item={link} isOpen={open} onOpen={handleOpen} setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}/>
+              <MenuMobileItem
+                key={link.title}
+                item={link}
+                isOpen={open}
+                onOpen={handleOpen}
+                setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
+                setOpenDownloadEssentialDlg={setOpenDownloadEssentialDlg}
+                setAfterSigninPath={setAfterSigninPath}
+              />
             ))}
           </List>
         </Scrollbar>
