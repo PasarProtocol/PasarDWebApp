@@ -81,7 +81,7 @@ export default function AssetCard(props) {
         <PaperRecord sx={{p:2, mb: '2px'}}>
           <Grid container>
             <Grid item xs={6}>
-              <Tooltip title="Collection: Feeds NFT Sticker" arrow disableInteractive placement="top">
+              <Tooltip title="Collection: Feeds NFT Sticker" arrow disableInteractive placement="top" enterTouchDelay={0}>
                 <Box sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
                   <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24 }} />
                 </Box>

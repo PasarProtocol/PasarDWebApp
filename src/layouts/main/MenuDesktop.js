@@ -240,7 +240,7 @@ function MenuDesktopItem(props) {
         {title}
       </LinkStyle>:
       
-      <Tooltip title="Coming Soon" arrow>
+      <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
         <LinkStyle
           disabled={1&&true}
           sx={{

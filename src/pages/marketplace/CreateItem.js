@@ -93,7 +93,9 @@ export default function CreateItem() {
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
   const navigate = useNavigate();
-  
+  // if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+  //   navigate('/marketplace')
+
   React.useEffect(async () => {
     if(mintype!=="Multiple")
       setQuantity(1)
@@ -516,12 +518,12 @@ export default function CreateItem() {
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
               <MintingTypeButton type="Single" description="Single item" onClick={()=>{setMintType("Single")}} current={mintype}/>
-              <Tooltip title="Coming Soon" arrow>
+              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
                   <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype} disabled={1&&true}/>
                 </div>
               </Tooltip>
-              <Tooltip title="Coming Soon" arrow>
+              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
                   <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype} disabled={1&&true}/>
                 </div>
@@ -624,7 +626,7 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Explicit & Sensitive Content&nbsp;
-                  <Tooltip title="Setting your asset as explicit and sensitive content, like pornography and other not safe for work (NSFW) content, will protect users with safe search while browsing Pasar" arrow disableInteractive>
+                  <Tooltip title="Setting your asset as explicit and sensitive content, like pornography and other not safe for work (NSFW) content, will protect users with safe search while browsing Pasar" arrow disableInteractive enterTouchDelay={0}>
                     <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
                   </Tooltip>
                 </Typography>
@@ -662,7 +664,7 @@ export default function CreateItem() {
                     <ItemTypeButton type="FixedPrice" onClick={()=>{setSaleType("FixedPrice")}} current={saletype}/>
                     {
                       mintype!=="Batch"&&
-                      <Tooltip title="Coming Soon" arrow>
+                      <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                         <div>
                           <ItemTypeButton type="Auction" onClick={()=>{setSaleType("Auction")}} current={saletype} disabled={1&&true}/>
                         </div>
@@ -695,7 +697,7 @@ export default function CreateItem() {
                     </FormControl>
                     <Divider/>
                     <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Platform fee 2%&nbsp;
-                      <Tooltip title="We take 2% of every transaction that happens on Pasar for providing the platform to users" arrow disableInteractive>
+                      <Tooltip title="We take 2% of every transaction that happens on Pasar for providing the platform to users" arrow disableInteractive enterTouchDelay={0}>
                         <Icon icon="eva:info-outline" style={{marginBottom: -4, fontSize: 18}}/>
                       </Tooltip>
                     </Typography>
@@ -709,7 +711,7 @@ export default function CreateItem() {
               }
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Royalties&nbsp;
-                  <Tooltip title="Royalties are the percentage cut of the total value of item sold and will be paid to the original creator" arrow disableInteractive>
+                  <Tooltip title="Royalties are the percentage cut of the total value of item sold and will be paid to the original creator" arrow disableInteractive enterTouchDelay={0}>
                     <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
                   </Tooltip>
                 </Typography>
@@ -751,12 +753,12 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <Stack spacing={1} direction="row">
                   <MintingTypeButton type="FSTK" description="Feeds NFT Sticker" onClick={()=>{setCollection("FSTK")}} current={collection}/>
-                  <Tooltip title="Coming Soon" arrow>
+                  <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                     <div>
                       <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose")}} current={collection} disabled={1&&true}/>
                     </div>
                   </Tooltip>
-                  <Tooltip title="Coming Soon" arrow>
+                  <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                     <div>
                       <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
                     </div>
@@ -769,7 +771,7 @@ export default function CreateItem() {
                   <Grid item xs={12}>
                     <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
                       Properties&nbsp;
-                      <Tooltip title="Attributes or traits to describe the item" arrow disableInteractive>
+                      <Tooltip title="Attributes or traits to describe the item" arrow disableInteractive enterTouchDelay={0}>
                         <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
                       </Tooltip>&nbsp;
                       <Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
@@ -819,7 +821,7 @@ export default function CreateItem() {
                     <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{pl: 0}}>
                       <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
                         Properties&nbsp;
-                        <Tooltip title="Attributes or traits to describe the item" arrow disableInteractive>
+                        <Tooltip title="Attributes or traits to describe the item" arrow disableInteractive enterTouchDelay={0}>
                           <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
                         </Tooltip>&nbsp;
                         <Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
