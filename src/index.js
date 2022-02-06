@@ -40,6 +40,7 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 // redux
 import { store, persistor } from './redux/store';
 // contexts
+import { SigninProvider } from './contexts/SigninContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { CollapseDrawerProvider } from './contexts/CollapseDrawerContext';
 // components
@@ -65,11 +66,13 @@ const getLibrary = (provider) => {
 ReactDOM.render(
   <HelmetProvider>
     <ReduxProvider store={store}>
-      <BrowserRouter>
-        <Web3ReactProvider getLibrary={getLibrary}>
-          <App />
-        </Web3ReactProvider>
-      </BrowserRouter>
+      <SigninProvider>
+        <BrowserRouter>
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <App />
+          </Web3ReactProvider>
+        </BrowserRouter>
+      </SigninProvider>
     </ReduxProvider>
   </HelmetProvider>,
   document.getElementById('root')

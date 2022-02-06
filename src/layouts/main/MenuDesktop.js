@@ -9,6 +9,7 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
 import { Box, Link, Grid, List, Stack, Popover, ListItem, ListSubheader, CardActionArea, Tooltip } from '@mui/material';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import useSingin from '../../hooks/useSignin';
 
 // ----------------------------------------------------------------------
 
@@ -74,7 +75,8 @@ function IconBullet({ type = 'item' }) {
 // };
 
 function MenuDesktopItem(props) {
-  const { item, isHome, isOpen, isOffset, onOpen, onClose, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = props
+  const { item, isHome, isOpen, isOffset, onOpen, onClose } = props
+  const { setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
   const { title, path, children } = item;
 
   if (children) {
@@ -258,7 +260,7 @@ MenuDesktop.propTypes = {
 };
 
 export default function MenuDesktop(props) {
-  const { isOffset, isHome, navConfig, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = props
+  const { isOffset, isHome, navConfig } = props
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
 
@@ -288,9 +290,6 @@ export default function MenuDesktop(props) {
           onClose={handleClose}
           isOffset={isOffset}
           isHome={isHome}
-          setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
-          setOpenDownloadEssentialDlg={setOpenDownloadEssentialDlg}
-          setAfterSigninPath={setAfterSigninPath}
         />
       ))}
     </Stack>

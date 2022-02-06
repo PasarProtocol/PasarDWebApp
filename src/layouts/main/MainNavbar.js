@@ -51,10 +51,6 @@ export default function MainNavbar() {
   const { pathname } = useLocation();
   const isHome = pathname === '/explorer';
   const isMarketHome = pathname === '' || pathname === '/';
-  const [openSigninEssential, setOpenSigninEssentialDlg] = React.useState(false);
-  const [openDownloadEssential, setOpenDownloadEssentialDlg] = React.useState(false);
-  const [afterSigninPath, setAfterSigninPath] = React.useState(null);
-  
 
   return (
     <AppBar sx={{ boxShadow: 0, bgcolor: 'transparent' }}>
@@ -103,28 +99,16 @@ export default function MainNavbar() {
               isOffset={isOffset}
               isHome={isHome}
               navConfig={navConfig}
-              setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
-              setOpenDownloadEssentialDlg={setOpenDownloadEssentialDlg}
-              setAfterSigninPath={setAfterSigninPath}
             />
           </MHidden>
 
-          <SignInDialog
-            openSigninEssential={openSigninEssential}
-            openDownloadEssential={openDownloadEssential}
-            setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
-            setOpenDownloadEssentialDlg={setOpenDownloadEssentialDlg}
-            afterSigninPath={afterSigninPath}
-          />
+          <SignInDialog/>
 
           <MHidden width="mdUp">
             <MenuMobile
               isOffset={isOffset}
               isHome={isHome}
               navConfig={navConfig}
-              setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
-              setOpenDownloadEssentialDlg={setOpenDownloadEssentialDlg}
-              setAfterSigninPath={setAfterSigninPath}
             />
           </MHidden>
         </Container>

@@ -18,7 +18,7 @@ import Scrollbar from '../../components/Scrollbar';
 import ModeSwitch from '../../components/mode-switch';
 import { MIconButton, MFab } from '../../components/@material-extend';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
-
+import useSingin from '../../hooks/useSignin';
 
 // ----------------------------------------------------------------------
 
@@ -44,7 +44,8 @@ const ListItemStyle = styled(ListItemButton)(({ theme }) => ({
 // };
 
 function MenuMobileItem(props) {
-  const { item, isOpen, onOpen, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = props
+  const { item, isOpen, onOpen } = props
+  const { setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
   const { title, path, icon, children } = item;
 
   if (children) {
@@ -163,7 +164,7 @@ MenuMobile.propTypes = {
 };
 
 export default function MenuMobile(props) {
-  const { isOffset, isHome, navConfig, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = props
+  const { isOffset, isHome, navConfig } = props
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -218,9 +219,6 @@ export default function MenuMobile(props) {
                 item={link}
                 isOpen={open}
                 onOpen={handleOpen}
-                setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
-                setOpenDownloadEssentialDlg={setOpenDownloadEssentialDlg}
-                setAfterSigninPath={setAfterSigninPath}
               />
             ))}
           </List>
