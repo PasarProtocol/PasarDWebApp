@@ -341,7 +341,7 @@ export default function SignInDialog(props) {
             open={Boolean(isOpenAccountPopup)}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            MenuListProps={{ onMouseLeave: closeAccountMenu }}
+            MenuListProps={{ onMouseLeave: ()=>setOpenAccountPopup(null) }}
           >
             <Box sx={{ px: 2, py: '6px' }}>
               <Typography variant="h6">
