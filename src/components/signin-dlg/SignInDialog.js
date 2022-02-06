@@ -1,25 +1,7 @@
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Dialog,
-  Stack,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  Alert,
-  DialogContentText,
-  IconButton,
-  Typography,
-  Grid,
-  Avatar,
-  Box,
-  Link,
-  Menu,
-  MenuItem
-} from '@mui/material';
+import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
 import * as math from 'mathjs';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
@@ -47,6 +29,7 @@ import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
 import { reduceHexAddress, getBalance, getCoinUSD, getExchangeInfo } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
+import useSingin from '../../hooks/useSignin';
 
 const useStyles = makeStyles({
   iconAbsolute1: {
@@ -73,8 +56,8 @@ const useStyles = makeStyles({
   }
 });
 
-export default function SignInDialog(props) {
-  const {openSigninEssential, openDownloadEssential, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, afterSigninPath} = props
+export default function SignInDialog() {
+  const {openSigninEssential, openDownloadEssential, afterSigninPath, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath} = useSingin()
   const { pathname } = useLocation();
   const isHome = pathname === '/';
 
@@ -260,8 +243,11 @@ export default function SignInDialog(props) {
             setOpenSigninDlg(false);
             setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
             setActivatingConnector(essentialsConnector);
-            if(afterSigninPath)
+            if(afterSigninPath){
+              setOpenSigninEssentialDlg(false)
               navigate(afterSigninPath)
+              setAfterSigninPath(null)
+            }
           } else {
             // console.log(data);
           }
