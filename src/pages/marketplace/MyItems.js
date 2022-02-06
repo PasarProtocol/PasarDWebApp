@@ -61,11 +61,12 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 export default function MyItems() {
+  const sessionDispMode = sessionStorage.getItem("disp-mode")
   const params = useParams(); // params.address
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([[], [], []]);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
-  const [dispmode, setDispmode] = React.useState(1);
+  const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):1);
   const [orderType, setOrderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(params.type!==undefined?parseInt(params.type, 10):0);
@@ -153,7 +154,9 @@ export default function MyItems() {
   }, [walletAddress, orderType, updateCount]);
 
   const handleDispmode = (event, mode) => {
-    if (mode === null) return;
+    if (mode === null)
+      return
+    sessionStorage.setItem('disp-mode', mode);
     setDispmode(mode);
   };
   const link2Detail = (tokenId) => {
