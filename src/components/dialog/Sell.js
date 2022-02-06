@@ -166,6 +166,7 @@ export default function Sell(props) {
                 title="We take 2% of every transaction that happens on Pasar for providing the platform to users"
                 arrow
                 disableInteractive
+                enterTouchDelay={0}
               >
                 <Icon icon="eva:info-outline" style={{ marginBottom: -4, fontSize: 18 }} />
               </Tooltip>

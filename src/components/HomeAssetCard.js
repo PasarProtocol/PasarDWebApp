@@ -55,7 +55,7 @@ export default function HomeAssetCard() {
                             </Box>
                         </Link>
                         <Box component="div" sx={{m:'auto !important', minWidth: '120px', textAlign: 'right'}}>
-                            <Tooltip title="Coming Soon" arrow>
+                            <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                             <div>
                                 <Button variant="contained" href="#" disabled={1&&true}>
                                     Get featured
