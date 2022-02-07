@@ -16,6 +16,7 @@ import { LoadingButton } from '@mui/lab';
 // components
 import { MHidden } from '../../components/@material-extend';
 import useOffSetTop from '../../hooks/useOffSetTop';
+import useMintDlg from '../../hooks/useMintDlg';
 import Page from '../../components/Page';
 import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
 import ItemTypeButton from '../../components/marketplace/ItemTypeButton';
@@ -27,6 +28,7 @@ import CustomSwitch from '../../components/custom-switch';
 import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
 import MintDlg from '../../components/dialog/Mint';
+import AccessDlg from '../../components/dialog/Access';
 import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS} from '../../config'
 import {hash, removeLeadingZero, callContractMethod} from '../../utils/common';
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
@@ -83,7 +85,7 @@ export default function CreateItem() {
   const [onProgress, setOnProgress] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [isOnValidation, setOnValidation] = React.useState(false);
-  const [mintDlgProp, setMintDlgProp] = React.useState({isOpen: false, isReadySign: false, current: 1});
+  const { setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
   const { enqueueSnackbar } = useSnackbar();
   
   const isOffset = useOffSetTop(40);
@@ -95,8 +97,8 @@ export default function CreateItem() {
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
   const navigate = useNavigate();
-  // if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
-  //   navigate('/marketplace')
+  if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+    navigate('/marketplace')
 
   React.useEffect(async () => {
     if(mintype!=="Multiple")
@@ -243,32 +245,50 @@ export default function CreateItem() {
             'value': 0
           };
           setProgress(progressStep(60, index))
-          setMintDlgProp({...mintDlgProp, isReadySign: true})
+          setReadySignForMint(true)
           stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).send(transactionParams)
             .on('receipt', (receipt) => {
-                setMintDlgProp({...mintDlgProp, isReadySign: false})
+                setReadySignForMint(false)
                 console.log("receipt", receipt);
                 if(isPutOnSale){
                   setProgress(progressStep(70, index))
                   stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
                     console.log("isApprovalForAll=", isApproval);
-                    if (!isApproval)
-                      stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
-                      .on('receipt', (receipt) => {
-                          console.log("setApprovalForAll-receipt", receipt);
-                          callContractMethod('createOrderForSale', {...paramObj, '_amount': _tokenSupply, '_price': BigInt(price*1e18).toString()}).then((success) => {
-                            resolve(success)
-                          }).catch(error=>{
+                    if (!isApproval) {
+                      setOpenAccessDlg(true)
+                      setApprovalFunction(()=>{
+                        stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
+                        .on('receipt', (receipt) => {
+                            setOpenAccessDlg(false)
+                            setCurrent(2)
+                            console.log("setApprovalForAll-receipt", receipt);
+                            callContractMethod('createOrderForSale', {
+                              ...paramObj,
+                              '_amount': _tokenSupply,
+                              '_price': BigInt(price*1e18).toString(),
+                              'beforeSendFunc': ()=>{setReadySignForMint(true)},
+                              'afterSendFunc': ()=>{setReadySignForMint(false)}
+                            }).then((success) => {
+                              resolve(success)
+                            }).catch(error=>{
+                              reject(error)
+                            })
+                        })
+                        .on('error', (error, receipt) => {
+                            console.error("setApprovalForAll-error", error);
+                            setOpenAccessDlg(false)
                             reject(error)
-                          })
+                        });
                       })
-                      .on('error', (error, receipt) => {
-                          console.error("setApprovalForAll-error", error);
-                          reject(error)
-                      });
-                    else{
-                      setMintDlgProp({...mintDlgProp, current: 2})
-                      callContractMethod('createOrderForSale', {...paramObj, '_amount': _tokenSupply, '_price': BigInt(price*1e18).toString()}).then((success) => {
+                    } else {
+                      setCurrent(2)
+                      callContractMethod('createOrderForSale', {
+                        ...paramObj,
+                        '_amount': _tokenSupply,
+                        '_price': BigInt(price*1e18).toString(),
+                        'beforeSendFunc': ()=>{setReadySignForMint(true)},
+                        'afterSendFunc': ()=>{setReadySignForMint(false)}
+                      }).then((success) => {
                         resolve(success)
                       }).catch(error=>{
                         reject(error)
@@ -416,7 +436,7 @@ export default function CreateItem() {
     if(!file)
       return
     setOnProgress(true)
-    setMintDlgProp({...mintDlgProp, isOpen: true})
+    setOpenMintDlg(true)
     uploadData().then((paramObj) => mint2net(paramObj)).then((success) => {
       setProgress(100)
       if(success){
@@ -428,19 +448,21 @@ export default function CreateItem() {
       else
         enqueueSnackbar('Mint token error!', { variant: 'warning' });
       setOnProgress(false)
-      setMintDlgProp({...mintDlgProp, isOpen: false})
+      setOpenMintDlg(false)
+      setCurrent(1)
     }).catch((error) => {
       setProgress(100)
       enqueueSnackbar('Mint token error!', { variant: 'error' });
       setOnProgress(false)
-      setMintDlgProp({...mintDlgProp, isOpen: false})
+      setOpenMintDlg(false)
+      setCurrent(1)
     });
   }
   const mintBatch = () => {
     if(!files.length)
       return
     setOnProgress(true)
-    setMintDlgProp({...mintDlgProp, isOpen: true})
+    setOpenMintDlg(true)
     setProgress(3)
     sendIpfsDidJson().then((didRecv) => {
       setProgress(6)
@@ -450,7 +472,7 @@ export default function CreateItem() {
       setProgress(100)
       enqueueSnackbar('Mint token error!', { variant: 'error' });
       setOnProgress(false)
-      setMintDlgProp({...mintDlgProp, isOpen: false})
+      setOpenMintDlg(false)
     })
   }
   const mintBatchMain = (_didUri) => {
@@ -468,13 +490,13 @@ export default function CreateItem() {
           enqueueSnackbar(`Mint token_${(i+1)} error!`, { variant: 'warning' });
         if((i+1)===files.length)
           setOnProgress(false)
-          setMintDlgProp({...mintDlgProp, isOpen: false})
+          setOpenMintDlg(false)
       }).catch((error) => {
         setProgress(progressStep(100, i))
         enqueueSnackbar(`Mint token_${(i+1)} error!`, { variant: 'error' });
         if((i+1)===files.length)
           setOnProgress(false)
-          setMintDlgProp({...mintDlgProp, isOpen: false})
+          setOpenMintDlg(false)
       })
     , Promise.resolve() );
   }
@@ -943,7 +965,8 @@ export default function CreateItem() {
           </MHidden>
         </Grid>
       </Container>
-      <MintDlg dlgProp={mintDlgProp} setProp={setMintDlgProp} totalSteps={isPutOnSale?2:1}/>
+      <MintDlg totalSteps={isPutOnSale?2:1}/>
+      <AccessDlg/>
     </RootStyle>
   );
 }
