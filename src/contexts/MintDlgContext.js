@@ -14,6 +14,7 @@ const initialState = {
   setOpenAccessDlg: () => {},
   setReadySignForMint: () => {},
   setReadySignForAccess: () => {},
+  setApprovalFunction: () => {},
 };
 
 const MintDlgContext = createContext(initialState);
@@ -28,6 +29,7 @@ function MintDlgProvider({ children }) {
   const [isOpenAccess, setOpenAccessDlg] = useState(false);
   const [isReadySignForMint, setReadySignForMint] = useState(false);
   const [isReadySignForAccess, setReadySignForAccess] = useState(false);
+  const [approvalFunction, setApprovalFunction] = useState(()=>{});
 
   return (
     <MintDlgContext.Provider
@@ -37,11 +39,13 @@ function MintDlgProvider({ children }) {
         isOpenAccess,
         isReadySignForMint,
         isReadySignForAccess,
+        approvalFunction,
         setCurrent,
         setOpenMintDlg,
         setOpenAccessDlg,
         setReadySignForMint,
-        setReadySignForAccess
+        setReadySignForAccess,
+        setApprovalFunction
       }}
     >
       {children}

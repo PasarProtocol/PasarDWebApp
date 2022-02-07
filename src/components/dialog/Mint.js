@@ -5,16 +5,14 @@ import TransLoadingButton from '../TransLoadingButton';
 import useMintDlg from '../../hooks/useMintDlg';
 
 export default function Mint(props) {
-  const { setProp, totalSteps } = props
-  // const { isOpen, current, isReadySign } = props.dlgProp
-  const {current, isOpenMint, setOpenMintDlg, isReadySignForMint} = useMintDlg()
+  const { totalSteps } = props
+  const {current, isOpenMint, isOpenAccess, setOpenMintDlg, isReadySignForMint} = useMintDlg()
   const handleClose = () => {
-    // setProp({...props.dlgProp, isOpen: false})
     setOpenMintDlg(false)
   };
 
   return (
-    <Dialog open={isOpenMint} onClose={handleClose}>
+    <Dialog open={isOpenMint&&!isOpenAccess} onClose={handleClose}>
       <DialogTitle>
         <IconButton
           aria-label="close"
