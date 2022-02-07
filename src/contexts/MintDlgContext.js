@@ -24,7 +24,7 @@ MintDlgProvider.propTypes = {
 };
 
 function MintDlgProvider({ children }) {
-  const [current, setCurrent] = useState(false);
+  const [current, setCurrent] = useState(1);
   const [isOpenMint, setOpenMintDlg] = useState(false);
   const [isOpenAccess, setOpenAccessDlg] = useState(false);
   const [isReadySignForMint, setReadySignForMint] = useState(false);
