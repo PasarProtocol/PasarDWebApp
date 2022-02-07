@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, Divider} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import TransLoadingButton from '../TransLoadingButton';
 import useMintDlg from '../../hooks/useMintDlg';
 
-export default function Mint(props) {
-  const { setProp, totalSteps } = props
-  // const { isOpen, current, isReadySign } = props.dlgProp
-  const {current, isOpenMint, setOpenMintDlg, isReadySignForMint} = useMintDlg()
+export default function Access(props) {
+  const {isOpenAccess, setOpenAccessDlg, isReadySignForAccess} = useMintDlg()
   const handleClose = () => {
-    // setProp({...props.dlgProp, isOpen: false})
-    setOpenMintDlg(false)
-  };
+    setOpenAccessDlg(false)
+  }
 
   return (
-    <Dialog open={isOpenMint} onClose={handleClose}>
+    <Dialog open={isOpenAccess} onClose={handleClose}>
       <DialogTitle>
         <IconButton
           aria-label="close"
@@ -31,18 +28,23 @@ export default function Mint(props) {
       </DialogTitle>
       <DialogContent>
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
-          {current===1?"Create Item":"List on Market"}
+          Enable Access
         </Typography>
-        <Box draggable = {false} component="img" src="/static/loading-light.gif" sx={{width: 100, m:'auto'}} />
-        {
-          isReadySignForMint?
-          <TransLoadingButton loading={Boolean(true)}/>:
-          <Typography variant="subtitle2" align="center">
-            Creating item on the blockchain...
-          </Typography>
-        }
-        <Typography variant="subtitle2" align="center" color='origin.main' sx={{my: '10px'}}>
-          Step {current} of {totalSteps}
+        <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }}>
+          Pasar requires your authorization
+          to transfer all sold items from your
+          wallet to the buyer’s address when a
+          buy order is complete
+        </Typography>
+        <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
+          <TransLoadingButton
+            loading={isReadySignForAccess}
+            onClick={()=>{}}>
+            Enable
+          </TransLoadingButton>
+        </Box>
+        <Typography variant="body2" display="block" color="red" gutterBottom align="center">
+          This is a one-time action only per address
         </Typography>
         <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
           We do not own your private keys and cannot access your funds
