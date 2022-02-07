@@ -179,8 +179,13 @@ export function callContractMethod(type, paramObj){
           reject(new Error)
           return
         }
+        const {beforeSendFunc, afterSendFunc} = paramObj
+        if(beforeSendFunc)
+          beforeSendFunc()
         method.send(transactionParams)
           .on('receipt', (receipt) => {
+              if(afterSendFunc)
+                afterSendFunc()
               console.log("receipt", receipt);
               resolve(true)
           })
