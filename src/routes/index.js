@@ -68,14 +68,20 @@ export default function Router() {
           path: 'marketplace',
           children: [
             { path: 'detail/:collection', element: <MarketCollectibleDetail /> },
-            { path: 'myitem', element: <MyItems /> },
-            { path: 'myitem/:type', element: <MyItems /> },
-            { path: 'others/:address', element: <MyItems /> },
             { path: 'search', element: <Navigate to="/marketplace" replace /> },
             { path: 'search/:key', element: <MarketExplorer /> },
           ]
         },
         { path: 'create', element: <CreateItem /> },
+        { path: 'profile', element: <Navigate to="/404" replace /> },
+        {
+          path: 'profile',
+          children: [
+            { path: 'myitem', element: <MyItems /> },
+            { path: 'myitem/:type', element: <MyItems /> },
+            { path: 'others/:address', element: <MyItems /> },
+          ]
+        },
       ]
     },
     { path: '*', element: <Navigate to="/404" replace /> }

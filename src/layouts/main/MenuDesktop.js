@@ -9,6 +9,7 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
 import { Box, Link, Grid, List, Stack, Popover, ListItem, ListSubheader, CardActionArea, Tooltip } from '@mui/material';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import useSingin from '../../hooks/useSignin';
 
 // ----------------------------------------------------------------------
 
@@ -74,7 +75,8 @@ function IconBullet({ type = 'item' }) {
 // };
 
 function MenuDesktopItem(props) {
-  const { item, isHome, isOpen, isOffset, onOpen, onClose, setOpenSigninEssentialDlg } = props
+  const { item, isHome, isOpen, isOffset, onOpen, onClose } = props
+  const { setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
   const { title, path, children } = item;
 
   if (children) {
@@ -184,13 +186,13 @@ function MenuDesktopItem(props) {
     );
   }
 
-  const openSignin = (e)=>{
+  const openSignin = (path)=>{
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
-      if(document.getElementById("getDidNow"))
-        document.getElementById("getDidNow").click()
+      setOpenDownloadEssentialDlg(true)
     }
     else
       setOpenSigninEssentialDlg(true)
+    setAfterSigninPath(path)
   }
 
   if(path.startsWith("/create")){
@@ -200,8 +202,6 @@ function MenuDesktopItem(props) {
         component={RouterLink}
         end={path === '/'}
         sx={{
-          // ...(isHome && { color: 'common.white' }),
-          // ...(isOffset && { color: 'text.primary' }),
           '&.active': {
             color: 'primary.main'
           }
@@ -210,8 +210,6 @@ function MenuDesktopItem(props) {
         {title}
       </LinkStyle>
     return <LinkStyle
-        // to={path}
-        // component={RouterLink}
         end={path === '/'}
         sx={{
           cursor: 'pointer',
@@ -219,7 +217,7 @@ function MenuDesktopItem(props) {
             color: 'primary.main'
           }
         }}
-        onClick={openSignin}
+        onClick={e=>openSignin(path)}
       >
         {title}
       </LinkStyle>
@@ -242,7 +240,7 @@ function MenuDesktopItem(props) {
         {title}
       </LinkStyle>:
       
-      <Tooltip title="Coming Soon" arrow>
+      <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
         <LinkStyle
           disabled={1&&true}
           sx={{
@@ -261,7 +259,8 @@ MenuDesktop.propTypes = {
   navConfig: PropTypes.array
 };
 
-export default function MenuDesktop({ isOffset, isHome, navConfig, setOpenSigninEssentialDlg }) {
+export default function MenuDesktop(props) {
+  const { isOffset, isHome, navConfig } = props
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
 
@@ -291,7 +290,6 @@ export default function MenuDesktop({ isOffset, isHome, navConfig, setOpenSignin
           onClose={handleClose}
           isOffset={isOffset}
           isHome={isHome}
-          setOpenSigninEssentialDlg={setOpenSigninEssentialDlg}
         />
       ))}
     </Stack>

@@ -20,7 +20,6 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
-import { LoadingButton } from '@mui/lab';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import {
   stickerContract as CONTRACT_ADDRESS,
@@ -28,6 +27,7 @@ import {
   blankAddress
 } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
+import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
 import { removeLeadingZero, callContractMethod, sendIpfsDidJson } from '../../utils/common';
 
@@ -112,8 +112,26 @@ export default function Sell(props) {
         })
         
       })
-  })
-  );
+    })
+  )
+
+  const putOnSale = async () => {
+    setOnProgress(true);
+    const didUri = await sendIpfsDidJson();
+    const sellPrice = BigInt(price*1e18).toString();
+    console.log('--------', tokenId, '--', sellPrice, '--', didUri, '--');
+    callSetApprovalForAllAndSell(MARKET_CONTRACT_ADDRESS, true, sellPrice, didUri).then(result=>{
+      if(result){
+        setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
+        enqueueSnackbar('Sell NFT success!', { variant: 'success' });
+        setOpen(false);
+      } else {
+        enqueueSnackbar('Sell NFT error!', { variant: 'warning' });
+      }
+    }).catch(e=>{
+      console.log(e)
+    });
+  }
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -166,45 +184,22 @@ export default function Sell(props) {
                 title="We take 2% of every transaction that happens on Pasar for providing the platform to users"
                 arrow
                 disableInteractive
+                enterTouchDelay={0}
               >
                 <Icon icon="eva:info-outline" style={{ marginBottom: -4, fontSize: 18 }} />
               </Tooltip>
             </Typography>
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive
-              <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}>
-                {' '}
-                {rcvprice} ELA{' '}
-              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}> {rcvprice} ELA </Typography>
               per item
             </Typography>
           </Grid>
         </Grid>
-        <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-          <LoadingButton
-            loading={onProgress}
-            variant="contained"
-            fullWidth
-            onClick={async () => {
-              setOnProgress(true);
-              const didUri = await sendIpfsDidJson();
-              const sellPrice = BigInt(price*1e18).toString();
-              console.log('--------', tokenId, '--', sellPrice, '--', didUri, '--');
-              callSetApprovalForAllAndSell(MARKET_CONTRACT_ADDRESS, true, sellPrice, didUri).then(result=>{
-                if(result){
-                  setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
-                  enqueueSnackbar('Sell NFT success!', { variant: 'success' });
-                  setOpen(false);
-                } else {
-                  enqueueSnackbar('Sell NFT error!', { variant: 'warning' });
-                }
-              }).catch(e=>{
-                console.log(e)
-              });
-            }}
-          >
+        <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
+          <TransLoadingButton loading={onProgress} onClick={putOnSale}>
             List
-          </LoadingButton>
+          </TransLoadingButton>
         </Box>
         <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
           We do not own your private keys and cannot access your funds

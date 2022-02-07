@@ -19,10 +19,10 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
-import { LoadingButton } from '@mui/lab';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
+import TransLoadingButton from '../TransLoadingButton';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson } from '../../utils/common';
 
 export default function Purchase(props) {
@@ -61,7 +61,7 @@ export default function Purchase(props) {
                 setOpen(false);
                 setOnProgress(false);
                 setTimeout(()=>{
-                  navigate('/marketplace/myitem/1')
+                  navigate('/profile/myitem/1')
                 }, 3000)
               }).catch((error) => {
                 console.log(error)
@@ -127,7 +127,7 @@ export default function Purchase(props) {
         setOpen(false);
         setOnProgress(false);
         setTimeout(()=>{
-          navigate('/marketplace/myitem/1')
+          navigate('/profile/myitem/1')
         }, 3000)
       })
       .on('confirmation', (confirmationNumber, receipt) => {
@@ -272,14 +272,12 @@ export default function Purchase(props) {
         </Grid>
         {price <= balance ? (
           <>
-            <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-              <LoadingButton
+            <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
+              <TransLoadingButton
                 loading={onProgress}
-                variant="contained"
-                fullWidth
                 onClick={buyNft}>
                 Buy
-              </LoadingButton>
+              </TransLoadingButton>
             </Box>
             <Typography variant="body2" display="block" color="red" gutterBottom align="center">
               Please check all item details before making a purchase

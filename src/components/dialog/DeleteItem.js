@@ -3,10 +3,8 @@ import Web3 from 'web3';
 import * as math from 'mathjs';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Link, Button, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { styled } from '@mui/material/styles';
-
 import { useSnackbar } from 'notistack';
-import { LoadingButton } from '@mui/lab';
+
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import {
   stickerContract as CONTRACT_ADDRESS,
@@ -14,6 +12,7 @@ import {
   blankAddress
 } from '../../config';
 import { reduceHexAddress } from '../../utils/common';
+import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 
 export default function DeleteItem(props) {
@@ -101,10 +100,10 @@ export default function DeleteItem(props) {
             {reduceHexAddress(blankAddress)}
           </Link>
         </Box>
-        <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-          <LoadingButton loading={onProgress} variant="contained" fullWidth onClick={burnNft}>
+        <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
+          <TransLoadingButton loading={onProgress} onClick={burnNft}>
             Delete Item
-          </LoadingButton>
+          </TransLoadingButton>
         </Box>
         <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
           We do not own your private keys and cannot access your funds

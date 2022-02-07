@@ -19,12 +19,12 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
-import { LoadingButton } from '@mui/lab';
 import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import CoinSelect from '../marketplace/CoinSelect';
+import TransLoadingButton from '../TransLoadingButton';
 import { removeLeadingZero } from '../../utils/common';
 
 const InputStyle = styled(Input)(({ theme }) => ({
@@ -151,6 +151,7 @@ export default function UpdatePrice(props) {
                 title="We take 2% of every transaction that happens on Pasar for providing the platform to users"
                 arrow
                 disableInteractive
+                enterTouchDelay={0}
               >
                 <Icon icon="eva:info-outline" style={{ marginBottom: -4, fontSize: 18 }} />
               </Tooltip>
@@ -158,17 +159,16 @@ export default function UpdatePrice(props) {
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive
               <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}>
-                {' '}
-                {rcvprice} ELA{' '}
+                {' '}{rcvprice} ELA{' '}
               </Typography>
               per item
             </Typography>
           </Grid>
         </Grid>
-        <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-          <LoadingButton loading={onProgress} variant="contained" fullWidth onClick={changePrice}>
+        <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
+          <TransLoadingButton loading={onProgress} onClick={changePrice}>
             Update
-          </LoadingButton>
+          </TransLoadingButton>
         </Box>
         <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
           We do not own your private keys and cannot access your funds
