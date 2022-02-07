@@ -5,7 +5,12 @@ import TransLoadingButton from '../TransLoadingButton';
 import useMintDlg from '../../hooks/useMintDlg';
 
 export default function Access(props) {
-  const {isOpenAccess, setOpenAccessDlg, isReadySignForAccess} = useMintDlg()
+  const {isOpenAccess, setOpenAccessDlg, setReadySignForAccess, isReadySignForAccess, approvalFunction} = useMintDlg()
+
+  const handleEnable = (e) => {
+    setReadySignForAccess(true)
+    approvalFunction()
+  }
   const handleClose = () => {
     setOpenAccessDlg(false)
   }
@@ -39,7 +44,7 @@ export default function Access(props) {
         <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
           <TransLoadingButton
             loading={isReadySignForAccess}
-            onClick={()=>{}}>
+            onClick={handleEnable}>
             Enable
           </TransLoadingButton>
         </Box>

@@ -85,7 +85,7 @@ export default function CreateItem() {
   const [onProgress, setOnProgress] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [isOnValidation, setOnValidation] = React.useState(false);
-  const { setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setReadySignForAccess, setCurrent } = useMintDlg()
+  const { setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
   const { enqueueSnackbar } = useSnackbar();
   
   const isOffset = useOffSetTop(40);
@@ -254,21 +254,33 @@ export default function CreateItem() {
                   setProgress(progressStep(70, index))
                   stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
                     console.log("isApprovalForAll=", isApproval);
-                    if (!isApproval)
-                      stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
-                      .on('receipt', (receipt) => {
-                          console.log("setApprovalForAll-receipt", receipt);
-                          callContractMethod('createOrderForSale', {...paramObj, '_amount': _tokenSupply, '_price': BigInt(price*1e18).toString()}).then((success) => {
-                            resolve(success)
-                          }).catch(error=>{
+                    if (!isApproval) {
+                      setOpenAccessDlg(true)
+                      setApprovalFunction(()=>{
+                        stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
+                        .on('receipt', (receipt) => {
+                            setOpenAccessDlg(false)
+                            setCurrent(2)
+                            console.log("setApprovalForAll-receipt", receipt);
+                            callContractMethod('createOrderForSale', {
+                              ...paramObj,
+                              '_amount': _tokenSupply,
+                              '_price': BigInt(price*1e18).toString(),
+                              'beforeSendFunc': ()=>{setReadySignForMint(true)},
+                              'afterSendFunc': ()=>{setReadySignForMint(false)}
+                            }).then((success) => {
+                              resolve(success)
+                            }).catch(error=>{
+                              reject(error)
+                            })
+                        })
+                        .on('error', (error, receipt) => {
+                            console.error("setApprovalForAll-error", error);
+                            setOpenAccessDlg(false)
                             reject(error)
-                          })
+                        });
                       })
-                      .on('error', (error, receipt) => {
-                          console.error("setApprovalForAll-error", error);
-                          reject(error)
-                      });
-                    else{
+                    } else {
                       setCurrent(2)
                       callContractMethod('createOrderForSale', {
                         ...paramObj,
@@ -437,11 +449,13 @@ export default function CreateItem() {
         enqueueSnackbar('Mint token error!', { variant: 'warning' });
       setOnProgress(false)
       setOpenMintDlg(false)
+      setCurrent(1)
     }).catch((error) => {
       setProgress(100)
       enqueueSnackbar('Mint token error!', { variant: 'error' });
       setOnProgress(false)
       setOpenMintDlg(false)
+      setCurrent(1)
     });
   }
   const mintBatch = () => {
