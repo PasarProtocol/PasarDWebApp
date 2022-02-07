@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import TransLoadingButton from '../TransLoadingButton';
+import useMintDlg from '../../hooks/useMintDlg';
 
 export default function Mint(props) {
-  const { setProp, totalSteps } = props
-  const { isOpen, current, isReadySign } = props.dlgProp
+  const { totalSteps } = props
+  const {current, isOpenMint, isOpenAccess, setOpenMintDlg, isReadySignForMint} = useMintDlg()
   const handleClose = () => {
-    setProp({...props.dlgProp, isOpen: false})
+    setOpenMintDlg(false)
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleClose}>
+    <Dialog open={isOpenMint&&!isOpenAccess} onClose={handleClose}>
       <DialogTitle>
         <IconButton
           aria-label="close"
@@ -32,7 +33,7 @@ export default function Mint(props) {
         </Typography>
         <Box draggable = {false} component="img" src="/static/loading-light.gif" sx={{width: 100, m:'auto'}} />
         {
-          isReadySign?
+          isReadySignForMint?
           <TransLoadingButton loading={Boolean(true)}/>:
           <Typography variant="subtitle2" align="center">
             Creating item on the blockchain...

@@ -5,6 +5,7 @@ import MainLayout from '../layouts/main';
 import LogoOnlyLayout from '../layouts/LogoOnlyLayout';
 // components
 import LoadingScreen from '../components/LoadingScreen';
+import { MintDlgProvider } from '../contexts/MintDlgContext';
 
 // ----------------------------------------------------------------------
 
@@ -72,7 +73,7 @@ export default function Router() {
             { path: 'search/:key', element: <MarketExplorer /> },
           ]
         },
-        { path: 'create', element: <CreateItem /> },
+        { path: 'create', element: <MintDlgProvider><CreateItem /></MintDlgProvider> },
         { path: 'profile', element: <Navigate to="/404" replace /> },
         {
           path: 'profile',
