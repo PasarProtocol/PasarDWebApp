@@ -97,8 +97,8 @@ export default function CreateItem() {
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
   const navigate = useNavigate();
-  // if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
-  //   navigate('/marketplace')
+  if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+    navigate('/marketplace')
 
   React.useEffect(async () => {
     if(mintype!=="Multiple")
