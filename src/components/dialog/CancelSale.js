@@ -4,10 +4,9 @@ import * as math from 'mathjs';
 import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { styled } from '@mui/material/styles';
-import { LoadingButton } from '@mui/lab';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
+import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 
 export default function CancelSale(props) {
@@ -91,10 +90,10 @@ export default function CancelSale(props) {
           </Typography>{' '}
           from the marketplace
         </Typography>
-        <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-          <LoadingButton loading={onProgress} variant="contained" fullWidth onClick={cancelSale}>
+        <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
+          <TransLoadingButton loading={onProgress} onClick={cancelSale}>
             Remove Listing
-          </LoadingButton>
+          </TransLoadingButton>
         </Box>
         <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
           We do not own your private keys and cannot access your funds

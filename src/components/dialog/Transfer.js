@@ -10,7 +10,6 @@ import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import arrowIosUpwardFill from '@iconify/icons-eva/arrow-ios-upward-fill';
 import { useSnackbar } from 'notistack';
-import { LoadingButton } from '@mui/lab';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import {
   stickerContract as CONTRACT_ADDRESS,
@@ -19,6 +18,7 @@ import {
 } from '../../config';
 import { reduceHexAddress, removeLeadingZero } from '../../utils/common';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
+import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
 
 const InputStyle = styled(Input)(({ theme }) => ({
@@ -99,69 +99,69 @@ export default function Transfer(props) {
                 </IconButton>
             </DialogTitle>
             <DialogContent>
-                <Typography variant="h3" component="div" sx={{color: 'text.primary'}} align="center">
-                    Transfer Item
-                </Typography>
-                <Typography variant="body1" sx={{color: 'text.secondary', display: 'inline', pr: 1, py: 2}}>
-                    Item: 
-                </Typography>
-                <Typography variant="subtitle1" sx={{display: 'inline'}}>{title}</Typography>
-                <Grid container>
-                  <Grid item xs={12}>
-                    <Typography variant="h4" sx={{fontWeight: 'normal'}}>Wallet Address</Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <FormControl variant="standard" sx={{width: '100%'}}>
-                      <InputLabel htmlFor="input-with-price">
-                        Enter recipient wallet address
-                      </InputLabel>
-                      <InputStyle
-                        id="input-with-price"
-                        value={address}
-                        onChange={(e)=>setAddress(e.target.value)}
-                        startAdornment={' '}
-                        endAdornment={
-                          <QrCodeScannerIcon/>
-                        }
-                      />
-                    </FormControl>
-                    <Divider/>
-                  </Grid>
+              <Typography variant="h3" component="div" sx={{color: 'text.primary'}} align="center">
+                  Transfer Item
+              </Typography>
+              <Typography variant="body1" sx={{color: 'text.secondary', display: 'inline', pr: 1, py: 2}}>
+                  Item: 
+              </Typography>
+              <Typography variant="subtitle1" sx={{display: 'inline'}}>{title}</Typography>
+              <Grid container>
+                <Grid item xs={12}>
+                  <Typography variant="h4" sx={{fontWeight: 'normal'}}>Wallet Address</Typography>
                 </Grid>
-                <Accordion expanded={isOpenAdvanced} sx={{my:0}}>
-                  <AccordionSummary onClick={()=>setOpenAdvanced(!isOpenAdvanced)} sx={{p:0, '& .MuiAccordionSummary-content': {justifyContent: 'center'}}}>
-                    <Typography variant="body2" sx={{display: 'inline-flex', alignItems: 'center'}}>Advanced Settings <Icon icon={isOpenAdvanced?arrowIosUpwardFill:arrowIosDownwardFill} width={20} height={20}/></Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Grid container>
-                      <Grid item xs={12}>
-                        <Typography variant="h4" sx={{fontWeight: 'normal'}}>Memo</Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <FormControl variant="standard" sx={{width: '100%'}}>
-                          <InputLabel htmlFor="input-with-price">
-                            Enter memo Transferred via Pasar
-                          </InputLabel>
-                          <InputStyle
-                            id="input-with-price"
-                            value={memo}
-                            onChange={(e)=>{setMemo(e.target.value)}}
-                            startAdornment={' '}
-                          />
-                        </FormControl>
-                        <Divider/>
-                      </Grid>
+                <Grid item xs={12}>
+                  <FormControl variant="standard" sx={{width: '100%'}}>
+                    <InputLabel htmlFor="input-with-price">
+                      Enter recipient wallet address
+                    </InputLabel>
+                    <InputStyle
+                      id="input-with-price"
+                      value={address}
+                      onChange={(e)=>setAddress(e.target.value)}
+                      startAdornment={' '}
+                      endAdornment={
+                        <QrCodeScannerIcon/>
+                      }
+                    />
+                  </FormControl>
+                  <Divider/>
+                </Grid>
+              </Grid>
+              <Accordion expanded={isOpenAdvanced} sx={{my:0}}>
+                <AccordionSummary onClick={()=>setOpenAdvanced(!isOpenAdvanced)} sx={{p:0, '& .MuiAccordionSummary-content': {justifyContent: 'center'}}}>
+                  <Typography variant="body2" sx={{display: 'inline-flex', alignItems: 'center'}}>Advanced Settings <Icon icon={isOpenAdvanced?arrowIosUpwardFill:arrowIosDownwardFill} width={20} height={20}/></Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Memo</Typography>
                     </Grid>
-                  </AccordionDetails>
-                </Accordion>
-                <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-                  <LoadingButton loading={onProgress} variant="contained" fullWidth onClick={transferNft}>
-                        Transfer
-                    </LoadingButton>
-                </Box>
-                <Typography variant="caption" display="block" sx={{color: 'text.secondary'}} gutterBottom align="center">
-                    We do not own your private keys and cannot access your funds<br/>without your confirmation.
-                </Typography>
+                    <Grid item xs={12}>
+                      <FormControl variant="standard" sx={{width: '100%'}}>
+                        <InputLabel htmlFor="input-with-price">
+                          Enter memo Transferred via Pasar
+                        </InputLabel>
+                        <InputStyle
+                          id="input-with-price"
+                          value={memo}
+                          onChange={(e)=>{setMemo(e.target.value)}}
+                          startAdornment={' '}
+                        />
+                      </FormControl>
+                      <Divider/>
+                    </Grid>
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
+              <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
+                <TransLoadingButton loading={onProgress} onClick={transferNft}>
+                  Transfer
+                </TransLoadingButton>
+              </Box>
+              <Typography variant="caption" display="block" sx={{color: 'text.secondary'}} gutterBottom align="center">
+                  We do not own your private keys and cannot access your funds<br/>without your confirmation.
+              </Typography>
             </DialogContent>
         </Dialog>
     )
