@@ -5,18 +5,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { isMobile } from 'react-device-detect';
 
 import { styled } from '@mui/material/styles';
-import {
-  Container,
-  Stack,
-  Typography,
-  Tab,
-  Tabs,
-  Link,
-  Button,
-  Box,
-  ToggleButtonGroup,
-  ToggleButton
-} from '@mui/material';
+import { Container, Stack, Typography, Tab, Tabs, Link, Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 // import { TabContext, TabList, TabPanel } from '@mui/lab';
 import SquareIcon from '@mui/icons-material/Square';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -72,11 +61,12 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 export default function MyItems() {
+  const sessionDispMode = sessionStorage.getItem("disp-mode")
   const params = useParams(); // params.address
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([[], [], []]);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
-  const [dispmode, setDispmode] = React.useState(1);
+  const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):1);
   const [orderType, setOrderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(params.type!==undefined?parseInt(params.type, 10):0);
@@ -99,6 +89,9 @@ export default function MyItems() {
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
       setMyAddress(account)
       setWalletAddress(account);
+    }
+    else {
+      navigate('/marketplace');
     }
     if (params.address)
       setWalletAddress(params.address);
@@ -161,7 +154,9 @@ export default function MyItems() {
   }, [walletAddress, orderType, updateCount]);
 
   const handleDispmode = (event, mode) => {
-    if (mode === null) return;
+    if (mode === null)
+      return
+    sessionStorage.setItem('disp-mode', mode);
     setDispmode(mode);
   };
   const link2Detail = (tokenId) => {

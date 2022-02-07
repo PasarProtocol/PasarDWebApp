@@ -332,7 +332,7 @@ export default function MarketExplorer() {
                 >
                   <MHidden width="mdUp">
                     <Box sx={{display: 'flex', pb: 1}}>
-                      <AssetSortSelect sx={{flex: 1}}/>
+                      <AssetSortSelect sx={{flex: 1}} onChange={setOrder}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
                           <SquareIcon />

@@ -26,6 +26,7 @@ import PaperRecord from '../../components/PaperRecord';
 import CustomSwitch from '../../components/custom-switch';
 import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
+import MintDlg from '../../components/dialog/Mint';
 import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS} from '../../config'
 import {hash, removeLeadingZero, callContractMethod} from '../../utils/common';
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
@@ -82,6 +83,7 @@ export default function CreateItem() {
   const [onProgress, setOnProgress] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [isOnValidation, setOnValidation] = React.useState(false);
+  const [mintDlgProp, setMintDlgProp] = React.useState({isOpen: false, isReadySign: false, current: 1});
   const { enqueueSnackbar } = useSnackbar();
   
   const isOffset = useOffSetTop(40);
@@ -93,7 +95,9 @@ export default function CreateItem() {
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
   const navigate = useNavigate();
-  
+  // if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+  //   navigate('/marketplace')
+
   React.useEffect(async () => {
     if(mintype!=="Multiple")
       setQuantity(1)
@@ -239,8 +243,10 @@ export default function CreateItem() {
             'value': 0
           };
           setProgress(progressStep(60, index))
+          setMintDlgProp({...mintDlgProp, isReadySign: true})
           stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).send(transactionParams)
             .on('receipt', (receipt) => {
+                setMintDlgProp({...mintDlgProp, isReadySign: false})
                 console.log("receipt", receipt);
                 if(isPutOnSale){
                   setProgress(progressStep(70, index))
@@ -260,12 +266,14 @@ export default function CreateItem() {
                           console.error("setApprovalForAll-error", error);
                           reject(error)
                       });
-                    else
+                    else{
+                      setMintDlgProp({...mintDlgProp, current: 2})
                       callContractMethod('createOrderForSale', {...paramObj, '_amount': _tokenSupply, '_price': BigInt(price*1e18).toString()}).then((success) => {
                         resolve(success)
                       }).catch(error=>{
                         reject(error)
                       })
+                    }
                   })
                 }
                 else
@@ -408,6 +416,7 @@ export default function CreateItem() {
     if(!file)
       return
     setOnProgress(true)
+    setMintDlgProp({...mintDlgProp, isOpen: true})
     uploadData().then((paramObj) => mint2net(paramObj)).then((success) => {
       setProgress(100)
       if(success){
@@ -419,16 +428,19 @@ export default function CreateItem() {
       else
         enqueueSnackbar('Mint token error!', { variant: 'warning' });
       setOnProgress(false)
+      setMintDlgProp({...mintDlgProp, isOpen: false})
     }).catch((error) => {
       setProgress(100)
       enqueueSnackbar('Mint token error!', { variant: 'error' });
       setOnProgress(false)
+      setMintDlgProp({...mintDlgProp, isOpen: false})
     });
   }
   const mintBatch = () => {
     if(!files.length)
       return
     setOnProgress(true)
+    setMintDlgProp({...mintDlgProp, isOpen: true})
     setProgress(3)
     sendIpfsDidJson().then((didRecv) => {
       setProgress(6)
@@ -438,6 +450,7 @@ export default function CreateItem() {
       setProgress(100)
       enqueueSnackbar('Mint token error!', { variant: 'error' });
       setOnProgress(false)
+      setMintDlgProp({...mintDlgProp, isOpen: false})
     })
   }
   const mintBatchMain = (_didUri) => {
@@ -455,14 +468,37 @@ export default function CreateItem() {
           enqueueSnackbar(`Mint token_${(i+1)} error!`, { variant: 'warning' });
         if((i+1)===files.length)
           setOnProgress(false)
+          setMintDlgProp({...mintDlgProp, isOpen: false})
       }).catch((error) => {
         setProgress(progressStep(100, i))
         enqueueSnackbar(`Mint token_${(i+1)} error!`, { variant: 'error' });
         if((i+1)===files.length)
           setOnProgress(false)
+          setMintDlgProp({...mintDlgProp, isOpen: false})
       })
     , Promise.resolve() );
   }
+  const scrollToRef = (ref)=>{
+    if(!ref.current)
+      return
+    let fixedHeight = isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP
+    fixedHeight = isMobile?APP_BAR_MOBILE:fixedHeight
+    window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
+  }
+  let duproperties = {};
+  singleProperties.forEach((item,index) => {
+    if(!item.type.length) return
+    duproperties[item.type] = duproperties[item.type] || [];
+    duproperties[item.type].push(index);
+  });
+  duproperties = Object.keys(duproperties)
+  .filter(key => duproperties[key].length>1)
+  .reduce((obj, key) => {
+    obj.push(key)
+    return obj
+  }, []);
+  // console.log(duproperties)
+
   const handleMintAction = (e) => {
     setOnValidation(true)
     if(mintype!=="Batch"&&!file || mintype==="Batch"&&!files.length)
@@ -472,17 +508,14 @@ export default function CreateItem() {
     else if(!description.length)
       scrollToRef(descriptionRef)
     else
-      if(mintype!=="Batch")
-        mintSingle()
+      if(mintype!=="Batch"){
+        if(duproperties.length || singleProperties.filter(el=>el.type.length>0&&!el.name.length).length)
+          enqueueSnackbar('Properties are invalid.', { variant: 'warning' });
+        else
+          mintSingle()
+      }
       else
         mintBatch()
-  }
-  const scrollToRef = (ref)=>{
-    if(!ref.current)
-      return
-    let fixedHeight = isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP
-    fixedHeight = isMobile?APP_BAR_MOBILE:fixedHeight
-    window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
   }
   return (
     <RootStyle title="CreateItem | PASAR">
@@ -498,12 +531,12 @@ export default function CreateItem() {
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
               <MintingTypeButton type="Single" description="Single item" onClick={()=>{setMintType("Single")}} current={mintype}/>
-              <Tooltip title="Coming Soon" arrow>
+              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
                   <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype} disabled={1&&true}/>
                 </div>
               </Tooltip>
-              <Tooltip title="Coming Soon" arrow>
+              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
                   <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype} disabled={1&&true}/>
                 </div>
@@ -606,7 +639,7 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Explicit & Sensitive Content&nbsp;
-                  <Tooltip title="Setting your asset as explicit and sensitive content, like pornography and other not safe for work (NSFW) content, will protect users with safe search while browsing Pasar" arrow disableInteractive>
+                  <Tooltip title="Setting your asset as explicit and sensitive content, like pornography and other not safe for work (NSFW) content, will protect users with safe search while browsing Pasar" arrow disableInteractive enterTouchDelay={0}>
                     <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
                   </Tooltip>
                 </Typography>
@@ -644,7 +677,7 @@ export default function CreateItem() {
                     <ItemTypeButton type="FixedPrice" onClick={()=>{setSaleType("FixedPrice")}} current={saletype}/>
                     {
                       mintype!=="Batch"&&
-                      <Tooltip title="Coming Soon" arrow>
+                      <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                         <div>
                           <ItemTypeButton type="Auction" onClick={()=>{setSaleType("Auction")}} current={saletype} disabled={1&&true}/>
                         </div>
@@ -677,7 +710,7 @@ export default function CreateItem() {
                     </FormControl>
                     <Divider/>
                     <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Platform fee 2%&nbsp;
-                      <Tooltip title="We take 2% of every transaction that happens on Pasar for providing the platform to users" arrow disableInteractive>
+                      <Tooltip title="We take 2% of every transaction that happens on Pasar for providing the platform to users" arrow disableInteractive enterTouchDelay={0}>
                         <Icon icon="eva:info-outline" style={{marginBottom: -4, fontSize: 18}}/>
                       </Tooltip>
                     </Typography>
@@ -691,7 +724,7 @@ export default function CreateItem() {
               }
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Royalties&nbsp;
-                  <Tooltip title="Royalties are the percentage cut of the total value of item sold and will be paid to the original creator" arrow disableInteractive>
+                  <Tooltip title="Royalties are the percentage cut of the total value of item sold and will be paid to the original creator" arrow disableInteractive enterTouchDelay={0}>
                     <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
                   </Tooltip>
                 </Typography>
@@ -733,12 +766,12 @@ export default function CreateItem() {
               <Grid item xs={12}>
                 <Stack spacing={1} direction="row">
                   <MintingTypeButton type="FSTK" description="Feeds NFT Sticker" onClick={()=>{setCollection("FSTK")}} current={collection}/>
-                  <Tooltip title="Coming Soon" arrow>
+                  <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                     <div>
                       <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose")}} current={collection} disabled={1&&true}/>
                     </div>
                   </Tooltip>
-                  <Tooltip title="Coming Soon" arrow>
+                  <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                     <div>
                       <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
                     </div>
@@ -751,7 +784,7 @@ export default function CreateItem() {
                   <Grid item xs={12}>
                     <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
                       Properties&nbsp;
-                      <Tooltip title="Attributes or traits to describe the item" arrow disableInteractive>
+                      <Tooltip title="Attributes or traits to describe the item" arrow disableInteractive enterTouchDelay={0}>
                         <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
                       </Tooltip>&nbsp;
                       <Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
@@ -770,10 +803,26 @@ export default function CreateItem() {
                       singleProperties.map((property, index)=>(
                         <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
                           <Grid item xs={6}>
-                            <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleSingleProperties('type', index, e)}}/>
+                            <TextField
+                              label="Example: Size"
+                              size="small"
+                              fullWidth
+                              value={property.type}
+                              onChange={(e)=>{handleSingleProperties('type', index, e)}}
+                              error={isOnValidation&&duproperties.includes(property.type)}
+                              helperText={isOnValidation&&duproperties.includes(property.type)?'Duplicated type':''}
+                            />
                           </Grid>
                           <Grid item xs={6}>
-                            <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleSingleProperties('name', index, e)}}/>
+                            <TextField
+                              label="Example: Big"
+                              size="small"
+                              fullWidth
+                              value={property.name}
+                              onChange={(e)=>{handleSingleProperties('name', index, e)}}
+                              error={isOnValidation&&property.type.length>0&&!property.name.length}
+                              helperText={isOnValidation&&property.type.length>0&&!property.name.length?'Can not be empty.':''}
+                            />
                           </Grid>
                         </Grid>
                       ))
@@ -785,7 +834,7 @@ export default function CreateItem() {
                     <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{pl: 0}}>
                       <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
                         Properties&nbsp;
-                        <Tooltip title="Attributes or traits to describe the item" arrow disableInteractive>
+                        <Tooltip title="Attributes or traits to describe the item" arrow disableInteractive enterTouchDelay={0}>
                           <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
                         </Tooltip>&nbsp;
                         <Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
@@ -894,6 +943,7 @@ export default function CreateItem() {
           </MHidden>
         </Grid>
       </Container>
+      <MintDlg dlgProp={mintDlgProp} setProp={setMintDlgProp} totalSteps={isPutOnSale?2:1}/>
     </RootStyle>
   );
 }
