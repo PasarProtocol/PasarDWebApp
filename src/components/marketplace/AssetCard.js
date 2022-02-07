@@ -29,6 +29,8 @@ import useSingin from '../../hooks/useSignin';
 
 export default function AssetCard(props) {
   const {title="???", description, quantity=1, price=0, isLink, tokenId, type, orderId, saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate} = props
+  // let {myaddress} = props
+  // myaddress='0x2D4aA0f8Cee7233BEE4e436E154075f50956e4b4'
   const { setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
@@ -36,7 +38,6 @@ export default function AssetCard(props) {
   const [cancelOpen, setOpenCancel] = React.useState(false);
   const [deleteOpen, setOpenDelete] = React.useState(false);
   const [transferOpen, setOpenTransfer] = React.useState(false);
-  // myaddress='0x2D4aA0f8Cee7233BEE4e436E154075f50956e4b4'
   const isCreatedByMe = myaddress===royaltyOwner
   const isListedOwnedByMe = myaddress===royaltyOwner&&saleType!=="Not on sale"
   const isUnlistedOwnedByMe = myaddress===holder&&saleType!=="Primary Sale"
@@ -46,6 +47,13 @@ export default function AssetCard(props) {
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);
   };
+  const handleSell = (event) => {
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+      setOpenDownloadEssentialDlg(true)
+      return
+    }
+    setOpenSell(true)
+  }
   const handleClosePopup = (e) => {
     const type = e.target.getAttribute("value")
     switch(type){
@@ -214,7 +222,7 @@ export default function AssetCard(props) {
           }
           {
             (type===2&&isUnlistedOwnedByMe)&&
-            <Button variant="contained" size="small" fullWidth sx={{mt: 1}} onClick={(e)=>{setOpenSell(true)}}>Sell</Button>
+            <Button variant="contained" size="small" fullWidth sx={{mt: 1}} onClick={handleSell}>Sell</Button>
           }
           {/* <Stack direction="row">
             <Badge name="diamond"/>
