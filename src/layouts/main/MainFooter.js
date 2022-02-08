@@ -153,7 +153,7 @@ export default function MainFooter({ hidden, isHome }) {
               <span role="img" aria-label="">
                 ❤️
               </span>{' '}
-              v1 - 6c57f5efda348a6c164b44e737a3abd4cdf03b6e
+              v1 - 6c57f
             </CopyRight>
           </Grid>
           <Grid item xs={12} md={6}>
