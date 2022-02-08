@@ -139,7 +139,7 @@ export function getDiaTokenPrice(connectProvider) {
     })
   })
 }
-export function getDiaTokenInfo(connectProvider, strAddress) {
+export function getDiaTokenInfo(strAddress, connectProvider=null) {
   return new Promise((resolve, reject) => {
     let walletConnectWeb3
     if(connectProvider)
@@ -154,7 +154,8 @@ export function getDiaTokenInfo(connectProvider, strAddress) {
     .then(result=>{
       // console.log(result)
       if(result === '0'){
-        return '0';
+        resolve(result)
+        return
       }
       const balance = walletConnectWeb3.utils.fromWei(result, 'ether');
       resolve(balance)

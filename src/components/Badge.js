@@ -20,7 +20,6 @@ export default function Badge({ name, value="", sx }) {
         backgroundColor: color,
         borderRadius: 2,
         p: value.length?'7px 10px':'5px',
-        mr: '5px',
         boxShadow: (theme)=>theme.customShadows.origin,
         ...sx
       }}

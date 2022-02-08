@@ -156,7 +156,7 @@ export default function SignInDialog() {
         }).catch((error) => {
           setDiaUSD(0)
         })
-        getDiaTokenInfo(library.provider, account).then(dia=>{
+        getDiaTokenInfo(account, library.provider).then(dia=>{
           setDiaBalance(dia)
         }).catch((error) => {
           setDiaBalance(0)
@@ -175,7 +175,7 @@ export default function SignInDialog() {
         }).catch((error) => {
           setDiaUSD(0)
         })
-        getDiaTokenInfo(essentialProvider, essentialProvider.accounts[0]).then(dia=>{
+        getDiaTokenInfo(essentialProvider.accounts[0], essentialProvider).then(dia=>{
           setDiaBalance(dia)
         }).catch((error) => {
           setDiaBalance(0)

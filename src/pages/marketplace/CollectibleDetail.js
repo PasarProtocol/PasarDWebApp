@@ -6,7 +6,7 @@ import Lightbox from 'react-image-lightbox';
 import { Icon } from '@iconify/react';
 import { useWeb3React } from "@web3-react/core";
 import { styled } from '@mui/material/styles';
-import { Link, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, 
+import { Link, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Tooltip,
   Typography, Box, Modal, Backdrop, Menu, MenuItem, Button, IconButton, Toolbar } from '@mui/material';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -29,10 +29,10 @@ import BidList from '../../components/marketplace/BidList';
 import Badge from '../../components/Badge';
 import Jazzicon from '../../components/Jazzicon';
 import PurchaseDlg from '../../components/dialog/Purchase'
-import { reduceHexAddress, getAssetImage, getTime, getCoinUSD } from '../../utils/common';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ScrollManager from '../../components/ScrollManager'
 import {blankAddress, marketContract} from '../../config'
+import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -109,6 +109,7 @@ export default function CollectibleDetail() {
   const [address, setAddress] = React.useState('');
 
   const [collectible, setCollectible] = React.useState({});
+  const [diaBadge, setDiaBadge] = React.useState({creator: false, owner: false});
   const [isForAuction, setForAuction] = React.useState(false);
   const [transRecord, setTransRecord] = React.useState([]);
   const [bidList, setBidList] = React.useState([]);
@@ -148,6 +149,14 @@ export default function CollectibleDetail() {
     const jsonCollectible = await resCollectible.json();
     if(jsonCollectible.data){
       setCollectible(jsonCollectible.data);
+      getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
+        if(dia!=='0')
+          setDiaBadgeOfUser('creator', true)
+      })
+      getDiaTokenInfo(jsonCollectible.data.holder).then(dia=>{
+        if(dia!=='0')
+          setDiaBadgeOfUser('owner', true)
+      })
       if(jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0)
         setPropertiesAccordionOpen(true)
     }
@@ -187,6 +196,15 @@ export default function CollectibleDetail() {
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);
   };
+
+  const setDiaBadgeOfUser = (type, value) => {
+    setDiaBadge((prevState) => {
+      const tempDiaBadge = {...prevState};
+      tempDiaBadge[type] = value;
+      return tempDiaBadge;
+    });
+  };
+
   const handleClosePopup = () => {
     setOpenPopup(null);
   };
@@ -349,21 +367,37 @@ export default function CollectibleDetail() {
                       <Jazzicon address={collectible.royaltyOwner}/>
                       {reduceHexAddress(collectible.royaltyOwner)}
                     </Link>
-                    {/* <Badge name="pasar" sx={{ml: 2}}/>
-                    <Badge name="diamond"/>
-                    <Badge name="user"/>
-                    <Badge name="thumbup" value="5"/>
-                    <Badge name="custom" value="100 ELA"/> */}
+                    <Stack spacing={.6} direction="row">
+                      {
+                        diaBadge.creator&&
+                        <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
+                          <Box><Badge name="diamond"/></Box>
+                        </Tooltip>
+                      }
+                      {/* <Badge name="pasar"/>
+                      <Badge name="diamond"/>
+                      <Badge name="user"/>
+                      <Badge name="thumbup" value="5"/>
+                      <Badge name="custom" value="100 ELA"/> */}
+                    </Stack>
                   </Typography>
                 </Stack>
                 <Typography variant="subtitle2">Owner</Typography>
                 <Stack direction='row'>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    <Link to={`/profile/others/${collectible.holder}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Link to={`/profile/others/${collectible.holder}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
                       <Jazzicon address={collectible.holder}/>
                       {reduceHexAddress(collectible.holder)}
                     </Link>
-                    {/* <Badge name="thumbdown" value="13" sx={{ml: 2}}/> */}
+                    <Stack spacing={.6} direction="row">
+                      {
+                        diaBadge.owner&&
+                        <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
+                          <Box><Badge name="diamond"/></Box>
+                        </Tooltip>
+                      }
+                      {/* <Badge name="thumbdown" value="13"/> */}
+                    </Stack>
                   </Typography>
                 </Stack>
                 <Typography variant="subtitle2">Collection</Typography>
