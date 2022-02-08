@@ -6,7 +6,7 @@ import { Box, Stack, Link, Typography, Grid, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import MethodLabel from '../../MethodLabel';
-import { reduceHexAddress, getThumbnail } from '../../../utils/common';
+import { reduceHexAddress, getAssetImage } from '../../../utils/common';
 
 TransactionListItem.propTypes = {
     item: PropTypes.object.isRequired
@@ -30,7 +30,7 @@ export default function TransactionListItem({ item }) {
                     draggable = {false}
                     component="img"
                     alt={item.name}
-                    src={getThumbnail(item.asset)}
+                    src={getAssetImage(item, true)}
                     onError={(e) => e.target.src = '/static/broken-image.svg'}
                     sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
                 />
