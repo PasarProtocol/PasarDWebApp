@@ -7,6 +7,7 @@ import Jazzicon from "@metamask/jazzicon";
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
 import {marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS} from '../config';
 import {PASAR_CONTRACT_ABI} from '../abi/pasarABI';
+import {DIAMOND_CONTRACT_ABI} from '../abi/diamondABI';
 
 const client = create('https://ipfs-test.trinity-feeds.app/');
 
@@ -91,50 +92,61 @@ export async function getCoinUSD() {
     return 0
   }
 }
-
-export async function getExchangeInfo(blocknum, connectProvider) {
-  const graphQLParams = {
-      "query": `query tokenPriceData {\n  token(id: "${DIA_CONTRACT_ADDRESS}", block: {number: ${blocknum}}) {\n    derivedELA\n  }\n  bundle(id: "1", block: {number: ${blocknum}}) {\n    elaPrice\n  }\n}\n`,
-      "variables": null,
-      "operationName": "tokenPriceData"
-  }
-  axios({
-    "method": "POST",
-    "url": 'https://api.glidefinance.io/subgraphs/name/glide/exchange',
-    "headers": {
-        "content-type": "application/json",
-        // "x-rapidapi-host": "reddit-graphql-proxy.p.rapidapi.com",
-        // "x-rapidapi-key": process.env.RAPIDAPI_KEY,
-        "accept": "application/json"
-    },
-    "data": graphQLParams
-  }).then(response=>{
-      try {
-          return response.data.data
-      } catch (error) {
-          return null;
+export function getDiaTokenPrice(connectProvider) {
+  return new Promise((resolve, reject) => {
+    if(!connectProvider)
+      return 0
+    const walletConnectWeb3 = new Web3(connectProvider);
+    walletConnectWeb3.eth.getBlockNumber().then(blocknum=>{
+      const graphQLParams = {
+          "query": `query tokenPriceData { token(id: "0x2c8010ae4121212f836032973919e8aec9aeaee5", block: {number: ${blocknum}}) { derivedELA } bundle(id: "1", block: {number: ${blocknum}}) { elaPrice } }`,
+          "variables": null,
+          "operationName": "tokenPriceData"
       }
-  });
-  
-  if(!connectProvider)
-    return 0
-  const walletConnectWeb3 = new Web3(connectProvider);
-  const diaABI4Balance = [{
-    "inputs": [{
-      "internalType": "address",
-      "name": "owner",
-      "type": "address"
-    }],
-    "name": "balanceOf",
-    "outputs": [{
-      "internalType": "uint256",
-      "name": "balance",
-      "type": "uint256"
-    }],
-    "stateMutability": "view",
-    "type": "function"
-  }]
-  const marketContract = new walletConnectWeb3.eth.Contract(diaABI4Balance, DIA_CONTRACT_ADDRESS)
+      axios({
+        "method": "POST",
+        "url": 'https://api.glidefinance.io/subgraphs/name/glide/exchange',
+        "headers": {
+            "content-type": "application/json",
+            // "x-rapidapi-host": "reddit-graphql-proxy.p.rapidapi.com",
+            // "x-rapidapi-key": process.env.RAPIDAPI_KEY,
+            "accept": "application/json"
+        },
+        "data": graphQLParams
+      }).then(response=>{
+        try {
+          resolve(response.data.data)
+        } catch (error) {
+          reject(error);
+        }
+      });
+    }).catch((error) => {
+      reject(error);
+    })
+  })
+}
+export function getDiaTokenInfo(connectProvider, strAddress) {
+  return new Promise((resolve, reject) => {
+    if(!connectProvider)
+      return 0
+    const walletConnectWeb3 = new Web3(connectProvider);
+    // const web3 = new Web3(Web3.givenProvider);
+    // const MyContract = new web3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS);
+    // MyContract.methods.balanceOf(strAddress).call().then(console.log);
+
+    const diamondContract = new walletConnectWeb3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS)
+    diamondContract.methods.balanceOf(strAddress).call()
+    .then(result=>{
+      // console.log(result)
+      if(result === '0'){
+        return '0';
+      }
+      const balance = walletConnectWeb3.utils.fromWei(result, 'ether');
+      resolve(balance)
+    }).catch((error) => {
+      reject(error);
+    })
+  })
 }
 
 export function removeLeadingZero(value) {

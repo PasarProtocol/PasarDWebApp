@@ -27,7 +27,7 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import { reduceHexAddress, getBalance, getCoinUSD, getExchangeInfo } from '../../utils/common';
+import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
 import useSingin from '../../hooks/useSignin';
 
@@ -97,7 +97,9 @@ export default function SignInDialog() {
   const [isOpenAccountPopup, setOpenAccountPopup] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
   const [balance, setBalance] = useState(0);
+  const [diaBalance, setDiaBalance] = useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
+  const [diaUSD, setDiaUSD] = React.useState(0);
   const navigate = useNavigate();
 
   const classes = useStyles();
@@ -127,7 +129,6 @@ export default function SignInDialog() {
 
   React.useEffect(async () => {
     initializeWalletConnection();
-    // getExchangeInfo('10724720')
     getCoinUSD().then((res) => {
       setCoinUSD(res);
     });
@@ -150,6 +151,17 @@ export default function SignInDialog() {
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library) {
+        getDiaTokenPrice(library.provider).then(res => {
+          setDiaUSD(res.token.derivedELA)
+        }).catch((error) => {
+          setDiaUSD(0)
+        })
+        getDiaTokenInfo(library.provider, account).then(dia=>{
+          setDiaBalance(dia)
+        }).catch((error) => {
+          setDiaBalance(0)
+        })
+        
         setWalletAddress(account);
         getBalance(library.provider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
@@ -383,24 +395,15 @@ export default function SignInDialog() {
                     />
                     <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                       <Typography variant="body2"> ELA </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {' '}
-                        Elastos (ESC){' '}
-                      </Typography>
+                      <Typography variant="body2" color="text.secondary"> Elastos (ESC) </Typography>
                     </Box>
                     <Box>
-                      <Typography variant="body2" align="right">
-                        {' '}
-                        {balance}{' '}
-                      </Typography>
-                      <Typography variant="body2" align="right" color="text.secondary">
-                        {' '}
-                        USD {math.round(coinUSD * balance, 2)}
-                      </Typography>
+                      <Typography variant="body2" align="right"> {balance} </Typography>
+                      <Typography variant="body2" align="right" color="text.secondary"> USD {math.round(coinUSD * balance, 2)} </Typography>
                     </Box>
                   </Stack>
                 </PaperRecord>
-                {/* <PaperRecord sx={{ p: 1.5 }}>
+                <PaperRecord sx={{ p: 1.5 }}>
                   <Stack direction="row" alignItems="center" spacing={2}>
                     <Box
                       draggable={false}
@@ -411,23 +414,14 @@ export default function SignInDialog() {
                     />
                     <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                       <Typography variant="body2"> DIA </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {' '}
-                        Diamond (ESC){' '}
-                      </Typography>
+                      <Typography variant="body2" color="text.secondary"> Diamond (ESC) </Typography>
                     </Box>
                     <Box>
-                      <Typography variant="body2" align="right">
-                        {' '}
-                        0
-                      </Typography>
-                      <Typography variant="body2" align="right" color="text.secondary">
-                        {' '}
-                        0
-                      </Typography>
+                      <Typography variant="body2" align="right"> {diaBalance} </Typography>
+                      <Typography variant="body2" align="right" color="text.secondary"> USD {math.round(diaUSD * diaBalance, 2)} </Typography>
                     </Box>
                   </Stack>
-                </PaperRecord> */}
+                </PaperRecord>
               </Stack>
             </Box>
             <MenuItem to="/profile/myitem" onClick={closeAccountMenu} component={RouterLink}>
