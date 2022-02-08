@@ -161,18 +161,30 @@ export default function SignInDialog() {
         }).catch((error) => {
           setDiaBalance(0)
         })
-        
-        setWalletAddress(account);
         getBalance(library.provider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
-        });
+        })
+        
+        setWalletAddress(account);
       }
 
       if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider()) {
-        setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
-        getBalance(essentialsConnector.getWalletConnectProvider()).then((res) => {
+        const essentialProvider = essentialsConnector.getWalletConnectProvider()
+        getDiaTokenPrice(essentialProvider).then(res => {
+          setDiaUSD(res.token.derivedELA)
+        }).catch((error) => {
+          setDiaUSD(0)
+        })
+        getDiaTokenInfo(essentialProvider, essentialProvider.accounts[0]).then(dia=>{
+          setDiaBalance(dia)
+        }).catch((error) => {
+          setDiaBalance(0)
+        })
+        getBalance(essentialProvider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
-        });
+        })
+
+        setWalletAddress(essentialProvider.accounts[0]);
       }
     }
   }, [sessionLinkFlag, account, active, chainId, activatingConnector]);
@@ -371,7 +383,7 @@ export default function SignInDialog() {
                 >
                   <Typography variant="h6">Total Balance</Typography>
                   <Typography variant="h3" color="origin.main">
-                    USD {math.round(coinUSD * balance, 2)}
+                    USD {math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2)}
                   </Typography>
                   <Button
                     href="https://glidefinance.io/swap"
