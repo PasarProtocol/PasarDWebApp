@@ -152,7 +152,7 @@ export default function SignInDialog() {
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library) {
         getDiaTokenPrice(library.provider).then(res => {
-          setDiaUSD(res.token.derivedELA)
+          setDiaUSD(res.token.derivedELA*res.bundle.elaPrice)
         }).catch((error) => {
           setDiaUSD(0)
         })
@@ -171,7 +171,7 @@ export default function SignInDialog() {
       if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider()) {
         const essentialProvider = essentialsConnector.getWalletConnectProvider()
         getDiaTokenPrice(essentialProvider).then(res => {
-          setDiaUSD(res.token.derivedELA)
+          setDiaUSD(res.token.derivedELA*res.bundle.elaPrice)
         }).catch((error) => {
           setDiaUSD(0)
         })
