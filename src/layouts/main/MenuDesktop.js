@@ -76,7 +76,7 @@ function IconBullet({ type = 'item' }) {
 
 function MenuDesktopItem(props) {
   const { item, isHome, isOpen, isOffset, onOpen, onClose } = props
-  const { setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
+  const { signinEssentialSuccess, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
   const { title, path, children } = item;
 
   if (children) {
