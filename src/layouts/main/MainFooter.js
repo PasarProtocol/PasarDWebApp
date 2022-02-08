@@ -5,6 +5,7 @@ import telegramIcon from '@iconify/icons-ic/round-telegram';
 // material
 import { styled } from '@mui/material/styles';
 import { Grid, Link, Divider, Container, Typography, IconButton, Stack, Box } from '@mui/material';
+import generatedGitInfo from '../../generatedGitInfo.json';
 import palette from '../../theme/palette';
 import ModeSwitch from '../../components/mode-switch';
 // ----------------------------------------------------------------------
@@ -153,7 +154,7 @@ export default function MainFooter({ hidden, isHome }) {
               <span role="img" aria-label="">
                 ❤️
               </span>{' '}
-              v1 - 6c57f
+              v1 - {generatedGitInfo.gitCommitHash}
             </CopyRight>
           </Grid>
           <Grid item xs={12} md={6}>
