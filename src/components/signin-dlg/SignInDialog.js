@@ -57,7 +57,7 @@ const useStyles = makeStyles({
 });
 
 export default function SignInDialog() {
-  const {openSigninEssential, openDownloadEssential, afterSigninPath, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath} = useSingin()
+  const {openSigninEssential, openDownloadEssential, afterSigninPath, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath, setSigninEssentialSuccess} = useSingin()
   const { pathname } = useLocation();
   const isHome = pathname === '/';
 
@@ -267,6 +267,7 @@ export default function SignInDialog() {
             setOpenSigninDlg(false);
             setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
             setActivatingConnector(essentialsConnector);
+            setSigninEssentialSuccess(true)
             if(afterSigninPath){
               setOpenSigninEssentialDlg(false)
               navigate(afterSigninPath)
@@ -328,6 +329,7 @@ export default function SignInDialog() {
             console.log(e);
           });
       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+      setSigninEssentialSuccess(false)
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('did');
       setActivatingConnector(null);
@@ -383,7 +385,7 @@ export default function SignInDialog() {
                 >
                   <Typography variant="h6">Total Balance</Typography>
                   <Typography variant="h3" color="origin.main">
-                    USD {math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2)}
+                    USD {math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2)}
                   </Typography>
                   <Button
                     href="https://glidefinance.io/swap"
