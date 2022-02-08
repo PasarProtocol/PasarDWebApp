@@ -200,7 +200,7 @@ function MenuDesktopItem(props) {
       return <LinkStyle
         to={path}
         component={RouterLink}
-        end={path === '/'}
+        // end={path === '/'}
         sx={{
           '&.active': {
             color: 'primary.main'
@@ -210,7 +210,7 @@ function MenuDesktopItem(props) {
         {title}
       </LinkStyle>
     return <LinkStyle
-        end={path === '/'}
+        // end={path === '/'}
         sx={{
           cursor: 'pointer',
           '&.active': {
@@ -228,7 +228,7 @@ function MenuDesktopItem(props) {
       <LinkStyle
         to={path}
         component={RouterLink}
-        end={path === '/'}
+        // end={path === '/'}
         sx={{
           // ...(isHome && { color: 'common.white' }),
           // ...(isOffset && { color: 'text.primary' }),
