@@ -4,7 +4,7 @@ import { formatDistance } from 'date-fns';
 import { Box, Stack, Link, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CopyButton from '../../CopyButton';
-import { getThumbnail } from '../../../utils/common';
+import { getAssetImage } from '../../../utils/common';
 
 CollectibleListItem.propTypes = {
     item: PropTypes.object.isRequired
@@ -22,7 +22,7 @@ export default function CollectibleListItem({ item }) {
                 draggable = {false}
                 component="img"
                 alt={name}
-                src={getThumbnail(thumbnail)}
+                src={getAssetImage(item, true)}
                 onError={(e) => e.target.src = '/static/broken-image.svg'}
                 sx={{ width: 48, height: 48, borderRadius: 1 }}
             />

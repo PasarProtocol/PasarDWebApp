@@ -31,8 +31,8 @@ export const getTime = timestamp => {
   const timeStr = [hours, min, sec].join(':').concat(" ").concat([suffix, "+UTC"].join(' '));
   return {'date':dateStr, 'time':timeStr};
 };
-// Get thumbnail url //
-export const getThumbnail = id => {
+
+const getIpfsUrl = id => {
   if(!id)
     return ""
   const prefixLen = id.split(':', 2).join(':').length
@@ -40,6 +40,19 @@ export const getThumbnail = id => {
     return ""
   const uri = id.substring(prefixLen+1)
   return `https://ipfs0.trinity-feeds.app/ipfs/${uri}`
+}
+
+export const getAssetImage = (metaObj, isThumbnail=false) => {
+  const {asset, thumbnail, tokenJsonVersion, data} = metaObj
+  let cid = asset
+  if(tokenJsonVersion==="2" && !asset){
+    if(isThumbnail)
+      cid = data.thumbnail
+    else cid = data.image
+  }
+  else if(isThumbnail)
+    cid = thumbnail
+  return getIpfsUrl(cid)
 }
 
 export const generateJazzicon = (address, size) => {

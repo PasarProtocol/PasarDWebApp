@@ -29,7 +29,7 @@ import BidList from '../../components/marketplace/BidList';
 import Badge from '../../components/Badge';
 import Jazzicon from '../../components/Jazzicon';
 import PurchaseDlg from '../../components/dialog/Purchase'
-import { reduceHexAddress, getThumbnail, getTime, getCoinUSD } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, getTime, getCoinUSD } from '../../utils/common';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ScrollManager from '../../components/ScrollManager'
 import {blankAddress, marketContract} from '../../config'
@@ -233,7 +233,7 @@ export default function CollectibleDetail() {
                 draggable = {false}
                 component="img"
                 alt={collectible.name}
-                src={getThumbnail(collectible.asset)}
+                src={getAssetImage(collectible)}
                 onLoad={onImgLoad}
                 onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
                 sx={{ maxHeight: 400, borderRadius: 1 }}
@@ -313,7 +313,7 @@ export default function CollectibleDetail() {
                     draggable = {false}
                     component="img"
                     alt={collectible.name}
-                    src={getThumbnail(collectible.asset)}
+                    src={getAssetImage(collectible)}
                     onLoad={onImgLoad}
                     onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
                     sx={{ width: '100%', height: '100%' }}
