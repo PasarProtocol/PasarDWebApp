@@ -8,7 +8,7 @@ import palette from '../../theme/palette'
 
 // material
 import LoadingScreen from '../LoadingScreen';
-import { MethodList, reduceHexAddress, getThumbnail } from '../../utils/common';
+import { MethodList, reduceHexAddress } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,

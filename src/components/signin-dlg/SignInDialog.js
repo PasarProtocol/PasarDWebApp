@@ -57,7 +57,8 @@ const useStyles = makeStyles({
 });
 
 export default function SignInDialog() {
-  const {openSigninEssential, openDownloadEssential, afterSigninPath, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath} = useSingin()
+  const { openSigninEssential, openDownloadEssential, afterSigninPath, diaBalance, 
+    setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath, setSigninEssentialSuccess, setDiaBalance } = useSingin()
   const { pathname } = useLocation();
   const isHome = pathname === '/';
 
@@ -97,7 +98,6 @@ export default function SignInDialog() {
   const [isOpenAccountPopup, setOpenAccountPopup] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
   const [balance, setBalance] = useState(0);
-  const [diaBalance, setDiaBalance] = useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [diaUSD, setDiaUSD] = React.useState(0);
   const navigate = useNavigate();
@@ -152,11 +152,11 @@ export default function SignInDialog() {
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library) {
         getDiaTokenPrice(library.provider).then(res => {
-          setDiaUSD(res.token.derivedELA)
+          setDiaUSD(res.token.derivedELA*res.bundle.elaPrice)
         }).catch((error) => {
           setDiaUSD(0)
         })
-        getDiaTokenInfo(library.provider, account).then(dia=>{
+        getDiaTokenInfo(account, library.provider).then(dia=>{
           setDiaBalance(dia)
         }).catch((error) => {
           setDiaBalance(0)
@@ -171,11 +171,11 @@ export default function SignInDialog() {
       if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider()) {
         const essentialProvider = essentialsConnector.getWalletConnectProvider()
         getDiaTokenPrice(essentialProvider).then(res => {
-          setDiaUSD(res.token.derivedELA)
+          setDiaUSD(res.token.derivedELA*res.bundle.elaPrice)
         }).catch((error) => {
           setDiaUSD(0)
         })
-        getDiaTokenInfo(essentialProvider, essentialProvider.accounts[0]).then(dia=>{
+        getDiaTokenInfo(essentialProvider.accounts[0], essentialProvider).then(dia=>{
           setDiaBalance(dia)
         }).catch((error) => {
           setDiaBalance(0)
@@ -269,6 +269,7 @@ export default function SignInDialog() {
             setOpenSigninDlg(false);
             setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
             setActivatingConnector(essentialsConnector);
+            setSigninEssentialSuccess(true)
             if(afterSigninPath){
               setOpenSigninEssentialDlg(false)
               navigate(afterSigninPath)
@@ -334,6 +335,7 @@ export default function SignInDialog() {
             console.log(e);
           });
       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+      setSigninEssentialSuccess(false)
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('did');
       setActivatingConnector(null);
@@ -389,7 +391,7 @@ export default function SignInDialog() {
                 >
                   <Typography variant="h6">Total Balance</Typography>
                   <Typography variant="h3" color="origin.main">
-                    USD {math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2)}
+                    USD {math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2)}
                   </Typography>
                   <Button
                     href="https://glidefinance.io/swap"

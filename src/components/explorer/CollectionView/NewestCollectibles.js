@@ -5,7 +5,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Box, Stack, Link, Typography } from '@mui/material';
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
-import { reduceHexAddress, getThumbnail } from '../../../utils/common';
+import { reduceHexAddress, getAssetImage } from '../../../utils/common';
 import CopyButton from '../../CopyButton';
 // ----------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ export default function NewestCollectibles(props) {
           <CollectibleItem 
             key={index}
             news={{
-              image: getThumbnail(collectible.thumbnail),
+              image: getAssetImage(collectible, true),
               title: collectible.name,
               creator: collectible.holder,
               postedAt: collectible.createTime*1000,

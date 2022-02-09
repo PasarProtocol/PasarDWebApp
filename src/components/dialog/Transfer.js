@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Web3 from 'web3';
 import * as math from 'mathjs';
 import {Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, Accordion, AccordionSummary, AccordionDetails, 
-    Grid, Tooltip, Button, Box} from '@mui/material';
+    Grid, Tooltip, FormHelperText, Box} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
@@ -13,13 +13,11 @@ import { useSnackbar } from 'notistack';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import {
   stickerContract as CONTRACT_ADDRESS,
-  marketContract as MARKET_CONTRACT_ADDRESS,
-  blankAddress
+  marketContract as MARKET_CONTRACT_ADDRESS
 } from '../../config';
 import { reduceHexAddress, removeLeadingZero } from '../../utils/common';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
-import CoinSelect from '../marketplace/CoinSelect';
 
 const InputStyle = styled(Input)(({ theme }) => ({
     '&:before': {
@@ -34,50 +32,67 @@ export default function Transfer(props) {
     const [address, setAddress] = React.useState('');
     const [isOpenAdvanced, setOpenAdvanced] = React.useState(false);
     const [memo, setMemo] = React.useState('');
+    const [isOnValidation, setOnValidation] = React.useState(false);
+
     const handleClose = () => {
+        setOnValidation(false)
+        setOnProgress(false)
         setOpen(false);
     }
 
-    const callSafeTransferFrom = async (_to, _id, _value) => {
+    const callSafeTransferFrom = (_to, _id, _value) => {
       const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
       const walletConnectWeb3 = new Web3(walletConnectProvider);
-      const accounts = await walletConnectWeb3.eth.getAccounts();
-  
-      const contractAbi = STICKER_CONTRACT_ABI;
-      const contractAddress = CONTRACT_ADDRESS;
-      const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-  
-      const gasPrice = await walletConnectWeb3.eth.getGasPrice();
-  
-      console.log('Sending transaction with account address:', accounts[0]);
-      const transactionParams = {
-        'from': accounts[0],
-        'gasPrice': gasPrice,
-        'gas': 5000000,
-        'value': 0
-      };
-  
-      stickerContract.methods
-        .safeTransferFrom(accounts[0], _to, _id, _value)
-        .send(transactionParams)
-        .on('transactionHash', (hash) => {
-          console.log('transactionHash', hash);
-        })
-        .on('receipt', (receipt) => {
-          console.log('receipt', receipt);
-          enqueueSnackbar('Transfer NFT success!', { variant: 'success' });
-          setOpen(false);
-        })
-        .on('confirmation', (confirmationNumber, receipt) => {
-          console.log('confirmation', confirmationNumber, receipt);
-        })
-        .on('error', (error, receipt) => {
-          console.error('error', error);
-          enqueueSnackbar('Transfer NFT error!', { variant: 'warning' });
+      walletConnectWeb3.eth.getAccounts().then(accounts=>{
+        const contractAbi = STICKER_CONTRACT_ABI;
+        const contractAddress = CONTRACT_ADDRESS;
+        const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+    
+        walletConnectWeb3.eth.getGasPrice().then(gasPrice=>{
+          console.log('Sending transaction with account address:', accounts[0]);
+          const transactionParams = {
+            'from': accounts[0],
+            'gasPrice': gasPrice,
+            'gas': 5000000,
+            'value': 0
+          };
+      
+          stickerContract.methods
+            .safeTransferFrom(accounts[0], _to, _id, _value)
+            .send(transactionParams)
+            .on('transactionHash', (hash) => {
+              console.log('transactionHash', hash);
+            })
+            .on('receipt', (receipt) => {
+              console.log('receipt', receipt);
+              enqueueSnackbar('Transfer NFT success!', { variant: 'success' });
+              setOnProgress(false);
+              setOpen(false);
+            })
+            .on('confirmation', (confirmationNumber, receipt) => {
+              console.log('confirmation', confirmationNumber, receipt);
+            })
+            .on('error', (error, receipt) => {
+              console.error('error', error);
+              enqueueSnackbar('Transfer NFT error!', { variant: 'warning' });
+              setOnProgress(false);
+            })
+        }).catch(err=>{
+          enqueueSnackbar('Transfer NFT error!', { variant: 'error' });
           setOnProgress(false);
-        });
-    };
+        })
+      }).catch(err=>{
+        enqueueSnackbar('Transfer NFT error!', { variant: 'error' });
+        setOnProgress(false);
+      })
+    }
+
     const transferNft = async () => {
+      setOnValidation(true)
+      if(!address.length){
+        enqueueSnackbar('Enter recipient wallet address', { variant: 'warning' });
+        return
+      }
       setOnProgress(true);
       callSafeTransferFrom(address, tokenId, 1);
     };
@@ -111,7 +126,7 @@ export default function Transfer(props) {
                   <Typography variant="h4" sx={{fontWeight: 'normal'}}>Wallet Address</Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <FormControl variant="standard" sx={{width: '100%'}}>
+                  <FormControl variant="standard" error={isOnValidation&&!address.length} sx={{width: '100%'}}>
                     <InputLabel htmlFor="input-with-price">
                       Enter recipient wallet address
                     </InputLabel>
@@ -124,6 +139,7 @@ export default function Transfer(props) {
                         <QrCodeScannerIcon/>
                       }
                     />
+                    <FormHelperText hidden={!isOnValidation||(isOnValidation&&address.length>0)}>Wallet address is required</FormHelperText>
                   </FormControl>
                   <Divider/>
                 </Grid>

@@ -45,7 +45,7 @@ const ListItemStyle = styled(ListItemButton)(({ theme }) => ({
 
 function MenuMobileItem(props) {
   const { item, isOpen, onOpen } = props
-  const { setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
+  const { signinEssentialSuccess, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
   const { title, path, icon, children } = item;
 
   if (children) {

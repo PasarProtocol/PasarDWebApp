@@ -24,7 +24,7 @@ import ByToSelect from '../../components/ByToSelect';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
+import { reduceHexAddress, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 

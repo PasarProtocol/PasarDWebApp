@@ -17,7 +17,7 @@ import TransactionCollectibleDetail from '../../components/explorer/TransactionL
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { reduceHexAddress, getThumbnail, getTime } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, getTime } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ export default function CollectibleDetail() {
                   draggable = {false}
                   component="img"
                   alt={collectible.name}
-                  src={getThumbnail(collectible.asset)}
+                  src={getAssetImage(collectible)}
                   onLoad={onImgLoad}
                   onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
                   sx={{ width: '100%', borderRadius: 1, mr: 2 }}

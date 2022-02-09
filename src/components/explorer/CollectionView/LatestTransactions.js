@@ -9,7 +9,7 @@ import palette from '../../../theme/palette'
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
 import MethodLabel from '../../MethodLabel';
-import { MethodList, reduceHexAddress, getThumbnail } from '../../../utils/common';
+import { MethodList, reduceHexAddress } from '../../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,
