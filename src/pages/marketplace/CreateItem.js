@@ -371,7 +371,7 @@ export default function CreateItem() {
   const sendIpfsDidJson = ()=>(
     new Promise((resolve, reject) => {
       // create the metadata object we'll be storing
-      const did = sessionStorage.getItem('did')?sessionStorage.getItem('did'):''
+      const did = sessionStorage.getItem('PASAR_DID') ? sessionStorage.getItem('PASAR_DID') : ''
       const didObj = {
         "version":"2",
         "did": `did:elastos:${did}`

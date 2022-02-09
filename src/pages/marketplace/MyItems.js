@@ -172,7 +172,7 @@ export default function MyItems() {
 
   const getMyName = () => {
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      const token = sessionStorage.getItem("token");
+      const token = sessionStorage.getItem("PASAR_TOKEN");
       const user = jwtDecode(token);
       const {name} = user;
       setMyName(name);

@@ -334,7 +334,7 @@ export const MethodList = [
 
 export const sendIpfsDidJson = async () => {
   // create the metadata object we'll be storing
-  const did = sessionStorage.getItem('did') ? sessionStorage.getItem('did') : '';
+  const did = sessionStorage.getItem('PASAR_DID') ? sessionStorage.getItem('PASAR_DID') : '';
   const didObj = {
     'version': '2',
     'did': `did:elastos:${did}`
