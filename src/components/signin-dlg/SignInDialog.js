@@ -88,7 +88,7 @@ export default function SignInDialog() {
       }
   );
 
-  let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+  let sessionLinkFlag = localStorage.getItem('PASAR_LINK_ADDRESS');
   const context = useWeb3React();
   const { connector, activate, active, error, library, chainId, account } = context;
   const [isOpenSnackbar, setSnackbarOpen] = useState(false);
@@ -140,15 +140,15 @@ export default function SignInDialog() {
     // if (active) { // check if is active
     //   if(activatingConnector === injected) {
     //     sessionLinkFlag = '1';
-    //     sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
+    //     localStorage.setItem('PASAR_LINK_ADDRESS', 1);
     //   }
     //   else if (activatingConnector === essentialsConnector) {
     //     sessionLinkFlag = '2';
-    //     sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
+    //     localStorage.setItem('PASAR_LINK_ADDRESS', 2);
     //   }
     // }
 
-    sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+    sessionLinkFlag = localStorage.getItem('PASAR_LINK_ADDRESS');
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library) {
         getDiaTokenPrice(library.provider).then(res => {
@@ -191,24 +191,24 @@ export default function SignInDialog() {
   
   // listen for disconnect from essentials
   React.useEffect(async()=>{
-    if(sessionLinkFlag === '2' && activatingConnector === essentialsConnector && !essentialsConnector.getWalletConnectProvider().wc.connected) {
+    if(sessionLinkFlag === '2' && activatingConnector === essentialsConnector && !essentialsConnector.hasWalletConnectSession()) {
       setOpenAccountPopup(null);
         await activate(null);
-        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+        if (localStorage.getItem('PASAR_LINK_ADDRESS') === '2')
           essentialsConnector
             .disconnectWalletConnect()
             .then((res) => {})
             .catch((e) => {
               console.log(e);
             });
-        sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-        sessionStorage.removeItem('PASAR_TOKEN');
-        sessionStorage.removeItem('PASAR_DID');
+        localStorage.removeItem('PASAR_LINK_ADDRESS');
+        localStorage.removeItem('PASAR_TOKEN');
+        localStorage.removeItem('PASAR_DID');
         setActivatingConnector(null);
         setWalletAddress(null);
         navigate('/marketplace');
       }
-  }, [essentialsConnector.getWalletConnectProvider().wc.connected]);
+  }, [essentialsConnector.hasWalletConnectSession()]);
 
   useConnectivitySDK();
 
@@ -223,7 +223,7 @@ export default function SignInDialog() {
     // if(active) {
     console.log('loged in');
     sessionLinkFlag = '1';
-    sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
+    localStorage.setItem('PASAR_LINK_ADDRESS', 1);
     // }
     setOpenSigninDlg(false);
   };
@@ -260,11 +260,11 @@ export default function SignInDialog() {
           if (data.code === 200) {
             alert('call api succeed');
             const token = data.data;
-            sessionStorage.setItem('PASAR_TOKEN', token);
-            sessionStorage.setItem('PASAR_DID', did);
+            localStorage.setItem('PASAR_TOKEN', token);
+            localStorage.setItem('PASAR_DID', did);
             const user = jwtDecode(token);
             sessionLinkFlag = '2';
-            sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
+            localStorage.setItem('PASAR_LINK_ADDRESS', 2);
 
             setOpenSigninDlg(false);
             setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
@@ -282,7 +282,7 @@ export default function SignInDialog() {
         })
         .catch((error) => {
           alert('call api error')
-          alert(sessionStorage.getItem('PASAR_LINK_ADDRESS'))
+          alert(localStorage.getItem('PASAR_LINK_ADDRESS'))
         });
     }
   };
@@ -327,17 +327,17 @@ export default function SignInDialog() {
     setOpenAccountPopup(null);
     if (e.target.getAttribute('value') === 'signout') {
       await activate(null);
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+      if (localStorage.getItem('PASAR_LINK_ADDRESS') === '2')
         essentialsConnector
           .disconnectWalletConnect()
           .then((res) => {})
           .catch((e) => {
             console.log(e);
           });
-      sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+      localStorage.removeItem('PASAR_LINK_ADDRESS');
       setSigninEssentialSuccess(false)
-      sessionStorage.removeItem('PASAR_TOKEN');
-      sessionStorage.removeItem('PASAR_DID');
+      localStorage.removeItem('PASAR_TOKEN');
+      localStorage.removeItem('PASAR_DID');
       setActivatingConnector(null);
       setWalletAddress(null);
       navigate('/marketplace');
@@ -365,10 +365,10 @@ export default function SignInDialog() {
               <Typography variant="h6">
                 {reduceHexAddress(walletAddress)} <CopyButton text={walletAddress} sx={{ mt: '-3px' }} />
               </Typography>
-              {sessionStorage.getItem('PASAR_DID') ? (
+              {localStorage.getItem('PASAR_DID') ? (
                 <Typography variant="body2" color="text.secondary">
-                  did:elastos:{sessionStorage.getItem('PASAR_DID')}
-                  <CopyButton text={`did:elastos:${sessionStorage.getItem('PASAR_DID')}`} />
+                  did:elastos:{localStorage.getItem('PASAR_DID')}
+                  <CopyButton text={`did:elastos:${localStorage.getItem('PASAR_DID')}`} />
                 </Typography>
               ) : (
                 <Link
@@ -517,6 +517,9 @@ export default function SignInDialog() {
                       className={classes.iconAbsolute1}
                       fullWidth
                       onClick={() => {
+                        // localStorage.removeItem('PASAR_LINK_ADDRESS');
+                        // localStorage.removeItem('PASAR_TOKEN');
+                        // localStorage.removeItem('PASAR_DID');
                         connectWithEssential();
                       }}
                       sx={!isLight && { backgroundColor: 'white' }}
