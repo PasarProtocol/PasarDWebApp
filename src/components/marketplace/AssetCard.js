@@ -32,7 +32,7 @@ export default function AssetCard(props) {
   const { title="???", description, quantity=1, price=0, isLink, tokenId, type, orderId, saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate } = props
   // let {myaddress} = props
   // myaddress='0x2D4aA0f8Cee7233BEE4e436E154075f50956e4b4'
-  const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
+  const { signinEssentialSuccess, diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
   const [updateOpen, setOpenUpdate] = React.useState(false);
@@ -67,9 +67,17 @@ export default function AssetCard(props) {
         setOpenSell(true)
         break;
       case 'update':
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+          setOpenDownloadEssentialDlg(true)
+          return
+        }
         setOpenUpdate(true)
         break;
       case 'cancel':
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+          setOpenDownloadEssentialDlg(true)
+          return
+        }
         setOpenCancel(true)
         break;
       case 'delete':
@@ -136,7 +144,7 @@ export default function AssetCard(props) {
                   type===1&&
                   <div>
                     {
-                      isCreatedByMe&&
+                      isCreatedByMe&&signinEssentialSuccess&&
                       <div>
                         <MenuItem value='update' onClick={handleClosePopup}>
                           <LocalOfferOutlinedIcon/>&nbsp;Update Price
@@ -155,13 +163,13 @@ export default function AssetCard(props) {
                   type===2&&
                   <div>
                     {
-                      isListedOwnedByMe&&
+                      isListedOwnedByMe&&signinEssentialSuccess&&
                       <MenuItem value='update' onClick={handleClosePopup}>
                         <LocalOfferOutlinedIcon/>&nbsp;Update Price
                       </MenuItem>
                     }
                     {
-                      isListedOwnedByMe&&
+                      isListedOwnedByMe&&signinEssentialSuccess&&
                       <MenuItem value='cancel' onClick={handleClosePopup}>
                         <CancelOutlinedIcon/>&nbsp;Cancel Sale
                       </MenuItem>
