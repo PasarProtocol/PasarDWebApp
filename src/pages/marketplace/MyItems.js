@@ -5,7 +5,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { isMobile } from 'react-device-detect';
 
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Typography, Tab, Tabs, Link, Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import { Container, Stack, Typography, Tab, Tabs, Link, Button, Box, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material';
 // import { TabContext, TabList, TabPanel } from '@mui/lab';
 import SquareIcon from '@mui/icons-material/Square';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -14,9 +14,8 @@ import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import { Icon } from '@iconify/react';
 import { useWeb3React } from '@web3-react/core';
 import jwtDecode from 'jwt-decode';
-import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
-import { reduceHexAddress } from '../../utils/common';
 // components
+import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
@@ -24,7 +23,8 @@ import MyItemsSortSelect from '../../components/MyItemsSortSelect';
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
 import Jazzicon from '../../components/Jazzicon';
-
+import Badge from '../../components/Badge';
+import { reduceHexAddress, getDiaTokenInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -74,6 +74,7 @@ export default function MyItems() {
   const [myAddress, setMyAddress] = React.useState(null);
   const [myName, setMyName] = React.useState("");
   const [updateCount, setUpdateCount] = React.useState(0);
+  const [diaBadge, setDiaBadge] = React.useState(false);
 
   const context = useWeb3React();
   const { account } = context;
@@ -126,6 +127,12 @@ export default function MyItems() {
   const apiNames = ['getListedCollectiblesByAddress', 'getOwnCollectiblesByAddress', 'getCreatedCollectiblesByAddress'];
   const typeNames = ['listed', 'owned', 'created'];
   React.useEffect(async () => {
+    if(walletAddress)
+      getDiaTokenInfo(walletAddress).then(dia=>{
+        if(dia!=='0')
+          setDiaBadge(true)
+      })
+
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
     const { signal } = newController;
@@ -178,7 +185,7 @@ export default function MyItems() {
   return (
     <RootStyle title="MyItems | PASAR">
       <Container maxWidth={false}>
-        <Box sx={{ position: 'relative', mb: { xs: 0, sm: 2 }, justifyContent: 'center' }}>
+        <Box sx={{ position: 'relative', justifyContent: 'center' }}>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Jazzicon
               address={walletAddress}
@@ -209,6 +216,14 @@ export default function MyItems() {
               )}
             </Link>
           </Typography>
+          <Box sx={{display: 'flex', justifyContent: 'center'}}>
+          {
+            diaBadge&&
+            <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
+              <Box sx={{display: 'inline-flex'}}><Badge name="diamond"/></Box>
+            </Tooltip>
+          }
+          </Box>
           <MHidden width="smUp">
             <ToolGroupStyle>
               <MyItemsSortSelect onChange={setOrderType} sx={{ flex: 1 }} />
