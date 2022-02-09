@@ -172,7 +172,7 @@ export function removeLeadingZero(value) {
 export function callContractMethod(type, paramObj){
   return new Promise((resolve, reject) => {
 
-    if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
+    if(localStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
       reject(new Error)
       return
     }
@@ -334,7 +334,7 @@ export const MethodList = [
 
 export const sendIpfsDidJson = async () => {
   // create the metadata object we'll be storing
-  const did = sessionStorage.getItem('did') ? sessionStorage.getItem('did') : '';
+  const did = localStorage.getItem('PASAR_DID') ? localStorage.getItem('PASAR_DID') : '';
   const didObj = {
     'version': '2',
     'did': `did:elastos:${did}`
@@ -345,6 +345,20 @@ export const sendIpfsDidJson = async () => {
   const didUri = await client.add(jsonDidObj);
   return `did:elastos:${didUri.path}`;
 };
+
+export const emptyCache = () => {
+  if ('caches' in window) {
+      caches.keys().then((names) => {
+          // Delete all the cache files
+          names.forEach((name) => {
+              caches.delete(name);
+          });
+      });
+
+      // Makes sure the page reloads. Changes are only visible after you refresh.
+      window.location.reload();
+  }
+}
 
 // export const getRepresentativeOwnerName = (document) => {
 //   let name = null;
