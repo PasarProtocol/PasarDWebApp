@@ -202,8 +202,8 @@ export default function SignInDialog() {
               console.log(e);
             });
         sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('did');
+        sessionStorage.removeItem('PASAR_TOKEN');
+        sessionStorage.removeItem('PASAR_DID');
         setActivatingConnector(null);
         setWalletAddress(null);
         navigate('/marketplace');
@@ -260,8 +260,8 @@ export default function SignInDialog() {
           if (data.code === 200) {
             alert('call api succeed');
             const token = data.data;
-            sessionStorage.setItem('token', token);
-            sessionStorage.setItem('did', did);
+            sessionStorage.setItem('PASAR_TOKEN', token);
+            sessionStorage.setItem('PASAR_DID', did);
             const user = jwtDecode(token);
             sessionLinkFlag = '2';
             sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
@@ -336,8 +336,8 @@ export default function SignInDialog() {
           });
       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
       setSigninEssentialSuccess(false)
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('did');
+      sessionStorage.removeItem('PASAR_TOKEN');
+      sessionStorage.removeItem('PASAR_DID');
       setActivatingConnector(null);
       setWalletAddress(null);
       navigate('/marketplace');
@@ -365,10 +365,10 @@ export default function SignInDialog() {
               <Typography variant="h6">
                 {reduceHexAddress(walletAddress)} <CopyButton text={walletAddress} sx={{ mt: '-3px' }} />
               </Typography>
-              {sessionStorage.getItem('did') ? (
+              {sessionStorage.getItem('PASAR_DID') ? (
                 <Typography variant="body2" color="text.secondary">
-                  did:elastos:{sessionStorage.getItem('did')}
-                  <CopyButton text={`did:elastos:${sessionStorage.getItem('did')}`} />
+                  did:elastos:{sessionStorage.getItem('PASAR_DID')}
+                  <CopyButton text={`did:elastos:${sessionStorage.getItem('PASAR_DID')}`} />
                 </Typography>
               ) : (
                 <Link
