@@ -95,7 +95,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 }));
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
-  const sessionDispMode = sessionStorage.getItem("disp-mode")
+  const sessionDispMode = localStorage.getItem("disp-mode")
   const params = useParams(); // params.key
   const drawerWidth = 360;
   const btnNames = ["Buy Now", "On Auction", "General", "Avatar"]
@@ -171,7 +171,7 @@ export default function MarketExplorer() {
   const handleDispmode = (event, mode) => {
     if(mode===null)
       return
-    sessionStorage.setItem('disp-mode', mode);
+    localStorage.setItem('disp-mode', mode);
     setDispmode(mode)
   };
   const handleBtns = (num)=>{

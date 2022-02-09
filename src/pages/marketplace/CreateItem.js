@@ -97,7 +97,7 @@ export default function CreateItem() {
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
   const navigate = useNavigate();
-  if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+  if(localStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
     navigate('/marketplace')
 
   React.useEffect(async () => {
@@ -223,7 +223,7 @@ export default function CreateItem() {
       const _tokenSupply = quantity
       const _royaltyFee = royalties*10000
 
-      if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
+      if(localStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
         reject(new Error)
         return
       }
@@ -371,7 +371,7 @@ export default function CreateItem() {
   const sendIpfsDidJson = ()=>(
     new Promise((resolve, reject) => {
       // create the metadata object we'll be storing
-      const did = sessionStorage.getItem('did')?sessionStorage.getItem('did'):''
+      const did = localStorage.getItem('PASAR_DID') ? localStorage.getItem('PASAR_DID') : ''
       const didObj = {
         "version":"2",
         "did": `did:elastos:${did}`

@@ -5,6 +5,7 @@ import menu2Fill from '@iconify/icons-eva/menu-2-fill';
 import twitterIcon from '@iconify/icons-ant-design/twitter';
 // import telegramIcon from '@iconify/icons-ic/outline-telegram';
 import TelegramIcon from '@mui/icons-material/Telegram';
+import githubIcon from '@iconify/icons-ant-design/github'
 import discordIcon from '@iconify/icons-ic/baseline-discord';
 import { NavLink as RouterLink, useLocation } from 'react-router-dom';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
@@ -74,7 +75,7 @@ function MenuMobileItem(props) {
   }
 
   const openSignin = (path)=>{
-    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+    if(localStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
       setOpenDownloadEssentialDlg(true)
     }
     else
@@ -83,7 +84,7 @@ function MenuMobileItem(props) {
   }
 
   if(path.startsWith("/create")) {
-    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && essentialsConnector.hasWalletConnectSession())
+    if(localStorage.getItem('PASAR_LINK_ADDRESS') === '2' && essentialsConnector.hasWalletConnectSession())
       return <ListItemStyle
         to={path}
         component={RouterLink}
@@ -237,6 +238,9 @@ export default function MenuMobile(props) {
               </MFab>
             </Grid>
             <Grid item xs={4} align="center">
+              <MFab color="info" size="medium" href="https://github.com/PasarProtocol" component={Link} target="_blank">
+                <Icon icon={githubIcon} width={30} height={30} />
+              </MFab>
               {/* <MFab color="info" size="medium">
                 <Icon icon={twitterIcon} width={30} height={30} />
               </MFab> */}
