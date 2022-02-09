@@ -276,7 +276,7 @@ export default function MyItems() {
                 {!isLoadingAssets[i] && (
                   <Box component="main">
                     {group.length > 0 ? (
-                      <AssetGrid assets={group} type={i + 1} dispmode={dispmode} myaddress={myAddress} updateCount={updateCount} handleUpdate={setUpdateCount} />
+                      <AssetGrid assets={group} type={i + 1} dispmode={dispmode} myaddress={myAddress} updateCount={updateCount} handleUpdate={setUpdateCount}/>
                     ) : (
                       <Typography variant="subtitle2" align="center" sx={{ mb: 3 }}>
                         No {typeNames[i]} collectible found!

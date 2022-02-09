@@ -22,22 +22,24 @@ import UpdateDlg from '../dialog/UpdatePrice';
 import CancelDlg from '../dialog/CancelSale';
 import DeleteDlg from '../dialog/DeleteItem';
 import TransferDlg from '../dialog/Transfer';
+import NeedBuyDIADlg from '../dialog/NeedBuyDIA';
 import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
 
 // ----------------------------------------------------------------------
 
 export default function AssetCard(props) {
-  const {title="???", description, quantity=1, price=0, isLink, tokenId, type, orderId, saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate} = props
+  const { title="???", description, quantity=1, price=0, isLink, tokenId, type, orderId, saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate } = props
   // let {myaddress} = props
   // myaddress='0x2D4aA0f8Cee7233BEE4e436E154075f50956e4b4'
-  const { setOpenDownloadEssentialDlg } = useSingin()
+  const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
   const [updateOpen, setOpenUpdate] = React.useState(false);
   const [cancelOpen, setOpenCancel] = React.useState(false);
   const [deleteOpen, setOpenDelete] = React.useState(false);
   const [transferOpen, setOpenTransfer] = React.useState(false);
+  const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const isCreatedByMe = myaddress===royaltyOwner
   const isListedOwnedByMe = myaddress===royaltyOwner&&saleType!=="Not on sale"
   const isUnlistedOwnedByMe = myaddress===holder&&saleType!=="Primary Sale"
@@ -74,7 +76,10 @@ export default function AssetCard(props) {
         setOpenDelete(true)
         break;
       case 'transfer':
-        setOpenTransfer(true)
+        if(diaBalance>=0.01)
+          setOpenTransfer(true)
+        else
+          setOpenBuyDIA(true)
         break;
       default:
         break;
@@ -162,9 +167,9 @@ export default function AssetCard(props) {
                         <StorefrontIcon/>&nbsp;Sell
                       </MenuItem>
                     }
-                    {/* <MenuItem value='transfer' onClick={handleClosePopup}>
+                    <MenuItem value='transfer' onClick={handleClosePopup}>
                       <SyncAltSharpIcon/>&nbsp;Transfer
-                    </MenuItem> */}
+                    </MenuItem>
                     {
                       isUnlistedOwnedByMe&&
                       <MenuItem value='delete' onClick={handleClosePopup}>
@@ -234,6 +239,7 @@ export default function AssetCard(props) {
         <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} title={title} orderId={orderId} updateCount={updateCount} handleUpdate={handleUpdate}/>
         <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} title={title} tokenId={tokenId} updateCount={updateCount} handleUpdate={handleUpdate}/>
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} title={title} tokenId={tokenId}/>
+        <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance}/>
       </motion.div>
     // </Link>
   );
