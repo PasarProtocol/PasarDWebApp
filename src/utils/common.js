@@ -31,8 +31,8 @@ export const getTime = timestamp => {
   const timeStr = [hours, min, sec].join(':').concat(" ").concat([suffix, "+UTC"].join(' '));
   return {'date':dateStr, 'time':timeStr};
 };
-// Get thumbnail url //
-export const getThumbnail = id => {
+
+const getIpfsUrl = id => {
   if(!id)
     return ""
   const prefixLen = id.split(':', 2).join(':').length
@@ -40,6 +40,19 @@ export const getThumbnail = id => {
     return ""
   const uri = id.substring(prefixLen+1)
   return `https://ipfs0.trinity-feeds.app/ipfs/${uri}`
+}
+
+export const getAssetImage = (metaObj, isThumbnail=false) => {
+  const {asset, thumbnail, tokenJsonVersion, data} = metaObj
+  let cid = asset
+  if(tokenJsonVersion==="2" && !asset){
+    if(isThumbnail)
+      cid = data.thumbnail
+    else cid = data.image
+  }
+  else if(isThumbnail)
+    cid = thumbnail
+  return getIpfsUrl(cid)
 }
 
 export const generateJazzicon = (address, size) => {
@@ -126,11 +139,12 @@ export function getDiaTokenPrice(connectProvider) {
     })
   })
 }
-export function getDiaTokenInfo(connectProvider, strAddress) {
+export function getDiaTokenInfo(strAddress, connectProvider=null) {
   return new Promise((resolve, reject) => {
-    if(!connectProvider)
-      return 0
-    const walletConnectWeb3 = new Web3(connectProvider);
+    let walletConnectWeb3
+    if(connectProvider)
+      walletConnectWeb3 = new Web3(connectProvider)
+    else walletConnectWeb3 = new Web3(Web3.givenProvider)
     // const web3 = new Web3(Web3.givenProvider);
     // const MyContract = new web3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS);
     // MyContract.methods.balanceOf(strAddress).call().then(console.log);
@@ -140,7 +154,8 @@ export function getDiaTokenInfo(connectProvider, strAddress) {
     .then(result=>{
       // console.log(result)
       if(result === '0'){
-        return '0';
+        resolve(result)
+        return
       }
       const balance = walletConnectWeb3.utils.fromWei(result, 'ether');
       resolve(balance)
@@ -307,7 +322,7 @@ export const MethodList = [
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
       {description: 'From initial value of', field: 'data.oldPrice', copyable: false},
     ],
-    verb: {description: 'Updated for', withPrice: true, subject: 'to'}
+    verb: {description: 'Updated to', withPrice: true, subject: 'to'}
   },
   {
     method: 'Bid', 

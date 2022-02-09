@@ -2,7 +2,7 @@ import React from 'react'
 import { Link as RouterLink } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { Paper, Box, Stack, Typography, Button, Tooltip, Link } from '@mui/material';
-import { reduceHexAddress, getThumbnail } from '../utils/common';
+import { reduceHexAddress, getAssetImage } from '../utils/common';
 import Jazzicon from './Jazzicon';
 import CardImgBox from './CardImgBox';
 
@@ -40,7 +40,7 @@ export default function HomeAssetCard() {
                 asset!=null&&
                 <>
                     <Link to={`/profile/others/${asset.royaltyOwner}`} component={RouterLink}>
-                        <CardImgBox src={getThumbnail(asset.asset)}/>
+                        <CardImgBox src={getAssetImage(asset)}/>
                     </Link>
                     <Stack direction="row" sx={{py: 2}}>
                         <Link to={`/profile/others/${asset.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'inherit' }}>

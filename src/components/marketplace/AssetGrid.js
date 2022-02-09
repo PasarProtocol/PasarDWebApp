@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 // material
 import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
-import { getThumbnail } from '../../utils/common';
+import { getAssetImage } from '../../utils/common';
 // ----------------------------------------------------------------------
 const StackedGrid = ({
   // gridItemWidth = "250px",
@@ -26,7 +26,7 @@ const GridItems = (props) => (
           exit={{ opacity: 0 }}
         >
           <AssetCard
-            thumbnail={getThumbnail(item.asset)}
+            thumbnail={getAssetImage(item)}
             title={item.name && item.name}
             description={item.description}
             price={round(item.price/1e18, 3)}
@@ -51,7 +51,13 @@ export default function AssetGrid(props){
   else itemWidth = isMobile?150:200
   return(
     <StackedGrid itemWidth={itemWidth}>
-      <GridItems items={props.assets} type={props.type?props.type:0} myaddress={props.myaddress} updateCount={props.updateCount} handleUpdate={props.handleUpdate}/>
+      <GridItems 
+        items={props.assets}
+        type={props.type?props.type:0}
+        myaddress={props.myaddress}
+        updateCount={props.updateCount}
+        handleUpdate={props.handleUpdate}
+      />
     </StackedGrid>
   )
 }

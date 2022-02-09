@@ -14,6 +14,7 @@ export default function TransLoadingButton(props) {
   return <LoadingButtonStyled
     loadingPosition="start"
     loading={props.loading}
+    startIcon={<div/>}
     variant={props.loading?"outlined":"contained"}
     fullWidth
     onClick={props.onClick}>
