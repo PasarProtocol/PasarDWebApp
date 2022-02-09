@@ -76,8 +76,13 @@ export default function AssetCard(props) {
         setOpenDelete(true)
         break;
       case 'transfer':
-        if(diaBalance>=0.01)
+        if(diaBalance>=0.01){
+          if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+            setOpenDownloadEssentialDlg(true)
+            return
+          }
           setOpenTransfer(true)
+        }
         else
           setOpenBuyDIA(true)
         break;
