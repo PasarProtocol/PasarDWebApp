@@ -91,7 +91,7 @@ export default function MyItems() {
       setMyAddress(account)
       setWalletAddress(account);
     }
-    else {
+    else if(!params.address) {
       navigate('/marketplace');
     }
     if (params.address)
