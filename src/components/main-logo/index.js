@@ -1,3 +1,4 @@
+import { Link as RouterLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import roundArrowRightAlt from '@iconify/icons-ic/round-arrow-right-alt';
@@ -19,19 +20,21 @@ export default function MainLogo() {
 
   return (
     <RootStyle>
-      <motion.div initial="initial" animate="animate" variants={varWrapEnter}>
-        <Container
-          maxWidth="lg"
-          sx={{
-            display: { md: 'flex' },
-            justifyContent: { md: 'space-between' }
-          }}
-        >
-          <motion.div variants={varFadeIn} style={{ margin: 'auto', display: 'table' }}>
-            <Box draggable = {false} component="img" src="/static/logo-gif.gif" sx={{ width: 220 }} />
-          </motion.div>
-        </Container>
-      </motion.div>
+      <Link to='/' component={RouterLink}>
+        <motion.div initial="initial" animate="animate" variants={varWrapEnter}>
+          <Container
+            maxWidth="lg"
+            sx={{
+              display: { md: 'flex' },
+              justifyContent: { md: 'space-between' }
+            }}
+          >
+            <motion.div variants={varFadeIn} style={{ margin: 'auto', display: 'table' }}>
+              <Box draggable = {false} component="img" src="/static/logo-gif.gif" sx={{ width: 220 }} />
+            </motion.div>
+          </Container>
+        </motion.div>
+      </Link>
     </RootStyle>
   );
 }
