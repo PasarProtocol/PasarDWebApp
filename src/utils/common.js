@@ -346,6 +346,20 @@ export const sendIpfsDidJson = async () => {
   return `did:elastos:${didUri.path}`;
 };
 
+export const emptyCache = () => {
+  if ('caches' in window) {
+      caches.keys().then((names) => {
+          // Delete all the cache files
+          names.forEach((name) => {
+              caches.delete(name);
+          });
+      });
+
+      // Makes sure the page reloads. Changes are only visible after you refresh.
+      window.location.reload();
+  }
+}
+
 // export const getRepresentativeOwnerName = (document) => {
 //   let name = null;
 
