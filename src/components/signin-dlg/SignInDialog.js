@@ -247,7 +247,6 @@ export default function SignInDialog() {
     }
 
     if (presentation) {
-      alert('has presentation');
       const did = presentation.getHolder().getMethodSpecificId() || '';
       fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/api/v1/login`, {
         method: 'POST',
@@ -259,7 +258,6 @@ export default function SignInDialog() {
         .then((response) => response.json())
         .then((data) => {
           if (data.code === 200) {
-            alert('call api succeed');
             const token = data.data;
             localStorage.setItem('PASAR_TOKEN', token);
             localStorage.setItem('PASAR_DID', did);
@@ -278,13 +276,9 @@ export default function SignInDialog() {
             }
           } else {
             // console.log(data);
-            alert('write token error')
           }
         })
-        .catch((error) => {
-          alert('call api error')
-          alert(localStorage.getItem('PASAR_LINK_ADDRESS'))
-        });
+        .catch((error) => {});
     }
   };
 
