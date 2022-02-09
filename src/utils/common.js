@@ -39,7 +39,7 @@ const getIpfsUrl = id => {
   if(prefixLen>=id.length)
     return ""
   const uri = id.substring(prefixLen+1)
-  return `https://ipfs0.trinity-feeds.app/ipfs/${uri}`
+  return `https://ipfs.pasarprotocol.io/ipfs/${uri}`
 }
 
 export const getAssetImage = (metaObj, isThumbnail=false) => {
