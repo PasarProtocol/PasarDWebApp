@@ -7,11 +7,13 @@ const initialState = {
   openSigninEssential: false,
   openDownloadEssential: false,
   afterSigninPath: null,
+  diaBalance: 0,
   signinEssentialSuccess: false,
   setOpenSigninEssentialDlg: () => {},
   setOpenDownloadEssentialDlg: () => {},
   setAfterSigninPath: () => {},
-  setSigninEssentialSuccess: () => {}
+  setSigninEssentialSuccess: () => {},
+  setDiaBalance: () => {}
 };
 
 const SigninContext = createContext(initialState);
@@ -25,6 +27,7 @@ function SigninProvider({ children }) {
   const [openDownloadEssential, setOpenDownloadEssentialDlg] = useState(false);
   const [afterSigninPath, setAfterSigninPath] = useState(null);
   const [signinEssentialSuccess, setSigninEssentialSuccess] = useState(false);
+  const [diaBalance, setDiaBalance] = useState(false);
 
   return (
     <SigninContext.Provider
@@ -33,10 +36,12 @@ function SigninProvider({ children }) {
         openDownloadEssential,
         afterSigninPath,
         signinEssentialSuccess,
+        diaBalance,
         setOpenSigninEssentialDlg,
         setOpenDownloadEssentialDlg,
         setAfterSigninPath,
-        setSigninEssentialSuccess
+        setSigninEssentialSuccess,
+        setDiaBalance
       }}
     >
       {children}

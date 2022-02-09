@@ -57,7 +57,8 @@ const useStyles = makeStyles({
 });
 
 export default function SignInDialog() {
-  const {openSigninEssential, openDownloadEssential, afterSigninPath, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath, setSigninEssentialSuccess} = useSingin()
+  const { openSigninEssential, openDownloadEssential, afterSigninPath, diaBalance, 
+    setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath, setSigninEssentialSuccess, setDiaBalance } = useSingin()
   const { pathname } = useLocation();
   const isHome = pathname === '/';
 
@@ -97,7 +98,6 @@ export default function SignInDialog() {
   const [isOpenAccountPopup, setOpenAccountPopup] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
   const [balance, setBalance] = useState(0);
-  const [diaBalance, setDiaBalance] = useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [diaUSD, setDiaUSD] = React.useState(0);
   const navigate = useNavigate();
