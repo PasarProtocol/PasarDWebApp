@@ -27,7 +27,7 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice } from '../../utils/common';
+import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
 import useSingin from '../../hooks/useSignin';
 
@@ -250,7 +250,7 @@ export default function SignInDialog() {
 
     if (presentation) {
       const did = presentation.getHolder().getMethodSpecificId() || '';
-      fetch(`${process.env.REACT_APP_BACKEND_URL}/auth/api/v1/login`, {
+      fetchFrom('auth/api/v1/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

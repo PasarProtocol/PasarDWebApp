@@ -16,10 +16,10 @@ export default function Badge({ name, value="", sx }) {
     <Stack
       direction='row'
       sx={{
-        height: 30,
+        height: 26,
         backgroundColor: color,
-        borderRadius: 2,
-        p: value.length?'7px 10px':'5px',
+        borderRadius: '100%',
+        p: value.length?'5px 10px':'3px',
         boxShadow: (theme)=>theme.customShadows.origin,
         ...sx
       }}

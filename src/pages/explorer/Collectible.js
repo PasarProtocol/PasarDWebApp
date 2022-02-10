@@ -13,6 +13,7 @@ import Pagination from '../../components/pagination';
 import PaperRecord from '../../components/PaperRecord';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import DateOrderSelect from '../../components/DateOrderSelect';
+import { fetchFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -51,7 +52,7 @@ export default function Collectible() {
     setAbortController(newController);
 
     setLoadingCollectibles(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetchFrom(`sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonCollectibles => {
         setTotalCount(jsonCollectibles.data.total)
         setPages(Math.ceil(jsonCollectibles.data.total/showCount));

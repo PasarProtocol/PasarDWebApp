@@ -2,9 +2,10 @@ import React from 'react'
 import { Link as RouterLink } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { Paper, Box, Stack, Typography, Button, Tooltip, Link } from '@mui/material';
-import { reduceHexAddress, getAssetImage } from '../utils/common';
+
 import Jazzicon from './Jazzicon';
 import CardImgBox from './CardImgBox';
+import { reduceHexAddress, getAssetImage, fetchFrom } from '../utils/common';
 
 const PaperStyle = styled(Paper)(({ theme }) => ({
     background: 'rgba(255, 255, 255, 0.1)',
@@ -20,7 +21,7 @@ export default function HomeAssetCard() {
     const [isAssetLoading, setAssetLoading] = React.useState(true);
 
     React.useEffect(() => {
-        fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getLatestPurchasedToken`).then(response => {
+        fetchFrom('sticker/api/v1/getLatestPurchasedToken').then(response => {
             response.json().then(jsonAsset => {
                 if(jsonAsset.data)
                     setAsset(jsonAsset.data);

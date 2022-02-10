@@ -9,7 +9,7 @@ import ReactApexChart from 'react-apexcharts';
 import BaseOptionChart from './BaseOptionChart';
 import LoadingScreen from '../LoadingScreen';
 import StatisticItem from '../explorer/StatisticPanel/StatisticItem'
-import { dateRangeBeforeDays } from '../../utils/common';
+import { dateRangeBeforeDays, fetchFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -67,9 +67,7 @@ export default function ChartArea({by, is4Address}) {
       return
     setLoadingStatisData(true)
 
-    const resRealData = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getStastisDataByWalletAddr?walletAddr=${params.address}`
-    )
+    const resRealData = await fetchFrom(`sticker/api/v1/getStastisDataByWalletAddr?walletAddr=${params.address}`)
     const jsonData = await resRealData.json()
     const statisData = [jsonData.data.assets, jsonData.data.sold, jsonData.data.purchased, jsonData.data.transactions]
     setStatisData(statisData)
@@ -88,9 +86,10 @@ export default function ChartArea({by, is4Address}) {
       suburl = `getNftPriceByTokenId?tokenId=${params.collection}`
     else if(by==="address")
       suburl = `getTotalRoyaltyandTotalSaleByWalletAddr?walletAddr=${params.address}&type=${volumeType}`
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/${suburl}`, { signal }).then(response => {
+    fetchFrom(`sticker/api/v1/${suburl}`, { signal }).then(response => {
       response.json().then(jsonVolume => {
-        setVolumeList(jsonVolume.data);
+        if(jsonVolume.data)
+          setVolumeList(jsonVolume.data);
         setLoadingVolumeChart(false);
       })
     }).catch(e => {

@@ -4,16 +4,20 @@ import { createHash } from 'crypto';
 import { create, urlSource } from 'ipfs-http-client'
 import { subDays, differenceInDays  } from 'date-fns';
 import Jazzicon from "@metamask/jazzicon";
-// import { DIDURL } from '@elastosfoundation/did-js-sdk/typings';
+import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
+
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
-import {marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS} from '../config';
+import {marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS, ipfsURL} from '../config';
 import {PASAR_CONTRACT_ABI} from '../abi/pasarABI';
 import {DIAMOND_CONTRACT_ABI} from '../abi/diamondABI';
 
-const client = create('https://ipfs-test.trinity-feeds.app/');
-
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = strAddress => strAddress?`${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`:'';
+
+export const fetchFrom = (uri, props={}) => {
+  const backendURL = process.env.REACT_APP_ENV==="production"?process.env.REACT_APP_BACKEND_URL_PRODUCTION:process.env.REACT_APP_BACKEND_URL_TEST
+  return fetch(`${backendURL}/${uri}`, props)
+}
 
 // Get time from timestamp //
 export const getTime = timestamp => {
@@ -39,14 +43,16 @@ const getIpfsUrl = id => {
   if(prefixLen>=id.length)
     return ""
   const uri = id.substring(prefixLen+1)
-  return `https://ipfs.pasarprotocol.io/ipfs/${uri}`
+  return `${ipfsURL}/ipfs/${uri}`
 }
 
 export const getAssetImage = (metaObj, isThumbnail=false) => {
   const {asset, thumbnail, tokenJsonVersion, data} = metaObj
   let cid = asset
   if(tokenJsonVersion==="2" && !asset){
-    if(isThumbnail)
+    if(!data)
+      cid = ''
+    else if(isThumbnail)
       cid = data.thumbnail
     else cid = data.image
   }
@@ -333,6 +339,7 @@ export const MethodList = [
 ]
 
 export const sendIpfsDidJson = async () => {
+  const client = create(`${ipfsURL}/`);
   // create the metadata object we'll be storing
   const did = sessionStorage.getItem('PASAR_DID') ? sessionStorage.getItem('PASAR_DID') : '';
   const didObj = {
@@ -360,36 +367,19 @@ export const emptyCache = () => {
   }
 }
 
-// export const getRepresentativeOwnerName = (document) => {
-//   let name = null;
-
-//   // Try to find suitable credentials in the document - start with the application credential type
-//   const applicationCredentials = document.getCredentialsByType("ApplicationCredential");
-//   if (applicationCredentials && applicationCredentials.length > 0) {
-//     const credSubject = applicationCredentials[0].getSubject();
-//     if ("name" in credSubject)
-//       name = credSubject.name;
-//   }
-
-//   // Check the "name" standard
-//   if (!name) {
-//     const nameCredentials = document.getCredentialsByType("NameCredential");
-//     if (nameCredentials && nameCredentials.length > 0) {
-//       const credSubject = nameCredentials[0].getSubject();
-//       if ("name" in credSubject)
-//         name = credSubject.name;
-//     }
-//   }
-
-//   // Check the legacy "name"
-//   if (!name) {
-//     const nameCredential = document.getCredentialById(new DIDURL("#name"));
-//     if (nameCredential) {
-//       const credSubject = nameCredential.getSubject();
-//       if ("name" in credSubject)
-//         name = credSubject.name;
-//     }
-//   }
-
-//   return name;
-// }
+export const getInfoFromDID = (did) => (
+  new Promise((resolve, reject) => {
+    DIDBackend.initialize(new DefaultDIDAdapter("https://api.elastos.io/eid"))
+    const didObj = new DID(did)
+    didObj.resolve(true).then(didDoc=>{
+      const credentials = didDoc.getCredentials()
+      const properties = credentials.reduce((props, c) => {
+        props[c.id.fragment] = c.subject.properties[c.id.fragment]
+        return props
+      }, {})
+      resolve(properties)
+    }).catch((error) => {
+      reject(error);
+    })
+  })
+)
