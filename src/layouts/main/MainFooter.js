@@ -70,8 +70,8 @@ export default function MainFooter({ hidden, isHome }) {
               />
             </h3>
             <Typography variant="body2" sx={{ pr: { md: 5 }, color: 'GrayText' }}>
-              Pasar Protocol is a truly decentralized Web3.0 Marketplace, Collectible Explorer and Analytics Platform
-              for NFTs created on the Elastos Smart Chain (ESC)
+              Pasar is a truly decentralized Web3.0 Marketplace, Collectible Explorer,
+              and Analytics Platform for NFTs created on the Elastos Smart Chain (ESC).
             </Typography>
           </Grid>
 

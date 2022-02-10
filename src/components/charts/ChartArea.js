@@ -88,7 +88,8 @@ export default function ChartArea({by, is4Address}) {
       suburl = `getTotalRoyaltyandTotalSaleByWalletAddr?walletAddr=${params.address}&type=${volumeType}`
     fetchFrom(`sticker/api/v1/${suburl}`, { signal }).then(response => {
       response.json().then(jsonVolume => {
-        setVolumeList(jsonVolume.data);
+        if(jsonVolume.data)
+          setVolumeList(jsonVolume.data);
         setLoadingVolumeChart(false);
       })
     }).catch(e => {
