@@ -24,7 +24,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
 import Jazzicon from '../../components/Jazzicon';
 import Badge from '../../components/Badge';
-import { reduceHexAddress, getDiaTokenInfo, fetchFrom } from '../../utils/common';
+import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -58,7 +58,6 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(1)
   }
 }));
-
 // ----------------------------------------------------------------------
 export default function MyItems() {
   const sessionDispMode = localStorage.getItem("disp-mode")
@@ -72,7 +71,7 @@ export default function MyItems() {
   const [tabValue, setTabValue] = React.useState(params.type!==undefined?parseInt(params.type, 10):0);
   const [walletAddress, setWalletAddress] = React.useState(null);
   const [myAddress, setMyAddress] = React.useState(null);
-  const [myName, setMyName] = React.useState("");
+  const [didInfo, setDidInfo] = React.useState({name: '', description: ''});
   const [updateCount, setUpdateCount] = React.useState(0);
   const [diaBadge, setDiaBadge] = React.useState(false);
 
@@ -86,6 +85,7 @@ export default function MyItems() {
       const strWalletAddress = await essentialsConnector.getWalletConnectProvider().wc.accounts[0];
       setMyAddress(strWalletAddress)
       setWalletAddress(strWalletAddress);
+
     }
     else if(localStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
       setMyAddress(account)
@@ -94,9 +94,19 @@ export default function MyItems() {
     else if(!params.address) {
       navigate('/marketplace');
     }
-    if (params.address)
-      setWalletAddress(params.address);
-    getMyName();
+    // ----------------------------------------------------------
+    if (params.address){
+      // getInfoFromDID('did:elastos:icZdMxZe6U1Exs6TFsKTzj2pY2JLznPhjC').then(info=>{
+      //   setDidInfo({'name': info.name, 'description': info.description})
+      // })
+      setWalletAddress(params.address)
+    }
+    else if(localStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+      const token = localStorage.getItem("PASAR_TOKEN");
+      const user = jwtDecode(token);
+      const {name} = user;
+      setDidInfo({'name': name, 'description': ''})
+    }
   }, [account, params.address]);
 
   const handleSwitchTab = (event, newValue) => {
@@ -167,23 +177,11 @@ export default function MyItems() {
     navigate(`/explorer/collectible/detail/${tokenId}`);
   };
 
-  const getMyName = () => {
-    if(localStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      const token = localStorage.getItem("PASAR_TOKEN");
-      const user = jwtDecode(token);
-      const {name} = user;
-      setMyName(name);
-    }
-    else {
-      setMyName(reduceHexAddress(account));
-    }
-  };
-
   return (
     <RootStyle title="MyItems | PASAR">
       <Container maxWidth={false}>
         <Box sx={{ position: 'relative', justifyContent: 'center' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: isMobile?1:1.5 }}>
             <Jazzicon
               address={walletAddress}
               size={isMobile ? 80 : 100}
@@ -200,18 +198,20 @@ export default function MyItems() {
               }}
             />
           </Box>
-          <Typography variant="h2" component="h2" align="center" sx={{ position: 'relative' }}>
+          <Typography variant="h2" component="h2" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
             <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink}>
-              {!params.address ? (
-                <span role="img" aria-label="">
-                  {myName}
-                </span>
-              ) : (
-                <span role="img" aria-label="">
-                  {reduceHexAddress(params.address)}
-                </span>
-              )}
+              <span role="img" aria-label="">
+                {didInfo.name || reduceHexAddress(walletAddress)}
+              </span>
             </Link>
+            {
+              didInfo.name.length>0 &&
+              <Typography variant="subtitle2" noWrap>{reduceHexAddress(walletAddress)}</Typography>
+            }
+            {
+              didInfo.description.length>0 &&
+              <Typography variant="subtitle2" noWrap sx={{color: 'text.secondary'}}>{didInfo.description}</Typography>
+            }
           </Typography>
           <Box sx={{display: 'flex', justifyContent: 'center'}}>
           {
@@ -237,9 +237,9 @@ export default function MyItems() {
         </Box>
         <Box sx={{ display: 'flex', position: 'relative', mb: 2, justifyContent: 'center' }} align="center">
           <Tabs value={tabValue} onChange={handleSwitchTab} TabIndicatorProps={{ style: { background: '#FF5082' } }}>
-            <Tab label="Listed" value={0} />
-            <Tab label="Owned" value={1} />
-            <Tab label="Created" value={2} />
+            <Tab label={`Listed (${assets[0].length})`} value={0} />
+            <Tab label={`Owned (${assets[1].length})`} value={1} />
+            <Tab label={`Created (${assets[2].length})`} value={2} />
           </Tabs>
           <MHidden width="smDown">
             <ToolGroupStyle>
