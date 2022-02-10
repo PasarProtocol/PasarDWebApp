@@ -177,21 +177,6 @@ export default function MyItems() {
     navigate(`/explorer/collectible/detail/${tokenId}`);
   };
 
-<<<<<<< HEAD
-  const getMyName = () => {
-    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      const token = sessionStorage.getItem("PASAR_TOKEN");
-      const user = jwtDecode(token);
-      const {name} = user;
-      setMyName(name);
-    }
-    else {
-      setMyName(reduceHexAddress(account));
-    }
-  };
-
-=======
->>>>>>> 3fa16d6a4a9f58083be3b08f91bdfc86fb757a01
   return (
     <RootStyle title="MyItems | PASAR">
       <Container maxWidth={false}>
