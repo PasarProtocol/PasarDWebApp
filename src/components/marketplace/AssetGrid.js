@@ -26,7 +26,7 @@ const GridItems = (props) => (
           exit={{ opacity: 0 }}
         >
           <AssetCard
-            thumbnail={getAssetImage(item)}
+            thumbnail={getAssetImage(item, true)}
             title={item.name && item.name}
             description={item.description}
             price={round(item.price/1e18, 3)}
