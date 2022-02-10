@@ -41,7 +41,9 @@ export default function Transfer(props) {
     }
 
     const callSafeTransferFrom = (_to, _id, _value) => {
-      const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
+      let walletConnectProvider = Web3.givenProvider;
+      if(localStorage.getItem("PASAR_LINK_ADDRESS") === '2')
+        walletConnectProvider = essentialsConnector.getWalletConnectProvider();
       const walletConnectWeb3 = new Web3(walletConnectProvider);
       walletConnectWeb3.eth.getAccounts().then(accounts=>{
         const contractAbi = STICKER_CONTRACT_ABI;
