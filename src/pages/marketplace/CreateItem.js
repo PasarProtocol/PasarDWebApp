@@ -99,7 +99,7 @@ export default function CreateItem() {
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
   const navigate = useNavigate();
-  if(localStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+  if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
     navigate('/marketplace')
 
   React.useEffect(async () => {
@@ -405,7 +405,7 @@ export default function CreateItem() {
         cancelAction()
       });
       // create the metadata object we'll be storing
-      const did = localStorage.getItem('PASAR_DID') ? localStorage.getItem('PASAR_DID') : ''
+      const did = sessionStorage.getItem('PASAR_DID') ? sessionStorage.getItem('PASAR_DID') : ''
       const didObj = {
         "version":"2",
         "did": `did:elastos:${did}`

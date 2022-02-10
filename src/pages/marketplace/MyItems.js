@@ -60,7 +60,7 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
 }));
 // ----------------------------------------------------------------------
 export default function MyItems() {
-  const sessionDispMode = localStorage.getItem("disp-mode")
+  const sessionDispMode = sessionStorage.getItem("disp-mode")
   const params = useParams(); // params.address
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([[], [], []]);
@@ -81,13 +81,13 @@ export default function MyItems() {
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   const triedEager = useEagerConnect();
   React.useEffect(async() => {
-    if(localStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
       const strWalletAddress = await essentialsConnector.getWalletConnectProvider().wc.accounts[0];
       setMyAddress(strWalletAddress)
       setWalletAddress(strWalletAddress);
 
     }
-    else if(localStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
+    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
       setMyAddress(account)
       setWalletAddress(account);
     }
@@ -170,7 +170,7 @@ export default function MyItems() {
   const handleDispmode = (event, mode) => {
     if (mode === null)
       return
-    localStorage.setItem('disp-mode', mode);
+    sessionStorage.setItem('disp-mode', mode);
     setDispmode(mode);
   };
   const link2Detail = (tokenId) => {
