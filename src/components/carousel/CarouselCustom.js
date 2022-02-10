@@ -11,7 +11,7 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import { CarouselControlsPaging2 } from './controls';
 import CopyButton from '../CopyButton';
 import { getTime } from '../../utils/common';
-import {stickerContract, marketContract} from '../../config'
+import {stickerContract, marketContract, blockchain} from '../../config'
 
 // ----------------------------------------------------------------------
 
@@ -130,7 +130,7 @@ export default function CarouselCustom({pgsize, detail}) {
     holder: detail.holder===marketContract?detail.royaltyOwner:detail.holder,
     collection: 'Feeds NFT Sticker - FSTK',
     tokenStandard: 'ERC-1155',
-    blockchain: 'Elastos Smart Chain (ESC)',
+    'blockchain': blockchain,
     // status: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?'Not on sale':'Listed on Pasar'
     status: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?0:1
   }

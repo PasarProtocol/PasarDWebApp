@@ -4,6 +4,8 @@ import AnimatedNumber from 'react-animated-number';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Typography, Grid, Card, Stack } from '@mui/material';
+
+import { fetchFrom } from '../../../utils/common';
 // ----------------------------------------------------------------------
 const apikey = ['gettv', 'nftnumber', 'relatednftnum', 'owneraddressnum']
 const RootStyle = styled('div')(({ theme, index }) => {
@@ -29,9 +31,7 @@ export default function StatisticItem(props) {
   React.useEffect(async () => {
     if(props.forAddress)
       return
-    const resRealData = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/${api}`
-    )
+    const resRealData = await fetchFrom(`sticker/api/v1/${api}`)
     const jsonData = await resRealData.json()
     setTimeout(()=>{setRealData(jsonData.data)}, 100)
   }, []);

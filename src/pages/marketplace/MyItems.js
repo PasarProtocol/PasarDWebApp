@@ -24,7 +24,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
 import Jazzicon from '../../components/Jazzicon';
 import Badge from '../../components/Badge';
-import { reduceHexAddress, getDiaTokenInfo } from '../../utils/common';
+import { reduceHexAddress, getDiaTokenInfo, fetchFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -142,10 +142,7 @@ export default function MyItems() {
       .fill(0)
       .forEach((_, i) => {
         setLoadingAssetsOfType(i, true);
-        fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/${apiNames[i]}?address=${walletAddress}&orderType=${orderType}`,
-          { signal }
-        )
+        fetchFrom(`sticker/api/v1/${apiNames[i]}?address=${walletAddress}&orderType=${orderType}`, { signal })
           .then((response) => {
             response.json().then((jsonAssets) => {
               setAssetsOfType(i, jsonAssets.data);
