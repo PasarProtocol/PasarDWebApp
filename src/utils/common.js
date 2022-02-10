@@ -383,3 +383,5 @@ export const getInfoFromDID = (did) => (
     })
   })
 )
+
+export const getFullUrl = (url) => `${window.location.protocol}//${window.location.host}/${url}`

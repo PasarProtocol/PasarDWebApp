@@ -1480,6 +1480,11 @@
     svelte-i18n "^3.3.6"
     web3-core "^1.6.1"
 
+"@elastosfoundation/elastos-cordova-plugin-did@^1.0.41":
+  version "1.0.45"
+  resolved "https://registry.yarnpkg.com/@elastosfoundation/elastos-cordova-plugin-did/-/elastos-cordova-plugin-did-1.0.45.tgz#3016feae1c6dcbcd7fb30e4c04c7aa55de34cf23"
+  integrity sha512-64hb8afz/L3OJTF7XJ1ECHJCMjarMXcZaNvO7m6aju2HLNNVwmQ9m+J9lqk5wGRrW+pyQNONEaEVP62L50DjVA==
+
 "@elastosfoundation/essentials-connector-client-browser@^1.0.32":
   version "1.0.32"
   resolved "https://registry.yarnpkg.com/@elastosfoundation/essentials-connector-client-browser/-/essentials-connector-client-browser-1.0.32.tgz#2712435c57c711244dce2afd4c0b500b127d0f3e"
@@ -8649,7 +8654,7 @@ dayjs@^1.10.4:
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.10.7.tgz#2cf5f91add28116748440866a0a1d26f3a6ce468"
   integrity sha512-P6twpd70BcPK34K26uJ1KT3wlhpuOAPoMwJzpsIWUxHZ7wpmbdZL/hQqBDfz7hGurYSa5PhzdhDHtt319hL3ig==
 
-debug@2.6.9, debug@^2.2.0, debug@^2.3.3, debug@^2.4.1, debug@^2.6.0, debug@^2.6.2, debug@^2.6.3, debug@^2.6.6, debug@^2.6.8, debug@^2.6.9:
+debug@2.6.9, debug@^2.1.3, debug@^2.2.0, debug@^2.3.3, debug@^2.4.1, debug@^2.6.0, debug@^2.6.2, debug@^2.6.3, debug@^2.6.6, debug@^2.6.8, debug@^2.6.9:
   version "2.6.9"
   resolved "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
   integrity sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==
@@ -14138,6 +14143,13 @@ jsonify@~0.0.0:
   resolved "https://registry.yarnpkg.com/jsonify/-/jsonify-0.0.0.tgz#2c74b6ee41d93ca51b7b5aaee8f503631d252a73"
   integrity sha1-LHS27kHZPKUbe1qu6PUDYx0lKnM=
 
+jsonp@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/jsonp/-/jsonp-0.2.1.tgz#a65b4fa0f10bda719a05441ea7b94c55f3e15bae"
+  integrity sha1-pltPoPEL2nGaBUQep7lMVfPhW64=
+  dependencies:
+    debug "^2.1.3"
+
 jsonparse@^1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/jsonparse/-/jsonparse-1.3.1.tgz#3f4dae4a91fac315f71062f8521cc239f1366280"
@@ -19191,6 +19203,14 @@ react-scroll@^1.8.4:
   dependencies:
     lodash.throttle "^4.1.1"
     prop-types "^15.7.2"
+
+react-share@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/react-share/-/react-share-4.4.0.tgz#cabbf2111d7a907a888ab4d89d08410329efd5ee"
+  integrity sha512-POe8Ge/JT9Ew9iyW7CiYsCCWCb8uMJWqFl9S7W0fJ/oH5gBJNzukH0bL5vSr17KKG5h15d3GfKaoviI22BKeYA==
+  dependencies:
+    classnames "^2.2.5"
+    jsonp "^0.2.1"
 
 react-simple-animate@^3.3.12:
   version "3.3.12"
