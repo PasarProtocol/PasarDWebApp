@@ -24,7 +24,7 @@ import ByToSelect from '../../components/ByToSelect';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { reduceHexAddress, getTime } from '../../utils/common';
+import { fetchFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ export default function AddressDetail() {
 
     setLoadingTransactions(true);
     const bytoKey = byto===0?"By":"To"
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByWalletAddr?walletAddr=${params.address}&pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}&performer=${bytoKey}&keyword=${keyword}`, { signal }).then(response => {
+    fetchFrom(`sticker/api/v1/getTranDetailsByWalletAddr?walletAddr=${params.address}&pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}&performer=${bytoKey}&keyword=${keyword}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
         setTotalCount(jsonTransactions.data.total)
         setPages(Math.ceil(jsonTransactions.data.total/showCount));

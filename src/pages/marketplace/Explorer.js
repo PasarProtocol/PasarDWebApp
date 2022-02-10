@@ -25,6 +25,7 @@ import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
+import { fetchFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -138,7 +139,7 @@ export default function MarketExplorer() {
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
     setLoadingAssets(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getDetailedCollectibles?`+
+    fetchFrom(`sticker/api/v1/getDetailedCollectibles?`+
       `collectionType=&`+
       `status=${statusFilter}&`+
       `itemType=${itemTypeFilter}&`+

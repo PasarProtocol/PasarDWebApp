@@ -123,10 +123,9 @@ export default function MarketHome() {
               Dawn of the DeMKT
             </HeadTitleStyle>
             <Typography variant="h4" component="div" sx={{fontWeight: 'normal', pb: 3}}>
-              Pasar is an open-sourced, community-centric, and one
-              of the first truly Web3 decentralized marketplace (DeMKT)
-              for exchanging data and Non-fungible Tokens (NFTs)
-              as valuable assets.
+              Pasar is open-sourced, community-centric, and one
+              of the first truly Web3.0 decentralized marketplaces (DeMKT)
+              for exchanging data and Non-fungible Tokens (NFTs).
             </Typography>
             <Stack spacing={1} direction="row">
               <OutlineBtnStyle to="/marketplace" variant="outlined" component={RouterLink}>
@@ -145,16 +144,14 @@ export default function MarketHome() {
           <CardStyle>
             <Box component="div">
               <TitleStyle component="h1">
-                Get started with Essentials
+                Get Started with Essentials
               </TitleStyle>
               <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-                Easy onboarding to set up decentralized identifier (DID) and wallet from
-                Elastos Essentials Super Wallet.<br/>
+                Onboarding is easy. Just register a Decentralized Identifier (DID) and wallet address from
+                the Elastos Essentials Super-Wallet.<br/>
                 <br/>
-                Discover Elastos’ Web3.0 technology stacks all in a single app such as
-                DID, decentralized personal storage, multiple blockchains support
-                (BTC, ETH, ELA ,BSC, etc.), Decentralized Autonomous Organization (DAO)
-                and so much more!
+                Then explore Elastos’ complete Web3.0 tech stack, including Hive decentralized storage,
+                Carrier’s P2P network, Ecosystem DAO Cyber Republic, and much more!
               </Typography>
             </Box>
             <Box draggable = {false} component="img" src="/static/essentials.png" sx={{p: {xs: '0px 32px 32px', sm: 0}, mt: '0 !important'}} />
@@ -175,11 +172,11 @@ export default function MarketHome() {
                 Decentralized Marketplace (DeMKT)
               </TitleStyle>
               <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-                Pasar is a truly decentralized marketplace which means there is no central server nor entity to facilitate the peer-to-peer trading of data and NFTs.<br/>
+                Pasar is a truly decentralized marketplace that does not depend on any central servers entities
+                to facilitate the peer-to-peer exchange of data and NFTs.<br/>
                 <br/>
-                Items cannot be censored, blocked nor taken down by Pasar due to
-                it being a decentralized marketplace. The trust based system protocol will
-                accelerate Pasar to become the next leader of Web3 DeMKT.
+                On Pasar, assets cannot be censored, blocked. or taken down, and Pasar’s trustless
+                exchange protocol is already poised to become a leader in Web3.0 space.
               </Typography>
             </Box>
             <Box draggable = {false} component="img" src="/static/market-home-1.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
@@ -200,13 +197,12 @@ export default function MarketHome() {
                 Decentralized Identity (DID)
               </TitleStyle>
               <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-                DID empowers users to be self-sovereign of our own personal data.Users are required to sign in with DID in order to create or sell items on Pasar.<br/>
-                However, users can still purchase items by just connecting their wallets
-                without a DID.<br/>
+                DID empowers users to become self-sovereign in virtual space.
+                On Pasar, users are required to sign in with their DIDs in order to create or sell assets.
+                However, all users may purchase assets simply connecting their wallets – no identification required.<br/>
                 <br/>
-                A reputation system based on DID will enable a user to be trusted by the
-                community instead of using the traditional verification system through
-                central authorities.
+                A reputation system based on DID enables users to cultivate trust within their communities
+                in place of depending on traditional verification systems provided by central authorities.
               </Typography>
             </Box>
             <Box draggable = {false} component="img" src="/static/user-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
@@ -227,13 +223,12 @@ export default function MarketHome() {
                 Elastos Smart Chain (ESC)
               </TitleStyle>
               <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-                ESC is a programmable smart-contract blockhchain component of Elastos. 
-                Pasar is built on ESC because of its ability to conduct fast transactions
-                efficiently with fees next to nothing.<br/>
+                ESC is a programmable smart-contract Sidechain that runs on Elastos.
+                Pasar is built on the ESC to benefit from its efficiency and high-performance,
+                so users can generate and exchange assets in a secure, low-cost environment.<br/>
                 <br/>
-                Users can purchase ELA on smart chain through the Essentials
-                app from Glide Finance, a decentralized exchange (DEX) also
-                built on the Elastos Smart Chain (ESC).
+                To execute transactions on the ESC, users can purchase ELA on the Essentials app via Glide Finance,
+                a Decentralized Exchange (DEX) also built on the ESC.
               </Typography>
             </Box>
             <Box draggable = {false} component="img" src="/static/chain-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />

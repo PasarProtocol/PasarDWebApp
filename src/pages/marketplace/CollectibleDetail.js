@@ -32,7 +32,7 @@ import PurchaseDlg from '../../components/dialog/Purchase'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ScrollManager from '../../components/ScrollManager'
 import {blankAddress, marketContract} from '../../config'
-import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -143,9 +143,7 @@ export default function CollectibleDetail() {
   React.useEffect(async () => {
     window.scrollTo(0,0)
     setCoinUSD(await getCoinUSD())
-    const resCollectible = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`
-    );
+    const resCollectible = await fetchFrom(`sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`);
     const jsonCollectible = await resCollectible.json();
     if(jsonCollectible.data){
       setCollectible(jsonCollectible.data);
@@ -174,7 +172,7 @@ export default function CollectibleDetail() {
   
   React.useEffect(async () => {
     setLoadingTransRecord(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=&timeOrder=-1`, {}).then(response => {
+    fetchFrom(`sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=&timeOrder=-1`).then(response => {
       response.json().then(jsonTransactions => {
         setTransRecord(jsonTransactions.data.filter((trans)=>
           !((trans.event==="SafeTransferFrom"||trans.event==="SafeTransferFromWithMemo") && (trans.to===blankAddress||trans.to===marketContract))

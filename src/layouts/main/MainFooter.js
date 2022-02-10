@@ -70,14 +70,14 @@ export default function MainFooter({ hidden, isHome }) {
               />
             </h3>
             <Typography variant="body2" sx={{ pr: { md: 5 }, color: 'GrayText' }}>
-              Pasar Protocol is a truly decentralized Web3.0 Marketplace, Collectible Explorer and Analytics Platform
-              for NFTs created on the Elastos Smart Chain (ESC)
+              Pasar is a truly decentralized Web3.0 Marketplace, Collectible Explorer,
+              and Analytics Platform for NFTs created on the Elastos Smart Chain (ESC).
             </Typography>
           </Grid>
 
           <Grid item xs={12} md={6}>
             <Stack
-              spacing={1.5}
+              spacing={1}
               direction="row"
               justifyContent={{ xs: 'center', md: 'flex-end' }}
               sx={{ mb: { xs: 5, md: 0 } }}
@@ -115,12 +115,12 @@ export default function MainFooter({ hidden, isHome }) {
               </IconButton>
               <IconButton
                 color="inherit"
-                sx={{ p: '4x', m: '0px' }}
+                sx={{ p: '2px' }}
                 href="https://github.com/PasarProtocol"
                 component={Link}
                 target="_blank"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" height="36" width="36" viewBox="0, 0, 44, 44">
+                <svg xmlns="http://www.w3.org/2000/svg" height="36" width="36" viewBox="0, 0, 43, 43">
                   <g fill="currentColor">
                     <path
                       d="M21.3035 0C9.5395 0 0 9.5373 0 21.3035c0 9.4122 6.1041 17.3976 14.5687 20.2146 1.0646.1972 1.4555-.4622 1.4555-1.0249 0-.5076-.0198-2.1861-.0289-3.9662-5.9266 1.2887-7.1772-2.5136-7.1772-2.5136-.9691-2.462-2.3654-3.1171-2.3654-3.1171-1.9329-1.3222.1457-1.295.1457-1.295 2.1392.1502 3.2656 2.1956 3.2656 2.1956 1.9001 3.2565 4.9837 2.315 6.1994 1.7706.1916-1.3765.7433-2.3167 1.3526-2.8487-4.7319-.5383-9.706-2.3653-9.706-10.5283 0-2.3255.8322-4.2259 2.195-5.7178-.2212-.537-.9504-2.7037.2067-5.638 0 0 1.789-.5723 5.8596 2.184 1.6994-.472 3.5218-.7088 5.3323-.7172 1.8104.008 3.6343.2451 5.3368.7172 4.0661-2.7563 5.8526-2.184 5.8526-2.184 1.1596 2.9343.4304 5.101.2092 5.638 1.366 1.4919 2.1921 3.3923 2.1921 5.7178 0 8.1827-4.9837 9.984-9.7275 10.5114.7642.6611 1.445 1.9576 1.445 3.9451 0 2.8505-.0243 5.1446-.0243 5.8462 0 .5673.3831 1.2316 1.463 1.0224 8.4603-2.8201 14.5566-10.8028 14.5566-20.212C42.6071 9.5372 33.0691 0 21.3036 0"

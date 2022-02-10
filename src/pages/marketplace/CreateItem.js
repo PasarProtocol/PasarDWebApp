@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { isString } from 'lodash';
 import {isMobile} from 'react-device-detect';
 import * as math from 'mathjs';
+import CancelablePromise from 'cancelable-promise';
 import { styled } from '@mui/material/styles';
 import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip, Box,
   Accordion, AccordionSummary, AccordionDetails, FormHelperText } from '@mui/material';
@@ -29,14 +30,14 @@ import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
 import MintDlg from '../../components/dialog/Mint';
 import AccessDlg from '../../components/dialog/Access';
-import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS} from '../../config'
-import {hash, removeLeadingZero, callContractMethod} from '../../utils/common';
+import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL} from '../../config'
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ProgressBar from '../../components/ProgressBar'
+import {hash, removeLeadingZero, callContractMethod} from '../../utils/common';
 // ----------------------------------------------------------------------
 
-const client = create('https://ipfs-test.trinity-feeds.app/')
+const client = create(`${ipfsURL}/`)
 const RootStyle = styled(Page)(({ theme }) => ({
   paddingTop: theme.spacing(10),
   paddingBottom: theme.spacing(12),
@@ -85,7 +86,8 @@ export default function CreateItem() {
   const [onProgress, setOnProgress] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [isOnValidation, setOnValidation] = React.useState(false);
-  const { setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
+  const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
+  const [currentPromise, setCurrentPromise] = React.useState(null);
   const { enqueueSnackbar } = useSnackbar();
   
   const isOffset = useOffSetTop(40);
@@ -110,6 +112,19 @@ export default function CreateItem() {
       setTimeout(()=>{setProgress(0)}, 110)
   }, [progress]);
   
+  React.useEffect(() => {
+    if(!isOpenMint){
+      if(currentPromise)
+        currentPromise.cancel()
+    }
+  }, [isOpenMint]);
+
+  const cancelAction = () => {
+    setProgress(100)
+    setCurrent(1)
+    setOnProgress(false)
+  }
+
   React.useEffect(async () => {
     const tempArr = [...files]
     setPreviewFiles(tempArr.map((file, i)=>{
@@ -219,11 +234,20 @@ export default function CreateItem() {
     return pos/files.length + 100*index/files.length
   }
   const mint2net = (paramObj, index=0)=>(
-    new Promise((resolve, reject) => {
+    new CancelablePromise((resolve, reject, onCancel) => {
       const _tokenSupply = quantity
       const _royaltyFee = royalties*10000
 
+<<<<<<< HEAD
       if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
+=======
+      onCancel(() => {
+        console.log("cancel mint2net")
+        cancelAction()
+      });
+    
+      if(localStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
+>>>>>>> 3fa16d6a4a9f58083be3b08f91bdfc86fb757a01
         reject(new Error)
         return
       }
@@ -313,7 +337,12 @@ export default function CreateItem() {
     })
   )
   const sendIpfsImage = (f)=>(
-    new Promise((resolve, reject) => {
+    new CancelablePromise((resolve, reject, onCancel) => {
+      onCancel(() => {
+        console.log("cancel ipfs")
+        cancelAction()
+      });
+      
       const reader = new window.FileReader();
       reader.readAsArrayBuffer(f);
       reader.onloadend = async() => {
@@ -328,7 +357,12 @@ export default function CreateItem() {
     })
   )
   const sendIpfsMetaJson = (added, index=0)=>(
-    new Promise((resolve, reject) => {
+    new CancelablePromise((resolve, reject, onCancel) => {
+      onCancel(() => {
+        console.log("cancel meta")
+        cancelAction()
+      });
+      
       let collectibleName = singleName;
       let propertiesObj = singleProperties.reduce((obj, item) => {
         if(item.type!=='' && item.name!=='')
@@ -369,7 +403,11 @@ export default function CreateItem() {
     })
   )
   const sendIpfsDidJson = ()=>(
-    new Promise((resolve, reject) => {
+    new CancelablePromise((resolve, reject, onCancel) => {
+      onCancel(() => {
+        console.log("cancel did")
+        cancelAction()
+      });
       // create the metadata object we'll be storing
       const did = sessionStorage.getItem('PASAR_DID') ? sessionStorage.getItem('PASAR_DID') : ''
       const didObj = {
@@ -388,21 +426,32 @@ export default function CreateItem() {
     })
   )
   const uploadData = ()=>(
-    new Promise((resolve, reject) => {
+    new CancelablePromise((resolve, reject, onCancel) => {
       let _id = ''
       let _uri = ''
       let _didUri = ''
       if (!file)
         return;
+      onCancel(() => {
+        console.log("cancel upload")
+        cancelAction()
+      });
+
       setProgress(5)
-      sendIpfsImage(file).then((added) => {
+      let temPromise = sendIpfsImage(file)
+      setCurrentPromise(temPromise)
+      temPromise.then((added) => {
         _id = `0x${hash(added.path)}`
         setProgress(15)
-        return sendIpfsMetaJson(added)
+        temPromise = sendIpfsMetaJson(added)
+        setCurrentPromise(temPromise)
+        return temPromise
       }).then((metaRecv) => {
         setProgress(30)
         _uri = `feeds:json:${metaRecv.path}`
-        return sendIpfsDidJson()
+        temPromise = sendIpfsDidJson()
+        setCurrentPromise(temPromise)
+        return temPromise
       }).then((didRecv) => {
         setProgress(45)
         _didUri = `feeds:json:${didRecv.path}`
@@ -413,11 +462,16 @@ export default function CreateItem() {
     })
   )
   const uploadOneOfBatch = (f, _didUri, index)=>(
-    new Promise((resolve, reject) => {
+    new CancelablePromise((resolve, reject, onCancel) => {
       let _id = ''
       let _uri = ''
       if (!f)
         return;
+      onCancel(() => {
+        console.log("cancel upload batch")
+        cancelAction()
+      });
+      
       setProgress(progressStep(10, index))
       sendIpfsImage(f).then((added) => {
         _id = `0x${hash(added.path)}`
@@ -437,7 +491,13 @@ export default function CreateItem() {
       return
     setOnProgress(true)
     setOpenMintDlg(true)
-    uploadData().then((paramObj) => mint2net(paramObj)).then((success) => {
+    let temPromise = uploadData()
+    setCurrentPromise(temPromise)
+    temPromise.then((paramObj) => {
+      temPromise = mint2net(paramObj)
+      setCurrentPromise(temPromise)
+      return temPromise
+    }).then((success) => {
       setProgress(100)
       if(success){
         enqueueSnackbar('Mint token success!', { variant: 'success' });
@@ -446,15 +506,17 @@ export default function CreateItem() {
         }, 3000)
       }
       else
-        enqueueSnackbar('Mint token error!', { variant: 'warning' });
+      enqueueSnackbar('Mint token error!', { variant: 'warning' });
       setOnProgress(false)
       setOpenMintDlg(false)
+      setCurrentPromise(null)
       setCurrent(1)
     }).catch((error) => {
       setProgress(100)
       enqueueSnackbar('Mint token error!', { variant: 'error' });
       setOnProgress(false)
       setOpenMintDlg(false)
+      setCurrentPromise(null)
       setCurrent(1)
     });
   }
@@ -519,7 +581,6 @@ export default function CreateItem() {
     obj.push(key)
     return obj
   }, []);
-  // console.log(duproperties)
 
   const handleMintAction = (e) => {
     setOnValidation(true)
@@ -541,7 +602,7 @@ export default function CreateItem() {
   }
   return (
     <RootStyle title="CreateItem | PASAR">
-      <ProgressBar isFinished={(progress===0||progress===100)} progress={progress} />
+      <ProgressBar isFinished={(progress===0||progress===100||!onProgress)} progress={progress} />
       <Container maxWidth="lg">
         <Typography variant="h2" component="h2" align="center" sx={{mb: 3}}>
           <span role="img" aria-label="">🔨</span> Create Item 

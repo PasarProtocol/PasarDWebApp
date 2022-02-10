@@ -227,24 +227,26 @@ export default function MenuMobile(props) {
         <Box sx={{ flexGrow: 1 }} />
         <Container>
           <Grid container dir="ltr" sx={{pb: 3}}>
-            <Grid item xs={4} align="center">
-              {/* <MFab color="info" size="medium">
+            {/* <Grid item xs={4} align="center">
+              <MFab color="info" size="medium">
                 <TelegramIcon sx={{ fontSize: 30 }} />
-              </MFab> */}
-            </Grid>
-            <Grid item xs={4} align="center">
+              </MFab>
+            </Grid> */}
+            <Grid item xs={6} align="center">
               <MFab color="info" size="medium" href="https://discord.gg/RPbcBv8ckh" component={Link} target="_blank">
                 <Icon icon={discordIcon} width={30} height={30} />
               </MFab>
             </Grid>
-            <Grid item xs={4} align="center">
+            <Grid item xs={6} align="center">
               <MFab color="info" size="medium" href="https://github.com/PasarProtocol" component={Link} target="_blank">
                 <Icon icon={githubIcon} width={30} height={30} />
               </MFab>
-              {/* <MFab color="info" size="medium">
-                <Icon icon={twitterIcon} width={30} height={30} />
-              </MFab> */}
             </Grid>
+            {/* <Grid item xs={4} align="center">
+              <MFab color="info" size="medium">
+                <Icon icon={twitterIcon} width={30} height={30} />
+              </MFab>
+            </Grid> */}
           </Grid>
           {/* <Box
             sx={{
