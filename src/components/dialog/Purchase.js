@@ -150,16 +150,16 @@ export default function Purchase(props) {
     const buyerDidUri = await sendIpfsDidJson();
     console.log('didUri:', buyerDidUri);
     const buyPrice = BigInt(info.Price).toString();
-    if(localStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
+    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
         callEthBuyOrder(info.OrderId, buyerDidUri, buyPrice);
     }
-    else if(localStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
         callBuyOrder(info.OrderId, buyerDidUri, buyPrice);
     }
   };
 
   React.useEffect(async () => {
-    const sessionLinkFlag = localStorage.getItem('PASAR_LINK_ADDRESS');
+    const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library)
         getBalance(library.provider).then((res) => {

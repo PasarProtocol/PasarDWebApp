@@ -50,7 +50,7 @@ export default function AssetCard(props) {
     setOpenPopup(event.currentTarget);
   };
   const handleSell = (event) => {
-    if(localStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
       setOpenDownloadEssentialDlg(true)
       return
     }
@@ -60,21 +60,21 @@ export default function AssetCard(props) {
     const type = e.target.getAttribute("value")
     switch(type){
       case 'sell':
-        if(localStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
           setOpenDownloadEssentialDlg(true)
           return
         }
         setOpenSell(true)
         break;
       case 'update':
-        if(localStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
           setOpenDownloadEssentialDlg(true)
           return
         }
         setOpenUpdate(true)
         break;
       case 'cancel':
-        if(localStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
           setOpenDownloadEssentialDlg(true)
           return
         }
@@ -85,7 +85,7 @@ export default function AssetCard(props) {
         break;
       case 'transfer':
         if(diaBalance>=0.01){
-          if(localStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+          if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
             setOpenDownloadEssentialDlg(true)
             return
           }

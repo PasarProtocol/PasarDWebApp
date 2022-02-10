@@ -127,12 +127,12 @@ export default function CollectibleDetail() {
   const context = useWeb3React()
   const { account } = context;
   React.useEffect(async() => {
-    const sessionLinkFlag = localStorage.getItem('PASAR_LINK_ADDRESS');
+    const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     setSignin(!!sessionLinkFlag)
-  }, [localStorage.getItem('PASAR_LINK_ADDRESS')]);
+  }, [sessionStorage.getItem('PASAR_LINK_ADDRESS')]);
 
   React.useEffect(async() => {
-    const sessionLinkFlag = localStorage.getItem('PASAR_LINK_ADDRESS')
+    const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
     if(sessionLinkFlag){
       if(sessionLinkFlag==='1')
         setAddress(account)

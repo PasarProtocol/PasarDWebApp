@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 
 // ----------------------------------------------------------------------
 
-export default function useLocalStorage(key, defaultValue) {
+export default function usesessionStorage(key, defaultValue) {
   const [value, setValue] = useState(() => {
-    const storedValue = localStorage.getItem(key);
+    const storedValue = sessionStorage.getItem(key);
     return storedValue === null ? defaultValue : JSON.parse(storedValue);
   });
 
   useEffect(() => {
     const listener = (e) => {
-      if (e.storageArea === localStorage && e.key === key) {
+      if (e.storageArea === sessionStorage && e.key === key) {
         setValue(JSON.parse(e.newValue));
       }
     };
@@ -21,13 +21,13 @@ export default function useLocalStorage(key, defaultValue) {
     };
   }, [key, defaultValue]);
 
-  const setValueInLocalStorage = (newValue) => {
+  const setValueInsessionStorage = (newValue) => {
     setValue((currentValue) => {
       const result = typeof newValue === 'function' ? newValue(currentValue) : newValue;
-      localStorage.setItem(key, JSON.stringify(result));
+      sessionStorage.setItem(key, JSON.stringify(result));
       return result;
     });
   };
 
-  return [value, setValueInLocalStorage];
+  return [value, setValueInsessionStorage];
 }
