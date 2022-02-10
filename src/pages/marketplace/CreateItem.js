@@ -238,16 +238,12 @@ export default function CreateItem() {
       const _tokenSupply = quantity
       const _royaltyFee = royalties*10000
 
-<<<<<<< HEAD
-      if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
-=======
       onCancel(() => {
         console.log("cancel mint2net")
         cancelAction()
       });
     
       if(localStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
->>>>>>> 3fa16d6a4a9f58083be3b08f91bdfc86fb757a01
         reject(new Error)
         return
       }
