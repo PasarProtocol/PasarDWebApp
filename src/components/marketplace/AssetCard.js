@@ -25,6 +25,7 @@ import TransferDlg from '../dialog/Transfer';
 import NeedBuyDIADlg from '../dialog/NeedBuyDIA';
 import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
+import { getDiaTokenInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -40,11 +41,20 @@ export default function AssetCard(props) {
   const [deleteOpen, setOpenDelete] = React.useState(false);
   const [transferOpen, setOpenTransfer] = React.useState(false);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
+  const [diaBadge, setDiaBadge] = React.useState(false);
+  
   const isCreatedByMe = myaddress===royaltyOwner
   const isListedOwnedByMe = myaddress===royaltyOwner&&saleType!=="Not on sale"
   const isUnlistedOwnedByMe = myaddress===holder&&saleType!=="Primary Sale"
   const isListedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType==="Primary Sale"
   const isUnlistedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType!=="Primary Sale"
+
+  React.useEffect(() => {
+    getDiaTokenInfo(holder).then(dia=>{
+      if(dia!=='0')
+        setDiaBadge(true)
+    })
+  })
 
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);
@@ -235,12 +245,17 @@ export default function AssetCard(props) {
           }
           {
             (type===2&&isUnlistedOwnedByMe)&&
-            <Button variant="contained" size="small" fullWidth sx={{mt: 1}} onClick={handleSell}>Sell</Button>
+            <Button variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={handleSell}>Sell</Button>
           }
-          {/* <Stack direction="row">
-            <Badge name="diamond"/>
-            <Badge name="user"/>
-          </Stack> */}
+          <Stack direction="row" sx={{minHeight: '26px'}}>
+            {
+              diaBadge&&
+              <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
+                <Box><Badge name="diamond"/></Box>
+              </Tooltip>
+            }
+            {/* <Badge name="user"/> */}
+          </Stack>
         </PaperRecord>
         <SellDlg isOpen={sellOpen} setOpen={setOpenSell} title={title} tokenId={tokenId} updateCount={updateCount} handleUpdate={handleUpdate}/>
         <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} title={title} orderId={orderId} updateCount={updateCount} handleUpdate={handleUpdate}/>
