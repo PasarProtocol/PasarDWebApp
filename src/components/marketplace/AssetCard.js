@@ -247,15 +247,18 @@ export default function AssetCard(props) {
             (type===2&&isUnlistedOwnedByMe)&&
             <Button variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={handleSell}>Sell</Button>
           }
-          <Stack direction="row" sx={{minHeight: '26px'}}>
-            {
-              diaBadge&&
-              <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                <Box><Badge name="diamond"/></Box>
-              </Tooltip>
-            }
-            {/* <Badge name="user"/> */}
-          </Stack>
+          {
+            type===0&&
+            <Stack direction="row" sx={{minHeight: '26px'}}>
+              {
+                diaBadge&&
+                <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
+                  <Box><Badge name="diamond"/></Box>
+                </Tooltip>
+              }
+              {/* <Badge name="user"/> */}
+            </Stack>
+          }
         </PaperRecord>
         <SellDlg isOpen={sellOpen} setOpen={setOpenSell} title={title} tokenId={tokenId} updateCount={updateCount} handleUpdate={handleUpdate}/>
         <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} title={title} orderId={orderId} updateCount={updateCount} handleUpdate={handleUpdate}/>
