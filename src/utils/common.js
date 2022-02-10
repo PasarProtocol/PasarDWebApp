@@ -6,14 +6,17 @@ import { subDays, differenceInDays  } from 'date-fns';
 import Jazzicon from "@metamask/jazzicon";
 // import { DIDURL } from '@elastosfoundation/did-js-sdk/typings';
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
-import {marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS} from '../config';
+import {marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS, ipfsURL} from '../config';
 import {PASAR_CONTRACT_ABI} from '../abi/pasarABI';
 import {DIAMOND_CONTRACT_ABI} from '../abi/diamondABI';
 
-const client = create('https://ipfs-test.trinity-feeds.app/');
-
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = strAddress => strAddress?`${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`:'';
+
+export const fetchFrom = (uri, props={}) => {
+  const backendURL = process.env.REACT_APP_ENV==="production"?process.env.REACT_APP_BACKEND_URL_PRODUCTION:process.env.REACT_APP_BACKEND_URL_TEST
+  return fetch(`${backendURL}/${uri}`, props)
+}
 
 // Get time from timestamp //
 export const getTime = timestamp => {
@@ -39,14 +42,16 @@ const getIpfsUrl = id => {
   if(prefixLen>=id.length)
     return ""
   const uri = id.substring(prefixLen+1)
-  return `https://ipfs.pasarprotocol.io/ipfs/${uri}`
+  return `${ipfsURL}/ipfs/${uri}`
 }
 
 export const getAssetImage = (metaObj, isThumbnail=false) => {
   const {asset, thumbnail, tokenJsonVersion, data} = metaObj
   let cid = asset
   if(tokenJsonVersion==="2" && !asset){
-    if(isThumbnail)
+    if(!data)
+      cid = ''
+    else if(isThumbnail)
       cid = data.thumbnail
     else cid = data.image
   }
@@ -333,6 +338,7 @@ export const MethodList = [
 ]
 
 export const sendIpfsDidJson = async () => {
+  const client = create(`${ipfsURL}/`);
   // create the metadata object we'll be storing
   const did = localStorage.getItem('PASAR_DID') ? localStorage.getItem('PASAR_DID') : '';
   const didObj = {

@@ -17,7 +17,7 @@ import TransactionCollectibleDetail from '../../components/explorer/TransactionL
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { reduceHexAddress, getAssetImage, getTime } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, fetchFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -61,9 +61,7 @@ export default function CollectibleDetail() {
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const imageRef = React.useRef();
   React.useEffect(async () => {
-    const resCollectible = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`
-    );
+    const resCollectible = await fetchFrom(`sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`);
     const jsonCollectible = await resCollectible.json();
     setCollectible(jsonCollectible.data);
     setLoadingCollectible(false);
@@ -91,7 +89,7 @@ export default function CollectibleDetail() {
     setAbortController(newController);
 
     setLoadingTransRecord(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetchFrom(`sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
         setTotalCount(jsonTransactions.data.length)
         const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {

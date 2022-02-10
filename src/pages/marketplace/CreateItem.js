@@ -30,14 +30,14 @@ import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
 import MintDlg from '../../components/dialog/Mint';
 import AccessDlg from '../../components/dialog/Access';
-import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS} from '../../config'
-import {hash, removeLeadingZero, callContractMethod} from '../../utils/common';
+import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL} from '../../config'
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ProgressBar from '../../components/ProgressBar'
+import {hash, removeLeadingZero, callContractMethod} from '../../utils/common';
 // ----------------------------------------------------------------------
 
-const client = create('https://ipfs.pasarprotocol.io/')
+const client = create(`${ipfsURL}/`)
 const RootStyle = styled(Page)(({ theme }) => ({
   paddingTop: theme.spacing(10),
   paddingBottom: theme.spacing(12),

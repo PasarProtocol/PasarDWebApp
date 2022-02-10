@@ -10,6 +10,7 @@ import SearchBox from '../components/SearchBox';
 import StatisticPanel from '../components/explorer/StatisticPanel';
 import NewestCollectibles from '../components/explorer/CollectionView/NewestCollectibles';
 import LatestTransactions from '../components/explorer/CollectionView/LatestTransactions';
+import { fetchFrom } from '../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -33,16 +34,12 @@ export default function Explorer() {
   React.useEffect(async () => {
     setLoadingCollectibles(true);
     setLoadingTransactions(true);
-    const resCollectibles = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listStickers?pageNum=1&pageSize=10`
-    );
+    const resCollectibles = await fetchFrom('sticker/api/v1/listStickers?pageNum=1&pageSize=10');
     const jsonCollectibles = await resCollectibles.json();
     setNewestCollectibles(jsonCollectibles.data.result);
     setLoadingCollectibles(false);
 
-    const resTransactions = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/listTrans?pageNum=1&pageSize=10`
-    );
+    const resTransactions = await fetchFrom('sticker/api/v1/listTrans?pageNum=1&pageSize=10');
     const jsonTransactions = await resTransactions.json();
     setLatestTransactions(jsonTransactions.data.results);
     setLoadingTransactions(false);

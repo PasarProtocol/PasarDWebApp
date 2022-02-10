@@ -11,6 +11,7 @@ import ShowSelect from '../../components/pagination/ShowSelect';
 import Pagination from '../../components/pagination';
 import PaperRecord from '../../components/PaperRecord';
 import LoadingWrapper from '../../components/LoadingWrapper';
+import { fetchFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -40,7 +41,7 @@ export default function SearchResult() {
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
   React.useEffect(async () => {
     setLoadingCollectibles(true);
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/sticker/api/v1/search?key=${params.key}`, {}).then(response => {
+    fetchFrom(`sticker/api/v1/search?key=${params.key}`).then(response => {
       response.json().then(jsonCollectibles => {
         setTotalCount(jsonCollectibles.data.result.length)
         setCollectibles(jsonCollectibles.data.result);
