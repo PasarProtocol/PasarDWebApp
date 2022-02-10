@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 import { connectivity } from '@elastosfoundation/elastos-connectivity-sdk-js';
 
