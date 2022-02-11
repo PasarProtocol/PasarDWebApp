@@ -1,7 +1,25 @@
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  Stack,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar,
+  Alert,
+  DialogContentText,
+  IconButton,
+  Typography,
+  Grid,
+  Avatar,
+  Box,
+  Link,
+  Menu,
+  MenuItem
+} from '@mui/material';
 import * as math from 'mathjs';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
@@ -27,7 +45,14 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom } from '../../utils/common';
+import {
+  reduceHexAddress,
+  getBalance,
+  getCoinUSD,
+  getDiaTokenInfo,
+  getDiaTokenPrice,
+  fetchFrom
+} from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
 import useSingin from '../../hooks/useSignin';
 
@@ -57,8 +82,19 @@ const useStyles = makeStyles({
 });
 
 export default function SignInDialog() {
-  const { openSigninEssential, openDownloadEssential, afterSigninPath, diaBalance, pasarLinkAddress,
-    setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath, setSigninEssentialSuccess, setDiaBalance, setPasarLinkAddress } = useSingin()
+  const {
+    openSigninEssential,
+    openDownloadEssential,
+    afterSigninPath,
+    diaBalance,
+    pasarLinkAddress,
+    setOpenSigninEssentialDlg,
+    setOpenDownloadEssentialDlg,
+    setAfterSigninPath,
+    setSigninEssentialSuccess,
+    setDiaBalance,
+    setPasarLinkAddress
+  } = useSingin();
   const { pathname } = useLocation();
   const isHome = pathname === '/';
 
@@ -110,24 +146,23 @@ export default function SignInDialog() {
         setActivatingConnector(injected);
         activate(injected);
       } else if (sessionLinkFlag === '2') {
-        // if (!essentialsConnector.hasWalletConnectSession()) {
-        //   essentialsConnector.setWalletConnectProvider(
-        //     new WalletConnectProvider({
-        //       rpc: {
-        //         20: 'https://api.elastos.io/eth',
-        //         21: 'https://api-testnet.elastos.io/eth',
-        //         128: 'https://http-mainnet.hecochain.com'
-        //       },
-        //       bridge: 'https://wallet-connect.trinity-tech.io/v2'
-        //     })
-        //   );
-        // }
         setWalletAddress(await essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+      } else if (sessionLinkFlag === '3') {
+        setActivatingConnector(walletconnect);
+        activate(walletconnect);
       }
     }
   }, [sessionLinkFlag, activatingConnector]);
 
   React.useEffect(async () => {
+    console.log('session storage: ------', sessionStorage.getItem('PASAR_LINK_ADDRESS'));
+    console.log('session flag: ------', sessionLinkFlag);
+    console.log('activating connector: ------', activatingConnector);
+    console.log('account: ------', account);
+    console.log('active: ------', active);
+    console.log('chainId: ------', chainId);
+    console.log('connector: ------', connector);
+
     initializeWalletConnection();
     getCoinUSD().then((res) => {
       setCoinUSD(res);
@@ -137,80 +172,102 @@ export default function SignInDialog() {
       setSnackbarOpen(true);
     }
 
-    // if (active) { // check if is active
-    //   if(activatingConnector === injected) {
-    //     sessionLinkFlag = '1';
-    //     sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
-    //   }
-    //   else if (activatingConnector === essentialsConnector) {
-    //     sessionLinkFlag = '2';
-    //     sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
-    //   }
-    // }
-
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS') || pasarLinkAddress;
     if (sessionLinkFlag) {
-      if (sessionLinkFlag === '1' && library) {
-        getDiaTokenPrice(library.provider).then(res => {
-          setDiaUSD(res.token.derivedELA*res.bundle.elaPrice)
-        }).catch((error) => {
-          setDiaUSD(0)
-        })
-        getDiaTokenInfo(account, library.provider).then(dia=>{
-          setDiaBalance(dia)
-        }).catch((error) => {
-          setDiaBalance(0)
-        })
+      // when connected
+      if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
+        getDiaTokenPrice(library.provider)
+          .then((res) => {
+            setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
+          })
+          .catch((error) => {
+            setDiaUSD(0);
+          });
+        getDiaTokenInfo(account, library.provider)
+          .then((dia) => {
+            setDiaBalance(dia);
+          })
+          .catch((error) => {
+            setDiaBalance(0);
+          });
         getBalance(library.provider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
-        })
-        
-        setWalletAddress(account);
-      }
-
-      if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider()) {
-        const essentialProvider = essentialsConnector.getWalletConnectProvider()
-        getDiaTokenPrice(essentialProvider).then(res => {
-          setDiaUSD(res.token.derivedELA*res.bundle.elaPrice)
-        }).catch((error) => {
-          setDiaUSD(0)
-        })
-        getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider).then(dia=>{
-          setDiaBalance(dia)
-        }).catch((error) => {
-          setDiaBalance(0)
-        })
+        });
+        if (activatingConnector !== null) setWalletAddress(await activatingConnector.getAccount());
+      } else if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider()) {
+        const essentialProvider = essentialsConnector.getWalletConnectProvider();
+        getDiaTokenPrice(essentialProvider)
+          .then((res) => {
+            setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
+          })
+          .catch((error) => {
+            setDiaUSD(0);
+          });
+        getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
+          .then((dia) => {
+            setDiaBalance(dia);
+          })
+          .catch((error) => {
+            setDiaBalance(0);
+          });
         getBalance(essentialProvider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
-        })
+        });
 
         setWalletAddress(essentialProvider.wc.accounts[0]);
       }
     }
   }, [sessionLinkFlag, account, active, chainId, activatingConnector]);
-  
-  // listen for disconnect from essentials
-  React.useEffect(async()=>{
-    if(sessionLinkFlag === '2' && activatingConnector === essentialsConnector && !essentialsConnector.hasWalletConnectSession()) {
+
+  // listen for disconnect from essentials / wallet connect
+  React.useEffect(async () => {
+    if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && !active && activatingConnector !== null) {
       setOpenAccountPopup(null);
-        await activate(null);
-        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' || pasarLinkAddress === '2')
-          essentialsConnector
-            .disconnectWalletConnect()
-            .then((res) => {})
-            .catch((e) => {
-              console.log(e);
-            });
-        sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-        sessionStorage.removeItem('PASAR_TOKEN');
-        sessionStorage.removeItem('PASAR_DID');
-        setPasarLinkAddress('0');
-        setActivatingConnector(null);
-        setWalletAddress(null);
-        navigate('/marketplace');
-        window.location.reload();
+      await activate(null);
+      if (
+        sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
+        pasarLinkAddress === '1' ||
+        sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3' ||
+        pasarLinkAddress === '3'
+      ) {
+        activatingConnector
+          .close()
+          .then((res) => {})
+          .catch((e) => {
+            console.log(e);
+          });
       }
-  }, [essentialsConnector.hasWalletConnectSession()]);
+        
+      sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+      setPasarLinkAddress('0');
+      setActivatingConnector(null);
+      setWalletAddress(null);
+      navigate('/marketplace');
+      window.location.reload();
+    } else if (
+      sessionLinkFlag === '2' &&
+      activatingConnector === essentialsConnector &&
+      !essentialsConnector.hasWalletConnectSession()
+    ) {
+      setOpenAccountPopup(null);
+      await activate(null);
+      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' || pasarLinkAddress === '2')
+        essentialsConnector
+          .disconnectWalletConnect()
+          .then((res) => {})
+          .catch((e) => {
+            console.log(e);
+          });
+      sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+      sessionStorage.removeItem('PASAR_TOKEN');
+      sessionStorage.removeItem('PASAR_DID');
+      setPasarLinkAddress('0');
+      setActivatingConnector(null);
+      setWalletAddress(null);
+      navigate('/marketplace');
+      window.location.reload();
+    }
+  }, [essentialsConnector.hasWalletConnectSession(), active]);
 
   useConnectivitySDK();
 
@@ -218,20 +275,32 @@ export default function SignInDialog() {
   const handleChooseWallet = async (wallet) => {
     let currentConnector = null;
     if (wallet === 'metamask') currentConnector = injected;
-    else if (wallet === 'walletlink') currentConnector = walletlink;
     else if (wallet === 'walletconnect') currentConnector = walletconnect;
+    else if (wallet === 'walletlink') currentConnector = walletlink;
     setActivatingConnector(currentConnector);
     await activate(currentConnector);
     // if(active) {
     console.log('loged in');
-    sessionLinkFlag = '1';
-    sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
-    setPasarLinkAddress('1');
+    if (wallet === 'metamask') {
+      sessionLinkFlag = '1';
+      sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
+      setPasarLinkAddress('1');
+    } else if (wallet === 'walletconnect') {
+      sessionLinkFlag = '3';
+      sessionStorage.setItem('PASAR_LINK_ADDRESS', 3);
+      setPasarLinkAddress('3');
+    } else if (wallet === 'walletlink') {
+      sessionLinkFlag = '4';
+      sessionStorage.setItem('PASAR_LINK_ADDRESS', 4);
+      setPasarLinkAddress('4');
+    }
     // }
+    setWalletAddress(await currentConnector.getAccount());
     setOpenSigninDlg(false);
   };
 
-  const connectWithEssential = async () => {
+  // essentials wallet connection
+  const connectWithEssentials = async () => {
     const didAccess = new DID.DIDAccess();
     let presentation;
     try {
@@ -247,7 +316,8 @@ export default function SignInDialog() {
 
       return;
     }
-
+    console.log(presentation);
+    // alert(presentation);
     if (presentation) {
       const did = presentation.getHolder().getMethodSpecificId() || '';
       fetchFrom('auth/api/v1/login', {
@@ -271,11 +341,11 @@ export default function SignInDialog() {
             setOpenSigninDlg(false);
             setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
             setActivatingConnector(essentialsConnector);
-            setSigninEssentialSuccess(true)
-            if(afterSigninPath){
-              setOpenSigninEssentialDlg(false)
-              navigate(afterSigninPath)
-              setAfterSigninPath(null)
+            setSigninEssentialSuccess(true);
+            if (afterSigninPath) {
+              setOpenSigninEssentialDlg(false);
+              navigate(afterSigninPath);
+              setAfterSigninPath(null);
             }
           } else {
             // console.log(data);
@@ -333,7 +403,7 @@ export default function SignInDialog() {
             console.log(e);
           });
       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-      setSigninEssentialSuccess(false)
+      setSigninEssentialSuccess(false);
       sessionStorage.removeItem('PASAR_TOKEN');
       sessionStorage.removeItem('PASAR_DID');
       setPasarLinkAddress('0');
@@ -358,7 +428,7 @@ export default function SignInDialog() {
             open={Boolean(isOpenAccountPopup)}
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            MenuListProps={{ onMouseLeave: ()=>setOpenAccountPopup(null) }}
+            MenuListProps={{ onMouseLeave: () => setOpenAccountPopup(null) }}
           >
             <Box sx={{ px: 2, py: '6px' }}>
               <Typography variant="h6">
@@ -414,11 +484,20 @@ export default function SignInDialog() {
                     />
                     <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                       <Typography variant="body2"> ELA </Typography>
-                      <Typography variant="body2" color="text.secondary"> Elastos (ESC) </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {' '}
+                        Elastos (ESC){' '}
+                      </Typography>
                     </Box>
                     <Box>
-                      <Typography variant="body2" align="right"> {balance} </Typography>
-                      <Typography variant="body2" align="right" color="text.secondary"> USD {math.round(coinUSD * balance, 2)} </Typography>
+                      <Typography variant="body2" align="right">
+                        {' '}
+                        {balance}{' '}
+                      </Typography>
+                      <Typography variant="body2" align="right" color="text.secondary">
+                        {' '}
+                        USD {math.round(coinUSD * balance, 2)}{' '}
+                      </Typography>
                     </Box>
                   </Stack>
                 </PaperRecord>
@@ -433,11 +512,20 @@ export default function SignInDialog() {
                     />
                     <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                       <Typography variant="body2"> DIA </Typography>
-                      <Typography variant="body2" color="text.secondary"> Diamond (ESC) </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {' '}
+                        Diamond (ESC){' '}
+                      </Typography>
                     </Box>
                     <Box>
-                      <Typography variant="body2" align="right"> {diaBalance} </Typography>
-                      <Typography variant="body2" align="right" color="text.secondary"> USD {math.round(diaUSD * diaBalance, 2)} </Typography>
+                      <Typography variant="body2" align="right">
+                        {' '}
+                        {diaBalance}{' '}
+                      </Typography>
+                      <Typography variant="body2" align="right" color="text.secondary">
+                        {' '}
+                        USD {math.round(diaUSD * diaBalance, 2)}{' '}
+                      </Typography>
                     </Box>
                   </Stack>
                 </PaperRecord>
@@ -516,7 +604,7 @@ export default function SignInDialog() {
                       className={classes.iconAbsolute1}
                       fullWidth
                       onClick={() => {
-                        connectWithEssential();
+                        connectWithEssentials();
                       }}
                       sx={!isLight && { backgroundColor: 'white' }}
                     >
@@ -704,7 +792,7 @@ export default function SignInDialog() {
                   className={classes.iconAbsolute1}
                   fullWidth
                   onClick={() => {
-                    connectWithEssential();
+                    connectWithEssentials();
                   }}
                   sx={!isLight && { backgroundColor: 'white' }}
                 >
@@ -718,13 +806,7 @@ export default function SignInDialog() {
               </Grid>
             </Grid>
           </Box>
-          <Typography
-            variant="caption"
-            display="block"
-            sx={{ color: 'text.secondary' }}
-            gutterBottom
-            align="center"
-          >
+          <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
             We do not own your private keys and cannot access your funds without your confirmation.
           </Typography>
         </DialogContent>
@@ -749,7 +831,8 @@ export default function SignInDialog() {
             Download Essentials
           </Typography>
           <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
-            A DID is required in order to create or sell items on Pasar. Get your own DID by downloading the Elastos Essentials mobile app now!
+            A DID is required in order to create or sell items on Pasar. Get your own DID by downloading the Elastos
+            Essentials mobile app now!
           </Typography>
           <Typography variant="body2" display="block" gutterBottom align="center" sx={{ mt: 4 }}>
             Web3.0 super wallet with Decentralized Identifier (DID)
