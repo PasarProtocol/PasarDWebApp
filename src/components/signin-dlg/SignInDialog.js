@@ -37,6 +37,8 @@ import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import jwtDecode from 'jwt-decode';
 import { DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
+import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
+import jwt from 'jsonwebtoken';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { essentialsConnector, useConnectivitySDK, isUsingEssentialsConnector } from './EssentialConnectivity';
 import { MIconButton, MFab } from '../@material-extend';
@@ -237,7 +239,7 @@ export default function SignInDialog() {
             console.log(e);
           });
       }
-        
+
       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
       setPasarLinkAddress('0');
       setActivatingConnector(null);
@@ -302,57 +304,101 @@ export default function SignInDialog() {
   // essentials wallet connection
   const connectWithEssentials = async () => {
     const didAccess = new DID.DIDAccess();
-    let presentation;
+    // let presentation;
     try {
-      presentation = await didAccess.requestCredentials({
+      const presentation = await didAccess.requestCredentials({
         claims: [DID.simpleIdClaim('Your name', 'name', false)]
       });
+
+      const did = presentation.getHolder().getMethodSpecificId() || '';
+
+      const resolverUrl = 'https://api.trinity-tech.cn/eid';
+      DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
+      // verify
+      const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
+      const valid = await vp.isValid();
+      if (!valid) {
+        console.log('Invalid presentation');
+        return;
+      }
+      const sDid = vp.getHolder().toString();
+      if (!sDid) {
+        console.log('Unable to extract owner DID from the presentation');
+        return;
+      }
+      // Optional name
+      const nameCredential = vp.getCredential(`name`);
+      const name = nameCredential ? nameCredential.getSubject().getProperty('name') : '';
+      // Optional email
+      const emailCredential = vp.getCredential(`email`);
+      const email = emailCredential ? emailCredential.getSubject().getProperty('email') : '';
+      const user = {
+        sDid,
+        type: 'user',
+        name,
+        email,
+        canManageAdmins: false
+      };
+      // succeed
+      const token = jwt.sign(user, 'pasar', { expiresIn: 60 * 60 * 24 * 7 });
+      sessionStorage.setItem('PASAR_TOKEN', token);
+      sessionStorage.setItem('PASAR_DID', did);
+      sessionLinkFlag = '2';
+      sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
+      setPasarLinkAddress('2');
+      setOpenSigninDlg(false);
+      setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
+      setActivatingConnector(essentialsConnector);
+      setSigninEssentialSuccess(true);
+      if (afterSigninPath) {
+        setOpenSigninEssentialDlg(false);
+        navigate(afterSigninPath);
+        setAfterSigninPath(null);
+      }
     } catch (e) {
       try {
         await essentialsConnector.getWalletConnectProvider().disconnect();
       } catch (e) {
-        // console.error("Error while trying to disconnect wallet connect session", e);
+        console.error("Error while trying to disconnect wallet connect session", e);
       }
-
-      return;
+      // return;
     }
-    console.log(presentation);
-    // alert(presentation);
-    if (presentation) {
-      const did = presentation.getHolder().getMethodSpecificId() || '';
-      fetchFrom('auth/api/v1/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(presentation.toJSON())
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.code === 200) {
-            const token = data.data;
-            sessionStorage.setItem('PASAR_TOKEN', token);
-            sessionStorage.setItem('PASAR_DID', did);
-            const user = jwtDecode(token);
-            sessionLinkFlag = '2';
-            sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
-            setPasarLinkAddress('2');
 
-            setOpenSigninDlg(false);
-            setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
-            setActivatingConnector(essentialsConnector);
-            setSigninEssentialSuccess(true);
-            if (afterSigninPath) {
-              setOpenSigninEssentialDlg(false);
-              navigate(afterSigninPath);
-              setAfterSigninPath(null);
-            }
-          } else {
-            // console.log(data);
-          }
-        })
-        .catch((error) => {});
-    }
+    // if (presentation) {
+    //   const did = presentation.getHolder().getMethodSpecificId() || '';
+    //   fetchFrom('auth/api/v1/login', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(presentation.toJSON())
+    //   })
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //       if (data.code === 200) {
+    //         const token = data.data;
+    //         sessionStorage.setItem('PASAR_TOKEN', token);
+    //         sessionStorage.setItem('PASAR_DID', did);
+    //         const user = jwtDecode(token);
+    //         sessionLinkFlag = '2';
+    //         sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
+    //         setPasarLinkAddress('2');
+
+    //         setOpenSigninDlg(false);
+    //         setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
+    //         setActivatingConnector(essentialsConnector);
+    //         setSigninEssentialSuccess(true);
+    //         if (afterSigninPath) {
+    //           setOpenSigninEssentialDlg(false);
+    //           navigate(afterSigninPath);
+    //           setAfterSigninPath(null);
+    //         }
+    //       } else {
+    //         // console.log(data);
+    //       }
+    //     })
+    //     .catch((error) => {});
+    // }
   };
 
   const handleClickOpenSinginDlg = () => {
