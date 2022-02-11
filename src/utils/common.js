@@ -150,7 +150,7 @@ export function getDiaTokenInfo(strAddress, connectProvider=null) {
     let walletConnectWeb3
     if(connectProvider)
       walletConnectWeb3 = new Web3(connectProvider)
-    else walletConnectWeb3 = new Web3(Web3.givenProvider)
+    else walletConnectWeb3 = new Web3(Web3.givenProvider || 'http://localhost:8545')
     // const web3 = new Web3(Web3.givenProvider);
     // const MyContract = new web3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS);
     // MyContract.methods.balanceOf(strAddress).call().then(console.log);
