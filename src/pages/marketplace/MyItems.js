@@ -117,6 +117,9 @@ export default function MyItems() {
       const {name} = user;
       setDidInfo({'name': name, 'description': ''})
     }
+    else {
+      setDidInfo({'name': '', 'description': ''})
+    }
   }, [account, params.address]);
 
   const handleSwitchTab = (event, newValue) => {
