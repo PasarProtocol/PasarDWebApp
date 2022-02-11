@@ -189,6 +189,7 @@ export default function MyItems() {
   const link2Detail = (tokenId) => {
     navigate(`/explorer/collectible/detail/${tokenId}`);
   };
+  const loadingSkeletons = Array(10).fill(null)
 
   return (
     <RootStyle title="MyItems | PASAR">
@@ -282,8 +283,8 @@ export default function MyItems() {
           >
             {assets.map((group, i) => (
               <Box key={i} sx={{ minHeight: 200 }}>
-                {isLoadingAssets[i] && <LoadingScreen sx={{ background: 'transparent' }} />}
-                {!isLoadingAssets[i] && (
+                {/* {isLoadingAssets[i] && <LoadingScreen sx={{ background: 'transparent' }} />} */}
+                {!isLoadingAssets[i]?
                   <Box component="main">
                     {group.length > 0 ? (
                       <AssetGrid assets={group} type={i + 1} dispmode={dispmode} myaddress={myAddress} updateCount={updateCount} handleUpdate={setUpdateCount}/>
@@ -292,8 +293,11 @@ export default function MyItems() {
                         No {typeNames[i]} collectible found!
                       </Typography>
                     )}
+                  </Box>:
+                  <Box component="main">
+                    <AssetGrid assets={loadingSkeletons} type={i + 1} dispmode={dispmode} myaddress={myAddress} updateCount={updateCount} handleUpdate={setUpdateCount}/>
                   </Box>
-                )}
+                }
               </Box>
             ))}
           </SwipeableViews>
