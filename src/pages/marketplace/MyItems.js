@@ -96,16 +96,29 @@ export default function MyItems() {
     }
     // ----------------------------------------------------------
     if (params.address){
-      // getInfoFromDID('did:elastos:icZdMxZe6U1Exs6TFsKTzj2pY2JLznPhjC').then(info=>{
-      //   setDidInfo({'name': info.name, 'description': info.description})
-      // })
       setWalletAddress(params.address)
+      fetchFrom(`pasar/api/v1/getDidByAddress?address=${params.address}`)
+        .then((response) => {
+          response.json().then((jsonData) => {
+            if(jsonData.data.did)
+              getInfoFromDID(jsonData.data.did.did).then(info=>{
+                setDidInfo({'name': info.name?info.name:'', 'description': info.description?info.description:''})
+              })
+          })
+          .catch((e) => {
+          })
+        })
+        .catch((e) => {
+        })
     }
-    else if(localStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      const token = localStorage.getItem("PASAR_TOKEN");
+    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+      const token = sessionStorage.getItem("PASAR_TOKEN");
       const user = jwtDecode(token);
       const {name} = user;
       setDidInfo({'name': name, 'description': ''})
+    }
+    else {
+      setDidInfo({'name': '', 'description': ''})
     }
   }, [account, params.address]);
 
@@ -176,6 +189,7 @@ export default function MyItems() {
   const link2Detail = (tokenId) => {
     navigate(`/explorer/collectible/detail/${tokenId}`);
   };
+  const loadingSkeletons = Array(10).fill(null)
 
   return (
     <RootStyle title="MyItems | PASAR">
@@ -269,8 +283,8 @@ export default function MyItems() {
           >
             {assets.map((group, i) => (
               <Box key={i} sx={{ minHeight: 200 }}>
-                {isLoadingAssets[i] && <LoadingScreen sx={{ background: 'transparent' }} />}
-                {!isLoadingAssets[i] && (
+                {/* {isLoadingAssets[i] && <LoadingScreen sx={{ background: 'transparent' }} />} */}
+                {!isLoadingAssets[i]?
                   <Box component="main">
                     {group.length > 0 ? (
                       <AssetGrid assets={group} type={i + 1} dispmode={dispmode} myaddress={myAddress} updateCount={updateCount} handleUpdate={setUpdateCount}/>
@@ -279,8 +293,11 @@ export default function MyItems() {
                         No {typeNames[i]} collectible found!
                       </Typography>
                     )}
+                  </Box>:
+                  <Box component="main">
+                    <AssetGrid assets={loadingSkeletons} type={i + 1} dispmode={dispmode} myaddress={myAddress} updateCount={updateCount} handleUpdate={setUpdateCount}/>
                   </Box>
-                )}
+                }
               </Box>
             ))}
           </SwipeableViews>

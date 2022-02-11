@@ -3,6 +3,7 @@ import React from 'react';
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import {round} from 'mathjs'
 import Lightbox from 'react-image-lightbox';
+import { FacebookShareButton, TwitterShareButton, FacebookIcon, TwitterIcon } from "react-share";
 import { Icon } from '@iconify/react';
 import { useWeb3React } from "@web3-react/core";
 import { styled } from '@mui/material/styles';
@@ -104,7 +105,8 @@ export default function CollectibleDetail() {
   const navigate = useNavigate();
   const params = useParams(); // params.collection
   const [isFullScreen, setFullScreen] = React.useState(false);
-  const [isOpenPopup, setOpenPopup] = React.useState(null);
+  const [isOpenSharePopup, setOpenSharePopup] = React.useState(null);
+  const [isOpenMorePopup, setOpenMorePopup] = React.useState(null);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [address, setAddress] = React.useState('');
 
@@ -191,10 +193,20 @@ export default function CollectibleDetail() {
     handleResize()
   }
   
-  const openPopupMenu = (event) => {
-    setOpenPopup(event.currentTarget);
+  const openSharePopupMenu = (event) => {
+    setOpenSharePopup(event.currentTarget);
+  };
+  const openMorePopupMenu = (event) => {
+    setOpenMorePopup(event.currentTarget);
   };
 
+  const handleCloseSharePopup = () => {
+    setOpenSharePopup(null);
+  };
+  const handleCloseMorePopup = () => {
+    setOpenMorePopup(null);
+  };
+  
   const setDiaBadgeOfUser = (type, value) => {
     setDiaBadge((prevState) => {
       const tempDiaBadge = {...prevState};
@@ -203,10 +215,6 @@ export default function CollectibleDetail() {
     });
   };
 
-  const handleClosePopup = () => {
-    setOpenPopup(null);
-  };
-  
   function handleResize() {
     if(!imageRef.current)
       return
@@ -269,27 +277,59 @@ export default function CollectibleDetail() {
             <MFab size="small" onClick={()=>{setFullScreen(!isFullScreen)}}>
               <FullscreenIcon />
             </MFab>
-            <MFab size="small" sx={{ml: 1, display: 'none'}} onClick={openPopupMenu}>
+            <MFab size="small" sx={{ml: 1}} onClick={openSharePopupMenu}>
+              <ShareOutlinedIcon />
+            </MFab>
+            <Menu 
+                keepMounted
+                id="simple-menu"
+                anchorEl={isOpenSharePopup}
+                onClose={handleCloseSharePopup}
+                open={Boolean(isOpenSharePopup)}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              >
+              <MenuItem onClick={handleCloseSharePopup}>
+                <FacebookShareButton
+                  url={window.location.href}
+                  // quote="Check out this item on Pasar"
+                  description="share item"
+                  style={{display: 'flex', alignItems: 'center'}}
+                >
+                  <FacebookIcon size={32} round />&nbsp;&nbsp;Share on Facebook
+                </FacebookShareButton>
+              </MenuItem>
+              <MenuItem onClick={handleCloseSharePopup}>
+                <TwitterShareButton
+                  url={window.location.href}
+                  description="share item"
+                  style={{display: 'flex', alignItems: 'center'}}
+                >
+                  <TwitterIcon size={32} round />&nbsp;&nbsp;Share on Twitter
+                </TwitterShareButton>
+              </MenuItem>
+            </Menu>
+            <MFab size="small" sx={{ml: 1, display: 'none'}} onClick={openMorePopupMenu}>
               <MoreHorizIcon />
             </MFab>
             <Menu 
                 keepMounted
                 id="simple-menu"
-                anchorEl={isOpenPopup}
-                onClose={handleClosePopup}
-                open={Boolean(isOpenPopup)}
+                anchorEl={isOpenMorePopup}
+                onClose={handleCloseMorePopup}
+                open={Boolean(isOpenMorePopup)}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
-              <MenuItem onClick={handleClosePopup}>
+              <MenuItem onClick={handleCloseMorePopup}>
                 <ThumbDownOffAltIcon/>&nbsp;Report Creator
               </MenuItem>
-              <MenuItem onClick={handleClosePopup}>
+              <MenuItem onClick={handleCloseMorePopup}>
                 <ThumbDownOffAltIcon/>&nbsp;Report Owner
               </MenuItem>
-              <MenuItem onClick={handleClosePopup}>
+              {/* <MenuItem onClick={handleCloseMorePopup}>
                 <ShareOutlinedIcon/>&nbsp;Share
-              </MenuItem>
+              </MenuItem> */}
             </Menu>
           </ToolGroupStyle>
 

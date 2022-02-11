@@ -119,7 +119,7 @@ export default function AssetCard(props) {
               </Tooltip>
             </Grid>
             <Grid item xs={6} align="right">
-              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}} disabled={!(type===1 || type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))}>
+              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}} disabled={!(type===1 && (isCreatedByMe && signinEssentialSuccess) || type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))}>
                 <MoreHorizIcon />
               </IconButton>
               <Menu 
@@ -159,9 +159,9 @@ export default function AssetCard(props) {
                         </MenuItem>
                       </div>
                     }
-                    <MenuItem onClick={handleClosePopup}>
+                    {/* <MenuItem onClick={handleClosePopup}>
                       <ShareOutlinedIcon/>&nbsp;Share
-                    </MenuItem>
+                    </MenuItem> */}
                   </div>
                 }
                 {
