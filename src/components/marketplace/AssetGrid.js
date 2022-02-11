@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 // material
 import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
+import AssetCardSkeleton from './AssetCardSkeleton';
 import { getAssetImage } from '../../utils/common';
 // ----------------------------------------------------------------------
 const StackedGrid = ({
@@ -25,21 +26,25 @@ const GridItems = (props) => (
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <AssetCard
-            thumbnail={getAssetImage(item, true)}
-            title={item.name && item.name}
-            description={item.description}
-            price={round(item.price/1e18, 3)}
-            quantity={item.quantity}
-            tokenId={item.tokenId}
-            saleType={item.SaleType?item.SaleType:item.saleType}
-            type={props.type}
-            isLink={1&&true}
-            orderId={item.orderId}
-            royaltyOwner={item.royaltyOwner}
-            holder={item.holder}
-            {...props}
-          />
+          {
+            item?
+            <AssetCard
+              thumbnail={getAssetImage(item, true)}
+              title={item.name && item.name}
+              description={item.description}
+              price={round(item.price/1e18, 3)}
+              quantity={item.quantity}
+              tokenId={item.tokenId}
+              saleType={item.SaleType?item.SaleType:item.saleType}
+              type={props.type}
+              isLink={1&&true}
+              orderId={item.orderId}
+              royaltyOwner={item.royaltyOwner}
+              holder={item.holder}
+              {...props}
+            />:
+            <AssetCardSkeleton/>
+          }
         </motion.div>
       ))}
     </AnimatePresence>
