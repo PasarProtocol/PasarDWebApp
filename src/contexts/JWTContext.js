@@ -67,7 +67,7 @@ function AuthProvider({ children }) {
   useEffect(() => {
     const initialize = async () => {
       try {
-        const accessToken = window.sessionStorage.getItem('accessToken');
+        const accessToken = window.localStorage.getItem('accessToken');
 
         if (accessToken && isValidToken(accessToken)) {
           setSession(accessToken);
@@ -131,7 +131,7 @@ function AuthProvider({ children }) {
     });
     const { accessToken, user } = response.data;
 
-    window.sessionStorage.setItem('accessToken', accessToken);
+    window.localStorage.setItem('accessToken', accessToken);
     dispatch({
       type: 'REGISTER',
       payload: {
