@@ -14,6 +14,7 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { alpha, styled } from '@mui/material/styles';
 import { Box, List, Link, Drawer, Typography, Grid, Paper, CardActionArea, ListItemText, ListItemIcon, ListItemButton, Container } from '@mui/material';
 // components
+import generatedGitInfo from '../../generatedGitInfo.json';
 import Logo from '../../components/Logo';
 import Scrollbar from '../../components/Scrollbar';
 import ModeSwitch from '../../components/mode-switch';
@@ -262,6 +263,9 @@ export default function MenuMobile(props) {
           </CopyRight>
           <CopyRight>
             Privacy Policy | Disclaimer️
+          </CopyRight>
+          <CopyRight>
+            v1 - {generatedGitInfo.gitCommitHash}
           </CopyRight>
         </Container>
       </Drawer>
