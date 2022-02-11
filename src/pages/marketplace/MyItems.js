@@ -111,8 +111,8 @@ export default function MyItems() {
         .catch((e) => {
         })
     }
-    else if(localStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      const token = localStorage.getItem("PASAR_TOKEN");
+    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+      const token = sessionStorage.getItem("PASAR_TOKEN");
       const user = jwtDecode(token);
       const {name} = user;
       setDidInfo({'name': name, 'description': ''})
