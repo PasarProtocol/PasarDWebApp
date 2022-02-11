@@ -17,9 +17,9 @@ import CheckIcon from '@mui/icons-material/Check';
 // components
 import { MHidden, MIconButton } from '../../components/@material-extend';
 import Page from '../../components/Page';
+import LoadingWrapper from '../../components/LoadingWrapper';
 import LoadingScreen from '../../components/LoadingScreen';
 import AssetSortSelect from '../../components/AssetSortSelect';
-import LoadingWrapper from '../../components/LoadingWrapper';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
@@ -119,7 +119,7 @@ export default function MarketExplorer() {
   const [loadNext, setLoadNext] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
-  const [showCount, setShowCount] = React.useState(50);
+  const [showCount, setShowCount] = React.useState(30);
 
   const fetchMoreData = () => {
     if(!loadNext){
@@ -238,6 +238,7 @@ export default function MarketExplorer() {
   const closeFilter = (e)=>{
     setFilterView(!isFilterView&&1)
   }
+  const loadingSkeletons = Array(25).fill(null)
   return (
     <ScrollManager scrollKey="asset-list-key" isAlreadyMounted={isAlreadyMounted}>
       {({ connectScrollTarget, ...props }) => 
@@ -304,7 +305,7 @@ export default function MarketExplorer() {
                 </ToolbarStyle>
                 {isOffset && <ToolbarShadowStyle />}
               </AppBarStyle>
-              {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
+              {/* {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>} */}
               <Box sx={{ display: 'flex' }}>
                 <Box
                   component="nav"
@@ -353,7 +354,7 @@ export default function MarketExplorer() {
                       !isLoadingAssets&&!assets.length&&<Typography variant="h4" align='center'>No matching collectible found!</Typography>
                     }
                   >
-                    <AssetGrid assets={assets} dispmode={dispmode}/>
+                    <AssetGrid assets={!isLoadingAssets?assets:[...assets, ...loadingSkeletons]} dispmode={dispmode}/>
                   </InfiniteScroll>
                 </Box>
               </Box>

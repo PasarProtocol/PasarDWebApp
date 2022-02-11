@@ -372,6 +372,8 @@ export const getInfoFromDID = (did) => (
     DIDBackend.initialize(new DefaultDIDAdapter("https://api.elastos.io/eid"))
     const didObj = new DID(did)
     didObj.resolve(true).then(didDoc=>{
+      if(!didDoc)
+        resolve({})
       const credentials = didDoc.getCredentials()
       const properties = credentials.reduce((props, c) => {
         props[c.id.fragment] = c.subject.properties[c.id.fragment]
@@ -383,3 +385,5 @@ export const getInfoFromDID = (did) => (
     })
   })
 )
+
+export const getFullUrl = (url) => `${window.location.protocol}//${window.location.host}/${url}`
