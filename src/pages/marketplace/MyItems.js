@@ -96,10 +96,20 @@ export default function MyItems() {
     }
     // ----------------------------------------------------------
     if (params.address){
-      // getInfoFromDID('did:elastos:icZdMxZe6U1Exs6TFsKTzj2pY2JLznPhjC').then(info=>{
-      //   setDidInfo({'name': info.name, 'description': info.description})
-      // })
       setWalletAddress(params.address)
+      fetchFrom(`pasar/api/v1/getDidByAddress?address=${params.address}`)
+        .then((response) => {
+          response.json().then((jsonData) => {
+            if(jsonData.data.did)
+              getInfoFromDID(jsonData.data.did.did).then(info=>{
+                setDidInfo({'name': info.name?info.name:'', 'description': info.description?info.description:''})
+              })
+          })
+          .catch((e) => {
+          })
+        })
+        .catch((e) => {
+        })
     }
     else if(localStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
       const token = localStorage.getItem("PASAR_TOKEN");
