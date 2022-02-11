@@ -75,7 +75,7 @@ function MenuMobileItem(props) {
   }
 
   const openSignin = (path)=>{
-    if(localStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
       setOpenDownloadEssentialDlg(true)
     }
     else
@@ -84,7 +84,7 @@ function MenuMobileItem(props) {
   }
 
   if(path.startsWith("/create")) {
-    if(localStorage.getItem('PASAR_LINK_ADDRESS') === '2' && essentialsConnector.hasWalletConnectSession())
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && essentialsConnector.hasWalletConnectSession())
       return <ListItemStyle
         to={path}
         component={RouterLink}
