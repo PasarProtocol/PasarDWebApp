@@ -17,9 +17,9 @@ import CheckIcon from '@mui/icons-material/Check';
 // components
 import { MHidden, MIconButton } from '../../components/@material-extend';
 import Page from '../../components/Page';
+import LoadingWrapper from '../../components/LoadingWrapper';
 import LoadingScreen from '../../components/LoadingScreen';
 import AssetSortSelect from '../../components/AssetSortSelect';
-import LoadingWrapper from '../../components/LoadingWrapper';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';

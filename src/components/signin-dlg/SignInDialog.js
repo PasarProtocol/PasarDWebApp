@@ -175,7 +175,7 @@ export default function SignInDialog() {
         }).catch((error) => {
           setDiaUSD(0)
         })
-        getDiaTokenInfo(essentialProvider.accounts[0], essentialProvider).then(dia=>{
+        getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider).then(dia=>{
           setDiaBalance(dia)
         }).catch((error) => {
           setDiaBalance(0)
@@ -184,7 +184,7 @@ export default function SignInDialog() {
           setBalance(math.round(res / 1e18, 4));
         })
 
-        setWalletAddress(essentialProvider.accounts[0]);
+        setWalletAddress(essentialProvider.wc.accounts[0]);
       }
     }
   }, [sessionLinkFlag, account, active, chainId, activatingConnector]);
