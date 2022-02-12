@@ -54,7 +54,11 @@ export default function AssetFilterPan(props){
                 <Stack spacing={1} direction='row'>
                 {
                   [...btnNames].splice(0,2).map((name, index)=>(
+                    filterProps.selectedBtns?
                     <Button key={index} variant={filterProps.selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index)}>
+                      {name}
+                    </Button>:
+                    <Button key={index} variant="outlined" color="primary" onClick={()=>handleFilter('statype', index)}>
                       {name}
                     </Button>
                   ))
@@ -151,7 +155,11 @@ export default function AssetFilterPan(props){
                 <Stack spacing={1} direction='row'>
                 {
                   [...btnNames].splice(2).map((name, index)=>(
+                    filterProps.selectedBtns?
                     <Button key={index} variant={filterProps.selectedBtns.includes(index+2)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index+2)}>
+                      {name}
+                    </Button>:
+                    <Button key={index} variant="outlined" color="primary" onClick={()=>handleFilter('statype', index+2)}>
                       {name}
                     </Button>
                   ))
