@@ -50,11 +50,12 @@ export default function AssetCard(props) {
   const isUnlistedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType!=="Primary Sale"
 
   React.useEffect(() => {
-    getDiaTokenInfo(holder).then(dia=>{
-      if(dia!=='0')
-        setDiaBadge(true)
-    })
-  })
+    if(holder)
+      getDiaTokenInfo(holder).then(dia=>{
+        if(dia!=='0')
+          setDiaBadge(true)
+      })
+  }, []);
 
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);
