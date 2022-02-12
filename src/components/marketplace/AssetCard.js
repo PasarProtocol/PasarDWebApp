@@ -232,7 +232,7 @@ export default function AssetCard(props) {
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
           {
             (type===0||type===1||type===2&&isListedOwnedByMe||type===2&&isListedByOthers)&&
-            <Typography variant="h4" sx={{color: "origin.main"}}>
+            <Typography variant="h4" sx={{color: "origin.main"}} noWrap>
               <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
               &nbsp;{price} ELA
             </Typography>

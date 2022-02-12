@@ -157,13 +157,13 @@ export default function SignInDialog() {
   }, [sessionLinkFlag, activatingConnector]);
 
   React.useEffect(async () => {
-    console.log('session storage: ------', sessionStorage.getItem('PASAR_LINK_ADDRESS'));
-    console.log('session flag: ------', sessionLinkFlag);
-    console.log('activating connector: ------', activatingConnector);
-    console.log('account: ------', account);
-    console.log('active: ------', active);
-    console.log('chainId: ------', chainId);
-    console.log('connector: ------', connector);
+    // console.log('session storage: ------', sessionStorage.getItem('PASAR_LINK_ADDRESS'));
+    // console.log('session flag: ------', sessionLinkFlag);
+    // console.log('activating connector: ------', activatingConnector);
+    // console.log('account: ------', account);
+    // console.log('active: ------', active);
+    // console.log('chainId: ------', chainId);
+    // console.log('connector: ------', connector);
 
     initializeWalletConnection();
     getCoinUSD().then((res) => {

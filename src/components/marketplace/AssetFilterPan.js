@@ -26,7 +26,7 @@ const DrawerStyle = styled(Drawer)(({ theme }) => ({
 }));
 
 export default function AssetFilterPan(props){
-  const {sx, scrollMaxHeight, btnNames, selectedBtns, handleFilter} = props
+  const {sx, scrollMaxHeight, btnNames, filterProps, handleFilter} = props
   const minRef = useRef();
   const maxRef = useRef();
 
@@ -54,7 +54,7 @@ export default function AssetFilterPan(props){
                 <Stack spacing={1} direction='row'>
                 {
                   [...btnNames].splice(0,2).map((name, index)=>(
-                    <Button key={index} variant={selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index)}>
+                    <Button key={index} variant={filterProps.selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index)}>
                       {name}
                     </Button>
                   ))
@@ -96,13 +96,13 @@ export default function AssetFilterPan(props){
                   </Select>
                   <Grid container>
                     <Grid item xs={5} md={5}>
-                      <TextField label="Min" size="small" type="number" inputRef={minRef}/>
+                      <TextField label="Min" size="small" type="number" inputRef={minRef} defaultValue={filterProps.range?filterProps.range.min:''}/>
                     </Grid>
                     <Grid item xs={2} md={2} align="center">
                       <Typography variant="body2" sx={{pt: 1}}>to</Typography>
                     </Grid>
                     <Grid item xs={5} md={5}>
-                      <TextField label="Max" size="small" type="number" inputRef={maxRef}/>
+                      <TextField label="Max" size="small" type="number" inputRef={maxRef} defaultValue={filterProps.range?filterProps.range.max:''}/>
                     </Grid>
                   </Grid>
                   <Button variant="contained" color="primary" width="100%" onClick={applyRange}>
@@ -151,7 +151,7 @@ export default function AssetFilterPan(props){
                 <Stack spacing={1} direction='row'>
                 {
                   [...btnNames].splice(2).map((name, index)=>(
-                    <Button key={index} variant={selectedBtns.includes(index+2)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index+2)}>
+                    <Button key={index} variant={filterProps.selectedBtns.includes(index+2)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index+2)}>
                       {name}
                     </Button>
                   ))
@@ -170,6 +170,7 @@ export default function AssetFilterPan(props){
               </AccordionSummary>
               <AccordionDetails>
                 <FormControlLabel
+                  checked={filterProps.adult || false}
                   control={<CustomSwitch onChange={(e)=>{handleFilter('adult', e.target.checked)}}/>}
                   label="Off"
                   labelPlacement="end"
