@@ -6,6 +6,7 @@ export const essentialsConnector = new EssentialsConnector();
 let connectivityInitialized = false;
 
 export const initConnectivitySDK = () => {
+  // alert(connectivityInitialized)
   if (connectivityInitialized) return;
 
   console.log('Preparing the Elastos connectivity SDK');
@@ -18,7 +19,6 @@ export const initConnectivitySDK = () => {
   }
 
   connectivity.registerConnector(essentialsConnector).then(() => {
-    // alert(connectivityInitialized)
     connectivityInitialized = true;
 
     console.log('essentialsConnector', essentialsConnector);
@@ -26,12 +26,10 @@ export const initConnectivitySDK = () => {
 
     const hasLink = isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession();
     console.log('Has link to essentials?', hasLink);
-    // alert("hasLink", hasLink)
-    // alert("WC", JSON.stringify(essentialsConnector.getWalletConnectProvider().wc))
+    // alert(hasLink)
+    // alert(essentialsConnector.hasWalletConnectSession())
     // Restore the wallet connect session - TODO: should be done by the connector itself?
     if (hasLink && !essentialsConnector.getWalletConnectProvider().connected)
-      // alert(hasLink);
-      // alert(essentialsConnector.getWalletConnectProvider().connected)
       essentialsConnector.getWalletConnectProvider().enable();
   });
 }
