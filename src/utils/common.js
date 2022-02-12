@@ -386,4 +386,26 @@ export const getInfoFromDID = (did) => (
   })
 )
 
+export const getDidInfoFromAddress = (address) => (
+  new Promise((resolve, reject) => {
+    fetchFrom(`pasar/api/v1/getDidByAddress?address=${address}`)
+      .then((response) => {
+        response.json().then((jsonData) => {
+          if(jsonData.data.did)
+            getInfoFromDID(jsonData.data.did.did).then(info=>{
+              resolve(info)
+            })
+          else 
+            reject(new Error)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+      })
+      .catch((error) => {
+        reject(error)
+      })
+  })
+)
+
 export const getFullUrl = (url) => `${window.location.protocol}//${window.location.host}/${url}`

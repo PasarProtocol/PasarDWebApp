@@ -1,4 +1,3 @@
-// material
 import React from 'react';
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import {round} from 'mathjs'
@@ -33,7 +32,7 @@ import PurchaseDlg from '../../components/dialog/Purchase'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ScrollManager from '../../components/ScrollManager'
 import {blankAddress, marketContract} from '../../config'
-import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -112,6 +111,7 @@ export default function CollectibleDetail() {
 
   const [collectible, setCollectible] = React.useState({});
   const [diaBadge, setDiaBadge] = React.useState({creator: false, owner: false});
+  const [didName, setDidName] = React.useState({creator: '', owner: ''});
   const [isForAuction, setForAuction] = React.useState(false);
   const [transRecord, setTransRecord] = React.useState([]);
   const [bidList, setBidList] = React.useState([]);
@@ -157,6 +157,24 @@ export default function CollectibleDetail() {
         if(dia!=='0')
           setDiaBadgeOfUser('owner', true)
       })
+      if(jsonCollectible.data.royaltyOwner === jsonCollectible.data.holder){
+        getInfoFromDID(jsonCollectible.data.tokenDid.did).then(info=>{
+          if(info.name)
+            setDidName({creator: info.name, owner: info.name})
+        })
+      } else {
+        getInfoFromDID(jsonCollectible.data.tokenDid.did).then(info=>{
+          if(info.name)
+            setDidNameOfUser('creator', info.name)
+        })
+
+        getDidInfoFromAddress(jsonCollectible.data.holder)
+          .then((info) => {
+            setDidNameOfUser('owner', info.name || '')
+          })
+          .catch((e) => {
+          })
+      }
       if(jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0)
         setPropertiesAccordionOpen(true)
     }
@@ -212,6 +230,14 @@ export default function CollectibleDetail() {
       const tempDiaBadge = {...prevState};
       tempDiaBadge[type] = value;
       return tempDiaBadge;
+    });
+  };
+  
+  const setDidNameOfUser = (type, value) => {
+    setDidName((prevState) => {
+      const tempDidName = {...prevState};
+      tempDidName[type] = value;
+      return tempDidName;
     });
   };
 
@@ -403,7 +429,7 @@ export default function CollectibleDetail() {
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     <Link to={`/profile/others/${collectible.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
                       <Jazzicon address={collectible.royaltyOwner}/>
-                      {reduceHexAddress(collectible.royaltyOwner)}
+                      {didName.creator?didName.creator:reduceHexAddress(collectible.royaltyOwner)}
                     </Link>
                     <Stack spacing={.6} direction="row">
                       {
@@ -425,7 +451,7 @@ export default function CollectibleDetail() {
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     <Link to={`/profile/others/${collectible.holder}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
                       <Jazzicon address={collectible.holder}/>
-                      {reduceHexAddress(collectible.holder)}
+                      {didName.owner?didName.owner:reduceHexAddress(collectible.holder)}
                     </Link>
                     <Stack spacing={.6} direction="row">
                       {
@@ -578,7 +604,7 @@ export default function CollectibleDetail() {
                 <Typography variant="h5">History</Typography>
               </AccordionSummary>
               <AccordionDetails sx={{pb: '50px', position: 'relative', px: 4}}>
-                <CollectibleHistory isLoading={isLoadingTransRecord} dataList={transRecord}/>
+                <CollectibleHistory isLoading={isLoadingTransRecord} dataList={transRecord} creator={{address: collectible.royaltyOwner, name: didName.creator}}/>
                 <Button
                   to={`/explorer/collectible/detail/${collectible.tokenId}`}
                   size="small"

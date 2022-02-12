@@ -1,3 +1,4 @@
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
@@ -8,17 +9,35 @@ import palette from '../../theme/palette'
 
 // material
 import LoadingScreen from '../LoadingScreen';
-import { MethodList, reduceHexAddress } from '../../utils/common';
+import { MethodList, reduceHexAddress, getDidInfoFromAddress } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,
   isLast: PropTypes.bool.isRequired
 };
-function TransItem({ trans, isLast }) {
+function TransItem(props) {
+  const { trans, creator, isLast } = props
+  const [didName, setDidName] = React.useState('');
   const sx = isLast?{}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2};
   let methodItem = MethodList.find((item)=>item.method===trans.event)
-    if(!methodItem)
-        methodItem = {color: 'grey', icon: 'tag', detail: []}
+  if(!methodItem)
+      methodItem = {color: 'grey', icon: 'tag', detail: []}
+  const subject = trans[methodItem.verb.subject]
+  
+  React.useEffect(() => {
+    if(subject) {
+      if(subject === creator.address)
+        setDidName(creator.name)
+      else
+        getDidInfoFromAddress(subject)
+          .then((info) => {
+            setDidName(info.name)
+          })
+          .catch((e) => {
+          })
+    }
+  }, [creator]);
+
   return (
       <Stack direction="row" spacing={2} sx={sx}>
           <Link to={`/explorer/transaction/${trans.tHash}`} component={RouterLink} underline="none" sx={{borderRadius: 1}} >
@@ -36,7 +55,7 @@ function TransItem({ trans, isLast }) {
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
                 <Link to={`/explorer/transaction/detail/${trans.to}`} component={RouterLink}>
-                  {methodItem.verb.description==='Transferred'?'to':'by'} {reduceHexAddress(trans[methodItem.verb.subject])}
+                  {methodItem.verb.description==='Transferred'?'to':'by'} {didName || reduceHexAddress(subject)}
                 </Link>
               </Typography>
           </Box>
@@ -56,6 +75,7 @@ export default function CollectibleHistory(props) {
           <TransItem 
             key={index}
             trans={trans}
+            creator={props.creator}
             isLast={index===props.dataList.length-1}
           />
       ))}
