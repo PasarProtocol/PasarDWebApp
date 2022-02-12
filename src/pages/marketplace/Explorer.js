@@ -81,6 +81,7 @@ const FilterBtnContainerStyle = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1),
   justifyContent: 'center',
   backdropFilter: 'blur(6px)',
+  zIndex: 1,
   background: alpha(theme.palette.background.default, 0.5)
 }));
 const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
@@ -97,6 +98,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
   const sessionDispMode = sessionStorage.getItem("disp-mode")
+  const sessionFilterProps = JSON.parse(sessionStorage.getItem("filter-props")) || {}
   const params = useParams(); // params.key
   const drawerWidth = 360;
   const btnNames = ["Buy Now", "On Auction", "General", "Avatar"]
@@ -104,15 +106,15 @@ export default function MarketExplorer() {
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([]);
-  const [selectedBtns, setSelectedBtns] = React.useState([]);
-  const [range, setRange] = React.useState({min:'', max:''});
-  const [adult, setAdult] = React.useState(false);
+  const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
+  const [range, setRange] = React.useState(sessionFilterProps.range || {min:'', max:''});
+  const [adult, setAdult] = React.useState(sessionFilterProps.adult || false);
   const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
   const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):1);
   const [isFilterView, setFilterView] = React.useState(1);
-  const [filterForm, setFilterForm] = React.useState({selectedBtns:[]});
+  const [filterForm, setFilterForm] = React.useState({selectedBtns:[], ...sessionFilterProps});
   const [totalCount, setTotalCount] = React.useState(0);
-  const [order, setOrder] = React.useState(0);
+  const [order, setOrder] = React.useState(sessionFilterProps.order || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
 
@@ -167,6 +169,7 @@ export default function MarketExplorer() {
       if(e.code !== e.ABORT_ERR)
         setLoadingAssets(false);
     });
+    sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, adult, order}))
   }, [page, showCount, selectedBtns, adult, range, order, params.key]);
   
   const handleDispmode = (event, mode) => {
@@ -191,8 +194,8 @@ export default function MarketExplorer() {
       case 'statype':
         handleBtns(value)
         break
-      case 'clear_all':
-        setSelectedBtns([])
+      case 'selectedBtns':
+        setSelectedBtns(value)
         break
       case 'range':
         setRange(value)
@@ -225,10 +228,11 @@ export default function MarketExplorer() {
     setFilterForm(tempForm)
   }
   const applyFilterForm = (e)=>{
-    Object.keys(filterForm).forEach(key => handleFilter(key, filterForm[key]))
     const tempForm = {...filterForm}
     delete tempForm.statype
     delete tempForm.clear_all
+    console.log(tempForm)
+    Object.keys(tempForm).forEach(key => handleFilter(key, tempForm[key]))
     setFilterForm(tempForm)
     closeFilter(e)
   }
@@ -291,7 +295,7 @@ export default function MarketExplorer() {
                       </Stack>
                     </Box>
                     <Box sx={{display: 'flex'}}>
-                      <AssetSortSelect onChange={setOrder}/>
+                      <AssetSortSelect selected={order} onChange={setOrder}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
                           <GridViewSharpIcon />
@@ -324,7 +328,7 @@ export default function MarketExplorer() {
                     }}
                     scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
                     btnNames = {btnNames}
-                    selectedBtns = {selectedBtns}
+                    filterProps = {sessionFilterProps}
                     handleFilter = {handleFilter}
                   />
                 </Box>
@@ -334,7 +338,7 @@ export default function MarketExplorer() {
                 >
                   <MHidden width="mdUp">
                     <Box sx={{display: 'flex', pb: 1}}>
-                      <AssetSortSelect sx={{flex: 1}} onChange={setOrder}/>
+                      <AssetSortSelect selected={order} onChange={setOrder} sx={{flex: 1}}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
                           <SquareIcon />
@@ -354,7 +358,11 @@ export default function MarketExplorer() {
                       !isLoadingAssets&&!assets.length&&<Typography variant="h4" align='center'>No matching collectible found!</Typography>
                     }
                   >
-                    <AssetGrid assets={!isLoadingAssets?assets:[...assets, ...loadingSkeletons]} dispmode={dispmode}/>
+                    {
+                      !isLoadingAssets?
+                      <AssetGrid assets={assets} dispmode={dispmode}/>:
+                      <AssetGrid assets={loadNext?[...assets, ...loadingSkeletons]:loadingSkeletons} dispmode={dispmode}/>
+                    }
                   </InfiniteScroll>
                 </Box>
               </Box>
@@ -435,7 +443,7 @@ export default function MarketExplorer() {
                       sx={{
                       }}
                       btnNames = {btnNames}
-                      selectedBtns = {filterForm.selectedBtns}
+                      filterProps = {filterForm}
                       handleFilter = {handleFilterMobile}
                     />
                   </Scrollbar>

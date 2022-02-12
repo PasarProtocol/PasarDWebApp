@@ -512,7 +512,7 @@ export default function CollectibleDetail() {
           </Grid>
           <Grid item xs={12} sm={6}>
             <PaperStyle sx={{height: '100%', p: '15px 32px', position: 'relative'}}>
-              <Typography variant="h5" sx={{ my: 1 }}>Collectible Detail</Typography>
+              <Typography variant="h5" sx={{ my: 1 }}>Item Details</Typography>
               <AssetDetailInfo detail={collectible}/>
               <Button
                 to={`/explorer/collectible/detail/${collectible.tokenId}`}
@@ -597,7 +597,7 @@ export default function CollectibleDetail() {
               <PaperStyle sx={{position: 'relative'}}>
                 <Stack direction="row" sx={{alignItems: 'center'}}>
                   <Typography variant="h5" sx={{ my: 1, flex: 1 }}>
-                      Collectible analytics and transaction record
+                      Analytics and transaction record
                   </Typography>
                   <ArrowForwardIcon/>
                 </Stack>
