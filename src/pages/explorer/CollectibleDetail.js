@@ -154,7 +154,7 @@ export default function CollectibleDetail() {
           </Grid>
           <Grid item xs={12} sm={6}>
             <PaperStyle sx={{height: '100%', p: '15px 32px'}}>
-              <Typography variant="h5" sx={{ my: 1 }}>Collectible Detail</Typography>
+              <Typography variant="h5" sx={{ my: 1 }}>Item Details</Typography>
               <CarouselCustom pgsize={detailPageSize} detail={collectible}/>
             </PaperStyle>
           </Grid>

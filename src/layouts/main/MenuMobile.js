@@ -89,7 +89,7 @@ function MenuMobileItem(props) {
       return <ListItemStyle
         to={path}
         component={RouterLink}
-        end={path === '/'}
+        // end={path === '/'}
         sx={{
           '&.active': {
             color: 'primary.main',
@@ -102,7 +102,7 @@ function MenuMobileItem(props) {
         <ListItemText disableTypography primary={title} />
       </ListItemStyle>
     return <ListItemStyle
-        end={path === '/'}
+        // end={path === '/'}
         sx={{
           cursor: 'pointer',
           '&.active': {
@@ -123,7 +123,7 @@ function MenuMobileItem(props) {
       <ListItemStyle
         to={path}
         component={RouterLink}
-        end={path === '/'}
+        // end={path === '/'}
         sx={{
           '&.active': {
             color: 'primary.main',
