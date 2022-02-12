@@ -99,8 +99,11 @@ export default function CreateItem() {
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
   const navigate = useNavigate();
-  if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
-    navigate('/marketplace')
+
+  React.useEffect(async () => {
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+      navigate('/marketplace')
+  }, []);
 
   React.useEffect(async () => {
     if(mintype!=="Multiple")
@@ -243,7 +246,7 @@ export default function CreateItem() {
         cancelAction()
       });
     
-      if(localStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
+      if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
         reject(new Error)
         return
       }
@@ -987,6 +990,7 @@ export default function CreateItem() {
                         description={description}
                         price={price}
                         quantity={quantity}
+                        type={0}
                       />
                     )
                   )
