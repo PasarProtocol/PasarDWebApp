@@ -143,20 +143,7 @@ export default function SignInDialog() {
   const classes = useStyles();
 
   const initializeWalletConnection = React.useCallback(async () => {
-    if (sessionLinkFlag && !activatingConnector) {
-      if (sessionLinkFlag === '1') {
-        setActivatingConnector(injected);
-        activate(injected);
-      } else if (sessionLinkFlag === '2') {
-        setWalletAddress(await essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
-      } else if (sessionLinkFlag === '3') {
-        setActivatingConnector(walletconnect);
-        activate(walletconnect);
-      }
-    }
-  }, [sessionLinkFlag, activatingConnector]);
-
-  React.useEffect(async () => {
+    // console.log('-----------initialize wallet connection is called -----------------');
     // console.log('session storage: ------', sessionStorage.getItem('PASAR_LINK_ADDRESS'));
     // console.log('session flag: ------', sessionLinkFlag);
     // console.log('activating connector: ------', activatingConnector);
@@ -164,6 +151,36 @@ export default function SignInDialog() {
     // console.log('active: ------', active);
     // console.log('chainId: ------', chainId);
     // console.log('connector: ------', connector);
+    // console.log('-----------initialize wallet connection is called -----------------');
+
+    if (sessionLinkFlag && !activatingConnector) {
+      if (sessionLinkFlag === '1') {
+        setActivatingConnector(injected);
+        // await activate(injected);
+        await injected.activate();
+        setWalletAddress(await injected.getAccount());
+      } else if (sessionLinkFlag === '2') {
+        setActivatingConnector(essentialsConnector);
+        setWalletAddress(await essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+      } else if (sessionLinkFlag === '3') {
+        setActivatingConnector(walletconnect);
+        // await activate(walletconnect);
+        await walletconnect.activate();
+        setWalletAddress(await walletconnect.getAccount());
+      }
+    }
+  }, [sessionLinkFlag, activatingConnector, account, chainId]);
+
+  React.useEffect(async () => {
+    // console.log('-----------initialize wallet connection is called -----------------');
+    // console.log('session storage: ------', sessionStorage.getItem('PASAR_LINK_ADDRESS'));
+    // console.log('session flag: ------', sessionLinkFlag);
+    // console.log('activating connector: ------', activatingConnector);
+    // console.log('account: ------', account);
+    // console.log('active: ------', active);
+    // console.log('chainId: ------', chainId);
+    // console.log('connector: ------', connector);
+    // console.log('-----------initialize wallet connection is called -----------------');
 
     initializeWalletConnection();
     getCoinUSD().then((res) => {
@@ -195,7 +212,7 @@ export default function SignInDialog() {
         getBalance(library.provider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
         });
-        if (activatingConnector !== null) setWalletAddress(await activatingConnector.getAccount());
+        // if (activatingConnector !== null) setWalletAddress(await activatingConnector.getAccount());
       } else if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider()) {
         const essentialProvider = essentialsConnector.getWalletConnectProvider();
         getDiaTokenPrice(essentialProvider)
@@ -223,53 +240,77 @@ export default function SignInDialog() {
 
   // listen for disconnect from essentials / wallet connect
   React.useEffect(async () => {
-    if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && !active && activatingConnector !== null) {
-      setOpenAccountPopup(null);
-      await activate(null);
-      if (
-        sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
-        pasarLinkAddress === '1' ||
-        sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3' ||
-        pasarLinkAddress === '3'
-      ) {
-        activatingConnector
-          .close()
-          .then((res) => {})
-          .catch((e) => {
-            console.log(e);
-          });
+    if (sessionLinkFlag === '1') {
+      if (activatingConnector === injected && !active) {
+        setOpenAccountPopup(null);
+        await activate(null);
+        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || pasarLinkAddress === '1') {
+          try {
+            await activatingConnector.deactivate();
+          } catch (e) {
+            console.log('injected connector deactive error: ', e);
+          }
+        }
+        sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+        setPasarLinkAddress('0');
+        setActivatingConnector(null);
+        setWalletAddress(null);
+        navigate('/marketplace');
+        window.location.reload();
       }
-
-      sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-      setPasarLinkAddress('0');
-      setActivatingConnector(null);
-      setWalletAddress(null);
-      navigate('/marketplace');
-      window.location.reload();
-    } else if (
-      sessionLinkFlag === '2' &&
-      activatingConnector === essentialsConnector &&
-      !essentialsConnector.hasWalletConnectSession()
-    ) {
-      setOpenAccountPopup(null);
-      await activate(null);
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' || pasarLinkAddress === '2')
-        essentialsConnector
-          .disconnectWalletConnect()
-          .then((res) => {})
-          .catch((e) => {
-            console.log(e);
-          });
-      sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-      sessionStorage.removeItem('PASAR_TOKEN');
-      sessionStorage.removeItem('PASAR_DID');
-      setPasarLinkAddress('0');
-      setActivatingConnector(null);
-      setWalletAddress(null);
-      navigate('/marketplace');
-      window.location.reload();
+    } else if (sessionLinkFlag === '2') {
+      if (activatingConnector === essentialsConnector && !essentialsConnector.hasWalletConnectSession()) {
+        setOpenAccountPopup(null);
+        await activate(null);
+        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' || pasarLinkAddress === '2')
+          essentialsConnector
+            .disconnectWalletConnect()
+            .then((res) => {})
+            .catch((e) => {
+              console.log(e);
+            });
+        sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+        sessionStorage.removeItem('PASAR_TOKEN');
+        sessionStorage.removeItem('PASAR_DID');
+        setPasarLinkAddress('0');
+        setActivatingConnector(null);
+        setWalletAddress(null);
+        navigate('/marketplace');
+        window.location.reload();
+      }
+    } else if (sessionLinkFlag === '3') {
+      if (activatingConnector === walletconnect && !walletconnect.walletConnectProvider.connected) {
+        setOpenAccountPopup(null);
+        await activate(null);
+        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3' || pasarLinkAddress === '3') {
+          try {
+            await activatingConnector.deactivate();
+          } catch (e) {
+            console.log('walletconnect deactive error: ', e);
+          }
+        }
+        sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+        setPasarLinkAddress('0');
+        setActivatingConnector(null);
+        setWalletAddress(null);
+        navigate('/marketplace');
+        window.location.reload();
+      }
     }
   }, [essentialsConnector.hasWalletConnectSession(), active]);
+
+  // const printLogs = () => {
+  //   console.log('-----------initialize wallet connection is called -----------------');
+  //   console.log('session storage: ------', sessionStorage.getItem('PASAR_LINK_ADDRESS'));
+  //   console.log('session flag: ------', sessionLinkFlag);
+  //   console.log('activating connector: ------', activatingConnector);
+  //   console.log('account: ------', account);
+  //   console.log('active: ------', active);
+  //   console.log('chainId: ------', chainId);
+  //   console.log('connector: ------', connector);
+  //   console.log('connector: ------', activatingConnector.walletConnectProvider);
+  //   console.log('-----------initialize wallet connection is called -----------------');
+  // };
 
   useConnectivitySDK();
 
@@ -359,7 +400,7 @@ export default function SignInDialog() {
       try {
         await essentialsConnector.getWalletConnectProvider().disconnect();
       } catch (e) {
-        console.error("Error while trying to disconnect wallet connect session", e);
+        console.error('Error while trying to disconnect wallet connect session', e);
       }
       // return;
     }
@@ -461,6 +502,9 @@ export default function SignInDialog() {
 
   return (
     <>
+      {/* <Button id="test" variant="contained" onClick={printLogs}>
+        Test
+      </Button> */}
       {walletAddress ? (
         <>
           <MFab id="signin" size="small" onClick={openAccountMenu} onMouseEnter={openAccountMenu}>
