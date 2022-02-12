@@ -309,111 +309,83 @@ export default function SignInDialog() {
 
   // essentials wallet connection
   const connectWithEssentials = async () => {
-    await initConnectivitySDK();
-
-    const didAccess = new DID.DIDAccess();
-    // let presentation;
-    try {
-      const presentation = await didAccess.requestCredentials({
-        claims: [DID.simpleIdClaim('Your name', 'name', false)]
-      });
-
-      const did = presentation.getHolder().getMethodSpecificId() || '';
-      const resolverUrl = 'https://api.trinity-tech.cn/eid';
-      DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
-      // verify
-      const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
-      // const valid = await vp.isValid();
-      // if (!valid) {
-      //   console.log('Invalid presentation');
-      //   return;
-      // }
-      const sDid = vp.getHolder().toString();
-      if (!sDid) {
-        console.log('Unable to extract owner DID from the presentation');
-        return;
-      }
-      // Optional name
-      const nameCredential = vp.getCredential(`name`);
-      const name = nameCredential ? nameCredential.getSubject().getProperty('name') : '';
-      // Optional email
-      const emailCredential = vp.getCredential(`email`);
-      const email = emailCredential ? emailCredential.getSubject().getProperty('email') : '';
-      const user = {
-        sDid,
-        type: 'user',
-        name,
-        email,
-        canManageAdmins: false
-      };
-      // succeed
-      const token = jwt.sign(user, 'pasar', { expiresIn: 60 * 60 * 24 * 7 });
-      sessionStorage.setItem('PASAR_TOKEN', token);
-      sessionStorage.setItem('PASAR_DID', did);
-      sessionLinkFlag = '2';
-      sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
-      setPasarLinkAddress('2');
-      setOpenSigninDlg(false);
-      setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
-      setActivatingConnector(essentialsConnector);
-      setSigninEssentialSuccess(true);
-      if (afterSigninPath) {
-        setOpenSigninEssentialDlg(false);
-        navigate(afterSigninPath);
-        setAfterSigninPath(null);
-      }
-      // alert(sessionStorage.getItem('PASAR_LINK_ADDRESS'))
-      // alert(sessionStorage.getItem('PASAR_DID'))
-      // alert(sessionStorage.getItem('PASAR_TOKEN'))
-      // alert(walletAddress)
-      // alert(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
-      // alert(essentialsConnector.hasWalletConnectSession())
-
-    } catch (e) {
-      alert(e);
+    initConnectivitySDK();
+    setTimeout(async () => {
+      const didAccess = new DID.DIDAccess();
       try {
-        await essentialsConnector.getWalletConnectProvider().disconnect();
+        // alert(1);
+        const presentation = await didAccess.requestCredentials({
+          claims: [
+            DID.simpleIdClaim('Your name', 'name', false),
+            DID.simpleIdClaim('Your description', 'bio', false),
+            DID.simpleIdClaim('Your email', 'email', false)
+          ]
+        });
+        if (presentation) {
+          const did = presentation.getHolder().getMethodSpecificId() || '';
+          const resolverUrl = 'https://api.trinity-tech.cn/eid';
+          DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
+          // verify
+          const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
+          // const valid = await vp.isValid();
+          // if (!valid) {
+          //   console.log('Invalid presentation');
+          //   return;
+          // }
+          const sDid = vp.getHolder().toString();
+          if (!sDid) {
+            console.log('Unable to extract owner DID from the presentation');
+            return;
+          }
+          // Optional name
+          const nameCredential = vp.getCredential(`name`);
+          const name = nameCredential ? nameCredential.getSubject().getProperty('name') : '';
+          // Optional bio
+          const bioCredential = vp.getCredential(`bio`);
+          const bio = bioCredential ? bioCredential.getSubject().getProperty('bio') : '';
+          // Optional email
+          const emailCredential = vp.getCredential(`email`);
+          const email = emailCredential ? emailCredential.getSubject().getProperty('email') : '';
+          const user = {
+            sDid,
+            type: 'user',
+            bio,
+            name,
+            email,
+            canManageAdmins: false
+          };
+          // succeed
+          const token = jwt.sign(user, 'pasar', { expiresIn: 60 * 60 * 24 * 7 });
+          sessionStorage.setItem('PASAR_TOKEN', token);
+          sessionStorage.setItem('PASAR_DID', did);
+          sessionLinkFlag = '2';
+          sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
+          setPasarLinkAddress('2');
+          setOpenSigninDlg(false);
+          setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+          setActivatingConnector(essentialsConnector);
+          setSigninEssentialSuccess(true);
+          if (afterSigninPath) {
+            setOpenSigninEssentialDlg(false);
+            navigate(afterSigninPath);
+            setAfterSigninPath(null);
+          }
+          // alert(sessionStorage.getItem('PASAR_LINK_ADDRESS'))
+          // alert(sessionStorage.getItem('PASAR_DID'))
+          // alert(sessionStorage.getItem('PASAR_TOKEN'))
+          // alert(walletAddress)
+          // alert(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
+          // alert(essentialsConnector.hasWalletConnectSession())
+        }
       } catch (e) {
-        console.error('Error while trying to disconnect wallet connect session', e);
+        alert(e);
+        try {
+          await essentialsConnector.getWalletConnectProvider().disconnect();
+        } catch (e) {
+          console.error('Error while trying to disconnect wallet connect session', e);
+        }
       }
-      // return;
-    }
-
-    // if (presentation) {
-    //   const did = presentation.getHolder().getMethodSpecificId() || '';
-    //   fetchFrom('auth/api/v1/login', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(presentation.toJSON())
-    //   })
-    //     .then((response) => response.json())
-    //     .then((data) => {
-    //       if (data.code === 200) {
-    //         const token = data.data;
-    //         sessionStorage.setItem('PASAR_TOKEN', token);
-    //         sessionStorage.setItem('PASAR_DID', did);
-    //         const user = jwtDecode(token);
-    //         sessionLinkFlag = '2';
-    //         sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
-    //         setPasarLinkAddress('2');
-
-    //         setOpenSigninDlg(false);
-    //         setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
-    //         setActivatingConnector(essentialsConnector);
-    //         setSigninEssentialSuccess(true);
-    //         if (afterSigninPath) {
-    //           setOpenSigninEssentialDlg(false);
-    //           navigate(afterSigninPath);
-    //           setAfterSigninPath(null);
-    //         }
-    //       } else {
-    //         // console.log(data);
-    //       }
-    //     })
-    //     .catch((error) => {});
-    // }
+    }, 1000);
   };
 
   const handleClickOpenSinginDlg = () => {
