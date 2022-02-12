@@ -114,7 +114,7 @@ export default function MarketExplorer() {
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({selectedBtns:[], ...sessionFilterProps});
   const [totalCount, setTotalCount] = React.useState(0);
-  const [order, setOrder] = React.useState(0);
+  const [order, setOrder] = React.useState(sessionFilterProps.order || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
 
@@ -169,7 +169,7 @@ export default function MarketExplorer() {
       if(e.code !== e.ABORT_ERR)
         setLoadingAssets(false);
     });
-    sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, adult}))
+    sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, adult, order}))
   }, [page, showCount, selectedBtns, adult, range, order, params.key]);
   
   const handleDispmode = (event, mode) => {
@@ -295,7 +295,7 @@ export default function MarketExplorer() {
                       </Stack>
                     </Box>
                     <Box sx={{display: 'flex'}}>
-                      <AssetSortSelect onChange={setOrder}/>
+                      <AssetSortSelect selected={order} onChange={setOrder}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
                           <GridViewSharpIcon />
@@ -328,7 +328,6 @@ export default function MarketExplorer() {
                     }}
                     scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
                     btnNames = {btnNames}
-                    // selectedBtns = {selectedBtns}
                     filterProps = {sessionFilterProps}
                     handleFilter = {handleFilter}
                   />
@@ -339,7 +338,7 @@ export default function MarketExplorer() {
                 >
                   <MHidden width="mdUp">
                     <Box sx={{display: 'flex', pb: 1}}>
-                      <AssetSortSelect sx={{flex: 1}} onChange={setOrder}/>
+                      <AssetSortSelect selected={order} onChange={setOrder} sx={{flex: 1}}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
                           <SquareIcon />
@@ -445,7 +444,6 @@ export default function MarketExplorer() {
                       }}
                       btnNames = {btnNames}
                       filterProps = {filterForm}
-                      // selectedBtns = {filterForm.selectedBtns}
                       handleFilter = {handleFilterMobile}
                     />
                   </Scrollbar>

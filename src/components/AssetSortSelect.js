@@ -13,16 +13,17 @@ const MenuProps = {
     horizontal: "left"
   },
   variant: "menu"
-};
-export default function AssetSortSelect({ onChange, sx={} }) {
-  const [selected, setSelected] = useState(0);
+}
+const menuItems = ['Latest: Listed', 'Latest: Created', 'Oldest: Listed', 'Oldest: Created', 'Price: Low to High', 'Price: High to Low']
+
+export default function AssetSortSelect({ selected, onChange, sx={} }) {
   const handleChange = (event) => {
-    setSelected(event.target.value);
     onChange(event.target.value);
-  };
+  }
+  // 6: 'Auction Ending Soon'
   return (
     <Select
-      defaultValue={0}
+      // defaultValue={0}
       value={selected}
       onChange={handleChange}
       inputProps={{ 'aria-label': 'Without label' }}
@@ -30,17 +31,13 @@ export default function AssetSortSelect({ onChange, sx={} }) {
       sx={{mr: 1, ...sx}}
       MenuProps={MenuProps}
     >
-      <MenuItem value={0}>Latest: Listed</MenuItem>
-      <MenuItem value={1}>Latest: Created</MenuItem>
-      <MenuItem value={2}>Oldest: Listed</MenuItem>
-      <MenuItem value={3}>Oldest: Created</MenuItem>
-      <MenuItem value={4}>Price: Low to High</MenuItem>
-      <MenuItem value={5}>Price: High to Low</MenuItem>
-      {/* <MenuItem value={6}>Auction Ending Soon</MenuItem> */}
+      {
+        menuItems.map((type, i)=><MenuItem key={i} value={i} autoFocus={selected===i}>{type}</MenuItem>)
+      }
     </Select>
-  );
+  )
 }
 
 AssetSortSelect.propTypes = {
   onChange: PropTypes.func,
-};
+}
