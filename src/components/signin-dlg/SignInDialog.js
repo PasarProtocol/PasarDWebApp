@@ -40,7 +40,7 @@ import { DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
 import jwt from 'jsonwebtoken';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import { essentialsConnector, useConnectivitySDK, isUsingEssentialsConnector } from './EssentialConnectivity';
+import { essentialsConnector, initConnectivitySDK, isUsingEssentialsConnector } from './EssentialConnectivity';
 import { MIconButton, MFab } from '../@material-extend';
 import { injected, walletconnect, walletlink } from './connectors';
 import { useEagerConnect, useInactiveListener } from './hook';
@@ -143,16 +143,6 @@ export default function SignInDialog() {
   const classes = useStyles();
 
   const initializeWalletConnection = React.useCallback(async () => {
-    // console.log('-----------initialize wallet connection is called -----------------');
-    // console.log('session storage: ------', sessionStorage.getItem('PASAR_LINK_ADDRESS'));
-    // console.log('session flag: ------', sessionLinkFlag);
-    // console.log('activating connector: ------', activatingConnector);
-    // console.log('account: ------', account);
-    // console.log('active: ------', active);
-    // console.log('chainId: ------', chainId);
-    // console.log('connector: ------', connector);
-    // console.log('-----------initialize wallet connection is called -----------------');
-
     if (sessionLinkFlag && !activatingConnector) {
       if (sessionLinkFlag === '1') {
         setActivatingConnector(injected);
@@ -172,16 +162,6 @@ export default function SignInDialog() {
   }, [sessionLinkFlag, activatingConnector, account, chainId]);
 
   React.useEffect(async () => {
-    // console.log('-----------initialize wallet connection is called -----------------');
-    // console.log('session storage: ------', sessionStorage.getItem('PASAR_LINK_ADDRESS'));
-    // console.log('session flag: ------', sessionLinkFlag);
-    // console.log('activating connector: ------', activatingConnector);
-    // console.log('account: ------', account);
-    // console.log('active: ------', active);
-    // console.log('chainId: ------', chainId);
-    // console.log('connector: ------', connector);
-    // console.log('-----------initialize wallet connection is called -----------------');
-
     initializeWalletConnection();
     getCoinUSD().then((res) => {
       setCoinUSD(res);
@@ -299,21 +279,6 @@ export default function SignInDialog() {
     }
   }, [essentialsConnector.hasWalletConnectSession(), active]);
 
-  // const printLogs = () => {
-  //   console.log('-----------initialize wallet connection is called -----------------');
-  //   console.log('session storage: ------', sessionStorage.getItem('PASAR_LINK_ADDRESS'));
-  //   console.log('session flag: ------', sessionLinkFlag);
-  //   console.log('activating connector: ------', activatingConnector);
-  //   console.log('account: ------', account);
-  //   console.log('active: ------', active);
-  //   console.log('chainId: ------', chainId);
-  //   console.log('connector: ------', connector);
-  //   console.log('connector: ------', activatingConnector.walletConnectProvider);
-  //   console.log('-----------initialize wallet connection is called -----------------');
-  // };
-
-  useConnectivitySDK();
-
   // ------------ Connect Wallet ------------
   const handleChooseWallet = async (wallet) => {
     let currentConnector = null;
@@ -344,6 +309,8 @@ export default function SignInDialog() {
 
   // essentials wallet connection
   const connectWithEssentials = async () => {
+    await initConnectivitySDK();
+
     const didAccess = new DID.DIDAccess();
     // let presentation;
     try {
@@ -352,16 +319,15 @@ export default function SignInDialog() {
       });
 
       const did = presentation.getHolder().getMethodSpecificId() || '';
-
       const resolverUrl = 'https://api.trinity-tech.cn/eid';
       DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
       // verify
       const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
-      const valid = await vp.isValid();
-      if (!valid) {
-        console.log('Invalid presentation');
-        return;
-      }
+      // const valid = await vp.isValid();
+      // if (!valid) {
+      //   console.log('Invalid presentation');
+      //   return;
+      // }
       const sDid = vp.getHolder().toString();
       if (!sDid) {
         console.log('Unable to extract owner DID from the presentation');
@@ -388,7 +354,7 @@ export default function SignInDialog() {
       sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
       setPasarLinkAddress('2');
       setOpenSigninDlg(false);
-      setWalletAddress(essentialsConnector.getWalletConnectProvider().accounts[0]);
+      setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
       setActivatingConnector(essentialsConnector);
       setSigninEssentialSuccess(true);
       if (afterSigninPath) {
@@ -396,7 +362,15 @@ export default function SignInDialog() {
         navigate(afterSigninPath);
         setAfterSigninPath(null);
       }
+      // alert(sessionStorage.getItem('PASAR_LINK_ADDRESS'))
+      // alert(sessionStorage.getItem('PASAR_DID'))
+      // alert(sessionStorage.getItem('PASAR_TOKEN'))
+      // alert(walletAddress)
+      // alert(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
+      // alert(essentialsConnector.hasWalletConnectSession())
+
     } catch (e) {
+      alert(e);
       try {
         await essentialsConnector.getWalletConnectProvider().disconnect();
       } catch (e) {
@@ -502,9 +476,6 @@ export default function SignInDialog() {
 
   return (
     <>
-      {/* <Button id="test" variant="contained" onClick={printLogs}>
-        Test
-      </Button> */}
       {walletAddress ? (
         <>
           <MFab id="signin" size="small" onClick={openAccountMenu} onMouseEnter={openAccountMenu}>
