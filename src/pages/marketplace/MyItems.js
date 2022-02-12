@@ -24,7 +24,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
 import Jazzicon from '../../components/Jazzicon';
 import Badge from '../../components/Badge';
-import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID } from '../../utils/common';
+import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -97,16 +97,9 @@ export default function MyItems() {
     // ----------------------------------------------------------
     if (params.address){
       setWalletAddress(params.address)
-      fetchFrom(`pasar/api/v1/getDidByAddress?address=${params.address}`)
-        .then((response) => {
-          response.json().then((jsonData) => {
-            if(jsonData.data.did)
-              getInfoFromDID(jsonData.data.did.did).then(info=>{
-                setDidInfo({'name': info.name?info.name:'', 'description': info.description?info.description:''})
-              })
-          })
-          .catch((e) => {
-          })
+      getDidInfoFromAddress(params.address)
+        .then((info) => {
+          setDidInfo({'name': info.name || '', 'description': info.description || ''})
         })
         .catch((e) => {
         })
