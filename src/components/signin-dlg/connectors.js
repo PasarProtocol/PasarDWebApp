@@ -26,6 +26,7 @@ export const injected = new InjectedConnector({
 export const walletconnect = new WalletConnectConnector({
   rpc: { 1: RPC_URLS[1] },
   qrcode: true,
+  // supportedChainIds: [1, 3, 4, 5, 20, 21, 42, 10, 137, 69, 420, 80001],
 });
 
 export const walletlink = new WalletLinkConnector({
