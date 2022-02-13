@@ -347,79 +347,77 @@ export default function SignInDialog() {
   // essentials wallet connection
   const connectWithEssentials = async () => {
     initConnectivitySDK();
-    setTimeout(async () => {
-      if (isMobile) await activate(walletconnect);
-      const didAccess = new DID.DIDAccess();
-      try {
-        const presentation = await didAccess.requestCredentials({
-          claims: [
-            DID.simpleIdClaim('Your name', 'name', false),
-            DID.simpleIdClaim('Your description', 'bio', false)
-          ]
-        });
-        if (presentation) {
-          const did = presentation.getHolder().getMethodSpecificId() || '';
-          const resolverUrl = 'https://api.trinity-tech.cn/eid';
-          DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
-          // verify
-          const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
-          // const valid = await vp.isValid();
-          // if (!valid) {
-          //   console.log('Invalid presentation');
-          //   return;
-          // }
-          const sDid = vp.getHolder().toString();
-          if (!sDid) {
-            console.log('Unable to extract owner DID from the presentation');
-            return;
-          }
-          // Optional name
-          const nameCredential = vp.getCredential(`name`);
-          const name = nameCredential ? nameCredential.getSubject().getProperty('name') : '';
-          // Optional bio
-          const bioCredential = vp.getCredential(`bio`);
-          const bio = bioCredential ? bioCredential.getSubject().getProperty('bio') : '';
-          // // Optional email
-          // const emailCredential = vp.getCredential(`email`);
-          // const email = emailCredential ? emailCredential.getSubject().getProperty('email') : '';
-          const user = {
-            sDid,
-            type: 'user',
-            bio,
-            name,
-            // email,
-            canManageAdmins: false
-          };
-          // succeed
-          const token = jwt.sign(user, 'pasar', { expiresIn: 60 * 60 * 24 * 7 });
-          sessionStorage.setItem('PASAR_TOKEN', token);
-          sessionStorage.setItem('PASAR_DID', did);
-          sessionLinkFlag = '2';
-          sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
-          setOpenSigninDlg(false);
-          if (isMobile) {
-            setWalletAddress(await walletconnect.getAccount());
-            setActivatingConnector(walletconnect);
-          } else {
-            setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
-            setActivatingConnector(essentialsConnector);
-          }
-          setSigninEssentialSuccess(true);
-          if (afterSigninPath) {
-            setOpenSigninEssentialDlg(false);
-            navigate(afterSigninPath);
-            setAfterSigninPath(null);
-          }
+    if (isMobile) await activate(walletconnect);
+    const didAccess = new DID.DIDAccess();
+    try {
+      const presentation = await didAccess.requestCredentials({
+        claims: [
+          DID.simpleIdClaim('Your name', 'name', false),
+          DID.simpleIdClaim('Your description', 'bio', false)
+        ]
+      });
+      if (presentation) {
+        const did = presentation.getHolder().getMethodSpecificId() || '';
+        const resolverUrl = 'https://api.trinity-tech.cn/eid';
+        DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
+        // verify
+        const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
+        // const valid = await vp.isValid();
+        // if (!valid) {
+        //   console.log('Invalid presentation');
+        //   return;
+        // }
+        const sDid = vp.getHolder().toString();
+        if (!sDid) {
+          console.log('Unable to extract owner DID from the presentation');
+          return;
         }
-      } catch (e) {
-        try {
-          if (isMobile) await essentialsConnector.getWalletConnectProvider().disconnect();
-          else await activatingConnector.deactivate();
-        } catch (e) {
-          console.error('Error while trying to disconnect wallet connect session', e);
+        // Optional name
+        const nameCredential = vp.getCredential(`name`);
+        const name = nameCredential ? nameCredential.getSubject().getProperty('name') : '';
+        // Optional bio
+        const bioCredential = vp.getCredential(`bio`);
+        const bio = bioCredential ? bioCredential.getSubject().getProperty('bio') : '';
+        // // Optional email
+        // const emailCredential = vp.getCredential(`email`);
+        // const email = emailCredential ? emailCredential.getSubject().getProperty('email') : '';
+        const user = {
+          sDid,
+          type: 'user',
+          bio,
+          name,
+          // email,
+          canManageAdmins: false
+        };
+        // succeed
+        const token = jwt.sign(user, 'pasar', { expiresIn: 60 * 60 * 24 * 7 });
+        sessionStorage.setItem('PASAR_TOKEN', token);
+        sessionStorage.setItem('PASAR_DID', did);
+        sessionLinkFlag = '2';
+        sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
+        setOpenSigninDlg(false);
+        if (isMobile) {
+          setWalletAddress(await walletconnect.getAccount());
+          setActivatingConnector(walletconnect);
+        } else {
+          setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+          setActivatingConnector(essentialsConnector);
+        }
+        setSigninEssentialSuccess(true);
+        if (afterSigninPath) {
+          setOpenSigninEssentialDlg(false);
+          navigate(afterSigninPath);
+          setAfterSigninPath(null);
         }
       }
-    }, 1000);
+    } catch (e) {
+      try {
+        if (isMobile) await essentialsConnector.getWalletConnectProvider().disconnect();
+        else await activatingConnector.deactivate();
+      } catch (e) {
+        console.error('Error while trying to disconnect wallet connect session', e);
+      }
+    }
   };
 
   const handleClickOpenSinginDlg = () => {
