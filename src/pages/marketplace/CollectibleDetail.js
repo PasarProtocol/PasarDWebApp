@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import {round} from 'mathjs'
+import { isMobile } from 'react-device-detect';
 import Lightbox from 'react-image-lightbox';
 import { FacebookShareButton, TwitterShareButton, FacebookIcon, TwitterIcon } from "react-share";
 import { Icon } from '@iconify/react';
@@ -30,6 +31,7 @@ import Badge from '../../components/Badge';
 import Jazzicon from '../../components/Jazzicon';
 import PurchaseDlg from '../../components/dialog/Purchase'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
 import {blankAddress, marketContract} from '../../config'
 import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress } from '../../utils/common';
@@ -133,13 +135,17 @@ export default function CollectibleDetail() {
     setSignin(!!sessionLinkFlag)
   }, [sessionStorage.getItem('PASAR_LINK_ADDRESS')]);
 
-  React.useEffect(async() => {
+  React.useEffect(() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
     if(sessionLinkFlag){
       if(sessionLinkFlag==='1')
         setAddress(account)
-      if(sessionLinkFlag==='2' && essentialsConnector.getWalletConnectProvider())
-        setAddress(essentialsConnector.getWalletConnectProvider().accounts[0])
+      if(sessionLinkFlag==='2'){
+        if (isMobile)
+          walletconnect.getAccount().then(setAddress)
+        else if(essentialsConnector.getWalletConnectProvider())
+          setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
+      }
     }
   }, [account]);
   React.useEffect(async () => {

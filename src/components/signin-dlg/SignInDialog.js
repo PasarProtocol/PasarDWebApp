@@ -1,25 +1,7 @@
 import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Dialog,
-  Stack,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  Alert,
-  DialogContentText,
-  IconButton,
-  Typography,
-  Grid,
-  Avatar,
-  Box,
-  Link,
-  Menu,
-  MenuItem
-} from '@mui/material';
+import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
 import * as math from 'mathjs';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
@@ -154,7 +136,7 @@ export default function SignInDialog() {
           setWalletAddress(await walletconnect.getAccount());
         } else {
           setActivatingConnector(essentialsConnector);
-          setWalletAddress(await essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+          setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
         }
       } else if (sessionLinkFlag === '3') {
         setActivatingConnector(walletconnect);
@@ -362,11 +344,11 @@ export default function SignInDialog() {
         DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
         // verify
         const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
-        // const valid = await vp.isValid();
-        // if (!valid) {
-        //   console.log('Invalid presentation');
-        //   return;
-        // }
+        const valid = await vp.isValid();
+        if (!valid) {
+          console.log('Invalid presentation');
+          return;
+        }
         const sDid = vp.getHolder().toString();
         if (!sDid) {
           console.log('Unable to extract owner DID from the presentation');

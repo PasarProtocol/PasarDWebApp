@@ -16,6 +16,7 @@ import { useWeb3React } from '@web3-react/core';
 import jwtDecode from 'jwt-decode';
 // components
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import { walletconnect } from '../../components/signin-dlg/connectors';
 import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
@@ -82,7 +83,11 @@ export default function MyItems() {
   const triedEager = useEagerConnect();
   React.useEffect(async() => {
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      const strWalletAddress = await essentialsConnector.getWalletConnectProvider().wc.accounts[0];
+      let strWalletAddress = ''
+      if (isMobile)
+        strWalletAddress = await walletconnect.getAccount()
+      else if(essentialsConnector.getWalletConnectProvider())
+        [strWalletAddress] = essentialsConnector.getWalletConnectProvider().wc.accounts;
       setMyAddress(strWalletAddress)
       setWalletAddress(strWalletAddress);
 
