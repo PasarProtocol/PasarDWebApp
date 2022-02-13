@@ -53,7 +53,8 @@ import {
   getCoinUSD,
   getDiaTokenInfo,
   getDiaTokenPrice,
-  fetchFrom
+  fetchFrom,
+  checkIsMobile
 } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
 import useSingin from '../../hooks/useSignin';
@@ -148,7 +149,7 @@ export default function SignInDialog() {
         await injected.activate();
         setWalletAddress(await injected.getAccount());
       } else if (sessionLinkFlag === '2') {
-        if (isMobile) {
+        if (checkIsMobile) {
           setActivatingConnector(walletconnect);
           await walletconnect.activate();
           setWalletAddress(await walletconnect.getAccount());
@@ -198,7 +199,7 @@ export default function SignInDialog() {
         });
         // if (activatingConnector !== null) setWalletAddress(await activatingConnector.getAccount());
       } else if (sessionLinkFlag === '2') {
-        if (isMobile) {
+        if (checkIsMobile) {
           if (library) {
             getDiaTokenPrice(library.provider)
               .then((res) => {
@@ -264,7 +265,7 @@ export default function SignInDialog() {
         window.location.reload();
       }
     } else if (sessionLinkFlag === '2') {
-      if (isMobile) {
+      if (checkIsMobile) {
         if (activatingConnector === walletconnect && !walletconnect.walletConnectProvider.connected) {
           setOpenAccountPopup(null);
           await activate(null);
@@ -348,7 +349,7 @@ export default function SignInDialog() {
   const connectWithEssentials = async () => {
     initConnectivitySDK();
     setTimeout(async () => {
-      if (isMobile) await activate(walletconnect);
+      if (checkIsMobile) await activate(walletconnect);
       const didAccess = new DID.DIDAccess();
       try {
         const presentation = await didAccess.requestCredentials({
@@ -397,7 +398,7 @@ export default function SignInDialog() {
           sessionLinkFlag = '2';
           sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
           setOpenSigninDlg(false);
-          if (isMobile) {
+          if (checkIsMobile) {
             setWalletAddress(await walletconnect.getAccount());
             setActivatingConnector(walletconnect);
           } else {
@@ -413,7 +414,7 @@ export default function SignInDialog() {
         }
       } catch (e) {
         try {
-          if (isMobile) await essentialsConnector.getWalletConnectProvider().disconnect();
+          if (checkIsMobile) await essentialsConnector.getWalletConnectProvider().disconnect();
           else await activatingConnector.deactivate();
         } catch (e) {
           console.error('Error while trying to disconnect wallet connect session', e);
