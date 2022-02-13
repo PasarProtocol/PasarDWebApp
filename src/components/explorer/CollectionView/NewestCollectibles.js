@@ -65,7 +65,7 @@ export default function NewestCollectibles(props) {
             news={{
               image: getAssetImage(collectible, true),
               title: collectible.name,
-              creator: collectible.holder,
+              creator: collectible.royaltyOwner,
               postedAt: collectible.createTime*1000,
               tokenId: collectible.tokenId,
               tokenIdHex: collectible.tokenIdHex
