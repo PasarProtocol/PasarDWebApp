@@ -16,3 +16,6 @@
   font-style: normal;
   src: local('CircularStd'), url('CircularStd-Bold.otf') format('opentype');
 }
+.walletconnect-modal__mobile__toggle a {
+  color: black;
+}
