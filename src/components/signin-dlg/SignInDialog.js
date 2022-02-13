@@ -280,9 +280,10 @@ export default function SignInDialog() {
     setOpenSigninDlg(false);
   };
 
+  if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') 
+    initConnectivitySDK();
   // essentials wallet connection
   const connectWithEssentials = async () => {
-    initConnectivitySDK();
     const didAccess = new DID.DIDAccess();
     // let presentation;
     try {
