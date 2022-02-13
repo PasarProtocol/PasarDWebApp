@@ -51,7 +51,7 @@ export default function Explorer() {
       <Container maxWidth="lg">
         <Stack spacing={6} sx={{ mb: 3 }}>
           <MHidden width="mdDown">
-            <SearchBox />
+            <SearchBox sx={{m: 'auto'}} />
           </MHidden>
           <StatisticPanel />
         </Stack>

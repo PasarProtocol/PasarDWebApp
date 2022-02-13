@@ -1,11 +1,13 @@
+import { useRef } from "react";
 import { motion } from 'framer-motion';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import searchFill from '@iconify/icons-eva/search-fill';
+import closeFill from '@iconify/icons-eva/close-fill';
 // material
 import { styled } from '@mui/material/styles';
-import { Box, alpha, Container, OutlinedInput, InputAdornment } from '@mui/material';
+import { Box, alpha, Container, OutlinedInput, InputAdornment, IconButton } from '@mui/material';
 //
 
 const ContentStyle = styled('div')(({ theme }) => ({
@@ -50,42 +52,56 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx, needbgcolor }) => {
     }
   })
 });
-
+const defaultPlaceHolder = "Search name, description, address and token ID"
 // ----------------------------------------------------------------------
-export default function SearchBox({placeholder, sx, outersx, rootsx, onChange, needbgcolor=false}) {
+export default function SearchBox({placeholder, sx, onChange, needbgcolor=false}) {
   const params = useParams(); // params.key
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  if(!pathname.startsWith('/explorer'))
+  const ref = useRef()
+  if(placeholder === defaultPlaceHolder && !pathname.startsWith('/explorer'))
     placeholder = 'Search items, creators and token ID'
   const handleChange = (e)=>{
     if(e.which===13) { // press enter
-      if(onChange)
-        onChange(e.target.value)
-      else
-        if(pathname.startsWith('/explorer'))
-          navigate(`/explorer/search/${e.target.value}`);
-        else
-          navigate(`/marketplace/search/${e.target.value}`);
+      changeAction(e.target.value)
     }
   }
+  const clearSearch = (e)=>{
+    if(ref.current){
+      ref.current.value = ''
+      ref.current.focus()
+    }
+  }
+  const changeAction = (value)=>{
+    if(onChange)
+      onChange(value)
+    else
+      if(pathname.startsWith('/explorer'))
+        navigate(`/explorer/search/${value}`);
+      else
+        navigate(`/marketplace/search/${value}`);
+  }
   return (
-      <Container maxWidth="lg" sx={{ height: '100%', width: 'auto', ...rootsx}}>
-          <ContentStyle sx={{...outersx}}>
-              <SearchStyle
-                placeholder={placeholder}
-                onKeyPress={handleChange}
-                defaultValue={params.key}
-                startAdornment={
-                  <InputAdornment position="start">
-                    <Box component={Icon} icon={searchFill} sx={{ color: 'text.disabled' }} />
-                  </InputAdornment>
-                }
-                sx = {sx}
-                needbgcolor = {needbgcolor?1:0}
-              />
-          </ContentStyle>
-      </Container>
+    <SearchStyle
+      inputRef={ref}
+      defaultValue={params.key}
+      placeholder={placeholder}
+      onKeyPress={handleChange}
+      startAdornment={
+        <InputAdornment position="start">
+          <Box component={Icon} icon={searchFill} sx={{ color: 'text.disabled' }} />
+        </InputAdornment>
+      }
+      endAdornment={
+        <InputAdornment position="end">
+          <IconButton size='small' onClick={clearSearch}>
+            <Box component={Icon} icon={closeFill} sx={{ color: 'text.disabled' }}/>
+          </IconButton>
+        </InputAdornment>
+      }
+      sx = {{width: 550, ...sx}}
+      needbgcolor = {needbgcolor?1:0}
+    />
   );
 }
 
@@ -95,6 +111,5 @@ SearchBox.propTypes = {
     sx: PropTypes.object
 };
 SearchBox.defaultProps = {
-    placeholder: "Search name, description, address and token ID",
-    sx: {width: 550}
+    placeholder: defaultPlaceHolder,
 };
