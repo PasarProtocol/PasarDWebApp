@@ -89,13 +89,11 @@ export default function SignInDialog() {
     openDownloadEssential,
     afterSigninPath,
     diaBalance,
-    pasarLinkAddress,
     setOpenSigninEssentialDlg,
     setOpenDownloadEssentialDlg,
     setAfterSigninPath,
     setSigninEssentialSuccess,
-    setDiaBalance,
-    setPasarLinkAddress
+    setDiaBalance
   } = useSingin();
   const { pathname } = useLocation();
   const isHome = pathname === '/';
@@ -126,7 +124,7 @@ export default function SignInDialog() {
       }
   );
 
-  let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS') || pasarLinkAddress;
+  let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
   const context = useWeb3React();
   const { connector, activate, active, error, library, chainId, account } = context;
   const [isOpenSnackbar, setSnackbarOpen] = useState(false);
@@ -150,8 +148,14 @@ export default function SignInDialog() {
         await injected.activate();
         setWalletAddress(await injected.getAccount());
       } else if (sessionLinkFlag === '2') {
-        setActivatingConnector(essentialsConnector);
-        setWalletAddress(await essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+        if (isMobile) {
+          setActivatingConnector(walletconnect);
+          await walletconnect.activate();
+          setWalletAddress(await walletconnect.getAccount());
+        } else {
+          setActivatingConnector(essentialsConnector);
+          setWalletAddress(await essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+        }
       } else if (sessionLinkFlag === '3') {
         setActivatingConnector(walletconnect);
         // await activate(walletconnect);
@@ -171,7 +175,7 @@ export default function SignInDialog() {
       setSnackbarOpen(true);
     }
 
-    sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS') || pasarLinkAddress;
+    sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     if (sessionLinkFlag) {
       // when connected
       if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
@@ -193,27 +197,49 @@ export default function SignInDialog() {
           setBalance(math.round(res / 1e18, 4));
         });
         // if (activatingConnector !== null) setWalletAddress(await activatingConnector.getAccount());
-      } else if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider()) {
-        const essentialProvider = essentialsConnector.getWalletConnectProvider();
-        getDiaTokenPrice(essentialProvider)
-          .then((res) => {
-            setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
-          })
-          .catch((error) => {
-            setDiaUSD(0);
+      } else if (sessionLinkFlag === '2') {
+        if (isMobile) {
+          if (library) {
+            getDiaTokenPrice(library.provider)
+              .then((res) => {
+                setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
+              })
+              .catch((error) => {
+                setDiaUSD(0);
+              });
+            getDiaTokenInfo(account, library.provider)
+              .then((dia) => {
+                setDiaBalance(dia);
+              })
+              .catch((error) => {
+                setDiaBalance(0);
+              });
+            getBalance(library.provider).then((res) => {
+              setBalance(math.round(res / 1e18, 4));
+            });
+          }
+        } else if (essentialsConnector.getWalletConnectProvider()) {
+          const essentialProvider = essentialsConnector.getWalletConnectProvider();
+          getDiaTokenPrice(essentialProvider)
+            .then((res) => {
+              setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
+            })
+            .catch((error) => {
+              setDiaUSD(0);
+            });
+          getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
+            .then((dia) => {
+              setDiaBalance(dia);
+            })
+            .catch((error) => {
+              setDiaBalance(0);
+            });
+          getBalance(essentialProvider).then((res) => {
+            setBalance(math.round(res / 1e18, 4));
           });
-        getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-          .then((dia) => {
-            setDiaBalance(dia);
-          })
-          .catch((error) => {
-            setDiaBalance(0);
-          });
-        getBalance(essentialProvider).then((res) => {
-          setBalance(math.round(res / 1e18, 4));
-        });
 
-        setWalletAddress(essentialProvider.wc.accounts[0]);
+          setWalletAddress(essentialProvider.wc.accounts[0]);
+        }
       }
     }
   }, [sessionLinkFlag, account, active, chainId, activatingConnector]);
@@ -224,7 +250,7 @@ export default function SignInDialog() {
       if (activatingConnector === injected && !active) {
         setOpenAccountPopup(null);
         await activate(null);
-        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || pasarLinkAddress === '1') {
+        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1') {
           try {
             await activatingConnector.deactivate();
           } catch (e) {
@@ -232,17 +258,33 @@ export default function SignInDialog() {
           }
         }
         sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-        setPasarLinkAddress('0');
         setActivatingConnector(null);
         setWalletAddress(null);
         navigate('/marketplace');
         window.location.reload();
       }
     } else if (sessionLinkFlag === '2') {
-      if (activatingConnector === essentialsConnector && !essentialsConnector.hasWalletConnectSession()) {
+      if (isMobile) {
+        if (activatingConnector === walletconnect && !walletconnect.walletConnectProvider.connected) {
+          setOpenAccountPopup(null);
+          await activate(null);
+          if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+            try {
+              await activatingConnector.deactivate();
+            } catch (e) {
+              console.log('walletconnect deactive error: ', e);
+            }
+          }
+          sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+          setActivatingConnector(null);
+          setWalletAddress(null);
+          navigate('/marketplace');
+          window.location.reload();
+        }
+      } else if (activatingConnector === essentialsConnector && !essentialsConnector.hasWalletConnectSession()) {
         setOpenAccountPopup(null);
         await activate(null);
-        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' || pasarLinkAddress === '2')
+        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
           essentialsConnector
             .disconnectWalletConnect()
             .then((res) => {})
@@ -252,7 +294,6 @@ export default function SignInDialog() {
         sessionStorage.removeItem('PASAR_LINK_ADDRESS');
         sessionStorage.removeItem('PASAR_TOKEN');
         sessionStorage.removeItem('PASAR_DID');
-        setPasarLinkAddress('0');
         setActivatingConnector(null);
         setWalletAddress(null);
         navigate('/marketplace');
@@ -262,7 +303,7 @@ export default function SignInDialog() {
       if (activatingConnector === walletconnect && !walletconnect.walletConnectProvider.connected) {
         setOpenAccountPopup(null);
         await activate(null);
-        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3' || pasarLinkAddress === '3') {
+        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
           try {
             await activatingConnector.deactivate();
           } catch (e) {
@@ -270,7 +311,6 @@ export default function SignInDialog() {
           }
         }
         sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-        setPasarLinkAddress('0');
         setActivatingConnector(null);
         setWalletAddress(null);
         navigate('/marketplace');
@@ -292,15 +332,12 @@ export default function SignInDialog() {
     if (wallet === 'metamask') {
       sessionLinkFlag = '1';
       sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
-      setPasarLinkAddress('1');
     } else if (wallet === 'walletconnect') {
       sessionLinkFlag = '3';
       sessionStorage.setItem('PASAR_LINK_ADDRESS', 3);
-      setPasarLinkAddress('3');
     } else if (wallet === 'walletlink') {
       sessionLinkFlag = '4';
       sessionStorage.setItem('PASAR_LINK_ADDRESS', 4);
-      setPasarLinkAddress('4');
     }
     // }
     setWalletAddress(await currentConnector.getAccount());
@@ -311,14 +348,13 @@ export default function SignInDialog() {
   const connectWithEssentials = async () => {
     initConnectivitySDK();
     setTimeout(async () => {
+      if (isMobile) await activate(walletconnect);
       const didAccess = new DID.DIDAccess();
       try {
-        // alert(1);
         const presentation = await didAccess.requestCredentials({
           claims: [
             DID.simpleIdClaim('Your name', 'name', false),
-            DID.simpleIdClaim('Your description', 'bio', false),
-            DID.simpleIdClaim('Your email', 'email', false)
+            DID.simpleIdClaim('Your description', 'bio', false)
           ]
         });
         if (presentation) {
@@ -343,15 +379,15 @@ export default function SignInDialog() {
           // Optional bio
           const bioCredential = vp.getCredential(`bio`);
           const bio = bioCredential ? bioCredential.getSubject().getProperty('bio') : '';
-          // Optional email
-          const emailCredential = vp.getCredential(`email`);
-          const email = emailCredential ? emailCredential.getSubject().getProperty('email') : '';
+          // // Optional email
+          // const emailCredential = vp.getCredential(`email`);
+          // const email = emailCredential ? emailCredential.getSubject().getProperty('email') : '';
           const user = {
             sDid,
             type: 'user',
             bio,
             name,
-            email,
+            // email,
             canManageAdmins: false
           };
           // succeed
@@ -360,27 +396,25 @@ export default function SignInDialog() {
           sessionStorage.setItem('PASAR_DID', did);
           sessionLinkFlag = '2';
           sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
-          setPasarLinkAddress('2');
           setOpenSigninDlg(false);
-          setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
-          setActivatingConnector(essentialsConnector);
+          if (isMobile) {
+            setWalletAddress(await walletconnect.getAccount());
+            setActivatingConnector(walletconnect);
+          } else {
+            setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+            setActivatingConnector(essentialsConnector);
+          }
           setSigninEssentialSuccess(true);
           if (afterSigninPath) {
             setOpenSigninEssentialDlg(false);
             navigate(afterSigninPath);
             setAfterSigninPath(null);
           }
-          // alert(sessionStorage.getItem('PASAR_LINK_ADDRESS'))
-          // alert(sessionStorage.getItem('PASAR_DID'))
-          // alert(sessionStorage.getItem('PASAR_TOKEN'))
-          // alert(walletAddress)
-          // alert(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
-          // alert(essentialsConnector.hasWalletConnectSession())
         }
       } catch (e) {
-        alert(e);
         try {
-          await essentialsConnector.getWalletConnectProvider().disconnect();
+          if (isMobile) await essentialsConnector.getWalletConnectProvider().disconnect();
+          else await activatingConnector.deactivate();
         } catch (e) {
           console.error('Error while trying to disconnect wallet connect session', e);
         }
@@ -428,7 +462,7 @@ export default function SignInDialog() {
     setOpenAccountPopup(null);
     if (e.target.getAttribute('value') === 'signout') {
       await activate(null);
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' || pasarLinkAddress === '2')
+      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
         essentialsConnector
           .disconnectWalletConnect()
           .then((res) => {})
@@ -439,7 +473,6 @@ export default function SignInDialog() {
       setSigninEssentialSuccess(false);
       sessionStorage.removeItem('PASAR_TOKEN');
       sessionStorage.removeItem('PASAR_DID');
-      setPasarLinkAddress('0');
       setActivatingConnector(null);
       setWalletAddress(null);
       navigate('/marketplace');
