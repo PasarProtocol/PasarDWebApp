@@ -83,23 +83,18 @@ export default function MyItems() {
   const triedEager = useEagerConnect();
   React.useEffect(async() => {
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      let strWalletAddress = ''
-      if (isMobile)
-        strWalletAddress = await walletconnect.getAccount()
-      else if(essentialsConnector.getWalletConnectProvider())
-        [strWalletAddress] = essentialsConnector.getWalletConnectProvider().wc.accounts;
+      const strWalletAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0];
       setMyAddress(strWalletAddress)
       setWalletAddress(strWalletAddress);
-
     }
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
       setMyAddress(account)
       setWalletAddress(account);
     }
     else if (sessionStorage.getItem("PASAR_LINK_ADDRESS") === '3') {
-      const tempAddress = await walletconnect.getAccount()
-      setMyAddress(tempAddress)
-      setWalletAddress(tempAddress);
+      const strWalletAddress = await walletconnect.getAccount()
+      setMyAddress(strWalletAddress)
+      setWalletAddress(strWalletAddress);
     }
     else if(!params.address) {
       navigate('/marketplace');
@@ -230,7 +225,7 @@ export default function MyItems() {
               <Typography variant="subtitle2" noWrap sx={{color: 'text.secondary'}}>{didInfo.description}</Typography>
             }
           </Typography>
-          <Box sx={{display: 'flex', justifyContent: 'center'}}>
+          <Box sx={{display: 'flex', justifyContent: 'center', pt: 1}}>
           {
             diaBadge&&
             <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>

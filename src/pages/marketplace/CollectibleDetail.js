@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import {round} from 'mathjs'
-import { isMobile } from 'react-device-detect';
 import Lightbox from 'react-image-lightbox';
 import { FacebookShareButton, TwitterShareButton, FacebookIcon, TwitterIcon } from "react-share";
 import { Icon } from '@iconify/react';
@@ -135,20 +134,15 @@ export default function CollectibleDetail() {
     setSignin(!!sessionLinkFlag)
   }, [sessionStorage.getItem('PASAR_LINK_ADDRESS')]);
 
-  React.useEffect(() => {
+  React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
     if(sessionLinkFlag){
       if(sessionLinkFlag==='1')
         setAddress(account)
-      if(sessionLinkFlag==='2'){
-        if (isMobile)
-          walletconnect.getAccount().then(setAddress)
-        else if(essentialsConnector.getWalletConnectProvider())
-          setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
-      }
-      if(sessionLinkFlag==='3'){
-          walletconnect.getAccount().then(setAddress)
-      }
+      if(sessionLinkFlag==='2' && essentialsConnector.getWalletConnectProvider())
+        setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
+      if(sessionLinkFlag==='3')
+        walletconnect.getAccount().then(setAddress)
     }
   }, [account]);
   React.useEffect(async () => {
