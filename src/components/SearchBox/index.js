@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useState, useRef } from "react";
 import { motion } from 'framer-motion';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -58,6 +58,7 @@ export default function SearchBox({placeholder, sx, onChange, needbgcolor=false}
   const params = useParams(); // params.key
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [needClose, setShowClose] = useState(false)
   const ref = useRef()
   if(placeholder === defaultPlaceHolder && !pathname.startsWith('/explorer'))
     placeholder = 'Search items, creators and token ID'
@@ -70,6 +71,7 @@ export default function SearchBox({placeholder, sx, onChange, needbgcolor=false}
     if(ref.current){
       ref.current.value = ''
       ref.current.focus()
+      setShowClose(false)
     }
   }
   const changeAction = (value)=>{
@@ -81,18 +83,23 @@ export default function SearchBox({placeholder, sx, onChange, needbgcolor=false}
       else
         navigate(`/marketplace/search/${value}`);
   }
+  const determineClose = (e)=>{
+    setShowClose(e.target.value.length>0)
+  }
   return (
     <SearchStyle
       inputRef={ref}
       defaultValue={params.key}
       placeholder={placeholder}
       onKeyPress={handleChange}
+      onChange={determineClose}
       startAdornment={
         <InputAdornment position="start">
           <Box component={Icon} icon={searchFill} sx={{ color: 'text.disabled' }} />
         </InputAdornment>
       }
       endAdornment={
+        needClose &&
         <InputAdornment position="end">
           <IconButton size='small' onClick={clearSearch}>
             <Box component={Icon} icon={closeFill} sx={{ color: 'text.disabled' }}/>
