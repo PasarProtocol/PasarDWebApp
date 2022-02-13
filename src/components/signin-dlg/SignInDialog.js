@@ -126,8 +126,7 @@ export default function SignInDialog() {
     if (sessionLinkFlag && !activatingConnector) {
       if (sessionLinkFlag === '1') {
         setActivatingConnector(injected);
-        // await activate(injected);
-        await injected.activate();
+        await activate(injected);
         setWalletAddress(await injected.getAccount());
       } else if (sessionLinkFlag === '2') {
         setActivatingConnector(essentialsConnector);
