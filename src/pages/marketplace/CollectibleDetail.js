@@ -146,6 +146,9 @@ export default function CollectibleDetail() {
         else if(essentialsConnector.getWalletConnectProvider())
           setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
       }
+      if(sessionLinkFlag==='3'){
+          walletconnect.getAccount().then(setAddress)
+      }
     }
   }, [account]);
   React.useEffect(async () => {

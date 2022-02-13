@@ -96,6 +96,11 @@ export default function MyItems() {
       setMyAddress(account)
       setWalletAddress(account);
     }
+    else if (sessionStorage.getItem("PASAR_LINK_ADDRESS") === '3') {
+      const tempAddress = await walletconnect.getAccount()
+      setMyAddress(tempAddress)
+      setWalletAddress(tempAddress);
+    }
     else if(!params.address) {
       navigate('/marketplace');
     }
