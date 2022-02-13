@@ -71,8 +71,8 @@ export default function MainNavbar() {
             justifyContent: 'space-between'
           }}
         >
-        {
-          !isMarketHome&&(
+          {
+            !isMarketHome?
             <>
               <MHidden width="mdUp">
                 <Searchbar />
@@ -83,17 +83,19 @@ export default function MainNavbar() {
                   <RouterLink to="/">
                     <Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
                   </RouterLink>
-                  <SearchBox sx={{width: 440}} needbgcolor={!isOffset && isMarketHome}/>
+                  <SearchBox sx={{flexGrow: 1, width: '100%', mx: 3}} needbgcolor={!isOffset && isMarketHome}/>
                 </MHidden>
               }
-            </>
-          )
-        }
-        {
-          isMarketHome&&<Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
-        }
-          <Box sx={{ flexGrow: 1 }} />
-
+            </>:
+            <Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
+          }
+          {
+            isHome||isMarketHome?
+            <Box sx={{ flexGrow: 1 }} />:
+            <MHidden width="mdUp">
+              <Box sx={{ flexGrow: 1 }} />
+            </MHidden>
+          }
           <MHidden width="mdDown">
             <MenuDesktop
               isOffset={isOffset}
@@ -101,9 +103,7 @@ export default function MainNavbar() {
               navConfig={navConfig}
             />
           </MHidden>
-
           <SignInDialog/>
-
           <MHidden width="mdUp">
             <MenuMobile
               isOffset={isOffset}

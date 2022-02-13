@@ -636,7 +636,7 @@ export default function SignInDialog() {
           </Menu>
         </>
       ) : (
-        <div>
+        <div style={{minWidth: 79}}>
           <Button id="signin" variant="contained" onClick={handleClickOpenSinginDlg}>
             Sign In
           </Button>

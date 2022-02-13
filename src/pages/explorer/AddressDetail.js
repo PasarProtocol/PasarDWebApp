@@ -172,12 +172,9 @@ export default function AddressDetail() {
             </Typography>
             <StackStyle sx={{ mb: 2 }}>
               <div style={{flex:1}}>
+                <SearchBox sx={{width: 400}} placeholder="Search record" onChange={setKeyword}/>
                 <MHidden width="mdDown">
-                  <SearchBox sx={{width: 400}} outersx={{textAlign: 'left'}} rootsx={{px: '0 !important', display: 'inline-block'}} placeholder="Search record" onChange={setKeyword}/>
                   <Typography variant="body2" sx={{ display: 'inline-block', pl: 1 }}>{totalCount.toLocaleString('en')} items</Typography>
-                </MHidden>
-                <MHidden width="mdUp">
-                  <SearchBox sx={{width: 400}} outersx={{textAlign: 'left'}} rootsx={{px: '0 !important'}} placeholder="Search record" onChange={setKeyword}/>
                 </MHidden>
               </div>
               <div className="top-pagination">

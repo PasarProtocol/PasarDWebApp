@@ -125,10 +125,10 @@ export default function AssetFilterPan(props){
                 <Typography variant="body2">Collections</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <SearchBox sx={{width: '100%'}} rootsx={{px: '0 !important', mb: 1}} placeholder="Search collections"/>
+                <SearchBox sx={{width: '100%', mb: 1}} placeholder="Search collections"/>
                 <Scrollbar sx={{maxHeight: 200}}>
                   <List
-                    sx={{ width: '100%', bgcolor: 'background.paper' }}
+                    sx={{ width: '100%', bgcolor: 'background.paper', pt: 0 }}
                     component="nav"
                     aria-labelledby="nested-list-subheader"
                   >
