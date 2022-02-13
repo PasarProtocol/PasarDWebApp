@@ -409,3 +409,5 @@ export const getDidInfoFromAddress = (address) => (
 )
 
 export const getFullUrl = (url) => `${window.location.protocol}//${window.location.host}/${url}`
+
+export const checkIsMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
