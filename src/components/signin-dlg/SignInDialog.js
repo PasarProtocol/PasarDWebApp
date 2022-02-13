@@ -149,7 +149,7 @@ export default function SignInDialog() {
         await injected.activate();
         setWalletAddress(await injected.getAccount());
       } else if (sessionLinkFlag === '2') {
-        if (checkIsMobile) {
+        if (checkIsMobile()) {
           setActivatingConnector(walletconnect);
           await walletconnect.activate();
           setWalletAddress(await walletconnect.getAccount());
@@ -199,7 +199,7 @@ export default function SignInDialog() {
         });
         // if (activatingConnector !== null) setWalletAddress(await activatingConnector.getAccount());
       } else if (sessionLinkFlag === '2') {
-        if (checkIsMobile) {
+        if (checkIsMobile()) {
           if (library) {
             getDiaTokenPrice(library.provider)
               .then((res) => {
@@ -265,7 +265,7 @@ export default function SignInDialog() {
         window.location.reload();
       }
     } else if (sessionLinkFlag === '2') {
-      if (checkIsMobile) {
+      if (checkIsMobile()) {
         if (activatingConnector === walletconnect && !walletconnect.walletConnectProvider.connected) {
           setOpenAccountPopup(null);
           await activate(null);
@@ -348,7 +348,7 @@ export default function SignInDialog() {
   // essentials wallet connection
   const connectWithEssentials = async () => {
     initConnectivitySDK();
-    if (checkIsMobile) await activate(walletconnect);
+    if (checkIsMobile()) await activate(walletconnect);
     const didAccess = new DID.DIDAccess();
     try {
       const presentation = await didAccess.requestCredentials({
@@ -363,11 +363,11 @@ export default function SignInDialog() {
         DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
         // verify
         const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
-        // const valid = await vp.isValid();
-        // if (!valid) {
-        //   console.log('Invalid presentation');
-        //   return;
-        // }
+        const valid = await vp.isValid();
+        if (!valid) {
+          console.log('Invalid presentation');
+          return;
+        }
         const sDid = vp.getHolder().toString();
         if (!sDid) {
           console.log('Unable to extract owner DID from the presentation');
@@ -379,15 +379,11 @@ export default function SignInDialog() {
         // Optional bio
         const bioCredential = vp.getCredential(`bio`);
         const bio = bioCredential ? bioCredential.getSubject().getProperty('bio') : '';
-        // // Optional email
-        // const emailCredential = vp.getCredential(`email`);
-        // const email = emailCredential ? emailCredential.getSubject().getProperty('email') : '';
         const user = {
           sDid,
           type: 'user',
           bio,
           name,
-          // email,
           canManageAdmins: false
         };
         // succeed
@@ -397,7 +393,7 @@ export default function SignInDialog() {
         sessionLinkFlag = '2';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
         setOpenSigninDlg(false);
-        if (checkIsMobile) {
+        if (checkIsMobile()) {
           setWalletAddress(await walletconnect.getAccount());
           setActivatingConnector(walletconnect);
         } else {
@@ -413,7 +409,7 @@ export default function SignInDialog() {
       }
     } catch (e) {
       try {
-        if (checkIsMobile) await essentialsConnector.getWalletConnectProvider().disconnect();
+        if (checkIsMobile()) await essentialsConnector.getWalletConnectProvider().disconnect();
         else await activatingConnector.deactivate();
       } catch (e) {
         console.error('Error while trying to disconnect wallet connect session', e);
