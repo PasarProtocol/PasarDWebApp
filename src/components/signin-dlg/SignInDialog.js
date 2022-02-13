@@ -284,6 +284,7 @@ export default function SignInDialog() {
     initConnectivitySDK();
   // essentials wallet connection
   const connectWithEssentials = async () => {
+    initConnectivitySDK();
     const didAccess = new DID.DIDAccess();
     // let presentation;
     try {
