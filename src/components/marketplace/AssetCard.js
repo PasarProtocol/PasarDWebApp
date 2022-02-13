@@ -31,9 +31,7 @@ import { getDiaTokenInfo } from '../../utils/common';
 
 export default function AssetCard(props) {
   const { title="???", description, quantity=1, price=0, isLink, tokenId, type, orderId, saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate } = props
-  // let {myaddress} = props
-  // myaddress='0x2D4aA0f8Cee7233BEE4e436E154075f50956e4b4'
-  const { signinEssentialSuccess, diaBalance, setOpenDownloadEssentialDlg } = useSingin()
+  const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
   const [updateOpen, setOpenUpdate] = React.useState(false);
@@ -120,7 +118,7 @@ export default function AssetCard(props) {
               </Tooltip>
             </Grid>
             <Grid item xs={6} align="right">
-              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}} disabled={!(type===1 && (isCreatedByMe && signinEssentialSuccess) || type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))}>
+              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}} disabled={!(type===1 && (isCreatedByMe && sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') || type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))}>
                 <MoreHorizIcon />
               </IconButton>
               <Menu 
@@ -150,7 +148,7 @@ export default function AssetCard(props) {
                   type===1&&
                   <div>
                     {
-                      isCreatedByMe&&signinEssentialSuccess&&
+                      isCreatedByMe&&sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
                       <div>
                         <MenuItem value='update' onClick={handleClosePopup}>
                           <LocalOfferOutlinedIcon/>&nbsp;Update Price
@@ -169,13 +167,13 @@ export default function AssetCard(props) {
                   type===2&&
                   <div>
                     {
-                      isListedOwnedByMe&&signinEssentialSuccess&&
+                      isListedOwnedByMe&&sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
                       <MenuItem value='update' onClick={handleClosePopup}>
                         <LocalOfferOutlinedIcon/>&nbsp;Update Price
                       </MenuItem>
                     }
                     {
-                      isListedOwnedByMe&&signinEssentialSuccess&&
+                      isListedOwnedByMe&&sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
                       <MenuItem value='cancel' onClick={handleClosePopup}>
                         <CancelOutlinedIcon/>&nbsp;Cancel Sale
                       </MenuItem>
