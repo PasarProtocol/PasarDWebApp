@@ -22,6 +22,7 @@ import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
+import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson } from '../../utils/common';
 
@@ -144,13 +145,13 @@ export default function Purchase(props) {
 
   const buyNft = async () => {
     setOnProgress(true);
-    console.log('---------------------------', info);
-    console.log('orderId:', info.OrderId);
-    console.log('price:', BigInt(info.Price).toString());
+    // console.log('---------------------------', info);
+    // console.log('orderId:', info.OrderId);
+    // console.log('price:', BigInt(info.Price).toString());
     const buyerDidUri = await sendIpfsDidJson();
     console.log('didUri:', buyerDidUri);
     const buyPrice = BigInt(info.Price).toString();
-    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
+    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
         callEthBuyOrder(info.OrderId, buyerDidUri, buyPrice);
     }
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
@@ -164,9 +165,13 @@ export default function Purchase(props) {
       if (sessionLinkFlag === '1' && library)
         getBalance(library.provider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
-        });
-      if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider())
+        })
+      else if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider())
         getBalance(essentialsConnector.getWalletConnectProvider()).then((res) => {
+          setBalance(math.round(res / 1e18, 4));
+        })
+      else if (sessionLinkFlag === '3')
+        getBalance(walletconnect.getProvider()).then((res) => {
           setBalance(math.round(res / 1e18, 4));
         });
     }

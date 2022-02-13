@@ -30,6 +30,7 @@ import Badge from '../../components/Badge';
 import Jazzicon from '../../components/Jazzicon';
 import PurchaseDlg from '../../components/dialog/Purchase'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
 import {blankAddress, marketContract} from '../../config'
 import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress } from '../../utils/common';
@@ -139,7 +140,9 @@ export default function CollectibleDetail() {
       if(sessionLinkFlag==='1')
         setAddress(account)
       if(sessionLinkFlag==='2' && essentialsConnector.getWalletConnectProvider())
-        setAddress(essentialsConnector.getWalletConnectProvider().accounts[0])
+        setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
+      if(sessionLinkFlag==='3')
+        walletconnect.getAccount().then(setAddress)
     }
   }, [account]);
   React.useEffect(async () => {

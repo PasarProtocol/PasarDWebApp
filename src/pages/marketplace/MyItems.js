@@ -16,6 +16,7 @@ import { useWeb3React } from '@web3-react/core';
 import jwtDecode from 'jwt-decode';
 // components
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import { walletconnect } from '../../components/signin-dlg/connectors';
 import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
@@ -82,14 +83,18 @@ export default function MyItems() {
   const triedEager = useEagerConnect();
   React.useEffect(async() => {
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      const strWalletAddress = await essentialsConnector.getWalletConnectProvider().wc.accounts[0];
+      const strWalletAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0];
       setMyAddress(strWalletAddress)
       setWalletAddress(strWalletAddress);
-
     }
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
       setMyAddress(account)
       setWalletAddress(account);
+    }
+    else if (sessionStorage.getItem("PASAR_LINK_ADDRESS") === '3') {
+      const strWalletAddress = await walletconnect.getAccount()
+      setMyAddress(strWalletAddress)
+      setWalletAddress(strWalletAddress);
     }
     else if(!params.address) {
       navigate('/marketplace');
@@ -107,8 +112,8 @@ export default function MyItems() {
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
       const token = sessionStorage.getItem("PASAR_TOKEN");
       const user = jwtDecode(token);
-      const {name} = user;
-      setDidInfo({'name': name, 'description': ''})
+      const {name, bio} = user;
+      setDidInfo({'name': name, 'description': bio})
     }
     else {
       setDidInfo({'name': '', 'description': ''})
@@ -220,7 +225,7 @@ export default function MyItems() {
               <Typography variant="subtitle2" noWrap sx={{color: 'text.secondary'}}>{didInfo.description}</Typography>
             }
           </Typography>
-          <Box sx={{display: 'flex', justifyContent: 'center'}}>
+          <Box sx={{display: 'flex', justifyContent: 'center', pt: 1}}>
           {
             diaBadge&&
             <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>

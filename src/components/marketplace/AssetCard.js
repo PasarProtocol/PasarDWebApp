@@ -61,7 +61,7 @@ export default function AssetCard(props) {
     setOpenPopup(event.currentTarget);
   };
   const handleSell = (event) => {
-    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
       setOpenDownloadEssentialDlg(true)
       return
     }
@@ -71,21 +71,21 @@ export default function AssetCard(props) {
     const type = e.target.getAttribute("value")
     switch(type){
       case 'sell':
-        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
           setOpenDownloadEssentialDlg(true)
           return
         }
         setOpenSell(true)
         break;
       case 'update':
-        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
           setOpenDownloadEssentialDlg(true)
           return
         }
         setOpenUpdate(true)
         break;
       case 'cancel':
-        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
           setOpenDownloadEssentialDlg(true)
           return
         }
