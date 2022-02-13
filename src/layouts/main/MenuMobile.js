@@ -76,7 +76,7 @@ function MenuMobileItem(props) {
   }
 
   const openSignin = (path)=>{
-    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1'){
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
       setOpenDownloadEssentialDlg(true)
     }
     else
