@@ -7,7 +7,7 @@ import twitterIcon from '@iconify/icons-ant-design/twitter';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import githubIcon from '@iconify/icons-ant-design/github'
 import discordIcon from '@iconify/icons-ic/baseline-discord';
-import { NavLink as RouterLink, useLocation } from 'react-router-dom';
+import { NavLink as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 // material
@@ -21,6 +21,7 @@ import ModeSwitch from '../../components/mode-switch';
 import { MIconButton, MFab } from '../../components/@material-extend';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import useSingin from '../../hooks/useSignin';
+import { isInAppBrowser } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -49,6 +50,7 @@ function MenuMobileItem(props) {
   const { item, isOpen, onOpen } = props
   const { signinEssentialSuccess, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
   const { title, path, icon, children } = item;
+  const navigate = useNavigate();
 
   if (children) {
     return (
@@ -75,9 +77,16 @@ function MenuMobileItem(props) {
     );
   }
 
-  const openSignin = (path)=>{
+  const openSignin = async(path)=>{
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
       setOpenDownloadEssentialDlg(true)
+    }
+    else if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'){
+      const connectedInApp = await window.elastos.getWeb3Provider()
+      if(isInAppBrowser() && connectedInApp)
+        navigate(path)
+      else
+        setOpenSigninEssentialDlg(true)
     }
     else
       setOpenSigninEssentialDlg(true)
