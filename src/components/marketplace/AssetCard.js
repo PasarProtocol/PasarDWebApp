@@ -43,7 +43,7 @@ export default function AssetCard(props) {
   
   const isCreatedByMe = myaddress===royaltyOwner
   const isListedOwnedByMe = myaddress===royaltyOwner&&saleType!=="Not on sale"
-  const isUnlistedOwnedByMe = myaddress===holder&&saleType!=="Primary Sale"
+  const isUnlistedOwnedByMe = myaddress===holder&&saleType==="Not on sale"
   const isListedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType==="Primary Sale"
   const isUnlistedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType!=="Primary Sale"
 
@@ -118,9 +118,25 @@ export default function AssetCard(props) {
               </Tooltip>
             </Grid>
             <Grid item xs={6} align="right">
-              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}} disabled={!(type===1 && (isCreatedByMe && sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') || type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))}>
-                <MoreHorizIcon />
-              </IconButton>
+              {
+                type!==3 &&
+                <IconButton
+                  color="inherit"
+                  size="small"
+                  sx={{p: 0}}
+                  onClick={isLink ? openPopupMenu : ()=>{}}
+                  disabled={
+                    !(
+                      sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && (
+                        (type===1 && myaddress===holder) || 
+                        (type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))
+                      )
+                    )
+                  }
+                >
+                  <MoreHorizIcon />
+                </IconButton>
+              }
               <Menu 
                 keepMounted
                 id="simple-menu"
@@ -145,10 +161,10 @@ export default function AssetCard(props) {
                   </div>
                 }
                 {
-                  type===1&&
+                  type===1&&myaddress===holder&&
                   <div>
                     {
-                      isCreatedByMe&&sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
+                      sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
                       <div>
                         <MenuItem value='update' onClick={handleClosePopup}>
                           <LocalOfferOutlinedIcon/>&nbsp;Update Price
@@ -164,36 +180,32 @@ export default function AssetCard(props) {
                   </div>
                 }
                 {
-                  type===2&&
-                  <div>
-                    {
-                      isListedOwnedByMe&&sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
-                      <MenuItem value='update' onClick={handleClosePopup}>
-                        <LocalOfferOutlinedIcon/>&nbsp;Update Price
-                      </MenuItem>
-                    }
-                    {
-                      isListedOwnedByMe&&sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
-                      <MenuItem value='cancel' onClick={handleClosePopup}>
-                        <CancelOutlinedIcon/>&nbsp;Cancel Sale
-                      </MenuItem>
-                    }
-                    {
+                  type===2&&sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&(
+                    (
+                      isListedOwnedByMe&&
+                      <div>
+                        <MenuItem value='update' onClick={handleClosePopup}>
+                          <LocalOfferOutlinedIcon/>&nbsp;Update Price
+                        </MenuItem>
+                        <MenuItem value='cancel' onClick={handleClosePopup}>
+                          <CancelOutlinedIcon/>&nbsp;Cancel Sale
+                        </MenuItem>
+                      </div>
+                    ) || (
                       isUnlistedOwnedByMe&&
-                      <MenuItem value='sell' onClick={handleClosePopup}>
-                        <StorefrontIcon/>&nbsp;Sell
-                      </MenuItem>
-                    }
-                    <MenuItem value='transfer' onClick={handleClosePopup}>
-                      <SyncAltSharpIcon/>&nbsp;Transfer
-                    </MenuItem>
-                    {
-                      isUnlistedOwnedByMe&&
-                      <MenuItem value='delete' onClick={handleClosePopup}>
-                        <DeleteOutlineIcon/>&nbsp;Delete
-                      </MenuItem>
-                    }
-                  </div>
+                      <div>
+                        <MenuItem value='sell' onClick={handleClosePopup}>
+                          <StorefrontIcon/>&nbsp;Sell
+                        </MenuItem>
+                        <MenuItem value='transfer' onClick={handleClosePopup}>
+                          <SyncAltSharpIcon/>&nbsp;Transfer
+                        </MenuItem>
+                        <MenuItem value='delete' onClick={handleClosePopup}>
+                          <DeleteOutlineIcon/>&nbsp;Delete
+                        </MenuItem>
+                      </div>
+                    )
+                  )
                 }
                 {/* {
                   type===3&&

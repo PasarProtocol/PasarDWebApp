@@ -44,17 +44,19 @@ export default function HomeAssetCard() {
                         <CardImgBox src={getAssetImage(asset)}/>
                     </Link>
                     <Stack direction="row" sx={{py: 2}}>
-                        <Link to={`/profile/others/${asset.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'inherit' }}>
-                            <Jazzicon address='0x123' sx={{mr: 0}}/>
-                            <Box sx={{ minWidth: 0, flexGrow: 1, ml: 1 }}>
-                                <Typography color="inherit" variant="subtitle2" noWrap>
-                                    {asset.name}
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                    {reduceHexAddress(asset.royaltyOwner)}
-                                </Typography>
-                            </Box>
-                        </Link>
+                        <Box sx={{flexGrow: 1, minWidth: 0}}>
+                            <Link to={`/profile/others/${asset.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: 'inherit' }}>
+                                <Jazzicon address='0x123' sx={{mr: 0}}/>
+                                <Box sx={{ flexGrow: 1, minWidth: 0, ml: 1 }}>
+                                    <Typography color="inherit" variant="subtitle2" noWrap>
+                                        {asset.name}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                        {reduceHexAddress(asset.royaltyOwner)}
+                                    </Typography>
+                                </Box>
+                            </Link>
+                        </Box>
                         <Box component="div" sx={{m:'auto !important', minWidth: '120px', textAlign: 'right'}}>
                             <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                             <div>

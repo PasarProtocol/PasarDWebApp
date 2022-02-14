@@ -333,7 +333,7 @@ export const MethodList = [
       { description: 'By', field: 'from', copyable: true, ellipsis: true },
       { description: 'From initial value of', field: 'data.oldPrice', copyable: false }
     ],
-    verb: { description: 'Updated to', withPrice: true, subject: 'to' }
+    verb: {description: 'Updated to', withPrice: true, subject: 'from'}
   },
   {
     method: 'Bid',
@@ -422,12 +422,9 @@ export const checkIsMobile = () =>
 export const isInAppBrowser = () => window.elastos !== undefined && window.elastos.name === 'essentialsiab';
 
 export const clearCacheData = () => {
-  // alert('prepare to clear cache');
   caches.keys().then((names) => {
     names.forEach((name) => {
-      console.log(name);
       caches.delete(name);
     });
   });
-  // alert('Complete Cache Cleared')
 };

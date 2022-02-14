@@ -11,11 +11,11 @@ export function initConnectivitySDK() {
   console.log('Preparing the Elastos connectivity SDK');
 
   // unregistear if already registerd
-  // const arrIConnectors = connectivity.getAvailableConnectors();
-  // if (arrIConnectors.findIndex((option) => option.name === essentialsConnector.name) !== -1) {
-  //   connectivity.unregisterConnector(essentialsConnector.name);
-  //   console.log('unregister connector succeed.');
-  // }
+  const arrIConnectors = connectivity.getAvailableConnectors();
+  if (arrIConnectors.findIndex((option) => option.name === essentialsConnector.name) !== -1) {
+    connectivity.unregisterConnector(essentialsConnector.name);
+    console.log('unregister connector succeed.');
+  }
 
   connectivity.registerConnector(essentialsConnector).then(() => {
     connectivityInitialized = true;

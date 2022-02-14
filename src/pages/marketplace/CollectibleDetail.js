@@ -151,35 +151,44 @@ export default function CollectibleDetail() {
     const resCollectible = await fetchFrom(`sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`);
     const jsonCollectible = await resCollectible.json();
     if(jsonCollectible.data){
-      setCollectible(jsonCollectible.data);
-      getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
-        if(dia!=='0')
-          setDiaBadgeOfUser('creator', true)
-      })
-      getDiaTokenInfo(jsonCollectible.data.holder).then(dia=>{
-        if(dia!=='0')
-          setDiaBadgeOfUser('owner', true)
-      })
-      if(jsonCollectible.data.royaltyOwner === jsonCollectible.data.holder){
-        getInfoFromDID(jsonCollectible.data.tokenDid.did).then(info=>{
-          if(info.name)
-            setDidName({creator: info.name, owner: info.name})
+      try{
+        setCollectible(jsonCollectible.data);
+        getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
+          if(dia!=='0')
+            setDiaBadgeOfUser('creator', true)
         })
-      } else {
-        getInfoFromDID(jsonCollectible.data.tokenDid.did).then(info=>{
-          if(info.name)
-            setDidNameOfUser('creator', info.name)
+        getDiaTokenInfo(jsonCollectible.data.holder).then(dia=>{
+          if(dia!=='0')
+            setDiaBadgeOfUser('owner', true)
         })
-
-        getDidInfoFromAddress(jsonCollectible.data.holder)
-          .then((info) => {
-            setDidNameOfUser('owner', info.name || '')
-          })
-          .catch((e) => {
-          })
+        if(jsonCollectible.data.royaltyOwner === jsonCollectible.data.holder){
+          getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
+            .then((info) => {
+              if(info.name)
+                setDidName({creator: info.name, owner: info.name})
+            })
+            .catch((e) => {
+            })
+        } else {
+          getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
+            .then((info) => {
+              setDidNameOfUser('creator', info.name || '')
+            })
+            .catch((e) => {
+            })
+  
+          getDidInfoFromAddress(jsonCollectible.data.holder)
+            .then((info) => {
+              setDidNameOfUser('owner', info.name || '')
+            })
+            .catch((e) => {
+            })
+        }
+        if(jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0)
+          setPropertiesAccordionOpen(true)
+      } catch(e) {
+        console.log(e)
       }
-      if(jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0)
-        setPropertiesAccordionOpen(true)
     }
     setLoadingCollectible(false);
     // setForAuction(true);
