@@ -169,14 +169,12 @@ export default function SignInDialog() {
     getCoinUSD().then((res) => {
       setCoinUSD(res);
     });
-
     if (chainId !== undefined && chainId !== 21 && chainId !== 20) {
       setSnackbarOpen(true);
     }
 
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-    if (sessionLinkFlag) {
-      // when connected
+    if (sessionLinkFlag) {      // when connected
       if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
         getDiaTokenPrice(library.provider)
           .then((res) => {
@@ -195,7 +193,6 @@ export default function SignInDialog() {
         getBalance(library.provider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
         });
-        // if (activatingConnector !== null) setWalletAddress(await activatingConnector.getAccount());
       } else if (sessionLinkFlag === '2') {
         if (isInAppBrowser()) {
           const elastosWeb3Provider = await window.elastos.getWeb3Provider();
@@ -216,7 +213,7 @@ export default function SignInDialog() {
           getBalance(elastosWeb3Provider).then((res) => {
             setBalance(math.round(res / 1e18, 4));
           });
-          setWalletAddress(await window.elastos.getWeb3Provider().address);
+          // setWalletAddress(await window.elastos.getWeb3Provider().address);
         } else if (essentialsConnector.getWalletConnectProvider()) {
           const essentialProvider = essentialsConnector.getWalletConnectProvider();
           getDiaTokenPrice(essentialProvider)
@@ -236,7 +233,7 @@ export default function SignInDialog() {
           getBalance(essentialProvider).then((res) => {
             setBalance(math.round(res / 1e18, 4));
           });
-          setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+          // setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
         }
       }
     }
@@ -315,16 +312,17 @@ export default function SignInDialog() {
     }
   }, [essentialsConnector.hasWalletConnectSession(), active]);
 
-  useEffect(async () => {
-    if (isInAppBrowser()) {
-      await window.elastos.getWeb3Provider().on('accountsChanged', (accounts) => {
-        // Handle the new accounts, or lack thereof.
-        // "accounts" will always be an array, but it can be empty.
-      });
-    }
-  }, []);
+  // useEffect(async () => {
+  //   if (isInAppBrowser()) {
+  //     await window.elastos.getWeb3Provider().on('accountsChanged', (accounts) => {
+  //       // Handle the new accounts, or lack thereof.
+  //       // "accounts" will always be an array, but it can be empty.
+  //       alert(accounts)
+  //     });
+  //   }
+  // }, []);
 
-  // ------------ Connect Wallet ------------
+  // ------------ MM, WC, WL Connect ------------
   const handleChooseWallet = async (wallet) => {
     let currentConnector = null;
     if (wallet === 'metamask') currentConnector = injected;
@@ -349,7 +347,9 @@ export default function SignInDialog() {
     setOpenSigninDlg(false);
   };
 
+  // ------------ EE Connect ------------
   if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') initConnectivitySDK();
+
   // essentials wallet connection
   const signInWithEssentials = async () => {
     initConnectivitySDK();
@@ -366,11 +366,11 @@ export default function SignInDialog() {
         DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
         // verify
         const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
-        // const valid = await vp.isValid();
-        // if (!valid) {
-        //   console.log('Invalid presentation');
-        //   return;
-        // }
+        const valid = await vp.isValid();
+        if (!valid) {
+          console.log('Invalid presentation');
+          return;
+        }
         const sDid = vp.getHolder().toString();
         if (!sDid) {
           console.log('Unable to extract owner DID from the presentation');
@@ -435,6 +435,8 @@ export default function SignInDialog() {
       setWalletAddress(null);
       if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession())
         await essentialsConnector.disconnectWalletConnect();
+      if (isInAppBrowser() && await window.elastos.getWeb3Provider().isConnected())
+        await window.elastos.getWeb3Provider().disconnect();
     } catch (error) {
       console.error('Error while disconnecting the wallet', error);
     }
