@@ -147,29 +147,33 @@ export function getDiaTokenPrice(connectProvider) {
 }
 export function getDiaTokenInfo(strAddress, connectProvider=null) {
   return new Promise((resolve, reject) => {
-    let walletConnectWeb3
-    if(connectProvider)
-      walletConnectWeb3 = new Web3(connectProvider)
-    else if(Web3.givenProvider)
-      walletConnectWeb3 = new Web3(Web3.givenProvider)
-    else reject(new Error)
-    // const web3 = new Web3(Web3.givenProvider);
-    // const MyContract = new web3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS);
-    // MyContract.methods.balanceOf(strAddress).call().then(console.log);
+    try{
+      let walletConnectWeb3
+      if(connectProvider)
+        walletConnectWeb3 = new Web3(connectProvider)
+      else if(Web3.givenProvider)
+        walletConnectWeb3 = new Web3(Web3.givenProvider)
+      else reject(new Error)
+      // const web3 = new Web3(Web3.givenProvider);
+      // const MyContract = new web3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS);
+      // MyContract.methods.balanceOf(strAddress).call().then(console.log);
 
-    const diamondContract = new walletConnectWeb3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS)
-    diamondContract.methods.balanceOf(strAddress).call()
-    .then(result=>{
-      // console.log(result)
-      if(result === '0'){
-        resolve(result)
-        return
-      }
-      const balance = walletConnectWeb3.utils.fromWei(result, 'ether');
-      resolve(balance)
-    }).catch((error) => {
-      reject(error);
-    })
+      const diamondContract = new walletConnectWeb3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS)
+      diamondContract.methods.balanceOf(strAddress).call()
+      .then(result=>{
+        // console.log(result)
+        if(result === '0'){
+          resolve(result)
+          return
+        }
+        const balance = walletConnectWeb3.utils.fromWei(result, 'ether');
+        resolve(balance)
+      }).catch((error) => {
+        reject(error);
+      })
+    } catch(e) {
+      reject(e)
+    }
   })
 }
 
