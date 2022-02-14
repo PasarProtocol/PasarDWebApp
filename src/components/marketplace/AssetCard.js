@@ -118,9 +118,12 @@ export default function AssetCard(props) {
               </Tooltip>
             </Grid>
             <Grid item xs={6} align="right">
-              <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}} disabled={!(type===1 && (isCreatedByMe && sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') || type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))}>
-                <MoreHorizIcon />
-              </IconButton>
+              {
+                type!==3 &&
+                <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}} disabled={!(type===1 && (isCreatedByMe && sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') || type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))}>
+                  <MoreHorizIcon />
+                </IconButton>
+              }
               <Menu 
                 keepMounted
                 id="simple-menu"

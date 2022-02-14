@@ -180,7 +180,7 @@ export default function AssetFilterPan(props){
                 <FormControlLabel
                   checked={filterProps.adult || false}
                   control={<CustomSwitch onChange={(e)=>{handleFilter('adult', e.target.checked)}}/>}
-                  label="Off"
+                  label={filterProps.adult?"On":"Off"}
                   labelPlacement="end"
                   sx={{ml:2, pr:2}}
                 />
