@@ -330,7 +330,7 @@ export const MethodList = [
       {description: 'By', field: 'from', copyable: true, ellipsis: true},
       {description: 'From initial value of', field: 'data.oldPrice', copyable: false},
     ],
-    verb: {description: 'Updated to', withPrice: true, subject: 'to'}
+    verb: {description: 'Updated to', withPrice: true, subject: 'from'}
   },
   {
     method: 'Bid', 
