@@ -25,7 +25,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
 import Jazzicon from '../../components/Jazzicon';
 import Badge from '../../components/Badge';
-import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress } from '../../utils/common';
+import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -82,14 +82,14 @@ export default function MyItems() {
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   const triedEager = useEagerConnect();
   React.useEffect(async() => {
-    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      const strWalletAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0];
-      setMyAddress(strWalletAddress)
-      setWalletAddress(strWalletAddress);
-    }
-    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
+    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
       setMyAddress(account)
       setWalletAddress(account);
+    }
+    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+      const strWalletAddress = isInAppBrowser() ? await window.elastos.getWeb3Provider().address : essentialsConnector.getWalletConnectProvider().wc.accounts[0];
+      setMyAddress(strWalletAddress)
+      setWalletAddress(strWalletAddress);
     }
     else if (sessionStorage.getItem("PASAR_LINK_ADDRESS") === '3') {
       const strWalletAddress = await walletconnect.getAccount()
