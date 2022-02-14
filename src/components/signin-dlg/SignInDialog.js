@@ -400,7 +400,7 @@ export default function SignInDialog() {
         sessionLinkFlag = '2';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
         setOpenSigninDlg(false);
-        if (window.elastos !== undefined && window.elastos.name === 'essentialsiab') {
+        if (isInAppBrowser()) {
           setWalletAddress(await window.elastos.getWeb3Provider().address);
           setActivatingConnector(essentialsConnector);
         } else {
