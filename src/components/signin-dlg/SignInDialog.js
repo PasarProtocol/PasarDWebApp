@@ -366,11 +366,11 @@ export default function SignInDialog() {
         DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
         // verify
         const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
-        const valid = await vp.isValid();
-        if (!valid) {
-          console.log('Invalid presentation');
-          return;
-        }
+        // const valid = await vp.isValid();
+        // if (!valid) {
+        //   console.log('Invalid presentation');
+        //   return;
+        // }
         const sDid = vp.getHolder().toString();
         if (!sDid) {
           console.log('Unable to extract owner DID from the presentation');
