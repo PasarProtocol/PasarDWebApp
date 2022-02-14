@@ -36,7 +36,7 @@ function TransItem(props) {
           .catch((e) => {
           })
     }
-  }, [creator]);
+  }, [subject]);
 
   return (
       <Stack direction="row" spacing={2} sx={sx}>
@@ -54,7 +54,7 @@ function TransItem(props) {
                 {methodItem.verb.withPrice?` ${parseFloat((trans.price/10**18).toFixed(7))} ELA`:''}
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
-                <Link to={`/explorer/transaction/detail/${trans.to}`} component={RouterLink}>
+                <Link to={`/explorer/transaction/detail/${subject}`} component={RouterLink}>
                   {methodItem.verb.description==='Transferred'?'to':'by'} {didName || reduceHexAddress(subject)}
                 </Link>
               </Typography>
