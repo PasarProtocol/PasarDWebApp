@@ -413,3 +413,13 @@ export const getDidInfoFromAddress = (address) => (
 export const getFullUrl = (url) => `${window.location.protocol}//${window.location.host}/${url}`
 
 export const checkIsMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
+export const clearCacheData = () => {
+  // alert('prepare to clear cache');
+  caches.keys().then((names) => {
+    names.forEach((name) => {
+      caches.delete(name);
+    });
+  });
+  // alert('Complete Cache Cleared')
+};
