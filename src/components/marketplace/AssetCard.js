@@ -120,7 +120,7 @@ export default function AssetCard(props) {
             <Grid item xs={6} align="right">
               {
                 type!==3 &&
-                <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}} disabled={!(type===1 && (isCreatedByMe && sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') || type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))}>
+                <IconButton color="inherit" size="small" sx={{p: 0}} onClick={isLink ? openPopupMenu : ()=>{}} disabled={!((type===1 && sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') || (type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe)))}>
                   <MoreHorizIcon />
                 </IconButton>
               }
@@ -151,7 +151,7 @@ export default function AssetCard(props) {
                   type===1&&
                   <div>
                     {
-                      isCreatedByMe&&sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
+                      sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
                       <div>
                         <MenuItem value='update' onClick={handleClosePopup}>
                           <LocalOfferOutlinedIcon/>&nbsp;Update Price

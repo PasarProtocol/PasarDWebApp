@@ -83,7 +83,7 @@ export default function CancelSale(props) {
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
           Unlist Item
         </Typography>
-        <Typography variant="h5" sx={{ color: 'text.secondary' }}>
+        <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }}>
           You are about to remove{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
             {title}
