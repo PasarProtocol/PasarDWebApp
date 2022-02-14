@@ -35,7 +35,8 @@ import {
   getCoinUSD,
   getDiaTokenInfo,
   getDiaTokenPrice,
-  fetchFrom
+  fetchFrom,
+  clearCacheData
 } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
 import useSingin from '../../hooks/useSignin';
@@ -284,6 +285,7 @@ export default function SignInDialog() {
     initConnectivitySDK();
   // essentials wallet connection
   const connectWithEssentials = async () => {
+    clearCacheData();
     initConnectivitySDK();
     const didAccess = new DID.DIDAccess();
     // let presentation;
