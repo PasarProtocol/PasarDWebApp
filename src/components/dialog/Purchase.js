@@ -24,7 +24,7 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
-import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson } from '../../utils/common';
+import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser } from '../../utils/common';
 
 export default function Purchase(props) {
   const navigate = useNavigate();
@@ -166,10 +166,18 @@ export default function Purchase(props) {
         getBalance(library.provider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
         })
-      else if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider())
-        getBalance(essentialsConnector.getWalletConnectProvider()).then((res) => {
-          setBalance(math.round(res / 1e18, 4));
-        })
+      else if (sessionLinkFlag === '2'){
+        if (isInAppBrowser()) {
+          const elastosWeb3Provider = await window.elastos.getWeb3Provider();
+          getBalance(elastosWeb3Provider).then((res) => {
+            setBalance(math.round(res / 1e18, 4));
+          });
+        } else if(essentialsConnector.getWalletConnectProvider()) {
+          getBalance(essentialsConnector.getWalletConnectProvider()).then((res) => {
+            setBalance(math.round(res / 1e18, 4));
+          })
+        }
+      }
       else if (sessionLinkFlag === '3')
         getBalance(walletconnect.getProvider()).then((res) => {
           setBalance(math.round(res / 1e18, 4));
