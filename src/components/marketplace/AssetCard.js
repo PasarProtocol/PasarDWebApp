@@ -44,7 +44,7 @@ export default function AssetCard(props) {
   const isCreatedByMe = myaddress===royaltyOwner
   const isListedOwnedByMe = (myaddress===royaltyOwner&&saleType==="Primary Sale") || (myaddress===holder&&saleType==="Secondary Sale")
   const isUnlistedOwnedByMe = myaddress===holder&&saleType==="Not on sale"
-  const isListedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType==="Primary Sale"
+  const isListedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType!=="Not on sale"
   const isUnlistedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType==="Not on sale"
 
   React.useEffect(() => {
