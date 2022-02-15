@@ -720,7 +720,7 @@ export default function SignInDialog() {
                       MetaMask
                     </ButtonStyle>
                   </Grid>
-                  <Grid item xs={12}>
+                  {/* <Grid item xs={12}>
                     <ButtonStyle
                       variant="contained"
                       startIcon={
@@ -738,7 +738,7 @@ export default function SignInDialog() {
                     >
                       WalletConnect
                     </ButtonStyle>
-                  </Grid>
+                  </Grid> */}
                   <Grid item xs={12}>
                     <ButtonOutlinedStyle variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
                       I don’t have a wallet
