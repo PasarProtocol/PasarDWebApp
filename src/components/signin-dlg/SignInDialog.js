@@ -1,25 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Dialog,
-  Stack,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  Alert,
-  DialogContentText,
-  IconButton,
-  Typography,
-  Grid,
-  Avatar,
-  Box,
-  Link,
-  Menu,
-  MenuItem
-} from '@mui/material';
+import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
 import * as math from 'mathjs';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
@@ -47,16 +29,7 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import {
-  reduceHexAddress,
-  getBalance,
-  getCoinUSD,
-  getDiaTokenInfo,
-  getDiaTokenPrice,
-  fetchFrom,
-  clearCacheData,
-  isInAppBrowser
-} from '../../utils/common';
+import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
 import useSingin from '../../hooks/useSignin';
 
@@ -444,8 +417,17 @@ export default function SignInDialog() {
     }
   };
 
-  const handleClickOpenSinginDlg = () => {
-    setOpenSigninDlg(true);
+  const handleClickOpenSinginDlg = async() => {
+    if(isInAppBrowser()){
+      if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
+        await signOutWithEssentials();
+        await signInWithEssentials();
+      } else {
+        await signInWithEssentials();
+      }
+    }
+    else
+      setOpenSigninDlg(true);
   };
   const handleClickOpenDownloadDlg = () => {
     setOpenSigninDlg(false);
