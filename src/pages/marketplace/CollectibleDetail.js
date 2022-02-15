@@ -32,6 +32,7 @@ import PurchaseDlg from '../../components/dialog/Purchase'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
+import useSingin from '../../hooks/useSignin';
 import {blankAddress, marketContract} from '../../config'
 import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser } from '../../utils/common';
 
@@ -123,6 +124,8 @@ export default function CollectibleDetail() {
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const [isOpenPurchase, setPurchaseOpen] = React.useState(false);
   const [didSignin, setSignin] = React.useState(false);
+  const [buyClicked, setBuyClicked] = React.useState(false);
+  const { pasarLinkAddress } = useSingin()
 
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
@@ -132,7 +135,11 @@ export default function CollectibleDetail() {
   React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     setSignin(!!sessionLinkFlag)
-  }, [sessionStorage.getItem('PASAR_LINK_ADDRESS')]);
+    if(buyClicked&&!!sessionLinkFlag){
+      setBuyClicked(false)
+      setTimeout(()=>{setPurchaseOpen(true)}, 300)
+    }
+  }, [pasarLinkAddress]);
 
   React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
@@ -275,8 +282,10 @@ export default function CollectibleDetail() {
   }
   
   const openSignin = (e)=>{
-    if(document.getElementById("signin"))
+    if(document.getElementById("signin")){
+      setBuyClicked(true)
       document.getElementById("signin").click()
+    }
   }
   
   window.addEventListener('resize', handleResize);

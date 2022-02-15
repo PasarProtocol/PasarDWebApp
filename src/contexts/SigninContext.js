@@ -9,7 +9,7 @@ const initialState = {
   afterSigninPath: null,
   diaBalance: 0,
   signinEssentialSuccess: false,
-  pasarLinkAddress: '0',
+  pasarLinkAddress: 0,
   setOpenSigninEssentialDlg: () => {},
   setOpenDownloadEssentialDlg: () => {},
   setAfterSigninPath: () => {},
@@ -30,7 +30,7 @@ function SigninProvider({ children }) {
   const [afterSigninPath, setAfterSigninPath] = useState(null);
   const [signinEssentialSuccess, setSigninEssentialSuccess] = useState(false);
   const [diaBalance, setDiaBalance] = useState(false);
-  const [pasarLinkAddress, setPasarLinkAddress] = useState('0');
+  const [pasarLinkAddress, setPasarLinkAddress] = useState(0);
 
   return (
     <SigninContext.Provider
