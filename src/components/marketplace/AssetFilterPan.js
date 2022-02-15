@@ -43,7 +43,7 @@ export default function AssetFilterPan(props){
     >
       <Scrollbar sx={{maxHeight: scrollMaxHeight, px: 1}}>
         <Grid container width="100%">
-          <Grid item xs={12} md={12}>
+          {/* <Grid item xs={12} md={12}>
             <Accordion
               defaultExpanded={1&&true}
             >
@@ -67,7 +67,7 @@ export default function AssetFilterPan(props){
               </AccordionDetails>
             </Accordion>
             <Divider />
-          </Grid>
+          </Grid> */}
           <Grid item xs={12} md={12}>
             <Accordion
               defaultExpanded={1&&true}

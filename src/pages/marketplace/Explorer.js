@@ -153,13 +153,15 @@ export default function MarketExplorer() {
       `pageNum=${page}&`+
       `pageSize=${showCount}`, { signal }).then(response => {
       response.json().then(jsonAssets => {
-        setTotalCount(jsonAssets.data.total)
-        setPages(Math.ceil(jsonAssets.data.total/showCount));
-        if(loadNext)
-          setAssets([...assets, ...jsonAssets.data.result]);
-        else {
-          setAssets(jsonAssets.data.result);
-          // window.scrollTo(0,0)
+        if(jsonAssets.data){
+          setTotalCount(jsonAssets.data.total)
+          setPages(Math.ceil(jsonAssets.data.total/showCount));
+          if(loadNext)
+            setAssets([...assets, ...jsonAssets.data.result]);
+          else {
+            setAssets(jsonAssets.data.result);
+            // window.scrollTo(0,0)
+          }
         }
         setAlreadyMounted(false)
         setLoadNext(false)
