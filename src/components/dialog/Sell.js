@@ -29,7 +29,7 @@ import {
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
-import { removeLeadingZero, callContractMethod, sendIpfsDidJson } from '../../utils/common';
+import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser } from '../../utils/common';
 
 const InputStyle = styled(Input)(({ theme }) => ({
   '&:before': {
@@ -57,8 +57,7 @@ export default function Sell(props) {
 
   const callSetApprovalForAllAndSell = (_operator, _approved, _price, _didUri) => (
     new Promise((resolve, reject) => {
-      const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
-      const walletConnectWeb3 = new Web3(walletConnectProvider);
+      const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       // const accounts = await walletConnectWeb3.eth.getAccounts();
       walletConnectWeb3.eth.getAccounts().then((accounts)=>{
 

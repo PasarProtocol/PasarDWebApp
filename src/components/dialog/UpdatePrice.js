@@ -25,7 +25,7 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import CoinSelect from '../marketplace/CoinSelect';
 import TransLoadingButton from '../TransLoadingButton';
-import { removeLeadingZero } from '../../utils/common';
+import { removeLeadingZero, isInAppBrowser } from '../../utils/common';
 
 const InputStyle = styled(Input)(({ theme }) => ({
   '&:before': {
@@ -52,7 +52,7 @@ export default function UpdatePrice(props) {
   };
 
   const callChangeOrderPrice = async (_orderId, _price) => {
-    const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
+    const walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
