@@ -119,7 +119,9 @@ export default function AssetCard(props) {
             </Grid>
             <Grid item xs={6} align="right">
               {
-                type!==3 &&
+                (
+                  (type===1 && myaddress===holder) || (type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))
+                ) &&
                 <IconButton
                   color="inherit"
                   size="small"
