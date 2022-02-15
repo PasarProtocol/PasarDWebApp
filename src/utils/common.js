@@ -110,11 +110,7 @@ export async function getCoinUSD() {
 export function getDiaTokenPrice(connectProvider) {
   return new Promise((resolve, reject) => {
     if (!connectProvider) return 0;
-    let walletConnectWeb3;
-    if (window.elastos !== undefined && window.elastos.name === 'essentialsiab') 
-      walletConnectWeb3 = connectProvider;
-    else 
-      walletConnectWeb3 = new Web3(connectProvider);
+    const walletConnectWeb3 = new Web3(connectProvider);
     walletConnectWeb3.eth
       .getBlockNumber()
       .then((blocknum) => {
@@ -186,7 +182,7 @@ export function callContractMethod(type, paramObj) {
       return;
     }
 
-    const walletConnectWeb3 = new Web3(essentialsConnector.getWalletConnectProvider());
+    const walletConnectWeb3 = isInAppBrowser() ? window.elastos.getWeb3Provider() : new Web3(essentialsConnector.getWalletConnectProvider());
     walletConnectWeb3.eth
       .getAccounts()
       .then((accounts) => {
