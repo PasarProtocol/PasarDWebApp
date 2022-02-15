@@ -36,13 +36,14 @@ import PropTypes from 'prop-types';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import jwtDecode from 'jwt-decode';
+import { isUndefined } from 'lodash';
 import { DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
 import jwt from 'jsonwebtoken';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { essentialsConnector, initConnectivitySDK, isUsingEssentialsConnector } from './EssentialConnectivity';
 import { MIconButton, MFab } from '../@material-extend';
-import { injected, walletconnect, walletlink } from './connectors';
+import { injected, walletconnect, resetWalletConnector } from './connectors';
 import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
@@ -128,7 +129,7 @@ export default function SignInDialog() {
 
   let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
   const context = useWeb3React();
-  const { connector, activate, active, error, library, chainId, account } = context;
+  const { connector, activate, deactivate, active, error, library, chainId, account } = context;
   const [isOpenSnackbar, setSnackbarOpen] = useState(false);
   const [openSignin, setOpenSigninDlg] = useState(false);
   const [openDownload, setOpenDownloadDlg] = useState(false);
@@ -157,8 +158,8 @@ export default function SignInDialog() {
         setActivatingConnector(essentialsConnector);
       } else if (sessionLinkFlag === '3') {
         setActivatingConnector(walletconnect);
-        // await activate(walletconnect);
-        await walletconnect.activate();
+        await activate(walletconnect);
+        // await walletconnect.activate();
         setWalletAddress(await walletconnect.getAccount());
       }
     }
@@ -169,6 +170,7 @@ export default function SignInDialog() {
     getCoinUSD().then((res) => {
       setCoinUSD(res);
     });
+
     if (chainId !== undefined && chainId !== 21 && chainId !== 20) {
       setSnackbarOpen(true);
     }
@@ -313,46 +315,39 @@ export default function SignInDialog() {
       }
     }
   }, [essentialsConnector.hasWalletConnectSession(), active]);
-
-  // useEffect(async () => {
-  //   if (isInAppBrowser()) {
-  //     await window.elastos.getWeb3Provider().on('accountsChanged', (accounts) => {
-  //       // Handle the new accounts, or lack thereof.
-  //       // "accounts" will always be an array, but it can be empty.
-  //       alert(accounts)
-  //     });
-  //   }
-  // }, []);
-
-  // ------------ MM, WC, WL Connect ------------
+  
+  // ------------ MM, WC Connect ------------ //
   const handleChooseWallet = async (wallet) => {
     let currentConnector = null;
-    if (wallet === 'metamask') currentConnector = injected;
-    else if (wallet === 'walletconnect') currentConnector = walletconnect;
-    else if (wallet === 'walletlink') currentConnector = walletlink;
-    setActivatingConnector(currentConnector);
-    await activate(currentConnector);
-    // if(active) {
-    console.log('loged in');
     if (wallet === 'metamask') {
-      sessionLinkFlag = '1';
-      sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
-    } else if (wallet === 'walletconnect') {
-      sessionLinkFlag = '3';
-      sessionStorage.setItem('PASAR_LINK_ADDRESS', 3);
-    } else if (wallet === 'walletlink') {
-      sessionLinkFlag = '4';
-      sessionStorage.setItem('PASAR_LINK_ADDRESS', 4);
+      currentConnector = injected;
+      activate(currentConnector);
     }
-    // }
-    setWalletAddress(await currentConnector.getAccount());
-    setOpenSigninDlg(false);
+    else if (wallet === 'walletconnect') {
+      currentConnector = walletconnect;
+      await resetWalletConnector(currentConnector);
+      await activate(currentConnector);
+    }
+    const retAddress = await currentConnector.getAccount();
+    if(!isUndefined(retAddress)) {
+      console.log('loged in');
+      if (currentConnector === injected) {
+        sessionLinkFlag = '1';
+        sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
+      } else if (currentConnector === walletconnect) {
+        sessionLinkFlag = '3';
+        sessionStorage.setItem('PASAR_LINK_ADDRESS', 3);
+      }
+      setActivatingConnector(currentConnector);
+      setWalletAddress(await currentConnector.getAccount());
+      setOpenSigninDlg(false);
+    }
   };
+  // ----------------------------------------- //
 
-  // ------------ EE Connect ------------
+  // ------------ EE Connect ------------ //
   if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') initConnectivitySDK();
 
-  // essentials wallet connection
   const signInWithEssentials = async () => {
     initConnectivitySDK();
     const didAccess = new DID.DIDAccess();
@@ -426,7 +421,6 @@ export default function SignInDialog() {
       }
     }
   };
-
   const signOutWithEssentials = async () => {
     sessionStorage.removeItem('PASAR_LINK_ADDRESS');
     sessionStorage.removeItem('PASAR_TOKEN');
@@ -443,6 +437,7 @@ export default function SignInDialog() {
       console.error('Error while disconnecting the wallet', error);
     }
   };
+  // ----------------------------------- //
 
   const handleClickOpenSinginDlg = () => {
     setOpenSigninDlg(true);
@@ -475,7 +470,6 @@ export default function SignInDialog() {
   const handleCloseDownloadDlg = () => {
     setOpenDownloadDlg(false);
   };
-
   const openAccountMenu = (event) => {
     if (isMobile && event.type === 'mouseenter') return;
     setOpenAccountPopup(event.currentTarget);
