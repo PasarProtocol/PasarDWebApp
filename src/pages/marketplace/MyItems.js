@@ -233,7 +233,7 @@ export default function MyItems() {
             </Tooltip>
           }
           </Box>
-          <MHidden width="smUp">
+          {/* <MHidden width="smUp">
             <ToolGroupStyle>
               <MyItemsSortSelect onChange={setOrderType} sx={{ flex: 1 }} />
               <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
@@ -245,7 +245,7 @@ export default function MyItems() {
                 </ToggleButton>
               </ToggleButtonGroup>
             </ToolGroupStyle>
-          </MHidden>
+          </MHidden> */}
         </Box>
         <Box sx={{ display: 'flex', position: 'relative', mb: 2, justifyContent: 'center' }} align="center">
           <Tabs value={tabValue} onChange={handleSwitchTab} TabIndicatorProps={{ style: { background: '#FF5082' } }}>
@@ -253,7 +253,7 @@ export default function MyItems() {
             <Tab label={`Owned (${assets[1].length})`} value={1} />
             <Tab label={`Created (${assets[2].length})`} value={2} />
           </Tabs>
-          <MHidden width="smDown">
+          {/* <MHidden width="smDown">
             <ToolGroupStyle>
               <MyItemsSortSelect onChange={setOrderType} />
               <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
@@ -265,7 +265,7 @@ export default function MyItems() {
                 </ToggleButton>
               </ToggleButtonGroup>
             </ToolGroupStyle>
-          </MHidden>
+          </MHidden> */}
         </Box>
         <Box
           sx={{
