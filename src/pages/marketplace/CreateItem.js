@@ -34,7 +34,7 @@ import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_A
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ProgressBar from '../../components/ProgressBar'
-import {hash, removeLeadingZero, callContractMethod} from '../../utils/common';
+import {hash, removeLeadingZero, callContractMethod, isInAppBrowser } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -236,6 +236,22 @@ export default function CreateItem() {
       return pos
     return pos/files.length + 100*index/files.length
   }
+
+  // const getCurrentWeb3Provider = async() => (
+  //   new Promise((resolve, reject)=>{
+  //     if(isInAppBrowser())
+  //       .then((provider) => {
+  //         if(provider)
+  //           resolve(provider)
+  //         else reject(new Error)
+  //       }).catch(e=>{
+  //         reject(e)
+  //       })
+  //     else
+  //       resolve(new Web3(essentialsConnector.getWalletConnectProvider()))
+  //   })
+  // );
+
   const mint2net = (paramObj, index=0)=>(
     new CancelablePromise((resolve, reject, onCancel) => {
       const _tokenSupply = quantity
@@ -246,93 +262,94 @@ export default function CreateItem() {
         cancelAction()
       });
     
-      if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2'){
+      if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2'){
         reject(new Error)
         return
       }
-
-      const walletConnectWeb3 = new Web3(essentialsConnector.getWalletConnectProvider())
-      walletConnectWeb3.eth.getAccounts().then((accounts)=>{
-        // console.log(accounts)
-        const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
-        setProgress(progressStep(50, index))
-        walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
-          console.log("Gas price:", gasPrice); 
-  
-          const _gasLimit = 5000000;
-          console.log("Sending transaction with account address:", accounts[0]);
-          const transactionParams = {
-            'from': accounts[0],
-            'gasPrice': gasPrice,
-            'gas': _gasLimit,
-            'value': 0
-          };
-          setProgress(progressStep(60, index))
-          setReadySignForMint(true)
-          stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).send(transactionParams)
-            .on('receipt', (receipt) => {
-                setReadySignForMint(false)
-                console.log("receipt", receipt);
-                if(isPutOnSale){
-                  setProgress(progressStep(70, index))
-                  stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
-                    console.log("isApprovalForAll=", isApproval);
-                    if (!isApproval) {
-                      setOpenAccessDlg(true)
-                      setApprovalFunction(()=>{
-                        stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
-                        .on('receipt', (receipt) => {
-                            setOpenAccessDlg(false)
-                            setCurrent(2)
-                            console.log("setApprovalForAll-receipt", receipt);
-                            callContractMethod('createOrderForSale', {
-                              ...paramObj,
-                              '_amount': _tokenSupply,
-                              '_price': BigInt(price*1e18).toString(),
-                              'beforeSendFunc': ()=>{setReadySignForMint(true)},
-                              'afterSendFunc': ()=>{setReadySignForMint(false)}
-                            }).then((success) => {
-                              resolve(success)
-                            }).catch(error=>{
+      const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+      // getCurrentWeb3Provider().then((walletConnectWeb3) => {
+        walletConnectWeb3.eth.getAccounts().then((accounts)=>{
+          // console.log(accounts)
+          const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
+          setProgress(progressStep(50, index))
+          walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+            console.log("Gas price:", gasPrice); 
+    
+            const _gasLimit = 5000000;
+            console.log("Sending transaction with account address:", accounts[0]);
+            const transactionParams = {
+              'from': accounts[0],
+              'gasPrice': gasPrice,
+              'gas': _gasLimit,
+              'value': 0
+            };
+            setProgress(progressStep(60, index))
+            setReadySignForMint(true)
+            stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).send(transactionParams)
+              .on('receipt', (receipt) => {
+                  setReadySignForMint(false)
+                  console.log("receipt", receipt);
+                  if(isPutOnSale){
+                    setProgress(progressStep(70, index))
+                    stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
+                      console.log("isApprovalForAll=", isApproval);
+                      if (!isApproval) {
+                        setOpenAccessDlg(true)
+                        setApprovalFunction(()=>{
+                          stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
+                          .on('receipt', (receipt) => {
+                              setOpenAccessDlg(false)
+                              setCurrent(2)
+                              console.log("setApprovalForAll-receipt", receipt);
+                              callContractMethod('createOrderForSale', {
+                                ...paramObj,
+                                '_amount': _tokenSupply,
+                                '_price': BigInt(price*1e18).toString(),
+                                'beforeSendFunc': ()=>{setReadySignForMint(true)},
+                                'afterSendFunc': ()=>{setReadySignForMint(false)}
+                              }).then((success) => {
+                                resolve(success)
+                              }).catch(error=>{
+                                reject(error)
+                              })
+                          })
+                          .on('error', (error, receipt) => {
+                              console.error("setApprovalForAll-error", error);
+                              setOpenAccessDlg(false)
                               reject(error)
-                            })
+                          });
                         })
-                        .on('error', (error, receipt) => {
-                            console.error("setApprovalForAll-error", error);
-                            setOpenAccessDlg(false)
-                            reject(error)
-                        });
-                      })
-                    } else {
-                      setCurrent(2)
-                      callContractMethod('createOrderForSale', {
-                        ...paramObj,
-                        '_amount': _tokenSupply,
-                        '_price': BigInt(price*1e18).toString(),
-                        'beforeSendFunc': ()=>{setReadySignForMint(true)},
-                        'afterSendFunc': ()=>{setReadySignForMint(false)}
-                      }).then((success) => {
-                        resolve(success)
-                      }).catch(error=>{
-                        reject(error)
-                      })
-                    }
-                  })
-                }
-                else
-                  resolve(true)
-            })
-            .on('error', (error, receipt) => {
-                console.error("error", error);
-                reject(error)
-            });
-
+                      } else {
+                        setCurrent(2)
+                        callContractMethod('createOrderForSale', {
+                          ...paramObj,
+                          '_amount': _tokenSupply,
+                          '_price': BigInt(price*1e18).toString(),
+                          'beforeSendFunc': ()=>{setReadySignForMint(true)},
+                          'afterSendFunc': ()=>{setReadySignForMint(false)}
+                        }).then((success) => {
+                          resolve(success)
+                        }).catch(error=>{
+                          reject(error)
+                        })
+                      }
+                    })
+                  }
+                  else
+                    resolve(true)
+              })
+              .on('error', (error, receipt) => {
+                  console.error("error", error);
+                  reject(error)
+              });
+  
+          }).catch((error) => {
+            reject(error);
+          })
         }).catch((error) => {
           reject(error);
         })
-      }).catch((error) => {
-        reject(error);
-      })
+      // }) 
     })
   )
   const sendIpfsImage = (f)=>(
@@ -519,6 +536,7 @@ export default function CreateItem() {
       setCurrent(1)
     });
   }
+
   const mintBatch = () => {
     if(!files.length)
       return
@@ -536,6 +554,7 @@ export default function CreateItem() {
       setOpenMintDlg(false)
     })
   }
+
   const mintBatchMain = (_didUri) => {
     // const delay = file => new Promise(resolve => setTimeout(resolve, ms));
     files.reduce( (p, f, i) => 
@@ -561,6 +580,7 @@ export default function CreateItem() {
       })
     , Promise.resolve() );
   }
+  
   const scrollToRef = (ref)=>{
     if(!ref.current)
       return

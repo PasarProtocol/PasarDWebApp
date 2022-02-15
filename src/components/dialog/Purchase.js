@@ -98,7 +98,7 @@ export default function Purchase(props) {
   }
 
   const callBuyOrder = async (_orderId, _didUri, _price) => {
-    const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
+    const walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
@@ -145,9 +145,6 @@ export default function Purchase(props) {
 
   const buyNft = async () => {
     setOnProgress(true);
-    // console.log('---------------------------', info);
-    // console.log('orderId:', info.OrderId);
-    // console.log('price:', BigInt(info.Price).toString());
     const buyerDidUri = await sendIpfsDidJson();
     console.log('didUri:', buyerDidUri);
     const buyPrice = BigInt(info.Price).toString();
