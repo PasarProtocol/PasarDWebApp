@@ -33,7 +33,7 @@ import { essentialsConnector } from '../../components/signin-dlg/EssentialConnec
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
 import {blankAddress, marketContract} from '../../config'
-import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -139,8 +139,12 @@ export default function CollectibleDetail() {
     if(sessionLinkFlag){
       if(sessionLinkFlag==='1')
         setAddress(account)
-      if(sessionLinkFlag==='2' && essentialsConnector.getWalletConnectProvider())
-        setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
+      if(sessionLinkFlag==='2'){
+        if(isInAppBrowser())
+          setAddress(await window.elastos.getWeb3Provider().address)
+        else if(essentialsConnector.getWalletConnectProvider())
+          setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
+      }
       if(sessionLinkFlag==='3')
         walletconnect.getAccount().then(setAddress)
     }
