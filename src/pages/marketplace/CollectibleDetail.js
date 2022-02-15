@@ -32,8 +32,9 @@ import PurchaseDlg from '../../components/dialog/Purchase'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
+import useSingin from '../../hooks/useSignin';
 import {blankAddress, marketContract} from '../../config'
-import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -123,6 +124,8 @@ export default function CollectibleDetail() {
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const [isOpenPurchase, setPurchaseOpen] = React.useState(false);
   const [didSignin, setSignin] = React.useState(false);
+  const [buyClicked, setBuyClicked] = React.useState(false);
+  const { pasarLinkAddress } = useSingin()
 
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
@@ -132,15 +135,23 @@ export default function CollectibleDetail() {
   React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     setSignin(!!sessionLinkFlag)
-  }, [sessionStorage.getItem('PASAR_LINK_ADDRESS')]);
+    if(buyClicked&&!!sessionLinkFlag){
+      setBuyClicked(false)
+      setTimeout(()=>{setPurchaseOpen(true)}, 300)
+    }
+  }, [pasarLinkAddress]);
 
   React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
     if(sessionLinkFlag){
       if(sessionLinkFlag==='1')
         setAddress(account)
-      if(sessionLinkFlag==='2' && essentialsConnector.getWalletConnectProvider())
-        setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
+      if(sessionLinkFlag==='2'){
+        if(isInAppBrowser())
+          setAddress(await window.elastos.getWeb3Provider().address)
+        else if(essentialsConnector.getWalletConnectProvider())
+          setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
+      }
       if(sessionLinkFlag==='3')
         walletconnect.getAccount().then(setAddress)
     }
@@ -271,8 +282,10 @@ export default function CollectibleDetail() {
   }
   
   const openSignin = (e)=>{
-    if(document.getElementById("signin"))
+    if(document.getElementById("signin")){
+      setBuyClicked(true)
       document.getElementById("signin").click()
+    }
   }
   
   window.addEventListener('resize', handleResize);

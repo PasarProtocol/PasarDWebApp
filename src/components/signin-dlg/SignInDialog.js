@@ -1,25 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Dialog,
-  Stack,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  Alert,
-  DialogContentText,
-  IconButton,
-  Typography,
-  Grid,
-  Avatar,
-  Box,
-  Link,
-  Menu,
-  MenuItem
-} from '@mui/material';
+import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
 import * as math from 'mathjs';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
@@ -48,16 +30,7 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import {
-  reduceHexAddress,
-  getBalance,
-  getCoinUSD,
-  getDiaTokenInfo,
-  getDiaTokenPrice,
-  fetchFrom,
-  clearCacheData,
-  isInAppBrowser
-} from '../../utils/common';
+import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
 import useSingin from '../../hooks/useSignin';
 
@@ -96,6 +69,7 @@ export default function SignInDialog() {
     setOpenDownloadEssentialDlg,
     setAfterSigninPath,
     setSigninEssentialSuccess,
+    setPasarLinkAddress,
     setDiaBalance
   } = useSingin();
   const { pathname } = useLocation();
@@ -396,6 +370,7 @@ export default function SignInDialog() {
         sessionStorage.setItem('PASAR_DID', did);
         sessionLinkFlag = '2';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
+        setPasarLinkAddress(2)
         setOpenSigninDlg(false);
         if (isInAppBrowser()) {
           setWalletAddress(await window.elastos.getWeb3Provider().address);
@@ -439,8 +414,17 @@ export default function SignInDialog() {
   };
   // ----------------------------------- //
 
-  const handleClickOpenSinginDlg = () => {
-    setOpenSigninDlg(true);
+  const handleClickOpenSinginDlg = async() => {
+    if(isInAppBrowser()){
+      if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
+        await signOutWithEssentials();
+        await signInWithEssentials();
+      } else {
+        await signInWithEssentials();
+      }
+    }
+    else
+      setOpenSigninDlg(true);
   };
   const handleClickOpenDownloadDlg = () => {
     setOpenSigninDlg(false);
@@ -727,7 +711,7 @@ export default function SignInDialog() {
                       MetaMask
                     </ButtonStyle>
                   </Grid>
-                  <Grid item xs={12}>
+                  {/* <Grid item xs={12}>
                     <ButtonStyle
                       variant="contained"
                       startIcon={
@@ -745,7 +729,7 @@ export default function SignInDialog() {
                     >
                       WalletConnect
                     </ButtonStyle>
-                  </Grid>
+                  </Grid> */}
                   <Grid item xs={12}>
                     <ButtonOutlinedStyle variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
                       I don’t have a wallet

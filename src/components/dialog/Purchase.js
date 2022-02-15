@@ -4,18 +4,7 @@ import Web3 from 'web3';
 import { ethers } from 'ethers';
 import * as math from 'mathjs';
 import { useWeb3React } from '@web3-react/core';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  IconButton,
-  Typography,
-  Button,
-  Box,
-  Grid,
-  Stack,
-  Divider
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
@@ -24,6 +13,7 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
+import useSingin from '../../hooks/useSignin';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser } from '../../utils/common';
 
 export default function Purchase(props) {
@@ -32,6 +22,7 @@ export default function Purchase(props) {
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const context = useWeb3React();
+  const { pasarLinkAddress } = useSingin()
   const { library, chainId, account } = context;
 
   const { isOpen, setOpen, info } = props;
@@ -180,7 +171,7 @@ export default function Purchase(props) {
           setBalance(math.round(res / 1e18, 4));
         });
     }
-  }, [account, chainId]);
+  }, [account, chainId, pasarLinkAddress]);
 
   const price = info.Price / 1e18;
   const platformFee = math.round((price * 2) / 100, 4);
