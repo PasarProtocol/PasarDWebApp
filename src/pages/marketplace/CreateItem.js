@@ -269,12 +269,10 @@ export default function CreateItem() {
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
-          alert(accounts)
           // console.log(accounts)
           const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
           setProgress(progressStep(50, index))
           walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
-            alert(gasPrice)
             console.log("Gas price:", gasPrice); 
     
             const _gasLimit = 5000000;

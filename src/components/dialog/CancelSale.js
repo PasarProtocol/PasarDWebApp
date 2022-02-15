@@ -8,6 +8,7 @@ import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
+import { isInAppBrowser } from '../../utils/common';
 
 export default function CancelSale(props) {
   const { isOpen, setOpen, title, orderId, updateCount, handleUpdate } = props;
@@ -18,7 +19,7 @@ export default function CancelSale(props) {
   };
 
   const callCancelOrder = async (_orderId) => {
-    const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
+    const walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 

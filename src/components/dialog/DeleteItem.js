@@ -11,7 +11,7 @@ import {
   marketContract as MARKET_CONTRACT_ADDRESS,
   blankAddress
 } from '../../config';
-import { reduceHexAddress } from '../../utils/common';
+import { reduceHexAddress, isInAppBrowser } from '../../utils/common';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 
@@ -24,7 +24,7 @@ export default function DeleteItem(props) {
   };
 
   const callBurn = async (_id, _value) => {
-    const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
+    const walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
