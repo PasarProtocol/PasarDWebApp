@@ -107,6 +107,7 @@ export async function getCoinUSD() {
     return 0;
   }
 }
+
 export function getDiaTokenPrice(connectProvider) {
   return new Promise((resolve, reject) => {
     if (!connectProvider) return 0;
@@ -142,6 +143,7 @@ export function getDiaTokenPrice(connectProvider) {
       });
   });
 }
+
 export function getDiaTokenInfo(strAddress, connectProvider = null) {
   return new Promise((resolve, reject) => {
     try{
@@ -185,7 +187,7 @@ export function callContractMethod(type, paramObj) {
       return;
     }
 
-    const walletConnectWeb3 = isInAppBrowser() ? window.elastos.getWeb3Provider() : new Web3(essentialsConnector.getWalletConnectProvider());
+    const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
     walletConnectWeb3.eth
       .getAccounts()
       .then((accounts) => {

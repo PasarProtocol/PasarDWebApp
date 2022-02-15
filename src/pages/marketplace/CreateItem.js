@@ -266,7 +266,7 @@ export default function CreateItem() {
         reject(new Error)
         return
       }
-      const walletConnectWeb3 = isInAppBrowser() ? window.elastos.getWeb3Provider() : new Web3(essentialsConnector.getWalletConnectProvider());
+      const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           alert(accounts)
