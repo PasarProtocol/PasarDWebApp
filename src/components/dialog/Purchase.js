@@ -163,10 +163,18 @@ export default function Purchase(props) {
         getBalance(library.provider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
         })
-      else if (sessionLinkFlag === '2' && essentialsConnector.getWalletConnectProvider())
-        getBalance(essentialsConnector.getWalletConnectProvider()).then((res) => {
-          setBalance(math.round(res / 1e18, 4));
-        })
+      else if (sessionLinkFlag === '2'){
+        if (isInAppBrowser()) {
+          const elastosWeb3Provider = await window.elastos.getWeb3Provider();
+          getBalance(elastosWeb3Provider).then((res) => {
+            setBalance(math.round(res / 1e18, 4));
+          });
+        } else if(essentialsConnector.getWalletConnectProvider()) {
+          getBalance(essentialsConnector.getWalletConnectProvider()).then((res) => {
+            setBalance(math.round(res / 1e18, 4));
+          })
+        }
+      }
       else if (sessionLinkFlag === '3')
         getBalance(walletconnect.getProvider()).then((res) => {
           setBalance(math.round(res / 1e18, 4));
