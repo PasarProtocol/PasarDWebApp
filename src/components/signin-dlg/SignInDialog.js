@@ -174,7 +174,8 @@ export default function SignInDialog() {
     }
 
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-    if (sessionLinkFlag) {      // when connected
+    if (sessionLinkFlag) {
+      // when connected
       if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
         getDiaTokenPrice(library.provider)
           .then((res) => {
@@ -261,7 +262,8 @@ export default function SignInDialog() {
         if (!(await window.elastos.getWeb3Provider().isConnected())) {
           setOpenAccountPopup(null);
           await activate(null);
-          window.elastos.getWeb3Provider()
+          window.elastos
+            .getWeb3Provider()
             .disconnect()
             .then((res) => {})
             .catch((e) => {
@@ -435,7 +437,7 @@ export default function SignInDialog() {
       setWalletAddress(null);
       if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession())
         await essentialsConnector.disconnectWalletConnect();
-      if (isInAppBrowser() && await window.elastos.getWeb3Provider().isConnected())
+      if (isInAppBrowser() && (await window.elastos.getWeb3Provider().isConnected()))
         await window.elastos.getWeb3Provider().disconnect();
     } catch (error) {
       console.error('Error while disconnecting the wallet', error);
@@ -482,13 +484,16 @@ export default function SignInDialog() {
     setOpenAccountPopup(null);
     if (e.target.getAttribute('value') === 'signout') {
       await activate(null);
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
-        essentialsConnector
-          .disconnectWalletConnect()
-          .then((res) => {})
-          .catch((e) => {
-            console.log(e);
-          });
+      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+        try {
+          if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession())
+            await essentialsConnector.disconnectWalletConnect();
+          if (isInAppBrowser() && (await window.elastos.getWeb3Provider().isConnected()))
+            await window.elastos.getWeb3Provider().disconnect();
+        } catch (error) {
+          console.error('Error while disconnecting the wallet', error);
+        }
+      }
       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
       setSigninEssentialSuccess(false);
       sessionStorage.removeItem('PASAR_TOKEN');
