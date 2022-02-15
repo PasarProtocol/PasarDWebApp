@@ -42,10 +42,10 @@ export default function AssetCard(props) {
   const [diaBadge, setDiaBadge] = React.useState(false);
   
   const isCreatedByMe = myaddress===royaltyOwner
-  const isListedOwnedByMe = myaddress===royaltyOwner&&saleType!=="Not on sale"
+  const isListedOwnedByMe = (myaddress===royaltyOwner&&saleType==="Primary Sale") || (myaddress===holder&&saleType==="Secondary Sale")
   const isUnlistedOwnedByMe = myaddress===holder&&saleType==="Not on sale"
-  const isListedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType==="Primary Sale"
-  const isUnlistedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType!=="Primary Sale"
+  const isListedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType!=="Not on sale"
+  const isUnlistedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType==="Not on sale"
 
   React.useEffect(() => {
     if(holder)
@@ -244,7 +244,7 @@ export default function AssetCard(props) {
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography>
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
           {
-            (type===0||type===1||type===2&&isListedOwnedByMe||type===2&&isListedByOthers)&&
+            (type===0||type===1||type===2&&(isListedOwnedByMe)||type===2&&isListedByOthers)&&
             <Typography variant="h4" sx={{color: "origin.main"}} noWrap>
               <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
               &nbsp;{price} ELA
