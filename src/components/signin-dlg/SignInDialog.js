@@ -23,40 +23,16 @@ import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosf
 import jwt from 'jsonwebtoken';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { essentialsConnector, initConnectivitySDK, isUsingEssentialsConnector } from './EssentialConnectivity';
+import VerificationDlg from '../dialog/Verification'
 import { MIconButton, MFab } from '../@material-extend';
 import { injected, walletconnect, walletlink } from './connectors';
+import StyledButton from './StyledButton';
 import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
 import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser } from '../../utils/common';
-import useSettings from '../../hooks/useSettings';
 import useSingin from '../../hooks/useSignin';
-
-const useStyles = makeStyles({
-  iconAbsolute1: {
-    paddingLeft: 40,
-    paddingRight: 80,
-    position: 'relative',
-    '& .MuiButton-startIcon': {
-      position: 'absolute',
-      left: 16
-    },
-    '& .MuiButton-endIcon': {
-      position: 'absolute',
-      right: 16
-    }
-  },
-  iconAbsolute2: {
-    paddingLeft: 40,
-    paddingRight: 40,
-    position: 'relative',
-    '& .MuiButton-startIcon': {
-      position: 'absolute',
-      left: 16
-    }
-  }
-});
 
 export default function SignInDialog() {
   const {
@@ -66,39 +42,12 @@ export default function SignInDialog() {
     diaBalance,
     setOpenSigninEssentialDlg,
     setOpenDownloadEssentialDlg,
+    setOpenVerification,
     setAfterSigninPath,
     setSigninEssentialSuccess,
     setPasarLinkAddress,
     setDiaBalance
   } = useSingin();
-  const { pathname } = useLocation();
-  const isHome = pathname === '/';
-
-  const { themeMode } = useSettings();
-  const isLight = !isHome && themeMode === 'light';
-
-  const ButtonStyle = styled(Button)(
-    ({ theme }) =>
-      !isLight && {
-        backgroundColor: 'white',
-        color: theme.palette.background.default,
-        '&:hover': {
-          backgroundColor: theme.palette.action.active
-        }
-      }
-  );
-
-  const ButtonOutlinedStyle = styled(Button)(
-    ({ theme }) =>
-      !isLight && {
-        borderColor: 'white',
-        color: 'white',
-        '&:hover': {
-          color: theme.palette.background.default,
-          backgroundColor: theme.palette.action.active
-        }
-      }
-  );
 
   let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
   const context = useWeb3React();
@@ -113,8 +62,6 @@ export default function SignInDialog() {
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [diaUSD, setDiaUSD] = React.useState(0);
   const navigate = useNavigate();
-
-  const classes = useStyles();
 
   const initializeWalletConnection = React.useCallback(async () => {
     if (sessionLinkFlag && !activatingConnector) {
@@ -469,7 +416,10 @@ export default function SignInDialog() {
   };
   const closeAccountMenu = async (e) => {
     setOpenAccountPopup(null);
-    if (e.target.getAttribute('value') === 'signout') {
+    if (e.target.getAttribute('value') === 'verification') {
+      setOpenVerification(true)
+    }
+    else if (e.target.getAttribute('value') === 'signout') {
       await activate(null);
       if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
         try {
@@ -617,6 +567,10 @@ export default function SignInDialog() {
               <SettingsOutlinedIcon />
               &nbsp;Settings
             </MenuItem> */}
+            <MenuItem value="verification" onClick={closeAccountMenu}>
+              <BookOutlinedIcon />
+              &nbsp;Verification
+            </MenuItem>
             <MenuItem value="signout" onClick={closeAccountMenu} id="signout">
               <LogoutOutlinedIcon />
               &nbsp;Sign Out
@@ -662,7 +616,7 @@ export default function SignInDialog() {
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sx={{ pt: '8px !important' }}>
-                    <ButtonStyle
+                    <StyledButton
                       variant="contained"
                       startIcon={
                         <Avatar
@@ -679,7 +633,6 @@ export default function SignInDialog() {
                           Popular
                         </Typography>
                       }
-                      className={classes.iconAbsolute1}
                       fullWidth
                       onClick={async () => {
                         // check if is already connected
@@ -691,10 +644,9 @@ export default function SignInDialog() {
                           await signInWithEssentials();
                         }
                       }}
-                      sx={!isLight && { backgroundColor: 'white' }}
                     >
                       Elastos Essentials
-                    </ButtonStyle>
+                    </StyledButton>
                   </Grid>
                   <Grid item xs={12} sx={{ pt: '8px !important' }}>
                     <Typography variant="body2" display="block" gutterBottom align="center">
@@ -702,7 +654,7 @@ export default function SignInDialog() {
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sx={{ pt: '8px !important' }}>
-                    <ButtonStyle
+                    <StyledButton
                       variant="contained"
                       startIcon={
                         <Avatar
@@ -711,17 +663,16 @@ export default function SignInDialog() {
                           sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
                         />
                       }
-                      className={classes.iconAbsolute2}
                       fullWidth
                       onClick={() => {
                         handleChooseWallet('metamask');
                       }}
                     >
                       MetaMask
-                    </ButtonStyle>
+                    </StyledButton>
                   </Grid>
                   {/* <Grid item xs={12}>
-                    <ButtonStyle
+                    <StyledButton
                       variant="contained"
                       startIcon={
                         <Avatar
@@ -730,19 +681,18 @@ export default function SignInDialog() {
                           sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
                         />
                       }
-                      className={classes.iconAbsolute2}
                       fullWidth
                       onClick={() => {
                         handleChooseWallet('walletconnect');
                       }}
                     >
                       WalletConnect
-                    </ButtonStyle>
+                    </StyledButton>
                   </Grid> */}
                   <Grid item xs={12}>
-                    <ButtonOutlinedStyle variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
+                    <StyledButton variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
                       I don’t have a wallet
-                    </ButtonOutlinedStyle>
+                    </StyledButton>
                   </Grid>
                 </Grid>
               </Box>
@@ -789,28 +739,26 @@ export default function SignInDialog() {
           <Box component="div" sx={{ maxWidth: 300, m: 'auto' }}>
             <Grid container spacing={2} sx={{ mt: 2, mb: 4 }}>
               <Grid item xs={12} sx={{ pt: '8px !important' }}>
-                <ButtonStyle
+                <StyledButton
                   variant="contained"
                   href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app"
                   target="_blank"
                   startIcon={<AdbIcon />}
-                  className={classes.iconAbsolute2}
                   fullWidth
                 >
                   Google Play
-                </ButtonStyle>
+                </StyledButton>
               </Grid>
               <Grid item xs={12}>
-                <ButtonOutlinedStyle
+                <StyledButton
                   variant="outlined"
                   href="https://apps.apple.com/us/app/elastos-essentials/id1568931743"
                   target="_blank"
                   startIcon={<AppleIcon />}
-                  className={classes.iconAbsolute2}
                   fullWidth
                 >
                   App Store
-                </ButtonOutlinedStyle>
+                </StyledButton>
               </Grid>
               <Grid item xs={12} align="center">
                 <Button color="inherit" startIcon={<Icon icon={arrowIosBackFill} />} onClick={handleGoBack}>
@@ -857,7 +805,7 @@ export default function SignInDialog() {
                 </Typography>
               </Grid>
               <Grid item xs={12} sx={{ pt: '8px !important' }}>
-                <ButtonStyle
+                <StyledButton
                   variant="contained"
                   startIcon={
                     <Avatar
@@ -874,7 +822,6 @@ export default function SignInDialog() {
                       Popular
                     </Typography>
                   }
-                  className={classes.iconAbsolute1}
                   fullWidth
                   onClick={async () => {
                     // check if is already connected
@@ -886,15 +833,14 @@ export default function SignInDialog() {
                       await signInWithEssentials();
                     }
                   }}
-                  sx={!isLight && { backgroundColor: 'white' }}
                 >
                   Elastos Essentials
-                </ButtonStyle>
+                </StyledButton>
               </Grid>
               <Grid item xs={12}>
-                <ButtonOutlinedStyle variant="outlined" fullWidth onClick={handleClickOpenDownloadEssentialDlg}>
+                <StyledButton variant="outlined" fullWidth onClick={handleClickOpenDownloadEssentialDlg}>
                   I don’t have a wallet
-                </ButtonOutlinedStyle>
+                </StyledButton>
               </Grid>
             </Grid>
           </Box>
@@ -932,28 +878,26 @@ export default function SignInDialog() {
           <Box component="div" sx={{ maxWidth: 300, m: 'auto' }}>
             <Grid container spacing={2} sx={{ mt: 2, mb: 4 }}>
               <Grid item xs={12} sx={{ pt: '8px !important' }}>
-                <ButtonStyle
+                <StyledButton
                   variant="contained"
                   href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app"
                   target="_blank"
                   startIcon={<AdbIcon />}
-                  className={classes.iconAbsolute2}
                   fullWidth
                 >
                   Google Play
-                </ButtonStyle>
+                </StyledButton>
               </Grid>
               <Grid item xs={12}>
-                <ButtonOutlinedStyle
+                <StyledButton
                   variant="outlined"
                   href="https://apps.apple.com/us/app/elastos-essentials/id1568931743"
                   target="_blank"
                   startIcon={<AppleIcon />}
-                  className={classes.iconAbsolute2}
                   fullWidth
                 >
                   App Store
-                </ButtonOutlinedStyle>
+                </StyledButton>
               </Grid>
               <Grid item xs={12} align="center">
                 <Button color="inherit" startIcon={<Icon icon={arrowIosBackFill} />} onClick={handleGoBackEssential}>
@@ -967,6 +911,7 @@ export default function SignInDialog() {
           </Typography>
         </DialogContent>
       </Dialog>
+      <VerificationDlg/>
       <SnackbarCustom isOpen={isOpenSnackbar} setOpen={setSnackbarOpen}>
         Wrong network, only Elastos Smart Chain is supported
       </SnackbarCustom>
