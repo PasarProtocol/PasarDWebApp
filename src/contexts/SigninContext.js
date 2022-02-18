@@ -9,11 +9,13 @@ const initialState = {
   afterSigninPath: null,
   diaBalance: 0,
   signinEssentialSuccess: false,
+  elaConnectivityService: null,
   pasarLinkAddress: 0,
   setOpenSigninEssentialDlg: () => {},
   setOpenDownloadEssentialDlg: () => {},
   setAfterSigninPath: () => {},
   setSigninEssentialSuccess: () => {},
+  setElastosConnectivityService: () => {},
   setDiaBalance: () => {},
   setPasarLinkAddress: () => {}
 };
@@ -30,6 +32,7 @@ function SigninProvider({ children }) {
   const [openVerification, setOpenVerification] = useState(false);
   const [afterSigninPath, setAfterSigninPath] = useState(null);
   const [signinEssentialSuccess, setSigninEssentialSuccess] = useState(false);
+  const [elaConnectivityService, setElastosConnectivityService] = useState(false);
   const [diaBalance, setDiaBalance] = useState(false);
   const [pasarLinkAddress, setPasarLinkAddress] = useState(0);
 
@@ -41,6 +44,7 @@ function SigninProvider({ children }) {
         openVerification,
         afterSigninPath,
         signinEssentialSuccess,
+        elaConnectivityService,
         diaBalance,
         pasarLinkAddress,
         setOpenSigninEssentialDlg,
@@ -48,6 +52,7 @@ function SigninProvider({ children }) {
         setOpenVerification,
         setAfterSigninPath,
         setSigninEssentialSuccess,
+        setElastosConnectivityService,
         setDiaBalance,
         setPasarLinkAddress
       }}

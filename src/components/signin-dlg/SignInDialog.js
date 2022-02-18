@@ -559,7 +559,7 @@ export default function SignInDialog() {
               &nbsp;Settings
             </MenuItem> */}
             <MenuItem value="verification" onClick={closeAccountMenu}>
-              <BookOutlinedIcon />
+              <Box component="img" alt="ico" src='/static/user-check.svg' sx={{ width: 24, px: '2px' }}/>
               &nbsp;Verification
             </MenuItem>
             <MenuItem value="signout" onClick={closeAccountMenu} id="signout">
