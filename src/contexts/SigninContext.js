@@ -27,6 +27,7 @@ SigninProvider.propTypes = {
 function SigninProvider({ children }) {
   const [openSigninEssential, setOpenSigninEssentialDlg] = useState(false);
   const [openDownloadEssential, setOpenDownloadEssentialDlg] = useState(false);
+  const [openVerification, setOpenVerification] = useState(false);
   const [afterSigninPath, setAfterSigninPath] = useState(null);
   const [signinEssentialSuccess, setSigninEssentialSuccess] = useState(false);
   const [diaBalance, setDiaBalance] = useState(false);
@@ -37,12 +38,14 @@ function SigninProvider({ children }) {
       value={{
         openSigninEssential,
         openDownloadEssential,
+        openVerification,
         afterSigninPath,
         signinEssentialSuccess,
         diaBalance,
         pasarLinkAddress,
         setOpenSigninEssentialDlg,
         setOpenDownloadEssentialDlg,
+        setOpenVerification,
         setAfterSigninPath,
         setSigninEssentialSuccess,
         setDiaBalance,
