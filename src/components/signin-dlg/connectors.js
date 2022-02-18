@@ -34,3 +34,12 @@ export const walletlink = new WalletLinkConnector({
   appName: "Global Income Coin",
   supportedChainIds: [1, 3, 4, 5, 20, 21, 42, 10, 137, 69, 420, 80001],
 });
+
+export const resetWalletConnector = (connector) => {
+  if (
+    connector &&
+    connector instanceof WalletConnectConnector
+  ) {
+    connector.walletConnectProvider = undefined
+  }
+}
