@@ -15,6 +15,7 @@ import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import PropTypes from 'prop-types';
+import Web3 from "web3"; // 
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import jwtDecode from 'jwt-decode';
@@ -290,19 +291,35 @@ export default function SignInDialog() {
     }
   }, [essentialsConnector.hasWalletConnectSession(), active]);
   
+  
+const ethEnabled = async () => {
+  if (window.ethereum) {
+    await window.ethereum.request({method: 'eth_requestAccounts'});
+    window.web3 = new Web3(window.ethereum);
+    return true;
+  }
+  return false;
+}
   // ------------ MM, WC Connect ------------ //
   const handleChooseWallet = async (wallet) => {
     let currentConnector = null;
     if (wallet === 'metamask') {
       currentConnector = injected;
-      activate(currentConnector);
+      alert("before activate")
+      await activate(currentConnector);
+      alert("after activate")
     }
     else if (wallet === 'walletconnect') {
       currentConnector = walletconnect;
-      await resetWalletConnector(currentConnector);
+      resetWalletConnector(currentConnector);
       await activate(currentConnector);
     }
+    alert(JSON.stringify(injected))
+    alert(JSON.stringify(injected.getAccount()))
+    alert(await ethEnabled())
     const retAddress = await currentConnector.getAccount();
+    alert(retAddress)
+    alert(ethEnabled())
     if(!isUndefined(retAddress)) {
       console.log('loged in');
       if (currentConnector === injected) {
