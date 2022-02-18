@@ -18,6 +18,10 @@ export default function TransLoadingButton(props) {
     variant={props.loading?"outlined":"contained"}
     fullWidth
     onClick={props.onClick}>
-    {props.loading?"Please Sign Transaction From Wallet":props.children}
+    {props.loading?props.loadingText:props.children}
   </LoadingButtonStyled>;
 }
+
+TransLoadingButton.defaultProps = {
+  loadingText: "Please Sign Transaction From Wallet",
+};
