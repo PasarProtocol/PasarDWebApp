@@ -40,8 +40,15 @@ export default class ElastosConnectivityService {
   constructor() {
     this._connector = new EssentialsConnector()
     this[sTrustedProvider] = ["did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK"] // Trinity. Tech KYC DID
-    if(!connectivity.getActiveConnector())
-      this.registerConnector().then(() => console.debug("Elastos Connectivity SDK connector is initialized"))
+    
+    // unregistear if already registerd
+    const arrIConnectors = connectivity.getAvailableConnectors();
+    if (arrIConnectors.findIndex((option) => option.name === this._connector.name) !== -1) {
+      connectivity.unregisterConnector(this._connector.name);
+      // console.log('unregister connector succeed.');
+    }
+
+    this.registerConnector().then(() => console.debug("Elastos Connectivity SDK connector is initialized"))
   }
 
   /**
