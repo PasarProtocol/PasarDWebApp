@@ -35,6 +35,7 @@ import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ProgressBar from '../../components/ProgressBar'
 import {hash, removeLeadingZero, callContractMethod, isInAppBrowser } from '../../utils/common';
+import convert from '../../utils/image-file-resize';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -364,8 +365,16 @@ export default function CreateItem() {
       reader.onloadend = async() => {
         try {
           const fileContent = Buffer.from(reader.result)
+          const thumbnail = await convert(f, 300, 300)
           const added = await client.add(fileContent)
-          resolve({...added, 'type':f.type})
+          
+          console.log(added)
+          if(thumbnail.success === 0){
+            const addedThumbnail = await client.add(thumbnail.fileContent)
+            resolve({'origin': {...added}, 'thumbnail': {...addedThumbnail}, 'type':f.type})
+            console.log(addedThumbnail)
+          }
+          resolve({'origin': {...added}, 'thumbnail': {...added}, 'type':f.type})
         } catch (error) {
           reject(error);
         }
@@ -400,10 +409,10 @@ export default function CreateItem() {
         "name": collectibleName,
         "description": description,
         "data": {
-          "image": `pasar:image:${added.path}`,
+          "image": `pasar:image:${added.origin.path}`,
           "kind": added.type.replace('image/', ''),
-          "size": added.size,
-          "thumbnail": `pasar:image:${added.path}`
+          "size": added.origin.size,
+          "thumbnail": `pasar:image:${added.thumbnail.path}`
         },
         "adult": explicitRef.current.checked,
         "properties": propertiesObj,
@@ -457,7 +466,7 @@ export default function CreateItem() {
       let temPromise = sendIpfsImage(file)
       setCurrentPromise(temPromise)
       temPromise.then((added) => {
-        _id = `0x${hash(added.path)}`
+        _id = `0x${hash(added.origin.path)}`
         setProgress(15)
         temPromise = sendIpfsMetaJson(added)
         setCurrentPromise(temPromise)
@@ -490,7 +499,7 @@ export default function CreateItem() {
       
       setProgress(progressStep(10, index))
       sendIpfsImage(f).then((added) => {
-        _id = `0x${hash(added.path)}`
+        _id = `0x${hash(added.origin.path)}`
         setProgress(progressStep(20, index))
         return sendIpfsMetaJson(added, index)
       }).then((metaRecv) => {
