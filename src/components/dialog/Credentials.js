@@ -10,8 +10,8 @@ import ElastosConnectivityService from '../../utils/elastosConnectivityService';
 import TransLoadingButton from '../TransLoadingButton';
 import { fetchFrom } from '../../utils/common';
 
-export default function Verification() {
-  const { openVerification, elaConnectivityService, setOpenVerification, setElastosConnectivityService } = useSingin();
+export default function Credentials() {
+  const { openCredentials, elaConnectivityService, setOpenCredentials, setElastosConnectivityService } = useSingin();
   React.useEffect(()=>{
     const connectivityService = new ElastosConnectivityService()
     setElastosConnectivityService(connectivityService)
@@ -20,7 +20,7 @@ export default function Verification() {
   const [onProgress, setOnProgress] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const handleClose = () => {
-    setOpenVerification(false);
+    setOpenCredentials(false);
     setIsSuccess(false)
     setOnProgress(false)
   }
@@ -65,7 +65,7 @@ export default function Verification() {
     //     }).catch((error) => {
     //       Promise.reject(error)
     //       setOnProgress(false)
-    //       enqueueSnackbar("Verification error", { variant: 'error' });
+    //       enqueueSnackbar("Credentials error", { variant: 'error' });
     //       // console.log(error);
     //   });
     //   return Promise.resolve();
@@ -76,7 +76,7 @@ export default function Verification() {
   }
 
   return (
-    <Dialog open={openVerification} onClose={handleClose}>
+    <Dialog open={openCredentials} onClose={handleClose}>
       <DialogTitle>
         <IconButton
           aria-label="close"
@@ -95,10 +95,10 @@ export default function Verification() {
         !isSuccess?
         <DialogContent>
           <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
-            Verification
+            Credentials
           </Typography>
           <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
-            Please provide verified identity credentials to<br/>receive a KYC-me badge on your profile.
+            Pasar requires certain verifiable credentials issued<br/>by KYC-me in order for the user to receive a badge.
           </Typography>
           <Typography variant="body2" display="block" gutterBottom align="center" sx={{ mt: 4 }}>
             Web3.0 super wallet with Decentralized Identifier (DID)
@@ -146,7 +146,7 @@ export default function Verification() {
                   fullWidth
                   sx={{textTransform: 'none'}}
                 >
-                  Get verified on KYC-me.io now
+                  Get credentials on KYC-me.io now
                 </StyledButton>
               </Grid>
             </Grid>
@@ -158,10 +158,10 @@ export default function Verification() {
 
         <DialogContent>
           <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
-            Verification
+            Credentials
           </Typography>
           <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
-            Your identity has already been verified!
+            KYC-me Badge
           </Typography>
           <Box sx={{justifyContent: 'center', display: 'flex', py: '20px'}}>
             <Box sx={{background: 'black', borderRadius: '100%', p: 3, display: 'inline-flex', boxShadow: '0px 8px 18px #4d4d4d'}}>
@@ -174,9 +174,6 @@ export default function Verification() {
               />
             </Box>
           </Box>
-          <Typography variant="body2" display="block" gutterBottom align="center">
-            Verification done through a 3rd-party via KYC-me.io
-          </Typography>
           <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
             This badge will appear on your profile as well on the item card whenever you list it on the marketplace.
             This is also gives you the power to vouch or report a creator, owner and collection.
