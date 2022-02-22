@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
+
 import Web3 from 'web3';
 import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Grid, Tooltip, Icon, Button, Box, Avatar } from '@mui/material';
@@ -9,6 +11,7 @@ import useSingin from '../../hooks/useSignin';
 import ElastosConnectivityService from '../../utils/elastosConnectivityService';
 import TransLoadingButton from '../TransLoadingButton';
 import { fetchFrom } from '../../utils/common';
+import { trustedProviders } from '../../config';
 
 export default function Credentials() {
   const { openCredentials, elaConnectivityService, setOpenCredentials, setElastosConnectivityService } = useSingin();
@@ -24,6 +27,11 @@ export default function Credentials() {
     setIsSuccess(false)
     setOnProgress(false)
   }
+  const stopProvide = (errMsg)=>{
+    setOnProgress(false)
+    enqueueSnackbar(errMsg, { variant: 'error' });
+  }
+
   const onClickProvideCredentials = async ()=>{
     setOnProgress(true)
 
@@ -36,9 +44,10 @@ export default function Credentials() {
         return
         // return Promise.reject(new Error("Error while trying to get the presentation"))
       }
+      const resolverUrl = 'https://api.trinity-tech.cn/eid';
+      DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
     } catch (error) {
-      setOnProgress(false)
-      enqueueSnackbar("Request credentials error", { variant: 'error' });
+      stopProvide("Request credentials error")
       try {
         await elaConnectivityService.disconnect();
       } catch (disconnectError) {
@@ -47,32 +56,88 @@ export default function Credentials() {
       return Promise.reject(error);
     }
 
-    // try {
-    //   fetchFrom('/auth/api/v1/kycactivation',
-    //     {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json"
-    //       },
-    //       body: JSON.stringify(kycVerifiablePresentation.toJSON())
-    //     }).then(response => response.json()).then(data => {
-    //       setOnProgress(false)
-    //       if (data.code === 200) {
-    //         setIsSuccess(true)
-    //       } else {
-    //         enqueueSnackbar(data.message, { variant: 'warning' });
-    //       }
-    //     }).catch((error) => {
-    //       Promise.reject(error)
-    //       setOnProgress(false)
-    //       enqueueSnackbar("Credentials error", { variant: 'error' });
-    //       // console.log(error);
-    //   });
-    //   return Promise.resolve();
-    // } catch (error) {
-    //   setOnProgress(false)
-    //   return Promise.reject(error);
-    // }
+    // Check presentation validity (genuine, not tampered)
+    const valid = await kycVerifiablePresentation.isValid();
+    if (!valid) {
+      stopProvide("Invalid presentation")
+      return
+    }
+
+    // Get the presentation holder
+    const presentationDID = kycVerifiablePresentation.getHolder().getMethodSpecificId();
+    if (!presentationDID) {
+      stopProvide("Unable to extract owner DID from the presentation")
+      return
+    }
+
+    // Make sure the holder of this presentation is the currently authentified user
+    if (sessionStorage.getItem('PASAR_DID') !== presentationDID) {
+      stopProvide("Presentation not issued by the currently authenticated user")
+      return
+    }
+
+    const credentials = kycVerifiablePresentation.getCredentials();
+    if (!credentials.length) {
+      stopProvide("Nothing to provide")
+      return
+    }
+
+    const nameCredential = credentials.find(c => c.getType().indexOf("NameCredential") >= 0);
+    const birthDateCredential = credentials.find(c => c.getType().indexOf("BirthDateCredential") >= 0);
+    const genderCredential = credentials.find(c => c.getType().indexOf("GenderCredential") >= 0);
+    const countryCredential = credentials.find(c => c.getType().indexOf("CountryCredential") >= 0);
+    if (!nameCredential && !birthDateCredential && !genderCredential && !countryCredential){
+      stopProvide("Nothing to provide")
+      return
+    }
+    
+    const credentialInfo = {}
+
+    if (nameCredential){
+      if(!ensureTrustedKycProvider(nameCredential)){
+        stopProvide("The issuer of the name credential is unknown or not trusted")
+        return
+      }
+      const lastName = nameCredential.getSubject().getProperty("lastName") || "";
+      const firstNames = nameCredential.getSubject().getProperty("firstNames") || "";
+      const name = `${lastName} ${firstNames}`.trim();
+      credentialInfo.name = name
+    } 
+
+    if (birthDateCredential) {
+      if(!ensureTrustedKycProvider(birthDateCredential)){
+        stopProvide("The issuer of the birth date credential is unknown or not trusted")
+        return
+      }
+      credentialInfo.birthDate = birthDateCredential.getSubject().getProperty("birthDate") || "";
+    }
+    
+    if (genderCredential) {
+      if(!ensureTrustedKycProvider(genderCredential)){
+        stopProvide("The issuer of the gender credential is unknown or not trusted")
+        return
+      }
+      credentialInfo.gender = genderCredential.getSubject().getProperty("gender") || "";
+    }
+
+    if (countryCredential) {
+      if(!ensureTrustedKycProvider(countryCredential)){
+        stopProvide("The issuer of the country credential is unknown or not trusted")
+        return
+      }
+      credentialInfo.country = countryCredential.getSubject().getProperty("country") || "";
+    }
+    sessionStorage.setItem('CREDENTIALS', JSON.stringify(credentialInfo))
+    setIsSuccess(true)
+    setOnProgress(false)
+  }
+  
+  /**
+   * Checks if we trust the issuer of a credential as KYC provider.
+   */
+  const ensureTrustedKycProvider = (credential) => {
+    const credentialIssuer = credential.getIssuer().toString();
+    return trustedProviders.indexOf(credentialIssuer) >= 0;
   }
 
   return (
