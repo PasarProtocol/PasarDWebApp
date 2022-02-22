@@ -29,7 +29,7 @@ SigninProvider.propTypes = {
 function SigninProvider({ children }) {
   const [openSigninEssential, setOpenSigninEssentialDlg] = useState(false);
   const [openDownloadEssential, setOpenDownloadEssentialDlg] = useState(false);
-  const [openVerification, setOpenVerification] = useState(false);
+  const [openCredentials, setOpenCredentials] = useState(false);
   const [afterSigninPath, setAfterSigninPath] = useState(null);
   const [signinEssentialSuccess, setSigninEssentialSuccess] = useState(false);
   const [elaConnectivityService, setElastosConnectivityService] = useState(false);
@@ -41,7 +41,7 @@ function SigninProvider({ children }) {
       value={{
         openSigninEssential,
         openDownloadEssential,
-        openVerification,
+        openCredentials,
         afterSigninPath,
         signinEssentialSuccess,
         elaConnectivityService,
@@ -49,7 +49,7 @@ function SigninProvider({ children }) {
         pasarLinkAddress,
         setOpenSigninEssentialDlg,
         setOpenDownloadEssentialDlg,
-        setOpenVerification,
+        setOpenCredentials,
         setAfterSigninPath,
         setSigninEssentialSuccess,
         setElastosConnectivityService,

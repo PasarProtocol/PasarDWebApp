@@ -24,7 +24,7 @@ import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosf
 import jwt from 'jsonwebtoken';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { essentialsConnector, initConnectivitySDK, isUsingEssentialsConnector } from './EssentialConnectivity';
-import VerificationDlg from '../dialog/Verification'
+import CredentialsDlg from '../dialog/Credentials'
 import { MIconButton, MFab } from '../@material-extend';
 import { injected, walletconnect, resetWalletConnector } from './connectors';
 import StyledButton from './StyledButton';
@@ -43,7 +43,7 @@ export default function SignInDialog() {
     diaBalance,
     setOpenSigninEssentialDlg,
     setOpenDownloadEssentialDlg,
-    setOpenVerification,
+    setOpenCredentials,
     setAfterSigninPath,
     setSigninEssentialSuccess,
     setPasarLinkAddress,
@@ -407,8 +407,8 @@ export default function SignInDialog() {
   };
   const closeAccountMenu = async (e) => {
     setOpenAccountPopup(null);
-    if (e.target.getAttribute('value') === 'verification') {
-      setOpenVerification(true)
+    if (e.target.getAttribute('value') === 'credentials') {
+      setOpenCredentials(true)
     }
     else if (e.target.getAttribute('value') === 'signout') {
       await activate(null);
@@ -558,9 +558,9 @@ export default function SignInDialog() {
               <SettingsOutlinedIcon />
               &nbsp;Settings
             </MenuItem> */}
-            <MenuItem value="verification" onClick={closeAccountMenu}>
-              <Box component="img" alt="ico" src='/static/user-check.svg' sx={{ width: 24, px: '2px' }}/>
-              &nbsp;Verification
+            <MenuItem value="credentials" onClick={closeAccountMenu}>
+              <Box component="img" alt="ico" src='/static/carbon_credentials.svg' sx={{ width: 24 }}/>
+              &nbsp;Credentials
             </MenuItem>
             <MenuItem value="signout" onClick={closeAccountMenu} id="signout">
               <LogoutOutlinedIcon />
@@ -902,7 +902,7 @@ export default function SignInDialog() {
           </Typography>
         </DialogContent>
       </Dialog>
-      <VerificationDlg/>
+      <CredentialsDlg/>
       <SnackbarCustom isOpen={isOpenSnackbar} setOpen={setSnackbarOpen}>
         Wrong network, only Elastos Smart Chain is supported
       </SnackbarCustom>
