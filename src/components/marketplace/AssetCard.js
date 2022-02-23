@@ -243,7 +243,7 @@ export default function AssetCard(props) {
           }
           </Box>
           <Typography variant="h4" noWrap>{title}</Typography>
-          <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography>
+          {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography> */}
           <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
           {
             (type===0||type===1||type===2&&(isListedOwnedByMe)||type===2&&isListedByOthers)&&

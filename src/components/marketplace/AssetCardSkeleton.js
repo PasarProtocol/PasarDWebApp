@@ -13,7 +13,7 @@ export default function AssetCardSkeleton() {
           <Skeleton circle width={24} height={24} style={{marginBottom: 5}}/>
           <Skeleton style={{ justifyContent: 'center', aspectRatio: '1/1', display: 'flex', marginBottom: -20 }} />
           <h2><Skeleton/></h2>
-          <h5><Skeleton count={2}/></h5>
+          <h5><Skeleton count={1}/></h5>
           <h2><Skeleton/></h2>
           <Box sx={{height: '20px'}}/>
         </SkeletonTheme>
