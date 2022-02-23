@@ -13,6 +13,7 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { create, urlSource } from 'ipfs-http-client'
 import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
+import jwtDecode from 'jwt-decode';
 
 // components
 import { MHidden } from '../../components/@material-extend';
@@ -402,12 +403,27 @@ export default function CreateItem() {
           return obj
         }, {})
       }
+
+      const did = sessionStorage.getItem('PASAR_DID') || ''
+      const token = sessionStorage.getItem("PASAR_TOKEN");
+      const user = jwtDecode(token);
+      const {name, bio} = user;
+      const proof = sessionStorage.getItem("KYCedProof") || ''
+      const creatorObj = {
+        "did": `did:elastos:${did}`,
+        "name": name || '',
+        "description": bio || '',
+      }
+      if(proof.length) {
+        creatorObj.KYCedProof = proof
+      }
       // create the metadata object we'll be storing
       const metaObj = {
         "version": "2",
         "type": itemtype==="General"?'image':itemtype.toLowerCase(),
         "name": collectibleName,
         "description": description,
+        "creator": creatorObj,
         "data": {
           "image": `pasar:image:${added.origin.path}`,
           "kind": added.type.replace('image/', ''),
@@ -434,7 +450,7 @@ export default function CreateItem() {
         cancelAction()
       });
       // create the metadata object we'll be storing
-      const did = sessionStorage.getItem('PASAR_DID') ? sessionStorage.getItem('PASAR_DID') : ''
+      const did = sessionStorage.getItem('PASAR_DID') || ''
       const didObj = {
         "version":"2",
         "did": `did:elastos:${did}`
