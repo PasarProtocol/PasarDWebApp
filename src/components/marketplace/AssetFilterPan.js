@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 // material
 import { styled } from '@mui/material/styles';
 import { Box, Accordion, AccordionSummary, AccordionDetails, Grid, MenuItem, List, TextField, FormControlLabel, Typography, Stack, 
@@ -27,11 +27,15 @@ const DrawerStyle = styled(Drawer)(({ theme }) => ({
 
 export default function AssetFilterPan(props){
   const {sx, scrollMaxHeight, btnNames, filterProps, handleFilter} = props
-  const minRef = useRef();
-  const maxRef = useRef();
+  const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
+  const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
 
+  React.useEffect(()=>{
+    setMinVal(filterProps.range.min)
+    setMaxVal(filterProps.range.max)
+  }, [filterProps.range])
   const applyRange = (e)=>{
-    const range = {min: minRef.current.value, max: maxRef.current.value}
+    const range = {min: minVal, max: maxVal}
     handleFilter('range', range)
   }
 
@@ -100,13 +104,13 @@ export default function AssetFilterPan(props){
                   </Select>
                   <Grid container>
                     <Grid item xs={5} md={5}>
-                      <TextField label="Min" size="small" type="number" inputRef={minRef} defaultValue={filterProps.range?filterProps.range.min:''}/>
+                      <TextField label="Min" size="small" type="number" value={minVal} onChange={(e)=>setMinVal(e.target.value)}/>
                     </Grid>
                     <Grid item xs={2} md={2} align="center">
                       <Typography variant="body2" sx={{pt: 1}}>to</Typography>
                     </Grid>
                     <Grid item xs={5} md={5}>
-                      <TextField label="Max" size="small" type="number" inputRef={maxRef} defaultValue={filterProps.range?filterProps.range.max:''}/>
+                      <TextField label="Max" size="small" type="number" value={maxVal} onChange={(e)=>setMaxVal(e.target.value)}/>
                     </Grid>
                   </Grid>
                   <Button variant="contained" color="primary" width="100%" onClick={applyRange}>
@@ -154,7 +158,7 @@ export default function AssetFilterPan(props){
               <AccordionDetails>
                 <Stack spacing={1} direction='row'>
                 {
-                  [...btnNames].splice(2).map((name, index)=>(
+                  [...btnNames].splice(2,2).map((name, index)=>(
                     filterProps.selectedBtns?
                     <Button key={index} variant={filterProps.selectedBtns.includes(index+2)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index+2)}>
                       {name}

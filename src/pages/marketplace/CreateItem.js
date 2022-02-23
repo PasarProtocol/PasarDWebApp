@@ -488,7 +488,6 @@ export default function CreateItem() {
         setCurrentPromise(temPromise)
         return temPromise
       }).then((didRecv) => {
-        console.log(didRecv.path, "--")
         setProgress(45)
         _didUri = `feeds:json:${didRecv.path}`
         resolve({ _id, _uri, _didUri })

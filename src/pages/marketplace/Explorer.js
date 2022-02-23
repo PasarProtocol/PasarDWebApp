@@ -101,7 +101,10 @@ export default function MarketExplorer() {
   const sessionFilterProps = JSON.parse(sessionStorage.getItem("filter-props")) || {}
   const params = useParams(); // params.key
   const drawerWidth = 360;
-  const btnNames = ["Buy Now", "On Auction", "General", "Avatar"]
+  const btnNames = ["Buy Now", "On Auction", "General", "Avatar", "ELA", "Explicit & Sensitive Content"]
+  const rangeBtnId = 4
+  const adultBtnId = 5
+  const emptyRange = {min: '', max: ''}
 
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
@@ -136,7 +139,7 @@ export default function MarketExplorer() {
     setAbortController(newController);
     let statusFilter = [...btnNames].splice(0, 2).filter((name, index)=>selectedBtns.indexOf(index)>=0)
     statusFilter = (statusFilter.length===2 || statusFilter.length===0)?'All':statusFilter[0]
-    let itemTypeFilter = [...btnNames].splice(2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
+    let itemTypeFilter = [...btnNames].splice(2, 2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
     itemTypeFilter = (itemTypeFilter.length===2 || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
@@ -181,6 +184,14 @@ export default function MarketExplorer() {
     setDispmode(mode)
   };
   const handleBtns = (num)=>{
+    if(num === rangeBtnId){
+      handleFilter('range', emptyRange)
+      return
+    }
+    if(num === adultBtnId){
+      handleFilter('adult', false)
+      return
+    }
     const tempBtns = [...selectedBtns]
     if(tempBtns.includes(num)){
       const findIndex = tempBtns.indexOf(num)
@@ -189,6 +200,26 @@ export default function MarketExplorer() {
     else
       tempBtns.push(num)
     setSelectedBtns(tempBtns);
+  }
+  const handleBtnsMobile = (num)=>{
+    if(num === rangeBtnId)
+      handleFilterMobile('range', emptyRange)
+    else if(num === adultBtnId)
+      handleFilterMobile('adult', false)
+    else handleFilterMobile('statype', num)
+  }
+  const setSelectedByValue = (value, btnId)=>{
+    const tempBtns = [...selectedBtns]
+    if(value){
+      if(!tempBtns.includes(btnId)) {
+        tempBtns.push(btnId)
+        setSelectedBtns(tempBtns)
+      }
+    } else if(tempBtns.includes(btnId)){
+      const findIndex = tempBtns.indexOf(btnId)
+      tempBtns.splice(findIndex, 1)
+      setSelectedBtns(tempBtns)
+    }
   }
   const handleFilter = (key, value)=>{
     setPage(1)
@@ -200,9 +231,11 @@ export default function MarketExplorer() {
         setSelectedBtns(value)
         break
       case 'range':
+        setSelectedByValue(value.min || value.max, rangeBtnId)
         setRange(value)
         break
       case 'adult':
+        setSelectedByValue(value, adultBtnId)
         setAdult(value)
         break
       default:
@@ -211,22 +244,42 @@ export default function MarketExplorer() {
   }
   const handleFilterMobile = (key, value)=>{
     const tempForm = {...filterForm}
+    const tempBtns = [...filterForm.selectedBtns]
     tempForm[key] = value
     if(key==='clear_all'){
       tempForm.selectedBtns = []
+      tempForm.range = emptyRange
+      tempForm.adult = false
       setFilterForm(tempForm)
       return
     }
     if(key==='statype'){
-      const tempBtns = [...filterForm.selectedBtns]
       if(tempBtns.includes(value)){
         const findIndex = tempBtns.indexOf(value)
         tempBtns.splice(findIndex, 1)
       }
       else
         tempBtns.push(value)
-      tempForm.selectedBtns = tempBtns
     }
+    else if(key==='range'){
+      if(value.min || value.max){
+        if(!tempBtns.includes(rangeBtnId))
+          tempBtns.push(rangeBtnId)
+      } else if(tempBtns.includes(rangeBtnId)){
+        const findIndex = tempBtns.indexOf(rangeBtnId)
+        tempBtns.splice(findIndex, 1)
+      }
+    }
+    else if(key==='adult'){
+      if(value){
+        if(!tempBtns.includes(adultBtnId))
+          tempBtns.push(adultBtnId)
+      } else if(tempBtns.includes(adultBtnId)){
+        const findIndex = tempBtns.indexOf(adultBtnId)
+        tempBtns.splice(findIndex, 1)
+      }
+    }
+    tempForm.selectedBtns = tempBtns
     setFilterForm(tempForm)
   }
   const applyFilterForm = (e)=>{
@@ -237,6 +290,11 @@ export default function MarketExplorer() {
     Object.keys(tempForm).forEach(key => handleFilter(key, tempForm[key]))
     setFilterForm(tempForm)
     closeFilter(e)
+  }
+  const handleClearAll = ()=>{
+    setSelectedBtns([])
+    setRange(emptyRange)
+    setAdult(false)
   }
   const link2Detail = (tokenId)=>{
     navigate(`/explorer/collectible/detail/${tokenId}`);
@@ -273,23 +331,27 @@ export default function MarketExplorer() {
                       <Typography variant="body2" sx={{ ml: 1, display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
                       <Stack spacing={1} sx={{display: 'inline', pl: 1}} direction="row">
                         {
-                          selectedBtns.map((nameId, index)=>(
-                            <Button
+                          selectedBtns.map((nameId, index)=>{
+                            let buttonName = btnNames[nameId]
+                            if(nameId === rangeBtnId){
+                              buttonName = `${range.min || 0} to ${range.max === ''?'inf':range.max} ELA`
+                            }
+                            return <Button
                               key={index}
                               variant="outlined"
                               color="origin"
                               endIcon={<CloseIcon />}
                               onClick={()=>{handleBtns(nameId)}}
                             >
-                              {btnNames[nameId]}
+                              {buttonName}
                             </Button>
-                          ))
+                          })
                         }
                         {
                           selectedBtns.length>0&&
                           <Button
                             color="inherit"
-                            onClick={()=>{setSelectedBtns([])}}
+                            onClick={handleClearAll}
                           >
                             Clear All
                           </Button>
@@ -330,7 +392,7 @@ export default function MarketExplorer() {
                     }}
                     scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
                     btnNames = {btnNames}
-                    filterProps = {sessionFilterProps}
+                    filterProps = {{selectedBtns, range, adult, order}}
                     handleFilter = {handleFilter}
                   />
                 </Box>
@@ -415,18 +477,22 @@ export default function MarketExplorer() {
                   <>
                     <Box sx={{ pt: 2, pb: 1, pr: 1, pl: 2.5 }}>
                       {
-                        filterForm.selectedBtns.map((nameId, index)=>(
-                          <Button
+                        filterForm.selectedBtns.map((nameId, index)=>{
+                          let buttonName = btnNames[nameId]
+                          if(nameId === rangeBtnId){
+                            buttonName = `${filterForm.range.min || 0} to ${filterForm.range.max === ''?'inf':filterForm.range.max} ELA`
+                          }
+                          return <Button
                             key={index}
                             variant="outlined"
                             color="origin"
                             endIcon={<CloseIcon />}
-                            onClick={()=>{handleFilterMobile('statype', nameId)}}
+                            onClick={()=>{handleBtnsMobile(nameId)}}
                             sx={{mr: 1, mb: 1}}
                           >
-                            {btnNames[nameId]}
+                            {buttonName}
                           </Button>
-                        ))
+                        })
                       }
                       <Button
                         color="inherit"
