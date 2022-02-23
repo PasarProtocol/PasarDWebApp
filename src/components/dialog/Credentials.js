@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
-
+import bs58 from 'bs58'
 import Web3 from 'web3';
 import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Grid, Tooltip, Icon, Button, Box, Avatar } from '@mui/material';
@@ -34,7 +34,6 @@ export default function Credentials() {
 
   const onClickProvideCredentials = async ()=>{
     setOnProgress(true)
-
     let kycVerifiablePresentation
     try {
       kycVerifiablePresentation = await elaConnectivityService.requestKYCCredentials();
@@ -91,7 +90,7 @@ export default function Credentials() {
       return
     }
     
-    const credentialInfo = {}
+    /* const credentialInfo = {}
 
     if (nameCredential){
       if(!ensureTrustedKycProvider(nameCredential)){
@@ -127,7 +126,11 @@ export default function Credentials() {
       }
       credentialInfo.country = countryCredential.getSubject().getProperty("country") || "";
     }
-    sessionStorage.setItem('CREDENTIALS', JSON.stringify(credentialInfo))
+    sessionStorage.setItem('CREDENTIALS', JSON.stringify(credentialInfo)) */
+    
+    const vpBuffer = Buffer.from(kycVerifiablePresentation.serialize())
+    const encodedPresentation = bs58.encode(vpBuffer)
+    sessionStorage.setItem('KYCedProof', encodedPresentation)
     setIsSuccess(true)
     setOnProgress(false)
   }
