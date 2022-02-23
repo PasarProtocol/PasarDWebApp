@@ -5,6 +5,7 @@ import { create, urlSource } from 'ipfs-http-client';
 import { subDays, differenceInDays } from 'date-fns';
 import Jazzicon from '@metamask/jazzicon';
 import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
+import jwtDecode from 'jwt-decode';
 
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
 import { marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS, ipfsURL, rpcURL } from '../config';
@@ -349,16 +350,25 @@ export const MethodList = [
 export const sendIpfsDidJson = async () => {
   const client = create(`${ipfsURL}/`);
   // create the metadata object we'll be storing
-  const did = sessionStorage.getItem('PASAR_DID') ? sessionStorage.getItem('PASAR_DID') : '';
+  const did = sessionStorage.getItem('PASAR_DID') || ''
+  const token = sessionStorage.getItem("PASAR_TOKEN");
+  const user = jwtDecode(token);
+  const {name, bio} = user;
+  const proof = sessionStorage.getItem("KYCedProof") || ''
   const didObj = {
-    version: '2',
-    did: `did:elastos:${did}`
-  };
+    "version":"2",
+    "did": `did:elastos:${did}`,
+    "name": name || '',
+    "description": bio || '',
+  }
+  if(proof.length) {
+    didObj.KYCedProof = proof
+  }
   const jsonDidObj = JSON.stringify(didObj);
   console.log(jsonDidObj);
   // add the metadata itself as well
   const didUri = await client.add(jsonDidObj);
-  return `did:elastos:${didUri.path}`;
+  return `feeds:json:${didUri.path}`;
 };
 
 export const emptyCache = () => {

@@ -403,27 +403,12 @@ export default function CreateItem() {
           return obj
         }, {})
       }
-
-      const did = sessionStorage.getItem('PASAR_DID') || ''
-      const token = sessionStorage.getItem("PASAR_TOKEN");
-      const user = jwtDecode(token);
-      const {name, bio} = user;
-      const proof = sessionStorage.getItem("KYCedProof") || ''
-      const creatorObj = {
-        "did": `did:elastos:${did}`,
-        "name": name || '',
-        "description": bio || '',
-      }
-      if(proof.length) {
-        creatorObj.KYCedProof = proof
-      }
       // create the metadata object we'll be storing
       const metaObj = {
         "version": "2",
         "type": itemtype==="General"?'image':itemtype.toLowerCase(),
         "name": collectibleName,
         "description": description,
-        "creator": creatorObj,
         "data": {
           "image": `pasar:image:${added.origin.path}`,
           "kind": added.type.replace('image/', ''),
@@ -451,9 +436,18 @@ export default function CreateItem() {
       });
       // create the metadata object we'll be storing
       const did = sessionStorage.getItem('PASAR_DID') || ''
+      const token = sessionStorage.getItem("PASAR_TOKEN");
+      const user = jwtDecode(token);
+      const {name, bio} = user;
+      const proof = sessionStorage.getItem("KYCedProof") || ''
       const didObj = {
         "version":"2",
-        "did": `did:elastos:${did}`
+        "did": `did:elastos:${did}`,
+        "name": name || '',
+        "description": bio || '',
+      }
+      if(proof.length) {
+        didObj.KYCedProof = proof
       }
       try {
         const jsonDidObj = JSON.stringify(didObj);
@@ -494,6 +488,7 @@ export default function CreateItem() {
         setCurrentPromise(temPromise)
         return temPromise
       }).then((didRecv) => {
+        console.log(didRecv.path, "--")
         setProgress(45)
         _didUri = `feeds:json:${didRecv.path}`
         resolve({ _id, _uri, _didUri })
