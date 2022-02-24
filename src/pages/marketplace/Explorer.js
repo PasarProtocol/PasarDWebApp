@@ -115,7 +115,7 @@ export default function MarketExplorer() {
   const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
   const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):1);
   const [isFilterView, setFilterView] = React.useState(1);
-  const [filterForm, setFilterForm] = React.useState({selectedBtns:[], ...sessionFilterProps});
+  const [filterForm, setFilterForm] = React.useState({selectedBtns: sessionFilterProps.selectedBtns || [], ...sessionFilterProps});
   const [totalCount, setTotalCount] = React.useState(0);
   const [order, setOrder] = React.useState(sessionFilterProps.order || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
@@ -175,6 +175,7 @@ export default function MarketExplorer() {
         setLoadingAssets(false);
     });
     sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, adult, order}))
+    setFilterForm({selectedBtns, range, adult, order})
   }, [page, showCount, selectedBtns, adult, range, order, params.key]);
   
   const handleDispmode = (event, mode) => {
@@ -209,17 +210,20 @@ export default function MarketExplorer() {
     else handleFilterMobile('statype', num)
   }
   const setSelectedByValue = (value, btnId)=>{
-    const tempBtns = [...selectedBtns]
-    if(value){
-      if(!tempBtns.includes(btnId)) {
-        tempBtns.push(btnId)
-        setSelectedBtns(tempBtns)
+    setSelectedBtns((prevState) => {
+      const tempBtns = [...prevState]
+      if(value){
+        if(!tempBtns.includes(btnId)) {
+          tempBtns.push(btnId)
+          return tempBtns
+        }
+      } else if(tempBtns.includes(btnId)){
+        const findIndex = tempBtns.indexOf(btnId)
+        tempBtns.splice(findIndex, 1)
+        return tempBtns
       }
-    } else if(tempBtns.includes(btnId)){
-      const findIndex = tempBtns.indexOf(btnId)
-      tempBtns.splice(findIndex, 1)
-      setSelectedBtns(tempBtns)
-    }
+      return tempBtns
+    })
   }
   const handleFilter = (key, value)=>{
     setPage(1)
@@ -286,7 +290,6 @@ export default function MarketExplorer() {
     const tempForm = {...filterForm}
     delete tempForm.statype
     delete tempForm.clear_all
-    console.log(tempForm)
     Object.keys(tempForm).forEach(key => handleFilter(key, tempForm[key]))
     setFilterForm(tempForm)
     closeFilter(e)

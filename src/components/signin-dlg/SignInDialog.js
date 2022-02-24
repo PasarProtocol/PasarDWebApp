@@ -195,6 +195,7 @@ export default function SignInDialog() {
           sessionStorage.removeItem('PASAR_LINK_ADDRESS');
           sessionStorage.removeItem('PASAR_TOKEN');
           sessionStorage.removeItem('PASAR_DID');
+          sessionStorage.removeItem('KYCedProof');
           setActivatingConnector(null);
           setWalletAddress(null);
           navigate('/marketplace');
@@ -347,6 +348,7 @@ export default function SignInDialog() {
     sessionStorage.removeItem('PASAR_LINK_ADDRESS');
     sessionStorage.removeItem('PASAR_TOKEN');
     sessionStorage.removeItem('PASAR_DID');
+    sessionStorage.removeItem('KYCedProof');
     try {
       setSigninEssentialSuccess(false);
       setActivatingConnector(null);
@@ -422,10 +424,11 @@ export default function SignInDialog() {
           console.error('Error while disconnecting the wallet', error);
         }
       }
-      sessionStorage.removeItem('PASAR_LINK_ADDRESS');
       setSigninEssentialSuccess(false);
+      sessionStorage.removeItem('PASAR_LINK_ADDRESS');
       sessionStorage.removeItem('PASAR_TOKEN');
       sessionStorage.removeItem('PASAR_DID');
+      sessionStorage.removeItem('KYCedProof');
       setActivatingConnector(null);
       setWalletAddress(null);
       navigate('/marketplace');
