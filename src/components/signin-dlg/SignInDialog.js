@@ -32,7 +32,7 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser } from '../../utils/common';
+import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 
 export default function SignInDialog() {
@@ -320,13 +320,15 @@ export default function SignInDialog() {
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
         setPasarLinkAddress(2)
         setOpenSigninDlg(false);
-        if (isInAppBrowser()) {
-          setWalletAddress(await window.elastos.getWeb3Provider().address);
-          setActivatingConnector(essentialsConnector);
-        } else {
-          setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
-          setActivatingConnector(essentialsConnector);
-        }
+        let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0]
+        if (isInAppBrowser())
+          essentialAddress = await window.elastos.getWeb3Provider().address
+        setWalletAddress(essentialAddress);
+        getCredentialInfo(essentialAddress).then(proofData=>{
+          if(proofData)
+            sessionStorage.setItem('KYCedProof', proofData)
+        })
+        setActivatingConnector(essentialsConnector);
         setSigninEssentialSuccess(true);
         if (afterSigninPath) {
           setOpenSigninEssentialDlg(false);
