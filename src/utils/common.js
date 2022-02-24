@@ -179,6 +179,20 @@ export function getDiaTokenInfo(strAddress, connectProvider = null) {
   })
 }
 
+export function getCredentialInfo(strAddress) {
+  return new Promise((resolve, reject) => {
+    fetchFrom(`auth/api/v1/getCredentials?address=${strAddress}`).then(response=>{
+      response.json().then(jsonData => {
+        resolve(jsonData.data)
+      }).catch((err)=>{
+        reject(err)
+      })
+    }).catch((err)=>{
+      reject(err)
+    })
+  })
+}
+
 export function removeLeadingZero(value) {
   return value.replace(/-/g, '').replace(/^0+(?!\.|$)/, '');
 }

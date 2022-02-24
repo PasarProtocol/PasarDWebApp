@@ -25,7 +25,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
 import Jazzicon from '../../components/Jazzicon';
 import Badge from '../../components/Badge';
-import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser } from '../../utils/common';
+import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ export default function MyItems() {
   const [myAddress, setMyAddress] = React.useState(null);
   const [didInfo, setDidInfo] = React.useState({name: '', description: ''});
   const [updateCount, setUpdateCount] = React.useState(0);
-  const [diaBadge, setDiaBadge] = React.useState(false);
+  const [badge, setBadge] = React.useState({dia: false, kyc: false});
 
   const context = useWeb3React();
   const { account } = context;
@@ -145,15 +145,26 @@ export default function MyItems() {
     });
   };
 
+  const setBadgeFlag = (type, value) => {
+    setBadge((prevState) => {
+      const tempFlag = {...prevState}
+      tempFlag[type] = value
+      return tempFlag
+    })
+  }
   const apiNames = ['getListedCollectiblesByAddress', 'getOwnCollectiblesByAddress', 'getCreatedCollectiblesByAddress'];
   const typeNames = ['listed', 'owned', 'created'];
   React.useEffect(async () => {
-    if(walletAddress)
+    if(walletAddress){
       getDiaTokenInfo(walletAddress).then(dia=>{
         if(dia!=='0')
-          setDiaBadge(true)
+          setBadgeFlag('dia', true)
       })
-
+      getCredentialInfo(walletAddress).then(proofData=>{
+        if(proofData)
+          setBadgeFlag('kyc', true)
+      })
+    }
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
     const { signal } = newController;
@@ -225,14 +236,20 @@ export default function MyItems() {
               <Typography variant="subtitle2" noWrap sx={{color: 'text.secondary'}}>{didInfo.description}</Typography>
             }
           </Typography>
-          <Box sx={{display: 'flex', justifyContent: 'center', pt: 1}}>
-          {
-            diaBadge&&
-            <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-              <Box sx={{display: 'inline-flex'}}><Badge name="diamond"/></Box>
-            </Tooltip>
-          }
-          </Box>
+          <Stack sx={{justifyContent: 'center', pt: 1}} spacing={1} direction="row">
+            {
+              badge.dia&&
+              <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
+                <Box sx={{display: 'inline-flex'}}><Badge name="diamond"/></Box>
+              </Tooltip>
+            }
+            {
+              badge.kyc&&
+              <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
+                <Box sx={{display: 'inline-flex'}}><Badge name="user"/></Box>
+              </Tooltip>
+            }
+          </Stack>
           {/* <MHidden width="smUp">
             <ToolGroupStyle>
               <MyItemsSortSelect onChange={setOrderType} sx={{ flex: 1 }} />
