@@ -34,7 +34,7 @@ import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
 import useSingin from '../../hooks/useSignin';
 import {blankAddress, marketContract} from '../../config'
-import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -112,7 +112,7 @@ export default function CollectibleDetail() {
   const [address, setAddress] = React.useState('');
 
   const [collectible, setCollectible] = React.useState({});
-  const [diaBadge, setDiaBadge] = React.useState({creator: false, owner: false});
+  const [badge, setBadge] = React.useState({creator: {dia: false, kyc: false}, owner: {dia: false, kyc: false}});
   const [didName, setDidName] = React.useState({creator: '', owner: ''});
   const [isForAuction, setForAuction] = React.useState(false);
   const [transRecord, setTransRecord] = React.useState([]);
@@ -166,11 +166,19 @@ export default function CollectibleDetail() {
         setCollectible(jsonCollectible.data);
         getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
           if(dia!=='0')
-            setDiaBadgeOfUser('creator', true)
+            setBadgeOfUser('creator', 'dia', true)
         })
         getDiaTokenInfo(jsonCollectible.data.holder).then(dia=>{
           if(dia!=='0')
-            setDiaBadgeOfUser('owner', true)
+            setBadgeOfUser('owner', 'dia', true)
+        })
+        getCredentialInfo(jsonCollectible.data.royaltyOwner).then(proofData=>{
+          if(proofData)
+            setBadgeOfUser('creator', 'kyc', true)
+        })
+        getCredentialInfo(jsonCollectible.data.holder).then(proofData=>{
+          if(proofData)
+            setBadgeOfUser('owner', 'kyc', true)
         })
         if(jsonCollectible.data.royaltyOwner === jsonCollectible.data.holder){
           getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
@@ -247,12 +255,12 @@ export default function CollectibleDetail() {
   const handleCloseMorePopup = () => {
     setOpenMorePopup(null);
   };
-  
-  const setDiaBadgeOfUser = (type, value) => {
-    setDiaBadge((prevState) => {
-      const tempDiaBadge = {...prevState};
-      tempDiaBadge[type] = value;
-      return tempDiaBadge;
+
+  const setBadgeOfUser = (usertype, badgetype, value) => {
+    setBadge((prevState) => {
+      const tempBadge = {...prevState};
+      tempBadge[usertype][badgetype] = value;
+      return tempBadge;
     });
   };
   
@@ -458,9 +466,15 @@ export default function CollectibleDetail() {
                     </Link>
                     <Stack spacing={.6} direction="row">
                       {
-                        diaBadge.creator&&
+                        badge.creator.dia&&
                         <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
                           <Box><Badge name="diamond"/></Box>
+                        </Tooltip>
+                      }
+                      {
+                        badge.creator.kyc&&
+                        <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
+                          <Box><Badge name="user"/></Box>
                         </Tooltip>
                       }
                       {/* <Badge name="pasar"/>
@@ -480,9 +494,15 @@ export default function CollectibleDetail() {
                     </Link>
                     <Stack spacing={.6} direction="row">
                       {
-                        diaBadge.owner&&
+                        badge.owner.dia&&
                         <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
                           <Box><Badge name="diamond"/></Box>
+                        </Tooltip>
+                      }
+                      {
+                        badge.owner.kyc&&
+                        <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
+                          <Box><Badge name="user"/></Box>
                         </Tooltip>
                       }
                       {/* <Badge name="thumbdown" value="13"/> */}
