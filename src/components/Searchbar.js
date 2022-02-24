@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { useState } from 'react';
 import searchFill from '@iconify/icons-eva/search-fill';
@@ -40,12 +40,16 @@ const SearchbarStyle = styled('div')(({ theme }) => ({
   }
 }));
 
+const defaultPlaceHolder = "Search name, description, address and token ID"
 // ----------------------------------------------------------------------
-
 export default function Searchbar({placeholder}) {
   const [isOpen, setOpen] = useState(false);
   const params = useParams(); // params.key
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  if(placeholder === defaultPlaceHolder && !pathname.startsWith('/explorer'))
+    placeholder = 'Search items, creators and token ID'
 
   const handleOpen = () => {
     setOpen((prev) => !prev);
@@ -57,10 +61,15 @@ export default function Searchbar({placeholder}) {
 
   const handleChange = (e)=>{
     if(e.which===13) { // press enter
-        navigate(`/explorer/search/${e.target.value}`);
+      changeAction(e.target.value)
     }
   }
-
+  const changeAction = (value)=>{
+    if(pathname.startsWith('/explorer'))
+      navigate(`/explorer/search/${value}`);
+    else
+      navigate(`/marketplace/search/${value}`);
+  }
   return (
     <ClickAwayListener onClickAway={handleClose}>
       <div>
@@ -103,5 +112,5 @@ Searchbar.propTypes = {
   placeholder: PropTypes.string,
 };
 Searchbar.defaultProps = {
-  placeholder: "Search name, description, address and token ID"
+  placeholder: defaultPlaceHolder
 };
