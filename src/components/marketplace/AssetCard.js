@@ -25,7 +25,7 @@ import TransferDlg from '../dialog/Transfer';
 import NeedBuyDIADlg from '../dialog/NeedBuyDIA';
 import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
-import { getDiaTokenInfo } from '../../utils/common';
+import { getDiaTokenInfo, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +40,7 @@ export default function AssetCard(props) {
   const [transferOpen, setOpenTransfer] = React.useState(false);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [diaBadge, setDiaBadge] = React.useState(false);
+  const [badge, setBadge] = React.useState({dia: false, kyc: false});
   
   const isCreatedByMe = myaddress===royaltyOwner
   const isListedOwnedByMe = (myaddress===royaltyOwner&&saleType==="Primary Sale") || (myaddress===holder&&saleType==="Secondary Sale")
@@ -48,13 +49,26 @@ export default function AssetCard(props) {
   const isUnlistedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType==="Not on sale"
 
   React.useEffect(() => {
-    if(holder)
+    if(holder) {
       getDiaTokenInfo(holder).then(dia=>{
         if(dia!=='0')
-          setDiaBadge(true)
+          setBadgeFlag('dia', true)
       })
+      getCredentialInfo(holder).then(proofData=>{
+        if(proofData)
+          setBadgeFlag('kyc', true)
+      })
+    }
   }, []);
 
+  const setBadgeFlag = (type, value) => {
+    setBadge((prevState) => {
+      const tempFlag = {...prevState}
+      tempFlag[type] = value
+      return tempFlag
+    })
+  }
+  
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);
   };
@@ -264,14 +278,19 @@ export default function AssetCard(props) {
           }
           {
             type===0&&
-            <Stack direction="row" sx={{minHeight: '26px'}}>
+            <Stack spacing={.6} direction="row" sx={{minHeight: '26px'}}>
               {
-                diaBadge&&
+                badge.dia&&
                 <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
                   <Box><Badge name="diamond"/></Box>
                 </Tooltip>
               }
-              {/* <Badge name="user"/> */}
+              {
+                badge.kyc&&
+                <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
+                  <Box><Badge name="user"/></Box>
+                </Tooltip>
+              }
             </Stack>
           }
         </PaperRecord>
