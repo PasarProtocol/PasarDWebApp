@@ -115,7 +115,11 @@ export default function MarketExplorer() {
   const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
   const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):1);
   const [isFilterView, setFilterView] = React.useState(1);
-  const [filterForm, setFilterForm] = React.useState({selectedBtns: sessionFilterProps.selectedBtns || [], ...sessionFilterProps});
+  const [filterForm, setFilterForm] = React.useState({
+    selectedBtns: sessionFilterProps.selectedBtns || [],
+    range: sessionFilterProps.range || {min:'', max:''},
+    ...sessionFilterProps
+  });
   const [totalCount, setTotalCount] = React.useState(0);
   const [order, setOrder] = React.useState(sessionFilterProps.order || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
