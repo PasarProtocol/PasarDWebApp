@@ -117,7 +117,7 @@ export default function AssetCard(props) {
     }
     setOpenPopup(null);
   };
-
+  const dlgProps = {title, tokenId, updateCount, handleUpdate}
   return (
       <motion.div
         animate={{ scale: 1 }}
@@ -294,11 +294,11 @@ export default function AssetCard(props) {
             </Stack>
           }
         </PaperRecord>
-        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} title={title} tokenId={tokenId} updateCount={updateCount} handleUpdate={handleUpdate}/>
-        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} title={title} orderId={orderId} updateCount={updateCount} handleUpdate={handleUpdate}/>
-        <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} title={title} orderId={orderId} updateCount={updateCount} handleUpdate={handleUpdate}/>
-        <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} title={title} tokenId={tokenId} updateCount={updateCount} handleUpdate={handleUpdate}/>
-        <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} title={title} tokenId={tokenId}/>
+        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} {...dlgProps}/>
+        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} {...dlgProps}/>
+        <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} {...dlgProps}/>
+        <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} {...dlgProps}/>
+        <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps}/>
         <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance}/>
       </motion.div>
     // </Link>

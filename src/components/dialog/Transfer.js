@@ -26,7 +26,7 @@ const InputStyle = styled(Input)(({ theme }) => ({
 }));
 
 export default function Transfer(props) {
-    const {isOpen, setOpen, title, tokenId} = props
+    const {isOpen, setOpen, title, tokenId, updateCount, handleUpdate} = props
     const { enqueueSnackbar } = useSnackbar();
     const [onProgress, setOnProgress] = React.useState(false);
     const [address, setAddress] = React.useState('');
@@ -67,6 +67,7 @@ export default function Transfer(props) {
             })
             .on('receipt', (receipt) => {
               console.log('receipt', receipt);
+              setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
               enqueueSnackbar('Transfer NFT success!', { variant: 'success' });
               setOnProgress(false);
               setOpen(false);
