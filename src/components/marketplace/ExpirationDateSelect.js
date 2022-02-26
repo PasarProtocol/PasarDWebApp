@@ -3,6 +3,7 @@ import {Select, MenuItem, TextField, Dialog, DialogContent, Typography, Stack, B
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import CalendarPicker from '@mui/lab/CalendarPicker';
+import { addDays } from 'date-fns';
 import PropTypes from 'prop-types';
 import {getTime, getDateTimeString, getTimeZone} from '../../utils/common'
 
@@ -19,12 +20,18 @@ const MenuProps = {
 }
 const menuItems = ['1 day', '3 days', '5 days', '7 days', 'Pick a specific date']
 const pickDateIndex = 4
-export default function ExpirationDateSelect({ selected, onChange }) {
+export default function ExpirationDateSelect({ onChangeDate }) {
+  const [selected, onChange] = React.useState(0);
   const [dateValue, setDateValue] = useState(new Date());
-  const [timeValue, setTimeValue] = useState(dateValue.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}));
+  const [timeValue, setTimeValue] = useState(`${dateValue.getHours().toString().padStart(2,0)}:${dateValue.getMinutes().toString().padStart(2,0)}`);
   const [isOpenPicker, setOpenPicker] = useState(false)
   const handleChange = (event) => {
-    onChange(event.target.value);
+    const selectedIndex = event.target.value
+    onChange(selectedIndex);
+    if(selectedIndex === pickDateIndex)
+      onChangeDate(dateValue)
+    else
+      onChangeDate(addDays(new Date(), 1+selectedIndex*2))
   }
   const handleSpecificPicker = (event) => {
     if(event.target.getAttribute('data-value') === pickDateIndex.toString())
@@ -38,6 +45,14 @@ export default function ExpirationDateSelect({ selected, onChange }) {
   const handleSpecificDate = () => {
     setOpenPicker(false)
   }
+  const handleDateChange = (newDate) => {
+    const splitTime = timeValue.split(':')
+    newDate.setHours(splitTime[0])
+    newDate.setMinutes(splitTime[1])
+    newDate.setSeconds(0)
+    setDateValue(newDate)
+    onChangeDate(newDate)
+  }
   const handleTimeChange = (e) => {
     setTimeValue(e.target.value)
     const splitTime = e.target.value.split(':')
@@ -46,6 +61,7 @@ export default function ExpirationDateSelect({ selected, onChange }) {
     tempDate.setMinutes(splitTime[1])
     tempDate.setSeconds(0)
     setDateValue(tempDate)
+    onChangeDate(tempDate)
   }
   const handleClosePicker = () => {
     setOpenPicker(false)
@@ -78,7 +94,7 @@ export default function ExpirationDateSelect({ selected, onChange }) {
       <Dialog open={isOpenPicker} onClose={handleClosePicker}>
         <DialogContent>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <CalendarPicker date={dateValue} onChange={(newDate) => setDateValue(newDate)} />
+            <CalendarPicker date={dateValue} onChange={handleDateChange} />
           </LocalizationProvider>
           <Stack direction='row' sx={{mb: 1}}>
             <Typography variant="body2" component="div" sx={{flexGrow: 1}}>

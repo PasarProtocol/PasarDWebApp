@@ -13,6 +13,7 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { create, urlSource } from 'ipfs-http-client'
 import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
+import { addDays } from 'date-fns';
 import jwtDecode from 'jwt-decode';
 
 // components
@@ -91,7 +92,7 @@ export default function CreateItem() {
   const [progress, setProgress] = React.useState(0);
   const [isOnValidation, setOnValidation] = React.useState(false);
   const [startingDate, setStartingDate] = React.useState(0);
-  const [expirationDate, setExpirationDate] = React.useState(0);
+  const [expirationDate, setExpirationDate] = React.useState(addDays(new Date(), 1));
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
   const [currentPromise, setCurrentPromise] = React.useState(null);
   const { enqueueSnackbar } = useSnackbar();
@@ -105,10 +106,10 @@ export default function CreateItem() {
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
   const navigate = useNavigate();
-
+  
   React.useEffect(async () => {
-    // if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
-    //   navigate('/marketplace')
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+      navigate('/marketplace')
   }, []);
 
   React.useEffect(async () => {
@@ -303,41 +304,69 @@ export default function CreateItem() {
                         setOpenAccessDlg(true)
                         setApprovalFunction(()=>{
                           stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
-                          .on('receipt', (receipt) => {
-                              setOpenAccessDlg(false)
-                              setCurrent(2)
-                              console.log("setApprovalForAll-receipt", receipt);
-                              callContractMethod('createOrderForSale', {
-                                ...paramObj,
-                                '_amount': _tokenSupply,
-                                '_price': BigInt(price*1e18).toString(),
-                                'beforeSendFunc': ()=>{setReadySignForMint(true)},
-                                'afterSendFunc': ()=>{setReadySignForMint(false)}
-                              }).then((success) => {
-                                resolve(success)
-                              }).catch(error=>{
+                            .on('receipt', (receipt) => {
+                                setOpenAccessDlg(false)
+                                setCurrent(2)
+                                console.log("setApprovalForAll-receipt", receipt);
+                                if(saletype === 'FixedPrice')
+                                  callContractMethod('createOrderForSale', {
+                                    ...paramObj,
+                                    '_amount': _tokenSupply,
+                                    '_price': BigInt(price*1e18).toString(),
+                                    'beforeSendFunc': ()=>{setReadySignForMint(true)},
+                                    'afterSendFunc': ()=>{setReadySignForMint(false)}
+                                  }).then((success) => {
+                                    resolve(success)
+                                  }).catch(error=>{
+                                    reject(error)
+                                  })
+                                else
+                                  callContractMethod('createOrderForAuction', {
+                                    ...paramObj,
+                                    '_amount': _tokenSupply,
+                                    '_minPrice': BigInt(price*1e18).toString(),
+                                    '_endTime': expirationDate.getTime()/1000,
+                                    'beforeSendFunc': ()=>{setReadySignForMint(true)},
+                                    'afterSendFunc': ()=>{setReadySignForMint(false)}
+                                  }).then((success) => {
+                                    resolve(success)
+                                  }).catch(error=>{
+                                    reject(error)
+                                  })
+                            })
+                            .on('error', (error, receipt) => {
+                                console.error("setApprovalForAll-error", error);
+                                setOpenAccessDlg(false)
                                 reject(error)
-                              })
-                          })
-                          .on('error', (error, receipt) => {
-                              console.error("setApprovalForAll-error", error);
-                              setOpenAccessDlg(false)
-                              reject(error)
-                          });
+                            })
                         })
                       } else {
                         setCurrent(2)
-                        callContractMethod('createOrderForSale', {
-                          ...paramObj,
-                          '_amount': _tokenSupply,
-                          '_price': BigInt(price*1e18).toString(),
-                          'beforeSendFunc': ()=>{setReadySignForMint(true)},
-                          'afterSendFunc': ()=>{setReadySignForMint(false)}
-                        }).then((success) => {
-                          resolve(success)
-                        }).catch(error=>{
-                          reject(error)
-                        })
+                        if(saletype === 'FixedPrice')
+                          callContractMethod('createOrderForSale', {
+                            ...paramObj,
+                            '_amount': _tokenSupply,
+                            '_price': BigInt(price*1e18).toString(),
+                            'beforeSendFunc': ()=>{setReadySignForMint(true)},
+                            'afterSendFunc': ()=>{setReadySignForMint(false)}
+                          }).then((success) => {
+                            resolve(success)
+                          }).catch(error=>{
+                            reject(error)
+                          })
+                        else
+                          callContractMethod('createOrderForAuction', {
+                            ...paramObj,
+                            '_amount': _tokenSupply,
+                            '_minPrice': BigInt(price*1e18).toString(),
+                            '_endTime': expirationDate.getTime()/1000,
+                            'beforeSendFunc': ()=>{setReadySignForMint(true)},
+                            'afterSendFunc': ()=>{setReadySignForMint(false)}
+                          }).then((success) => {
+                            resolve(success)
+                          }).catch(error=>{
+                            reject(error)
+                          })
                       }
                     })
                   }
@@ -876,7 +905,7 @@ export default function CreateItem() {
                         </Grid>
                         <Grid item xs={6}>
                           <Typography variant="h4" sx={{fontWeight: 'normal'}}>Expiration Date</Typography>
-                          <ExpirationDateSelect selected={expirationDate} onChange={setExpirationDate}/>
+                          <ExpirationDateSelect onChangeDate={setExpirationDate}/>
                         </Grid>
                       </Grid>
                     </Grid>
