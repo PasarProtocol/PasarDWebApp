@@ -41,6 +41,13 @@ export const getTime = (timestamp) => {
   return { date: dateStr, time: timeStr };
 };
 
+export const getDateTimeString = (date) => `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+
+export const getTimeZone = () => {
+  const e = String(-(new Date).getTimezoneOffset() / 60);
+  return e.includes("-") ? e : "+".concat(e)
+}
+
 const getIpfsUrl = (id) => {
   if (!id) return '';
   const prefixLen = id.split(':', 2).join(':').length;
@@ -228,6 +235,10 @@ export function callContractMethod(type, paramObj) {
               console.log('createOrderForSale');
               const { _id, _amount, _price, _didUri } = paramObj;
               method = marketContract.methods.createOrderForSale(_id, _amount, _price, _didUri);
+            } else if (type === 'createOrderForAuction') {
+              console.log('createOrderForAuction');
+              const { _id, _amount, _minPrice, _endTime, _didUri } = paramObj;
+              method = marketContract.methods.createOrderForAuction(_id, _amount, _minPrice, _endTime, _didUri);
             } else if (type === 'buyOrder') {
               console.log('buyOrder');
               const { _orderId, _didUri } = paramObj;
