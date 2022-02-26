@@ -21,7 +21,7 @@ const menuItems = ['1 day', '3 days', '5 days', '7 days', 'Pick a specific date'
 const pickDateIndex = 4
 export default function ExpirationDateSelect({ selected, onChange }) {
   const [dateValue, setDateValue] = useState(new Date());
-  const [timeValue, setTimeValue] = useState('00:00');
+  const [timeValue, setTimeValue] = useState(dateValue.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}));
   const [isOpenPicker, setOpenPicker] = useState(false)
   const handleChange = (event) => {
     onChange(event.target.value);
@@ -37,11 +37,15 @@ export default function ExpirationDateSelect({ selected, onChange }) {
   }
   const handleSpecificDate = () => {
     setOpenPicker(false)
-    console.log(dateValue)
-    console.log(timeValue)
   }
   const handleTimeChange = (e) => {
     setTimeValue(e.target.value)
+    const splitTime = e.target.value.split(':')
+    const tempDate = dateValue
+    tempDate.setHours(splitTime[0])
+    tempDate.setMinutes(splitTime[1])
+    tempDate.setSeconds(0)
+    setDateValue(tempDate)
   }
   const handleClosePicker = () => {
     setOpenPicker(false)
