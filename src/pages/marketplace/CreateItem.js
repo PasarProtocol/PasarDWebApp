@@ -35,6 +35,8 @@ import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_A
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ProgressBar from '../../components/ProgressBar'
+import StartingDateSelect from '../../components/marketplace/StartingDateSelect'
+import ExpirationDateSelect from '../../components/marketplace/ExpirationDateSelect'
 import {hash, removeLeadingZero, callContractMethod, isInAppBrowser } from '../../utils/common';
 import convert from '../../utils/image-file-resize';
 // ----------------------------------------------------------------------
@@ -69,7 +71,7 @@ const InputStyle = styled(Input)(({ theme }) => ({
 export default function CreateItem() {
   const [mintype, setMintType] = React.useState("Single");
   const [itemtype, setItemType] = React.useState("General");
-  const [saletype, setSaleType] = React.useState("");
+  const [saletype, setSaleType] = React.useState("FixedPrice");
   const [collection, setCollection] = React.useState("FSTK");
   const [file, setFile] = React.useState(null);
   const [files, setFiles] = React.useState([]);
@@ -88,6 +90,8 @@ export default function CreateItem() {
   const [onProgress, setOnProgress] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [isOnValidation, setOnValidation] = React.useState(false);
+  const [startingDate, setStartingDate] = React.useState(0);
+  const [expirationDate, setExpirationDate] = React.useState(0);
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
   const [currentPromise, setCurrentPromise] = React.useState(null);
   const { enqueueSnackbar } = useSnackbar();
@@ -103,8 +107,8 @@ export default function CreateItem() {
   const navigate = useNavigate();
 
   React.useEffect(async () => {
-    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
-      navigate('/marketplace')
+    // if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+    //   navigate('/marketplace')
   }, []);
 
   React.useEffect(async () => {
@@ -798,54 +802,90 @@ export default function CreateItem() {
                     <ItemTypeButton type="FixedPrice" onClick={()=>{setSaleType("FixedPrice")}} current={saletype}/>
                     {
                       mintype!=="Batch"&&
-                      <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                        <div>
-                          <ItemTypeButton type="Auction" onClick={()=>{setSaleType("Auction")}} current={saletype} disabled={1&&true}/>
-                        </div>
-                      </Tooltip>
+                      <ItemTypeButton type="Auction" onClick={()=>{setSaleType("Auction")}} current={saletype}/>
                     }
                   </Stack>
                 }
               </Grid>
               {
                 isPutOnSale&&
-                <>
-                  <Grid item xs={12}>
-                    <Typography variant="h4" sx={{fontWeight: 'normal'}}>Price</Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <FormControl variant="standard" sx={{width: '100%'}}>
-                      <InputLabel htmlFor="input-with-price">
-                        Enter a fixed price of each item
-                      </InputLabel>
-                      <InputStyle
-                        type="number"
-                        id="input-with-price"
-                        value={price}
-                        onChange={handleChangePrice}
-                        startAdornment={' '}
-                        endAdornment={
-                          <CoinSelect/>
-                        }
-                      />
-                    </FormControl>
-                    <Divider/>
-                    <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Platform fee 2%&nbsp;
-                      <Tooltip title="We take 2% of every transaction that happens on Pasar for providing the platform to users" arrow disableInteractive enterTouchDelay={0}>
-                        <Icon icon="eva:info-outline" style={{marginBottom: -4, fontSize: 18}}/>
-                      </Tooltip>
-                    </Typography>
-                    <Typography variant="body2" component="div" sx={{fontWeight: 'normal'}}>
-                      You will receive
-                      <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}> {rcvprice} ELA </Typography>
-                      per item
-                    </Typography>
-                  </Grid>
-                </>
+                (
+                  saletype==="FixedPrice"?
+                  <>
+                    <Grid item xs={12}>
+                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Price</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormControl variant="standard" sx={{width: '100%'}}>
+                        <InputLabel htmlFor="input-with-price">
+                          Enter a fixed price of each item
+                        </InputLabel>
+                        <InputStyle
+                          type="number"
+                          id="input-with-price"
+                          value={price}
+                          onChange={handleChangePrice}
+                          startAdornment={' '}
+                          endAdornment={
+                            <CoinSelect/>
+                          }
+                        />
+                      </FormControl>
+                      <Divider/>
+                      <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Platform fee 2%&nbsp;
+                        <Tooltip title="We take 2% of every transaction that happens on Pasar for providing the platform to users" arrow disableInteractive enterTouchDelay={0}>
+                          <Icon icon="eva:info-outline" style={{marginBottom: -4, fontSize: 18}}/>
+                        </Tooltip>
+                      </Typography>
+                      <Typography variant="body2" component="div" sx={{fontWeight: 'normal'}}>
+                        You will receive
+                        <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}> {rcvprice} ELA </Typography>
+                        per item
+                      </Typography>
+                    </Grid>
+                  </>:
+
+                  <>
+                    <Grid item xs={12}>
+                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Minimum Bid</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormControl variant="standard" sx={{width: '100%'}}>
+                        <InputLabel htmlFor="input-with-price">
+                          Enter minimum bid
+                        </InputLabel>
+                        <InputStyle
+                          type="number"
+                          id="input-with-price"
+                          value={price}
+                          onChange={handleChangePrice}
+                          startAdornment={' '}
+                          endAdornment={
+                            <CoinSelect/>
+                          }
+                        />
+                      </FormControl>
+                      <Divider/>
+                      <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Bids below this amount won't be allowed</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Grid container spacing={1}>
+                        <Grid item xs={6}>
+                          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Starting Date1</Typography>
+                          <StartingDateSelect selected={startingDate} onChange={setStartingDate}/>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Expiration Date</Typography>
+                          <ExpirationDateSelect selected={expirationDate} onChange={setExpirationDate}/>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </>
+                )
               }
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Royalties&nbsp;
-                  <Tooltip title="Royalties are the percentage cut of the total value of item sold and will be paid to the original creator" arrow disableInteractive enterTouchDelay={0}>
+                  <Tooltip title="Royalties are the percentage cut of the total value of item sold and will be paid to the original creator" arrow disableInteractive enterTouchDelay={0}>
                     <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
                   </Tooltip>
                 </Typography>
