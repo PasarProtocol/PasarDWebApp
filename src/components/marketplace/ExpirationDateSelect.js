@@ -5,6 +5,7 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import CalendarPicker from '@mui/lab/CalendarPicker';
 import { addDays } from 'date-fns';
 import PropTypes from 'prop-types';
+import { useSnackbar } from 'notistack';
 import {getTime, getDateTimeString, getTimeZone} from '../../utils/common'
 
 const MenuProps = {
@@ -25,6 +26,8 @@ export default function ExpirationDateSelect({ onChangeDate }) {
   const [dateValue, setDateValue] = useState(new Date());
   const [timeValue, setTimeValue] = useState(`${dateValue.getHours().toString().padStart(2,0)}:${dateValue.getMinutes().toString().padStart(2,0)}`);
   const [isOpenPicker, setOpenPicker] = useState(false)
+  const { enqueueSnackbar } = useSnackbar();
+
   const handleChange = (event) => {
     const selectedIndex = event.target.value
     onChange(selectedIndex);
@@ -54,12 +57,16 @@ export default function ExpirationDateSelect({ onChangeDate }) {
     onChangeDate(newDate)
   }
   const handleTimeChange = (e) => {
-    setTimeValue(e.target.value)
     const splitTime = e.target.value.split(':')
     const tempDate = dateValue
     tempDate.setHours(splitTime[0])
     tempDate.setMinutes(splitTime[1])
     tempDate.setSeconds(0)
+    if(tempDate<new Date()) {
+      enqueueSnackbar('Past time can not be selected!', { variant: 'warning' });
+      return
+    }
+    setTimeValue(e.target.value)
     setDateValue(tempDate)
     onChangeDate(tempDate)
   }
@@ -94,7 +101,7 @@ export default function ExpirationDateSelect({ onChangeDate }) {
       <Dialog open={isOpenPicker} onClose={handleClosePicker}>
         <DialogContent>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <CalendarPicker date={dateValue} onChange={handleDateChange} />
+            <CalendarPicker disablePast date={dateValue} onChange={handleDateChange} />
           </LocalizationProvider>
           <Stack direction='row' sx={{mb: 1}}>
             <Typography variant="body2" component="div" sx={{flexGrow: 1}}>
