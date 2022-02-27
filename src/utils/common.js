@@ -369,7 +369,18 @@ export const MethodList = [
     color: '#CD25BC',
     icon: 'auction',
     verb: { description: 'Bid', withPrice: true, subject: 'to' }
-  }
+  },
+  {
+    method: 'OrderForAuction',
+    color: '#25CDCD',
+    icon: 'marketplace-auction',
+    detail: [
+      { description: 'Collectible put up for auction →', field: 'marketplace', copyable: true, ellipsis: true },
+      { description: 'By', field: 'from', copyable: true, ellipsis: true },
+      { description: 'For a minimum bid of', field: 'price', copyable: false }
+    ],
+    verb: { description: 'Auctioned for', withPrice: true, subject: 'from' }
+  },
 ];
 
 export const sendIpfsDidJson = async () => {
