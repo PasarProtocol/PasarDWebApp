@@ -108,8 +108,8 @@ export default function CreateItem() {
   const navigate = useNavigate();
   
   React.useEffect(async () => {
-    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
-      navigate('/marketplace')
+    // if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+    //   navigate('/marketplace')
   }, []);
 
   React.useEffect(async () => {
