@@ -6,7 +6,7 @@ import { Box, Stack, Link, Typography, Grid, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import MethodLabel from '../../MethodLabel';
-import { reduceHexAddress, getAssetImage } from '../../../utils/common';
+import { reduceHexAddress, getAssetImage, MethodList } from '../../../utils/common';
 
 TransactionListItem.propTypes = {
     item: PropTypes.object.isRequired
@@ -23,18 +23,28 @@ const TypographyStyle = styled(Typography)(({ theme, alignsm }) => ({
     }
 }));
 export default function TransactionListItem({ item }) {
+    const methodItem = MethodList.find((el)=>el.method===item.event)
     return (
         <RootStyle>
-            <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink} sx={{borderRadius: 1}} >
+            {
+                item.event==="SetApprovalForAll"?
                 <Box
-                    draggable = {false}
                     component="img"
-                    alt={item.name}
-                    src={getAssetImage(item, true)}
-                    onError={(e) => e.target.src = '/static/broken-image.svg'}
-                    sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
-                />
-            </Link>
+                    alt=""
+                    src={`/static/${methodItem.icon}.svg`}
+                    sx={{ width: 48, height: 48, borderRadius: 1, mr: 2, background: methodItem.color, p: 2 }}
+                />:
+                <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink} sx={{borderRadius: 1}} >
+                    <Box
+                        draggable = {false}
+                        component="img"
+                        alt={item.name}
+                        src={getAssetImage(item, true)}
+                        onError={(e) => e.target.src = '/static/broken-image.svg'}
+                        sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
+                    />
+                </Link>
+            }
             <Grid container spacing={2}>
                 <Grid item xs={5} sm={3}>
                     <Typography color="inherit" variant="subtitle2" noWrap>
