@@ -8,7 +8,7 @@ import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sd
 import jwtDecode from 'jwt-decode';
 
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
-import { marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS, ipfsURL, rpcURL } from '../config';
+import { erc20Contract as ERC20_ADDRESS, stickerContract as STICKER_ADDRESS, marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS, ipfsURL, rpcURL } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { DIAMOND_CONTRACT_ABI } from '../abi/diamondABI';
 
@@ -234,11 +234,11 @@ export function callContractMethod(type, paramObj) {
             if (type === 'createOrderForSale') {
               console.log('createOrderForSale');
               const { _id, _amount, _price, _didUri } = paramObj;
-              method = marketContract.methods.createOrderForSale(_id, _amount, _price, _didUri);
+              method = marketContract.methods.createOrderForSale(STICKER_ADDRESS, _id, _amount, ERC20_ADDRESS, _price, _didUri);
             } else if (type === 'createOrderForAuction') {
               console.log('createOrderForAuction');
               const { _id, _amount, _minPrice, _endTime, _didUri } = paramObj;
-              method = marketContract.methods.createOrderForAuction(_id, _amount, _minPrice, _endTime, _didUri);
+              method = marketContract.methods.createOrderForAuction(STICKER_ADDRESS, _id, _amount, ERC20_ADDRESS, _minPrice, _endTime, _didUri);
             } else if (type === 'buyOrder') {
               console.log('buyOrder');
               const { _orderId, _didUri } = paramObj;
