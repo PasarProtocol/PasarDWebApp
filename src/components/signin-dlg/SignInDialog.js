@@ -336,13 +336,13 @@ export default function SignInDialog() {
           setAfterSigninPath(null);
         }
       } else {
-        console.error('User closed modal');
+        // console.log('User closed modal');
       }
     } catch (e) {
       try {
         await essentialsConnector.getWalletConnectProvider().disconnect();
       } catch (e) {
-        console.error('Error while trying to disconnect wallet connect session', e);
+        console.log('Error while trying to disconnect wallet connect session', e);
       }
     }
   };
@@ -360,7 +360,7 @@ export default function SignInDialog() {
       if (isInAppBrowser() && (await window.elastos.getWeb3Provider().isConnected()))
         await window.elastos.getWeb3Provider().disconnect();
     } catch (error) {
-      console.error('Error while disconnecting the wallet', error);
+      console.log('Error while disconnecting the wallet', error);
     }
   };
   // ----------------------------------- //
@@ -423,7 +423,7 @@ export default function SignInDialog() {
           if (isInAppBrowser() && (await window.elastos.getWeb3Provider().isConnected()))
             await window.elastos.getWeb3Provider().disconnect();
         } catch (error) {
-          console.error('Error while disconnecting the wallet', error);
+          console.log('Error while disconnecting the wallet', error);
         }
       }
       setSigninEssentialSuccess(false);
