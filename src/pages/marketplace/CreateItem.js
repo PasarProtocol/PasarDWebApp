@@ -292,7 +292,7 @@ export default function CreateItem() {
             };
             setProgress(progressStep(60, index))
             setReadySignForMint(true)
-            stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri).send(transactionParams)
+            stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee).send(transactionParams)
               .on('receipt', (receipt) => {
                   setReadySignForMint(false)
                   console.log("receipt", receipt);
@@ -301,8 +301,8 @@ export default function CreateItem() {
                     stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
                       console.log("isApprovalForAll=", isApproval);
                       if (!isApproval) {
-                        setOpenAccessDlg(true)
-                        setApprovalFunction(()=>{
+                        // setOpenAccessDlg(true)
+                        // setApprovalFunction(()=>{
                           stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
                             .on('receipt', (receipt) => {
                                 setOpenAccessDlg(false)
@@ -339,7 +339,7 @@ export default function CreateItem() {
                                 setOpenAccessDlg(false)
                                 reject(error)
                             })
-                        })
+                        // })
                       } else {
                         setCurrent(2)
                         if(saletype === 'FixedPrice')
@@ -436,12 +436,28 @@ export default function CreateItem() {
           return obj
         }, {})
       }
+
+      // create the metadata object we'll be storing
+      const did = sessionStorage.getItem('PASAR_DID') || ''
+      const token = sessionStorage.getItem("PASAR_TOKEN");
+      const user = jwtDecode(token);
+      const {name, bio} = user;
+      const proof = sessionStorage.getItem("KYCedProof") || ''
+      const creatorObj = {
+        "did": `did:elastos:${did}`,
+        "name": name || '',
+        "description": bio || '',
+      }
+      if(proof.length) {
+        creatorObj.KYCedProof = proof
+      }
       // create the metadata object we'll be storing
       const metaObj = {
         "version": "2",
         "type": itemtype==="General"?'image':itemtype.toLowerCase(),
         "name": collectibleName,
         "description": description,
+        "creator": creatorObj,
         "data": {
           "image": `pasar:image:${added.origin.path}`,
           "kind": added.type.replace('image/', ''),
