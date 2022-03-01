@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
 import AssetCardSkeleton from './AssetCardSkeleton';
-import { getAssetImage } from '../../utils/common';
+import { getAssetImage, getCoinUSD } from '../../utils/common';
 // ----------------------------------------------------------------------
 const StackedGrid = ({
   // gridItemWidth = "250px",
@@ -17,8 +17,14 @@ const StackedGrid = ({
     {children}
   </Box>
 );
-const GridItems = (props) => (
-    <AnimatePresence>
+const GridItems = (props) => {
+  const [coinUSD, setCoinUSD] = React.useState(0);
+  React.useEffect(()=>{
+    getCoinUSD().then((res) => {
+      setCoinUSD(res);
+    });
+  }, [])
+  return <AnimatePresence>
       {props.items.map((item, index) => (
         <motion.div
           key={index}
@@ -41,6 +47,7 @@ const GridItems = (props) => (
               orderId={item.orderId}
               royaltyOwner={item.royaltyOwner}
               holder={item.holder}
+              coinUSD={coinUSD}
               {...props}
             />:
             <AssetCardSkeleton/>
@@ -48,7 +55,7 @@ const GridItems = (props) => (
         </motion.div>
       ))}
     </AnimatePresence>
-);
+}
 export default function AssetGrid(props){
   let itemWidth = 200
   if(props.dispmode===0)

@@ -1,4 +1,5 @@
 import React from 'react';
+import * as math from 'mathjs';
 import Imgix from "react-imgix";
 import { SizeMe } from "react-sizeme";
 import { Link as RouterLink } from 'react-router-dom';
@@ -25,12 +26,13 @@ import TransferDlg from '../dialog/Transfer';
 import NeedBuyDIADlg from '../dialog/NeedBuyDIA';
 import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
+import BadgeProfile from './BadgeProfile'
 import { getDiaTokenInfo, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
 export default function AssetCard(props) {
-  const { title="???", description, quantity=1, price=0, isLink, tokenId, type, orderId, saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate } = props
+  const { title="???", description, quantity=1, price=0, isLink, tokenId, type, orderId, saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD } = props
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
@@ -122,14 +124,15 @@ export default function AssetCard(props) {
       <motion.div
         animate={{ scale: 1 }}
       >
-        <PaperRecord sx={{p:2, mb: '2px'}}>
-          <Grid container>
+        <PaperRecord sx={{mb: '2px'}}>
+          <Grid container sx={{p:2, pb: 1}}>
             <Grid item xs={6}>
-              <Tooltip title="Collection: Feeds NFT Sticker" arrow disableInteractive placement="top" enterTouchDelay={0}>
-                <Box sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
+              {/* <Tooltip title="Collection: Feeds NFT Sticker" arrow disableInteractive placement="top" enterTouchDelay={0}>
+                <Box sx={{ width: 26, height: 26, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
                   <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24 }} />
                 </Box>
-              </Tooltip>
+              </Tooltip> */}
+              <BadgeProfile type={1}/>
             </Grid>
             <Grid item xs={6} align="right">
               {
@@ -234,7 +237,7 @@ export default function AssetCard(props) {
               </Menu>
             </Grid>
           </Grid>
-          <Box sx={{py: 1}}>
+          <Box>
           {
             isLink?(
               <Link
@@ -256,43 +259,49 @@ export default function AssetCard(props) {
             )
           }
           </Box>
-          <Typography variant="h4" noWrap>{title}</Typography>
-          {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography> */}
-          <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography>
-          {
-            (type===0||type===1||type===2&&(isListedOwnedByMe)||type===2&&isListedByOthers)&&
-            <Typography variant="h4" sx={{color: "origin.main"}} noWrap>
-              <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
-              &nbsp;{price} ELA
-            </Typography>
-          }
-          {
-            (type===2&&isUnlistedByOthers)&&
-            <Typography variant="h4" sx={{color: "origin.main"}} align='center'>
-              Not on Sale
-            </Typography>
-          }
-          {
-            (type===2&&isUnlistedOwnedByMe)&&
-            <Button variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={handleSell}>Sell</Button>
-          }
-          {
-            type===0&&
-            <Stack spacing={.6} direction="row" sx={{minHeight: '26px'}}>
-              {
-                badge.dia&&
-                <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                  <Box><Badge name="diamond"/></Box>
-                </Tooltip>
-              }
-              {
-                badge.kyc&&
-                <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
-                  <Box><Badge name="user"/></Box>
-                </Tooltip>
-              }
+          <Box sx={{p:2}}>
+            <Stack direction="row">
+              <Typography variant="h5" noWrap sx={{flexGrow: 1}}>{title}</Typography>
+              <Typography variant="subtitle2" sx={{display: 'flex', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}}>1/{quantity}</Typography>
             </Stack>
-          }
+            {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography> */}
+            {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography> */}
+            {
+              (type===0||type===1||type===2&&(isListedOwnedByMe)||type===2&&isListedByOthers)&&
+              <Typography variant="h5" sx={{color: "origin.main"}} noWrap>
+                <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
+                &nbsp;{price} ELA&nbsp;
+                <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline-flex', alignItems: 'end'}}>≈ USD {math.round(coinUSD * price, 2)}</Typography>
+              </Typography>
+            }
+            {
+              (type===2&&isUnlistedByOthers)&&
+              <Typography variant="h4" sx={{color: "origin.main"}} align='center'>
+                Not on Sale
+              </Typography>
+            }
+            {
+              (type===2&&isUnlistedOwnedByMe)&&
+              <Button variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={handleSell}>Sell</Button>
+            }
+            {
+              type===0&&
+              <Stack spacing={.6} direction="row" sx={{minHeight: '26px'}}>
+                {
+                  badge.dia&&
+                  <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
+                    <Box><Badge name="diamond"/></Box>
+                  </Tooltip>
+                }
+                {
+                  badge.kyc&&
+                  <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
+                    <Box><Badge name="user"/></Box>
+                  </Tooltip>
+                }
+              </Stack>
+            }
+          </Box>
         </PaperRecord>
         <SellDlg isOpen={sellOpen} setOpen={setOpenSell} {...dlgProps}/>
         <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} {...dlgProps}/>
@@ -301,6 +310,5 @@ export default function AssetCard(props) {
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps}/>
         <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance}/>
       </motion.div>
-    // </Link>
   );
 };
