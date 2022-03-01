@@ -125,16 +125,12 @@ export default function AssetCard(props) {
         animate={{ scale: 1 }}
       >
         <PaperRecord sx={{mb: '2px'}}>
-          <Grid container sx={{p:2, pb: 1}}>
-            <Grid item xs={6}>
-              {/* <Tooltip title="Collection: Feeds NFT Sticker" arrow disableInteractive placement="top" enterTouchDelay={0}>
-                <Box sx={{ width: 26, height: 26, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
-                  <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24 }} />
-                </Box>
-              </Tooltip> */}
+          <Stack sx={{p:2, pb: 1}} direction="row">
+            <Stack sx={{flexGrow:1}} direction="row" spacing={.5}>
               <BadgeProfile type={1}/>
-            </Grid>
-            <Grid item xs={6} align="right">
+              <BadgeProfile type={2} walletAddress={holder} badge={badge}/>
+            </Stack>
+            <Box>
               {
                 (
                   (type===1 && myaddress===holder) || (type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))
@@ -235,8 +231,8 @@ export default function AssetCard(props) {
                   </div>
                 } */}
               </Menu>
-            </Grid>
-          </Grid>
+            </Box>
+          </Stack>
           <Box>
           {
             isLink?(
@@ -284,7 +280,7 @@ export default function AssetCard(props) {
               (type===2&&isUnlistedOwnedByMe)&&
               <Button variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={handleSell}>Sell</Button>
             }
-            {
+            {/* {
               type===0&&
               <Stack spacing={.6} direction="row" sx={{minHeight: '26px'}}>
                 {
@@ -300,7 +296,7 @@ export default function AssetCard(props) {
                   </Tooltip>
                 }
               </Stack>
-            }
+            } */}
           </Box>
         </PaperRecord>
         <SellDlg isOpen={sellOpen} setOpen={setOpenSell} {...dlgProps}/>

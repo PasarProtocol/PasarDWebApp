@@ -448,11 +448,11 @@ export const getDidInfoFromAddress = (address) =>
         response
           .json()
           .then((jsonData) => {
-            if (jsonData.data.did)
+            if (jsonData.data && jsonData.data.did)
               getInfoFromDID(jsonData.data.did.did).then((info) => {
                 resolve(info);
               });
-            else reject(new Error());
+            else resolve({})
           })
           .catch((error) => {
             reject(error);
