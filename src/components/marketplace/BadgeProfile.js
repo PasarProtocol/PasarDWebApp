@@ -3,7 +3,7 @@ import { isMobile } from 'react-device-detect';
 import { Link as RouterLink } from 'react-router-dom';
 // material
 import { useTheme, styled } from '@mui/material/styles';
-import { Box, Stack, Typography, Menu, Popover, Tooltip } from '@mui/material';
+import { Box, Stack, Typography, Menu, Popover, Tooltip, Link } from '@mui/material';
 
 import Badge from '../Badge';
 import Jazzicon from '../Jazzicon';
@@ -55,7 +55,7 @@ export default function BadgeProfile(props) {
       <Box
         onClick={handlePopoverOpen}
         onMouseEnter={handlePopoverOpen}
-        onMouseLeave={handlePopoverClose}
+        // onMouseLeave={handlePopoverClose}
       >
         {
           type===1&&
@@ -68,24 +68,15 @@ export default function BadgeProfile(props) {
           <Jazzicon address={walletAddress} size={26} sx={{mr: 0}}/>
         }
       </Box>
-      <Popover
-        id="mouse-over-popover"
-        sx={{
-          pointerEvents: 'none',
-          textAlign: 'center'
-        }}
+      <Menu
+        keepMounted
+        id="simple-menu"
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
         onClose={handlePopoverClose}
-        disableRestoreFocus
+        transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+        MenuListProps={{ onMouseLeave: handlePopoverClose }}
       >
         <Stack sx={{minWidth: 180, p: 2, alignItems: 'center'}}>
           <Box sx={{...style}}>
@@ -97,17 +88,32 @@ export default function BadgeProfile(props) {
             }
             {
               type===2&&
-              <Jazzicon
-                address={walletAddress}
-                size={60}
-                sx={{mr: 0}}
-              />
+              <Link to={`/profile/others/${walletAddress}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Jazzicon
+                  address={walletAddress}
+                  size={60}
+                  sx={{mr: 0}}
+                />
+              </Link>
             }
           </Box>
-          <Typography variant='h5' sx={{ pt: 2 }}>{title}</Typography>
           {
-            dispAddress&&
-            <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{dispAddress}</Typography>
+            type===1?
+            <Typography variant='h5' sx={{ pt: 2 }}>{title}</Typography>:
+
+            <Link to={`/profile/others/${walletAddress}`} component={RouterLink}>
+              <Typography variant='h5' sx={{ pt: 2 }}>{title}</Typography>
+            </Link>
+          }
+          {
+            dispAddress&&(
+              type===1?
+              <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{dispAddress}</Typography>:
+
+              <Link to={`/profile/others/${walletAddress}`} component={RouterLink}>
+                <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{dispAddress}</Typography>
+              </Link>
+            )
           }
           {
             description&&
@@ -131,21 +137,28 @@ export default function BadgeProfile(props) {
             </Stack>
           }
         </Stack>
-      </Popover>
-      {/* <Menu
-        keepMounted
-        id="simple-menu"
+      </Menu>
+      {/* <Popover
+        id="mouse-over-popover"
+        sx={{
+          pointerEvents: 'none',
+          textAlign: 'center'
+        }}
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
         onClose={handlePopoverClose}
-        transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-        MenuListProps={{ onMouseLeave: handlePopoverClose }}
+        // disableRestoreFocus
       >
-        <Box sx={{ px: 2, py: '6px' }}>
-          aa
-        </Box>
-      </Menu> */}
+        123
+      </Popover> */}
     </>
   )
 }
