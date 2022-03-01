@@ -12,7 +12,9 @@ const CardImgBox = (props) => {
       <Box sx={{
           position: 'relative',
           paddingBottom: '100%',
-          height: 0
+          height: 0,
+          boxShadow: '#d4d6d8 0px 1px 4px 0px inset, rgb(255 255 255 / 50%) 0px -1px 4px 0px inset',
+          background: (theme)=>theme.palette.grey[200]
         }}>
         <Box sx={{
             position: 'absolute',
