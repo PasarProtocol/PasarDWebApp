@@ -29,6 +29,7 @@ import BidList from '../../components/marketplace/BidList';
 import Badge from '../../components/Badge';
 import Jazzicon from '../../components/Jazzicon';
 import PurchaseDlg from '../../components/dialog/Purchase'
+import PlaceBidDlg from '../../components/dialog/PlaceBid'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
@@ -123,6 +124,7 @@ export default function CollectibleDetail() {
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const [isOpenPurchase, setPurchaseOpen] = React.useState(false);
+  const [isOpenPlaceBid, setPlaceBidOpen] = React.useState(false);
   const [didSignin, setSignin] = React.useState(false);
   const [buyClicked, setBuyClicked] = React.useState(false);
   const { pasarLinkAddress } = useSingin()
@@ -299,7 +301,7 @@ export default function CollectibleDetail() {
   window.addEventListener('resize', handleResize);
   const properties = collectible&&collectible.properties?collectible.properties:{}
 
-  const tempDeadLine = getTime(new Date('2022-01-25').getTime()/1000)
+  const tempDeadLine = getTime(new Date('2022-03-03 00:00:00').getTime()/1000)
   return (
     <RootStyle title="Collectible | PASAR">
       <ScrollManager scrollKey="asset-detail-key"/>
@@ -519,22 +521,22 @@ export default function CollectibleDetail() {
             {
               isForAuction?(
                 <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
-                  <Grid container direction="row">
-                    <Grid item xs={6}>
+                  <Stack direction="row">
+                    <Box sx={{flexGrow: 1}}>
                       <Typography variant="h4">Current bid</Typography>
                       <Typography variant="h3" color="origin.main">50 ELA</Typography>
                       <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD 150.11</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
+                    </Box>
+                    <Box>
                       <Stack direction="row">
                         <AccessTimeIcon/>&nbsp;
                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>Ends {tempDeadLine.date} {tempDeadLine.time}</Typography>
                       </Stack>
-                      <Countdown deadline="2022-01-25"/>
-                    </Grid>
-                  </Grid>
+                      <Countdown deadline="2022-03-03 00:00:00"/>
+                    </Box>
+                  </Stack>
                   <MHidden width="smDown">
-                    <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2, textTransform: 'none'}}>
+                    <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}} sx={{mt: 2, textTransform: 'none'}}>
                       Place a bid
                     </Button>
                   </MHidden>
@@ -680,7 +682,7 @@ export default function CollectibleDetail() {
           {
             isForAuction&&
             <StickyPaperStyle>
-              <Button variant="contained" fullWidth onClick={()=>{}}>
+              <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
                 Place a bid
               </Button>
             </StickyPaperStyle>
@@ -711,6 +713,7 @@ export default function CollectibleDetail() {
         </MHidden>
       </Container>
       <PurchaseDlg isOpen={isOpenPurchase} setOpen={setPurchaseOpen} info={collectible}/>
+      <PlaceBidDlg isOpen={isOpenPlaceBid} setOpen={setPlaceBidOpen} info={{...collectible, currentBid: 20}}/>
     </RootStyle>
   );
 }
