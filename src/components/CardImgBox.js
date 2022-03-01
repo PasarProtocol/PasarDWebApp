@@ -3,8 +3,8 @@ import { Box } from '@mui/material';
 const CardImgBox = (props) => {
     const { src } = props;
     const imageStyle = {
-      borderRadius: 1,
-      boxShadow: (theme)=>theme.customShadows.z16,
+      // borderRadius: 1,
+      // boxShadow: (theme)=>theme.customShadows.z16,
       display: 'inline-flex',
       maxHeight: '100%',
     }
