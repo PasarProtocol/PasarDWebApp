@@ -3,8 +3,7 @@ import { isMobile } from 'react-device-detect';
 import { Link as RouterLink } from 'react-router-dom';
 // material
 import { useTheme, styled } from '@mui/material/styles';
-import { Box, Stack, Typography, Menu, Popover, Popper, Tooltip, Link } from '@mui/material';
-import Fade from '@mui/material/Fade';
+import { Box, Stack, Typography, Menu, Popover, Popper, Tooltip, Link, Fade } from '@mui/material';
 
 import Badge from '../Badge';
 import Jazzicon from '../Jazzicon';

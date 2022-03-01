@@ -379,7 +379,7 @@ export const MethodList = [
       { description: 'By', field: 'from', copyable: true, ellipsis: true },
       { description: 'For a minimum bid of', field: 'price', copyable: false }
     ],
-    verb: { description: 'Auctioned for', withPrice: true, subject: 'from' }
+    verb: { description: 'Put up for auction for a minimum bid of', withPrice: true, subject: 'from' }
   },
 ];
 
