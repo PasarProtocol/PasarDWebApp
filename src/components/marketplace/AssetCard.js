@@ -1,9 +1,11 @@
 import React from 'react';
 import * as math from 'mathjs';
 import Imgix from "react-imgix";
-import { SizeMe } from "react-sizeme";
+import { alpha, styled } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { motion } from "framer-motion";
+import Countdown from "react-countdown";
+
 // material
 import { Icon } from '@iconify/react';
 import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip } from '@mui/material';
@@ -30,6 +32,18 @@ import BadgeProfile from './BadgeProfile'
 import { getDiaTokenInfo, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
+const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  top: 50,
+  right: 8,
+  zIndex: 1,
+  borderRadius: theme.spacing(2),
+  padding: '2px 8px',
+  backdropFilter: 'blur(6px)',
+  // background: alpha(theme.palette.background.default, 0.5),
+  background: 'linear-gradient(#fff, #fff) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box',
+  border: '2px solid transparent'
+}));
 
 export default function AssetCard(props) {
   const { title="???", description, quantity=1, price=0, isLink, tokenId, type, orderId, saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD } = props
@@ -124,7 +138,7 @@ export default function AssetCard(props) {
       <motion.div
         animate={{ scale: 1 }}
       >
-        <PaperRecord sx={{mb: '2px'}}>
+        <PaperRecord sx={{mb: '2px', position: 'relative'}}>
           <Stack sx={{p:2, pb: 1}} direction="row">
             <Stack sx={{flexGrow:1}} direction="row" spacing={.5}>
               <BadgeProfile type={1}/>
@@ -233,6 +247,14 @@ export default function AssetCard(props) {
               </Menu>
             </Box>
           </Stack>
+          {
+            saleType==="auction"&&
+            <TimeCountBoxStyle>
+              <Typography variant='subtitle2' sx={{fontWeight: 'normal'}}>
+                <Countdown date={Date.now() + 25*3600*1000} /> <Typography variant='caption' sx={{color:'text.secondary'}}>left</Typography> ⏰
+              </Typography>
+            </TimeCountBoxStyle>
+          }
           <Box>
           {
             isLink?(
@@ -258,7 +280,13 @@ export default function AssetCard(props) {
           <Box sx={{p:2}}>
             <Stack direction="row">
               <Typography variant="h5" noWrap sx={{flexGrow: 1}}>{title}</Typography>
-              <Typography variant="subtitle2" sx={{display: 'flex', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}}>1/{quantity}</Typography>
+              <Typography variant="subtitle2" sx={{display: 'flex', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}}>
+                {
+                  saleType==="auction"?
+                  "Current Bid":
+                  `1/${quantity}`
+                }
+              </Typography>
             </Stack>
             {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography> */}
             {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography> */}
