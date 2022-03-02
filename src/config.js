@@ -27,7 +27,7 @@ export const blankAddress = "0x0000000000000000000000000000000000000000";
 
 const addressForProduction = {
   stickerContract: "0x020c7303664bc88ae92cE3D380BF361E03B78B81",
-  erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
+  // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
   marketContract: "0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0",
   diaContract: "0x2C8010Ae4121212F836032973919E8AeC9AEaEE5",
   blockchain: 'Elastos Smart Chain (ESC)'
@@ -35,7 +35,7 @@ const addressForProduction = {
 
 const addressForTest = {
   stickerContract: "0xc366B74663eE40476f71AB73f6332096575F16b6",
-  erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
+  // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
   marketContract: "0x29A082850737D3ccc8c63928579970e36b6B2CFb",
   diaContract: "0x85946E4b6AB7C5c5C60A7b31415A52C0647E3272",
   blockchain: 'Testnet (ESC)'
@@ -44,7 +44,7 @@ const addressForTest = {
 const rpcUrlForMain = "https://api.elastos.io/eth"
 const rpcUrlForTest = "https://api-testnet.elastos.io/eth"
 
-export const {stickerContract, erc20Contract, marketContract, diaContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
+export const {stickerContract, marketContract, diaContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
 
 export const ipfsURL = process.env.REACT_APP_ENV==="production"?process.env.REACT_APP_IPFS_URL_PRODUCTION:process.env.REACT_APP_IPFS_URL_TEST
 export const rpcURL = process.env.REACT_APP_ENV==="production"?rpcUrlForMain:rpcUrlForTest
