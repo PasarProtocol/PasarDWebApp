@@ -41,6 +41,7 @@ export default function Sell(props) {
   const { isOpen, setOpen, title, tokenId, updateCount, handleUpdate } = props;
   const [price, setPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
+  const [coinType, setCoinType] = React.useState(0);
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const handleClose = () => {
@@ -81,7 +82,7 @@ export default function Sell(props) {
               stickerContract.methods.setApprovalForAll(_operator, true).send(transactionParams)
               .on('receipt', (receipt) => {
                   console.log("setApprovalForAll-receipt", receipt);
-                  callContractMethod('createOrderForSale', {
+                  callContractMethod('createOrderForSale', coinType, {
                     '_id': tokenId,
                     '_amount': 1,
                     '_price': _price,
@@ -97,7 +98,7 @@ export default function Sell(props) {
                   reject(error)
               });
             else
-              callContractMethod('createOrderForSale', {
+              callContractMethod('createOrderForSale', coinType, {
                 '_id': tokenId,
                 '_amount': 1,
                 '_price': _price,
@@ -173,7 +174,7 @@ export default function Sell(props) {
                 value={price}
                 onChange={handleChangePrice}
                 startAdornment={' '}
-                endAdornment={<CoinSelect />}
+                endAdornment={<CoinSelect onChange={setCoinType}/>}
               />
             </FormControl>
             <Divider />

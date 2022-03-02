@@ -3,9 +3,9 @@ import {Select, Button, Menu, MenuItem, Box} from '@mui/material';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import PropTypes from 'prop-types';
+import {coinTypes} from '../../utils/common'
 
 export default function CoinSelect({ onChange }) {
-  const coins = [{icon: 'elastos.svg', name: 'ELA'}]
   const [selected, setSelected] = useState(0);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
 
@@ -15,10 +15,15 @@ export default function CoinSelect({ onChange }) {
   const handleClosePopup = () => {
     setOpenPopup(null);
   };
+  const handleSelect = (index) => {
+    setSelected(index)
+    onChange(index)
+    handleClosePopup();
+  }
   return (
     <>
       <Button color="inherit" size="small" sx={{px: 1, py: .5}} onClick={openPopupMenu}>
-        <Box component="img" src={`/static/${coins[selected].icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coins[selected].name}
+        <Box component="img" src={`/static/${coinTypes[selected].icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coinTypes[selected].name}
         <Icon icon={arrowIosDownwardFill} width={20} height={20}/>
       </Button>
       <Menu 
@@ -30,8 +35,8 @@ export default function CoinSelect({ onChange }) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {coins.map((coin, index)=>(
-          <MenuItem key={index} onClick={()=>{handleClosePopup(); setSelected(index)}}>
+        {coinTypes.map((coin, index)=>(
+          <MenuItem key={index} onClick={()=>{handleSelect(index)}} selected={index===selected}>
             <Box component="img" src={`/static/${coin.icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coin.name}
           </MenuItem>
         ))}
