@@ -2,7 +2,7 @@ import React, {useRef, useState} from 'react';
 // material
 import { styled } from '@mui/material/styles';
 import { Box, Accordion, AccordionSummary, AccordionDetails, Grid, MenuItem, List, TextField, FormControlLabel, Typography, Stack, 
-  ListItemButton, ListItemIcon, ListItemText, Select, Drawer, Divider, Button} from '@mui/material';
+  ListItemButton, ListItemIcon, ListItemText, Select, Drawer, Divider, Button, FormControl, FormHelperText} from '@mui/material';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 
@@ -29,6 +29,7 @@ export default function AssetFilterPan(props){
   const {sx, scrollMaxHeight, btnNames, filterProps, handleFilter} = props
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
   const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
+  const [isErrRangeInput, setErrRangeInput] = React.useState(false);
 
   React.useEffect(()=>{
     setMinVal(filterProps.range.min)
@@ -36,6 +37,11 @@ export default function AssetFilterPan(props){
   }, [filterProps.range])
   const applyRange = (e)=>{
     const range = {min: minVal, max: maxVal}
+    if(minVal>maxVal && maxVal!==''){
+      setErrRangeInput(true)
+      return
+    }
+    setErrRangeInput(false)
     handleFilter('range', range)
   }
 
@@ -104,15 +110,18 @@ export default function AssetFilterPan(props){
                   </Select>
                   <Grid container>
                     <Grid item xs={5} md={5}>
-                      <TextField label="Min" size="small" type="number" value={minVal} onChange={(e)=>setMinVal(e.target.value)}/>
+                      <TextField label="Min" size="small" type="number" value={minVal} onChange={(e)=>setMinVal(e.target.value)} error={isErrRangeInput}/>
                     </Grid>
                     <Grid item xs={2} md={2} align="center">
                       <Typography variant="body2" sx={{pt: 1}}>to</Typography>
                     </Grid>
                     <Grid item xs={5} md={5}>
-                      <TextField label="Max" size="small" type="number" value={maxVal} onChange={(e)=>setMaxVal(e.target.value)}/>
+                      <TextField label="Max" size="small" type="number" value={maxVal} onChange={(e)=>setMaxVal(e.target.value)} error={isErrRangeInput}/>
                     </Grid>
                   </Grid>
+                  <FormControl error={isErrRangeInput} variant="standard" sx={isErrRangeInput?{mt: '0 !important'}:{display: 'none'}}>
+                    <FormHelperText id="name-error-text">Max value must be higher than min value</FormHelperText>
+                  </FormControl>
                   <Button variant="contained" color="primary" width="100%" onClick={applyRange}>
                     Apply
                   </Button>
