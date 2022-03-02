@@ -8,10 +8,11 @@ import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sd
 import jwtDecode from 'jwt-decode';
 
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
-import { erc20Contract as ERC20_ADDRESS, stickerContract as STICKER_ADDRESS, marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS, ipfsURL, rpcURL } from '../config';
+import { stickerContract as STICKER_ADDRESS, marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS, blankAddress, ipfsURL, rpcURL } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { DIAMOND_CONTRACT_ABI } from '../abi/diamondABI';
 
+const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS]
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = (strAddress) =>
   strAddress ? `${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}` : '';
@@ -204,7 +205,7 @@ export function removeLeadingZero(value) {
   return value.replace(/-/g, '').replace(/^0+(?!\.|$)/, '');
 }
 
-export function callContractMethod(type, paramObj) {
+export function callContractMethod(type, coinType, paramObj) {
   return new Promise((resolve, reject) => {
     if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') {
       reject(new Error());
@@ -234,11 +235,11 @@ export function callContractMethod(type, paramObj) {
             if (type === 'createOrderForSale') {
               console.log('createOrderForSale');
               const { _id, _amount, _price, _didUri } = paramObj;
-              method = marketContract.methods.createOrderForSale(STICKER_ADDRESS, _id, _amount, ERC20_ADDRESS, _price, _didUri);
+              method = marketContract.methods.createOrderForSale(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _price, _didUri);
             } else if (type === 'createOrderForAuction') {
               console.log('createOrderForAuction');
               const { _id, _amount, _minPrice, _endTime, _didUri } = paramObj;
-              method = marketContract.methods.createOrderForAuction(STICKER_ADDRESS, _id, _amount, ERC20_ADDRESS, _minPrice, _endTime, _didUri);
+              method = marketContract.methods.createOrderForAuction(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _minPrice, _endTime, _didUri);
             } else if (type === 'buyOrder') {
               console.log('buyOrder');
               const { _orderId, _didUri } = paramObj;
@@ -382,7 +383,7 @@ export const MethodList = [
     verb: { description: 'Put up for auction for a minimum bid of', withPrice: true, subject: 'from' }
   },
 ];
-
+export const coinTypes = [{icon: 'elastos.svg', name: 'ELA'}, {icon: 'badges/diamond.svg', name: 'DIA'}]
 export const sendIpfsDidJson = async () => {
   const client = create(`${ipfsURL}/`);
   // create the metadata object we'll be storing

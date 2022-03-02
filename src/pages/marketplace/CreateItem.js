@@ -38,7 +38,7 @@ import { essentialsConnector } from '../../components/signin-dlg/EssentialConnec
 import ProgressBar from '../../components/ProgressBar'
 import StartingDateSelect from '../../components/marketplace/StartingDateSelect'
 import ExpirationDateSelect from '../../components/marketplace/ExpirationDateSelect'
-import {hash, removeLeadingZero, callContractMethod, isInAppBrowser } from '../../utils/common';
+import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes } from '../../utils/common';
 import convert from '../../utils/image-file-resize';
 // ----------------------------------------------------------------------
 
@@ -95,6 +95,7 @@ export default function CreateItem() {
   const [expirationDate, setExpirationDate] = React.useState(addDays(new Date(), 1));
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
   const [currentPromise, setCurrentPromise] = React.useState(null);
+  const [coinType, setCoinType] = React.useState(0);
   const { enqueueSnackbar } = useSnackbar();
   
   const isOffset = useOffSetTop(40);
@@ -108,8 +109,8 @@ export default function CreateItem() {
   const navigate = useNavigate();
   
   React.useEffect(async () => {
-    // if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
-    //   navigate('/marketplace')
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+      navigate('/marketplace')
   }, []);
 
   React.useEffect(async () => {
@@ -309,7 +310,7 @@ export default function CreateItem() {
                                 setCurrent(2)
                                 console.log("setApprovalForAll-receipt", receipt);
                                 if(saletype === 'FixedPrice')
-                                  callContractMethod('createOrderForSale', {
+                                  callContractMethod('createOrderForSale', coinType, {
                                     ...paramObj,
                                     '_amount': _tokenSupply,
                                     '_price': BigInt(price*1e18).toString(),
@@ -321,7 +322,7 @@ export default function CreateItem() {
                                     reject(error)
                                   })
                                 else
-                                  callContractMethod('createOrderForAuction', {
+                                  callContractMethod('createOrderForAuction', coinType, {
                                     ...paramObj,
                                     '_amount': _tokenSupply,
                                     '_minPrice': BigInt(price*1e18).toString(),
@@ -343,7 +344,7 @@ export default function CreateItem() {
                       } else {
                         setCurrent(2)
                         if(saletype === 'FixedPrice')
-                          callContractMethod('createOrderForSale', {
+                          callContractMethod('createOrderForSale', coinType, {
                             ...paramObj,
                             '_amount': _tokenSupply,
                             '_price': BigInt(price*1e18).toString(),
@@ -355,7 +356,7 @@ export default function CreateItem() {
                             reject(error)
                           })
                         else
-                          callContractMethod('createOrderForAuction', {
+                          callContractMethod('createOrderForAuction', coinType, {
                             ...paramObj,
                             '_amount': _tokenSupply,
                             '_minPrice': BigInt(price*1e18).toString(),
@@ -874,7 +875,7 @@ export default function CreateItem() {
                           onChange={handleChangePrice}
                           startAdornment={' '}
                           endAdornment={
-                            <CoinSelect/>
+                            <CoinSelect onChange={setCoinType}/>
                           }
                         />
                       </FormControl>
@@ -886,7 +887,7 @@ export default function CreateItem() {
                       </Typography>
                       <Typography variant="body2" component="div" sx={{fontWeight: 'normal'}}>
                         You will receive
-                        <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}> {rcvprice} ELA </Typography>
+                        <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}> {rcvprice} {coinTypes[coinType].name} </Typography>
                         per item
                       </Typography>
                     </Grid>
