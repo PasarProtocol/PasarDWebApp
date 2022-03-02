@@ -590,7 +590,7 @@ export default function CreateItem() {
         }, 3000)
       }
       else
-      enqueueSnackbar('Mint token error!', { variant: 'warning' });
+        enqueueSnackbar('Mint token error!', { variant: 'warning' });
       setOnProgress(false)
       setOpenMintDlg(false)
       setCurrentPromise(null)
@@ -632,19 +632,29 @@ export default function CreateItem() {
         mint2net(paramObj, i)
       ).then((success) => {
         setProgress(progressStep(100, i))
-        if(success)
+        if(success){
+          if((i+1)===files.length){
+            setTimeout(()=>{
+              navigate('/marketplace')
+            }, 3000)
+          }
           enqueueSnackbar(`Mint token_${(i+1)} success!`, { variant: 'success' });
+        }
         else
           enqueueSnackbar(`Mint token_${(i+1)} error!`, { variant: 'warning' });
-        if((i+1)===files.length)
+        if((i+1)===files.length){
           setOnProgress(false)
           setOpenMintDlg(false)
+        }
+        setCurrent(1)
       }).catch((error) => {
         setProgress(progressStep(100, i))
         enqueueSnackbar(`Mint token_${(i+1)} error!`, { variant: 'error' });
-        if((i+1)===files.length)
+        if((i+1)===files.length){
           setOnProgress(false)
           setOpenMintDlg(false)
+        }
+        setCurrent(1)
       })
     , Promise.resolve() );
   }
@@ -701,16 +711,8 @@ export default function CreateItem() {
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
               <MintingTypeButton type="Single" description="Single item" onClick={()=>{setMintType("Single")}} current={mintype}/>
-              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                <div>
-                  <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype} disabled={1&&true}/>
-                </div>
-              </Tooltip>
-              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                <div>
-                  <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype} disabled={1&&true}/>
-                </div>
-              </Tooltip>
+              <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype}/>
+              <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
             </Stack>
           </Grid>
           <Grid item xs={12}>

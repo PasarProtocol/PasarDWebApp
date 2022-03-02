@@ -142,7 +142,9 @@ export default function AssetCard(props) {
           <Stack sx={{p:2, pb: 1}} direction="row">
             <Stack sx={{flexGrow:1}} direction="row" spacing={.5}>
               <BadgeProfile type={1}/>
-              <BadgeProfile type={2} walletAddress={holder} badge={badge}/>
+              {
+                holder&&<BadgeProfile type={2} walletAddress={holder} badge={badge}/>
+              }
             </Stack>
             <Box>
               {
