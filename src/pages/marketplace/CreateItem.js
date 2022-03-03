@@ -38,7 +38,7 @@ import { essentialsConnector } from '../../components/signin-dlg/EssentialConnec
 import ProgressBar from '../../components/ProgressBar'
 import StartingDateSelect from '../../components/marketplace/StartingDateSelect'
 import ExpirationDateSelect from '../../components/marketplace/ExpirationDateSelect'
-import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes } from '../../utils/common';
+import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice } from '../../utils/common';
 import convert from '../../utils/image-file-resize';
 // ----------------------------------------------------------------------
 
@@ -93,9 +93,10 @@ export default function CreateItem() {
   const [isOnValidation, setOnValidation] = React.useState(false);
   const [startingDate, setStartingDate] = React.useState(0);
   const [expirationDate, setExpirationDate] = React.useState(addDays(new Date(), 1));
-  const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
   const [currentPromise, setCurrentPromise] = React.useState(null);
   const [coinType, setCoinType] = React.useState(0);
+  const [coinUSD, setCoinUSD] = React.useState(0);
+  const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
   const { enqueueSnackbar } = useSnackbar();
   
   const isOffset = useOffSetTop(40);
@@ -129,6 +130,27 @@ export default function CreateItem() {
         currentPromise.cancel()
     }
   }, [isOpenMint]);
+
+  React.useEffect(() => {
+    switch(coinType){
+      case 0:
+        getCoinUSD().then((res) => {
+          setCoinUSD(res);
+        });
+        break;
+      case 1:
+        getDiaTokenPrice()
+          .then((res) => {
+            setCoinUSD(res.token.derivedELA * res.bundle.elaPrice);
+          })
+          .catch((error) => {
+            setCoinUSD(0);
+          });
+        break;
+      default:
+        break;
+    }
+  }, [coinType]);
 
   const cancelAction = () => {
     setProgress(100)
@@ -1114,10 +1136,8 @@ export default function CreateItem() {
                       <AssetCard
                         thumbnail={isString(file) ? file : file.preview}
                         title={singleName}
-                        description={description}
-                        price={price}
-                        quantity={quantity}
                         type={0}
+                        {...{description, price, coinType, quantity, coinUSD}}
                       />
                     )
                   )
@@ -1137,7 +1157,10 @@ export default function CreateItem() {
                         </Typography>
                       </PaperRecord>
                     ):(
-                      <MultiMintGrid assets={previewFiles} multiNames={multiNames} description={description} quantity={quantity} price={price}/>
+                      <MultiMintGrid
+                        assets={previewFiles}
+                        {...{multiNames, description, quantity, price, coinType, coinUSD}}
+                      />
                     )
                   )
                 }
