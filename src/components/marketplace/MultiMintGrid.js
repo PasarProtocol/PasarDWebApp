@@ -29,7 +29,10 @@ const GridItems = (props) => (
             description={props.description}
             price={props.price}
             quantity={props.quantity}
+            coinType={props.coinType}
+            coinUSD={props.coinUSD}
             isLink={false}
+            type={0}
           />
         </motion.div>
       ))}
@@ -38,7 +41,7 @@ const GridItems = (props) => (
 export default function MultiMintGrid(props){
   return(
     <StackedGrid>
-      <GridItems {...props} />
+      <GridItems {...props}/>
     </StackedGrid>
   )
 }
