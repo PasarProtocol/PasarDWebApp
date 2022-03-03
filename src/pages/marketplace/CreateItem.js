@@ -73,7 +73,7 @@ export default function CreateItem() {
   const [mintype, setMintType] = React.useState("Single");
   const [itemtype, setItemType] = React.useState("General");
   const [saletype, setSaleType] = React.useState("FixedPrice");
-  const [collection, setCollection] = React.useState("FSTK");
+  const [collection, setCollection] = React.useState("PSRC");
   const [file, setFile] = React.useState(null);
   const [files, setFiles] = React.useState([]);
   const [singleName, setSingleName] = React.useState("");
@@ -996,7 +996,7 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <Stack spacing={1} direction="row">
-                  <MintingTypeButton type="FSTK" description="Feeds NFT Sticker" onClick={()=>{setCollection("FSTK")}} current={collection}/>
+                  <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{setCollection("PSRC")}} current={collection}/>
                   <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                     <div>
                       <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose")}} current={collection} disabled={1&&true}/>
@@ -1137,6 +1137,7 @@ export default function CreateItem() {
                         thumbnail={isString(file) ? file : file.preview}
                         title={singleName}
                         type={0}
+                        collection='psrc'
                         {...{description, price, coinType, quantity, coinUSD}}
                       />
                     )

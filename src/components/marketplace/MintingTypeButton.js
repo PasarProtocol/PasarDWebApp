@@ -54,6 +54,12 @@ const MintingTypeButton = (props)=>{
                 </SvgStyle>
             }
             {
+                type==="PSRC"&&
+                <Box sx={{ width: {xs: 35, sm: 50}, height: {xs: 35, sm: 50}, borderRadius: 2, p: {xs: 1, sm: 1.5}, m: 'auto', backgroundColor: current===type?'text.primary':'text.disabled' }}>
+                    <Box draggable = {false} component="img" src="/static/logo-icon.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26} }} />
+                </Box>
+            }
+            {
                 type==="FSTK"&&
                 <Box sx={{ width: {xs: 35, sm: 50}, height: {xs: 35, sm: 50}, borderRadius: 2, p: {xs: 1, sm: 1.5}, m: 'auto', backgroundColor: current===type?'text.primary':'text.disabled' }}>
                     <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26} }} />
