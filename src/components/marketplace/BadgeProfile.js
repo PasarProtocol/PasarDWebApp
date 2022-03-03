@@ -7,7 +7,7 @@ import { Box, Stack, Typography, Menu, Popover, Popper, Tooltip, Link, Fade } fr
 
 import Badge from '../Badge';
 import Jazzicon from '../Jazzicon';
-import { reduceHexAddress, getDidInfoFromAddress } from '../../utils/common';
+import { reduceHexAddress, getDidInfoFromAddress, collectionTypes } from '../../utils/common';
 import { stickerContract as STICKER_ADDRESS } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ const AvatarBoxStyle = {
 }
 
 export default function BadgeProfile(props) {
-  const {type, walletAddress, badge} = props
+  const {type, walletAddress, badge, collection='fstk'} = props
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = React.useState(false);
   const [didInfo, setDidInfo] = useState({name: '', description: ''});
@@ -45,9 +45,9 @@ export default function BadgeProfile(props) {
     setOpen(false);
   };
 
-  let title = "Feeds NFT Sticker"
+  let {title, description} = collectionTypes[collection]
+  const {icon} = collectionTypes[collection]
   let dispAddress = reduceHexAddress(STICKER_ADDRESS)
-  let description = 'Feeds default collection.'
   if(type===2){
     title = didInfo.name || reduceHexAddress(walletAddress)
     dispAddress = didInfo.name?reduceHexAddress(walletAddress):''
@@ -64,7 +64,7 @@ export default function BadgeProfile(props) {
         {
           type===1&&
           <Box sx={{ width: 26, height: 26, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
-            <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24 }} />
+            <Box draggable = {false} component="img" src={`/static/${icon}`} sx={{ width: 24 }} />
           </Box>
         }
         {
@@ -88,7 +88,7 @@ export default function BadgeProfile(props) {
                   {
                     type===1&&
                     <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center' }}>
-                      <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 35 }} />
+                      <Box draggable = {false} component="img" src={`/static/${icon}`} sx={{ width: 35 }} />
                     </Box>
                   }
                   {

@@ -47,7 +47,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 
 export default function AssetCard(props) {
   const { title="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId,
-   saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD } = props
+   saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, collection } = props
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
@@ -142,7 +142,7 @@ export default function AssetCard(props) {
         <PaperRecord sx={{mb: '2px', position: 'relative'}}>
           <Stack sx={{p:2, pb: 1}} direction="row">
             <Stack sx={{flexGrow:1}} direction="row" spacing={.5}>
-              <BadgeProfile type={1}/>
+              <BadgeProfile type={1} collection={collection}/>
               {
                 holder&&<BadgeProfile type={2} walletAddress={holder} badge={badge}/>
               }

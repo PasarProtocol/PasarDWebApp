@@ -389,7 +389,22 @@ export const MethodList = [
     verb: { description: 'Put up for auction for a minimum bid of', withPrice: true, subject: 'from' }
   },
 ];
+export const collectionTypes = {
+  fstk: {
+    name: 'FSTK',
+    icon: 'feeds-sticker.svg',
+    title: 'Feeds NFT Sticker',
+    description: 'Feeds default collection'
+  },
+  psrc: {
+    name: 'PSRC',
+    icon: 'logo-icon.svg',
+    title: 'Pasar Collection',
+    description: 'Pasar default collection'
+  }
+}
 export const coinTypes = [{icon: 'elastos.svg', name: 'ELA'}, {icon: 'badges/diamond.svg', name: 'DIA'}]
+
 export const sendIpfsDidJson = async () => {
   const client = create(`${ipfsURL}/`);
   // create the metadata object we'll be storing
