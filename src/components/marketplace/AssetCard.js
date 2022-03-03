@@ -29,7 +29,7 @@ import NeedBuyDIADlg from '../dialog/NeedBuyDIA';
 import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
 import BadgeProfile from './BadgeProfile'
-import { getDiaTokenInfo, getCredentialInfo } from '../../utils/common';
+import { getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
@@ -46,7 +46,8 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 export default function AssetCard(props) {
-  const { title="???", description, quantity=1, price=0, isLink, tokenId, type, orderId, saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD } = props
+  const { title="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId,
+   saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD } = props
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
@@ -295,8 +296,8 @@ export default function AssetCard(props) {
             {
               (type===0||type===1||type===2&&(isListedOwnedByMe)||type===2&&isListedByOthers)&&
               <Typography variant="h5" sx={{color: "origin.main"}} noWrap>
-                <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
-                &nbsp;{price} ELA&nbsp;
+                <Box component="img" src={`/static/${coinTypes[coinType].icon}`} sx={{ width: 18, display: 'inline' }} />
+                &nbsp;{price} {coinTypes[coinType].name}&nbsp;
                 <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline-flex', alignItems: 'end'}}>≈ USD {math.round(coinUSD * price, 2)}</Typography>
               </Typography>
             }
