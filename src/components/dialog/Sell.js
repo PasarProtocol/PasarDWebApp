@@ -46,6 +46,7 @@ export default function Sell(props) {
   const [onProgress, setOnProgress] = React.useState(false);
   const handleClose = () => {
     setOpen(false);
+    setOnProgress(false);
   };
 
   const handleChangePrice = (event) => {
@@ -126,9 +127,12 @@ export default function Sell(props) {
         enqueueSnackbar('Sell NFT success!', { variant: 'success' });
         setOpen(false);
       } else {
-        enqueueSnackbar('Sell NFT error!', { variant: 'warning' });
+        enqueueSnackbar('Sell NFT error!', { variant: 'error' });
+        setOnProgress(false);
       }
     }).catch(e=>{
+      enqueueSnackbar('Sell NFT error!', { variant: 'error' });
+      setOnProgress(false);
       console.log(e)
     });
   }
