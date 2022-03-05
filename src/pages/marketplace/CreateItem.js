@@ -348,7 +348,7 @@ export default function CreateItem() {
                                     ...paramObj,
                                     '_amount': _tokenSupply,
                                     '_minPrice': BigInt(price*1e18).toString(),
-                                    '_endTime': expirationDate.getTime()/1000,
+                                    '_endTime': (expirationDate.getTime()/1000).toFixed(),
                                     'beforeSendFunc': ()=>{setReadySignForMint(true)},
                                     'afterSendFunc': ()=>{setReadySignForMint(false)}
                                   }).then((success) => {
@@ -382,7 +382,7 @@ export default function CreateItem() {
                             ...paramObj,
                             '_amount': _tokenSupply,
                             '_minPrice': BigInt(price*1e18).toString(),
-                            '_endTime': expirationDate.getTime()/1000,
+                            '_endTime': (expirationDate.getTime()/1000).toFixed(),
                             'beforeSendFunc': ()=>{setReadySignForMint(true)},
                             'afterSendFunc': ()=>{setReadySignForMint(false)}
                           }).then((success) => {
@@ -931,7 +931,7 @@ export default function CreateItem() {
                           onChange={handleChangePrice}
                           startAdornment={' '}
                           endAdornment={
-                            <CoinSelect/>
+                            <CoinSelect onChange={setCoinType}/>
                           }
                         />
                       </FormControl>

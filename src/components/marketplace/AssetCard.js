@@ -17,6 +17,7 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import SyncAltSharpIcon from '@mui/icons-material/SyncAltSharp';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import GavelIcon from '@mui/icons-material/Gavel';
 
 import Badge from '../Badge';
 import PaperRecord from '../PaperRecord';
@@ -26,6 +27,7 @@ import CancelDlg from '../dialog/CancelSale';
 import DeleteDlg from '../dialog/DeleteItem';
 import TransferDlg from '../dialog/Transfer';
 import NeedBuyDIADlg from '../dialog/NeedBuyDIA';
+import AuctionDlg from '../dialog/Auction';
 import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
 import BadgeProfile from './BadgeProfile'
@@ -51,6 +53,7 @@ export default function AssetCard(props) {
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
+  const [auctionOpen, setOpenAuction] = React.useState(false);
   const [updateOpen, setOpenUpdate] = React.useState(false);
   const [cancelOpen, setOpenCancel] = React.useState(false);
   const [deleteOpen, setOpenDelete] = React.useState(false);
@@ -105,6 +108,13 @@ export default function AssetCard(props) {
           return
         }
         setOpenSell(true)
+        break;
+      case 'auction':
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
+          setOpenDownloadEssentialDlg(true)
+          return
+        }
+        setOpenAuction(true)
         break;
       case 'update':
         if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
@@ -229,6 +239,9 @@ export default function AssetCard(props) {
                         <MenuItem value='sell' onClick={handleClosePopup}>
                           <StorefrontIcon/>&nbsp;Sell
                         </MenuItem>
+                        <MenuItem value='auction' onClick={handleClosePopup}>
+                          <GavelIcon/>&nbsp;Auction
+                        </MenuItem>
                         <MenuItem value='transfer' onClick={handleClosePopup}>
                           <SyncAltSharpIcon/>&nbsp;Transfer
                         </MenuItem>
@@ -336,6 +349,7 @@ export default function AssetCard(props) {
         <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} {...dlgProps}/>
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps}/>
         <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance}/>
+        <AuctionDlg isOpen={auctionOpen} setOpen={setOpenAuction} {...dlgProps}/>
       </motion.div>
   );
 };
