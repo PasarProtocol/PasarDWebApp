@@ -245,6 +245,7 @@ export function callContractMethod(type, coinType, paramObj) {
             } else if (type === 'createOrderForAuction') {
               console.log('createOrderForAuction');
               const { _id, _amount, _minPrice, _endTime, _didUri } = paramObj;
+              console.log(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _minPrice, _endTime, _didUri)
               method = marketContract.methods.createOrderForAuction(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _minPrice, _endTime, _didUri);
             } else if (type === 'buyOrder') {
               console.log('buyOrder');
@@ -389,20 +390,22 @@ export const MethodList = [
     verb: { description: 'Put up for auction for a minimum bid of', withPrice: true, subject: 'from' }
   },
 ];
-export const collectionTypes = {
-  fstk: {
-    name: 'FSTK',
-    icon: 'feeds-sticker.svg',
-    title: 'Feeds NFT Sticker',
-    description: 'Feeds default collection'
-  },
-  psrc: {
+export const collectionTypes = [
+  {
     name: 'PSRC',
     icon: 'logo-icon.svg',
     title: 'Pasar Collection',
-    description: 'Pasar default collection'
+    description: 'Pasar default collection',
+    detail: 'A collection of all items minted using the Pasar Collection Contract'
+  },
+  {
+    name: 'FSTK',
+    icon: 'feeds-sticker.svg',
+    title: 'Feeds NFT Sticker',
+    description: 'Feeds default collection',
+    detail: 'A collection of all items minted using the Feeds NFT Stickers Contract'
   }
-}
+]
 export const coinTypes = [{icon: 'elastos.svg', name: 'ELA'}, {icon: 'badges/diamond.svg', name: 'DIA'}]
 
 export const sendIpfsDidJson = async () => {

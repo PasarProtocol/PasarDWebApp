@@ -74,6 +74,7 @@ export default function Router() {
           ]
         },
         { path: 'create', element: <MintDlgProvider><CreateItem /></MintDlgProvider> },
+        { path: 'collection', element: <CollectionExplorer /> },
         { path: 'profile', element: <Navigate to="/404" replace /> },
         {
           path: 'profile',
@@ -102,5 +103,7 @@ const MarketHome = Loadable(lazy(() => import('../pages/MarketHome')));
 const MarketExplorer = Loadable(lazy(() => import('../pages/marketplace/Explorer')));
 const CreateItem = Loadable(lazy(() => import('../pages/marketplace/CreateItem')));
 const MyItems = Loadable(lazy(() => import('../pages/marketplace/MyItems')));
+// Collection
+const CollectionExplorer = Loadable(lazy(() => import('../pages/collection/Explorer')));
 
 const NotFound = Loadable(lazy(() => import('../pages/Page404')));

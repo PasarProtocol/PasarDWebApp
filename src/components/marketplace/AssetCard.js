@@ -59,7 +59,6 @@ export default function AssetCard(props) {
   const [deleteOpen, setOpenDelete] = React.useState(false);
   const [transferOpen, setOpenTransfer] = React.useState(false);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
-  const [diaBadge, setDiaBadge] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
   
   const isCreatedByMe = myaddress===royaltyOwner

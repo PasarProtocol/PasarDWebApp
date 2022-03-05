@@ -1137,7 +1137,7 @@ export default function CreateItem() {
                         thumbnail={isString(file) ? file : file.preview}
                         title={singleName}
                         type={0}
-                        collection='psrc'
+                        collection={0}
                         {...{description, price, coinType, quantity, coinUSD}}
                       />
                     )
