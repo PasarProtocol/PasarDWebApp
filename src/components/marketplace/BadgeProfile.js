@@ -24,7 +24,7 @@ const AvatarBoxStyle = {
 }
 
 export default function BadgeProfile(props) {
-  const {type, walletAddress, badge, collection='fstk'} = props
+  const {type, walletAddress, badge, collection=0} = props
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = React.useState(false);
   const [didInfo, setDidInfo] = useState({name: '', description: ''});
