@@ -22,7 +22,8 @@ export const PATH_AUTH = {
 export const PATH_PAGE = {
   explorer: '/explorer',
   marketplace: '/marketplace',
-  create: '/create'
+  create: '/create',
+  collection: '/collection'
 };
 
 export const PATH_DOCS = 'https://docs.pasarprotocol.io';

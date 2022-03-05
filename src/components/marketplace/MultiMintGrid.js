@@ -33,7 +33,7 @@ const GridItems = (props) => (
             coinUSD={props.coinUSD}
             isLink={false}
             type={0}
-            collection='psrc'
+            collection={0}
           />
         </motion.div>
       ))}
