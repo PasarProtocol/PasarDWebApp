@@ -46,6 +46,38 @@ module.exports.STICKER_CONTRACT_ABI = [
       {
         "indexed": true,
         "internalType": "address",
+        "name": "_diaBeacon",
+        "type": "address"
+      }
+    ],
+    "name": "DiaBeaconSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_diaToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_diaValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "DiaTokenSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "previousOwner",
         "type": "address"
       },
@@ -389,6 +421,55 @@ module.exports.STICKER_CONTRACT_ABI = [
       }
     ],
     "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "diaNeeded",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getDiaBeacon",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getDiaToken",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -945,6 +1026,37 @@ module.exports.STICKER_CONTRACT_ABI = [
       }
     ],
     "name": "setApprovalForAll",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_diaBeacon",
+        "type": "address"
+      }
+    ],
+    "name": "setDiaBeacon",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_diaToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_diaValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "setDiaToken",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
