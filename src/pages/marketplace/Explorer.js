@@ -25,7 +25,7 @@ import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
-import { fetchFrom } from '../../utils/common';
+import { fetchFrom, collectionTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -109,6 +109,8 @@ export default function MarketExplorer() {
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([]);
+  const [collections, setCollections] = React.useState(collectionTypes);
+  const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
   const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
   const [range, setRange] = React.useState(sessionFilterProps.range || {min:'', max:''});
   const [adult, setAdult] = React.useState(sessionFilterProps.adult || false);
@@ -117,6 +119,7 @@ export default function MarketExplorer() {
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({
     selectedBtns: sessionFilterProps.selectedBtns || [],
+    selectedCollections: sessionFilterProps.selectedCollections || [],
     range: sessionFilterProps.range || {min:'', max:''},
     ...sessionFilterProps
   });
@@ -178,9 +181,9 @@ export default function MarketExplorer() {
       if(e.code !== e.ABORT_ERR)
         setLoadingAssets(false);
     });
-    sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, adult, order}))
-    setFilterForm({selectedBtns, range, adult, order})
-  }, [page, showCount, selectedBtns, adult, range, order, params.key]);
+    sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, selectedCollections, adult, order}))
+    setFilterForm({selectedBtns, range, selectedCollections, adult, order})
+  }, [page, showCount, selectedBtns, selectedCollections, adult, range, order, params.key]);
   
   const handleDispmode = (event, mode) => {
     if(mode===null)
@@ -229,6 +232,18 @@ export default function MarketExplorer() {
       return tempBtns
     })
   }
+  const handleSelectedCollections = (value)=>{
+    setSelectedCollections((prevState) => {
+      const tempCollections = [...prevState]
+      if(!tempCollections.includes(value)){
+        tempCollections.push(value)
+      } else {
+        const findIndex = tempCollections.indexOf(value)
+        tempCollections.splice(findIndex, 1)
+      }
+      return tempCollections
+    })
+  }
   const handleFilter = (key, value)=>{
     setPage(1)
     switch(key){
@@ -241,6 +256,12 @@ export default function MarketExplorer() {
       case 'range':
         setSelectedByValue(value.min || value.max, rangeBtnId)
         setRange(value)
+        break
+      case 'collection':
+        handleSelectedCollections(value)
+        break
+      case 'selectedCollections':
+        setSelectedCollections(value)
         break
       case 'adult':
         setSelectedByValue(value, adultBtnId)
@@ -278,6 +299,14 @@ export default function MarketExplorer() {
         tempBtns.splice(findIndex, 1)
       }
     }
+    else if(key==='collection'){
+      if(!tempForm.selectedCollections.includes(value)){
+        tempForm.selectedCollections.push(value)
+      } else {
+        const findIndex = tempForm.selectedCollections.indexOf(value)
+        tempForm.selectedCollections.splice(findIndex, 1)
+      }
+    }
     else if(key==='adult'){
       if(value){
         if(!tempBtns.includes(adultBtnId))
@@ -294,6 +323,7 @@ export default function MarketExplorer() {
     const tempForm = {...filterForm}
     delete tempForm.statype
     delete tempForm.clear_all
+    delete tempForm.collection
     Object.keys(tempForm).forEach(key => handleFilter(key, tempForm[key]))
     setFilterForm(tempForm)
     closeFilter(e)
@@ -398,9 +428,8 @@ export default function MarketExplorer() {
                       },
                     }}
                     scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
-                    btnNames = {btnNames}
-                    filterProps = {{selectedBtns, range, adult, order}}
-                    handleFilter = {handleFilter}
+                    filterProps = {{selectedBtns, selectedCollections, range, adult, order}}
+                    {...{btnNames, collections, handleFilter}}
                   />
                 </Box>
                 <Box
@@ -517,9 +546,9 @@ export default function MarketExplorer() {
                     <AssetFilterPan 
                       sx={{
                       }}
-                      btnNames = {btnNames}
                       filterProps = {filterForm}
                       handleFilter = {handleFilterMobile}
+                      {...{btnNames, collections}}
                     />
                   </Scrollbar>
                 </Box>
