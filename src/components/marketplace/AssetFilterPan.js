@@ -5,6 +5,7 @@ import { Box, Accordion, AccordionSummary, AccordionDetails, Grid, MenuItem, Lis
   ListItemButton, ListItemIcon, ListItemText, Select, Drawer, Divider, Button, FormControl, FormHelperText} from '@mui/material';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
+import CheckIcon from '@mui/icons-material/Check';
 
 import CustomSwitch from '../custom-switch';
 import SearchBox from '../SearchBox';
@@ -26,15 +27,29 @@ const DrawerStyle = styled(Drawer)(({ theme }) => ({
 }));
 
 export default function AssetFilterPan(props){
-  const {sx, scrollMaxHeight, btnNames, filterProps, handleFilter} = props
+  const {sx, scrollMaxHeight, btnNames, collections, filterProps, handleFilter} = props
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
   const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
+  const [filterCollections, setFilterCollections] = React.useState(collections);
 
   React.useEffect(()=>{
     setMinVal(filterProps.range.min)
     setMaxVal(filterProps.range.max)
   }, [filterProps.range])
+
+  const searchCollections = (inputStr)=>{
+    if(inputStr.length){
+      setFilterCollections(collections.filter(el=>el.title.includes(inputStr)))
+    } else {
+      setFilterCollections(collections)
+    }
+  }
+
+  const selectCollection = (title)=>{
+    handleFilter('collection', title)
+  }
+
   const applyRange = (e)=>{
     const range = {min: minVal, max: maxVal}
     if(minVal>maxVal && maxVal!==''){
@@ -44,7 +59,6 @@ export default function AssetFilterPan(props){
     setErrRangeInput(false)
     handleFilter('range', range)
   }
-
   return(
     <DrawerStyle
       variant="persistent"
@@ -53,7 +67,7 @@ export default function AssetFilterPan(props){
     >
       <Scrollbar sx={{maxHeight: scrollMaxHeight, px: 1}}>
         <Grid container width="100%">
-          {/* <Grid item xs={12} md={12}>
+          <Grid item xs={12} md={12}>
             <Accordion
               defaultExpanded={1&&true}
             >
@@ -77,7 +91,7 @@ export default function AssetFilterPan(props){
               </AccordionDetails>
             </Accordion>
             <Divider />
-          </Grid> */}
+          </Grid>
           <Grid item xs={12} md={12}>
             <Accordion
               defaultExpanded={1&&true}
@@ -138,19 +152,26 @@ export default function AssetFilterPan(props){
                 <Typography variant="body2">Collections</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <SearchBox sx={{width: '100%', mb: 1}} placeholder="Search collections"/>
+                <SearchBox sx={{width: '100%', mb: 1}} placeholder="Search collections" onChange={searchCollections}/>
                 <Scrollbar sx={{maxHeight: 200}}>
                   <List
                     sx={{ width: '100%', bgcolor: 'background.paper', pt: 0 }}
                     component="nav"
                     aria-labelledby="nested-list-subheader"
                   >
-                    <ListItemButton>
-                      <ListItemIcon>
-                        <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
-                      </ListItemIcon>
-                      <ListItemText primary="Feeds NFT Sticker" />
-                    </ListItemButton>
+                    {
+                      filterCollections.map((el, i)=>(
+                        <ListItemButton key={i} onClick={()=>{selectCollection(el.title)}} selected={filterProps.selectedCollections.includes(el.title)}>
+                          <ListItemIcon>
+                            <Box draggable = {false} component="img" src={`/static/${el.icon}`} sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
+                          </ListItemIcon>
+                          <ListItemText primary={el.title} />
+                          {
+                            filterProps.selectedCollections.includes(el.title)&&<CheckIcon/>
+                          }
+                        </ListItemButton>
+                      ))
+                    }
                   </List>
                 </Scrollbar>
               </AccordionDetails>

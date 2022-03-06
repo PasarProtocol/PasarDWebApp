@@ -36,7 +36,7 @@ const addressForProduction = {
 const addressForTest = {
   stickerContract: "0xc366B74663eE40476f71AB73f6332096575F16b6",
   // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
-  marketContract: "0x29A082850737D3ccc8c63928579970e36b6B2CFb",
+  marketContract: "0x9fF81BDC39A13C113E71984a3b3a8965b2c01Da3",
   diaContract: "0x85946E4b6AB7C5c5C60A7b31415A52C0647E3272",
   blockchain: 'Testnet (ESC)'
 }

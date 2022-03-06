@@ -338,6 +338,18 @@ module.exports.PASAR_CONTRACT_ABI = [
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "_buyoutPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_startTime",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "_endTime",
         "type": "uint256"
       }
@@ -388,6 +400,12 @@ module.exports.PASAR_CONTRACT_ABI = [
         "indexed": false,
         "internalType": "uint256",
         "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_startTime",
         "type": "uint256"
       }
     ],
@@ -468,6 +486,12 @@ module.exports.PASAR_CONTRACT_ABI = [
         "indexed": false,
         "internalType": "uint256",
         "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_startTime",
         "type": "uint256"
       }
     ],
@@ -784,6 +808,16 @@ module.exports.PASAR_CONTRACT_ABI = [
       },
       {
         "internalType": "uint256",
+        "name": "_buyoutPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_startTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "_endTime",
         "type": "uint256"
       },
@@ -826,6 +860,11 @@ module.exports.PASAR_CONTRACT_ABI = [
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
+        "name": "_startTime",
+        "type": "uint256"
+      },
+      {
         "internalType": "string",
         "name": "_didUri",
         "type": "string"
@@ -839,9 +878,9 @@ module.exports.PASAR_CONTRACT_ABI = [
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "_baseTokens",
-        "type": "address[]"
+        "internalType": "address",
+        "name": "_baseToken",
+        "type": "address"
       },
       {
         "internalType": "uint256[]",
@@ -854,13 +893,18 @@ module.exports.PASAR_CONTRACT_ABI = [
         "type": "uint256[]"
       },
       {
-        "internalType": "address[]",
-        "name": "_quoteTokens",
-        "type": "address[]"
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
       },
       {
         "internalType": "uint256[]",
         "name": "_prices",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_startTimes",
         "type": "uint256[]"
       },
       {
@@ -902,6 +946,11 @@ module.exports.PASAR_CONTRACT_ABI = [
         "type": "uint256"
       },
       {
+        "internalType": "uint256",
+        "name": "_startTime",
+        "type": "uint256"
+      },
+      {
         "internalType": "string",
         "name": "_didUri",
         "type": "string"
@@ -915,9 +964,9 @@ module.exports.PASAR_CONTRACT_ABI = [
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "_baseTokens",
-        "type": "address[]"
+        "internalType": "address",
+        "name": "_baseToken",
+        "type": "address"
       },
       {
         "internalType": "uint256[]",
@@ -930,13 +979,18 @@ module.exports.PASAR_CONTRACT_ABI = [
         "type": "uint256[]"
       },
       {
-        "internalType": "address[]",
-        "name": "_quoteTokens",
-        "type": "address[]"
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
       },
       {
         "internalType": "uint256[]",
         "name": "_prices",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_startTimes",
         "type": "uint256[]"
       },
       {
@@ -1216,6 +1270,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "endTime",
             "type": "uint256"
           },
@@ -1353,6 +1417,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -1498,6 +1572,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "endTime",
             "type": "uint256"
           },
@@ -1635,6 +1719,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -1814,6 +1908,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "endTime",
             "type": "uint256"
           },
@@ -1946,6 +2050,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -2099,6 +2213,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "endTime",
             "type": "uint256"
           },
@@ -2231,6 +2355,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -2800,6 +2934,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "endTime",
             "type": "uint256"
           },
@@ -2937,6 +3081,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -3082,6 +3236,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "endTime",
             "type": "uint256"
           },
@@ -3219,6 +3383,16 @@ module.exports.PASAR_CONTRACT_ABI = [
           {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
