@@ -111,6 +111,7 @@ export default function MarketExplorer() {
   const [assets, setAssets] = React.useState([]);
   const [collections, setCollections] = React.useState(collectionTypes);
   const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
+  const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
   const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
   const [range, setRange] = React.useState(sessionFilterProps.range || {min:'', max:''});
   const [adult, setAdult] = React.useState(sessionFilterProps.adult || false);
@@ -120,6 +121,7 @@ export default function MarketExplorer() {
   const [filterForm, setFilterForm] = React.useState({
     selectedBtns: sessionFilterProps.selectedBtns || [],
     selectedCollections: sessionFilterProps.selectedCollections || [],
+    selectedTokens: sessionFilterProps.selectedTokens || [],
     range: sessionFilterProps.range || {min:'', max:''},
     ...sessionFilterProps
   });
@@ -181,9 +183,9 @@ export default function MarketExplorer() {
       if(e.code !== e.ABORT_ERR)
         setLoadingAssets(false);
     });
-    sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, selectedCollections, adult, order}))
-    setFilterForm({selectedBtns, range, selectedCollections, adult, order})
-  }, [page, showCount, selectedBtns, selectedCollections, adult, range, order, params.key]);
+    sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, selectedCollections, selectedTokens, adult, order}))
+    setFilterForm({selectedBtns, range, selectedCollections, selectedTokens, adult, order})
+  }, [page, showCount, selectedBtns, selectedCollections, selectedTokens, adult, range, order, params.key]);
   
   const handleDispmode = (event, mode) => {
     if(mode===null)
@@ -244,6 +246,19 @@ export default function MarketExplorer() {
       return tempCollections
     })
   }
+  const handleSelectedTokens = (value)=>{
+    setSelectedTokens((prevState) => {
+      const tempTokens = [...prevState]
+      if(!tempTokens.includes(value)){
+        tempTokens.push(value)
+      } else {
+        const findIndex = tempTokens.indexOf(value)
+        tempTokens.splice(findIndex, 1)
+      }
+      return tempTokens
+    })
+  }
+
   const handleFilter = (key, value)=>{
     setPage(1)
     switch(key){
@@ -260,8 +275,14 @@ export default function MarketExplorer() {
       case 'collection':
         handleSelectedCollections(value)
         break
+      case 'token':
+        handleSelectedTokens(value)
+        break
       case 'selectedCollections':
         setSelectedCollections(value)
+        break
+      case 'selectedTokens':
+        setSelectedTokens(value)
         break
       case 'adult':
         setSelectedByValue(value, adultBtnId)
@@ -307,6 +328,14 @@ export default function MarketExplorer() {
         tempForm.selectedCollections.splice(findIndex, 1)
       }
     }
+    else if(key==='token'){
+      if(!tempForm.selectedTokens.includes(value)){
+        tempForm.selectedTokens.push(value)
+      } else {
+        const findIndex = tempForm.selectedTokens.indexOf(value)
+        tempForm.selectedTokens.splice(findIndex, 1)
+      }
+    }
     else if(key==='adult'){
       if(value){
         if(!tempBtns.includes(adultBtnId))
@@ -324,6 +353,7 @@ export default function MarketExplorer() {
     delete tempForm.statype
     delete tempForm.clear_all
     delete tempForm.collection
+    delete tempForm.token
     Object.keys(tempForm).forEach(key => handleFilter(key, tempForm[key]))
     setFilterForm(tempForm)
     closeFilter(e)
@@ -428,7 +458,7 @@ export default function MarketExplorer() {
                       },
                     }}
                     scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
-                    filterProps = {{selectedBtns, selectedCollections, range, adult, order}}
+                    filterProps = {{selectedBtns, selectedCollections, selectedTokens, range, adult, order}}
                     {...{btnNames, collections, handleFilter}}
                   />
                 </Box>
