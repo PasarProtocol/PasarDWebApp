@@ -178,7 +178,7 @@ export default function Sell(props) {
                 value={price}
                 onChange={handleChangePrice}
                 startAdornment={' '}
-                endAdornment={<CoinSelect onChange={setCoinType}/>}
+                endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
               />
             </FormControl>
             <Divider />

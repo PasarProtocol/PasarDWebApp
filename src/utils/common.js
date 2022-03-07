@@ -241,12 +241,13 @@ export function callContractMethod(type, coinType, paramObj) {
             if (type === 'createOrderForSale') {
               console.log('createOrderForSale');
               const { _id, _amount, _price, _didUri } = paramObj;
+              console.log(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri)
               method = marketContract.methods.createOrderForSale(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri);
             } else if (type === 'createOrderForAuction') {
               console.log('createOrderForAuction');
-              const { _id, _amount, _minPrice, _endTime, _didUri } = paramObj;
-              console.log(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _minPrice, _endTime, _didUri)
-              method = marketContract.methods.createOrderForAuction(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _minPrice, 0, (new Date().getTime()/1000).toFixed(), _endTime, _didUri);
+              const { _id, _amount, _minPrice, _buyoutPrice, _endTime, _didUri } = paramObj;
+              console.log(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _minPrice, _buyoutPrice, (new Date().getTime()/1000).toFixed(), _endTime, _didUri)
+              method = marketContract.methods.createOrderForAuction(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _minPrice, _buyoutPrice, (new Date().getTime()/1000).toFixed(), _endTime, _didUri);
             } else if (type === 'buyOrder') {
               console.log('buyOrder');
               const { _orderId, _didUri } = paramObj;
@@ -429,7 +430,7 @@ export const sendIpfsDidJson = async () => {
   console.log(jsonDidObj);
   // add the metadata itself as well
   const didUri = await client.add(jsonDidObj);
-  return `feeds:json:${didUri.path}`;
+  return `pasar:json:${didUri.path}`;
 };
 
 export const emptyCache = () => {

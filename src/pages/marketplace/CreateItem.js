@@ -80,9 +80,11 @@ export default function CreateItem() {
   const [multiNames, setMultiNames] = React.useState([]);
   const [previewFiles, setPreviewFiles] = React.useState([]);
   const [isPutOnSale, setPutOnSale] = React.useState(false);
+  const [isReserveForAuction, setReserveForAuction] = React.useState(false);
   const [description, setDescription] = React.useState('');
   const [quantity, setQuantity] = React.useState(1);
   const [price, setPrice] = React.useState('');
+  const [reservePrice, setReservePrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [royalties, setRoyalties] = React.useState(10);
   const [uploadedCount, setUploadedCount] = React.useState(0);
@@ -218,6 +220,12 @@ export default function CreateItem() {
     setPutOnSale(event.target.checked);
   };
 
+  const handleReserveForAuction = (event) => {
+    if(!event.target.checked)
+      setReservePrice('')
+    setReserveForAuction(event.target.checked);
+  };
+
   const handleChangePrice = (event) => {
     let priceValue = event.target.value
     if(priceValue<0)
@@ -225,6 +233,14 @@ export default function CreateItem() {
     priceValue = removeLeadingZero(priceValue)
     setPrice(priceValue)
     setRcvPrice(math.round(priceValue*98/100, 3))
+  };
+
+  const handleChangeReservePrice = (event) => {
+    let priceValue = event.target.value
+    if(priceValue<0)
+      return
+    priceValue = removeLeadingZero(priceValue)
+    setReservePrice(priceValue)
   };
 
   const handleChangeRoyalties = (event) => {
@@ -348,6 +364,7 @@ export default function CreateItem() {
                                     ...paramObj,
                                     '_amount': _tokenSupply,
                                     '_minPrice': BigInt(price*1e18).toString(),
+                                    '_buyoutPrice': BigInt(reservePrice*1e18).toString(),
                                     '_endTime': (expirationDate.getTime()/1000).toFixed(),
                                     'beforeSendFunc': ()=>{setReadySignForMint(true)},
                                     'afterSendFunc': ()=>{setReadySignForMint(false)}
@@ -382,6 +399,7 @@ export default function CreateItem() {
                             ...paramObj,
                             '_amount': _tokenSupply,
                             '_minPrice': BigInt(price*1e18).toString(),
+                            '_buyoutPrice': BigInt(reservePrice*1e18).toString(),
                             '_endTime': (expirationDate.getTime()/1000).toFixed(),
                             'beforeSendFunc': ()=>{setReadySignForMint(true)},
                             'afterSendFunc': ()=>{setReadySignForMint(false)}
@@ -555,13 +573,13 @@ export default function CreateItem() {
         return temPromise
       }).then((metaRecv) => {
         setProgress(30)
-        _uri = `feeds:json:${metaRecv.path}`
+        _uri = `pasar:json:${metaRecv.path}`
         temPromise = sendIpfsDidJson()
         setCurrentPromise(temPromise)
         return temPromise
       }).then((didRecv) => {
         setProgress(45)
-        _didUri = `feeds:json:${didRecv.path}`
+        _didUri = `pasar:json:${didRecv.path}`
         resolve({ _id, _uri, _didUri })
       }).catch((error) => {
         reject(error);
@@ -586,7 +604,7 @@ export default function CreateItem() {
         return sendIpfsMetaJson(added, index)
       }).then((metaRecv) => {
         setProgress(progressStep(40, index))
-        _uri = `feeds:json:${metaRecv.path}`
+        _uri = `pasar:json:${metaRecv.path}`
         resolve({ _id, _uri, _didUri })
       }).catch((error) => {
         reject(error);
@@ -636,7 +654,7 @@ export default function CreateItem() {
     setProgress(3)
     sendIpfsDidJson().then((didRecv) => {
       setProgress(6)
-      const _didUri = `feeds:json:${didRecv.path}`
+      const _didUri = `pasar:json:${didRecv.path}`
       mintBatchMain(_didUri)
     }).catch((error) => {
       setProgress(100)
@@ -897,7 +915,7 @@ export default function CreateItem() {
                           onChange={handleChangePrice}
                           startAdornment={' '}
                           endAdornment={
-                            <CoinSelect onChange={setCoinType}/>
+                            <CoinSelect selected={coinType} onChange={setCoinType}/>
                           }
                         />
                       </FormControl>
@@ -931,7 +949,7 @@ export default function CreateItem() {
                           onChange={handleChangePrice}
                           startAdornment={' '}
                           endAdornment={
-                            <CoinSelect onChange={setCoinType}/>
+                            <CoinSelect selected={coinType} onChange={setCoinType}/>
                           }
                         />
                       </FormControl>
@@ -941,15 +959,57 @@ export default function CreateItem() {
                     <Grid item xs={12}>
                       <Grid container spacing={1}>
                         <Grid item xs={6}>
-                          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Starting Date1</Typography>
+                          <Typography variant="h4" sx={{fontWeight: 'normal', display: 'inline-flex'}}>Starting Date</Typography>
                           <StartingDateSelect selected={startingDate} onChange={setStartingDate}/>
                         </Grid>
                         <Grid item xs={6}>
-                          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Expiration Date</Typography>
+                          <Typography variant="h4" sx={{fontWeight: 'normal', display: 'inline-flex'}}>Expiration Date</Typography>
                           <ExpirationDateSelect onChangeDate={setExpirationDate}/>
                         </Grid>
                       </Grid>
                     </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Reserve Price</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack direction="row">
+                        <InputLabel sx={{ fontSize: 12, flex: 1 }}>
+                          Set reserve price for auction
+                        </InputLabel>
+                        <FormControlLabel
+                          control={<CustomSwitch onChange={handleReserveForAuction}/>}
+                          sx={{mt:-1, mr: 0}}
+                          label=""
+                        />
+                      </Stack>
+                    </Grid>
+                    {
+                      isReserveForAuction&&
+                      <>
+                        <Grid item xs={12}>
+                          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Reserve Price</Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormControl variant="standard" sx={{width: '100%'}}>
+                            <InputLabel htmlFor="input-with-price">
+                              Enter reserve price
+                            </InputLabel>
+                            <InputStyle
+                              type="number"
+                              id="input-with-price"
+                              value={reservePrice}
+                              onChange={handleChangeReservePrice}
+                              startAdornment={' '}
+                              endAdornment={
+                                <CoinSelect selected={coinType} onChange={setCoinType}/>
+                              }
+                            />
+                          </FormControl>
+                          <Divider/>
+                          <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Bids below this amount won't be allowed</Typography>
+                        </Grid>
+                      </>
+                    }
                   </>
                 )
               }
