@@ -10,6 +10,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CustomSwitch from '../custom-switch';
 import SearchBox from '../SearchBox';
 import Scrollbar from '../Scrollbar';
+import {coinTypes} from '../../utils/common'
 // ----------------------------------------------------------------------
 const DrawerStyle = styled(Drawer)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -32,6 +33,7 @@ export default function AssetFilterPan(props){
   const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
   const [filterCollections, setFilterCollections] = React.useState(collections);
+  const [filterTokens, setFilterTokens] = React.useState(coinTypes);
 
   React.useEffect(()=>{
     setMinVal(filterProps.range.min)
@@ -46,8 +48,20 @@ export default function AssetFilterPan(props){
     }
   }
 
+  const searchTokens = (inputStr)=>{
+    if(inputStr.length){
+      setFilterTokens(coinTypes.filter(el=>el.name.includes(inputStr)))
+    } else {
+      setFilterTokens(coinTypes)
+    }
+  }
+
   const selectCollection = (title)=>{
     handleFilter('collection', title)
+  }
+  
+  const selectToken = (name)=>{
+    handleFilter('token', name)
   }
 
   const applyRange = (e)=>{
@@ -199,6 +213,40 @@ export default function AssetFilterPan(props){
                   ))
                 }
                 </Stack>
+              </AccordionDetails>
+            </Accordion>
+            <Divider />
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <Accordion
+              defaultExpanded={1&&true}
+            >
+              <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                <Typography variant="body2">Tokens</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <SearchBox sx={{width: '100%', mb: 1}} placeholder="Search tokens" onChange={searchTokens}/>
+                <Scrollbar sx={{maxHeight: 200}}>
+                  <List
+                    sx={{ width: '100%', bgcolor: 'background.paper', pt: 0 }}
+                    component="nav"
+                    aria-labelledby="nested-list-subheader"
+                  >
+                    {
+                      filterTokens.map((el, i)=>(
+                        <ListItemButton key={i} onClick={()=>{selectToken(el.name)}} selected={filterProps.selectedTokens.includes(el.name)}>
+                          <ListItemIcon>
+                            <Box draggable = {false} component="img" src={`/static/${el.icon}`} sx={{ width: 24, height: 24 }} />
+                          </ListItemIcon>
+                          <ListItemText primary={el.name} />
+                          {
+                            filterProps.selectedTokens.includes(el.name)&&<CheckIcon/>
+                          }
+                        </ListItemButton>
+                      ))
+                    }
+                  </List>
+                </Scrollbar>
               </AccordionDetails>
             </Accordion>
             <Divider />
