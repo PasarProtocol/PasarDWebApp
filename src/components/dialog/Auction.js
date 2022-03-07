@@ -205,7 +205,7 @@ export default function Auction(props) {
             value={price}
             onChange={handleChangePrice}
             startAdornment={' '}
-            endAdornment={<CoinSelect onChange={setCoinType}/>}
+            endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
           />
         </FormControl>
         <Divider />

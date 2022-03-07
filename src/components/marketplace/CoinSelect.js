@@ -5,8 +5,8 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import PropTypes from 'prop-types';
 import {coinTypes} from '../../utils/common'
 
-export default function CoinSelect({ onChange }) {
-  const [selected, setSelected] = useState(0);
+export default function CoinSelect({ selected, onChange }) {
+  // const [selected, setSelected] = useState(0);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
 
   const openPopupMenu = (event) => {
@@ -16,7 +16,7 @@ export default function CoinSelect({ onChange }) {
     setOpenPopup(null);
   };
   const handleSelect = (index) => {
-    setSelected(index)
+    // setSelected(index)
     onChange(index)
     handleClosePopup();
   }
