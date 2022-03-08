@@ -53,6 +53,7 @@
     "@fullcalendar/timeline": "^5.9.0",
     "@hookform/devtools": "^4.0.1",
     "@hookform/resolvers": "^2.8.0",
+    "@iconify-icons/akar-icons": "^1.2.3",
     "@iconify/icons-ant-design": "^1.1.0",
     "@iconify/icons-eva": "^1.1.0",
     "@iconify/icons-ic": "^1.1.10",
