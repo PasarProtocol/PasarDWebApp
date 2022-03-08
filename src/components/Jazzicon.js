@@ -7,6 +7,7 @@ const StyledIdenticon = styled('div')(({ theme, size }) => ({
   height: size,
   display: 'inline-flex',
   borderRadius: '50%',
+  overflow: 'hidden',
   backgroundColor: 'black',
   marginRight: 8
 }));

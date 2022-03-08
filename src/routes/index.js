@@ -85,7 +85,7 @@ export default function Router() {
         {
           path: 'profile',
           children: [
-            // { path: 'myitem', element: <MyItems /> },
+            { path: 'edit', element: <EditProfile /> },
             { path: 'myitem/:type', element: <MyProfile /> },
             { path: 'others/:address', element: <MyItems /> },
           ]
@@ -110,6 +110,7 @@ const MarketExplorer = Loadable(lazy(() => import('../pages/marketplace/Explorer
 const CreateItem = Loadable(lazy(() => import('../pages/marketplace/CreateItem')));
 const MyItems = Loadable(lazy(() => import('../pages/marketplace/MyItems')));
 const MyProfile = Loadable(lazy(() => import('../pages/marketplace/MyProfile')));
+const EditProfile = Loadable(lazy(() => import('../pages/marketplace/EditProfile')));
 // Collection
 const CollectionExplorer = Loadable(lazy(() => import('../pages/collection/Explorer')));
 const CollectionDetail = Loadable(lazy(() => import('../pages/collection/CollectionDetail')));

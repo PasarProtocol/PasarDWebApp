@@ -131,4 +131,28 @@ export default class ElastosConnectivityService {
     });
     return presentation
   }
+  
+  /**
+   * Request the Custom credentials
+   */
+   async requestCustomCredentials(claimItems) {
+    const didAccess = new ConnDID.DIDAccess();
+    const presentation = await didAccess.requestCredentials({
+      claims: claimItems.map(item=>(
+        ConnDID.simpleTypeClaim(`Your ${item.title}`, item.title, true)
+          .withIssuers(this[sTrustedProvider])
+          .withNoMatchRecommendations([
+            { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
+          ])
+      ))
+      // claims: [
+      //   ConnDID.simpleTypeClaim("Your name", "NameCredential", false)
+      //     .withIssuers(this[sTrustedProvider])
+      //     .withNoMatchRecommendations([
+      //       { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
+      //     ]),
+      // ]
+    });
+    return presentation
+  }
 }
