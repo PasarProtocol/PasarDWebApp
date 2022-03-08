@@ -3,7 +3,6 @@ import React from 'react';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import SwipeableViews from 'react-swipeable-views';
 import { isMobile } from 'react-device-detect';
-
 import { styled } from '@mui/material/styles';
 import { Container, Stack, Typography, Tab, Tabs, Link, Button, Box, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material';
 // import { TabContext, TabList, TabPanel } from '@mui/lab';
@@ -208,9 +207,11 @@ export default function MyProfile() {
         <Box sx={{ position: 'relative', justifyContent: 'center' }}>
           <Button
             variant="outlined"
+            component={RouterLink}
             endIcon={
               <Icon icon={editIcon}/>
             }
+            to='edit'
             sx={{position: 'absolute'}}
           >
             Edit Profile
