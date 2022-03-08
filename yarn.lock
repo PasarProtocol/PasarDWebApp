@@ -2440,6 +2440,13 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.0.tgz"
   integrity sha512-wdppn25U8z/2yiaT6YGquE6X8sSv7hNMWSXYSSU1jGv/yd6XqjXgTDJ8KP4NgjTXfJ3GbRjeeb8RTV7a/VpM+w==
 
+"@iconify-icons/akar-icons@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@iconify-icons/akar-icons/-/akar-icons-1.2.3.tgz#33cee9f1391a18338db81d66f9b32305feefccf6"
+  integrity sha512-URK5PWh0OvXasrW3BiR6hw+JiVnNAzJTV/Ki31Rb28VYY1WA94vXkfmUQ1ahpE8qN1yI+e4XqHkQvWx2DQDFFw==
+  dependencies:
+    "@iconify/types" "^1.0.12"
+
 "@iconify/icons-ant-design@^1.1.0":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@iconify/icons-ant-design/-/icons-ant-design-1.1.0.tgz"
@@ -2459,6 +2466,11 @@
   version "3.0.1"
   resolved "https://registry.npmjs.org/@iconify/react/-/react-3.0.1.tgz"
   integrity sha512-yUskSSR80JzRSWcqNsBAG9AN802XzZgHsex8mTOkMLYcPQC3fk1XwK17ulnY5vf692OafhGCAMccR8TWKFaGdw==
+
+"@iconify/types@^1.0.12":
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/@iconify/types/-/types-1.0.12.tgz#839f1f784b7030b94482d51996570f4dbd7d6796"
+  integrity sha512-6er6wSGF3hgc1JEZqiGpg21CTCjHBYOUwqLmb2Idzkjiw6ogalGP0ZMLVutCzah+0WB4yP+Zd2oVPN8jvJ+Ftg==
 
 "@ipld/dag-cbor@^7.0.0":
   version "7.0.0"

@@ -555,9 +555,9 @@ export default function SignInDialog() {
                 </PaperRecord>
               </Stack>
             </Box>
-            <MenuItem to="/profile/myitem" onClick={closeAccountMenu} component={RouterLink}>
-              <BookOutlinedIcon />
-              &nbsp;My Items
+            <MenuItem to="/profile" onClick={closeAccountMenu} component={RouterLink}>
+              <AccountCircleOutlinedIcon />
+              &nbsp;Profile
             </MenuItem>
             {/* <MenuItem onClick={closeAccountMenu}>
               <SettingsOutlinedIcon />
