@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 import {round} from 'mathjs'
 import Lightbox from 'react-image-lightbox';
 import { FacebookShareButton, TwitterShareButton, FacebookIcon, TwitterIcon } from "react-share";
@@ -102,6 +103,7 @@ const Property = ({type, name}) => (
 const BackdropStyle = styled(Backdrop)(({ theme }) => ({
   background: 'rgba(0, 0, 0, 0.8)'
 }));
+
 // ----------------------------------------------------------------------
 export default function CollectibleDetail() {
   const navigate = useNavigate();
@@ -116,6 +118,7 @@ export default function CollectibleDetail() {
   const [badge, setBadge] = React.useState({creator: {dia: false, kyc: false}, owner: {dia: false, kyc: false}});
   const [didName, setDidName] = React.useState({creator: '', owner: ''});
   const [isForAuction, setForAuction] = React.useState(false);
+  const [deadLine, setDeadLine] = React.useState('');
   const [transRecord, setTransRecord] = React.useState([]);
   const [bidList, setBidList] = React.useState([]);
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
@@ -161,11 +164,16 @@ export default function CollectibleDetail() {
   React.useEffect(async () => {
     window.scrollTo(0,0)
     setCoinUSD(await getCoinUSD())
-    const resCollectible = await fetchFrom(`sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`);
+    const resCollectible = await fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${params.collection}`);
     const jsonCollectible = await resCollectible.json();
     if(jsonCollectible.data){
       try{
         setCollectible(jsonCollectible.data);
+        if(jsonCollectible.data.orderType === '2'){
+          const tempDeadLine = getTime(jsonCollectible.data.endTime)
+          setForAuction(true)
+          setDeadLine(`${tempDeadLine.date} ${tempDeadLine.time}`)
+        }
         getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
           if(dia!=='0')
             setBadgeOfUser('creator', 'dia', true)
@@ -215,9 +223,9 @@ export default function CollectibleDetail() {
     // setForAuction(true);
 
     const tempBidArr = [
-      {'price': 50000000000000000000, 'to': '0x504342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431},
-      {'price': 60000000000000000000, 'to': '0x604342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431},
-      {'price': 70000000000000000000, 'to': '0x704342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431}
+      // {'price': 50000000000000000000, 'to': '0x504342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431},
+      // {'price': 60000000000000000000, 'to': '0x604342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431},
+      // {'price': 70000000000000000000, 'to': '0x704342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431}
     ]
     setBidList(tempBidArr)
     setLoadingBid(false)
@@ -524,22 +532,31 @@ export default function CollectibleDetail() {
                   <Stack direction="row">
                     <Box sx={{flexGrow: 1}}>
                       <Typography variant="h4">Current bid</Typography>
-                      <Typography variant="h3" color="origin.main">50 ELA</Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD 150.11</Typography>
+                      <Typography variant="h3" color="origin.main">{round(collectible.Price/1e18, 3)} ELA</Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*collectible.Price/1e18, 3)}</Typography>
                     </Box>
                     <Box>
                       <Stack direction="row">
                         <AccessTimeIcon/>&nbsp;
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>Ends {tempDeadLine.date} {tempDeadLine.time}</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>Ends {deadLine}</Typography>
                       </Stack>
-                      <Countdown deadline="2022-03-03 00:00:00"/>
+                      <Countdown deadline={format(new Date(1000*collectible.endTime), 'yyyy-MM-dd HH:mm:ii')}/>
                     </Box>
                   </Stack>
-                  <MHidden width="smDown">
-                    <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}} sx={{mt: 2, textTransform: 'none'}}>
-                      Place a bid
-                    </Button>
-                  </MHidden>
+                  {
+                    address!==collectible.holder && address!==collectible.royaltyOwner &&
+                    <MHidden width="smDown">
+                      {
+                        didSignin?
+                        <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}} sx={{mt: 2, textTransform: 'none'}}>
+                          Place a bid
+                        </Button>:
+                        <Button variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
+                          Sign in to Place a bid
+                        </Button>
+                      }
+                    </MHidden>
+                  }
                 </PaperStyle>
               ):(
                 <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
@@ -604,6 +621,10 @@ export default function CollectibleDetail() {
               <Grid item xs={12}>
                 <PaperStyle>
                   <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>Bids</Typography>
+                  {
+                    !isLoadingBidList&&!bidList.length&&
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>No bid found!</Typography>
+                  }
                   <BidList isLoading={isLoadingBidList} dataList={bidList}/>
                 </PaperStyle>
               </Grid>
@@ -680,11 +701,17 @@ export default function CollectibleDetail() {
         </Grid>
         <MHidden width="smUp">
           {
-            isForAuction&&
+            isForAuction && address!==collectible.holder && address!==collectible.royaltyOwner &&
             <StickyPaperStyle>
-              <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
-                Place a bid
-              </Button>
+              {
+                didSignin?
+                <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
+                  Place a bid
+                </Button>:
+                <Button variant="contained" fullWidth onClick={openSignin}>
+                  Sign in to Place a bid
+                </Button>
+              }
             </StickyPaperStyle>
           }
           {
