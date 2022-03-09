@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
-import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
+import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
@@ -26,6 +26,9 @@ export default function Purchase(props) {
   const { library, chainId, account } = context;
 
   const { isOpen, setOpen, info } = props;
+  let priceInfo = info.Price;
+  if(info.orderType===auctionOrderType && info.reservePrice)
+    priceInfo = info.reservePrice
   const handleClose = () => {
     setOpen(false);
   };
@@ -138,7 +141,7 @@ export default function Purchase(props) {
     setOnProgress(true);
     const buyerDidUri = await sendIpfsDidJson();
     console.log('didUri:', buyerDidUri);
-    const buyPrice = BigInt(info.Price).toString();
+    const buyPrice = BigInt(priceInfo).toString();
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
         callEthBuyOrder(info.OrderId, buyerDidUri, buyPrice);
     }
@@ -173,7 +176,7 @@ export default function Purchase(props) {
     }
   }, [account, chainId, pasarLinkAddress]);
 
-  const price = info.Price / 1e18;
+  const price = priceInfo / 1e18;
   const platformFee = math.round((price * 2) / 100, 4);
   const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royalties) / 10 ** 6, 4);
   return (
@@ -209,7 +212,7 @@ export default function Purchase(props) {
           <br />
           for{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-            {math.round(info.Price / 1e18, 3)} ELA
+            {math.round(priceInfo / 1e18, 3)} ELA
           </Typography>
         </Typography>
         <Grid container sx={{ mt: 2, display: 'block' }}>

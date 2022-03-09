@@ -374,10 +374,15 @@ export const MethodList = [
     verb: {description: 'Updated to', withPrice: true, subject: 'from'}
   },
   {
-    method: 'Bid',
+    method: 'OrderBid',
     color: '#CD25BC',
     icon: 'auction',
-    verb: { description: 'Bid', withPrice: true, subject: 'to' }
+    detail: [
+      { description: 'Bid placed on collectible →', field: 'marketplace', copyable: true, ellipsis: true },
+      { description: 'By', field: 'from', copyable: true, ellipsis: true },
+      { description: 'For a value of', field: 'price', copyable: false }
+    ],
+    verb: { description: 'Bid', withPrice: true, subject: 'from' }
   },
   {
     method: 'OrderForAuction',

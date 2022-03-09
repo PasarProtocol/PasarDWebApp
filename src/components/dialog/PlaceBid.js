@@ -121,8 +121,9 @@ export default function PlaceBid(props) {
       'from': accounts[0],
       'gasPrice': gasPrice,
       'gas': 5000000,
-      'value': 0
+      'value': _price
     };
+    console.log(_orderId, _price, _didUri)
     pasarContract.methods
       .bidForOrder(_orderId, _price, _didUri)
       .send(transactionParams)

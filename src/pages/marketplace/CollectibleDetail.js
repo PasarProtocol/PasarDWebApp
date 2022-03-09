@@ -35,7 +35,7 @@ import { essentialsConnector } from '../../components/signin-dlg/EssentialConnec
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
 import useSingin from '../../hooks/useSignin';
-import {blankAddress, marketContract} from '../../config'
+import {blankAddress, marketContract, auctionOrderType} from '../../config'
 import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -169,7 +169,7 @@ export default function CollectibleDetail() {
     if(jsonCollectible.data){
       try{
         setCollectible(jsonCollectible.data);
-        if(jsonCollectible.data.orderType === '2'){
+        if(jsonCollectible.data.orderType === auctionOrderType){
           const tempDeadLine = getTime(jsonCollectible.data.endTime)
           setForAuction(true)
           setDeadLine(`${tempDeadLine.date} ${tempDeadLine.time}`)
@@ -548,11 +548,19 @@ export default function CollectibleDetail() {
                     <MHidden width="smDown">
                       {
                         didSignin?
-                        <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}} sx={{mt: 2, textTransform: 'none'}}>
-                          Place a bid
-                        </Button>:
+                        <Stack direction="row" spacing={1} sx={{mt: 2}}>
+                          <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
+                            Place bid
+                          </Button>
+                          {
+                            collectible.reservePrice&&
+                            <Button variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
+                              Instant purchase at {round(collectible.reservePrice/1e18, 3)} ELA
+                            </Button>
+                          }
+                        </Stack>:
                         <Button variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
-                          Sign in to Place a bid
+                          Sign in to Place bid
                         </Button>
                       }
                     </MHidden>
@@ -705,11 +713,19 @@ export default function CollectibleDetail() {
             <StickyPaperStyle>
               {
                 didSignin?
-                <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
-                  Place a bid
-                </Button>:
+                <Stack direction="row" spacing={1} sx={{mt: 2}}>
+                  <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
+                    Place bid
+                  </Button>
+                  {
+                    collectible.reservePrice&&
+                    <Button variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
+                      Instant purchase at {round(collectible.reservePrice/1e18, 3)} ELA
+                    </Button>
+                  }
+                </Stack>:
                 <Button variant="contained" fullWidth onClick={openSignin}>
-                  Sign in to Place a bid
+                  Sign in to Place bid
                 </Button>
               }
             </StickyPaperStyle>
