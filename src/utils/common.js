@@ -399,14 +399,14 @@ export const MethodList = [
 export const collectionTypes = [
   {
     name: 'PSRC',
-    icon: 'logo-icon.svg',
+    avatar: '/static/logo-icon.svg',
     title: 'Pasar Collection',
     description: 'Pasar default collection',
     detail: 'A collection of all items minted using the Pasar Collection Contract'
   },
   {
     name: 'FSTK',
-    icon: 'feeds-sticker.svg',
+    avatar: '/static/feeds-sticker.svg',
     title: 'Feeds NFT Sticker',
     description: 'Feeds default collection',
     detail: 'A collection of all items minted using the Feeds NFT Stickers Contract'

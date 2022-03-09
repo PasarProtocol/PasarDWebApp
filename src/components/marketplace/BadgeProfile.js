@@ -46,7 +46,7 @@ export default function BadgeProfile(props) {
   };
 
   let {title, description} = collectionTypes[collection]
-  const {icon} = collectionTypes[collection]
+  const {avatar} = collectionTypes[collection]
   let dispAddress = reduceHexAddress(STICKER_ADDRESS)
   if(type===2){
     title = didInfo.name || reduceHexAddress(walletAddress)
@@ -64,7 +64,7 @@ export default function BadgeProfile(props) {
         {
           type===1&&
           <Box sx={{ width: 26, height: 26, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
-            <Box draggable = {false} component="img" src={`/static/${icon}`} sx={{ width: 24 }} />
+            <Box draggable = {false} component="img" src={avatar} sx={{ width: 24 }} />
           </Box>
         }
         {
@@ -88,7 +88,7 @@ export default function BadgeProfile(props) {
                   {
                     type===1&&
                     <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center' }}>
-                      <Box draggable = {false} component="img" src={`/static/${icon}`} sx={{ width: 35 }} />
+                      <Box draggable = {false} component="img" src={avatar} sx={{ width: 35 }} />
                     </Box>
                   }
                   {

@@ -205,17 +205,20 @@ export default function MyProfile() {
     <RootStyle title="MyProfile | PASAR">
       <Container maxWidth={false}>
         <Box sx={{ position: 'relative', justifyContent: 'center' }}>
-          <Button
-            variant="outlined"
-            component={RouterLink}
-            endIcon={
-              <Icon icon={editIcon}/>
-            }
-            to='edit'
-            sx={{position: 'absolute'}}
-          >
-            Edit Profile
-          </Button>
+          {
+            sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
+            <Button
+              variant="outlined"
+              component={RouterLink}
+              endIcon={
+                <Icon icon={editIcon}/>
+              }
+              to='edit'
+              sx={{position: 'absolute'}}
+            >
+              Edit Profile
+            </Button>
+          }
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: isMobile?1:1.5 }}>
             <Jazzicon
               address={walletAddress}
@@ -326,7 +329,7 @@ export default function MyProfile() {
                           <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
                             <Typography variant="h3" align="center"> No Collections Found </Typography>
                             <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>We could not find any of your collections</Typography>
-                            <Button variant="contained">
+                            <Button variant="contained" component={RouterLink} to='/collection/import'>
                               Import existing collection
                             </Button>
                           </Stack>:
