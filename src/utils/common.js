@@ -28,17 +28,17 @@ export const fetchFrom = (uri, props = {}) => {
 // Get time from timestamp //
 export const getTime = (timestamp) => {
   const date = new Date(timestamp * 1000);
-  const pieces = date.toUTCString().split(' ');
-  const [wd, d, m, y] = pieces;
+  const pieces = date.toString().split(' ');
+  const [wd, m, d, y] = pieces;
   const dateStr = [m, d, y].join('-');
 
-  let hours = date.getUTCHours();
+  let hours = date.getHours();
   const suffix = hours >= 12 ? 'PM' : 'AM';
   hours = hours > 12 ? hours - 12 : hours;
   hours = hours.toString().padStart(2, '0');
-  const min = date.getUTCMinutes().toString().padStart(2, '0');
-  const sec = date.getUTCSeconds().toString().padStart(2, '0');
-  const timeStr = [hours, min, sec].join(':').concat(' ').concat([suffix, '+UTC'].join(' '));
+  const min = date.getMinutes().toString().padStart(2, '0');
+  const sec = date.getSeconds().toString().padStart(2, '0');
+  const timeStr = [hours, min, sec].join(':').concat(' ').concat([suffix, `UTC${getTimeZone()}`].join(' '));
   return { date: dateStr, time: timeStr };
 };
 

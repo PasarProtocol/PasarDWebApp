@@ -39,6 +39,7 @@ export default function UpdatePrice(props) {
   const [onProgress, setOnProgress] = React.useState(false);
   const [price, setPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
+  const [coinType, setCoinType] = React.useState(0);
   const handleClose = () => {
     setOpen(false);
   };
@@ -141,7 +142,7 @@ export default function UpdatePrice(props) {
                 value={price}
                 onChange={handleChangePrice}
                 startAdornment={' '}
-                endAdornment={<CoinSelect />}
+                endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
               />
             </FormControl>
             <Divider />

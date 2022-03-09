@@ -27,6 +27,7 @@ export default function PlaceBid(props) {
   const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
+  const [coinType, setCoinType] = React.useState(0);
   const [onProgress, setOnProgress] = useState(false);
   const [bidPrice, setBidPrice] = useState('');
 
@@ -239,7 +240,7 @@ export default function PlaceBid(props) {
                 value={bidPrice}
                 onChange={handleChangeBidPrice}
                 startAdornment={' '}
-                endAdornment={<CoinSelect />}
+                endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
               />
             </FormControl>
             <Divider />
