@@ -33,7 +33,7 @@ const MarkBoxStyle = styled(Box)(({ theme }) => ({
   padding: '10px'
 }));
 const CollectionImgBox = (props) => {
-  const { src, icon } = props;
+  const { cover, avatar } = props;
   const imageStyle = {
     // borderRadius: 1,
     // boxShadow: (theme)=>theme.customShadows.z16,
@@ -43,8 +43,8 @@ const CollectionImgBox = (props) => {
   return (
     <Stack sx={{position: 'relative', height: '120px', mb: '25px'}}>
       {
-        src?
-        <Box draggable = {false} component="img" src={src} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
+        cover?
+        <Box draggable = {false} component="img" src={cover} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
         <Box
           sx={{
             background: 'linear-gradient(90deg, #a951f4, #FF5082)',
@@ -54,15 +54,15 @@ const CollectionImgBox = (props) => {
         />
       }
       <MarkBoxStyle>
-        <Box draggable = {false} component="img" src={`/static/${icon}`} />
+        <Box draggable = {false} component="img" src={avatar} />
       </MarkBoxStyle>
     </Stack>
   );
 };
 
 export default function CollectionCard(props) {
-  const { info, image } = props
-  const {title, icon, detail} = info
+  const { info } = props
+  const {title, avatar, coverImage, detail} = info
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
   
 
@@ -96,7 +96,7 @@ export default function CollectionCard(props) {
           //     />
           //   </Link>
           // ):(
-            <CollectionImgBox icon={icon} src={image}/>
+            <CollectionImgBox avatar={avatar} cover={coverImage}/>
           // )
         }
         </Box>
@@ -106,7 +106,7 @@ export default function CollectionCard(props) {
             <Typography variant="subtitle2" component='div' sx={{fontWeight: 'normal'}}>
               by{' '}<Typography variant="subtitle2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline-flex'}}>Various Creators</Typography>
             </Typography>
-            <Typography variant="subtitle2" sx={{display: 'flex', fontWeight: 'normal'}} color='text.secondary'>
+            <Typography variant="subtitle2" sx={{fontWeight: 'normal'}} color='text.secondary'>
               {detail}
             </Typography>
           </Stack>

@@ -153,7 +153,7 @@ export default function MarketExplorer() {
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
     setLoadingAssets(true);
-    fetchFrom(`sticker/api/v1/getDetailedCollectibles?`+
+    fetchFrom(`api/v2/sticker/getDetailedCollectibles?`+
       `collectionType=&`+
       `status=${statusFilter}&`+
       `itemType=${itemTypeFilter}&`+
