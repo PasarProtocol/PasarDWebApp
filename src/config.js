@@ -52,3 +52,4 @@ export const rpcURL = process.env.REACT_APP_ENV==="production"?rpcUrlForMain:rpc
 export const trustedProviders = [
   "did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK" // Trinity Tech KYC
 ]
+export const auctionOrderType = '2'
