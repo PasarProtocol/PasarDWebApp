@@ -1,3 +1,4 @@
+import React from 'react'
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
@@ -7,20 +8,31 @@ import palette from '../../theme/palette'
 // material
 import LoadingScreen from '../LoadingScreen';
 import Jazzicon from '../Jazzicon';
-import { reduceHexAddress, getTime } from '../../utils/common';
+import { reduceHexAddress, getTime, getDidInfoFromAddress } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,
   isLast: PropTypes.bool.isRequired
 };
 function TransItem({ trans, isLast }) {
+  const [didName, setDidName] = React.useState('');
   const sx = isLast?{}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2};
   const timeObj = getTime(trans.timestamp)
-  const avatar = "glide"
+  React.useEffect(() => {
+    if(trans.buyerAddr) {
+        getDidInfoFromAddress(trans.buyerAddr)
+          .then((info) => {
+            setDidName(info.name)
+          })
+          .catch((e) => {
+          })
+    }
+  }, [trans]);
+
   return (
       <Stack direction="row" spacing={2} sx={sx}>
           <Jazzicon
-            address={trans.sellerAddr}
+            address={trans.buyerAddr}
             size={48}
           />
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
@@ -28,7 +40,7 @@ function TransItem({ trans, isLast }) {
                 {parseFloat((trans.price/10**18).toFixed(7))} ELA
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
-                  by {reduceHexAddress(trans.sellerAddr)}
+                  by {didName || reduceHexAddress(trans.buyerAddr)}
               </Typography>
           </Box>
           <Box>
