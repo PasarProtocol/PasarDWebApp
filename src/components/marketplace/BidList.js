@@ -6,6 +6,7 @@ import palette from '../../theme/palette'
 
 // material
 import LoadingScreen from '../LoadingScreen';
+import Jazzicon from '../Jazzicon';
 import { reduceHexAddress, getTime } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
@@ -14,22 +15,20 @@ TransItem.propTypes = {
 };
 function TransItem({ trans, isLast }) {
   const sx = isLast?{}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2};
-  const timeObj = getTime(trans.date)
+  const timeObj = getTime(trans.timestamp)
   const avatar = "glide"
   return (
       <Stack direction="row" spacing={2} sx={sx}>
-          <Box
-              component="img"
-              alt=""
-              src={`/static/${avatar}.png`}
-              sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer', background: 'black', p: 1 }}
+          <Jazzicon
+            address={trans.sellerAddr}
+            size={48}
           />
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Typography variant="body2" noWrap>
                 {parseFloat((trans.price/10**18).toFixed(7))} ELA
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
-                  by {reduceHexAddress(trans.to)}
+                  by {reduceHexAddress(trans.sellerAddr)}
               </Typography>
           </Box>
           <Box>
@@ -43,7 +42,7 @@ function TransItem({ trans, isLast }) {
 export default function BitList(props) {
   return (
     <Stack spacing={2}>
-      {props.isLoading && <LoadingScreen />}
+      {/* {props.isLoading && <LoadingScreen />} */}
       {props.dataList.map((trans, index) => (
           <TransItem 
             key={index}
