@@ -379,10 +379,10 @@ export const MethodList = [
     icon: 'auction',
     detail: [
       { description: 'Bid placed on collectible →', field: 'marketplace', copyable: true, ellipsis: true },
-      { description: 'By', field: 'from', copyable: true, ellipsis: true },
+      { description: 'By', field: 'to', copyable: true, ellipsis: true },
       { description: 'For a value of', field: 'price', copyable: false }
     ],
-    verb: { description: 'Bid', withPrice: true, subject: 'from' }
+    verb: { description: 'Bid', withPrice: true, subject: 'to' }
   },
   {
     method: 'OrderForAuction',
