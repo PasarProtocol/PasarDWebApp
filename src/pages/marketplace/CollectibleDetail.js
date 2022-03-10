@@ -120,10 +120,8 @@ export default function CollectibleDetail() {
   const [isForAuction, setForAuction] = React.useState(false);
   const [deadLine, setDeadLine] = React.useState('');
   const [transRecord, setTransRecord] = React.useState([]);
-  const [bidList, setBidList] = React.useState([]);
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
-  const [isLoadingBidList, setLoadingBid] = React.useState(true);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const [isOpenPurchase, setPurchaseOpen] = React.useState(false);
@@ -220,15 +218,6 @@ export default function CollectibleDetail() {
       }
     }
     setLoadingCollectible(false);
-    // setForAuction(true);
-
-    const tempBidArr = [
-      // {'price': 50000000000000000000, 'to': '0x504342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431},
-      // {'price': 60000000000000000000, 'to': '0x604342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431},
-      // {'price': 70000000000000000000, 'to': '0x704342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431}
-    ]
-    setBidList(tempBidArr)
-    setLoadingBid(false)
   }, []);
   
   React.useEffect(async () => {
@@ -625,11 +614,11 @@ export default function CollectibleDetail() {
             </PaperStyle>
           </Grid>
           {
-            isForAuction&&(isLoadingBidList||bidList.length>0)&&(
+            isForAuction&&(collectible.listBid.length>0)&&(
               <Grid item xs={12}>
                 <PaperStyle>
                   <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>Bids</Typography>
-                  <BidList isLoading={isLoadingBidList} dataList={bidList}/>
+                  <BidList dataList={collectible.listBid}/>
                 </PaperStyle>
               </Grid>
             )
