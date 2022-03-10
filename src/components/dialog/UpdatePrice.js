@@ -1,22 +1,7 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
 import * as math from 'mathjs';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  IconButton,
-  Typography,
-  Input,
-  FormControl,
-  InputLabel,
-  Divider,
-  Grid,
-  Tooltip,
-  Icon,
-  Button,
-  Box
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, Grid, Tooltip, Icon, Button, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
@@ -25,7 +10,7 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import CoinSelect from '../marketplace/CoinSelect';
 import TransLoadingButton from '../TransLoadingButton';
-import { removeLeadingZero, isInAppBrowser } from '../../utils/common';
+import { removeLeadingZero, isInAppBrowser, coinTypes } from '../../utils/common';
 
 const InputStyle = styled(Input)(({ theme }) => ({
   '&:before': {
@@ -160,7 +145,7 @@ export default function UpdatePrice(props) {
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive
               <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}>
-                {' '}{rcvprice} ELA{' '}
+                {' '}{rcvprice} {coinTypes[coinType].name}{' '}
               </Typography>
               per item
             </Typography>
