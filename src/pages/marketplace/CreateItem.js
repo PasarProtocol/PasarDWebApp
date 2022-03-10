@@ -937,12 +937,12 @@ export default function CreateItem() {
 
                   <>
                     <Grid item xs={12}>
-                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Minimum Bid</Typography>
+                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Starting Price</Typography>
                     </Grid>
                     <Grid item xs={12}>
                       <FormControl variant="standard" sx={{width: '100%'}}>
                         <InputLabel htmlFor="input-with-price">
-                          Enter minimum bid
+                          Enter starting price
                         </InputLabel>
                         <InputStyle
                           type="number"

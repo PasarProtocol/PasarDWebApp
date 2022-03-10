@@ -195,10 +195,10 @@ export default function Auction(props) {
           Item: <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{title}</Typography>
         </Typography>
         <Typography variant="h5" sx={{ fontWeight: 'normal', mt:1 }}>
-          Minimum Bid
+          Starting Price
         </Typography>
         <FormControl variant="standard" sx={{ width: '100%' }}>
-          <InputLabel htmlFor="input-with-price">Enter minimum bid</InputLabel>
+          <InputLabel htmlFor="input-with-price">Enter starting price</InputLabel>
           <InputStyle
             type="number"
             id="input-with-price"
