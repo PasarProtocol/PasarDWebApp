@@ -36,7 +36,8 @@ import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
 import useSingin from '../../hooks/useSignin';
 import {blankAddress, marketContract, auctionOrderType} from '../../config'
-import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl,
+  getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -115,6 +116,7 @@ export default function CollectibleDetail() {
   const [address, setAddress] = React.useState('');
 
   const [collectible, setCollectible] = React.useState({});
+  const [collectionType, setCollectionType] = React.useState(null);
   const [badge, setBadge] = React.useState({creator: {dia: false, kyc: false}, owner: {dia: false, kyc: false}});
   const [didName, setDidName] = React.useState({creator: '', owner: ''});
   const [isForAuction, setForAuction] = React.useState(false);
@@ -167,6 +169,8 @@ export default function CollectibleDetail() {
     if(jsonCollectible.data){
       try{
         setCollectible(jsonCollectible.data);
+        const collectionTypeId = getCollectionTypeFromImageUrl(jsonCollectible.data)
+        setCollectionType(collectionTypes[collectionTypeId])
         if(jsonCollectible.data.orderType === auctionOrderType){
           const tempDeadLine = getTime(jsonCollectible.data.endTime)
           setForAuction(true)
@@ -509,10 +513,14 @@ export default function CollectibleDetail() {
                   </Typography>
                 </Stack>
                 <Typography variant="subtitle2">Collection</Typography>
-                <Stack direction='row'>
-                  <AvatarStyle draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ p: 1 }} />
-                  <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>Feeds NFT Sticker (FSTK)</Typography>
-                </Stack>
+                {
+                  collectionType?
+                  <Stack direction='row'>
+                    <AvatarStyle draggable = {false} component="img" src={collectionType.avatar} sx={{ p: 1 }} />
+                    <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>{collectionType.title} ({collectionType.name})</Typography>
+                  </Stack>:
+                  <AvatarStyle sx={{ p: 1 }} />
+                }
               </Stack>
             </PaperStyle>
             {
@@ -520,9 +528,9 @@ export default function CollectibleDetail() {
                 <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
                   <Stack direction="row">
                     <Box sx={{flexGrow: 1}}>
-                      <Typography variant="h4">Current bid</Typography>
-                      <Typography variant="h3" color="origin.main">{round(collectible.Price/1e18, 3)} ELA</Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*collectible.Price/1e18, 3)}</Typography>
+                      <Typography variant="h4">{collectible.listBid.length>0?'Current Bid':'Starting Price'}</Typography>
+                      <Typography variant="h3" color="origin.main">{round((collectible.listBid.length>0?collectible.listBid[0].price:collectible.Price)/1e18, 3)} ELA</Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*(collectible.listBid.length>0?collectible.listBid[0].price:collectible.Price)/1e18, 3)}</Typography>
                     </Box>
                     <Box>
                       <Stack direction="row">
@@ -598,7 +606,7 @@ export default function CollectibleDetail() {
 
           </Grid>
           <Grid item xs={12} sm={6}>
-            <PaperStyle sx={{height: '100%', p: '15px 32px', position: 'relative'}}>
+            <PaperStyle sx={{height: '100%', p: '15px 20px', position: 'relative'}}>
               <Typography variant="h5" sx={{ my: 1 }}>Item Details</Typography>
               <AssetDetailInfo detail={collectible}/>
               <Button
@@ -635,10 +643,10 @@ export default function CollectibleDetail() {
                 }}
               >
                 <AccordionSummary 
-                  expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                  expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: '20px'}}>
                   <Typography variant="h5">Properties</Typography>
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails sx={{px: '20px'}}>
                   <Grid container spacing={1}>
                     {
                       Object.keys(properties).map((type, index)=>(
@@ -661,10 +669,10 @@ export default function CollectibleDetail() {
                   boxShadow: (theme) => theme.customShadows.z1
                 }}
               >
-              <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+              <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: '20px'}}>
                 <Typography variant="h5">History</Typography>
               </AccordionSummary>
-              <AccordionDetails sx={{pb: '50px', position: 'relative', px: 4}}>
+              <AccordionDetails sx={{pb: '50px', position: 'relative', px: '20px'}}>
                 <CollectibleHistory isLoading={isLoadingTransRecord} dataList={transRecord} creator={{address: collectible.royaltyOwner, name: didName.creator}}/>
                 <Button
                   to={`/explorer/collectible/detail/${collectible.tokenId}`}

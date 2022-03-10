@@ -68,6 +68,20 @@ export const getAssetImage = (metaObj, isThumbnail = false) => {
   return getIpfsUrl(cid);
 };
 
+export const getCollectionTypeFromImageUrl = (metaObj) => {
+  const { asset, tokenJsonVersion, data } = metaObj
+  let cid = asset
+  if (tokenJsonVersion === '2') {
+    if (!data)
+      return 1
+    cid = data.image
+  }
+  const prefix = cid.split(':')[0]
+  if(prefix==='pasar')
+    return 0
+  return 1
+};
+
 export const generateJazzicon = (address, size) => {
   if (!address) return Jazzicon(size, 0);
   return Jazzicon(size, parseInt(address.slice(2, 12), 16));
