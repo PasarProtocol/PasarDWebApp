@@ -1,22 +1,7 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
 import * as math from 'mathjs';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  IconButton,
-  Typography,
-  Input,
-  FormControl,
-  InputLabel,
-  Divider,
-  Grid,
-  Tooltip,
-  Icon,
-  Button,
-  Box
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, Grid, Tooltip, Icon, Button, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
@@ -29,7 +14,7 @@ import {
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
-import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser } from '../../utils/common';
+import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes } from '../../utils/common';
 
 const InputStyle = styled(Input)(({ theme }) => ({
   '&:before': {
@@ -195,7 +180,9 @@ export default function Sell(props) {
             </Typography>
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive
-              <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}> {rcvprice} ELA </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}>
+                {' '}{rcvprice} {coinTypes[coinType].name}{' '}
+              </Typography>
               per item
             </Typography>
           </Grid>
