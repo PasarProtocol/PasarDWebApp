@@ -391,9 +391,9 @@ export const MethodList = [
     detail: [
       { description: 'Collectible put up for auction →', field: 'marketplace', copyable: true, ellipsis: true },
       { description: 'By', field: 'from', copyable: true, ellipsis: true },
-      { description: 'For a minimum bid of', field: 'price', copyable: false }
+      { description: 'For a starting price of', field: 'price', copyable: false }
     ],
-    verb: { description: 'Put up for auction for a minimum bid of', withPrice: true, subject: 'from' }
+    verb: { description: 'Put up for auction for a starting price of', withPrice: true, subject: 'from' }
   },
 ];
 export const collectionTypes = [
