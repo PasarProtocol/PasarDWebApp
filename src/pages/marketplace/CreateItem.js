@@ -927,7 +927,9 @@ export default function CreateItem() {
                       </Typography>
                       <Typography variant="body2" component="div" sx={{fontWeight: 'normal'}}>
                         You will receive
-                        <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}> {rcvprice} {coinTypes[coinType].name} </Typography>
+                        <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline'}}>
+                          {' '}{rcvprice} {coinTypes[coinType].name}{' '}
+                        </Typography>
                         per item
                       </Typography>
                     </Grid>

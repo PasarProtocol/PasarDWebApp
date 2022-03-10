@@ -625,14 +625,10 @@ export default function CollectibleDetail() {
             </PaperStyle>
           </Grid>
           {
-            isForAuction&&(
+            isForAuction&&(isLoadingBidList||bidList.length>0)&&(
               <Grid item xs={12}>
                 <PaperStyle>
                   <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>Bids</Typography>
-                  {
-                    !isLoadingBidList&&!bidList.length&&
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>No bid found!</Typography>
-                  }
                   <BidList isLoading={isLoadingBidList} dataList={bidList}/>
                 </PaperStyle>
               </Grid>
