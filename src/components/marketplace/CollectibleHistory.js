@@ -45,7 +45,7 @@ function TransItem(props) {
                 component="img"
                 alt=""
                 src={`/static/${methodItem.icon}.svg`}
-                sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
+                sx={{ minWidth: 48, width: 48, height: 48, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
             />
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>

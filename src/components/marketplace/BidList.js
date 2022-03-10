@@ -31,10 +31,12 @@ function TransItem({ trans, isLast }) {
 
   return (
       <Stack direction="row" spacing={2} sx={sx}>
-          <Jazzicon
-            address={trans.buyerAddr}
-            size={48}
-          />
+          <Box sx={{minWidth: 48}}>
+            <Jazzicon
+              address={trans.buyerAddr}
+              size={48}
+            />
+          </Box>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Typography variant="body2" noWrap>
                 {parseFloat((trans.price/10**18).toFixed(7))} ELA
@@ -44,7 +46,7 @@ function TransItem({ trans, isLast }) {
               </Typography>
           </Box>
           <Box>
-              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
+              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right">
                   {timeObj.date} {timeObj.time}
               </Typography>
           </Box>
