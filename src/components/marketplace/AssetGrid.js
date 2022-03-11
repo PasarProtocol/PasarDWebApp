@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
 import AssetCardSkeleton from './AssetCardSkeleton';
-import { getAssetImage, getCoinUSD } from '../../utils/common';
+import { getAssetImage, getCoinUSD, getCollectionTypeFromImageUrl } from '../../utils/common';
 // ----------------------------------------------------------------------
 const StackedGrid = ({
   // gridItemWidth = "250px",
@@ -48,6 +48,7 @@ const GridItems = (props) => {
               royaltyOwner={item.royaltyOwner}
               holder={item.holder}
               coinUSD={coinUSD}
+              collection={getCollectionTypeFromImageUrl(item)}
               {...props}
             />:
             <AssetCardSkeleton/>
