@@ -47,6 +47,9 @@ const GridItems = (props) => {
               orderId={item.orderId}
               royaltyOwner={item.royaltyOwner}
               holder={item.holder}
+              orderType={item.orderType}
+              endTime={item.endTime}
+              currentBid={item.currentBid}
               coinUSD={coinUSD}
               collection={getCollectionTypeFromImageUrl(item)}
               {...props}

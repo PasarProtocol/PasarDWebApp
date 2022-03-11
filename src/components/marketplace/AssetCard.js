@@ -31,6 +31,7 @@ import AuctionDlg from '../dialog/Auction';
 import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
 import BadgeProfile from './BadgeProfile'
+import { auctionOrderType } from '../../config';
 import { getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -48,7 +49,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 export default function AssetCard(props) {
-  const { title="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId,
+  const { title="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId, orderType, endTime, currentBid,
    saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, collection } = props
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
@@ -144,6 +145,7 @@ export default function AssetCard(props) {
     setOpenPopup(null);
   };
   const dlgProps = {title, tokenId, updateCount, handleUpdate}
+  const currentBidPrice = currentBid.length>0?currentBid[0].price:0
   return (
       <motion.div
         animate={{ scale: 1 }}
@@ -263,10 +265,10 @@ export default function AssetCard(props) {
             </Box>
           </Stack>
           {
-            saleType==="auction"&&
+            orderType===auctionOrderType&&
             <TimeCountBoxStyle>
               <Typography variant='subtitle2' sx={{fontWeight: 'normal'}}>
-                <Countdown date={Date.now() + 25*3600*1000} /> <Typography variant='caption' sx={{color:'text.secondary'}}>left</Typography> ⏰
+                <Countdown date={endTime*1000} /> <Typography variant='caption' sx={{color:'text.secondary'}}>left</Typography> ⏰
               </Typography>
             </TimeCountBoxStyle>
           }
@@ -297,8 +299,8 @@ export default function AssetCard(props) {
               <Typography variant="h5" noWrap sx={{flexGrow: 1}}>{title}</Typography>
               <Typography variant="subtitle2" sx={{display: 'flex', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}}>
                 {
-                  saleType==="auction"?
-                  "Current Bid":
+                  orderType===auctionOrderType?
+                  `${math.round(currentBidPrice/1e18, 3)} ELA`:
                   `1/${quantity}`
                 }
               </Typography>
