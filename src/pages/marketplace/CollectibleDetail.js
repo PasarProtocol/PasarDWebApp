@@ -121,6 +121,7 @@ export default function CollectibleDetail() {
   const [didName, setDidName] = React.useState({creator: '', owner: ''});
   const [isForAuction, setForAuction] = React.useState(false);
   const [deadLine, setDeadLine] = React.useState('');
+  const [currentBid, setCurrentBid] = React.useState(0);
   const [transRecord, setTransRecord] = React.useState([]);
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
@@ -171,6 +172,9 @@ export default function CollectibleDetail() {
         setCollectible(jsonCollectible.data);
         const collectionTypeId = getCollectionTypeFromImageUrl(jsonCollectible.data)
         setCollectionType(collectionTypes[collectionTypeId])
+        if(jsonCollectible.data.listBid.length)
+          setCurrentBid(jsonCollectible.data.listBid[0].price)
+
         if(jsonCollectible.data.orderType === auctionOrderType){
           const tempDeadLine = getTime(jsonCollectible.data.endTime)
           setForAuction(true)
@@ -528,9 +532,9 @@ export default function CollectibleDetail() {
                 <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
                   <Stack direction="row">
                     <Box sx={{flexGrow: 1}}>
-                      <Typography variant="h4">{collectible.listBid.length>0?'Current Bid':'Starting Price'}</Typography>
-                      <Typography variant="h3" color="origin.main">{round((collectible.listBid.length>0?collectible.listBid[0].price:collectible.Price)/1e18, 3)} ELA</Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*(collectible.listBid.length>0?collectible.listBid[0].price:collectible.Price)/1e18, 3)}</Typography>
+                      <Typography variant="h4">{currentBid>0?'Current Bid':'Starting Price'}</Typography>
+                      <Typography variant="h3" color="origin.main">{round((currentBid || collectible.Price)/1e18, 3)} ELA</Typography>
+                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*(currentBid || collectible.Price)/1e18, 3)}</Typography>
                     </Box>
                     <Box>
                       <Stack direction="row">
@@ -755,7 +759,7 @@ export default function CollectibleDetail() {
         </MHidden>
       </Container>
       <PurchaseDlg isOpen={isOpenPurchase} setOpen={setPurchaseOpen} info={collectible}/>
-      <PlaceBidDlg isOpen={isOpenPlaceBid} setOpen={setPlaceBidOpen} info={{...collectible, currentBid: 20}}/>
+      <PlaceBidDlg isOpen={isOpenPlaceBid} setOpen={setPlaceBidOpen} info={{...collectible, currentBid}}/>
     </RootStyle>
   );
 }
