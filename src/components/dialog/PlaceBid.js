@@ -14,8 +14,7 @@ import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import useSingin from '../../hooks/useSignin';
-import CoinSelect from '../marketplace/CoinSelect';
-import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero } from '../../utils/common';
+import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, coinTypes } from '../../utils/common';
 
 const InputStyle = styled(Input)(({ theme }) => ({
   '&:before': {
@@ -23,11 +22,15 @@ const InputStyle = styled(Input)(({ theme }) => ({
   }
 }));
 
+const CoinTypeLabel = ({type})=>(
+  <Box sx={{display: 'contents'}}>
+    <Box draggable={false} component="img" src={`/static/${coinTypes[type].icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coinTypes[type].name}
+  </Box>
+)
 export default function PlaceBid(props) {
   const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
-  const [coinType, setCoinType] = React.useState(0);
   const [onProgress, setOnProgress] = useState(false);
   const [bidPrice, setBidPrice] = useState('');
 
@@ -35,7 +38,7 @@ export default function PlaceBid(props) {
   const { pasarLinkAddress } = useSingin()
   const { library, chainId, account } = context;
 
-  const { isOpen, setOpen, info } = props;
+  const { isOpen, setOpen, info, coinType=0 } = props;
   const handleClose = () => {
     setOpen(false);
   }
@@ -152,6 +155,14 @@ export default function PlaceBid(props) {
   };
 
   const bidNft = async () => {
+    if(!bidPrice){
+      enqueueSnackbar('Bid amount is required', { variant: 'warning' });
+      return
+    }
+    if(bidPrice<Math.max(info.currentBid, info.Price)/1e18){
+      enqueueSnackbar('Your Bid amount cannot be lower than Starting Price and Current Bid', { variant: 'warning' });
+      return
+    }
     setOnProgress(true);
     const biderDidUri = await sendIpfsDidJson();
     console.log('didUri:', biderDidUri);
@@ -214,17 +225,14 @@ export default function PlaceBid(props) {
         <Typography variant="h3" component="div" sx={{ color: 'text.primary', pb: 1 }} align="center">
           Place Bid
         </Typography>
-        <Typography variant="h6" component="div" sx={{ color: 'text.secondary', lineHeight: 1.1, fontWeight: 'normal' }}>
+        <Typography variant="h6" component="div" sx={{ color: 'text.secondary', lineHeight: 1.1, fontWeight: 'normal', pb: 1 }}>
           You are about to bid <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{info.name}</Typography>
           <br />
           from <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{reduceHexAddress(info.holder)}</Typography>
-          <br />
-          for <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{math.round(info.Price / 1e18, 3)} ELA</Typography>
-          <br />
-          <Typography variant="h6" sx={{ ...TypographyStyle, color: 'origin.main', fontWeight: 'normal' }}>Current Bid:</Typography>{' '}
-          <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>
-            {math.round(info.currentBid / 1e18, 3)} ELA
-          </Typography>
+        </Typography>
+        <Typography variant="h6" sx={{ ...TypographyStyle, color: 'origin.main', fontWeight: 'normal' }}>{info.currentBid?'Current Bid:':'Starting Price:'}</Typography>{' '}
+        <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>
+          {math.round((info.currentBid || info.Price) / 1e18, 3)} ELA
         </Typography>
         <Grid container sx={{pt: 2, pb: 3}}>
           <Grid item xs={12}>
@@ -241,7 +249,7 @@ export default function PlaceBid(props) {
                 value={bidPrice}
                 onChange={handleChangeBidPrice}
                 startAdornment={' '}
-                endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
+                endAdornment={<CoinTypeLabel type={coinType}/>}
               />
             </FormControl>
             <Divider />
