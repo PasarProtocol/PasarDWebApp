@@ -550,9 +550,9 @@ export default function CollectibleDetail() {
                             Place bid
                           </Button>
                           {
-                            collectible.reservePrice&&
-                            <Button variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
-                              Instant purchase at {round(collectible.reservePrice/1e18, 3)} ELA
+                            collectible.buyoutPrice&&
+                            <Button variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
+                              Instant purchase at {round(collectible.buyoutPrice/1e18, 3)} ELA
                             </Button>
                           }
                         </Stack>:
@@ -561,6 +561,12 @@ export default function CollectibleDetail() {
                         </Button>
                       }
                     </MHidden>
+                  }
+                  {
+                    (address===collectible.holder || address===collectible.royaltyOwner) && collectible.buyoutPrice &&
+                    <Typography variant="h4" component='div' align='center' sx={{pt: 2}}>
+                      Your Reserve Price: <Typography variant="h4" color="origin.main" sx={{display: 'inline'}}>{round(collectible.buyoutPrice/1e18, 3)} ELA</Typography>
+                    </Typography>
                   }
                 </PaperStyle>
               ):(
@@ -711,9 +717,9 @@ export default function CollectibleDetail() {
                     Place bid
                   </Button>
                   {
-                    collectible.reservePrice&&
-                    <Button variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
-                      Instant purchase at {round(collectible.reservePrice/1e18, 3)} ELA
+                    collectible.buyoutPrice&&
+                    <Button variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
+                      Instant purchase at {round(collectible.buyoutPrice/1e18, 3)} ELA
                     </Button>
                   }
                 </Stack>:
