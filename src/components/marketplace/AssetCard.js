@@ -145,7 +145,7 @@ export default function AssetCard(props) {
     setOpenPopup(null);
   };
   const dlgProps = {title, tokenId, updateCount, handleUpdate}
-  const currentBidPrice = currentBid.length>0?currentBid[0].price:0
+  const currentBidPrice = currentBid&&currentBid.length>0?currentBid[0].price:0
   return (
       <motion.div
         animate={{ scale: 1 }}
