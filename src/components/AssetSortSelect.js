@@ -14,13 +14,12 @@ const MenuProps = {
   },
   variant: "menu"
 }
-const menuItems = ['Latest: Listed', 'Latest: Created', 'Oldest: Listed', 'Oldest: Created', 'Price: Low to High', 'Price: High to Low']
+const menuItems = ['Latest: Listed', 'Latest: Created', 'Oldest: Listed', 'Oldest: Created', 'Price: Low to High', 'Price: High to Low', 'Auction Ending Soon']
 
 export default function AssetSortSelect({ selected, onChange, sx={} }) {
   const handleChange = (event) => {
     onChange(event.target.value);
   }
-  // 6: 'Auction Ending Soon'
   return (
     <Select
       // defaultValue={0}
