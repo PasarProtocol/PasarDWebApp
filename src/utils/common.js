@@ -76,6 +76,8 @@ export const getCollectionTypeFromImageUrl = (metaObj) => {
       return 1
     cid = data.image
   }
+  if(!cid)
+    return 1
   const prefix = cid.split(':')[0]
   if(prefix==='pasar')
     return 0

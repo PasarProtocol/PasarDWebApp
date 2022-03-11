@@ -27,8 +27,8 @@ export default function Purchase(props) {
 
   const { isOpen, setOpen, info } = props;
   let priceInfo = info.Price;
-  if(info.orderType===auctionOrderType && info.reservePrice)
-    priceInfo = info.reservePrice
+  if(info.orderType===auctionOrderType && info.buyoutPrice)
+    priceInfo = info.buyoutPrice
   const handleClose = () => {
     setOpen(false);
   };
