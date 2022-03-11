@@ -556,7 +556,7 @@ export default function CollectibleDetail() {
                           {
                             collectible.buyoutPrice&&
                             <Button variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
-                              Instant purchase at {round(collectible.buyoutPrice/1e18, 3)} ELA
+                              Buy now for {round(collectible.buyoutPrice/1e18, 3)} ELA
                             </Button>
                           }
                         </Stack>:
@@ -723,7 +723,7 @@ export default function CollectibleDetail() {
                   {
                     collectible.buyoutPrice&&
                     <Button variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
-                      Instant purchase at {round(collectible.buyoutPrice/1e18, 3)} ELA
+                      Buy now for {round(collectible.buyoutPrice/1e18, 3)} ELA
                     </Button>
                   }
                 </Stack>:
