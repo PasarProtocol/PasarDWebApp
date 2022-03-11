@@ -300,7 +300,7 @@ export default function AssetCard(props) {
               <Typography variant="subtitle2" sx={{display: 'flex', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}}>
                 {
                   orderType===auctionOrderType?
-                  `${math.round(currentBidPrice/1e18, 3)} ELA`:
+                  `${math.round((currentBidPrice)/1e18, 3) || price} ELA`:
                   `1/${quantity}`
                 }
               </Typography>

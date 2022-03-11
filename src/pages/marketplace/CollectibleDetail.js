@@ -537,11 +537,11 @@ export default function CollectibleDetail() {
                       <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*(currentBid || collectible.Price)/1e18, 3)}</Typography>
                     </Box>
                     <Box>
-                      <Stack direction="row">
+                      <Stack direction="row" sx={{minHeight: {xs: 30, md: 36}, alignItems: 'center'}}>
                         <AccessTimeIcon/>&nbsp;
                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>Ends {deadLine}</Typography>
                       </Stack>
-                      <Countdown deadline={format(new Date(1000*collectible.endTime), 'yyyy-MM-dd HH:mm:ii')}/>
+                      <Countdown deadline={collectible.endTime*1000}/>
                     </Box>
                   </Stack>
                   {
