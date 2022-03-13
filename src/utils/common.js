@@ -15,7 +15,7 @@ import { DIAMOND_CONTRACT_ABI } from '../abi/diamondABI';
 const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS]
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = (strAddress) =>
-  strAddress ? `${strAddress.substring(0, 5)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}` : '';
+  strAddress ? `${strAddress.substring(0, 6)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}` : '';
 
 export const fetchFrom = (uri, props = {}) => {
   const backendURL =

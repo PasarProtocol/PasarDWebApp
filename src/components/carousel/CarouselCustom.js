@@ -10,7 +10,7 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 //
 import { CarouselControlsPaging2 } from './controls';
 import CopyButton from '../CopyButton';
-import { getTime } from '../../utils/common';
+import { getTime, reduceHexAddress } from '../../utils/common';
 import {stickerContract, marketContract, blockchain} from '../../config'
 
 // ----------------------------------------------------------------------
@@ -27,9 +27,13 @@ const RootStyle = styled('div')(({ theme }) => ({
 }));
 
 // ----------------------------------------------------------------------
-const DetailItem = ({ item, isLast, value })=>{
+const DetailItem = (props)=>{
   const params = useParams(); // params.collection
+  const { item, isLast, value } = props
   const { icon, title, copyable } = item;
+  let displayValue = value
+  if(item.key==='tokenIdHex')
+    displayValue = reduceHexAddress(value)
   const sx = isLast?{}:{borderBottom: '1px solid', borderColor: (theme) => `${theme.palette.grey[500_32]}`, pb: 2};
   const iconSrc = `/static/${icon}.svg`;
   return (
@@ -60,9 +64,9 @@ const DetailItem = ({ item, isLast, value })=>{
                     title!=="Status"&&(
                       (title==="Creator" || title==="Owner")?
                       <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
-                        {value}
+                        {displayValue}
                       </Link>:
-                      value
+                      displayValue
                     )
                   }
                 </Typography>
@@ -96,9 +100,9 @@ function CarouselItem({ page, detail }) {
 }
 
 export default function CarouselCustom({pgsize, detail}) {
-  const pgcount = Math.floor(CAROUSEL_ICONS.length/pgsize)+1
+  const pgcount = Math.ceil(CAROUSEL_ICONS.length/pgsize)
   const DETAIL_CAROUSELS = [...Array(pgcount)].map((_, index1) => {
-    const pageSize = index1===(pgcount-1)?CAROUSEL_ICONS.length%pgsize:pgsize;
+    const pageSize = index1===(pgcount-1)?(CAROUSEL_ICONS.length-(pgcount-1)*pgsize):pgsize;
     return [...Array(pageSize)].map((_, index2) => ({
       icon: CAROUSEL_ICONS[index1*pgsize+index2],
       title: CAROUSEL_TITLE[index1*pgsize+index2],
