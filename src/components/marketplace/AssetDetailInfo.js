@@ -7,7 +7,7 @@ import { useTheme, styled } from '@mui/material/styles';
 import { Box, Stack, Typography, Link } from '@mui/material';
 //
 import CopyButton from '../CopyButton';
-import { getTime } from '../../utils/common';
+import { getTime, reduceHexAddress } from '../../utils/common';
 import { marketContract } from '../../config'
 
 // ----------------------------------------------------------------------
@@ -23,10 +23,16 @@ const RootStyle = styled('div')(({ theme }) => ({
 }));
 
 // ----------------------------------------------------------------------
-const DetailItem = ({ item, isLast, value })=>{
+const DetailItem = (props)=>{
+  const { item, isLast, value } = props
   const { icon, title } = item;
-  if(item.key==='type'&&value)
-    value = value.charAt(0).toUpperCase().concat(value.substring(1))
+  let displayValue = value
+  if(value){
+    if(item.key==='type')
+      displayValue = value.charAt(0).toUpperCase().concat(value.substring(1))
+    if(item.key==='tokenIdHex')
+      displayValue = reduceHexAddress(value)
+  }
   const sx = isLast?{}:{borderBottom: '1px solid', borderColor: (theme) => `${theme.palette.grey[500_32]}`, pb: 1};
   const iconSrc = `/static/${icon}.svg`;
   return (
@@ -46,9 +52,9 @@ const DetailItem = ({ item, isLast, value })=>{
                   {
                     (title==="Creator" || title==="Owner")?
                     <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
-                      {value}
+                      {displayValue}
                     </Link>:
-                    value
+                    displayValue
                   }
                 </Typography>
                 {
