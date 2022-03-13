@@ -569,7 +569,7 @@ export default function CollectibleDetail() {
                   {
                     (address===collectible.holder || address===collectible.royaltyOwner) && collectible.buyoutPrice &&
                     <Typography variant="h4" component='div' align='center' sx={{pt: 2}}>
-                      Your Reserve Price: <Typography variant="h4" color="origin.main" sx={{display: 'inline'}}>{round(collectible.buyoutPrice/1e18, 3)} ELA</Typography>
+                      Your Buy Now Price: <Typography variant="h4" color="origin.main" sx={{display: 'inline'}}>{round(collectible.buyoutPrice/1e18, 3)} ELA</Typography>
                     </Typography>
                   }
                 </PaperStyle>

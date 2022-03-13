@@ -49,15 +49,15 @@ function TransItem(props) {
             />
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-              <Typography variant="body2" color='text.secondary' noWrap>
+              <Typography variant="body2" noWrap>
                 {methodItem.verb.description}
                 {methodItem.verb.withPrice?` ${parseFloat((trans.price/10**18).toFixed(7))} ELA`:''}
               </Typography>
-              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
-                <Link to={`/explorer/transaction/detail/${subject}`} component={RouterLink}>
+              <Link to={`/explorer/transaction/detail/${subject}`} component={RouterLink}>
+                <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
                   {methodItem.verb.description==='Transferred'?'to':'by'} {didName || reduceHexAddress(subject)}
-                </Link>
-              </Typography>
+                </Typography>
+              </Link>
           </Box>
           <Box>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
