@@ -147,10 +147,23 @@ export default function AssetCard(props) {
   const dlgProps = {title, tokenId, updateCount, handleUpdate}
   const currentBidPrice = currentBid&&currentBid.length>0?currentBid[0].price:0
   return (
-      <motion.div
-        animate={{ scale: 1 }}
-      >
-        <PaperRecord sx={{mb: '2px', position: 'relative'}}>
+      <Box>
+        <PaperRecord
+          sx={{
+            mb: '2px',
+            position: 'relative',
+            transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+            '&:hover': {
+              boxShadow: '0 4px 8px 0px rgb(0 0 0 / 30%)',
+              transform: 'translateY(-4px)',
+              '& .card-img:after': {
+                transform: 'rotate(25deg)',
+                top: '-30%',
+                opacity: 0.18
+              }
+            }
+          }}
+        >
           <Stack sx={{p:2, pb: 1}} direction="row">
             <Stack sx={{flexGrow:1}} direction="row" spacing={.5}>
               <BadgeProfile type={1} collection={collection}/>
@@ -351,6 +364,6 @@ export default function AssetCard(props) {
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps}/>
         <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance}/>
         <AuctionDlg isOpen={auctionOpen} setOpen={setOpenAuction} {...dlgProps}/>
-      </motion.div>
+      </Box>
   );
 };
