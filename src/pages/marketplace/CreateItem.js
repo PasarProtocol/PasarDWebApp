@@ -80,11 +80,11 @@ export default function CreateItem() {
   const [multiNames, setMultiNames] = React.useState([]);
   const [previewFiles, setPreviewFiles] = React.useState([]);
   const [isPutOnSale, setPutOnSale] = React.useState(false);
-  const [isReserveForAuction, setReserveForAuction] = React.useState(false);
+  const [isBuynowForAuction, setBuynowForAuction] = React.useState(false);
+  const [buynowPrice, setBuynowPrice] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [quantity, setQuantity] = React.useState(1);
   const [price, setPrice] = React.useState('');
-  const [reservePrice, setReservePrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [royalties, setRoyalties] = React.useState(10);
   const [uploadedCount, setUploadedCount] = React.useState(0);
@@ -220,10 +220,10 @@ export default function CreateItem() {
     setPutOnSale(event.target.checked);
   };
 
-  const handleReserveForAuction = (event) => {
+  const handleBuynowForAuction = (event) => {
     if(!event.target.checked)
-      setReservePrice('')
-    setReserveForAuction(event.target.checked);
+      setBuynowPrice('')
+    setBuynowForAuction(event.target.checked);
   };
 
   const handleChangePrice = (event) => {
@@ -235,12 +235,12 @@ export default function CreateItem() {
     setRcvPrice(math.round(priceValue*98/100, 3))
   };
 
-  const handleChangeReservePrice = (event) => {
+  const handleChangeBuynowPrice = (event) => {
     let priceValue = event.target.value
     if(priceValue<0)
       return
     priceValue = removeLeadingZero(priceValue)
-    setReservePrice(priceValue)
+    setBuynowPrice(priceValue)
   };
 
   const handleChangeRoyalties = (event) => {
@@ -364,7 +364,7 @@ export default function CreateItem() {
                                     ...paramObj,
                                     '_amount': _tokenSupply,
                                     '_minPrice': BigInt(price*1e18).toString(),
-                                    '_buyoutPrice': BigInt(reservePrice*1e18).toString(),
+                                    '_buyoutPrice': BigInt(buynowPrice*1e18).toString(),
                                     '_endTime': (expirationDate.getTime()/1000).toFixed(),
                                     'beforeSendFunc': ()=>{setReadySignForMint(true)},
                                     'afterSendFunc': ()=>{setReadySignForMint(false)}
@@ -399,7 +399,7 @@ export default function CreateItem() {
                             ...paramObj,
                             '_amount': _tokenSupply,
                             '_minPrice': BigInt(price*1e18).toString(),
-                            '_buyoutPrice': BigInt(reservePrice*1e18).toString(),
+                            '_buyoutPrice': BigInt(buynowPrice*1e18).toString(),
                             '_endTime': (expirationDate.getTime()/1000).toFixed(),
                             'beforeSendFunc': ()=>{setReadySignForMint(true)},
                             'afterSendFunc': ()=>{setReadySignForMint(false)}
@@ -971,36 +971,36 @@ export default function CreateItem() {
                       </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Reserve Price</Typography>
+                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Buy Now Price</Typography>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack direction="row">
                         <InputLabel sx={{ fontSize: 12, flex: 1 }}>
-                          Set reserve price for auction
+                          Set instant purchase price (auction ends immediately after a sale)
                         </InputLabel>
                         <FormControlLabel
-                          control={<CustomSwitch onChange={handleReserveForAuction}/>}
+                          control={<CustomSwitch onChange={handleBuynowForAuction}/>}
                           sx={{mt:-1, mr: 0}}
                           label=""
                         />
                       </Stack>
                     </Grid>
                     {
-                      isReserveForAuction&&
+                      isBuynowForAuction&&
                       <>
                         <Grid item xs={12}>
-                          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Reserve Price</Typography>
+                          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Buy Now Price</Typography>
                         </Grid>
                         <Grid item xs={12}>
                           <FormControl variant="standard" sx={{width: '100%'}}>
                             <InputLabel htmlFor="input-with-price">
-                              Enter reserve price
+                              Enter buy now price
                             </InputLabel>
                             <InputStyle
                               type="number"
                               id="input-with-price"
-                              value={reservePrice}
-                              onChange={handleChangeReservePrice}
+                              value={buynowPrice}
+                              onChange={handleChangeBuynowPrice}
                               startAdornment={' '}
                               endAdornment={
                                 <CoinSelect selected={coinType} onChange={setCoinType}/>
