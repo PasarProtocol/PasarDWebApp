@@ -101,7 +101,7 @@ export default function MarketExplorer() {
   const sessionFilterProps = JSON.parse(sessionStorage.getItem("filter-props")) || {}
   const params = useParams(); // params.key
   const drawerWidth = 360;
-  const btnNames = ["Buy Now", "On Auction", "General", "Avatar", "ELA", "Explicit & Sensitive Content"]
+  const btnNames = ["Buy Now", "On Auction", "Has Bids", "General", "Avatar", "ELA", "Explicit & Sensitive Content"]
   const rangeBtnId = 4
   const adultBtnId = 5
   const emptyRange = {min: '', max: ''}
@@ -146,9 +146,9 @@ export default function MarketExplorer() {
     const newController = new AbortController();
     const {signal} = newController;
     setAbortController(newController);
-    let statusFilter = [...btnNames].splice(0, 2).filter((name, index)=>selectedBtns.indexOf(index)>=0)
+    let statusFilter = [...btnNames].splice(0, 3).filter((name, index)=>selectedBtns.indexOf(index)>=0)
     statusFilter = (statusFilter.length===2 || statusFilter.length===0)?'All':statusFilter[0]
-    let itemTypeFilter = [...btnNames].splice(2, 2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
+    let itemTypeFilter = [...btnNames].splice(3, 2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
     itemTypeFilter = (itemTypeFilter.length===2 || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
