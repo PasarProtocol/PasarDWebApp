@@ -1,4 +1,36 @@
 import { Box } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+const BoxStyle = styled(Box)(({ theme }) => ({
+    position: 'relative',
+    paddingBottom: '100%',
+    height: 0,
+    boxShadow: '#d4d6d8 0px 1px 4px 0px inset, rgb(255 255 255 / 50%) 0px -1px 4px 0px inset',
+    background: (theme)=>theme.palette.grey[200],
+    overflow: 'hidden',
+    '&:after': {
+      content: "''",
+      width: '200%',
+      height: '100%',
+      top: '-90%',
+      left: '-20px',
+      opacity: 0.1,
+      transform: 'rotate(45deg)',
+      background: 'linear-gradient(to top, transparent, #fff 15%, rgba(255,255,255,0.5))',
+      transition: '0.3s',
+      position: 'absolute'
+    },
+    '& .img-box': {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+      display: 'flex'
+    }
+}));
 
 const CardImgBox = (props) => {
     const { src } = props;
@@ -9,26 +41,11 @@ const CardImgBox = (props) => {
       maxHeight: '100%',
     }
     return (
-      <Box sx={{
-          position: 'relative',
-          paddingBottom: '100%',
-          height: 0,
-          boxShadow: '#d4d6d8 0px 1px 4px 0px inset, rgb(255 255 255 / 50%) 0px -1px 4px 0px inset',
-          background: (theme)=>theme.palette.grey[200]
-        }}>
-        <Box sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            alignItems: 'center',
-            justifyContent: 'center',
-            display: 'flex'
-        }}>
+      <BoxStyle className='card-img'>
+        <Box className='img-box'>
           <Box draggable = {false} component="img" src={src} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
         </Box>
-      </Box>
+      </BoxStyle>
     );
 };
 export default CardImgBox

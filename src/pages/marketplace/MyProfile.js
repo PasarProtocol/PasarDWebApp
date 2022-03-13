@@ -305,7 +305,8 @@ export default function MyProfile() {
         </Box>
         <Box
           sx={{
-            width: '100%'
+            width: '100%',
+            m: '-10px'
           }}
         >
           <SwipeableViews
@@ -316,7 +317,7 @@ export default function MyProfile() {
             }}
           >
             {assets.map((group, i) => (
-              <Box key={i} sx={{ minHeight: 200 }}>
+              <Box key={i} sx={{ minHeight: 200, p: '10px' }}>
                 {/* {isLoadingAssets[i] && <LoadingScreen sx={{ background: 'transparent' }} />} */}
                 {!isLoadingAssets[i]?
                   <Box component="main">
