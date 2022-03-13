@@ -613,7 +613,6 @@ export default function CollectibleDetail() {
                 </PaperStyle>
               )
             }
-
           </Grid>
           <Grid item xs={12} sm={6}>
             <PaperStyle sx={{height: '100%', p: '15px 20px', position: 'relative'}}>
