@@ -202,7 +202,7 @@ function MenuDesktopItem(props) {
         // end={path === '/'}
         sx={{
           '&.active': {
-            color: 'primary.main'
+            color: 'text.primary'
           }
         }}
       >
@@ -213,7 +213,7 @@ function MenuDesktopItem(props) {
         sx={{
           cursor: 'pointer',
           '&.active': {
-            color: 'primary.main'
+            color: 'text.primary'
           }
         }}
         onClick={e=>openSignin(path)}
@@ -232,7 +232,7 @@ function MenuDesktopItem(props) {
           // ...(isHome && { color: 'common.white' }),
           // ...(isOffset && { color: 'text.primary' }),
           '&.active': {
-            color: 'primary.main'
+            color: 'text.primary'
           }
         }}
       >

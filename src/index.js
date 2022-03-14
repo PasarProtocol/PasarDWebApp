@@ -66,13 +66,15 @@ const getLibrary = (provider) => {
 ReactDOM.render(
   <HelmetProvider>
     <ReduxProvider store={store}>
-      <SigninProvider>
-        <BrowserRouter>
-          <Web3ReactProvider getLibrary={getLibrary}>
-            <App />
-          </Web3ReactProvider>
-        </BrowserRouter>
-      </SigninProvider>
+      <SettingsProvider>
+        <SigninProvider>
+          <BrowserRouter>
+            <Web3ReactProvider getLibrary={getLibrary}>
+              <App />
+            </Web3ReactProvider>
+          </BrowserRouter>
+        </SigninProvider>
+      </SettingsProvider>
     </ReduxProvider>
   </HelmetProvider>,
   document.getElementById('root')
