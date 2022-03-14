@@ -49,12 +49,12 @@ const DetailItem = (props)=>{
                 {title}
               </Typography>
               <Stack sx={{flexDirection: 'row'}}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                <Typography variant="body2" color='text.secondary' noWrap>
                   {
                     title==="Status"&&(
                       value===0?
                       "Not on sale":(
-                        <Link to={`/marketplace/detail/${params.collection}`} component={RouterLink} sx={{display: 'flex', alignItems: 'center'}}>
+                        <Link to={`/marketplace/detail/${params.collection}`} component={RouterLink} color='text.secondary' sx={{display: 'flex', alignItems: 'center'}}>
                           Listed on Pasar&nbsp;<Icon icon={externalLinkFill} width="17px"/>
                         </Link>
                       )
@@ -63,7 +63,7 @@ const DetailItem = (props)=>{
                   {
                     title!=="Status"&&(
                       (title==="Creator" || title==="Owner")?
-                      <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
+                      <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink} color='text.secondary'>
                         {displayValue}
                       </Link>:
                       displayValue

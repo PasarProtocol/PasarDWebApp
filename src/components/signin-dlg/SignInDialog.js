@@ -504,7 +504,7 @@ export default function SignInDialog() {
                       component="img"
                       alt=""
                       src="/static/elastos.svg"
-                      sx={{ width: 24, height: 24 }}
+                      sx={{ width: 24, height: 24, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}
                     />
                     <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                       <Typography variant="body2"> ELA </Typography>
@@ -564,7 +564,7 @@ export default function SignInDialog() {
               &nbsp;Settings
             </MenuItem> */}
             <MenuItem value="credentials" onClick={closeAccountMenu}>
-              <Box component="img" alt="ico" src='/static/carbon_credentials.svg' sx={{ width: 24 }}/>
+              <Box component="img" alt="ico" src='/static/carbon_credentials.svg' sx={{ width: 24, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}/>
               &nbsp;Credentials
             </MenuItem>
             <MenuItem value="signout" onClick={closeAccountMenu} id="signout">

@@ -30,7 +30,7 @@ export default function MainLogo() {
         >
           <motion.div variants={varFadeIn} style={{ margin: 'auto', display: 'table' }}>
             <Link to='/' component={RouterLink}>
-              <Box draggable = {false} component="img" src="/static/logo-gif.gif" sx={{ width: 220 }} />
+              <Box draggable = {false} component="img" src={`/static/logo-gif-${theme.palette.mode}.gif`} sx={{ width: 220 }} />
             </Link>
           </motion.div>
         </Container>
