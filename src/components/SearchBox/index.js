@@ -25,7 +25,7 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx, needbgcolor }) => {
         width: '100%',
     },
     borderRadius: theme.shape.borderRadiusMd,
-    color: theme.palette.common.black,
+    // color: theme.palette.common.black,
     transition: theme.transitions.create(['box-shadow', 'width'], {
         easing: theme.transitions.easing.easeInOut,
         duration: theme.transitions.duration.shorter
@@ -33,18 +33,18 @@ const SearchStyle = styled(OutlinedInput)(({ theme, sx, needbgcolor }) => {
     '&.Mui-focused': {
         backgroundColor: alpha(theme.palette.common.white, 0.04),
         ...bgColor,
-        boxShadow: 'rgb(190 190 190 / 50%) 0px 4px 8px 0px'
+        boxShadow: theme.palette.mode==='dark'?'rgb(62 76 92) 0px 3px 6px 0px':'rgb(190 190 190 / 50%) 0px 4px 8px 0px'
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#e0e0e0 !important',
+      borderColor: theme.palette.mode==='dark'?'#818e9c !important':'#e0e0e0 !important',
       borderWidth: `2px !important`
     },
     '&.MuiOutlinedInput-root:hover fieldset': {
-      borderColor: '#e0e0e0 !important',
+      borderColor: theme.palette.mode==='dark'?'#818e9c !important':'#e0e0e0 !important',
       borderWidth: `2px !important`
     },
     '& fieldset': {
-        borderWidth: `1px !important`
+      borderWidth: `1px !important`
     },
     input: {
         padding: 8,
