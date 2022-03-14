@@ -27,7 +27,7 @@ const menuConfig = [
     disable: false
   },
   {
-    title: 'Collection',
+    title: 'Collections',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
     path: PATH_PAGE.collection,
     disable: false
