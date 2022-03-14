@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { formatDistance } from 'date-fns';
 import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Box, Stack, Link, Typography } from '@mui/material';
+import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
 import { reduceHexAddress, getAssetImage } from '../../../utils/common';
@@ -11,15 +11,13 @@ import CopyButton from '../../CopyButton';
 
 
 CollectibleItem.propTypes = {
-  news: PropTypes.object.isRequired,
-  isLast: PropTypes.bool.isRequired
+  news: PropTypes.object.isRequired
 };
 
-function CollectibleItem({ news, isLast, sx }) {
+function CollectibleItem({ news }) {
   const { image, title, tokenId, tokenIdHex, postedAt, creator } = news;
-  const style = isLast?{...sx}:{borderBottom: '1px solid', borderColor: 'grey.300', pb: 2, ...sx};
   return (
-      <Stack direction="row" alignItems="center" spacing={2} sx={style}>
+      <Stack direction="row" alignItems="center" spacing={2}>
           <Link to={`/explorer/collectible/detail/${tokenId}`} component={RouterLink} sx={{borderRadius: 1}} >
             <Box
                 draggable = {false}
@@ -31,13 +29,13 @@ function CollectibleItem({ news, isLast, sx }) {
             />
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-              <Typography color="inherit" variant="subtitle2" noWrap>
-                <Link to={`/explorer/collectible/detail/${tokenId}`} component={RouterLink}>
+              <Link to={`/explorer/collectible/detail/${tokenId}`} component={RouterLink} color="text.primary">
+                <Typography variant="subtitle2" noWrap>
                   {title}
-                </Link>
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                <Link to={`/explorer/transaction/detail/${creator}`} component={RouterLink}>
+                </Typography>
+              </Link>
+              <Typography variant="body2" noWrap>
+                <Link to={`/explorer/transaction/detail/${creator}`} component={RouterLink} color="text.secondary">
                   Creator : {reduceHexAddress(creator)}
                 </Link>
                 <CopyButton text={creator}/>
@@ -60,8 +58,8 @@ export default function NewestCollectibles(props) {
     <CollectionView title={props.title} to="collectible">
       {props.isLoading && <LoadingScreen />}
       {props.dataList.map((collectible, index) => (
+        <Box key={index}>
           <CollectibleItem 
-            key={index}
             news={{
               image: getAssetImage(collectible, true),
               title: collectible.name,
@@ -70,8 +68,12 @@ export default function NewestCollectibles(props) {
               tokenId: collectible.tokenId,
               tokenIdHex: collectible.tokenIdHex
             }}
-            isLast={index===props.dataList.length-1}
           />
+          {
+            index<props.dataList.length-1&&
+            <Divider sx={{pb: 2}}/>
+          }
+        </Box>
       ))}
     </CollectionView>
   );

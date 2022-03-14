@@ -15,13 +15,13 @@ const SOCIALS = [
   { name: 'Twitter', icon: twitterFill }
 ];
 
-const RootStyle = styled('div')(({ theme, sx }) => ({
+const RootStyle = styled(Box)(({ theme, sx }) => ({
   ...sx,
   position: 'absolute',
   bottom: 0,
   width: '100%',
   // position: 'relative',
-  backgroundColor: '#c4c4c4',
+  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : '#c4c4c4',
   [theme.breakpoints.down('md')]: {
     display: 'none'
   }
@@ -66,7 +66,7 @@ export default function MainFooter({ hidden, isHome }) {
                 draggable={false}
                 component="img"
                 src="/static/elastos.svg"
-                sx={{ width: 21, display: 'inline', pl: 0.5 }}
+                sx={{ width: 21, display: 'inline', pl: 0.5, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}
               />
             </h3>
             <Typography variant="body2" sx={{ pr: { md: 5 }, color: 'GrayText' }}>
@@ -131,11 +131,14 @@ export default function MainFooter({ hidden, isHome }) {
                 </svg>
               </IconButton>
             </Stack>
-            {/* <Stack
-              direction="row"
-              justifyContent={{ xs: 'center', md: 'flex-end' }}>
-                <ModeSwitch sx={{ mt: 1, mb: 1 }} defaultChecked />
-            </Stack> */}
+            {
+              !isHome&&
+              <Stack
+                direction="row"
+                justifyContent={{ xs: 'center', md: 'flex-end' }}>
+                  <ModeSwitch />
+              </Stack>
+            }
           </Grid>
         </Grid>
         <Grid
