@@ -50,11 +50,11 @@ export default function TransactionListItem({ item }) {
                     <Typography color="inherit" variant="subtitle2" noWrap>
                         Name
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                        <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink}>
+                    <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink} color='text.secondary'>
+                        <Typography variant="body2">
                             {item.name}
-                        </Link>
-                    </Typography>
+                        </Typography>
+                    </Link>
                 </Grid>
                 <Grid item xs={7} sm={3}>
                     <TypographyStyle color="inherit" variant="subtitle2" noWrap align="center" alignsm="right">
@@ -69,7 +69,7 @@ export default function TransactionListItem({ item }) {
                         Tx Hash
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="left">
-                        <Link href={`https://esc.elastos.io/tx/${item.tHash}`} sx={{borderRadius: 1}} target="_blank">
+                        <Link href={`https://esc.elastos.io/tx/${item.tHash}`} color='text.secondary' target="_blank">
                             {reduceHexAddress(item.tHash)}
                             <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                                 <Icon icon={externalLinkFill} width="17px"/>
