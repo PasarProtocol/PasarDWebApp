@@ -9,6 +9,7 @@ import ReactApexChart from 'react-apexcharts';
 import BaseOptionChart from './BaseOptionChart';
 import LoadingScreen from '../LoadingScreen';
 import StatisticItem from '../explorer/StatisticPanel/StatisticItem'
+import useSettings from '../../hooks/useSettings';
 import { dateRangeBeforeDays, fetchFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -33,6 +34,7 @@ const getUTCdate = (date)=>{
 }
 export default function ChartArea({by, is4Address}) {
   const params = useParams();
+  const { themeMode } = useSettings();
   const [period, setPeriod] = useState('a');
   const [volumeType, setType] = useState(by==="address"?1:0);
   const [volumeList, setVolumeList] = useState([]);
@@ -58,9 +60,15 @@ export default function ChartArea({by, is4Address}) {
           }
         }
       },
-      tooltip: { x: { format: 'dd/MM/yy HH:mm' } }
+      tooltip: { x: { format: 'dd/MM/yy HH:mm' }, theme: themeMode }
     });
+  const [optionDates, setOptionDates] = useState([]);
   const [chartOptions, setChartOptions] = useState(mergeChartOption([]));
+  
+  useEffect(() => {
+    setChartOptions(mergeChartOption(optionDates))
+  }, [optionDates, themeMode]);
+
   
   useEffect(async () => {
     if(by!=="address")
@@ -130,7 +138,8 @@ export default function ChartArea({by, is4Address}) {
       if(indexOfDate>=0)
         tempValueArray[indexOfDate] = parseFloat((value/10**18).toFixed(7));
     })
-    setChartOptions(mergeChartOption(dates))
+    setOptionDates(dates)
+    // setChartOptions(mergeChartOption(dates))
     setChartValueArray(tempValueArray)
     setDataPoint([tempValueArray[0], getUTCdate(dates[0])]);
   };
@@ -188,7 +197,7 @@ export default function ChartArea({by, is4Address}) {
               onChange={handleType}
               inputProps={{ 'aria-label': 'Without label' }}
               size="small"
-              sx={{mx: 1}}
+              sx={{mx: 1, '&.Mui-focused fieldset': (theme)=>theme.palette.mode==='dark'?{borderColor: '#919eab52 !important'}:{}}}
             >
               {
                 by==="collectible"?

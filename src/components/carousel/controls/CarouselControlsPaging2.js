@@ -60,7 +60,7 @@ export default function CarouselControlsPaging2({ color, ...other }) {
         <DotStyle
           className="dotActive"
           sx={{
-            bgcolor: color || 'primary.main'
+            bgcolor: color || 'text.primary'
           }}
         />
       </Box>
