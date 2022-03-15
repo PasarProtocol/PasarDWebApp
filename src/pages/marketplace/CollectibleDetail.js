@@ -34,6 +34,7 @@ import PlaceBidDlg from '../../components/dialog/PlaceBid'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
+import StyledButton from '../../components/signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
 import {blankAddress, marketContract, auctionOrderType} from '../../config'
 import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl,
@@ -83,7 +84,7 @@ const AvatarStyle = styled(Box)(({ theme }) => ({
 const StickyPaperStyle = styled(Paper)(({ theme }) => ({
   position: 'sticky',
   bottom: 0,
-  boxShadow: 'rgb(230 230 230) 0px -5px 12px',
+  boxShadow: `${theme.palette.mode==='dark'?'rgb(6 12 20)':'rgb(230 230 230)'} 0px -5px 12px`,
   marginTop: theme.spacing(2),
   padding: theme.spacing(2),
   borderRadius: '16px 16px 0 0'
@@ -314,7 +315,7 @@ export default function CollectibleDetail() {
         sx={{
           py: 6,
           mb: 2,
-          bgcolor: (theme) => (theme.palette.mode === 'light' ? 'grey.200' : 'grey.800')
+          bgcolor: (theme) => (theme.palette.mode === 'light' ? 'grey.200' : '#060c14')
         }}
       >
         <Container maxWidth="lg" align="center" sx={{position: 'relative', px: {sm: 3, md: 12}}}>
@@ -467,7 +468,7 @@ export default function CollectibleDetail() {
                 <Typography variant="subtitle2">Creator</Typography>
                 <Stack direction='row'>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    <Link to={`/profile/others/${collectible.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
+                    <Link to={`/profile/others/${collectible.royaltyOwner}`} component={RouterLink} color='text.primary' sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
                       <Jazzicon address={collectible.royaltyOwner}/>
                       {didName.creator?didName.creator:reduceHexAddress(collectible.royaltyOwner)}
                     </Link>
@@ -495,7 +496,7 @@ export default function CollectibleDetail() {
                 <Typography variant="subtitle2">Owner</Typography>
                 <Stack direction='row'>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    <Link to={`/profile/others/${collectible.holder}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
+                    <Link to={`/profile/others/${collectible.holder}`} component={RouterLink} color='text.primary' sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
                       <Jazzicon address={collectible.holder}/>
                       {didName.owner?didName.owner:reduceHexAddress(collectible.holder)}
                     </Link>
@@ -550,19 +551,19 @@ export default function CollectibleDetail() {
                       {
                         didSignin?
                         <Stack direction="row" spacing={1} sx={{mt: 2}}>
-                          <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
+                          <StyledButton variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
                             Place bid
-                          </Button>
+                          </StyledButton>
                           {
                             collectible.buyoutPrice&&
-                            <Button variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
+                            <StyledButton variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
                               Buy now for {round(collectible.buyoutPrice/1e18, 3)} ELA
-                            </Button>
+                            </StyledButton>
                           }
                         </Stack>:
-                        <Button variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
+                        <StyledButton variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
                           Sign in to Place bid
-                        </Button>
+                        </StyledButton>
                       }
                     </MHidden>
                   }
@@ -585,7 +586,7 @@ export default function CollectibleDetail() {
                         <Typography variant="h4">This item is currently</Typography>
                         <Typography variant="h3" color="origin.main">Not on Sale</Typography>
                         <MHidden width="smDown">
-                          <Button variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}} sx={{mt: 2}}>Go back to Marketplace</Button>
+                          <StyledButton variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}} sx={{mt: 2}}>Go back to Marketplace</StyledButton>
                         </MHidden>
                       </>:
                       <>
@@ -597,12 +598,12 @@ export default function CollectibleDetail() {
                           <MHidden width="smDown">
                             {
                               didSignin?
-                              <Button variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}} sx={{mt: 2}}>
+                              <StyledButton variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}} sx={{mt: 2}}>
                                 Buy
-                              </Button>:
-                              <Button variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
+                              </StyledButton>:
+                              <StyledButton variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
                                 Sign in to Buy
-                              </Button>
+                              </StyledButton>
                             }
                           </MHidden>
                         }
@@ -716,19 +717,19 @@ export default function CollectibleDetail() {
               {
                 didSignin?
                 <Stack direction="row" spacing={1} sx={{mt: 2}}>
-                  <Button variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
+                  <StyledButton variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
                     Place bid
-                  </Button>
+                  </StyledButton>
                   {
                     collectible.buyoutPrice&&
-                    <Button variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
+                    <StyledButton variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
                       Buy now for {round(collectible.buyoutPrice/1e18, 3)} ELA
-                    </Button>
+                    </StyledButton>
                   }
                 </Stack>:
-                <Button variant="contained" fullWidth onClick={openSignin}>
+                <StyledButton variant="contained" fullWidth onClick={openSignin}>
                   Sign in to Place bid
-                </Button>
+                </StyledButton>
               }
             </StickyPaperStyle>
           }
@@ -738,18 +739,18 @@ export default function CollectibleDetail() {
               {
                 collectible.SaleType === "Not on sale"?
                 <StickyPaperStyle>
-                  <Button variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}} sx={{mt: 2}}>Go back to Marketplace</Button>
+                  <StyledButton variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}} sx={{mt: 2}}>Go back to Marketplace</StyledButton>
                 </StickyPaperStyle>:
                 address!==collectible.holder && address!==collectible.royaltyOwner &&
                 <StickyPaperStyle>
                   {
                     didSignin?
-                    <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}}>
+                    <StyledButton variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}}>
                       Buy
-                    </Button>:
-                    <Button variant="contained" fullWidth onClick={openSignin}>
+                    </StyledButton>:
+                    <StyledButton variant="contained" fullWidth onClick={openSignin}>
                       Sign in to Buy
-                    </Button>
+                    </StyledButton>
                   }
                 </StickyPaperStyle>
               }
