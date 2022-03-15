@@ -279,7 +279,7 @@ export default function ImportCollection() {
               ))
             }
             <Grid item xs={12}>
-              <Accordion>
+              <Accordion sx={{bgcolor: 'unset'}}>
                 <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{pl: 0}}>
                   <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
                     Socials&nbsp;<Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>

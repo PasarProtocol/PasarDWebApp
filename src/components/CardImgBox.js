@@ -6,7 +6,7 @@ const BoxStyle = styled(Box)(({ theme }) => ({
     paddingBottom: '100%',
     height: 0,
     boxShadow: `${theme.palette.mode==='dark'?'#141618':'#d4d6d8'} 0px 1px 4px 0px inset, rgb(${theme.palette.mode==='dark'?'0 0 0':'255 255 255'} / 50%) 0px -1px 4px 0px inset`,
-    background: (theme)=>theme.palette.grey[200],
+    background: theme.palette.background.neutral,
     overflow: 'hidden',
     '&:after': {
       content: "''",

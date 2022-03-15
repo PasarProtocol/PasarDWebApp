@@ -31,6 +31,7 @@ import AuctionDlg from '../dialog/Auction';
 import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
 import BadgeProfile from './BadgeProfile'
+import StyledButton from '../signin-dlg/StyledButton';
 import { auctionOrderType } from '../../config';
 import { getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
 
@@ -336,7 +337,7 @@ export default function AssetCard(props) {
             }
             {
               (type===2&&isUnlistedOwnedByMe)&&
-              <Button variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={handleSell}>Sell</Button>
+              <StyledButton variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={handleSell}>Sell</StyledButton>
             }
             {/* {
               type===0&&
