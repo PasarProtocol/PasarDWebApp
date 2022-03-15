@@ -589,6 +589,7 @@ export default function MarketExplorer() {
                   <Button
                     endIcon={<CheckIcon/>}
                     onClick={applyFilterForm}
+                    color='inherit'
                   >
                     Done
                   </Button>

@@ -5,7 +5,7 @@ const BoxStyle = styled(Box)(({ theme }) => ({
     position: 'relative',
     paddingBottom: '100%',
     height: 0,
-    boxShadow: '#d4d6d8 0px 1px 4px 0px inset, rgb(255 255 255 / 50%) 0px -1px 4px 0px inset',
+    boxShadow: `${theme.palette.mode==='dark'?'#141618':'#d4d6d8'} 0px 1px 4px 0px inset, rgb(${theme.palette.mode==='dark'?'0 0 0':'255 255 255'} / 50%) 0px -1px 4px 0px inset`,
     background: (theme)=>theme.palette.grey[200],
     overflow: 'hidden',
     '&:after': {
@@ -16,7 +16,7 @@ const BoxStyle = styled(Box)(({ theme }) => ({
       left: '-20px',
       opacity: 0.1,
       transform: 'rotate(45deg)',
-      background: 'linear-gradient(to top, transparent, #fff 15%, rgba(255,255,255,0.5))',
+      background: `linear-gradient(to top, transparent, ${theme.palette.mode==='dark'?'#ffffff80':'#fff'} 15%, rgba(${theme.palette.mode==='dark'?'0, 0, 0':'255, 255, 255'},0.5))`,
       transition: '0.3s',
       position: 'absolute'
     },

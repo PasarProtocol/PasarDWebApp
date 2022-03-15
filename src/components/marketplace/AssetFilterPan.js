@@ -10,6 +10,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CustomSwitch from '../custom-switch';
 import SearchBox from '../SearchBox';
 import Scrollbar from '../Scrollbar';
+import StyledButton from '../signin-dlg/StyledButton';
 import {coinTypes} from '../../utils/common'
 // ----------------------------------------------------------------------
 const DrawerStyle = styled(Drawer)(({ theme }) => ({
@@ -19,6 +20,7 @@ const DrawerStyle = styled(Drawer)(({ theme }) => ({
     }
   },
   '& .MuiDrawer-paper': {
+    backgroundColor: 'unset',
     boxSizing: 'border-box',
     transition: theme.transitions.create(['top'], {
       easing: theme.transitions.easing.easeInOut,
@@ -26,7 +28,9 @@ const DrawerStyle = styled(Drawer)(({ theme }) => ({
     }),
   }
 }));
-
+const AccordionStyle = styled(Accordion)(({ theme }) => ({
+  backgroundColor: 'unset'
+}))
 export default function AssetFilterPan(props){
   const {sx, scrollMaxHeight, btnNames, collections, filterProps, handleFilter} = props
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
@@ -82,7 +86,7 @@ export default function AssetFilterPan(props){
       <Scrollbar sx={{maxHeight: scrollMaxHeight, px: 1}}>
         <Grid container width="100%">
           <Grid item xs={12} md={12}>
-            <Accordion
+            <AccordionStyle
               defaultExpanded={1&&true}
             >
               <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
@@ -93,21 +97,21 @@ export default function AssetFilterPan(props){
                 {
                   [...btnNames].splice(0,3).map((name, index)=>(
                     filterProps.selectedBtns?
-                    <Button key={index} variant={filterProps.selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index)}>
+                    <Button key={index} variant={filterProps.selectedBtns.includes(index)?"contained":"outlined"} color="inherit" onClick={()=>handleFilter('statype', index)}>
                       {name}
                     </Button>:
-                    <Button key={index} variant="outlined" color="primary" onClick={()=>handleFilter('statype', index)}>
+                    <Button key={index} variant="outlined" color="inherit" onClick={()=>handleFilter('statype', index)}>
                       {name}
                     </Button>
                   ))
                 }
                 </Stack>
               </AccordionDetails>
-            </Accordion>
+            </AccordionStyle>
             <Divider />
           </Grid>
           <Grid item xs={12} md={12}>
-            <Accordion
+            <AccordionStyle
               defaultExpanded={1&&true}
             >
               <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
@@ -131,7 +135,7 @@ export default function AssetFilterPan(props){
                   >
                     <MenuItem value={0}>
                       <ListItemIcon>
-                        <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
+                        <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
                       </ListItemIcon>
                       <ListItemText primary="Elastos (ELA)" />
                     </MenuItem>
@@ -150,16 +154,16 @@ export default function AssetFilterPan(props){
                   <FormControl error={isErrRangeInput} variant="standard" sx={isErrRangeInput?{mt: '0 !important'}:{display: 'none'}}>
                     <FormHelperText id="name-error-text">Max value must be higher than min value</FormHelperText>
                   </FormControl>
-                  <Button variant="contained" color="primary" width="100%" onClick={applyRange}>
+                  <StyledButton variant="contained" fullWidth onClick={applyRange}>
                     Apply
-                  </Button>
+                  </StyledButton>
                 </Stack>
               </AccordionDetails>
-            </Accordion>
+            </AccordionStyle>
             <Divider />
           </Grid>
           <Grid item xs={12} md={12}>
-            <Accordion
+            <AccordionStyle
               defaultExpanded={1&&true}
             >
               <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
@@ -169,7 +173,7 @@ export default function AssetFilterPan(props){
                 <SearchBox sx={{width: '100%', mb: 1}} placeholder="Search collections" onChange={searchCollections}/>
                 <Scrollbar sx={{maxHeight: 200}}>
                   <List
-                    sx={{ width: '100%', bgcolor: 'background.paper', pt: 0 }}
+                    sx={{ width: '100%', bgcolor: 'unset', pt: 0 }}
                     component="nav"
                     aria-labelledby="nested-list-subheader"
                   >
@@ -189,11 +193,11 @@ export default function AssetFilterPan(props){
                   </List>
                 </Scrollbar>
               </AccordionDetails>
-            </Accordion>
+            </AccordionStyle>
             <Divider />
           </Grid>
           <Grid item xs={12} md={12}>
-            <Accordion
+            <AccordionStyle
               defaultExpanded={1&&true}
             >
               <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
@@ -204,21 +208,21 @@ export default function AssetFilterPan(props){
                 {
                   [...btnNames].splice(3,2).map((name, index)=>(
                     filterProps.selectedBtns?
-                    <Button key={index} variant={filterProps.selectedBtns.includes(index+2)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index+2)}>
+                    <Button key={index} variant={filterProps.selectedBtns.includes(index+2)?"contained":"outlined"} color="inherit" onClick={()=>handleFilter('statype', index+2)}>
                       {name}
                     </Button>:
-                    <Button key={index} variant="outlined" color="primary" onClick={()=>handleFilter('statype', index+2)}>
+                    <Button key={index} variant="outlined" color="inherit" onClick={()=>handleFilter('statype', index+2)}>
                       {name}
                     </Button>
                   ))
                 }
                 </Stack>
               </AccordionDetails>
-            </Accordion>
+            </AccordionStyle>
             <Divider />
           </Grid>
           <Grid item xs={12} md={12}>
-            <Accordion
+            <AccordionStyle
               defaultExpanded={1&&true}
             >
               <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
@@ -228,7 +232,7 @@ export default function AssetFilterPan(props){
                 <SearchBox sx={{width: '100%', mb: 1}} placeholder="Search tokens" onChange={searchTokens}/>
                 <Scrollbar sx={{maxHeight: 200}}>
                   <List
-                    sx={{ width: '100%', bgcolor: 'background.paper', pt: 0 }}
+                    sx={{ width: '100%', bgcolor: 'unset', pt: 0 }}
                     component="nav"
                     aria-labelledby="nested-list-subheader"
                   >
@@ -236,7 +240,16 @@ export default function AssetFilterPan(props){
                       filterTokens.map((el, i)=>(
                         <ListItemButton key={i} onClick={()=>{selectToken(el.name)}} selected={filterProps.selectedTokens.includes(el.name)}>
                           <ListItemIcon>
-                            <Box draggable = {false} component="img" src={`/static/${el.icon}`} sx={{ width: 24, height: 24 }} />
+                            <Box 
+                              draggable = {false}
+                              component="img"
+                              src={`/static/${el.icon}`}
+                              sx={{
+                                width: 24,
+                                height: 24,
+                                filter: (theme)=>theme.palette.mode==='dark'&&el.icon==='elastos.svg'?'invert(1)':'none'
+                              }} 
+                            />
                           </ListItemIcon>
                           <ListItemText primary={el.name} />
                           {
@@ -248,11 +261,11 @@ export default function AssetFilterPan(props){
                   </List>
                 </Scrollbar>
               </AccordionDetails>
-            </Accordion>
+            </AccordionStyle>
             <Divider />
           </Grid>
           <Grid item xs={12} md={12}>
-            <Accordion
+            <AccordionStyle
               defaultExpanded={1&&true}
             >
               <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
@@ -267,7 +280,7 @@ export default function AssetFilterPan(props){
                   sx={{ml:2, pr:2}}
                 />
               </AccordionDetails>
-            </Accordion>
+            </AccordionStyle>
             <Divider />
           </Grid>
         </Grid>
