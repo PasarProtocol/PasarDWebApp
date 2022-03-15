@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
-import { Box, Stack, Link, Typography, IconButton } from '@mui/material';
+import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import { Icon } from '@iconify/react';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import palette from '../../theme/palette'
@@ -16,9 +16,8 @@ TransItem.propTypes = {
   isLast: PropTypes.bool.isRequired
 };
 function TransItem(props) {
-  const { trans, creator, isLast } = props
+  const { trans, creator } = props
   const [didName, setDidName] = React.useState('');
-  const sx = isLast?{}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2};
   let methodItem = MethodList.find((item)=>item.method===trans.event)
   if(!methodItem)
       methodItem = {color: 'grey', icon: 'tag', detail: []}
@@ -39,7 +38,7 @@ function TransItem(props) {
   }, [subject]);
 
   return (
-      <Stack direction="row" spacing={2} sx={sx}>
+      <Stack direction="row" spacing={2}>
           <Link to={`/explorer/transaction/${trans.tHash}`} component={RouterLink} underline="none" sx={{borderRadius: 1}} >
             <Box
                 component="img"
@@ -72,12 +71,16 @@ export default function CollectibleHistory(props) {
     <Stack spacing={2}>
       {props.isLoading && <LoadingScreen />}
       {props.dataList.map((trans, index) => (
+        <Box key={index}>
           <TransItem 
-            key={index}
             trans={trans}
             creator={props.creator}
-            isLast={index===props.dataList.length-1}
           />
+          {
+            index<props.dataList.length-1&&
+            <Divider sx={{pb: 2}}/>
+          }
+        </Box>
       ))}
     </Stack>
   );
