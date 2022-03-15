@@ -106,7 +106,7 @@ export default function BadgeProfile(props) {
                   type===1?
                   <Typography variant='h5' sx={{ pt: 2 }}>{title}</Typography>:
 
-                  <Link to={`/profile/others/${walletAddress}`} component={RouterLink}>
+                  <Link to={`/profile/others/${walletAddress}`} component={RouterLink} color='text.primary'>
                     <Typography variant='h5' sx={{ pt: 2 }}>{title}</Typography>
                   </Link>
                 }
@@ -115,7 +115,7 @@ export default function BadgeProfile(props) {
                     type===1?
                     <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{dispAddress}</Typography>:
 
-                    <Link to={`/profile/others/${walletAddress}`} component={RouterLink}>
+                    <Link to={`/profile/others/${walletAddress}`} component={RouterLink} color='text.primary'>
                       <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{dispAddress}</Typography>
                     </Link>
                   )

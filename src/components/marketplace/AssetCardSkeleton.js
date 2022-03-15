@@ -3,13 +3,20 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { Box, Stack } from '@mui/material';
 import PaperRecord from '../PaperRecord';
+import useSettings from '../../hooks/useSettings';
 
 // ----------------------------------------------------------------------
 
 export default function AssetCardSkeleton() {
+  const { themeMode } = useSettings();
+  const themeProp = {}
+  if(themeMode==="dark"){
+    themeProp.baseColor = '#161c24'
+    themeProp.highlightColor = '#282e34'
+  }
   return (
       <PaperRecord>
-        {/* <SkeletonTheme borderRadius="0.5rem"> */}
+        <SkeletonTheme {...themeProp}>
           <Stack direction="row" spacing={.5} sx={{p:2, pb: 1}}>
             <Skeleton circle width={26} height={26}/>
             <Skeleton circle width={26} height={26}/>
@@ -19,7 +26,7 @@ export default function AssetCardSkeleton() {
             <h3><Skeleton/></h3>
             <h3><Skeleton/></h3>
           </Box>
-        {/* </SkeletonTheme> */}
+        </SkeletonTheme>
       </PaperRecord>
   )
 }
