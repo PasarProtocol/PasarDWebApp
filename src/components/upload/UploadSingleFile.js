@@ -56,7 +56,7 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, sx, 
         py: 1,
         px: 2,
         mt: 3,
-        borderColor: 'error.light',
+        borderColor: (theme)=>`error.${theme.palette.mode}`,
         bgcolor: (theme) => alpha(theme.palette.error.main, 0.08)
       }}
     >
@@ -86,8 +86,8 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, sx, 
           ...(isDragActive && { opacity: 0.72 }),
           ...((isDragReject || error) && {
             color: 'error.main',
-            borderColor: 'error.light',
-            bgcolor: 'error.lighter'
+            borderColor: (theme)=>`error.${theme.palette.mode}`,
+            bgcolor: (theme)=>`error.${theme.palette.mode}er`
           }),
           ...(file && { p: 8 })
         }}
