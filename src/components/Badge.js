@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import { Stack, Box, Typography } from '@mui/material';
 
+import { customShadows } from '../theme/shadows';
 // ----------------------------------------------------------------------
 
 Badge.propTypes = {
@@ -20,7 +21,7 @@ export default function Badge({ name, value="", sx }) {
         backgroundColor: color,
         borderRadius: '100%',
         p: value.length?'5px 10px':'3px',
-        boxShadow: (theme)=>theme.customShadows.origin,
+        boxShadow: (theme)=>theme.palette.mode==='light'?customShadows.dark.origin:customShadows.light.origin,
         ...sx
       }}
     >

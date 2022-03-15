@@ -215,6 +215,7 @@ export default function MyProfile() {
               }
               to='edit'
               sx={{position: 'absolute'}}
+              color='inherit'
             >
               Edit Profile
             </Button>
@@ -237,7 +238,7 @@ export default function MyProfile() {
             />
           </Box>
           <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
-            <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink}>
+            <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink} color='text.primary'>
               <span role="img" aria-label="">
                 {didInfo.name || reduceHexAddress(walletAddress)}
               </span>
