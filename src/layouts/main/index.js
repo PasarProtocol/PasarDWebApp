@@ -9,6 +9,7 @@ import { useLocation, Outlet } from 'react-router-dom';
 // material
 import { Box } from '@mui/material';
 // components
+import useSettings from '../../hooks/useSettings';
 import MainNavbar from './MainNavbar';
 import MainFooter from './MainFooter';
 
@@ -56,6 +57,7 @@ const BodyStyle = styled('div')(({ theme, footerhidden }) => (
 ));
 
 export default function MainLayout() {
+  const { themeMode } = useSettings();
   const { pathname } = useLocation();
   const isHome = pathname === '/';
   const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create' || pathname === '/create/' || pathname.startsWith('/marketplace/search');
@@ -67,7 +69,7 @@ export default function MainLayout() {
       </BodyStyle>
       <MainFooter hidden={isFooterHiddenPage} isHome={isHome}/>
       <ScrollTop>
-        <Fab variant="contained" size="small" aria-label="scroll back to top">
+        <Fab variant="contained" size="small" aria-label="scroll back to top" color={themeMode==='light'?'primary':'default'}>
           <KeyboardArrowUpIcon />
         </Fab>
       </ScrollTop>
