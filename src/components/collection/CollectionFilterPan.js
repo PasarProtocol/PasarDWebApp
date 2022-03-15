@@ -130,7 +130,7 @@ export default function CollectionFilterPan(props){
                 >
                   <MenuItem value={0}>
                     <ListItemIcon>
-                      <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline' }} />
+                      <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
                     </ListItemIcon>
                     <ListItemText primary="Elastos (ELA)" />
                   </MenuItem>

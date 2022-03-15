@@ -44,7 +44,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
   padding: '2px 8px',
   backdropFilter: 'blur(6px)',
   // background: alpha(theme.palette.background.default, 0.5),
-  background: 'linear-gradient(#fff, #fff) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box',
+  background: `linear-gradient(${theme.palette.background.paper}, ${theme.palette.background.paper}) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box`,
   border: '2px solid transparent'
 }));
 
@@ -323,7 +323,7 @@ export default function AssetCard(props) {
             {
               (type===0||type===1||type===2&&(isListedOwnedByMe)||type===2&&isListedByOthers)&&
               <Typography variant="h5" sx={{color: "origin.main"}} noWrap>
-                <Box component="img" src={`/static/${coinTypes[coinType].icon}`} sx={{ width: 18, display: 'inline' }} />
+                <Box component="img" src={`/static/${coinTypes[coinType].icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType===0?'invert(1)':'none' }} />
                 &nbsp;{price} {coinTypes[coinType].name}&nbsp;
                 <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline-flex', alignItems: 'end'}}>≈ USD {math.round(coinUSD * price, 2)}</Typography>
               </Typography>
