@@ -67,7 +67,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
         py: 1,
         px: 2,
         mt: 3,
-        borderColor: 'error.light',
+        borderColor: (theme)=>`error.${theme.palette.mode}`,
         bgcolor: (theme) => alpha(theme.palette.error.main, 0.08)
       }}
     >
@@ -98,8 +98,8 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
           ...(isDragActive && { opacity: 0.72 }),
           ...((isDragReject || error) && {
             color: 'error.main',
-            borderColor: 'error.light',
-            bgcolor: 'error.lighter'
+            borderColor: (theme)=>`error.${theme.palette.mode}`,
+            bgcolor: (theme)=>`error.${theme.palette.mode}er`
           })
         }}
         onClick={(e)=>e.preventDefault()}
@@ -221,7 +221,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
 
       {hasFile && (
         <Stack direction="row" justifyContent="flex-end">
-          <Button onClick={onRemoveAll} sx={{ mr: 1.5 }}>
+          <Button onClick={onRemoveAll} sx={{ mr: 1.5 }} color='inherit'>
             Remove all
           </Button>
           {/* <Button variant="contained">Upload files</Button> */}
