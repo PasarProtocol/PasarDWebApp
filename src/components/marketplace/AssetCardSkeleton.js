@@ -2,17 +2,17 @@ import React from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { Box, Stack } from '@mui/material';
+
 import PaperRecord from '../PaperRecord';
 import useSettings from '../../hooks/useSettings';
-
 // ----------------------------------------------------------------------
 
 export default function AssetCardSkeleton() {
   const { themeMode } = useSettings();
   const themeProp = {}
   if(themeMode==="dark"){
-    themeProp.baseColor = '#161c24'
-    themeProp.highlightColor = '#282e34'
+    themeProp.baseColor = '#333d48'
+    themeProp.highlightColor = '#434d58'
   }
   return (
       <PaperRecord>

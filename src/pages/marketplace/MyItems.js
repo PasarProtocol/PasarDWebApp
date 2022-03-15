@@ -222,7 +222,7 @@ export default function MyItems() {
             />
           </Box>
           <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
-            <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink}>
+            <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink} color='text.primary'>
               <span role="img" aria-label="">
                 {didInfo.name || reduceHexAddress(walletAddress)}
               </span>
