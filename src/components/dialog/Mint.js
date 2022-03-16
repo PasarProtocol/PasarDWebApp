@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useTheme } from '@mui/material/styles';
+
 import TransLoadingButton from '../TransLoadingButton';
 import useMintDlg from '../../hooks/useMintDlg';
 
 export default function Mint(props) {
   const { totalSteps } = props
   const {current, isOpenMint, isOpenAccess, setOpenMintDlg, isReadySignForMint} = useMintDlg()
+  const theme = useTheme();
+
   const handleClose = () => {
     setOpenMintDlg(false)
   };
@@ -31,7 +35,7 @@ export default function Mint(props) {
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
           {current===1?"Create Item":"List on Market"}
         </Typography>
-        <Box draggable = {false} component="img" src="/static/loading-light.gif" sx={{width: 100, m:'auto'}} />
+        <Box draggable = {false} component="img" src={`/static/loading-${theme.palette.mode}.gif`} sx={{width: 100, m:'auto'}} />
         {
           isReadySignForMint?
           <TransLoadingButton loading={Boolean(true)}/>:
