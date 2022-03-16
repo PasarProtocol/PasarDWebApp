@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import {Select, MenuItem, TextField, Dialog, DialogContent, Typography, Stack, Button} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import {Box, Select, MenuItem, TextField, Dialog, DialogContent, Typography, Stack, Button} from '@mui/material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import CalendarPicker from '@mui/lab/CalendarPicker';
 import { addDays } from 'date-fns';
 import PropTypes from 'prop-types';
 import { useSnackbar } from 'notistack';
+import StyledButton from '../signin-dlg/StyledButton';
 import {getTime, getDateTimeString, getTimeZone} from '../../utils/common'
 
 const MenuProps = {
@@ -21,6 +23,13 @@ const MenuProps = {
 }
 const menuItems = ['1 day', '3 days', '5 days', '7 days', 'Pick a specific date']
 const pickDateIndex = 4
+
+const CalendarBoxStyle = styled(Box)(({ theme }) => ({
+  '& .MuiCalendarPicker-root button.Mui-selected': {
+      color: theme.palette.background.paper,
+      backgroundColor: theme.palette.text.primary
+  }
+}));
 export default function ExpirationDateSelect({ onChangeDate }) {
   const [selected, onChange] = React.useState(0);
   const [dateValue, setDateValue] = useState(new Date());
@@ -100,9 +109,11 @@ export default function ExpirationDateSelect({ onChangeDate }) {
       </Select>
       <Dialog open={isOpenPicker} onClose={handleClosePicker}>
         <DialogContent>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <CalendarPicker disablePast date={dateValue} onChange={handleDateChange} />
-          </LocalizationProvider>
+          <CalendarBoxStyle>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <CalendarPicker disablePast date={dateValue} onChange={handleDateChange}/>
+            </LocalizationProvider>
+          </CalendarBoxStyle>
           <Stack direction='row' sx={{mb: 1}}>
             <Typography variant="body2" component="div" sx={{flexGrow: 1}}>
               <Typography variant="h6" sx={{display: 'block'}}>Select time</Typography>
@@ -119,8 +130,9 @@ export default function ExpirationDateSelect({ onChangeDate }) {
                   cursor: 'pointer',
                   p: 1,
                   border: '1px solid',
-                  borderColor: (theme) => theme.palette.grey[400],
-                  borderRadius: '100%'
+                  borderColor: (theme) => theme.palette.mode==='dark'?theme.palette.grey[800]:theme.palette.grey[400],
+                  borderRadius: '100%',
+                  filter: (theme) => `invert(${theme.palette.mode==='dark'?1:0})`
                 },
                 '& input[type="time"]::-webkit-calendar-picker-indicator:hover': {
                   borderColor: (theme) => theme.palette.grey[500]
@@ -131,9 +143,9 @@ export default function ExpirationDateSelect({ onChangeDate }) {
               onChange={handleTimeChange}
             />
           </Stack>
-          <Button variant="contained" onClick={handleSpecificDate} fullWidth>
+          <StyledButton variant="contained" onClick={handleSpecificDate} fullWidth>
             Apply
-          </Button>
+          </StyledButton>
         </DialogContent>
       </Dialog>
     </>

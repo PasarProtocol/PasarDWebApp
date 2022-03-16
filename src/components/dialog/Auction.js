@@ -19,14 +19,9 @@ import useSingin from '../../hooks/useSignin';
 import StartingDateSelect from '../marketplace/StartingDateSelect'
 import ExpirationDateSelect from '../marketplace/ExpirationDateSelect'
 import CoinSelect from '../marketplace/CoinSelect';
+import { InputStyle, InputLabelStyle } from '../CustomInput';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString } from '../../utils/common';
-
-const InputStyle = styled(Input)(({ theme }) => ({
-  '&:before': {
-    borderWidth: 0
-  }
-}));
 
 export default function Auction(props) {
   const { isOpen, setOpen, title, tokenId, updateCount, handleUpdate } = props;
@@ -198,7 +193,7 @@ export default function Auction(props) {
           Starting Price
         </Typography>
         <FormControl variant="standard" sx={{ width: '100%' }}>
-          <InputLabel htmlFor="input-with-price">Enter starting price</InputLabel>
+          <InputLabelStyle htmlFor="input-with-price">Enter starting price</InputLabelStyle>
           <InputStyle
             type="number"
             id="input-with-price"
