@@ -154,6 +154,7 @@ export default function AssetCard(props) {
             mb: '2px',
             position: 'relative',
             transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+            transform: 'translateY(0px)',
             '&:hover': {
               boxShadow: '0 4px 8px 0px rgb(0 0 0 / 30%)',
               transform: 'translateY(-4px)',
