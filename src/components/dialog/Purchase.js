@@ -13,6 +13,7 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
+import StyledButton from '../signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser } from '../../utils/common';
 
@@ -265,7 +266,7 @@ export default function Purchase(props) {
           </Grid>
           <Grid item xs={12}>
             <Stack direction="row">
-              <Typography variant="body2" display="block" gutterBottom sx={{ flex: 1 }} color="red">
+              <Typography variant="body2" display="block" gutterBottom sx={{ flex: 1 }} color="origin.main">
                 You will pay
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right">
@@ -290,14 +291,14 @@ export default function Purchase(props) {
         ) : (
           <>
             <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-              <Button
+              <StyledButton
                 variant="outlined"
                 href="https://glidefinance.io/swap"
                 target="_blank"
                 fullWidth
               >
                 Add funds
-              </Button>
+              </StyledButton>
             </Box>
             <Typography variant="body2" display="block" color="red" gutterBottom align="center">
               Insufficient funds in ELA

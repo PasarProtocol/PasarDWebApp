@@ -13,18 +13,13 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
+import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, coinTypes } from '../../utils/common';
 
-const InputStyle = styled(Input)(({ theme }) => ({
-  '&:before': {
-    borderWidth: 0
-  }
-}));
-
 const CoinTypeLabel = ({type})=>(
   <Box sx={{display: 'contents'}}>
-    <Box draggable={false} component="img" src={`/static/${coinTypes[type].icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coinTypes[type].name}
+    <Box draggable={false} component="img" src={`/static/${coinTypes[type].icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&type===0?'invert(1)':'none' }} />&nbsp;{coinTypes[type].name}
   </Box>
 )
 export default function PlaceBid(props) {
@@ -242,7 +237,7 @@ export default function PlaceBid(props) {
           </Grid>
           <Grid item xs={12}>
             <FormControl variant="standard" sx={{ width: '100%' }}>
-              <InputLabel htmlFor="input-with-price">Enter bid amount</InputLabel>
+              <InputLabelStyle htmlFor="input-with-price">Enter bid amount</InputLabelStyle>
               <InputStyle
                 type="number"
                 id="input-with-price"

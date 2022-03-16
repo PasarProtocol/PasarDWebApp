@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import StyledButton from '../signin-dlg/StyledButton';
 
 export default function NeedBuyDIA(props) {
   const context = useWeb3React();
@@ -62,14 +63,14 @@ export default function NeedBuyDIA(props) {
           </Grid>
         </Grid>
         <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-          <Button
+          <StyledButton
             variant="contained"
             href="https://glidefinance.io/swap"
             target="_blank"
             fullWidth
           >
             Buy DIA
-          </Button>
+          </StyledButton>
         </Box>
         <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
           We do not own your private keys and cannot access your funds

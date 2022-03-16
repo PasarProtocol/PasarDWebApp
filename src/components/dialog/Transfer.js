@@ -10,6 +10,8 @@ import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import arrowIosUpwardFill from '@iconify/icons-eva/arrow-ios-upward-fill';
 import { useSnackbar } from 'notistack';
+
+import { InputStyle, InputLabelStyle } from '../CustomInput';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import {
   stickerContract as CONTRACT_ADDRESS,
@@ -18,12 +20,6 @@ import {
 import { reduceHexAddress, removeLeadingZero, isInAppBrowser } from '../../utils/common';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
-
-const InputStyle = styled(Input)(({ theme }) => ({
-    '&:before': {
-        borderWidth: 0
-    }
-}));
 
 export default function Transfer(props) {
     const {isOpen, setOpen, title, tokenId, updateCount, handleUpdate} = props
@@ -130,9 +126,9 @@ export default function Transfer(props) {
                 </Grid>
                 <Grid item xs={12}>
                   <FormControl variant="standard" error={isOnValidation&&!address.length} sx={{width: '100%'}}>
-                    <InputLabel htmlFor="input-with-price">
+                    <InputLabelStyle htmlFor="input-with-price">
                       Enter recipient wallet address
-                    </InputLabel>
+                    </InputLabelStyle>
                     <InputStyle
                       id="input-with-price"
                       value={address}
@@ -158,9 +154,9 @@ export default function Transfer(props) {
                     </Grid>
                     <Grid item xs={12}>
                       <FormControl variant="standard" sx={{width: '100%'}}>
-                        <InputLabel htmlFor="input-with-price">
+                        <InputLabelStyle htmlFor="input-with-price">
                           Enter memo Transferred via Pasar
-                        </InputLabel>
+                        </InputLabelStyle>
                         <InputStyle
                           id="input-with-price"
                           value={memo}

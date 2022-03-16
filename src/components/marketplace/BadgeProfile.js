@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Link as RouterLink } from 'react-router-dom';
 // material
-import { useTheme, styled } from '@mui/material/styles';
 import { Box, Stack, Typography, Menu, Popover, Popper, Tooltip, Link, Fade } from '@mui/material';
 
 import Badge from '../Badge';
@@ -18,8 +17,8 @@ const AvatarBoxStyle = {
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: '100%',
-  background:
-    'linear-gradient(#fff, #fff) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box',
+  background: (theme)=>
+    `linear-gradient(${theme.palette.background.paper}, ${theme.palette.background.paper}) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box`,    
   border: '2px solid transparent'
 }
 
