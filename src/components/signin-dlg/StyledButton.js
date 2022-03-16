@@ -41,10 +41,10 @@ export default function StyledButton(props) {
   const ButtonStyle = styled(Button)(
     ({ theme }) =>
       !isLight && {
-        backgroundColor: 'white',
-        color: theme.palette.background.default,
+        backgroundColor: theme.palette.grey[700],
+        color: theme.palette.text.primary,
         '&:hover': {
-          backgroundColor: theme.palette.action.active
+          backgroundColor: theme.palette.grey[600]
         }
       }
   );

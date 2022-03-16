@@ -1161,9 +1161,9 @@ export default function CreateItem() {
               }
               <MHidden width="smDown">
                 <Grid item xs={12}>
-                  <LoadingButtonStyled loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
+                  <LoadingButton loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
                     Create
-                  </LoadingButtonStyled>
+                  </LoadingButton>
                 </Grid>
               </MHidden>
             </Grid>
@@ -1226,9 +1226,9 @@ export default function CreateItem() {
           </Grid>
           <MHidden width="smUp">
             <Grid item xs={12}>
-              <LoadingButtonStyled loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
+              <LoadingButton loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
                 Create
-              </LoadingButtonStyled>
+              </LoadingButton>
             </Grid>
           </MHidden>
         </Grid>
