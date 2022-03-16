@@ -3,10 +3,16 @@ import { LoadingButton } from '@mui/lab';
 
 const LoadingButtonStyled = styled(LoadingButton)(({ theme }) => ({
   minWidth: 200,
+  backgroundColor: theme.palette.text.primary,
+  color: theme.palette.background.default,
+  '&:hover': theme.palette.mode==='dark'?{
+    backgroundColor: theme.palette.action.active
+  }:{},
   '&.Mui-disabled': {
     paddingLeft: 40,
     color: theme.palette.origin.main,
-    borderColor: theme.palette.origin.main
+    borderColor: theme.palette.origin.main,
+    backgroundColor: 'unset'
   }
 }));
 

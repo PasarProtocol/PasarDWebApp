@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import {coinTypes} from '../../utils/common'
 
 export default function CoinSelect({ selected, onChange }) {
-  // const [selected, setSelected] = useState(0);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
 
   const openPopupMenu = (event) => {
@@ -16,14 +15,14 @@ export default function CoinSelect({ selected, onChange }) {
     setOpenPopup(null);
   };
   const handleSelect = (index) => {
-    // setSelected(index)
     onChange(index)
     handleClosePopup();
   }
   return (
     <>
       <Button color="inherit" size="small" sx={{px: 1, py: .5}} onClick={openPopupMenu}>
-        <Box component="img" src={`/static/${coinTypes[selected].icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coinTypes[selected].name}
+        <Box component="img" src={`/static/${coinTypes[selected].icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&selected===0?'invert(1)':'none' }} />
+        &nbsp;{coinTypes[selected].name}&nbsp;
         <Icon icon={arrowIosDownwardFill} width={20} height={20}/>
       </Button>
       <Menu 
@@ -37,7 +36,7 @@ export default function CoinSelect({ selected, onChange }) {
       >
         {coinTypes.map((coin, index)=>(
           <MenuItem key={index} onClick={()=>{handleSelect(index)}} selected={index===selected}>
-            <Box component="img" src={`/static/${coin.icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coin.name}
+            <Box component="img" src={`/static/${coin.icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&index===0?'invert(1)':'none' }} />&nbsp;{coin.name}
           </MenuItem>
         ))}
       </Menu>
