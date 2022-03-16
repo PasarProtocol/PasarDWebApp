@@ -10,13 +10,8 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import CoinSelect from '../marketplace/CoinSelect';
 import TransLoadingButton from '../TransLoadingButton';
+import { InputStyle, InputLabelStyle } from '../CustomInput';
 import { removeLeadingZero, isInAppBrowser, coinTypes } from '../../utils/common';
-
-const InputStyle = styled(Input)(({ theme }) => ({
-  '&:before': {
-    borderWidth: 0
-  }
-}));
 
 export default function UpdatePrice(props) {
   const { isOpen, setOpen, title, orderId, updateCount, handleUpdate } = props;
@@ -120,7 +115,7 @@ export default function UpdatePrice(props) {
           </Grid>
           <Grid item xs={12}>
             <FormControl variant="standard" sx={{ width: '100%' }}>
-              <InputLabel htmlFor="input-with-price">Enter a fixed price of each item</InputLabel>
+              <InputLabelStyle htmlFor="input-with-price">Enter a fixed price of each item</InputLabelStyle>
               <InputStyle
                 type="number"
                 id="input-with-price"
