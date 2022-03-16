@@ -39,6 +39,7 @@ const CardImgBox = (props) => {
       // boxShadow: (theme)=>theme.customShadows.z16,
       display: 'inline-flex',
       maxHeight: '100%',
+      p: '1px'
     }
     return (
       <BoxStyle className='card-img'>

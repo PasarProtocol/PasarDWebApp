@@ -14,13 +14,8 @@ import {
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
+import { InputStyle, InputLabelStyle } from '../CustomInput';
 import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes } from '../../utils/common';
-
-const InputStyle = styled(Input)(({ theme }) => ({
-  '&:before': {
-    borderWidth: 0
-  }
-}));
 
 export default function Sell(props) {
   const { isOpen, setOpen, title, tokenId, updateCount, handleUpdate } = props;
@@ -156,7 +151,7 @@ export default function Sell(props) {
           </Grid>
           <Grid item xs={12}>
             <FormControl variant="standard" sx={{ width: '100%' }}>
-              <InputLabel htmlFor="input-with-price">Enter a fixed price of each item</InputLabel>
+              <InputLabelStyle htmlFor="input-with-price">Enter a fixed price of each item</InputLabelStyle>
               <InputStyle
                 type="number"
                 id="input-with-price"
