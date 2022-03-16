@@ -10,7 +10,7 @@ import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosf
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import Page from '../../components/Page';
-import Jazzicon from '../../components/Jazzicon';
+import RingAvatar from '../../components/RingAvatar';
 import CustomSwitch from '../../components/custom-switch';
 import ElastosConnectivityService from '../../utils/elastosConnectivityService';
 import useSingin from '../../hooks/useSignin';
@@ -141,23 +141,11 @@ export default function EditProfile() {
           </Grid>
           <Grid item xs={5}>
             <Typography variant="h4" sx={{fontWeight: 'normal'}}>Avatar</Typography>
-            <Box sx={{
-                m: 4,
-                borderRadius: '50%',
-                width: 128,
-                height: 128,
-                borderColor: (theme) => theme.palette.origin.main,
-                backgroundColor: (theme) => theme.palette.background.paper,
-                p: '5px',
-                background:
-                  'linear-gradient(#fff, #fff) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box',
-                border: '4px solid transparent'
-              }}>
-              <Jazzicon
-                address={walletAddress}
-                size={110}
-              />
-            </Box>
+            <RingAvatar
+              address={walletAddress}
+              size={110}
+              outersx={{m: 4}}
+            />
           </Grid>
         </Grid>
       </Container>

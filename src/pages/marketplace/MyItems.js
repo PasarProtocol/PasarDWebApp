@@ -23,7 +23,7 @@ import LoadingScreen from '../../components/LoadingScreen';
 import MyItemsSortSelect from '../../components/MyItemsSortSelect';
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
-import Jazzicon from '../../components/Jazzicon';
+import RingAvatar from '../../components/RingAvatar';
 import Badge from '../../components/Badge';
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
@@ -205,20 +205,9 @@ export default function MyItems() {
       <Container maxWidth={false}>
         <Box sx={{ position: 'relative', justifyContent: 'center' }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: isMobile?1:1.5 }}>
-            <Jazzicon
+            <RingAvatar
               address={walletAddress}
               size={isMobile ? 80 : 100}
-              sx={{
-                mr: 0,
-                borderColor: (theme) => theme.palette.origin.main,
-                width: isMobile ? 98 : 118,
-                height: isMobile ? 98 : 118,
-                backgroundColor: (theme) => theme.palette.background.paper,
-                p: '5px',
-                background:
-                  'linear-gradient(#fff, #fff) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box',
-                border: '4px solid transparent'
-              }}
             />
           </Box>
           <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>

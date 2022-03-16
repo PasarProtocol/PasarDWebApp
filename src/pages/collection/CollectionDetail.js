@@ -26,7 +26,7 @@ import CollectionFilterPan from '../../components/collection/CollectionFilterPan
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
-import Jazzicon from '../../components/Jazzicon';
+import RingAvatar from '../../components/RingAvatar';
 import CopyButton from '../../components/CopyButton';
 import StatisticPanel from '../../components/collection/StatisticPanel'
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
@@ -368,20 +368,9 @@ export default function CollectionDetail() {
           <Stack direction="row">
             <Container maxWidth={false}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: isMobile?1:1.5 }}>
-                <Jazzicon
+                <RingAvatar
                   address={collectionAddress}
                   size={isMobile ? 80 : 100}
-                  sx={{
-                    mr: 0,
-                    borderColor: (theme) => theme.palette.origin.main,
-                    width: isMobile ? 98 : 118,
-                    height: isMobile ? 98 : 118,
-                    backgroundColor: (theme) => theme.palette.background.paper,
-                    p: '5px',
-                    background:
-                      'linear-gradient(#fff, #fff) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box',
-                    border: '4px solid transparent'
-                  }}
                 />
               </Box>
               <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>

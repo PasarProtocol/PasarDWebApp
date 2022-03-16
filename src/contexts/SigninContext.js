@@ -33,7 +33,7 @@ function SigninProvider({ children }) {
   const [afterSigninPath, setAfterSigninPath] = useState(null);
   const [signinEssentialSuccess, setSigninEssentialSuccess] = useState(false);
   const [elaConnectivityService, setElastosConnectivityService] = useState(false);
-  const [diaBalance, setDiaBalance] = useState(false);
+  const [diaBalance, setDiaBalance] = useState(0);
   const [pasarLinkAddress, setPasarLinkAddress] = useState(0);
 
   return (

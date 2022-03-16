@@ -38,6 +38,7 @@ import { essentialsConnector } from '../../components/signin-dlg/EssentialConnec
 import ProgressBar from '../../components/ProgressBar'
 import StartingDateSelect from '../../components/marketplace/StartingDateSelect'
 import ExpirationDateSelect from '../../components/marketplace/ExpirationDateSelect'
+import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice } from '../../utils/common';
 import convert from '../../utils/image-file-resize';
 // ----------------------------------------------------------------------
@@ -53,20 +54,13 @@ const RootStyle = styled(Page)(({ theme }) => ({
     paddingBottom: theme.spacing(3)
   }
 }));
-
-const StackStyle = styled(Stack)(({ theme }) => ({
-  flexDirection: 'row',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-  }
+const LoadingButtonStyled = styled(LoadingButton)(({ theme }) => ({
+  backgroundColor: theme.palette.text.primary,
+  color: theme.palette.background.default,
+  '&:hover': theme.palette.mode==='dark'?{
+    backgroundColor: theme.palette.action.active
+  }:{}
 }));
-
-const InputStyle = styled(Input)(({ theme }) => ({
-  '&:before': {
-    borderWidth: 0
-  }
-}));
-
 // ----------------------------------------------------------------------
 
 export default function CreateItem() {
@@ -810,9 +804,9 @@ export default function CreateItem() {
                     </>
                   ):(
                     <FormControl error={isOnValidation&&!singleName.length} variant="standard" sx={{width: '100%'}}>
-                      <InputLabel htmlFor="input-with-name">
+                      <InputLabelStyle htmlFor="input-with-name">
                         Add item name
-                      </InputLabel>
+                      </InputLabelStyle>
                       <InputStyle
                         id="input-with-name"
                         startAdornment={' '}
@@ -831,13 +825,13 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <FormControl error={isOnValidation&&!description.length} variant="standard" sx={{width: '100%'}}>
-                  <InputLabel htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
+                  <InputLabelStyle htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
                     {
                       mintype!=="Batch"?
                       "Add item description":
                       "Fixed Description (Leave blank if you want to manually edit each item description on the preview cards)"
                     }
-                  </InputLabel>
+                  </InputLabelStyle>
                   <InputStyle
                     id="input-with-description"
                     startAdornment={' '}
@@ -859,9 +853,9 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <Stack direction="row">
-                  <InputLabel sx={{ fontSize: 12, flex: 1 }}>
+                  <InputLabelStyle sx={{ fontSize: 12, flex: 1 }}>
                     Set this item as explicit and sensitive content
-                  </InputLabel>
+                  </InputLabelStyle>
                   <FormControlLabel
                     control={<CustomSwitch inputRef={explicitRef}/>}
                     sx={{mt:-1, mr: 0}}
@@ -875,9 +869,9 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <Stack direction="row">
-                  <InputLabel sx={{ fontSize: 12, flex: 1 }}>
+                  <InputLabelStyle sx={{ fontSize: 12, flex: 1 }}>
                     List on market directly after minting
-                  </InputLabel>
+                  </InputLabelStyle>
                   <FormControlLabel
                     control={<CustomSwitch onChange={handlePutOnSale}/>}
                     sx={{mt:-1, mr: 0}}
@@ -905,9 +899,9 @@ export default function CreateItem() {
                     </Grid>
                     <Grid item xs={12}>
                       <FormControl variant="standard" sx={{width: '100%'}}>
-                        <InputLabel htmlFor="input-with-price">
+                        <InputLabelStyle htmlFor="input-with-price">
                           Enter a fixed price of each item
-                        </InputLabel>
+                        </InputLabelStyle>
                         <InputStyle
                           type="number"
                           id="input-with-price"
@@ -941,9 +935,9 @@ export default function CreateItem() {
                     </Grid>
                     <Grid item xs={12}>
                       <FormControl variant="standard" sx={{width: '100%'}}>
-                        <InputLabel htmlFor="input-with-price">
+                        <InputLabelStyle htmlFor="input-with-price">
                           Enter starting price
-                        </InputLabel>
+                        </InputLabelStyle>
                         <InputStyle
                           type="number"
                           id="input-with-price"
@@ -975,9 +969,9 @@ export default function CreateItem() {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack direction="row">
-                        <InputLabel sx={{ fontSize: 12, flex: 1 }}>
+                        <InputLabelStyle sx={{ fontSize: 12, flex: 1 }}>
                           Set instant purchase price (auction ends immediately after a sale)
-                        </InputLabel>
+                        </InputLabelStyle>
                         <FormControlLabel
                           control={<CustomSwitch onChange={handleBuynowForAuction}/>}
                           sx={{mt:-1, mr: 0}}
@@ -993,9 +987,9 @@ export default function CreateItem() {
                         </Grid>
                         <Grid item xs={12}>
                           <FormControl variant="standard" sx={{width: '100%'}}>
-                            <InputLabel htmlFor="input-with-price">
+                            <InputLabelStyle htmlFor="input-with-price">
                               Enter buy now price
-                            </InputLabel>
+                            </InputLabelStyle>
                             <InputStyle
                               type="number"
                               id="input-with-price"
@@ -1024,9 +1018,9 @@ export default function CreateItem() {
               </Grid>
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{width: '100%'}}>
-                  <InputLabel htmlFor="input-with-royalties">
+                  <InputLabelStyle htmlFor="input-with-royalties">
                     Enter royalties (Suggested: 10%, Maximum: 20%)
-                  </InputLabel>
+                  </InputLabelStyle>
                   <InputStyle
                     type="number"
                     id="input-with-royalties"
@@ -1096,7 +1090,7 @@ export default function CreateItem() {
                       singleProperties.map((property, index)=>(
                         <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
                           <Grid item xs={6}>
-                            <TextField
+                            <TextFieldStyle
                               label="Example: Size"
                               size="small"
                               fullWidth
@@ -1107,7 +1101,7 @@ export default function CreateItem() {
                             />
                           </Grid>
                           <Grid item xs={6}>
-                            <TextField
+                            <TextFieldStyle
                               label="Example: Big"
                               size="small"
                               fullWidth
@@ -1150,10 +1144,10 @@ export default function CreateItem() {
                             properties.map((property, index)=>(
                               <Grid container spacing={1} key={index} sx={{pb:1}}>
                                 <Grid item xs={6}>
-                                  <TextField label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleMultiProperties('type', multiIndex, index, e)}}/>
+                                  <TextFieldStyle label="Example: Size" size="small" fullWidth value={property.type} onChange={(e)=>{handleMultiProperties('type', multiIndex, index, e)}}/>
                                 </Grid>
                                 <Grid item xs={6}>
-                                  <TextField label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleMultiProperties('name', multiIndex, index, e)}}/>
+                                  <TextFieldStyle label="Example: Big" size="small" fullWidth value={property.name} onChange={(e)=>{handleMultiProperties('name', multiIndex, index, e)}}/>
                                 </Grid>
                               </Grid>
                             ))
@@ -1167,9 +1161,9 @@ export default function CreateItem() {
               }
               <MHidden width="smDown">
                 <Grid item xs={12}>
-                  <LoadingButton loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
+                  <LoadingButtonStyled loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
                     Create
-                  </LoadingButton>
+                  </LoadingButtonStyled>
                 </Grid>
               </MHidden>
             </Grid>
@@ -1232,9 +1226,9 @@ export default function CreateItem() {
           </Grid>
           <MHidden width="smUp">
             <Grid item xs={12}>
-              <LoadingButton loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
+              <LoadingButtonStyled loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
                 Create
-              </LoadingButton>
+              </LoadingButtonStyled>
             </Grid>
           </MHidden>
         </Grid>

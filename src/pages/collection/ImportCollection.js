@@ -20,6 +20,7 @@ import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_A
 import ProgressBar from '../../components/ProgressBar'
 import TransLoadingButton from '../../components/TransLoadingButton';
 import CollectionCard from '../../components/collection/CollectionCard';
+import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import { isInAppBrowser, removeLeadingZero } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -32,12 +33,6 @@ const RootStyle = styled(Page)(({ theme }) => ({
   },
   [theme.breakpoints.down('md')]: {
     paddingBottom: theme.spacing(3)
-  }
-}));
-
-const InputStyle = styled(Input)(({ theme }) => ({
-  '&:before': {
-    borderWidth: 0
   }
 }));
 
@@ -162,9 +157,9 @@ export default function ImportCollection() {
           <Grid item xs={8}>
             <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Contract/Collection Address</Typography>
             <FormControl error={isOnValidation&&!address.length} variant="standard" sx={{width: '100%'}}>
-              <InputLabel htmlFor="input-with-address">
+              <InputLabelStyle htmlFor="input-with-address">
                 Enter your ERC-721 or ERC-1155 contract/collection address
-              </InputLabel>
+              </InputLabelStyle>
               <InputStyle
                 id="input-with-address"
                 startAdornment={' '}
@@ -223,9 +218,9 @@ export default function ImportCollection() {
             
             <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}}>Description</Typography>
             <FormControl error={isOnValidation&&!description.length} variant="standard" sx={{width: '100%'}}>
-              <InputLabel htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
+              <InputLabelStyle htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
                 Add collection description
-              </InputLabel>
+              </InputLabelStyle>
               <InputStyle
                 id="input-with-description"
                 startAdornment={' '}
@@ -253,7 +248,7 @@ export default function ImportCollection() {
               recipientRoyaltiesGroup.map((item, index)=>(
                 <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
                   <Grid item xs={6}>
-                    <TextField
+                    <TextFieldStyle
                       label="Example: 0x012...ABC"
                       size="small"
                       fullWidth
@@ -264,7 +259,7 @@ export default function ImportCollection() {
                     />
                   </Grid>
                   <Grid item xs={6}>
-                    <TextField
+                    <TextFieldStyle
                       type="number"
                       label="Example: 10"
                       size="small"
@@ -291,9 +286,9 @@ export default function ImportCollection() {
                     <>
                       <Typography variant="h4" sx={{fontWeight: 'normal', color: 'origin.main'}}>{type}</Typography>
                       <FormControl variant="standard" sx={{width: '100%'}}>
-                        <InputLabel htmlFor={`input-with-${type}`} sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
+                        <InputLabelStyle htmlFor={`input-with-${type}`} sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
                           Add {type} URL
-                        </InputLabel>
+                        </InputLabelStyle>
                         <InputStyle
                           id={`input-with-${type}`}
                           startAdornment={' '}
