@@ -12,8 +12,7 @@ import LoadingScreen from '../LoadingScreen';
 import { MethodList, reduceHexAddress, getDidInfoFromAddress } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
-  trans: PropTypes.object.isRequired,
-  isLast: PropTypes.bool.isRequired
+  trans: PropTypes.object.isRequired
 };
 function TransItem(props) {
   const { trans, creator } = props
