@@ -22,6 +22,7 @@ import CloseIcon from '@mui/icons-material/Close';
 // components
 import { MFab, MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
+import CollectibleHandleSection from './CollectibleHandleSection'
 import LoadingScreen from '../../components/LoadingScreen';
 import Countdown from '../../components/Countdown';
 import AssetDetailInfo from '../../components/marketplace/AssetDetailInfo';
@@ -162,7 +163,7 @@ export default function CollectibleDetail() {
       if(sessionLinkFlag==='3')
         walletconnect.getAccount().then(setAddress)
     }
-  }, [account]);
+  }, [account, pasarLinkAddress]);
   React.useEffect(async () => {
     window.scrollTo(0,0)
     setCoinUSD(await getCoinUSD())
@@ -307,7 +308,6 @@ export default function CollectibleDetail() {
   window.addEventListener('resize', handleResize);
   const properties = collectible&&collectible.properties?collectible.properties:{}
 
-  const tempDeadLine = getTime(new Date('2022-03-03 00:00:00').getTime()/1000)
   return (
     <RootStyle title="Collectible | PASAR">
       <ScrollManager scrollKey="asset-detail-key"/>
@@ -528,92 +528,13 @@ export default function CollectibleDetail() {
                 }
               </Stack>
             </PaperStyle>
+            <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
             {
-              isForAuction?(
-                <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
-                  <Stack direction="row">
-                    <Box sx={{flexGrow: 1}}>
-                      <Typography variant="h4">{currentBid>0?'Current Bid':'Starting Price'}</Typography>
-                      <Typography variant="h3" color="origin.main">{round((currentBid || collectible.Price)/1e18, 3)} ELA</Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*(currentBid || collectible.Price)/1e18, 3)}</Typography>
-                    </Box>
-                    <Box>
-                      <Stack direction="row" sx={{minHeight: {xs: 30, md: 36}, alignItems: 'center'}}>
-                        <AccessTimeIcon/>&nbsp;
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>Ends {deadLine}</Typography>
-                      </Stack>
-                      <Countdown deadline={collectible.endTime*1000}/>
-                    </Box>
-                  </Stack>
-                  {
-                    address!==collectible.holder && address!==collectible.royaltyOwner &&
-                    <MHidden width="smDown">
-                      {
-                        didSignin?
-                        <Stack direction="row" spacing={1} sx={{mt: 2}}>
-                          <StyledButton variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
-                            Place bid
-                          </StyledButton>
-                          {
-                            collectible.buyoutPrice&&
-                            <StyledButton variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
-                              Buy now for {round(collectible.buyoutPrice/1e18, 3)} ELA
-                            </StyledButton>
-                          }
-                        </Stack>:
-                        <StyledButton variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
-                          Sign in to Place bid
-                        </StyledButton>
-                      }
-                    </MHidden>
-                  }
-                  {
-                    (address===collectible.holder || address===collectible.royaltyOwner) && collectible.buyoutPrice &&
-                    <Typography variant="h4" component='div' align='center' sx={{pt: 2}}>
-                      Your Buy Now Price: <Typography variant="h4" color="origin.main" sx={{display: 'inline'}}>{round(collectible.buyoutPrice/1e18, 3)} ELA</Typography>
-                    </Typography>
-                  }
-                </PaperStyle>
-              ):(
-                <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
-                {
-                  isLoadingCollectible?
-                  <LoadingScreen/>:
-                  <>
-                    {
-                      collectible.SaleType === "Not on sale"?
-                      <>
-                        <Typography variant="h4">This item is currently</Typography>
-                        <Typography variant="h3" color="origin.main">Not on Sale</Typography>
-                        <MHidden width="smDown">
-                          <StyledButton variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}} sx={{mt: 2}}>Go back to Marketplace</StyledButton>
-                        </MHidden>
-                      </>:
-                      <>
-                        <Typography variant="h4">On sale for a fixed price of</Typography>
-                        <Typography variant="h3" color="origin.main">{round(collectible.Price/1e18, 3)} ELA</Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*collectible.Price/1e18, 3)}</Typography>
-                        {
-                          address!==collectible.holder && address!==collectible.royaltyOwner &&
-                          <MHidden width="smDown">
-                            {
-                              didSignin?
-                              <StyledButton variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}} sx={{mt: 2}}>
-                                Buy
-                              </StyledButton>:
-                              <StyledButton variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
-                                Sign in to Buy
-                              </StyledButton>
-                            }
-                          </MHidden>
-                        }
-                      </>
-                    }
-                  </>
-                }
-                </PaperStyle>
-              )
+              isLoadingCollectible?
+              <LoadingScreen/>:
+              <CollectibleHandleSection {...{collectible, coinUSD, address}}/>
             }
+            </PaperStyle>
           </Grid>
           <Grid item xs={12} sm={6}>
             <PaperStyle sx={{height: '100%', p: '15px 20px', position: 'relative'}}>
