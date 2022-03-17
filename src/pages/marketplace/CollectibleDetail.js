@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import {round} from 'mathjs'
 import Lightbox from 'react-image-lightbox';
 import { FacebookShareButton, TwitterShareButton, FacebookIcon, TwitterIcon } from "react-share";
 import { Icon } from '@iconify/react';
@@ -16,7 +15,6 @@ import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CloseIcon from '@mui/icons-material/Close';
 
 // components
@@ -24,21 +22,17 @@ import { MFab, MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import CollectibleHandleSection from './CollectibleHandleSection'
 import LoadingScreen from '../../components/LoadingScreen';
-import Countdown from '../../components/Countdown';
 import AssetDetailInfo from '../../components/marketplace/AssetDetailInfo';
 import CollectibleHistory from '../../components/marketplace/CollectibleHistory';
 import BidList from '../../components/marketplace/BidList';
 import Badge from '../../components/Badge';
 import Jazzicon from '../../components/Jazzicon';
-import PurchaseDlg from '../../components/dialog/Purchase'
-import PlaceBidDlg from '../../components/dialog/PlaceBid'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
-import StyledButton from '../../components/signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
-import {blankAddress, marketContract, auctionOrderType} from '../../config'
-import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl,
+import { blankAddress, marketContract } from '../../config'
+import { reduceHexAddress, getAssetImage, getCoinUSD, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl,
   getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -82,14 +76,6 @@ const AvatarStyle = styled(Box)(({ theme }) => ({
   backgroundColor: 'black',
   marginRight: 8
 }));
-const StickyPaperStyle = styled(Paper)(({ theme }) => ({
-  position: 'sticky',
-  bottom: 0,
-  boxShadow: `${theme.palette.mode==='dark'?'rgb(6 12 20)':'rgb(230 230 230)'} 0px -5px 12px`,
-  marginTop: theme.spacing(2),
-  padding: theme.spacing(2),
-  borderRadius: '16px 16px 0 0'
-}));
 const Property = ({type, name}) => (
   <Paper
     sx={{
@@ -121,18 +107,11 @@ export default function CollectibleDetail() {
   const [collectionType, setCollectionType] = React.useState(null);
   const [badge, setBadge] = React.useState({creator: {dia: false, kyc: false}, owner: {dia: false, kyc: false}});
   const [didName, setDidName] = React.useState({creator: '', owner: ''});
-  const [isForAuction, setForAuction] = React.useState(false);
-  const [deadLine, setDeadLine] = React.useState('');
-  const [currentBid, setCurrentBid] = React.useState(0);
   const [transRecord, setTransRecord] = React.useState([]);
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
-  const [isOpenPurchase, setPurchaseOpen] = React.useState(false);
-  const [isOpenPlaceBid, setPlaceBidOpen] = React.useState(false);
-  const [didSignin, setSignin] = React.useState(false);
-  const [buyClicked, setBuyClicked] = React.useState(false);
   const { pasarLinkAddress } = useSingin()
 
   const imageRef = React.useRef();
@@ -140,15 +119,7 @@ export default function CollectibleDetail() {
   
   const context = useWeb3React()
   const { account } = context;
-  React.useEffect(async() => {
-    const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-    setSignin(!!sessionLinkFlag)
-    if(buyClicked&&!!sessionLinkFlag){
-      setBuyClicked(false)
-      setTimeout(()=>{setPurchaseOpen(true)}, 300)
-    }
-  }, [pasarLinkAddress]);
-
+  
   React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
     if(sessionLinkFlag){
@@ -174,14 +145,6 @@ export default function CollectibleDetail() {
         setCollectible(jsonCollectible.data);
         const collectionTypeId = getCollectionTypeFromImageUrl(jsonCollectible.data)
         setCollectionType(collectionTypes[collectionTypeId])
-        if(jsonCollectible.data.listBid.length)
-          setCurrentBid(jsonCollectible.data.listBid[0].price)
-
-        if(jsonCollectible.data.orderType === auctionOrderType){
-          const tempDeadLine = getTime(jsonCollectible.data.endTime)
-          setForAuction(true)
-          setDeadLine(`${tempDeadLine.date} ${tempDeadLine.time}`)
-        }
         getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
           if(dia!=='0')
             setBadgeOfUser('creator', 'dia', true)
@@ -295,13 +258,6 @@ export default function CollectibleDetail() {
         imageBoxRef.current.style.width = 'fit-content'
         imageBoxRef.current.style.height = 'calc(100% - 24px)'
       }
-    }
-  }
-  
-  const openSignin = (e)=>{
-    if(document.getElementById("signin")){
-      setBuyClicked(true)
-      document.getElementById("signin").click()
     }
   }
   
@@ -553,7 +509,7 @@ export default function CollectibleDetail() {
             </PaperStyle>
           </Grid>
           {
-            isForAuction&&(collectible.listBid.length>0)&&(
+            collectible.listBid&&collectible.listBid.length>0&&(
               <Grid item xs={12}>
                 <PaperStyle>
                   <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>Bids</Typography>
@@ -631,56 +587,8 @@ export default function CollectibleDetail() {
             </Link>
           </Grid>
         </Grid>
-        <MHidden width="smUp">
-          {
-            isForAuction && address!==collectible.holder && address!==collectible.royaltyOwner &&
-            <StickyPaperStyle>
-              {
-                didSignin?
-                <Stack direction="row" spacing={1} sx={{mt: 2}}>
-                  <StyledButton variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
-                    Place bid
-                  </StyledButton>
-                  {
-                    collectible.buyoutPrice&&
-                    <StyledButton variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
-                      Buy now for {round(collectible.buyoutPrice/1e18, 3)} ELA
-                    </StyledButton>
-                  }
-                </Stack>:
-                <StyledButton variant="contained" fullWidth onClick={openSignin}>
-                  Sign in to Place bid
-                </StyledButton>
-              }
-            </StickyPaperStyle>
-          }
-          {
-            !isForAuction && 
-            <>
-              {
-                collectible.SaleType === "Not on sale"?
-                <StickyPaperStyle>
-                  <StyledButton variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}} sx={{mt: 2}}>Go back to Marketplace</StyledButton>
-                </StickyPaperStyle>:
-                address!==collectible.holder && address!==collectible.royaltyOwner &&
-                <StickyPaperStyle>
-                  {
-                    didSignin?
-                    <StyledButton variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}}>
-                      Buy
-                    </StyledButton>:
-                    <StyledButton variant="contained" fullWidth onClick={openSignin}>
-                      Sign in to Buy
-                    </StyledButton>
-                  }
-                </StickyPaperStyle>
-              }
-            </>
-          }
-        </MHidden>
+        <CollectibleHandleSection {...{collectible, coinUSD, address}} onlyHandle={Boolean(true)}/>
       </Container>
-      <PurchaseDlg isOpen={isOpenPurchase} setOpen={setPurchaseOpen} info={collectible}/>
-      <PlaceBidDlg isOpen={isOpenPlaceBid} setOpen={setPlaceBidOpen} info={{...collectible, currentBid}}/>
     </RootStyle>
   );
 }
