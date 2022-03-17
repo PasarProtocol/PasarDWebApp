@@ -3,8 +3,9 @@ import { isMobile } from 'react-device-detect';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {round} from 'mathjs'
 // material
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography, Paper } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { styled } from '@mui/material/styles';
 
 import { MHidden } from '../../components/@material-extend';
 import StyledButton from '../../components/signin-dlg/StyledButton';
@@ -16,9 +17,18 @@ import { getTime } from '../../utils/common';
 import { auctionOrderType } from '../../config';
 // ----------------------------------------------------------------------
 
+const StickyPaperStyle = styled(Paper)(({ theme }) => ({
+  position: 'sticky',
+  bottom: 0,
+  boxShadow: `${theme.palette.mode==='dark'?'rgb(6 12 20)':'rgb(230 230 230)'} 0px -5px 12px`,
+  marginTop: theme.spacing(2),
+  padding: theme.spacing(2),
+  borderRadius: '16px 16px 0 0'
+}));
+
 export default function CollectibleHandleSection(props) {
   const navigate = useNavigate();
-  const {collectible, coinUSD, address} = props
+  const {collectible, coinUSD, address, onlyHandle=false} = props
   const [buyClicked, setBuyClicked] = useState(false);
   const [didSignin, setSignin] = useState(false);
   const [isOpenPurchase, setPurchaseOpen] = useState(false);
@@ -45,7 +55,7 @@ export default function CollectibleHandleSection(props) {
   let priceText = `${round(collectible.Price/1e18, 3)} ELA`
   let usdPriceText = `≈ USD ${round(coinUSD*collectible.Price/1e18, 3)}`
   let handleField = null
-  const currentBid = collectible.listBid.length?collectible.listBid[0].price:0
+  const currentBid = collectible.listBid&&collectible.listBid.length?collectible.listBid[0].price:0
   let deadline = ''
   let auctionTextField = null
   if(collectible.orderType === auctionOrderType) {
@@ -63,7 +73,7 @@ export default function CollectibleHandleSection(props) {
       if(address!==collectible.holder && address!==collectible.royaltyOwner)
         handleField = 
           didSignin?
-          <Stack direction="row" spacing={1} sx={{mt: 2}}>
+          <Stack direction="row" spacing={1}>
             <StyledButton variant="contained" fullWidth onClick={(e)=>{setPlaceBidOpen(true)}}>
               Place bid
             </StyledButton>
@@ -74,7 +84,7 @@ export default function CollectibleHandleSection(props) {
               </StyledButton>
             }
           </Stack>:
-          <StyledButton variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
+          <StyledButton variant="contained" fullWidth onClick={openSignin}>
             Sign in to Place bid
           </StyledButton>
       else
@@ -88,7 +98,7 @@ export default function CollectibleHandleSection(props) {
         statusText = 'Starting Price'
         if(address === collectible.holder)
           handleField = 
-            <StyledButton variant="contained" fullWidth onClick={(e)=>{}} sx={{mt: 2}}>
+            <StyledButton variant="contained" fullWidth onClick={(e)=>{}}>
               Remove Listing
             </StyledButton>
         else
@@ -112,7 +122,7 @@ export default function CollectibleHandleSection(props) {
             </Typography>
         else
           handleField = 
-            <StyledButton variant="contained" fullWidth onClick={(e)=>{}} sx={{mt: 2}}>
+            <StyledButton variant="contained" fullWidth onClick={(e)=>{}}>
               Close Order
             </StyledButton>
       }
@@ -122,21 +132,30 @@ export default function CollectibleHandleSection(props) {
       statusText = 'This item is currently'
       priceText = 'Not on Sale'
       handleField = 
-        <StyledButton variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}} sx={{mt: 2}}>
+        <StyledButton variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}}>
           Go back to Marketplace
         </StyledButton>
     } else if(address!==collectible.holder && address!==collectible.royaltyOwner) {
       handleField = 
         didSignin?
-        <StyledButton variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}} sx={{mt: 2}}>
+        <StyledButton variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
           Buy
         </StyledButton>:
 
-        <StyledButton variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
+        <StyledButton variant="contained" fullWidth onClick={openSignin}>
           Sign in to Buy
         </StyledButton>
     }
   return (
+    onlyHandle?
+    <MHidden width="smUp">
+      {
+        handleField!==null&&
+        <StickyPaperStyle>
+          {handleField}
+        </StickyPaperStyle>
+      }
+    </MHidden>:
     <>
       {
         collectible.orderType===auctionOrderType?
@@ -156,7 +175,11 @@ export default function CollectibleHandleSection(props) {
             </Box>
           </Stack>
           {auctionTextField}
-          <MHidden width="smDown">{handleField}</MHidden>
+          <MHidden width="smDown">
+            <Box sx={{mt: 2}}>
+              {handleField}
+            </Box>
+          </MHidden>
         </Box>:
 
         <Box>
@@ -166,7 +189,11 @@ export default function CollectibleHandleSection(props) {
             collectible.SaleType!=="Not on sale" &&
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>{usdPriceText}</Typography>
           }
-          <MHidden width="smDown">{handleField}</MHidden>
+          <MHidden width="smDown">
+            <Box sx={{mt: 2}}>
+              {handleField}
+            </Box>
+          </MHidden>
         </Box>
       }
       <PurchaseDlg
