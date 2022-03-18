@@ -61,6 +61,7 @@ export default function AssetCard(props) {
   const [deleteOpen, setOpenDelete] = React.useState(false);
   const [transferOpen, setOpenTransfer] = React.useState(false);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
+  const [auctionEnded, setAuctionEnded] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
   
   const isCreatedByMe = myaddress===royaltyOwner
@@ -80,8 +81,17 @@ export default function AssetCard(props) {
           setBadgeFlag('kyc', true)
       })
     }
+    const interval = setInterval(()=>checkHasEnded(), 1000)
+    return () => clearInterval(interval);
   }, []);
 
+  const checkHasEnded  = () => {
+    const tempEndTime = endTime*1000
+    if(!tempEndTime)
+      return
+    if(!auctionEnded&&tempEndTime<=Date.now())
+      setAuctionEnded(true)
+  }
   const setBadgeFlag = (type, value) => {
     setBadge((prevState) => {
       const tempFlag = {...prevState}
@@ -282,9 +292,15 @@ export default function AssetCard(props) {
           {
             orderType===auctionOrderType&&
             <TimeCountBoxStyle>
-              <Typography variant='subtitle2' sx={{fontWeight: 'normal'}}>
-                <Countdown date={endTime*1000} /> <Typography variant='caption' sx={{color:'text.secondary'}}>left</Typography> ⏰
-              </Typography>
+              {
+                auctionEnded?
+                <Typography variant='subtitle2' sx={{fontWeight: 'normal'}}>
+                  Auction has ended
+                </Typography>:
+                <Typography variant='subtitle2' sx={{fontWeight: 'normal'}}>
+                  <Countdown date={endTime*1000} /> <Typography variant='caption' sx={{color:'text.secondary'}}>left</Typography> ⏰
+                </Typography>
+              }
             </TimeCountBoxStyle>
           }
           <Box>

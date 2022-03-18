@@ -31,6 +31,7 @@ export default function CollectibleHandleSection(props) {
   const {collectible, coinUSD, address, onlyHandle=false} = props
   const [buyClicked, setBuyClicked] = useState(false);
   const [didSignin, setSignin] = useState(false);
+  const [auctionEnded, setAuctionEnded] = useState(false);
   const [isOpenPurchase, setPurchaseOpen] = useState(false);
   const [isOpenPlaceBid, setPlaceBidOpen] = useState(false);
   const { pasarLinkAddress } = useSingin()
@@ -43,12 +44,26 @@ export default function CollectibleHandleSection(props) {
       setTimeout(()=>{setPurchaseOpen(true)}, 300)
     }
   }, [pasarLinkAddress]);
-  
+
+  useEffect(() => {
+    checkHasEnded()
+  }, []);
+
   const openSignin = (e)=>{
     if(document.getElementById("signin")){
       setBuyClicked(true)
       document.getElementById("signin").click()
     }
+  }
+
+  const checkHasEnded  = () => {
+    const tempEndTime = collectible.endTime*1000
+    if(!tempEndTime)
+      return
+    if(!auctionEnded&&tempEndTime<=Date.now())
+      setAuctionEnded(true)
+    else
+      setTimeout(()=>checkHasEnded(), 1000)
   }
 
   let statusText = 'On sale for a fixed price of'
@@ -60,8 +75,8 @@ export default function CollectibleHandleSection(props) {
   let auctionTextField = null
   if(collectible.orderType === auctionOrderType) {
     const tempDeadLine = getTime(collectible.endTime)
-    deadline = `${tempDeadLine.date} ${tempDeadLine.time}`
-    if(collectible.endTime*1000 > Date.now()) { // not end yet
+    deadline = `${auctionEnded?'Ended':'Ends'} ${tempDeadLine.date} ${tempDeadLine.time}`
+    if(!auctionEnded) { // not end yet
       if(!currentBid)
         statusText = 'Starting Price'
       else {
@@ -169,7 +184,7 @@ export default function CollectibleHandleSection(props) {
             <Box>
               <Stack direction="row" sx={{minHeight: {xs: 30, md: 36}, alignItems: 'center'}}>
                 <AccessTimeIcon/>&nbsp;
-                <Typography variant="body2" color='text.secondary'>Ends {deadline}</Typography>
+                <Typography variant="body2" color='text.secondary'>{deadline}</Typography>
               </Stack>
               <Countdown deadline={collectible.endTime*1000}/>
             </Box>
