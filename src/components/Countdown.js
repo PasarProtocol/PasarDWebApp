@@ -10,6 +10,10 @@ export default function Countdown({deadline}) {
     if(deadline <= new Date().getTime())
         return
     const tick = setInterval(() => {
+        if(deadline <= new Date().getTime()){
+          clearInterval(tick)
+          return
+        }
         const days = differenceInDays(new Date(deadline).getTime(), Date.now())
         const hours = differenceInHours(new Date(deadline).getTime(), Date.now())%24
         const minutes = differenceInMinutes(new Date(deadline).getTime(), Date.now())%60
