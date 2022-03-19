@@ -16,7 +16,6 @@ const RootStyle = styled('div')(({ theme }) => ({
 
 export default function MainLogo() {
   const theme = useTheme();
-  const isLight = theme.palette.mode === 'light';
 
   return (
     <RootStyle>
