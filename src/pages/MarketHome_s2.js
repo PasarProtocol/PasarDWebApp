@@ -7,14 +7,12 @@ import AdbIcon from '@mui/icons-material/Adb';
 import AppleIcon from '@mui/icons-material/Apple';
 // components
 import Page from '../components/Page';
-import HomeAssetCarousel from '../components/HomeAssetCarousel';
-import StyledButton from '../components/signin-dlg/StyledButton';
-import RecentSoldGrid from '../components/marketplace/RecentSoldGrid'
+import HomeAssetCard from '../components/HomeAssetCard';
 import { MotionInView, varFadeInUp, varFadeInDown } from '../components/animate';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
-  // background: 'black',
+  background: 'black',
   paddingTop: theme.spacing(8),
   paddingBottom: theme.spacing(12),
   [theme.breakpoints.up('md')]: {
@@ -40,18 +38,17 @@ const StackStyle = styled(Stack)(({ theme }) => ({
     }
   }
 }));
-const CardStyle = styled(Box)(({ theme }) => ({
-  // backgroundColor: '#0d0d0d',
-  // padding: theme.spacing(4),
-  position: 'relative',
+const CardStyle = styled(Card)(({ theme }) => ({
+  backgroundColor: '#0d0d0d',
+  padding: theme.spacing(4),
   marginBottom: theme.spacing(4),
   display: 'flex',
   [theme.breakpoints.up('sm')]: {
     flexDirection: 'row',
     '& img': {
       marginTop: theme.spacing(8),
-      marginLeft: theme.spacing(10),
-      width: '15%',
+      marginLeft: theme.spacing(2),
+      width: '25%',
       height: '100%',
     }
   },
@@ -86,6 +83,15 @@ const TitleStyle = styled(Typography)(({ theme }) => ({
   }
 }));
 
+const OutlineBtnStyle = styled(Button)(({ theme }) => ({
+  color: theme.palette.origin.main,
+  borderColor: theme.palette.origin.main,
+  "&:hover": {
+    color: 'white',
+    background: theme.palette.origin.main
+  }
+}));
+
 const HeadTitleStyle = styled(Typography)(({ theme }) => ({
   backgroundImage: 'linear-gradient(90deg, #FF5082, #a951f4)',
   backgroundSize: '100%',
@@ -113,39 +119,27 @@ export default function MarketHome() {
       <Container sx={{pt: 4, mb: '100px', position: 'relative'}}>
         <StackStyle>
           <Box sx={{ flexGrow: 1 }}>
-            <Stack sx={{height: '100%'}}>
-              <Box sx={{ flexGrow: 1 }}>
-                <HeadTitleStyle variant="h1">
-                  Dawn of the DeMKT
-                </HeadTitleStyle>
-                <Typography variant="h4" component="div" sx={{fontWeight: 'normal', pr: 4}}>
-                  Pasar is open-sourced, community-centric, and one
-                  of the first truly Web3.0 decentralized marketplaces (DeMKT)
-                  for exchanging data and Non-fungible Tokens (NFTs).
-                </Typography>
-              </Box>
-              <Stack spacing={1} direction="row">
-                <StyledButton to="/marketplace" variant="contained" component={RouterLink}>
-                  Explorer
-                </StyledButton>
-                <Button to="/create" variant="outlined" component={RouterLink} color="inherit">
-                  Create
-                </Button>
-              </Stack>
+            <HeadTitleStyle variant="h1">
+              Dawn of the DeMKT
+            </HeadTitleStyle>
+            <Typography variant="h4" component="div" sx={{fontWeight: 'normal', pb: 3}}>
+              Pasar is open-sourced, community-centric, and one
+              of the first truly Web3.0 decentralized marketplaces (DeMKT)
+              for exchanging data and Non-fungible Tokens (NFTs).
+            </Typography>
+            <Stack spacing={1} direction="row">
+              <OutlineBtnStyle to="/marketplace" variant="outlined" component={RouterLink}>
+                Go to App
+              </OutlineBtnStyle>
+              <Button to="/create" variant="contained" component={RouterLink} color="inherit">
+                Create
+              </Button>
             </Stack>
           </Box>
-          <HomeAssetCarousel/>
+          <HomeAssetCard/>
         </StackStyle>
       </Container>
-      <Container>
-        <MotionInView variants={varFadeInUp}>
-          <Box>
-            <TitleStyle component="h1">
-              Recently Sold <span role="img" aria-label="">🤝</span>
-            </TitleStyle>
-            <RecentSoldGrid/>
-          </Box>
-        </MotionInView>
+      <Container maxWidth="md">
         <MotionInView variants={varFadeInUp}>
           <CardStyle>
             <Box component="div">
@@ -162,10 +156,10 @@ export default function MarketHome() {
             </Box>
             <Box draggable = {false} component="img" src="/static/essentials.png" sx={{p: {xs: '0px 32px 32px', sm: 0}, mt: '0 !important'}} />
             <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <StyledButton variant="contained" href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app" target="_blank" startIcon={<AdbIcon />}>
+              <OutlineBtnStyle variant="outlined" href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app" target="_blank" startIcon={<AdbIcon />}>
                 Google Play
-              </StyledButton>
-              <Button variant="outlined" href="https://apps.apple.com/us/app/elastos-essentials/id1568931743" target="_blank" startIcon={<AppleIcon />} color="inherit">
+              </OutlineBtnStyle>
+              <Button variant="contained" href="https://apps.apple.com/us/app/elastos-essentials/id1568931743" target="_blank" startIcon={<AppleIcon />} color="inherit">
                 App Store
               </Button>
             </Stack>
@@ -187,9 +181,9 @@ export default function MarketHome() {
             </Box>
             <Box draggable = {false} component="img" src="/static/market-home-1.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
             <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <StyledButton to="/marketplace" variant="outlined" component={RouterLink}>
+              <OutlineBtnStyle to="/marketplace" variant="outlined" component={RouterLink}>
                 Marketplace
-              </StyledButton>
+              </OutlineBtnStyle>
               <Button variant="contained" to="/explorer" component={RouterLink} color="inherit">
                 Explorer
               </Button>
@@ -213,9 +207,9 @@ export default function MarketHome() {
             </Box>
             <Box draggable = {false} component="img" src="/static/user-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
             <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <StyledButton variant="outlined" onClick={openSignin}>
+              <OutlineBtnStyle variant="outlined" onClick={openSignin}>
                 Sign in with DID
-              </StyledButton>
+              </OutlineBtnStyle>
               <Button variant="contained" href="https://www.elastos.org/did" target="_blank" color="inherit">
                 Learn more about DID
               </Button>
@@ -239,9 +233,9 @@ export default function MarketHome() {
             </Box>
             <Box draggable = {false} component="img" src="/static/chain-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
             <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <StyledButton variant="outlined" href="https://glidefinance.io/swap" target="_blank">
+              <OutlineBtnStyle variant="outlined" href="https://glidefinance.io/swap" target="_blank">
                 Get ELA 
-              </StyledButton>
+              </OutlineBtnStyle>
               <Button variant="contained" href="https://www.elastos.org/esc" target="_blank" color="inherit">
                 Learn more about ESC
               </Button>

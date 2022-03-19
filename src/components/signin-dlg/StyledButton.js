@@ -35,7 +35,8 @@ export default function StyledButton(props) {
   const isHome = pathname === '/';
   
   const { themeMode } = useSettings();
-  const isLight = !isHome && themeMode === 'light';
+  // const isLight = !isHome && themeMode === 'light';
+  const isLight = themeMode === 'light';
   const classes = useStyles();
 
   const ButtonStyle = styled(Button)(

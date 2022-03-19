@@ -25,7 +25,8 @@ export default function ThemeConfig({ children }) {
   const isHome = pathname === '/';
 
   const { themeMode, themeDirection } = useSettings();
-  const isLight = !isHome && themeMode === 'light';
+  // const isLight = !isHome && themeMode === 'light';
+  const isLight = themeMode === 'light';
 
   const themeOptions = useMemo(
     () => ({

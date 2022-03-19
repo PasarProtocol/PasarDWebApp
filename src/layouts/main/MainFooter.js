@@ -46,7 +46,7 @@ function CopyRight(prop) {
 }
 export default function MainFooter({ hidden, isHome }) {
   const sx = hidden ? { display: 'none' } : {};
-  if (isHome) sx.backgroundColor = '#0d0d0d';
+  // if (isHome) sx.backgroundColor = '#0d0d0d';
   return (
     <RootStyle sx={sx}>
       <Divider />
@@ -131,14 +131,11 @@ export default function MainFooter({ hidden, isHome }) {
                 </svg>
               </IconButton>
             </Stack>
-            {
-              !isHome&&
-              <Stack
-                direction="row"
-                justifyContent={{ xs: 'center', md: 'flex-end' }}>
-                  <ModeSwitch />
-              </Stack>
-            }
+            <Stack
+              direction="row"
+              justifyContent={{ xs: 'center', md: 'flex-end' }}>
+                <ModeSwitch />
+            </Stack>
           </Grid>
         </Grid>
         <Grid
