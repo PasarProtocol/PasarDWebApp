@@ -5,11 +5,14 @@ import { styled } from '@mui/material/styles';
 import { Box, Container, Stack, Grid, Typography, Button, Card } from '@mui/material';
 import AdbIcon from '@mui/icons-material/Adb';
 import AppleIcon from '@mui/icons-material/Apple';
+import { Icon } from '@iconify/react';
+import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 // components
 import Page from '../components/Page';
 import HomeAssetCarousel from '../components/HomeAssetCarousel';
 import StyledButton from '../components/signin-dlg/StyledButton';
-import RecentSoldGrid from '../components/marketplace/RecentSoldGrid'
+import FilteredAssetGrid from '../components/marketplace/FilteredAssetGrid'
+import FilteredCollectionGrid from '../components/marketplace/FilteredCollectionGrid'
 import { MotionInView, varFadeInUp, varFadeInDown } from '../components/animate';
 // ----------------------------------------------------------------------
 
@@ -44,7 +47,7 @@ const CardStyle = styled(Box)(({ theme }) => ({
   // backgroundColor: '#0d0d0d',
   // padding: theme.spacing(4),
   position: 'relative',
-  marginBottom: theme.spacing(4),
+  // marginBottom: theme.spacing(4),
   display: 'flex',
   [theme.breakpoints.up('sm')]: {
     flexDirection: 'row',
@@ -110,7 +113,7 @@ export default function MarketHome() {
   return (
     <RootStyle title="Explorer | PASAR">
       <Box draggable = {false} component="img" src="/static/corner-logo.png" sx={{ width: '50%', maxWidth: '550px', position: 'absolute', top: 0, right: 0 }} />
-      <Container sx={{pt: 4, mb: '100px', position: 'relative'}}>
+      <Container sx={{pt: 4, mb: 3, position: 'relative'}}>
         <StackStyle>
           <Box sx={{ flexGrow: 1 }}>
             <Stack sx={{height: '100%'}}>
@@ -138,117 +141,156 @@ export default function MarketHome() {
         </StackStyle>
       </Container>
       <Container>
-        <MotionInView variants={varFadeInUp}>
-          <Box>
-            <TitleStyle component="h1">
-              Recently Sold <span role="img" aria-label="">🤝</span>
-            </TitleStyle>
-            <RecentSoldGrid/>
-          </Box>
-        </MotionInView>
-        <MotionInView variants={varFadeInUp}>
-          <CardStyle>
-            <Box component="div">
+        <Stack spacing={3}>
+          <MotionInView variants={varFadeInUp}>
+            <Box>
               <TitleStyle component="h1">
-                Get Started with Essentials
+                Recently Sold <span role="img" aria-label="">🤝</span>
               </TitleStyle>
-              <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-                Onboarding is easy. Just register a Decentralized Identifier (DID) and wallet address from
-                the Elastos Essentials Super-Wallet.<br/>
-                <br/>
-                Then explore Elastos’ complete Web3.0 tech stack, including Hive decentralized storage,
-                Carrier’s P2P network, Ecosystem DAO Cyber Republic, and much more!
-              </Typography>
+              <FilteredAssetGrid type='recent_sold'/>
             </Box>
-            <Box draggable = {false} component="img" src="/static/essentials.png" sx={{p: {xs: '0px 32px 32px', sm: 0}, mt: '0 !important'}} />
-            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <StyledButton variant="contained" href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app" target="_blank" startIcon={<AdbIcon />}>
-                Google Play
-              </StyledButton>
-              <Button variant="outlined" href="https://apps.apple.com/us/app/elastos-essentials/id1568931743" target="_blank" startIcon={<AppleIcon />} color="inherit">
-                App Store
-              </Button>
-            </Stack>
-          </CardStyle>
-        </MotionInView>
-        <MotionInView variants={varFadeInUp}>
-          <CardStyle>
-            <Box component="div">
-              <TitleStyle component="h1">
-                Decentralized Marketplace (DeMKT)
-              </TitleStyle>
-              <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-                Pasar is a truly decentralized marketplace that does not depend on any central servers entities
-                to facilitate the peer-to-peer exchange of data and NFTs.<br/>
-                <br/>
-                On Pasar, assets cannot be censored, blocked. or taken down, and Pasar’s trustless
-                exchange protocol is already poised to become a leader in Web3.0 space.
-              </Typography>
+          </MotionInView>
+          <MotionInView variants={varFadeInUp}>
+            <CardStyle>
+              <Box component="div">
+                <TitleStyle component="h1">
+                  Get Started with Essentials
+                </TitleStyle>
+                <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
+                  Onboarding is easy. Just register a Decentralized Identifier (DID) and wallet address from
+                  the Elastos Essentials Super-Wallet.<br/>
+                  <br/>
+                  Then explore Elastos’ complete Web3.0 tech stack, including Hive decentralized storage,
+                  Carrier’s P2P network, Ecosystem DAO Cyber Republic, and much more!
+                </Typography>
+              </Box>
+              <Box draggable = {false} component="img" src="/static/essentials.png" sx={{p: {xs: '0px 32px 32px', sm: 0}, mt: '0 !important'}} />
+              <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 0, mr: 4}}>
+                <StyledButton variant="contained" href="https://play.google.com/store/apps/details?id=org.elastos.essentials.app" target="_blank" startIcon={<AdbIcon />}>
+                  Google Play
+                </StyledButton>
+                <Button variant="outlined" href="https://apps.apple.com/us/app/elastos-essentials/id1568931743" target="_blank" startIcon={<AppleIcon />} color="inherit">
+                  App Store
+                </Button>
+              </Stack>
+            </CardStyle>
+          </MotionInView>
+          <MotionInView variants={varFadeInUp}>
+            <Box>
+              <Stack direction='row'>
+                <TitleStyle component="h1" sx={{flex: 1}}>
+                  Live Auctions <span role="img" aria-label="">⏰</span>
+                </TitleStyle>
+                <Button
+                    to='/marketplace'
+                    size="small"
+                    color="inherit"
+                    component={RouterLink}
+                    endIcon={<Icon icon={arrowIosForwardFill} />}
+                >
+                  See more
+                </Button>
+              </Stack>
+              <FilteredAssetGrid type='live_auction'/>
             </Box>
-            <Box draggable = {false} component="img" src="/static/market-home-1.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
-            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <StyledButton to="/marketplace" variant="outlined" component={RouterLink}>
-                Marketplace
-              </StyledButton>
-              <Button variant="contained" to="/explorer" component={RouterLink} color="inherit">
-                Explorer
-              </Button>
-            </Stack>
-          </CardStyle>
-        </MotionInView>
-        <MotionInView variants={varFadeInUp}>
-          <CardStyle>
-            <Box component="div">
-              <TitleStyle component="h1">
-                Decentralized Identity (DID)
-              </TitleStyle>
-              <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-                DID empowers users to become self-sovereign in virtual space.
-                On Pasar, users are required to sign in with their DIDs in order to create or sell assets.
-                However, all users may purchase assets simply connecting their wallets – no identification required.<br/>
-                <br/>
-                A reputation system based on DID enables users to cultivate trust within their communities
-                in place of depending on traditional verification systems provided by central authorities.
-              </Typography>
+          </MotionInView>
+          <MotionInView variants={varFadeInUp}>
+            <Box>
+              <Stack direction='row'>
+                <TitleStyle component="h1" sx={{flex: 1}}>
+                  Popular Collections <span role="img" aria-label="">🔥</span>
+                </TitleStyle>
+                <Button
+                    to='/collection'
+                    size="small"
+                    color="inherit"
+                    component={RouterLink}
+                    endIcon={<Icon icon={arrowIosForwardFill} />}
+                >
+                  See more
+                </Button>
+              </Stack>
+              <FilteredCollectionGrid/>
             </Box>
-            <Box draggable = {false} component="img" src="/static/user-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
-            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <StyledButton variant="outlined" onClick={openSignin}>
-                Sign in with DID
-              </StyledButton>
-              <Button variant="contained" href="https://www.elastos.org/did" target="_blank" color="inherit">
-                Learn more about DID
-              </Button>
-            </Stack>
-          </CardStyle>
-        </MotionInView>
-        <MotionInView variants={varFadeInUp}>
-          <CardStyle>
-            <Box component="div">
-              <TitleStyle component="h1">
-                Elastos Smart Chain (ESC)
-              </TitleStyle>
-              <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-                ESC is a programmable smart-contract Sidechain that runs on Elastos.
-                Pasar is built on the ESC to benefit from its efficiency and high-performance,
-                so users can generate and exchange assets in a secure, low-cost environment.<br/>
-                <br/>
-                To execute transactions on the ESC, users can purchase ELA on the Essentials app via Glide Finance,
-                a Decentralized Exchange (DEX) also built on the ESC.
-              </Typography>
-            </Box>
-            <Box draggable = {false} component="img" src="/static/chain-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
-            <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-              <StyledButton variant="outlined" href="https://glidefinance.io/swap" target="_blank">
-                Get ELA 
-              </StyledButton>
-              <Button variant="contained" href="https://www.elastos.org/esc" target="_blank" color="inherit">
-                Learn more about ESC
-              </Button>
-            </Stack>
-          </CardStyle>
-        </MotionInView>
-        <Box draggable = {false} component="img" src="/static/elastos-logo.svg" sx={{m: 'auto', width: '40%'}}/>
+          </MotionInView>
+          <MotionInView variants={varFadeInUp}>
+            <CardStyle>
+              <Box component="div">
+                <TitleStyle component="h1">
+                  Decentralized Marketplace (DeMKT)
+                </TitleStyle>
+                <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
+                  Pasar is a truly decentralized marketplace that does not depend on any central servers entities
+                  to facilitate the peer-to-peer exchange of data and NFTs.<br/>
+                  <br/>
+                  On Pasar, assets cannot be censored, blocked. or taken down, and Pasar’s trustless
+                  exchange protocol is already poised to become a leader in Web3.0 space.
+                </Typography>
+              </Box>
+              <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 0, mr: 4}}>
+                <StyledButton to="/marketplace" variant="contained" component={RouterLink}>
+                  Marketplace
+                </StyledButton>
+                <StyledButton variant="outlined" to="/explorer" component={RouterLink} color="inherit">
+                  Explorer
+                </StyledButton>
+              </Stack>
+            </CardStyle>
+          </MotionInView>
+          <MotionInView variants={varFadeInUp}>
+            <CardStyle>
+              <Box component="div">
+                <TitleStyle component="h1">
+                  Decentralized Identity (DID)
+                </TitleStyle>
+                <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
+                  DID empowers users to become self-sovereign in virtual space.
+                  On Pasar, users are required to sign in with their DIDs in order to create or sell assets.
+                  However, all users may purchase assets simply connecting their wallets – no identification required.<br/>
+                  <br/>
+                  A reputation system based on DID enables users to cultivate trust within their communities
+                  in place of depending on traditional verification systems provided by central authorities.
+                </Typography>
+              </Box>
+              <Box draggable = {false} component="img" src="/static/user-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
+              <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
+                <StyledButton variant="outlined" onClick={openSignin}>
+                  Sign in with DID
+                </StyledButton>
+                <Button variant="contained" href="https://www.elastos.org/did" target="_blank" color="inherit">
+                  Learn more about DID
+                </Button>
+              </Stack>
+            </CardStyle>
+          </MotionInView>
+          <MotionInView variants={varFadeInUp}>
+            <CardStyle>
+              <Box component="div">
+                <TitleStyle component="h1">
+                  Elastos Smart Chain (ESC)
+                </TitleStyle>
+                <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
+                  ESC is a programmable smart-contract Sidechain that runs on Elastos.
+                  Pasar is built on the ESC to benefit from its efficiency and high-performance,
+                  so users can generate and exchange assets in a secure, low-cost environment.<br/>
+                  <br/>
+                  To execute transactions on the ESC, users can purchase ELA on the Essentials app via Glide Finance,
+                  a Decentralized Exchange (DEX) also built on the ESC.
+                </Typography>
+              </Box>
+              <Box draggable = {false} component="img" src="/static/chain-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
+              <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
+                <StyledButton variant="outlined" href="https://glidefinance.io/swap" target="_blank">
+                  Get ELA 
+                </StyledButton>
+                <Button variant="contained" href="https://www.elastos.org/esc" target="_blank" color="inherit">
+                  Learn more about ESC
+                </Button>
+              </Stack>
+            </CardStyle>
+          </MotionInView>
+          <Box draggable = {false} component="img" src="/static/elastos-logo.svg" sx={{m: 'auto', width: '40%'}}/>
+        </Stack>
       </Container>
     </RootStyle>
   );
