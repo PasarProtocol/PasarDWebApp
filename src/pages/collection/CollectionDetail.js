@@ -93,6 +93,7 @@ export default function CollectionDetail() {
   const rangeBtnId = 4
   const adultBtnId = 5
   const emptyRange = {min: '', max: ''}
+  const defaultDispMode = isMobile?1:0
 
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
@@ -106,7 +107,7 @@ export default function CollectionDetail() {
   const [range, setRange] = React.useState(sessionFilterProps.range || {min:'', max:''});
   const [adult, setAdult] = React.useState(sessionFilterProps.adult || false);
   const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
-  const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):1);
+  const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):defaultDispMode);
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({
     selectedBtns: sessionFilterProps.selectedBtns || [],

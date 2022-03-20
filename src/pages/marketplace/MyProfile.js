@@ -62,12 +62,13 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
 }));
 // ----------------------------------------------------------------------
 export default function MyProfile() {
+  const defaultDispMode = isMobile?1:0
   const sessionDispMode = sessionStorage.getItem("disp-mode")
   const params = useParams(); // params.address
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([[], [], [], []]);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
-  const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):1);
+  const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):defaultDispMode);
   const [orderType, setOrderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(params.type!==undefined?parseInt(params.type, 10):0);
