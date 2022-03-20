@@ -1,7 +1,23 @@
 import React, { Component } from "react";
 import { Box, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { Fade } from "react-slideshow-image";
 import "react-slideshow-image/dist/styles.css";
+
+const BoxStyle = styled(Box)(({ theme }) => ({
+    width: '80%',
+    height: '100%',
+    borderRadius: theme.spacing(2),
+    overflow: 'hidden',
+    position: 'relative',
+    '& .indicators': {
+        position: 'absolute',
+        width: '100%',
+        bottom: 20,
+        zIndex: 1,
+        padding: '0 20px'
+    }
+}));
 
 export default function HomeAssetCarousel() {
     // const [current, setCurrentBox] = React.useState(0);
@@ -63,30 +79,19 @@ export default function HomeAssetCarousel() {
     ];
     const slideCollections = ['Bunny Punks', 'Pasar', 'Elastos']
     return (
-        <Box 
-            sx={{
-                minWidth: 400,
-                maxWidth: 400,
-                borderRadius: 2,
-                overflow: 'hidden',
-                position: 'relative',
-                '& .indicators': {
-                    position: 'absolute',
-                    width: '100%',
-                    bottom: 20,
-                    zIndex: 1,
-                    px: '20px'
-                }
-            }}
-        >
+        <BoxStyle className="carousel-box">
             <Fade {...properties}>
                 {slideImages.map((each, index) => (
-                    <Box key={index}>
-                        <Typography variant="h5" sx={{position: 'absolute', top: 16, left: 16, color: 'white'}}>{slideCollections[index]}</Typography>
-                        <Box component='img' src={each} sx={{width: 400, height: 400}}/>
+                    <Box key={index} sx={{
+                        // position: 'relative',
+                        pb: '100%',
+                        height: 0,
+                    }}>
+                        <Typography variant="h5" sx={{position: 'absolute', top: 16, left: 16, color: 'white', zIndex: 1}}>{slideCollections[index]}</Typography>
+                        <Box component='img' src={each} sx={{position: 'absolute', width: '100%', height: '100%'}}/>
                     </Box>
                 ))}
             </Fade>
-        </Box>
+        </BoxStyle>
     );
 }

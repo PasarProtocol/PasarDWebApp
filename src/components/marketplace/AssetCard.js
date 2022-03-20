@@ -328,7 +328,7 @@ export default function AssetCard(props) {
           <Box sx={{p:2}}>
             <Stack direction="row">
               <Typography variant="h5" noWrap sx={{flexGrow: 1}}>{title}</Typography>
-              <Typography variant="subtitle2" sx={{display: 'flex', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}}>
+              <Typography variant="subtitle2" sx={{pt: '3px', display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
                 {
                   orderType===auctionOrderType?
                   `${math.round((currentBidPrice)/1e18, 3) || price} ELA`:
