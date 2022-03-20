@@ -5,7 +5,9 @@ import {isMobile} from 'react-device-detect';
 import { motion, AnimatePresence } from "framer-motion";
 import Carousel from 'react-grid-carousel'
 // material
-import { Box, Button, Divider } from '@mui/material';
+import { Box, Button, Stack, Card, Divider } from '@mui/material';
+
+import { MHidden } from '../@material-extend';
 import { TransItem } from '../explorer/CollectionView/LatestTransactions'
 import TransSkeleton from './TransSkeleton';
 import { fetchFrom, getAssetImage, getCoinUSD, getCollectionTypeFromImageUrl } from '../../utils/common';
@@ -13,25 +15,10 @@ import { fetchFrom, getAssetImage, getCoinUSD, getCollectionTypeFromImageUrl } f
 export default function FilteredTransGrid(props){
   const [transactions, setFilteredTrans] = React.useState([]);
   const [isLoadingTrans, setLoadingTrans] = React.useState(false);
-  const settings = {
-    dots: false,
-    arrows: true,
-    nextArrow: <Button>next</Button>,
-    autoplay: false,
-    infinite: false,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    rows: 3,
-    responsive: [
-      {breakpoint: 1500, settings: {slidesToShow: 3}},
-      {breakpoint: 1000, settings: {slidesToShow: 2}},
-      {breakpoint: 700, settings: {slidesToShow: 1}}
-    ]
-  }
 
   React.useEffect(async () => {
     setLoadingTrans(true);
-    fetchFrom(`api/v2/sticker/listTrans?pageNum=1&pageSize=9`)
+    fetchFrom(`api/v2/sticker/listTrans?pageNum=1&pageSize=10`)
       .then((response) => {
         response.json().then((jsonTrans) => {
           if(jsonTrans.data){
@@ -47,26 +34,64 @@ export default function FilteredTransGrid(props){
           setLoadingTrans(false);
       });
   }, []);
-  const loadingSkeletons = Array(9).fill(null)
+  const loadingSkeletons = Array(5).fill(null)
   return (
-    <Box sx={{ mx: 0 }}>
-      <Slider {...settings}>
+    <Stack direction='row' spacing={2}>
+      <Card sx={{flexGrow: 1}}>
+        <Stack spacing={2} sx={{ p: 3 }}>
+          {
+            isLoadingTrans?
+            loadingSkeletons.map((_, index)=>(
+              <Box key={index}>
+                <TransSkeleton/>
+                {
+                  index<loadingSkeletons.length-1&&
+                  <Divider sx={{pb: 2}}/>
+                }
+              </Box>
+            )):
+            transactions.slice(0,5).map((trans, index) => (
+              <Box key={index}>
+                <TransItem trans={trans}/>
+                {
+                  index<transactions.slice(0,5).length-1&&
+                  <Divider sx={{pb: 2}}/>
+                }
+              </Box>
+            ))
+          }
+        </Stack>
+      </Card>
+      <MHidden width="mdDown">
         {
-          isLoadingTrans?
-          loadingSkeletons.map((item, index)=>(
-            <Box key={index} sx={{p: 1}}>
-              <TransSkeleton key={index}/>
-            </Box>
-          )):
-          transactions.map((trans, index)=>(
-            <Box key={index} sx={{p: 1}}>
-              <TransItem trans={trans}/>
-              <Divider sx={{pt: 1}}/>
-            </Box>
-          ))
+          (isLoadingTrans || !isLoadingTrans&&transactions.length>5) &&
+          <Card sx={{flexGrow: 1}}>
+            <Stack spacing={2} sx={{ p: 3 }}>
+              {
+                isLoadingTrans?
+                loadingSkeletons.map((_, index)=>(
+                  <Box key={index}>
+                    <TransSkeleton/>
+                    {
+                      index<loadingSkeletons.length-1&&
+                      <Divider sx={{pb: 2}}/>
+                    }
+                  </Box>
+                )):
+                transactions.slice(5,10).map((trans, index) => (
+                  <Box key={index}>
+                    <TransItem trans={trans}/>
+                    {
+                      index<transactions.slice(5,10).length-1&&
+                      <Divider sx={{pb: 2}}/>
+                    }
+                  </Box>
+                ))
+              }
+            </Stack>
+          </Card>
         }
-      </Slider>
-    </Box>
-    
+      </MHidden>
+    </Stack>
   )
 }
