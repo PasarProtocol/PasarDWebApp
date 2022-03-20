@@ -74,13 +74,13 @@ const TitleStyle = styled(Typography)(({ theme }) => ({
   lineHeight: 64 / 48,
   fontSize: '2rem',
   '@media (min-width:600px)': {
-    fontSize: '2.3rem'
+    fontSize: '2.1rem'
   },
   '@media (min-width:900px)': {
-    fontSize: '2.5rem'
+    fontSize: '2.3rem'
   },
   '@media (min-width:1200px)': {
-    fontSize: '2.7rem'
+    fontSize: '2.5rem'
   }
 }));
 
@@ -124,7 +124,7 @@ export default function MarketHome() {
               </Box>
               <Stack spacing={1} direction="row">
                 <StyledButton to="/marketplace" variant="contained" component={RouterLink}>
-                  Explorer
+                  Explore
                 </StyledButton>
                 <Button to="/create" variant="outlined" component={RouterLink} color="inherit">
                   Create
@@ -236,10 +236,7 @@ export default function MarketHome() {
             <Box>
               <Stack direction='row'>
                 <TitleStyle component="h1" sx={{flex: 1}}>
-                  Marketplace&nbsp;
-                  <StyledButton to="/create" variant="contained" component={RouterLink}>
-                    NEW
-                  </StyledButton>
+                  Marketplace <span role="img" aria-label="">🛍️</span>
                 </TitleStyle>
                 <Button
                     to='/marketplace'
