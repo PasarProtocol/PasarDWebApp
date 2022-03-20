@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import InfiniteScroll from "react-infinite-scroll-component";
+import { isMobile } from 'react-device-detect';
 import { Container, Stack, Typography, AppBar, Toolbar, Paper, Divider, Backdrop, 
   Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { Icon } from '@iconify/react';
@@ -105,7 +106,7 @@ export default function MarketExplorer() {
   const rangeBtnId = 4
   const adultBtnId = 5
   const emptyRange = {min: '', max: ''}
-
+  const defaultDispMode = isMobile?1:0
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([]);
@@ -116,7 +117,7 @@ export default function MarketExplorer() {
   const [range, setRange] = React.useState(sessionFilterProps.range || {min:'', max:''});
   const [adult, setAdult] = React.useState(sessionFilterProps.adult || false);
   const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
-  const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):1);
+  const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):defaultDispMode);
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({
     selectedBtns: sessionFilterProps.selectedBtns || [],
