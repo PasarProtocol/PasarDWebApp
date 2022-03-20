@@ -7,15 +7,6 @@ import { Box, Button } from '@mui/material';
 import CollectionCard from '../collection/CollectionCard';
 import { fetchFrom, getAssetImage, getCoinUSD, getCollectionTypeFromImageUrl, collectionTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
-const StackedGrid = ({
-  // gridItemWidth = "250px",
-  children,
-  ...props
-}) => (
-  <Box display="grid" gridTemplateColumns={`repeat(auto-fill, minmax(${props.itemWidth}px, 1fr))`} gap={1.5}>
-    {children}
-  </Box>
-);
 
 const settings = {
   dots: false,
@@ -31,7 +22,7 @@ const settings = {
     {breakpoint: 450, settings: {slidesToShow: 1}}
   ]
 };
-export default function FilteredAssetGrid(props){
+export default function FilteredCollectionGrid(props){
   const {type} = props
   const [collections, setCollections] = React.useState(collectionTypes);
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
@@ -56,7 +47,7 @@ export default function FilteredAssetGrid(props){
   }, []);
   const loadingSkeletons = Array(3).fill(null)
   return (
-    <Box sx={{ mx: -1 }}>
+    <Box sx={{ mx: 0 }}>
       <Slider {...settings}>
         {
           // isLoadingCollections?

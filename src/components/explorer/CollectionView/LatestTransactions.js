@@ -12,7 +12,7 @@ import { MethodList, reduceHexAddress } from '../../../utils/common';
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,
 };
-function TransItem({ trans }) {
+export function TransItem({ trans }) {
   let methodItem = MethodList.find((item)=>item.method===trans.event)
     if(!methodItem)
         methodItem = {color: 'grey', icon: 'tag', detail: []}
@@ -53,10 +53,7 @@ export default function LatestTransactions(props) {
       {props.isLoading && <LoadingScreen />}
       {props.dataList.map((trans, index) => (
         <Box key={index}>
-          <TransItem 
-            trans={trans}
-            isLast={index===props.dataList.length-1}
-          />
+          <TransItem trans={trans}/>
           {
             index<props.dataList.length-1&&
             <Divider sx={{pb: 2}}/>

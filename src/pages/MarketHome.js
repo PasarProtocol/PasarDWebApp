@@ -9,10 +9,11 @@ import { Icon } from '@iconify/react';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 // components
 import Page from '../components/Page';
-import HomeAssetCarousel from '../components/HomeAssetCarousel';
+import HomeAssetCarousel from '../components/home/HomeAssetCarousel';
 import StyledButton from '../components/signin-dlg/StyledButton';
-import FilteredAssetGrid from '../components/marketplace/FilteredAssetGrid'
-import FilteredCollectionGrid from '../components/marketplace/FilteredCollectionGrid'
+import FilteredAssetGrid from '../components/home/FilteredAssetGrid'
+import FilteredTransGrid from '../components/home/FilteredTransGrid'
+import FilteredCollectionGrid from '../components/home/FilteredCollectionGrid'
 import { MotionInView, varFadeInUp, varFadeInDown } from '../components/animate';
 // ----------------------------------------------------------------------
 
@@ -29,16 +30,10 @@ const RootStyle = styled(Page)(({ theme }) => ({
 }));
 const StackStyle = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
-  [theme.breakpoints.up('sm')]: {
-    '& .MuiPaper-root': {
-      width: '30%',
-      height: '100%',
-      minWidth: '300px'
-    }
-  },
   [theme.breakpoints.down('sm')]: {
     flexDirection: 'column',
-    '& .MuiPaper-root': {
+    '& .carousel-box': {
+      width: '100%',
       marginTop: theme.spacing(2)
     }
   }
@@ -68,9 +63,9 @@ const CardStyle = styled(Box)(({ theme }) => ({
     minWidth: 0,
     flexGrow: 1,
     position: 'relative',
-    [theme.breakpoints.up('sm')]: {
+    // [theme.breakpoints.up('sm')]: {
       paddingBottom: 48
-    }
+    // }
   }
 }));
 
@@ -121,7 +116,7 @@ export default function MarketHome() {
                 <HeadTitleStyle variant="h1">
                   Dawn of the DeMKT
                 </HeadTitleStyle>
-                <Typography variant="h4" component="div" sx={{fontWeight: 'normal', pr: 4}}>
+                <Typography variant="h4" component="div" sx={{fontWeight: 'normal', pr: 4, pb: 2}}>
                   Pasar is open-sourced, community-centric, and one
                   of the first truly Web3.0 decentralized marketplaces (DeMKT)
                   for exchanging data and Non-fungible Tokens (NFTs).
@@ -238,6 +233,28 @@ export default function MarketHome() {
             </CardStyle>
           </MotionInView>
           <MotionInView variants={varFadeInUp}>
+            <Box>
+              <Stack direction='row'>
+                <TitleStyle component="h1" sx={{flex: 1}}>
+                  Marketplace&nbsp;
+                  <StyledButton to="/create" variant="contained" component={RouterLink}>
+                    NEW
+                  </StyledButton>
+                </TitleStyle>
+                <Button
+                    to='/marketplace'
+                    size="small"
+                    color="inherit"
+                    component={RouterLink}
+                    endIcon={<Icon icon={arrowIosForwardFill} />}
+                >
+                  See more
+                </Button>
+              </Stack>
+              <FilteredAssetGrid type='all'/>
+            </Box>
+          </MotionInView>
+          <MotionInView variants={varFadeInUp}>
             <CardStyle>
               <Box component="div">
                 <TitleStyle component="h1">
@@ -252,16 +269,34 @@ export default function MarketHome() {
                   in place of depending on traditional verification systems provided by central authorities.
                 </Typography>
               </Box>
-              <Box draggable = {false} component="img" src="/static/user-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
-              <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-                <StyledButton variant="outlined" onClick={openSignin}>
+              <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 0, mr: 4}}>
+                <StyledButton variant="contained" onClick={openSignin}>
                   Sign in with DID
                 </StyledButton>
-                <Button variant="contained" href="https://www.elastos.org/did" target="_blank" color="inherit">
+                <StyledButton variant="outlined" href="https://www.elastos.org/did" target="_blank" color="inherit">
                   Learn more about DID
-                </Button>
+                </StyledButton>
               </Stack>
             </CardStyle>
+          </MotionInView>
+          <MotionInView variants={varFadeInUp}>
+            <Box>
+              <Stack direction='row'>
+                <TitleStyle component="h1" sx={{flex: 1}}>
+                  Latest Transactions <span role="img" aria-label="">✉️</span>
+                </TitleStyle>
+                <Button
+                    to='/transaction'
+                    size="small"
+                    color="inherit"
+                    component={RouterLink}
+                    endIcon={<Icon icon={arrowIosForwardFill} />}
+                >
+                  See more
+                </Button>
+              </Stack>
+              <FilteredTransGrid/>
+            </Box>
           </MotionInView>
           <MotionInView variants={varFadeInUp}>
             <CardStyle>
@@ -270,26 +305,22 @@ export default function MarketHome() {
                   Elastos Smart Chain (ESC)
                 </TitleStyle>
                 <Typography variant="p" component="div" sx={{color: 'text.secondary'}}>
-                  ESC is a programmable smart-contract Sidechain that runs on Elastos.
-                  Pasar is built on the ESC to benefit from its efficiency and high-performance,
-                  so users can generate and exchange assets in a secure, low-cost environment.<br/>
+                  ESC is a programmable smart-contract Sidechain that runs on Elastos.<br/>
                   <br/>
-                  To execute transactions on the ESC, users can purchase ELA on the Essentials app via Glide Finance,
-                  a Decentralized Exchange (DEX) also built on the ESC.
+                  Pasar is built on the ESC to benefit from its efficiency and high-performance,
+                  so users can generate and exchange assets in a secure, low-cost environment.
                 </Typography>
               </Box>
-              <Box draggable = {false} component="img" src="/static/chain-home.svg" sx={{p: {xs: '0px 32px 32px', sm: 0}}} />
-              <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 32, mr: 4}}>
-                <StyledButton variant="outlined" href="https://glidefinance.io/swap" target="_blank">
+              <Stack spacing={1} direction="row" sx={{position: 'absolute', bottom: 0, mr: 4}}>
+                <StyledButton variant="contained" href="https://glidefinance.io/swap" target="_blank">
                   Get ELA 
                 </StyledButton>
-                <Button variant="contained" href="https://www.elastos.org/esc" target="_blank" color="inherit">
+                <StyledButton variant="outlined" href="https://www.elastos.org/esc" target="_blank">
                   Learn more about ESC
-                </Button>
+                </StyledButton>
               </Stack>
             </CardStyle>
           </MotionInView>
-          <Box draggable = {false} component="img" src="/static/elastos-logo.svg" sx={{m: 'auto', width: '40%'}}/>
         </Stack>
       </Container>
     </RootStyle>
