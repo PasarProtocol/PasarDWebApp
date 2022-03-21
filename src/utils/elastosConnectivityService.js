@@ -35,6 +35,16 @@ const getVerifiablePresentation = async () => {
   return didAccess.requestCredentials(credentialRequest);
 }
 
+/**
+ * Request the signdata on tokenID
+ */
+export async function requestSigndataOnTokenID(tokenId) {
+  const didAccess = new ConnDID.DIDAccess();
+  const signedData = await didAccess.signData(tokenId, { extraField: 0 }, "signature");
+  console.log(signedData)
+  return signedData
+}
+
 export default class ElastosConnectivityService {
   // TrustedKYCProviders = ["did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK"] // Trinity. Tech KYC DID
   constructor() {
@@ -135,7 +145,7 @@ export default class ElastosConnectivityService {
   /**
    * Request the Custom credentials
    */
-   async requestCustomCredentials(claimItems) {
+  async requestCustomCredentials(claimItems) {
     const didAccess = new ConnDID.DIDAccess();
     const presentation = await didAccess.requestCredentials({
       claims: claimItems.map(item=>(

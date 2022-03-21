@@ -18,8 +18,6 @@ import jwtDecode from 'jwt-decode';
 
 // components
 import { MHidden } from '../../components/@material-extend';
-import useOffSetTop from '../../hooks/useOffSetTop';
-import useMintDlg from '../../hooks/useMintDlg';
 import Page from '../../components/Page';
 import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
 import ItemTypeButton from '../../components/marketplace/ItemTypeButton';
@@ -40,7 +38,10 @@ import StartingDateSelect from '../../components/marketplace/StartingDateSelect'
 import ExpirationDateSelect from '../../components/marketplace/ExpirationDateSelect'
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice } from '../../utils/common';
+import {requestSigndataOnTokenID} from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
+import useOffSetTop from '../../hooks/useOffSetTop';
+import useMintDlg from '../../hooks/useMintDlg';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -486,30 +487,37 @@ export default function CreateItem() {
       if(proof.length) {
         creatorObj.KYCedProof = proof
       }
-      // create the metadata object we'll be storing
-      const metaObj = {
-        "version": "2",
-        "type": itemtype==="General"?'image':itemtype.toLowerCase(),
-        "name": collectibleName,
-        "description": description,
-        "creator": creatorObj,
-        "data": {
-          "image": `pasar:image:${added.origin.path}`,
-          "kind": added.type.replace('image/', ''),
-          "size": added.origin.size,
-          "thumbnail": `pasar:image:${added.thumbnail.path}`
-        },
-        "adult": explicitRef.current.checked,
-        "properties": propertiesObj,
-      }
-      try {
-        const jsonMetaObj = JSON.stringify(metaObj);
-        // add the metadata itself as well
-        const metaRecv = Promise.resolve(client.add(jsonMetaObj))
-        resolve(metaRecv)
-      } catch (error) {
+      const tokenId = `0x${hash(added.origin.path)}`
+      requestSigndataOnTokenID(tokenId).then(rsp=>{
+        // create the metadata object we'll be storing
+        const metaObj = {
+          "version": "2",
+          "type": itemtype==="General"?'image':itemtype.toLowerCase(),
+          "name": collectibleName,
+          "description": description,
+          "creator": creatorObj,
+          "data": {
+            "image": `pasar:image:${added.origin.path}`,
+            "kind": added.type.replace('image/', ''),
+            "size": added.origin.size,
+            "thumbnail": `pasar:image:${added.thumbnail.path}`,
+            "signature": rsp.signature
+          },
+          "adult": explicitRef.current.checked,
+          "properties": propertiesObj,
+        }
+        console.log(metaObj)
+        try {
+          const jsonMetaObj = JSON.stringify(metaObj);
+          // add the metadata itself as well
+          const metaRecv = Promise.resolve(client.add(jsonMetaObj))
+          resolve(metaRecv)
+        } catch (error) {
+          reject(error);
+        }
+      }).catch((error) => {
         reject(error);
-      }
+      })
     })
   )
   const sendIpfsDidJson = ()=>(
