@@ -1,3 +1,4 @@
+import React from 'react'
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
@@ -34,6 +35,18 @@ const BoxStyle = styled(Box)(({ theme }) => ({
 
 const CardImgBox = (props) => {
     const { src } = props;
+    const imageRef = React.useRef();
+
+    const handleResize = ()=>{
+      if(!imageRef.current)
+        return
+      const { clientWidth: imgWidth, clientHeight: imgHeight } = imageRef.current;
+      if(imgWidth > imgHeight)
+        imageRef.current.style.width = '100%'
+      else
+        imageRef.current.style.height = '100%'
+    }
+
     const imageStyle = {
       // borderRadius: 1,
       // boxShadow: (theme)=>theme.customShadows.z16,
@@ -44,7 +57,7 @@ const CardImgBox = (props) => {
     return (
       <BoxStyle className='card-img'>
         <Box className='img-box'>
-          <Box draggable = {false} component="img" src={src} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
+          <Box draggable = {false} component="img" src={src} sx={imageStyle} ref={imageRef} onLoad={handleResize} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
         </Box>
       </BoxStyle>
     );
