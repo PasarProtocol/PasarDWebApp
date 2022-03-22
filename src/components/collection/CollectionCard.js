@@ -17,9 +17,8 @@ import PaperRecord from '../PaperRecord';
 import { getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
-const MarkBoxStyle = styled(Box)(({ theme }) => ({
+const avatarStyle = {
   border: '1px solid',
-  borderColor: theme.palette.background.paper,
   width: 56,
   height: 56,
   borderRadius: '100%',
@@ -29,8 +28,16 @@ const MarkBoxStyle = styled(Box)(({ theme }) => ({
   left:0,
   right: 0,
   bottom: -29,
-  margin: 'auto',
+  margin: 'auto'
+}
+const MarkBoxStyle = styled(Box)(({ theme }) => ({
+  ...avatarStyle,
+  borderColor: theme.palette.background.paper,
   padding: '10px'
+}));
+const AvatarBoxStyle = styled(Box)(({ theme }) => ({
+  ...avatarStyle,
+  borderColor: theme.palette.background.paper,
 }));
 const CollectionImgBox = (props) => {
   const { cover, avatar } = props;
@@ -53,9 +60,13 @@ const CollectionImgBox = (props) => {
           }} 
         />
       }
-      <MarkBoxStyle>
-        <Box draggable = {false} component="img" src={avatar} />
-      </MarkBoxStyle>
+      {
+        avatar.startsWith('/static')?
+        <MarkBoxStyle>
+          <Box draggable = {false} component="img" src={avatar} />
+        </MarkBoxStyle>:
+        <AvatarBoxStyle draggable = {false} component="img" src={avatar} />
+      }
     </Stack>
   );
 };

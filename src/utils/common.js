@@ -426,6 +426,13 @@ export const collectionTypes = [
     title: 'Feeds NFT Sticker',
     description: 'Feeds default collection',
     detail: 'A collection of all items minted using the Feeds NFT Stickers Contract'
+  },
+  {
+    name: 'Bunny',
+    avatar: 'https://ipfs-test.trinity-feeds.app/ipfs/QmVGaCENQCFKm1cJhRWBJ6Wj41LWh1Ev4gjkTBTZCyH7YC',
+    title: 'Bunny Punk',
+    description: 'Bunny Punk collection',
+    detail: 'Bunny Punk is a collection of 1,000 unique 3D well-designed Bunnies united together to get on the Elastos Smart chain Each Bunny Punk is unique and exclusive based on a hundred traits. The objective is to build the strongest Elastos NFT community and project.'
   }
 ]
 export const coinTypes = [{icon: 'elastos.svg', name: 'ELA'}, {icon: 'badges/diamond.svg', name: 'DIA'}]
