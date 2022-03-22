@@ -69,7 +69,7 @@ export default function MyItems() {
             Collections
           </Typography>
         </Box>
-        <Stack direction='row'>
+        <Stack direction='row' sx={{mb: 1}}>
           <Typography variant="subtitle2" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
             {collections.length} collections
           </Typography>

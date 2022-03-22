@@ -181,7 +181,7 @@ export default function AssetFilterPan(props){
                       filterCollections.map((el, i)=>(
                         <ListItemButton key={i} onClick={()=>{selectCollection(el.title)}} selected={filterProps.selectedCollections.includes(el.title)}>
                           <ListItemIcon>
-                            <Box draggable = {false} component="img" src={el.avatar} sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
+                            <Box draggable = {false} component="img" src={el.avatar} sx={{ width: 24, height: 24, borderRadius: 2, p: el.avatar.startsWith('/static')?.5:0, backgroundColor: 'black' }} />
                           </ListItemIcon>
                           <ListItemText primary={el.title} />
                           {
