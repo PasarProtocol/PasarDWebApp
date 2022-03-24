@@ -837,7 +837,7 @@ export default function CreateItem() {
                     {
                       mintype!=="Batch"?
                       "Add item description":
-                      "Fixed Description (Leave blank if you want to manually edit each item description on the preview cards)"
+                      "Fixed Description"
                     }
                   </InputLabelStyle>
                   <InputStyle
