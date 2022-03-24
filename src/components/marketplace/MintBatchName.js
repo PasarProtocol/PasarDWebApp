@@ -69,7 +69,7 @@ export default function MintBatchName(props) {
           </Stack>
         </Grid>
         <Grid item xs={6} sm={3}>
-          <TypographyStyle variant="caption">From (Number)<br/>Leave blank if not needed</TypographyStyle>
+          <TypographyStyle variant="caption">Starting Number</TypographyStyle>
           <TextField type="number" label="Example: 1" size="small" fullWidth onChange={(e)=>{setFromNumber(e.target.value)}}/>
         </Grid>
         <Grid item xs={6} sm={3}>
