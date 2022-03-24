@@ -147,21 +147,33 @@ export default class ElastosConnectivityService {
    */
   async requestCustomCredentials(claimItems) {
     const didAccess = new ConnDID.DIDAccess();
+    const claimArray = claimItems.reduce((arr, item)=>{
+      if(item.title==='KYC-me') {
+        arr=[
+          ...arr,
+          ConnDID.simpleTypeClaim("Your birth date", "BirthDateCredential", false)
+            .withIssuers(this[sTrustedProvider])
+            .withNoMatchRecommendations([
+              { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
+            ]),
+          ConnDID.simpleTypeClaim("Your gender", "GenderCredential", false)
+            .withIssuers(this[sTrustedProvider])
+            .withNoMatchRecommendations([
+              { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
+            ]),
+          ConnDID.simpleTypeClaim("Your country", "CountryCredential", false)
+            .withIssuers(this[sTrustedProvider])
+            .withNoMatchRecommendations([
+              { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
+            ])
+        ];
+        return arr
+      }
+      arr.push(ConnDID.simpleTypeClaim(`Your ${item.title}`, item.title, true));
+      return arr
+    }, [])
     const presentation = await didAccess.requestCredentials({
-      claims: claimItems.map(item=>(
-        ConnDID.simpleTypeClaim(`Your ${item.title}`, item.title, true)
-          .withIssuers(this[sTrustedProvider])
-          .withNoMatchRecommendations([
-            { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
-          ])
-      ))
-      // claims: [
-      //   ConnDID.simpleTypeClaim("Your name", "NameCredential", false)
-      //     .withIssuers(this[sTrustedProvider])
-      //     .withNoMatchRecommendations([
-      //       { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
-      //     ]),
-      // ]
+      claims: claimArray
     });
     return presentation
   }

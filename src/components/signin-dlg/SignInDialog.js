@@ -24,7 +24,7 @@ import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosf
 import jwt from 'jsonwebtoken';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { essentialsConnector, initConnectivitySDK, isUsingEssentialsConnector } from './EssentialConnectivity';
-import CredentialsDlg from '../dialog/Credentials'
+// import CredentialsDlg from '../dialog/Credentials'
 import { MIconButton, MFab } from '../@material-extend';
 import { injected, walletconnect, resetWalletConnector } from './connectors';
 import StyledButton from './StyledButton';
@@ -563,10 +563,10 @@ export default function SignInDialog() {
               <SettingsOutlinedIcon />
               &nbsp;Settings
             </MenuItem> */}
-            <MenuItem value="credentials" onClick={closeAccountMenu}>
+            {/* <MenuItem value="credentials" onClick={closeAccountMenu}>
               <Box component="img" alt="ico" src='/static/carbon_credentials.svg' sx={{ width: 24, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}/>
               &nbsp;Credentials
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem value="signout" onClick={closeAccountMenu} id="signout">
               <LogoutOutlinedIcon />
               &nbsp;Sign Out
@@ -907,7 +907,7 @@ export default function SignInDialog() {
           </Typography>
         </DialogContent>
       </Dialog>
-      <CredentialsDlg/>
+      {/* <CredentialsDlg/> */}
       <SnackbarCustom isOpen={isOpenSnackbar} setOpen={setSnackbarOpen}>
         Wrong network, only Elastos Smart Chain is supported
       </SnackbarCustom>

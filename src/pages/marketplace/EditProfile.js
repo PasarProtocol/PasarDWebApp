@@ -1,10 +1,13 @@
 import React from 'react';
+import bs58 from 'bs58'
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip, Box } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useSnackbar } from 'notistack';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
+import { Icon } from '@iconify/react';
+import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 
 // components
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
@@ -38,6 +41,7 @@ const credentialItems = [
   {title: 'Discord', description: 'Discord account'},
   {title: 'Telegram', description: 'Telegram account'},
   {title: 'Medium', description: 'Medium account'},
+  {title: 'KYC-me', description: 'KYC-me badge'},
 ]
 export default function EditProfile() {
   const [checkedItem, setCheckedItem] = React.useState(Array(7).fill(false));
@@ -96,6 +100,45 @@ export default function EditProfile() {
       }
       return Promise.reject(error);
     }
+
+    // Check presentation validity (genuine, not tampered)
+    const valid = await kycVerifiablePresentation.isValid();
+    if (!valid) {
+      stopProvide("Invalid presentation")
+      return
+    }
+
+    // Get the presentation holder
+    const presentationDID = kycVerifiablePresentation.getHolder().getMethodSpecificId();
+    if (!presentationDID) {
+      stopProvide("Unable to extract owner DID from the presentation")
+      return
+    }
+
+    // Make sure the holder of this presentation is the currently authentified user
+    if (sessionStorage.getItem('PASAR_DID') !== presentationDID) {
+      stopProvide("Presentation not issued by the currently authenticated user")
+      return
+    }
+
+    const credentials = kycVerifiablePresentation.getCredentials();
+    if (!credentials.length) {
+      stopProvide("Nothing to provide")
+      return
+    }
+
+    const birthDateCredential = credentials.find(c => c.getType().indexOf("BirthDateCredential") >= 0);
+    const genderCredential = credentials.find(c => c.getType().indexOf("GenderCredential") >= 0);
+    const countryCredential = credentials.find(c => c.getType().indexOf("CountryCredential") >= 0);
+    if (!birthDateCredential && !genderCredential && !countryCredential){
+      stopProvide("Nothing to provide KYC-me credentials")
+      return
+    }
+
+    const vpBuffer = Buffer.from(kycVerifiablePresentation.serialize())
+    const encodedPresentation = bs58.encode(vpBuffer)
+    sessionStorage.setItem('KYCedProof', encodedPresentation)
+    enqueueSnackbar('Save action success', { variant: 'success' });
     setOnProgress(false)
   }
   return (
@@ -113,7 +156,7 @@ export default function EditProfile() {
             </Typography>
           </Grid>
           <Grid item xs={7}>
-            <Stack direction='column' spacing={1}>
+            <Stack direction='column' spacing={1} sx={{mb: 2}}>
               {
                 credentialItems.map((item, i)=>(
                   <Box key={i}>
@@ -129,15 +172,22 @@ export default function EditProfile() {
                       />
                     </Stack>
                     <Divider/>
+                    {
+                      item.title==='KYC-me'&&
+                      <Link href='http://kyc-me.io' target="_blank" sx={{display: 'flex', alignItems: 'center'}}>
+                        <Typography variant="caption" sx={{color: 'origin.main'}}>No such credentials yet? Get credentials on KYC-me.io now!</Typography>
+                        <Icon icon={externalLinkFill} width="15px"/>
+                      </Link>
+                    }
                   </Box>
                 ))
               }
-              <TransLoadingButton loading={onProgress} loadingText="Please Provide Credentials From Wallet" onClick={handleSaveAction} fullWidth>
-                Save Credentials
-              </TransLoadingButton>
               {/* <LoadingButton loading={onProgress} variant="contained" onClick={handleSaveAction} fullWidth>
               </LoadingButton> */}
             </Stack>
+            <TransLoadingButton loading={onProgress} loadingText="Please Provide Credentials From Wallet" onClick={handleSaveAction} fullWidth>
+              Save Credentials
+            </TransLoadingButton>
           </Grid>
           <Grid item xs={5}>
             <Typography variant="h4" sx={{fontWeight: 'normal'}}>Avatar</Typography>
