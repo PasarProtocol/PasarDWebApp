@@ -282,23 +282,24 @@ export default function ImportCollection() {
                 </AccordionSummary>
                 <AccordionDetails>
                   {
-                    socialTypes.map(type=>
-                    <>
-                      <Typography variant="h4" sx={{fontWeight: 'normal', color: 'origin.main'}}>{type}</Typography>
-                      <FormControl variant="standard" sx={{width: '100%'}}>
-                        <InputLabelStyle htmlFor={`input-with-${type}`} sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
-                          Add {type} URL
-                        </InputLabelStyle>
-                        <InputStyle
-                          id={`input-with-${type}`}
-                          startAdornment={' '}
-                          value={socialUrl[type]}
-                          onChange={(e)=>handleInputSocials(e.target.value, type)}
-                          sx={{mt: '-5px !important'}}
-                        />
-                      </FormControl>
-                      <Divider/>
-                    </>)
+                    socialTypes.map((type, index)=>
+                      <Box key={index}>
+                        <Typography variant="h4" sx={{fontWeight: 'normal', color: 'origin.main'}}>{type}</Typography>
+                        <FormControl variant="standard" sx={{width: '100%'}}>
+                          <InputLabelStyle htmlFor={`input-with-${type}`} sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
+                            Add {type} URL
+                          </InputLabelStyle>
+                          <InputStyle
+                            id={`input-with-${type}`}
+                            startAdornment={' '}
+                            value={socialUrl[type]}
+                            onChange={(e)=>handleInputSocials(e.target.value, type)}
+                            sx={{mt: '-5px !important'}}
+                          />
+                        </FormControl>
+                        <Divider/>
+                      </Box>
+                    )
                   }
                 </AccordionDetails>
               </Accordion>
@@ -314,6 +315,7 @@ export default function ImportCollection() {
               </Grid>
               <Grid item xs={12} sx={{width: '100%'}}>
                 <CollectionCard 
+                  isPreview={Boolean(true)}
                   info={{
                     title: 'Collection Name',
                     detail: description,
