@@ -32,7 +32,7 @@ const RootStyle = styled(Page)(({ theme }) => ({
 }));
 
 // ----------------------------------------------------------------------
-export default function MyItems() {
+export default function Explorer() {
   const navigate = useNavigate();
   const [collections, setCollections] = React.useState(collectionTypes);
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
@@ -78,7 +78,7 @@ export default function MyItems() {
         <Grid container spacing={2}>
           {
             collections.map((info, index)=>
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid item key={index} xs={12} sm={6} md={4}>
                 <CollectionCard info={info}/>
               </Grid>
             )

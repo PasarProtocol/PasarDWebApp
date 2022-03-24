@@ -4,16 +4,13 @@ import Imgix from "react-imgix";
 import { alpha, styled } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { motion } from "framer-motion";
-import Countdown from "react-countdown";
-
-// material
 import { Icon } from '@iconify/react';
 import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip } from '@mui/material';
-// import Badge from '../Badge';
+
 import PaperRecord from '../PaperRecord';
-// import CardImgBox from '../CardImgBox';
-// import useSingin from '../../hooks/useSignin';
+// import Badge from '../Badge';
 // import BadgeProfile from './BadgeProfile'
+// import useSingin from '../../hooks/useSignin';
 import { getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -29,6 +26,22 @@ const avatarStyle = {
   right: 0,
   bottom: -29,
   margin: 'auto'
+}
+const paperStyle = {
+  transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+  transform: 'translateY(0px)',
+  '.cover-image': {
+    OTransition: 'all .5s',
+    transition: 'all .5s'
+  },
+  '&:hover': {
+    boxShadow: '0 4px 8px 0px rgb(0 0 0 / 30%)',
+    transform: 'translateY(-4px)'
+  },
+  '&:hover .cover-image': {
+    OTransform: 'scale(1.2)',
+    transform: 'scale(1.2)'
+  }
 }
 const MarkBoxStyle = styled(Box)(({ theme }) => ({
   ...avatarStyle,
@@ -49,19 +62,22 @@ const CollectionImgBox = (props) => {
   }
   return (
     <Stack sx={{position: 'relative', height: '120px', mb: '25px'}}>
+      <Stack sx={{height: '100%', overflow: 'hidden'}}>
+        {
+          cover?
+          <Box className='cover-image' draggable = {false} component="img" src={cover} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
+          <Box
+            className='cover-image'
+            sx={{
+              background: 'linear-gradient(90deg, #a951f4, #FF5082)',
+              width: '100%',
+              height: '100%'
+            }} 
+          />
+        }
+      </Stack>
       {
-        cover?
-        <Box draggable = {false} component="img" src={cover} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
-        <Box
-          sx={{
-            background: 'linear-gradient(90deg, #a951f4, #FF5082)',
-            width: '100%',
-            height: '100%'
-          }} 
-        />
-      }
-      {
-        avatar.startsWith('/static')?
+        !avatar || avatar.startsWith('/static')?
         <MarkBoxStyle>
           <Box draggable = {false} component="img" src={avatar} />
         </MarkBoxStyle>:
@@ -71,8 +87,8 @@ const CollectionImgBox = (props) => {
   );
 };
 
-export default function CollectionCard(props) {
-  const { info } = props
+const CollectionCardPaper = (props) => {
+  const { info, isPreview } = props
   const {title, avatar, coverImage, detail} = info
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
   
@@ -91,7 +107,7 @@ export default function CollectionCard(props) {
   }, []);
 
   return (
-      <PaperRecord sx={{overflow: 'hidden'}}>
+      <PaperRecord sx={isPreview?{ overflow: 'hidden' } : { overflow: 'hidden', ...paperStyle }}>
         <Box>
         {
           // isLink?(
@@ -123,5 +139,22 @@ export default function CollectionCard(props) {
           </Stack>
         </Box>
       </PaperRecord>
+  );
+};
+
+export default function CollectionCard(props) {
+  const { info, isPreview=false } = props
+  return (
+    isPreview?
+    <CollectionCardPaper {...props}/>:
+    <Link
+      component={RouterLink}
+      // to={`/marketplace/detail/${tokenId}`}
+      to='#'
+      alt=""
+      underline="none"
+    >
+      <CollectionCardPaper {...props}/>
+    </Link>
   );
 };
