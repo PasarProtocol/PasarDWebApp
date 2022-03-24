@@ -21,6 +21,7 @@ import ModeSwitch from '../../components/mode-switch';
 import { MIconButton, MFab } from '../../components/@material-extend';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import useSingin from '../../hooks/useSignin';
+import useSettings from '../../hooks/useSettings';
 import { isInAppBrowser } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -179,6 +180,9 @@ export default function MenuMobile(props) {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  
+  const { themeMode } = useSettings();
+  const fabColorType = themeMode==='light'?'primary':'default'
 
   useEffect(() => {
     if (drawerOpen) {
@@ -236,19 +240,19 @@ export default function MenuMobile(props) {
         </Scrollbar>
         <Box sx={{ flexGrow: 1 }} />
         <Container>
-          <Grid container dir="ltr" sx={{pb: 3}}>
+          <Grid container dir="ltr" sx={{pb: 1}}>
             {/* <Grid item xs={4} align="center">
               <MFab color="info" size="medium">
                 <TelegramIcon sx={{ fontSize: 30 }} />
               </MFab>
             </Grid> */}
             <Grid item xs={6} align="center">
-              <MFab color="info" size="medium" href="https://discord.gg/RPbcBv8ckh" component={Link} target="_blank">
+              <MFab size="medium" color={fabColorType} href="https://discord.gg/RPbcBv8ckh" component={Link} target="_blank">
                 <Icon icon={discordIcon} width={30} height={30} />
               </MFab>
             </Grid>
             <Grid item xs={6} align="center">
-              <MFab color="info" size="medium" href="https://github.com/PasarProtocol" component={Link} target="_blank">
+              <MFab size="medium" color={fabColorType} href="https://github.com/PasarProtocol" component={Link} target="_blank">
                 <Icon icon={githubIcon} width={30} height={30} />
               </MFab>
             </Grid>
@@ -258,15 +262,15 @@ export default function MenuMobile(props) {
               </MFab>
             </Grid> */}
           </Grid>
-          {/* <Box
+          <Box
             sx={{
-              py: 3,
+              pb: 1,
               display: 'flex',
               justifyContent: 'center'
             }}
           >
             <ModeSwitch/>
-          </Box> */}
+          </Box>
           <CopyRight>
             Pasar Protocol 2021 | Donate <span role="img" aria-label="">❤️</span>
           </CopyRight>
