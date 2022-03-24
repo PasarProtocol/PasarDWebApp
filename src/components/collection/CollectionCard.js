@@ -28,6 +28,7 @@ const avatarStyle = {
   margin: 'auto'
 }
 const paperStyle = {
+  height: '100%',
   transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
   transform: 'translateY(0px)',
   '.cover-image': {
@@ -58,21 +59,23 @@ const CollectionImgBox = (props) => {
     // borderRadius: 1,
     // boxShadow: (theme)=>theme.customShadows.z16,
     display: 'inline-flex',
-    maxHeight: '100%',
+    // maxHeight: '100%',
+    height: '100%',
   }
   return (
     <Stack sx={{position: 'relative', height: '120px', mb: '25px'}}>
       <Stack sx={{height: '100%', overflow: 'hidden'}}>
         {
           cover?
-          <Box className='cover-image' draggable = {false} component="img" src={cover} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
+          <Box className='cover-image' sx={{...imageStyle, background: `url(${cover}) no-repeat center`, backgroundSize: 'cover'}} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
+          // <Box className='cover-image' draggable = {false} component="img" src={cover} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
           <Box
             className='cover-image'
             sx={{
               background: 'linear-gradient(90deg, #a951f4, #FF5082)',
               width: '100%',
               height: '100%'
-            }} 
+            }}
           />
         }
       </Stack>
@@ -88,7 +91,7 @@ const CollectionImgBox = (props) => {
 };
 
 const CollectionCardPaper = (props) => {
-  const { info, isPreview } = props
+  const { info, isPreview, isOnSlider } = props
   const {title, avatar, coverImage, detail} = info
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
   
@@ -133,9 +136,27 @@ const CollectionCardPaper = (props) => {
             <Typography variant="subtitle2" component='div' sx={{fontWeight: 'normal'}}>
               by{' '}<Typography variant="subtitle2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline-flex'}}>Various Creators</Typography>
             </Typography>
-            <Typography variant="subtitle2" sx={{fontWeight: 'normal'}} color='text.secondary'>
-              {detail}
-            </Typography>
+            {
+              isOnSlider?
+              <Typography 
+                variant="subtitle2"
+                sx={{ 
+                  fontWeight: 'normal',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  whiteSpace: 'normal',
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  display: '-webkit-box !important'
+                }}
+                color='text.secondary'
+              >
+                {detail}
+              </Typography>:
+              <Typography variant="subtitle2" sx={{ fontWeight: 'normal' }} color='text.secondary'>
+                {detail.length>200?`${detail.substring(0, 200)}...`:detail}
+              </Typography>
+            }
           </Stack>
         </Box>
       </PaperRecord>
