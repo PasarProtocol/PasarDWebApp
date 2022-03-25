@@ -28,10 +28,10 @@ export default function FilteredAssetGrid(props){
     slidesToScroll: 1,
     rows: type==='all'&&!isMobile?2:1,
     responsive: [
-      {breakpoint: 1200, settings: {slidesToShow: 5}},
-      {breakpoint: 900, settings: {slidesToShow: 4}},
-      {breakpoint: 750, settings: {slidesToShow: 3}},
-      {breakpoint: 600, settings: {slidesToShow: 2}},
+      {breakpoint: 1300, settings: {slidesToShow: 5}},
+      {breakpoint: 1000, settings: {slidesToShow: 4}},
+      {breakpoint: 850, settings: {slidesToShow: 3}},
+      {breakpoint: 700, settings: {slidesToShow: 2}},
       {breakpoint: 450, settings: {slidesToShow: 1}}
     ]
   }

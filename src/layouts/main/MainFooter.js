@@ -54,7 +54,7 @@ export default function MainFooter({ hidden, isHome }) {
   return (
     <RootStyle sx={sx}>
       <Divider />
-      <Container maxWidth="lg" sx={{ pt: 6 }}>
+      <Container maxWidth="xl" sx={{ pt: 6 }}>
         <Grid
           container
           justifyContent={{ xs: 'center', md: 'space-between' }}
