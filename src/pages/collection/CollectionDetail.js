@@ -27,7 +27,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
 import RingAvatar from '../../components/RingAvatar';
-import CopyButton from '../../components/CopyButton';
+import AddressPaper from '../../components/AddressPaper';
 import StatisticPanel from '../../components/collection/StatisticPanel'
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import Badge from '../../components/Badge';
@@ -65,24 +65,6 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
   alignItems: 'center',
   marginLeft: theme.spacing(1)
 }));
-const AddressPaper = ({address, type}) => {
-  let iconName = type
-  if(type==='diamond')
-  iconName = 'diamond2'
-  return <Paper
-    sx={{
-        border: '1px solid',
-        borderColor: 'action.disabledBackground',
-        px: 1,
-        py: '5px',
-        display: 'inline-block'
-    }}
-  >
-    <Typography variant="body2" component='div' sx={{display: 'flex', alignItems: 'center'}}>
-      <Box component='img' src={`/static/${iconName}.svg`} sx={{width: 18, height: 18, mr: .5}}/>{reduceHexAddress(address)}<CopyButton text={address}/>
-    </Typography>
-  </Paper>
-}
 // ----------------------------------------------------------------------
 export default function CollectionDetail() {
   const sessionDispMode = sessionStorage.getItem("disp-mode")

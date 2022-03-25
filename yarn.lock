@@ -18757,6 +18757,11 @@ q@^1.1.2:
   resolved "https://registry.npmjs.org/q/-/q-1.5.1.tgz"
   integrity sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=
 
+qr.js@0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/qr.js/-/qr.js-0.0.0.tgz#cace86386f59a0db8050fa90d9b6b0e88a1e364f"
+  integrity sha1-ys6GOG9ZoNuAUPqQ2baw6IoeNk8=
+
 qrcode-terminal@^0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/qrcode-terminal/-/qrcode-terminal-0.12.0.tgz#bb5b699ef7f9f0505092a3748be4464fe71b5819"
@@ -19291,6 +19296,14 @@ react-native-fetch-api@^2.0.0:
   integrity sha512-GOA8tc1EVYLnHvma/TU9VTgLOyralO7eATRuCDchQveXW9Fr9vXygyq9iwqmM7YRZ8qRJfEt9xOS7OYMdJvRFw==
   dependencies:
     p-defer "^3.0.0"
+
+react-qr-code@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/react-qr-code/-/react-qr-code-2.0.3.tgz#cc80785e08f817d1ab066ca4035262f77d049648"
+  integrity sha512-6GDH0l53lksf2JgZwwcoS0D60a1OAal/GQRyNFkMBW19HjSqvtD5S20scmSQsKl+BgWM85Wd5DCcUYoHd+PZnQ==
+  dependencies:
+    prop-types "^15.7.2"
+    qr.js "0.0.0"
 
 react-quill@^2.0.0-beta.4:
   version "2.0.0-beta.4"

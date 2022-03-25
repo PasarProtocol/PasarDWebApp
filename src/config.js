@@ -23,6 +23,8 @@ export const mapConfig = process.env.REACT_APP_MAP_MAPBOX;
 
 export const googleAnalyticsConfig = process.env.REACT_APP_GA_MEASUREMENT_ID;
 
+export const donationAddress = "0x48353677e2aDe5f164a3731d7b18e22Ac0AbaFea";
+
 export const blankAddress = "0x0000000000000000000000000000000000000000";
 
 const addressForProduction = {

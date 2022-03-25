@@ -1,3 +1,4 @@
+import React from 'react';
 import { Icon } from '@iconify/react';
 import twitterFill from '@iconify/icons-ant-design/twitter-circle';
 import telegramIcon from '@iconify/icons-ic/round-telegram';
@@ -7,6 +8,7 @@ import { styled } from '@mui/material/styles';
 import { Grid, Link, Divider, Container, Typography, IconButton, Stack, Box } from '@mui/material';
 import generatedGitInfo from '../../generatedGitInfo.json';
 import palette from '../../theme/palette';
+import DonateDlg from '../../components/dialog/Donate';
 import ModeSwitch from '../../components/mode-switch';
 // ----------------------------------------------------------------------
 
@@ -45,6 +47,8 @@ function CopyRight(prop) {
   );
 }
 export default function MainFooter({ hidden, isHome }) {
+  const [donateOpen, setOpenDonate] = React.useState(false);
+
   const sx = hidden ? { display: 'none' } : {};
   // if (isHome) sx.backgroundColor = '#0d0d0d';
   return (
@@ -150,10 +154,11 @@ export default function MainFooter({ hidden, isHome }) {
         >
           <Grid item xs={12} md={6}>
             <CopyRight textAlign="left">
-              Pasar Protocol 2021 | Donate{' '}
-              <span role="img" aria-label="">
-                ❤️
-              </span>{' '}
+              Pasar Protocol 2021 |{' '}
+              <Link onClick={()=>{setOpenDonate(true)}} color='GrayText' sx={{cursor: 'pointer'}}>
+                Donate <span role="img" aria-label="">❤️</span>
+              </Link>
+              {' '}
               v1 - {generatedGitInfo.gitCommitHash}
             </CopyRight>
           </Grid>
@@ -162,6 +167,7 @@ export default function MainFooter({ hidden, isHome }) {
           </Grid>
         </Grid>
       </Container>
+      <DonateDlg isOpen={donateOpen} setOpen={setOpenDonate}/>
     </RootStyle>
   );
 }
