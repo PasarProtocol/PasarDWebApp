@@ -149,12 +149,12 @@ export default function ImportCollection() {
           Import Collection
         </Typography>
         <Grid container direction="row" spacing={2}>
-          <Grid item xs={8}>
+          <Grid item xs={12} sm={8}>
             <Typography variant="h5" sx={{fontWeight: 'normal', color: 'text.secondary'}}>
               What is the address of your ERC-721 or ERC-1155 contract on the Elastos Smart Chain Mainnet Network?
             </Typography>
           </Grid>
-          <Grid item xs={8}>
+          <Grid item xs={12} sm={8}>
             <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Contract/Collection Address</Typography>
             <FormControl error={isOnValidation&&!address.length} variant="standard" sx={{width: '100%'}}>
               <InputLabelStyle htmlFor="input-with-address">
@@ -175,7 +175,7 @@ export default function ImportCollection() {
           {
             autoLoaded&&
             <>
-              <Grid item xs={8}>
+              <Grid item xs={12} sm={8}>
                 <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Collection Name</Typography>
                 <InputStyle
                   endAdornment={<CheckIcon loaded={autoLoaded}/>}
@@ -185,7 +185,7 @@ export default function ImportCollection() {
                 />
                 <Divider/>
               </Grid>
-              <Grid item xs={8}>
+              <Grid item xs={12} sm={8}>
                 <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Symbol</Typography>
                 <InputStyle
                   endAdornment={<CheckIcon loaded={autoLoaded}/>}
@@ -241,7 +241,7 @@ export default function ImportCollection() {
                 <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Fee Recipient Address</Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Royalties</Typography>
+                <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Royalties (%)</Typography>
               </Grid>
             </Grid>
             {
@@ -304,9 +304,6 @@ export default function ImportCollection() {
                 </AccordionDetails>
               </Accordion>
             </Grid>
-            <TransLoadingButton loading={onProgress} loadingText="Please wait while import collection" onClick={handleImportAction} fullWidth>
-              Import
-            </TransLoadingButton>
           </Grid>
           <Grid item xs={12} sm={4}>
             <Grid container direction="column" spacing={1} sx={{position: 'sticky', top: isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP}}>
@@ -324,6 +321,11 @@ export default function ImportCollection() {
                   }}/>
               </Grid>
             </Grid>
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <TransLoadingButton loading={onProgress} loadingText="Please wait while import collection" onClick={handleImportAction} fullWidth>
+              Import
+            </TransLoadingButton>
           </Grid>
         </Grid>
       </Container>

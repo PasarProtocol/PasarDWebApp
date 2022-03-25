@@ -144,12 +144,12 @@ export default function CreateCollection() {
           Create Collection
         </Typography>
         <Grid container direction="row" spacing={2}>
-          <Grid item xs={8}>
+          <Grid item xs={12} sm={8}>
             <Typography variant="h5" sx={{fontWeight: 'normal', color: 'text.secondary'}}>
               Create an ERC-1155 collection on the Elastos Smart Chain Mainnet Network
             </Typography>
           </Grid>
-          <Grid item xs={8}>
+          <Grid item xs={12} sm={8}>
             <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Collection Name</Typography>
             <FormControl error={isOnValidation&&!name.length} variant="standard" sx={{width: '100%'}}>
               <InputLabelStyle htmlFor="input-with-name">
@@ -166,7 +166,7 @@ export default function CreateCollection() {
             </FormControl>
             <Divider/>
           </Grid>
-          <Grid item xs={8}>
+          <Grid item xs={12} sm={8}>
             <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Symbol</Typography>
             <FormControl error={isOnValidation&&!symbol.length} variant="standard" sx={{width: '100%'}}>
               <InputLabelStyle htmlFor="input-with-name">
@@ -227,7 +227,7 @@ export default function CreateCollection() {
                 <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Fee Recipient Address</Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Royalties</Typography>
+                <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Royalties (%)</Typography>
               </Grid>
             </Grid>
             {
@@ -290,9 +290,6 @@ export default function CreateCollection() {
                 </AccordionDetails>
               </Accordion>
             </Grid>
-            <TransLoadingButton loading={onProgress} loadingText="Please wait while create collection" onClick={handleCreateAction} fullWidth>
-              Create
-            </TransLoadingButton>
           </Grid>
           <Grid item xs={12} sm={4}>
             <Grid container direction="column" spacing={1} sx={{position: 'sticky', top: isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP}}>
@@ -310,6 +307,11 @@ export default function CreateCollection() {
                   }}/>
               </Grid>
             </Grid>
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <TransLoadingButton loading={onProgress} loadingText="Please wait while create collection" onClick={handleCreateAction} fullWidth>
+              Create
+            </TransLoadingButton>
           </Grid>
         </Grid>
       </Container>
