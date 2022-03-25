@@ -26,7 +26,7 @@ export default function FilteredAssetGrid(props){
     infinite: false,
     slidesToShow: 5,
     slidesToScroll: 1,
-    rows: type==='all'?2:1,
+    rows: type==='all'&&!isMobile?2:1,
     responsive: [
       {breakpoint: 1200, settings: {slidesToShow: 5}},
       {breakpoint: 900, settings: {slidesToShow: 4}},
