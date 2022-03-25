@@ -1066,11 +1066,11 @@ export default function CreateItem() {
                       <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose")}} current={collection} disabled={1&&true}/>
                     </div>
                   </Tooltip>
-                  <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+                  {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                     <div>
                       <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
                     </div>
-                  </Tooltip>
+                  </Tooltip> */}
                 </Stack>
               </Grid>
               {
