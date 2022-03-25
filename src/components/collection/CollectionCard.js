@@ -53,6 +53,15 @@ const AvatarBoxStyle = styled(Box)(({ theme }) => ({
   ...avatarStyle,
   borderColor: theme.palette.background.paper,
 }));
+const TypographyStyle = styled(Typography)(({ theme }) => ({
+  fontWeight: 'normal',
+  whiteSpace: 'pre-wrap',
+  // whiteSpace: '-moz-pre-wrap',
+  // whiteSpace: '-pre-wrap',
+  // whiteSpace: '-o-pre-wrap',
+  wordWrap: 'break-word'
+}));
+
 const CollectionImgBox = (props) => {
   const { cover, avatar } = props;
   const imageStyle = {
@@ -132,16 +141,16 @@ const CollectionCardPaper = (props) => {
         </Box>
         <Box sx={{p:2}}>
           <Stack direction="column" sx={{justifyContent: 'center', textAlign: 'center'}}>
-            <Typography variant="h5" noWrap>{title}</Typography>
+            <TypographyStyle variant="h5" noWrap>{title}</TypographyStyle>
             <Typography variant="subtitle2" component='div' sx={{fontWeight: 'normal'}}>
               by{' '}<Typography variant="subtitle2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline-flex'}}>Various Creators</Typography>
             </Typography>
             {
               isOnSlider?
-              <Typography 
+              <TypographyStyle 
                 variant="subtitle2"
+                color='text.secondary'
                 sx={{ 
-                  fontWeight: 'normal',
                   WebkitLineClamp: 3,
                   WebkitBoxOrient: 'vertical',
                   whiteSpace: 'normal',
@@ -149,13 +158,12 @@ const CollectionCardPaper = (props) => {
                   overflow: 'hidden',
                   display: '-webkit-box !important'
                 }}
-                color='text.secondary'
               >
                 {detail}
-              </Typography>:
-              <Typography variant="subtitle2" sx={{ fontWeight: 'normal' }} color='text.secondary'>
+              </TypographyStyle>:
+              <TypographyStyle variant="subtitle2" color='text.secondary'>
                 {detail.length>200?`${detail.substring(0, 200)}...`:detail}
-              </Typography>
+              </TypographyStyle>
             }
           </Stack>
         </Box>
