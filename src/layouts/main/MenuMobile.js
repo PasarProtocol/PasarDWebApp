@@ -102,9 +102,9 @@ function MenuMobileItem(props) {
         // end={path === '/'}
         sx={{
           '&.active': {
-            color: 'primary.main',
+            color: 'text.primary',
             fontWeight: 'fontWeightMedium',
-            bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+            bgcolor: (theme) => alpha(theme.palette.text.primary, theme.palette.action.selectedOpacity)
           }
         }}
       >
@@ -116,9 +116,9 @@ function MenuMobileItem(props) {
         sx={{
           cursor: 'pointer',
           '&.active': {
-            color: 'primary.main',
+            color: 'text.primary',
             fontWeight: 'fontWeightMedium',
-            bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+            bgcolor: (theme) => alpha(theme.palette.text.primary, theme.palette.action.selectedOpacity)
           }
         }}
         onClick={e=>openSignin(path)}
@@ -136,9 +136,9 @@ function MenuMobileItem(props) {
         // end={path === '/'}
         sx={{
           '&.active': {
-            color: 'primary.main',
+            color: 'text.primary',
             fontWeight: 'fontWeightMedium',
-            bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+            bgcolor: (theme) => alpha(theme.palette.text.primary, theme.palette.action.selectedOpacity)
           }
         }}
       >
