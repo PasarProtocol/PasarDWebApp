@@ -283,7 +283,7 @@ export default function MarketHome() {
                   Latest Transactions <span role="img" aria-label="">✉️</span>
                 </TitleStyle>
                 <Button
-                    to='/transaction'
+                    to='explorer/transaction'
                     size="small"
                     color="inherit"
                     component={RouterLink}

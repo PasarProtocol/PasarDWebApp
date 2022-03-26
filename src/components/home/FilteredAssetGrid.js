@@ -52,22 +52,22 @@ const AssetGroupSlider = (props)=>{
       tablet: {
         breakpoint: {
           max: 1000,
-          min: 850
+          min: 800
         },
         items: 3,
         partialVisibilityGutter: 40
       },
       tablet_sm: {
         breakpoint: {
-          max: 850,
-          min: 700
+          max: 800,
+          min: 600
         },
         items: 2,
         partialVisibilityGutter: 30
       },
       mobile: {
         breakpoint: {
-          max: 700,
+          max: 600,
           min: 0
         },
         items: 1,
@@ -91,13 +91,13 @@ const AssetGroupSlider = (props)=>{
         {
           isLoading?
           loadingSkeletons.map((item, index)=>(
-            <Box key={index} sx={{p: 1}}>
+            <Box key={index} sx={{p: 2}}>
               <AssetCardSkeleton key={index}/>
             </Box>
           )):
           assets.map((item, index)=>(
             <Box key={index} sx={{
-              p: 1,
+              p: 2,
               '& h5 img': {
                 display: 'inline'
               }
