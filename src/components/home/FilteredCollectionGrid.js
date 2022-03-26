@@ -8,25 +8,32 @@ import CollectionCard from '../collection/CollectionCard';
 import { fetchFrom, getAssetImage, getCoinUSD, getCollectionTypeFromImageUrl, collectionTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 
-const settings = {
-  dots: false,
-  arrows: true,
-  nextArrow: <Button>next</Button>,
-  autoplay: false,
-  infinite: false,
-  slidesToShow: 3,
-  slidesToScroll: 1,
-  responsive: [
-    {breakpoint: 1200, settings: {slidesToShow: 3}},
-    {breakpoint: 750, settings: {slidesToShow: 2}},
-    {breakpoint: 450, settings: {slidesToShow: 1}}
-  ]
-};
 export default function FilteredCollectionGrid(props){
   const {type} = props
   const [collections, setCollections] = React.useState(collectionTypes);
+  const [isDragging, setDragging] = React.useState(false);
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
   const [coinUSD, setCoinUSD] = React.useState(0);
+
+  const settings = {
+    dots: false,
+    arrows: true,
+    nextArrow: <Button>next</Button>,
+    autoplay: true,
+    autoplaySpeed: 1000,
+    infinite: true,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    swipeToSlide: true,
+    beforeChange: () => {setDragging(true)},
+    afterChange: () => {setDragging(false)},
+    responsive: [
+      {breakpoint: 1200, settings: {slidesToShow: 3}},
+      {breakpoint: 750, settings: {slidesToShow: 2}},
+      {breakpoint: 450, settings: {slidesToShow: 1}}
+    ]
+  };
+  
   React.useEffect(async () => {
     setLoadingCollections(true);
     // fetchFrom(`api/v2/sticker/getDetailedCollectibles?collectionType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=5`)

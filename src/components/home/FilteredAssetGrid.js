@@ -6,27 +6,30 @@ import { motion, AnimatePresence } from "framer-motion";
 import Carousel from 'react-grid-carousel'
 // material
 import { Box, Button } from '@mui/material';
+import { MHidden } from '../@material-extend';
 import { CarouselControlsPaging2 } from '../carousel/controls';
 import AssetCard from '../marketplace/AssetCard';
 import AssetCardSkeleton from '../marketplace/AssetCardSkeleton';
 import { fetchFrom, getAssetImage, getCoinUSD, getCollectionTypeFromImageUrl } from '../../utils/common';
 // ----------------------------------------------------------------------
 
-export default function FilteredAssetGrid(props){
-  const {type} = props
-  const [filteredCollectibles, setFilteredCollectibles] = React.useState([]);
-  const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
+const AssetGroupSlider = (props)=>{
+  const {isLoading, assets} = props
   const [coinUSD, setCoinUSD] = React.useState(0);
-  const count = type==='all'?10:5
+  const [isDragging, setDragging] = React.useState(false);
   const settings = {
     dots: false,
     arrows: true,
     nextArrow: <Button>next</Button>,
-    autoplay: false,
-    infinite: false,
+    autoplay: true,
+    autoplaySpeed: 1000,
+    infinite: true,
     slidesToShow: 5,
     slidesToScroll: 1,
-    rows: type==='all'&&!isMobile?2:1,
+    swipeToSlide: true,
+    beforeChange: () => {setDragging(true)},
+    afterChange: () => {setDragging(false)},
+    rows: 1,
     responsive: [
       {breakpoint: 1300, settings: {slidesToShow: 5}},
       {breakpoint: 1000, settings: {slidesToShow: 4}},
@@ -37,10 +40,56 @@ export default function FilteredAssetGrid(props){
   }
 
   React.useEffect(async () => {
-    setLoadingCollectibles(true);
     getCoinUSD().then((res) => {
       setCoinUSD(res);
     });
+  }, []);
+  const loadingSkeletons = Array(10).fill(null)
+  return (
+    <Box sx={{ mx: 0 }}>
+      <Slider {...settings}>
+        {
+          isLoading?
+          loadingSkeletons.map((item, index)=>(
+            <Box key={index} sx={{p: 1}}>
+              <AssetCardSkeleton key={index}/>
+            </Box>
+          )):
+          assets.map((item, index)=>(
+            <Box key={index} sx={{
+              p: 1,
+              '& h5 img': {
+                display: 'inline'
+              }
+            }}>
+              <AssetCard
+                {...item}
+                isDragging={isDragging}
+                thumbnail={getAssetImage(item, true)}
+                title={item.name && item.name}
+                price={round(item.price/1e18, 3)}
+                saleType={item.SaleType || item.saleType}
+                type={0}
+                isLink={1&&true}
+                coinUSD={coinUSD}
+                collection={getCollectionTypeFromImageUrl(item)}
+              />
+            </Box>
+          ))
+        }
+      </Slider>
+    </Box>
+  )
+}
+
+export default function FilteredAssetGrid(props){
+  const {type} = props
+  const [filteredCollectibles, setFilteredCollectibles] = React.useState([]);
+  const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
+  const count = type==='all'?20:10
+
+  React.useEffect(async () => {
+    setLoadingCollectibles(true);
     fetchFrom(`api/v2/sticker/getDetailedCollectibles?collectionType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=${count}`)
       .then((response) => {
         response.json().then((jsonAssets) => {
@@ -57,40 +106,19 @@ export default function FilteredAssetGrid(props){
           setLoadingCollectibles(false);
       });
   }, []);
-  const loadingSkeletons = Array(count).fill(null)
+
   return (
-    <Box sx={{ mx: 0 }}>
-      <Slider {...settings}>
+    type==='all'?(
+      <>
+        <AssetGroupSlider isLoading={isLoadingCollectibles} assets={filteredCollectibles.slice(0, 10)}/>
         {
-          isLoadingCollectibles?
-          loadingSkeletons.map((item, index)=>(
-            <Box key={index} sx={{p: 1}}>
-              <AssetCardSkeleton key={index}/>
-            </Box>
-          )):
-          filteredCollectibles.map((item, index)=>(
-            <Box key={index} sx={{
-              p: 1,
-              '& h5 img': {
-                display: 'inline'
-              }
-            }}>
-              <AssetCard
-                {...item}
-                thumbnail={getAssetImage(item, true)}
-                title={item.name && item.name}
-                price={round(item.price/1e18, 3)}
-                saleType={item.SaleType || item.saleType}
-                type={0}
-                isLink={1&&true}
-                coinUSD={coinUSD}
-                collection={getCollectionTypeFromImageUrl(item)}
-              />
-            </Box>
-          ))
+          filteredCollectibles.slice(10).length>0&&
+          <MHidden width="mdDown">
+            <AssetGroupSlider isLoading={isLoadingCollectibles} assets={filteredCollectibles.slice(10)}/>
+          </MHidden>
         }
-      </Slider>
-    </Box>
-    
+      </>
+    ):
+    <AssetGroupSlider isLoading={isLoadingCollectibles} assets={filteredCollectibles.slice(0, 10)}/>
   )
 }
