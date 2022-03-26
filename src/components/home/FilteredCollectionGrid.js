@@ -64,7 +64,7 @@ export default function FilteredCollectionGrid(props){
           //   </Box>
           // )):
           collections.map((item, index)=>(
-            <Box key={index} sx={{ p: 1, height: 330 }}>
+            <Box key={index} sx={{ p: 2, height: 330 }}>
               <CollectionCard info={item} isOnSlider={Boolean(true)}/>
             </Box>
           ))
