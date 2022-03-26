@@ -1,13 +1,11 @@
 import React from 'react';
-import Slider from 'react-slick';
 import {round} from 'mathjs'
 import {isMobile} from 'react-device-detect';
-import { motion, AnimatePresence } from "framer-motion";
-import Carousel from 'react-grid-carousel'
+import Carousel from 'react-multi-carousel';
+import 'react-multi-carousel/lib/styles.css';
 // material
 import { Box, Button } from '@mui/material';
 import { MHidden } from '../@material-extend';
-import { CarouselControlsPaging2 } from '../carousel/controls';
 import AssetCard from '../marketplace/AssetCard';
 import AssetCardSkeleton from '../marketplace/AssetCardSkeleton';
 import { fetchFrom, getAssetImage, getCoinUSD, getCollectionTypeFromImageUrl } from '../../utils/common';
@@ -18,25 +16,67 @@ const AssetGroupSlider = (props)=>{
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [isDragging, setDragging] = React.useState(false);
   const settings = {
-    dots: false,
-    arrows: true,
-    nextArrow: <Button>next</Button>,
-    autoplay: true,
-    autoplaySpeed: 1000,
-    infinite: true,
-    slidesToShow: 5,
-    slidesToScroll: 1,
-    swipeToSlide: true,
     beforeChange: () => {setDragging(true)},
     afterChange: () => {setDragging(false)},
-    rows: 1,
-    responsive: [
-      {breakpoint: 1300, settings: {slidesToShow: 5}},
-      {breakpoint: 1000, settings: {slidesToShow: 4}},
-      {breakpoint: 850, settings: {slidesToShow: 3}},
-      {breakpoint: 700, settings: {slidesToShow: 2}},
-      {breakpoint: 450, settings: {slidesToShow: 1}}
-    ]
+    additionalTransfrom: 0,
+    arrows: false,
+    pauseOnHover: false,
+    autoPlay: true,
+    autoPlaySpeed: 2500,
+    centerMode: false,
+    containerClass: "container-with-dots",
+    draggable: true,
+    focusOnSelect: false,
+    infinite: true,
+    keyBoardControl: true,
+    minimumTouchDrag: 80,
+    renderButtonGroupOutside: false,
+    renderDotsOutside: false,
+    responsive: {
+      desktop: {
+        breakpoint: {
+          max: 3000,
+          min: 1300
+        },
+        items: 5,
+        partialVisibilityGutter: 50
+      },
+      desktop_sm: {
+        breakpoint: {
+          max: 1300,
+          min: 1000
+        },
+        items: 4,
+        partialVisibilityGutter: 40
+      },
+      tablet: {
+        breakpoint: {
+          max: 1000,
+          min: 850
+        },
+        items: 3,
+        partialVisibilityGutter: 40
+      },
+      tablet_sm: {
+        breakpoint: {
+          max: 850,
+          min: 700
+        },
+        items: 2,
+        partialVisibilityGutter: 30
+      },
+      mobile: {
+        breakpoint: {
+          max: 700,
+          min: 0
+        },
+        items: 1,
+        partialVisibilityGutter: 30
+      }
+    },
+    showDots: false,
+    slidesToSlide: 1,
+    swipeable: true
   }
 
   React.useEffect(async () => {
@@ -47,7 +87,7 @@ const AssetGroupSlider = (props)=>{
   const loadingSkeletons = Array(10).fill(null)
   return (
     <Box sx={{ mx: 0 }}>
-      <Slider {...settings}>
+      <Carousel {...settings}>
         {
           isLoading?
           loadingSkeletons.map((item, index)=>(
@@ -64,7 +104,6 @@ const AssetGroupSlider = (props)=>{
             }}>
               <AssetCard
                 {...item}
-                isDragging={isDragging}
                 thumbnail={getAssetImage(item, true)}
                 title={item.name && item.name}
                 price={round(item.price/1e18, 3)}
@@ -72,12 +111,13 @@ const AssetGroupSlider = (props)=>{
                 type={0}
                 isLink={1&&true}
                 coinUSD={coinUSD}
+                isDragging={isDragging}
                 collection={getCollectionTypeFromImageUrl(item)}
               />
             </Box>
           ))
         }
-      </Slider>
+      </Carousel>
     </Box>
   )
 }
@@ -87,7 +127,7 @@ export default function FilteredAssetGrid(props){
   const [filteredCollectibles, setFilteredCollectibles] = React.useState([]);
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
   const count = type==='all'?20:10
-
+  
   React.useEffect(async () => {
     setLoadingCollectibles(true);
     fetchFrom(`api/v2/sticker/getDetailedCollectibles?collectionType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=${count}`)
@@ -106,7 +146,6 @@ export default function FilteredAssetGrid(props){
           setLoadingCollectibles(false);
       });
   }, []);
-
   return (
     type==='all'?(
       <>
