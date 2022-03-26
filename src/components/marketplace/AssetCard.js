@@ -51,7 +51,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 
 export default function AssetCard(props) {
   const { title="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId, orderType, endTime, currentBid,
-   saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, collection } = props
+   saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, collection, isDragging=false } = props
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
@@ -311,6 +311,7 @@ export default function AssetCard(props) {
                 to={`/marketplace/detail/${tokenId}`}
                 alt=""
                 underline="none"
+                onClick={(e)=>{if(isDragging) e.preventDefault()}}
               >
                 <CardImgBox
                   src={props.thumbnail}
