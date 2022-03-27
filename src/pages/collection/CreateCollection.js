@@ -20,6 +20,7 @@ import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_A
 import ProgressBar from '../../components/ProgressBar'
 import TransLoadingButton from '../../components/TransLoadingButton';
 import CollectionCard from '../../components/collection/CollectionCard';
+import CategorySelect from '../../components/collection/CategorySelect';
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import { isInAppBrowser, removeLeadingZero } from '../../utils/common';
 // ----------------------------------------------------------------------
@@ -47,6 +48,7 @@ export default function CreateCollection() {
   const [name, setName] = React.useState('')
   const [symbol, setSymbol] = React.useState('')
   const [description, setDescription] = React.useState('');
+  const [category, setCategory] = React.useState(0);
   const [avatarFile, setAvatarFile] = React.useState(null);
   const [coverFile, setCoverFile] = React.useState(null);
   const [isOnValidation, setOnValidation] = React.useState(false);
@@ -218,7 +220,10 @@ export default function CreateCollection() {
               <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
             </FormControl>
             <Divider/>
-            
+
+            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}}>Category</Typography>
+            <CategorySelect selected={category} onChange={setCategory} />
+
             <Typography variant="h4" component="div" sx={{fontWeight: 'normal', py: 1}}>
               Fee Recipient Address & Royalties
             </Typography>
