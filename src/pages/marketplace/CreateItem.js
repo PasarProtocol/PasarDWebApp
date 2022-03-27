@@ -76,7 +76,9 @@ export default function CreateItem() {
   const [previewFiles, setPreviewFiles] = React.useState([]);
   const [isPutOnSale, setPutOnSale] = React.useState(false);
   const [isBuynowForAuction, setBuynowForAuction] = React.useState(false);
+  const [isReserveForAuction, setReserveForAuction] = React.useState(false);
   const [buynowPrice, setBuynowPrice] = React.useState('');
+  const [reservePrice, setReservePrice] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [quantity, setQuantity] = React.useState(1);
   const [price, setPrice] = React.useState('');
@@ -221,6 +223,12 @@ export default function CreateItem() {
     setBuynowForAuction(event.target.checked);
   };
 
+  const handleReserveForAuction = (event) => {
+    if(!event.target.checked)
+      setReservePrice('')
+    setReserveForAuction(event.target.checked);
+  };
+
   const handleChangePrice = (event) => {
     let priceValue = event.target.value
     if(priceValue<0)
@@ -228,6 +236,14 @@ export default function CreateItem() {
     priceValue = removeLeadingZero(priceValue)
     setPrice(priceValue)
     setRcvPrice(math.round(priceValue*98/100, 3))
+  };
+
+  const handleChangeReservePrice = (event) => {
+    let priceValue = event.target.value
+    if(priceValue<0)
+      return
+    priceValue = removeLeadingZero(priceValue)
+    setReservePrice(priceValue)
   };
 
   const handleChangeBuynowPrice = (event) => {
@@ -359,6 +375,7 @@ export default function CreateItem() {
                                     ...paramObj,
                                     '_amount': _tokenSupply,
                                     '_minPrice': BigInt(price*1e18).toString(),
+                                    '_reservePrice': BigInt(reservePrice*1e18).toString(),
                                     '_buyoutPrice': BigInt(buynowPrice*1e18).toString(),
                                     '_endTime': (expirationDate.getTime()/1000).toFixed(),
                                     'beforeSendFunc': ()=>{setReadySignForMint(true)},
@@ -394,6 +411,7 @@ export default function CreateItem() {
                             ...paramObj,
                             '_amount': _tokenSupply,
                             '_minPrice': BigInt(price*1e18).toString(),
+                            '_reservePrice': BigInt(reservePrice*1e18).toString(),
                             '_buyoutPrice': BigInt(buynowPrice*1e18).toString(),
                             '_endTime': (expirationDate.getTime()/1000).toFixed(),
                             'beforeSendFunc': ()=>{setReadySignForMint(true)},
@@ -973,6 +991,47 @@ export default function CreateItem() {
                       </Grid>
                     </Grid>
                     <Grid item xs={12}>
+                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Reserve Price</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack direction="row">
+                        <InputLabelStyle sx={{ fontSize: 12, flex: 1 }}>
+                          Set a minimum price before auction can complete
+                        </InputLabelStyle>
+                        <FormControlLabel
+                          control={<CustomSwitch onChange={handleReserveForAuction}/>}
+                          sx={{mt:-1, mr: 0}}
+                          label=""
+                        />
+                      </Stack>
+                    </Grid>
+                    {
+                      isReserveForAuction&&
+                      <>
+                        <Grid item xs={12}>
+                          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Reserve Price</Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <FormControl variant="standard" sx={{width: '100%'}}>
+                            <InputLabelStyle htmlFor="input-reserve-price">
+                              Enter reserve price
+                            </InputLabelStyle>
+                            <InputStyle
+                              type="number"
+                              id="input-reserve-price"
+                              value={reservePrice}
+                              onChange={handleChangeReservePrice}
+                              startAdornment={' '}
+                              endAdornment={
+                                <CoinSelect selected={coinType} onChange={setCoinType}/>
+                              }
+                            />
+                          </FormControl>
+                          <Divider/>
+                        </Grid>
+                      </>
+                    }
+                    <Grid item xs={12}>
                       <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Buy Now Price</Typography>
                     </Grid>
                     <Grid item xs={12}>
@@ -995,12 +1054,12 @@ export default function CreateItem() {
                         </Grid>
                         <Grid item xs={12}>
                           <FormControl variant="standard" sx={{width: '100%'}}>
-                            <InputLabelStyle htmlFor="input-with-price">
+                            <InputLabelStyle htmlFor="input-buynow-price">
                               Enter buy now price
                             </InputLabelStyle>
                             <InputStyle
                               type="number"
-                              id="input-with-price"
+                              id="input-buynow-price"
                               value={buynowPrice}
                               onChange={handleChangeBuynowPrice}
                               startAdornment={' '}
@@ -1010,7 +1069,6 @@ export default function CreateItem() {
                             />
                           </FormControl>
                           <Divider/>
-                          <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Bids below this amount won't be allowed</Typography>
                         </Grid>
                       </>
                     }
