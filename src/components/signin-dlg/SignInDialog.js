@@ -256,9 +256,11 @@ export default function SignInDialog() {
       if (currentConnector === injected) {
         sessionLinkFlag = '1';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
+        setPasarLinkAddress(1)
       } else if (currentConnector === walletconnect) {
         sessionLinkFlag = '3';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 3);
+        setPasarLinkAddress(3)
       }
       setActivatingConnector(currentConnector);
       setWalletAddress(await currentConnector.getAccount());

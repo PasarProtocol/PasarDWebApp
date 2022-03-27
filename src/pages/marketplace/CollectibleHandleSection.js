@@ -29,7 +29,7 @@ const StickyPaperStyle = styled(Paper)(({ theme }) => ({
 export default function CollectibleHandleSection(props) {
   const navigate = useNavigate();
   const {collectible, coinUSD, address, onlyHandle=false} = props
-  const [buyClicked, setBuyClicked] = useState(false);
+  const [clickedType, setClickedType] = useState('');
   const [didSignin, setSignin] = useState(false);
   const [auctionEnded, setAuctionEnded] = useState(false);
   const [isOpenPurchase, setPurchaseOpen] = useState(false);
@@ -39,9 +39,12 @@ export default function CollectibleHandleSection(props) {
   useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     setSignin(!!sessionLinkFlag)
-    if(buyClicked&&!!sessionLinkFlag){
-      setBuyClicked(false)
-      setTimeout(()=>{setPurchaseOpen(true)}, 300)
+    if(clickedType&&!!sessionLinkFlag){
+      setClickedType('')
+      if(clickedType === 'buy')
+        setTimeout(()=>{setPurchaseOpen(true)}, 300)
+      else if(clickedType === 'bid')
+        setTimeout(()=>{setPlaceBidOpen(true)}, 300)
     }
   }, [pasarLinkAddress]);
 
@@ -50,8 +53,9 @@ export default function CollectibleHandleSection(props) {
   }, []);
 
   const openSignin = (e)=>{
+    const actionType = e.target.getAttribute("actiontype")
     if(document.getElementById("signin")){
-      setBuyClicked(true)
+      setClickedType(actionType)
       document.getElementById("signin").click()
     }
   }
@@ -99,7 +103,7 @@ export default function CollectibleHandleSection(props) {
               </StyledButton>
             }
           </Stack>:
-          <StyledButton variant="contained" fullWidth onClick={openSignin}>
+          <StyledButton variant="contained" actiontype='bid' fullWidth onClick={openSignin}>
             Sign in to Place bid
           </StyledButton>
       else
@@ -113,8 +117,12 @@ export default function CollectibleHandleSection(props) {
         statusText = 'Starting Price'
         if(address === collectible.holder)
           handleField = 
+            didSignin?
             <StyledButton variant="contained" fullWidth onClick={(e)=>{}}>
               Remove Listing
+            </StyledButton>:
+            <StyledButton variant="contained" actiontype='remove' fullWidth onClick={openSignin}>
+              Sign in to Remove Listing
             </StyledButton>
         else
           auctionTextField = 
@@ -157,7 +165,7 @@ export default function CollectibleHandleSection(props) {
           Buy
         </StyledButton>:
 
-        <StyledButton variant="contained" fullWidth onClick={openSignin}>
+        <StyledButton variant="contained" actiontype='buy' fullWidth onClick={openSignin}>
           Sign in to Buy
         </StyledButton>
     }
