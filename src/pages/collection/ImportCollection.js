@@ -20,6 +20,7 @@ import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_A
 import ProgressBar from '../../components/ProgressBar'
 import TransLoadingButton from '../../components/TransLoadingButton';
 import CollectionCard from '../../components/collection/CollectionCard';
+import CategorySelect from '../../components/collection/CategorySelect';
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import { isInAppBrowser, removeLeadingZero } from '../../utils/common';
 // ----------------------------------------------------------------------
@@ -46,6 +47,7 @@ const socialTypes = ['Website', 'Twitter', 'Discord', 'Telegram', 'Medium']
 export default function ImportCollection() {
   const [address, setAddress] = React.useState('')
   const [description, setDescription] = React.useState('');
+  const [category, setCategory] = React.useState(0);
   const [avatarFile, setAvatarFile] = React.useState(null);
   const [coverFile, setCoverFile] = React.useState(null);
   const [isOnValidation, setOnValidation] = React.useState(false);
@@ -59,8 +61,8 @@ export default function ImportCollection() {
   const navigate = useNavigate();
   
   React.useEffect(async () => {
-    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
-      navigate('/marketplace')
+    // if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+    //   navigate('/marketplace')
   }, []);
 
   const handleInputAddress = (e)=>{
@@ -232,6 +234,9 @@ export default function ImportCollection() {
               <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
             </FormControl>
             <Divider/>
+            
+            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}}>Category</Typography>
+            <CategorySelect selected={category} onChange={setCategory} />
             
             <Typography variant="h4" component="div" sx={{fontWeight: 'normal', py: 1}}>
               Fee Recipient Address & Royalties
