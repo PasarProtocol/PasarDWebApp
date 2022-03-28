@@ -61,8 +61,8 @@ export default function ImportCollection() {
   const navigate = useNavigate();
   
   React.useEffect(async () => {
-    // if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
-    //   navigate('/marketplace')
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
+      navigate('/marketplace')
   }, []);
 
   const handleInputAddress = (e)=>{

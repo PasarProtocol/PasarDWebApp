@@ -321,12 +321,17 @@ export default function MyProfile() {
                           <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
                             <Typography variant="h3" align="center"> No Collections Found </Typography>
                             <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>We could not find any of your collections</Typography>
-                            <Button variant="contained" component={RouterLink} to='/collection/create' sx={{mb: 2}}>
-                              Create new collection
-                            </Button>
-                            <Button variant="contained" component={RouterLink} to='/collection/import'>
-                              Import existing collection
-                            </Button>
+                            {
+                              sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
+                              <>
+                                <Button variant="contained" component={RouterLink} to='/collection/create' sx={{mb: 2}}>
+                                  Create new collection
+                                </Button>
+                                <Button variant="contained" component={RouterLink} to='/collection/import'>
+                                  Import existing collection
+                                </Button>
+                              </>
+                            }
                           </Stack>:
                           <Typography variant="subtitle2" align="center" sx={{ mb: 3 }}>
                             No {typeNames[i]} collectible found!
