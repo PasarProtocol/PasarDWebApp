@@ -227,6 +227,16 @@ export function removeLeadingZero(value) {
   return value.replace(/-/g, '').replace(/^0+(?!\.|$)/, '');
 }
 
+export function getShortUrl(url) {
+  return new Promise((resolve, reject) => {
+    fetch(`${process.env.REACT_APP_SHORTEN_SERVICE_URL}/api/v2/action/shorten?key=d306f2eda6b16d9ecf8a40c74e9e91&url=${url}&is_secret=false`).then(resShorternUrl=>{
+      resolve(resShorternUrl.text())
+    }).catch((err)=>{
+      resolve(url)
+    })
+  });
+}
+
 export function callContractMethod(type, coinType, paramObj) {
   return new Promise((resolve, reject) => {
     if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') {
