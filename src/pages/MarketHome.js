@@ -137,15 +137,14 @@ export default function MarketHome() {
       </Container>
       <Container maxWidth='xl'>
         <Stack spacing={3}>
-          <MotionInView variants={varFadeInUp}>
+          {/* <MotionInView variants={varFadeInUp}> */}
             <Box>
               <TitleStyle component="h1">
                 Recently Sold <span role="img" aria-label="">🤝</span>
               </TitleStyle>
               <FilteredAssetGrid type='recent_sold'/>
             </Box>
-          </MotionInView>
-          <MotionInView variants={varFadeInUp}>
+          {/* </MotionInView> */}
             <CardStyle>
               <Box component="div">
                 <TitleStyle component="h1">
@@ -169,8 +168,6 @@ export default function MarketHome() {
                 </Button>
               </Stack>
             </CardStyle>
-          </MotionInView>
-          <MotionInView variants={varFadeInUp}>
             <Box>
               <Stack direction='row'>
                 <TitleStyle component="h1" sx={{flex: 1}}>
@@ -188,8 +185,6 @@ export default function MarketHome() {
               </Stack>
               <FilteredAssetGrid type='live_auction'/>
             </Box>
-          </MotionInView>
-          <MotionInView variants={varFadeInUp}>
             <Box>
               <Stack direction='row'>
                 <TitleStyle component="h1" sx={{flex: 1}}>
@@ -207,8 +202,6 @@ export default function MarketHome() {
               </Stack>
               <FilteredCollectionGrid/>
             </Box>
-          </MotionInView>
-          <MotionInView variants={varFadeInUp}>
             <CardStyle>
               <Box component="div">
                 <TitleStyle component="h1">
@@ -231,8 +224,6 @@ export default function MarketHome() {
                 </StyledButton>
               </Stack>
             </CardStyle>
-          </MotionInView>
-          <MotionInView variants={varFadeInUp}>
             <Box>
               <Stack direction='row'>
                 <TitleStyle component="h1" sx={{flex: 1}}>
@@ -250,8 +241,6 @@ export default function MarketHome() {
               </Stack>
               <FilteredAssetGrid type='all'/>
             </Box>
-          </MotionInView>
-          <MotionInView variants={varFadeInUp}>
             <CardStyle>
               <Box component="div">
                 <TitleStyle component="h1">
@@ -275,8 +264,6 @@ export default function MarketHome() {
                 </StyledButton>
               </Stack>
             </CardStyle>
-          </MotionInView>
-          <MotionInView variants={varFadeInUp}>
             <Box>
               <Stack direction='row'>
                 <TitleStyle component="h1" sx={{flex: 1}}>
@@ -294,8 +281,6 @@ export default function MarketHome() {
               </Stack>
               <FilteredTransGrid/>
             </Box>
-          </MotionInView>
-          <MotionInView variants={varFadeInUp}>
             <CardStyle>
               <Box component="div">
                 <TitleStyle component="h1">
@@ -317,7 +302,7 @@ export default function MarketHome() {
                 </StyledButton>
               </Stack>
             </CardStyle>
-          </MotionInView>
+          {/* </MotionInView> */}
         </Stack>
       </Container>
     </RootStyle>
