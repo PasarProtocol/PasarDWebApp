@@ -16,6 +16,8 @@ import Page from '../../components/Page';
 import MyItemsSortSelect from '../../components/MyItemsSortSelect';
 import CollectionCard from '../../components/collection/CollectionCard';
 import Jazzicon from '../../components/Jazzicon';
+import StyledButton from '../../components/signin-dlg/StyledButton';
+import useSingin from '../../hooks/useSignin';
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -38,6 +40,7 @@ export default function Explorer() {
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
   const [orderType, setOrderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
+  const { setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
 
   React.useEffect(() => {
     controller.abort(); // cancel the previous request
@@ -59,6 +62,19 @@ export default function Explorer() {
     //   });
   }, [orderType]);
 
+  const handleNavlink = (e)=>{
+    const path = e.target.getAttribute('to')
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+      navigate(path)
+      return
+    }
+    if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3')
+      setOpenDownloadEssentialDlg(1)
+    else
+      setOpenSigninEssentialDlg(true)
+    setAfterSigninPath(path)
+  }
+
   const loadingSkeletons = Array(10).fill(null)
 
   return (
@@ -73,7 +89,15 @@ export default function Explorer() {
           <Typography variant="subtitle2" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
             {collections.length} collections
           </Typography>
-          <MyItemsSortSelect onChange={setOrderType} />
+          <Stack direction='row' spacing={1}>
+            <StyledButton variant="contained" onClick={handleNavlink} to='/collection/create'>
+              Create
+            </StyledButton>
+            <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
+              Import
+            </StyledButton>
+            <MyItemsSortSelect onChange={setOrderType} />
+          </Stack>
         </Stack>
         <Grid container spacing={2}>
           {

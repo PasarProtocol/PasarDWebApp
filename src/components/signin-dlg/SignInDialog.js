@@ -867,7 +867,7 @@ export default function SignInDialog() {
             Download Essentials
           </Typography>
           <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
-            A DID is required in order to create or sell items on Pasar. Get your own DID by downloading the Elastos
+            A DID is required in order to create or {openDownloadEssential===true?'sell items':'import collections'} on Pasar. Get your own DID by downloading the Elastos
             Essentials mobile app now!
           </Typography>
           <Typography variant="body2" display="block" gutterBottom align="center" sx={{ mt: 4 }}>
