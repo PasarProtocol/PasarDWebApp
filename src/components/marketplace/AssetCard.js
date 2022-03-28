@@ -377,7 +377,7 @@ export default function AssetCard(props) {
           </Box>
         </PaperRecord>
         <SellDlg isOpen={sellOpen} setOpen={setOpenSell} {...dlgProps}/>
-        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} {...dlgProps}/>
+        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} {...dlgProps} orderType={orderType}/>
         <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} {...dlgProps}/>
         <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} {...dlgProps}/>
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps}/>

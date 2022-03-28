@@ -6,33 +6,53 @@ import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
-import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import CoinSelect from '../marketplace/CoinSelect';
 import TransLoadingButton from '../TransLoadingButton';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import { removeLeadingZero, isInAppBrowser, coinTypes } from '../../utils/common';
+import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
+
 
 export default function UpdatePrice(props) {
-  const { isOpen, setOpen, title, orderId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, title, orderId, orderType, updateCount, handleUpdate } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [price, setPrice] = React.useState('');
+  const [reservePrice, setReservePrice] = React.useState('');
+  const [buyoutPrice, setBuyoutPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [coinType, setCoinType] = React.useState(0);
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleChangePrice = (event) => {
+  const handlePrice = (event) => {
     let priceValue = event.target.value;
     if (priceValue < 0) return;
     priceValue = removeLeadingZero(priceValue);
+    return priceValue
+    // setPrice(priceValue);
+    // setRcvPrice(math.round((priceValue * 98) / 100, 3));
+  };
+
+  const handleChangePrice = (event) => {
+    const priceValue = handlePrice(event);
     setPrice(priceValue);
     setRcvPrice(math.round((priceValue * 98) / 100, 3));
   };
 
-  const callChangeOrderPrice = async (_orderId, _price) => {
+  const handleChangeReservePrice = (event) => {
+    const priceValue = handlePrice(event);
+    setReservePrice(priceValue);
+  };
+
+  const handleChangeBuyoutPrice = (event) => {
+    const priceValue = handlePrice(event);
+    setBuyoutPrice(priceValue);
+  };
+
+  const callChangeOrderPrice = async (_orderId, _price, _reservePrice, _buyoutPrice) => {
     const walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
@@ -52,7 +72,7 @@ export default function UpdatePrice(props) {
     };
 
     pasarContract.methods
-      .changeOrderPrice(_orderId, _price)
+      .changeOrderPrice(_orderId, _price, _reservePrice, _buyoutPrice)
       .send(transactionParams)
       .on('transactionHash', (hash) => {
         console.log('transactionHash', hash);
@@ -77,8 +97,10 @@ export default function UpdatePrice(props) {
     setOnProgress(true);
     console.log('orderId:', orderId);
     const updatedPrice = BigInt(price*1e18).toString();
+    const reservePrice = BigInt(reservePrice*1e18).toString();
+    const buyoutPrice = BigInt(buyoutPrice*1e18).toString();
     console.log(updatedPrice);
-    callChangeOrderPrice(orderId, updatedPrice);
+    callChangeOrderPrice(orderId, updatedPrice, reservePrice, buyoutPrice);
   };
 
   return (
@@ -110,12 +132,12 @@ export default function UpdatePrice(props) {
         <Grid container>
           <Grid item xs={12}>
             <Typography variant="h4" sx={{ fontWeight: 'normal' }}>
-              Price
+              {orderType===auctionOrderType?'Starting Price':'Price'}
             </Typography>
           </Grid>
           <Grid item xs={12}>
             <FormControl variant="standard" sx={{ width: '100%' }}>
-              <InputLabelStyle htmlFor="input-with-price">Enter a fixed price of each item</InputLabelStyle>
+              <InputLabelStyle htmlFor="input-with-price">Enter a {orderType===auctionOrderType?'starting':'fixed'} price of each item</InputLabelStyle>
               <InputStyle
                 type="number"
                 id="input-with-price"
@@ -146,6 +168,49 @@ export default function UpdatePrice(props) {
             </Typography>
           </Grid>
         </Grid>
+        {
+          orderType===auctionOrderType &&
+          <Grid container>
+            <Grid item xs={12}>
+              <Typography variant="h4" sx={{ fontWeight: 'normal' }}>
+                Reserve Price
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl variant="standard" sx={{ width: '100%' }}>
+                <InputLabelStyle htmlFor="input-with-price">Enter a reserve price</InputLabelStyle>
+                <InputStyle
+                  type="number"
+                  id="input-reserve-price"
+                  value={reservePrice}
+                  onChange={handleChangeReservePrice}
+                  startAdornment={' '}
+                  endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
+                />
+              </FormControl>
+              <Divider />
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="h4" sx={{ fontWeight: 'normal' }}>
+                Buy Now Price
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl variant="standard" sx={{ width: '100%' }}>
+                <InputLabelStyle htmlFor="input-with-price">Enter a buy now price</InputLabelStyle>
+                <InputStyle
+                  type="number"
+                  id="input-buyout-price"
+                  value={buyoutPrice}
+                  onChange={handleChangeBuyoutPrice}
+                  startAdornment={' '}
+                  endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
+                />
+              </FormControl>
+              <Divider />
+            </Grid>
+          </Grid>
+        }
         <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
           <TransLoadingButton loading={onProgress} onClick={changePrice}>
             Update
