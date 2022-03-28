@@ -33,7 +33,7 @@ import ScrollManager from '../../components/ScrollManager'
 import useSingin from '../../hooks/useSignin';
 import { blankAddress, marketContract } from '../../config'
 import { reduceHexAddress, getAssetImage, getCoinUSD, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl,
-  getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes } from '../../utils/common';
+  getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes, getShortUrl } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -102,6 +102,7 @@ export default function CollectibleDetail() {
   const [isOpenMorePopup, setOpenMorePopup] = React.useState(null);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [address, setAddress] = React.useState('');
+  const [shareUrl, setShareUrl] = React.useState(window.location.href);
 
   const [collectible, setCollectible] = React.useState({});
   const [collectionType, setCollectionType] = React.useState(null);
@@ -113,12 +114,18 @@ export default function CollectibleDetail() {
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const { pasarLinkAddress } = useSingin()
-
+  
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
   
   const context = useWeb3React()
   const { account } = context;
+
+  React.useEffect(() => {
+    getShortUrl(window.location.href).then((shortUrl)=>{
+      setShareUrl(shortUrl)
+    })
+  }, [])
   
   React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
@@ -314,7 +321,7 @@ export default function CollectibleDetail() {
               >
               <MenuItem onClick={handleCloseSharePopup}>
                 <FacebookShareButton
-                  url={window.location.href}
+                  url={shareUrl}
                   // quote="Check out this item on Pasar"
                   description="share item"
                   style={{display: 'flex', alignItems: 'center'}}
@@ -324,7 +331,7 @@ export default function CollectibleDetail() {
               </MenuItem>
               <MenuItem onClick={handleCloseSharePopup}>
                 <TwitterShareButton
-                  url={window.location.href}
+                  url={shareUrl}
                   description="share item"
                   style={{display: 'flex', alignItems: 'center'}}
                 >
