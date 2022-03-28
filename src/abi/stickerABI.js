@@ -10,6 +10,21 @@ module.exports.STICKER_CONTRACT_ABI = [
         "internalType": "string",
         "name": "_symbol",
         "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_contractUri",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_diaToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_diaValue",
+        "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable",
@@ -408,6 +423,19 @@ module.exports.STICKER_CONTRACT_ABI = [
     "name": "burnFrom",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "contractURI",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1033,6 +1061,19 @@ module.exports.STICKER_CONTRACT_ABI = [
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "_uri",
+        "type": "string"
+      }
+    ],
+    "name": "setContractURI",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_diaBeacon",
         "type": "address"
@@ -1291,6 +1332,11 @@ module.exports.STICKER_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "tokenMinter",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "createTime",
             "type": "uint256"
@@ -1301,7 +1347,7 @@ module.exports.STICKER_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IToken1155Info.TokenInfo",
+        "internalType": "struct ITokenGeneralInfo.TokenInfo",
         "name": "",
         "type": "tuple"
       }
@@ -1352,6 +1398,11 @@ module.exports.STICKER_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "tokenMinter",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "createTime",
             "type": "uint256"
@@ -1362,7 +1413,7 @@ module.exports.STICKER_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IToken1155Info.TokenInfo[]",
+        "internalType": "struct ITokenGeneralInfo.TokenInfo[]",
         "name": "",
         "type": "tuple[]"
       }
