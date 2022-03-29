@@ -33,7 +33,7 @@ export default function CategorySelect(props) {
       fullWidth
     >
       {
-        menuItems.map((type, i)=><MenuItem key={i} value={i} autoFocus={selected===i}>{type}</MenuItem>)
+        menuItems.map((type, i)=><MenuItem key={i} value={type} autoFocus={selected===type}>{type}</MenuItem>)
       }
     </Select>
   )
