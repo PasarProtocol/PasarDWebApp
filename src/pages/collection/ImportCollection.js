@@ -1,7 +1,10 @@
 import React from 'react';
 import Web3 from 'web3';
+import bs58 from 'bs58'
 import { useNavigate } from 'react-router-dom';
 import { isString } from 'lodash';
+import { isMobile } from 'react-device-detect';
+import CancelablePromise from 'cancelable-promise';
 import { styled } from '@mui/material/styles';
 import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip, Box,
   Accordion, AccordionSummary, AccordionDetails, FormHelperText } from '@mui/material';
@@ -9,19 +12,24 @@ import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import checkCircleIcon from '@iconify-icons/akar-icons/circle-check-fill';
 import { create, urlSource } from 'ipfs-http-client';
+import jwtDecode from 'jwt-decode';
 import { useSnackbar } from 'notistack';
 
 // components
 import { MHidden } from '../../components/@material-extend';
-import useOffSetTop from '../../hooks/useOffSetTop';
 import Page from '../../components/Page';
 import { UploadSingleFile } from '../../components/upload';
-import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL} from '../../config'
-import ProgressBar from '../../components/ProgressBar'
 import TransLoadingButton from '../../components/TransLoadingButton';
 import CollectionCard from '../../components/collection/CollectionCard';
 import CategorySelect from '../../components/collection/CategorySelect';
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
+import RegisterCollectionDlg from '../../components/dialog/RegisterCollection';
+import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+
+import {REGISTER_CONTRACT_ABI} from '../../abi/registerABI'
+import {registerContract as CONTRACT_ADDRESS, ipfsURL} from '../../config'
+import useOffSetTop from '../../hooks/useOffSetTop';
+import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import { isInAppBrowser, removeLeadingZero, getContractInfo } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -48,16 +56,26 @@ export default function ImportCollection() {
   const [address, setAddress] = React.useState('')
   const [collectionInfo, setCollectionInfo] = React.useState({name: '', symbol: ''})
   const [description, setDescription] = React.useState('');
-  const [category, setCategory] = React.useState(0);
+  const [category, setCategory] = React.useState('General');
   const [avatarFile, setAvatarFile] = React.useState(null);
   const [backgroundFile, setBackgroundFile] = React.useState(null);
   const [isOnValidation, setOnValidation] = React.useState(false);
   const [recipientRoyaltiesGroup, setRecipientRoyaltiesGroup] = React.useState([{address: '', royalties: ''}]);
-  const [socialUrl, setSocialUrl] = React.useState({Website: '', Twitter: '', Discord: '', Telegram: '', Medium: ''});
+  const [socialUrl, setSocialUrl] = React.useState({website: '', twitter: '', discord: '', telegram: '', medium: ''});
   const [onProgress, setOnProgress] = React.useState(false);
   const [autoLoaded, setAutoLoaded] = React.useState(false);
+  const [currentPromise, setCurrentPromise] = React.useState(null);
+  const [isOpenRegCollection, setOpenRegCollectionDlg] = React.useState(false);
+  const [isReadySignForRegister, setReadySignForRegister] = React.useState(false);
   
+  const contractRef = React.useRef();
+  const uploadAvatarRef = React.useRef();
+  const uploadBackgroundRef = React.useRef();
+  const descriptionRef = React.useRef();
+
+  const { enqueueSnackbar } = useSnackbar();
   const isOffset = useOffSetTop(40);
+  const APP_BAR_MOBILE = 64;
   const APP_BAR_DESKTOP = 88;
   const navigate = useNavigate();
   
@@ -65,6 +83,13 @@ export default function ImportCollection() {
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
       navigate('/marketplace')
   }, []);
+
+  React.useEffect(() => {
+    if(!isOpenRegCollection){
+      if(currentPromise)
+        currentPromise.cancel()
+    }
+  }, [isOpenRegCollection]);
 
   const handleInputAddress = (e)=>{
     const inputAddress = e.target.value
@@ -150,8 +175,208 @@ export default function ImportCollection() {
       setAutoLoaded(false)
     })
   }
-  const handleImportAction = () => {
+  const sendIpfsImage = (f)=>(
+    new CancelablePromise((resolve, reject, onCancel) => {
+      onCancel(() => {
+        console.log("cancel ipfs")
+        setOnProgress(false)
+      });
+      
+      const reader = new window.FileReader();
+      reader.readAsArrayBuffer(f);
+      reader.onloadend = async() => {
+        try {
+          const fileContent = Buffer.from(reader.result)
+          const added = await client.add(fileContent)
+          console.log(added)
+          resolve({'origin': {...added}, 'type':f.type})
+        } catch (error) {
+          reject(error);
+        }
+      }
+    })
+  )
+  const sendIpfsMetaJson = (avatar, background)=>(
+    new CancelablePromise((resolve, reject, onCancel) => {
+      onCancel(() => {
+        console.log("cancel meta")
+        setOnProgress(false)
+      });
+      
+      // create the metadata object we'll be storing
+      const did = sessionStorage.getItem('PASAR_DID') || ''
+      const token = sessionStorage.getItem("PASAR_TOKEN");
+      const user = jwtDecode(token);
+      const {name, bio} = user;
+      const proof = sessionStorage.getItem("KYCedProof") || ''
+      const creatorObj = {
+        "did": `did:elastos:${did}`,
+        "name": name || '',
+        "description": bio || '',
+      }
+      if(proof.length) {
+        creatorObj.KYCedProof = proof
+      }
+      const dataObj = { avatar, background, description, category: category.toLowerCase(), "socials": socialUrl}
+      const plainBuffer = Buffer.from(JSON.stringify(dataObj))
+      const plainText = bs58.encode(plainBuffer)
+      requestSigndataOnTokenID(plainText).then(rsp=>{
+        // create the metadata object we'll be storing
+        creatorObj.signature = rsp.signature
+        const metaObj = {
+          "version": "1",
+          "creator": creatorObj,
+          "data": dataObj
+        }
+        console.log(metaObj)
+        try {
+          const jsonMetaObj = JSON.stringify(metaObj);
+          // add the metadata itself as well
+          const metaRecv = Promise.resolve(client.add(jsonMetaObj))
+          resolve(metaRecv)
+        } catch (error) {
+          reject(error);
+        }
+      }).catch((error) => {
+        reject(error);
+      })
+    })
+  )
+  const uploadData = ()=>(
+    new CancelablePromise((resolve, reject, onCancel) => {
+      let avatarSrc = ''
+      let backgroundSrc = ''
+      onCancel(() => {
+        console.log("cancel upload")
+        setOnProgress(false)
+      });
 
+      let temPromise = sendIpfsImage(avatarFile)
+      setCurrentPromise(temPromise)
+      temPromise.then((added) => {
+        avatarSrc = `pasar:image:${added.origin.path}`
+        temPromise = sendIpfsImage(backgroundFile)
+        setCurrentPromise(temPromise)
+        return temPromise
+      }).then((added) => {
+        backgroundSrc = `pasar:image:${added.origin.path}`
+        temPromise = sendIpfsMetaJson(avatarSrc, backgroundSrc)
+        setCurrentPromise(temPromise)
+        return temPromise
+      }).then((metaRecv) => {
+        const _uri = `pasar:json:${metaRecv.path}`
+        resolve({ _uri })
+      }).catch((error) => {
+        reject(error);
+      })
+    })
+  )
+  
+  const registerCollection = (paramObj)=>(
+    new CancelablePromise((resolve, reject, onCancel) => {
+      const propertiesObj = recipientRoyaltiesGroup.reduce((obj, item) => {
+        if(item.address!=='' && item.royalties!=='') {
+          obj.owners.push(item.address)
+          obj.feeRates.push(item.royalties*10000)
+        }
+        return obj
+      }, {owners: [], feeRates: []})
+
+      onCancel(() => {
+        console.log("cancel register")
+        setOnProgress(false)
+      });
+    
+      if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2'){
+        reject(new Error)
+        return
+      }
+
+      const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+      // getCurrentWeb3Provider().then((walletConnectWeb3) => {
+        walletConnectWeb3.eth.getAccounts().then((accounts)=>{
+          const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, CONTRACT_ADDRESS)
+          walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+            console.log("Gas price:", gasPrice); 
+    
+            const _gasLimit = 5000000;
+            console.log("Sending transaction with account address:", accounts[0]);
+            const transactionParams = {
+              'from': accounts[0],
+              'gasPrice': gasPrice,
+              'gas': _gasLimit,
+              'value': 0
+            };
+            setReadySignForRegister(true)
+            registerContract.methods.registerToken(address, collectionInfo.name, paramObj._uri, propertiesObj.owners, propertiesObj.feeRates).send(transactionParams)
+              .on('receipt', (receipt) => {
+                  setReadySignForRegister(false)
+                  console.log("receipt", receipt);
+                  resolve(true)
+              })
+              .on('error', (error, receipt) => {
+                  console.error("error", error);
+                  reject(error)
+              });
+  
+          }).catch((error) => {
+            reject(error);
+          })
+        }).catch((error) => {
+          reject(error);
+        })
+      // }) 
+    })
+  )
+  const importCollection = () => {
+    setOnProgress(true)
+    setOpenRegCollectionDlg(true)
+    let temPromise = uploadData()
+    setCurrentPromise(temPromise)
+    temPromise.then((paramObj) => {
+      temPromise = registerCollection(paramObj)
+      setCurrentPromise(temPromise)
+      return temPromise
+    }).then((success) => {
+      if(success){
+        enqueueSnackbar('Import collection success!', { variant: 'success' });
+        // setTimeout(()=>{
+        //   navigate('/marketplace')
+        // }, 3000)
+      }
+      else
+        enqueueSnackbar('Import collection error!', { variant: 'warning' });
+      setOnProgress(false)
+      setOpenRegCollectionDlg(false)
+      setCurrentPromise(null)
+    }).catch((error) => {
+      enqueueSnackbar('Import collection error!', { variant: 'error' });
+      setOnProgress(false)
+      setOpenRegCollectionDlg(false)
+      setCurrentPromise(null)
+    });
+  }
+  const scrollToRef = (ref)=>{
+    if(!ref.current)
+      return
+    let fixedHeight = isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP
+    fixedHeight = isMobile?APP_BAR_MOBILE:fixedHeight
+    window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
+  }
+  const handleImportAction = () => {
+    setOnValidation(true)
+    if(!address.length || !autoLoaded)
+      scrollToRef(contractRef)
+    else if(!avatarFile)
+      scrollToRef(uploadAvatarRef)
+    else if(!backgroundFile)
+      scrollToRef(uploadBackgroundRef)
+    else if(!description.length)
+      scrollToRef(descriptionRef)
+    else if(duproperties.length || recipientRoyaltiesGroup.filter(el=>el.address.length>0&&!el.royalties.length).length)
+      enqueueSnackbar('Fee recipient properties are invalid.', { variant: 'warning' });
+    else
+      importCollection()
   }
   return (
     <RootStyle title="ImportCollection | PASAR">
@@ -165,9 +390,9 @@ export default function ImportCollection() {
               What is the address of your ERC-721 or ERC-1155 contract on the Elastos Smart Chain Mainnet Network?
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={8}>
+          <Grid item xs={12} sm={8} ref={contractRef}>
             <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Contract/Collection Address</Typography>
-            <FormControl error={isOnValidation&&!address.length} variant="standard" sx={{width: '100%'}}>
+            <FormControl error={isOnValidation&&(!address.length||!autoLoaded)} variant="standard" sx={{width: '100%'}}>
               <InputLabelStyle htmlFor="input-with-address">
                 Enter your ERC-721 or ERC-1155 contract/collection address
               </InputLabelStyle>
@@ -179,7 +404,7 @@ export default function ImportCollection() {
                 onChange={handleInputAddress}
                 aria-describedby="address-error-text"
               />
-              <FormHelperText id="address-error-text" hidden={!isOnValidation||(isOnValidation&&address.length>0)}>Address is required</FormHelperText>
+              <FormHelperText id="address-error-text" hidden={!isOnValidation||(isOnValidation&&address.length>0&&autoLoaded)}>Address is required</FormHelperText>
             </FormControl>
             <Divider/>
           </Grid>
@@ -209,7 +434,7 @@ export default function ImportCollection() {
             </>
           }
           <Grid item xs={12} sm={8}>
-            <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Avatar</Typography>
+            <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}} ref={uploadAvatarRef}>Avatar</Typography>
             <UploadSingleFile
               file={avatarFile}
               error={isOnValidation&&!avatarFile}
@@ -218,7 +443,7 @@ export default function ImportCollection() {
               accept=".jpg, .png, .jpeg, .gif"/>
             <FormHelperText error={isOnValidation&&!avatarFile} hidden={!isOnValidation||(isOnValidation&&avatarFile!==null)}>Image file is required</FormHelperText>
 
-            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}}>Background Image</Typography>
+            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}} ref={uploadBackgroundRef}>Background Image</Typography>
             <UploadSingleFile
               file={backgroundFile}
               error={isOnValidation&&!backgroundFile}
@@ -227,7 +452,7 @@ export default function ImportCollection() {
               accept=".jpg, .png, .jpeg, .gif"/>
             <FormHelperText error={isOnValidation&&!backgroundFile} hidden={!isOnValidation||(isOnValidation&&backgroundFile!==null)}>Image file is required</FormHelperText>
             
-            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}}>Description</Typography>
+            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}} ref={descriptionRef}>Description</Typography>
             <FormControl error={isOnValidation&&!description.length} variant="standard" sx={{width: '100%'}}>
               <InputLabelStyle htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
                 Add collection description
@@ -269,7 +494,7 @@ export default function ImportCollection() {
                       value={item.address}
                       onChange={(e)=>{handleRecipientRoyaltiesGroup('address', index, e)}}
                       error={isOnValidation&&duproperties.includes(item.address)}
-                      helperText={isOnValidation&&duproperties.includes(item.address)?'Duplicated type':''}
+                      helperText={isOnValidation&&duproperties.includes(item.address)?'Duplicated address':''}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -280,8 +505,8 @@ export default function ImportCollection() {
                       fullWidth
                       value={item.royalties}
                       onChange={(e)=>{handleRecipientRoyaltiesGroup('royalties', index, e)}}
-                      error={isOnValidation&&item.royalties.length>0&&!item.royalties.length}
-                      helperText={isOnValidation&&item.royalties.length>0&&!item.royalties.length?'Can not be empty.':''}
+                      error={isOnValidation&&item.address.length>0&&!item.royalties.length}
+                      helperText={isOnValidation&&item.address.length>0&&!item.royalties.length?'Can not be empty.':''}
                     />
                   </Grid>
                 </Grid>
@@ -306,8 +531,8 @@ export default function ImportCollection() {
                           <InputStyle
                             id={`input-with-${type}`}
                             startAdornment={' '}
-                            value={socialUrl[type]}
-                            onChange={(e)=>handleInputSocials(e.target.value, type)}
+                            value={socialUrl[type.toLowerCase()]}
+                            onChange={(e)=>handleInputSocials(e.target.value, type.toLowerCase())}
                             sx={{mt: '-5px !important'}}
                           />
                         </FormControl>
@@ -343,6 +568,7 @@ export default function ImportCollection() {
           </Grid>
         </Grid>
       </Container>
+      <RegisterCollectionDlg isOpenDlg={isOpenRegCollection} setOpenDlg={setOpenRegCollectionDlg} isReadySign={isReadySignForRegister}/>
     </RootStyle>
   );
 }
