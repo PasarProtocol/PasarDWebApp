@@ -50,7 +50,7 @@ export default function CreateCollection() {
   const [description, setDescription] = React.useState('');
   const [category, setCategory] = React.useState(0);
   const [avatarFile, setAvatarFile] = React.useState(null);
-  const [coverFile, setCoverFile] = React.useState(null);
+  const [backgroundFile, setBackgroundFile] = React.useState(null);
   const [isOnValidation, setOnValidation] = React.useState(false);
   const [recipientRoyaltiesGroup, setRecipientRoyaltiesGroup] = React.useState([{address: '', royalties: ''}]);
   const [socialUrl, setSocialUrl] = React.useState({Website: '', Twitter: '', Discord: '', Telegram: '', Medium: ''});
@@ -78,13 +78,13 @@ export default function CreateCollection() {
       if(type===1)
         setAvatarFile(tempFileObj)
       else
-        setCoverFile(tempFileObj)
+        setBackgroundFile(tempFileObj)
     }
   }
   const handleDropAvatarFile = React.useCallback((acceptedFiles) => {dropFileAction(acceptedFiles, 1)}, []);
-  const handleDropCoverFile = React.useCallback((acceptedFiles) => {dropFileAction(acceptedFiles, 2)}, []);
+  const handleDropBackgroundFile = React.useCallback((acceptedFiles) => {dropFileAction(acceptedFiles, 2)}, []);
   const handleRemoveAvatar = (file) => {setAvatarFile(null)};
-  const handleRemoveCover = (file) => {setCoverFile(null)};
+  const handleRemoveBackground = (file) => {setBackgroundFile(null)};
 
   const handleRecipientRoyaltiesGroup = (key, index, e) => {
     let inputValue = e.target.value
@@ -195,14 +195,14 @@ export default function CreateCollection() {
               accept=".jpg, .png, .jpeg, .gif"/>
             <FormHelperText error={isOnValidation&&!avatarFile} hidden={!isOnValidation||(isOnValidation&&avatarFile!==null)}>Image file is required</FormHelperText>
 
-            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}}>Cover Photo</Typography>
+            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}}>Background Image</Typography>
             <UploadSingleFile
-              file={coverFile}
-              error={isOnValidation&&!coverFile}
-              onDrop={handleDropCoverFile}
-              onRemove={handleRemoveCover}
+              file={backgroundFile}
+              error={isOnValidation&&!backgroundFile}
+              onDrop={handleDropBackgroundFile}
+              onRemove={handleRemoveBackground}
               accept=".jpg, .png, .jpeg, .gif"/>
-            <FormHelperText error={isOnValidation&&!coverFile} hidden={!isOnValidation||(isOnValidation&&coverFile!==null)}>Image file is required</FormHelperText>
+            <FormHelperText error={isOnValidation&&!backgroundFile} hidden={!isOnValidation||(isOnValidation&&backgroundFile!==null)}>Image file is required</FormHelperText>
             
             <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}}>Description</Typography>
             <FormControl error={isOnValidation&&!description.length} variant="standard" sx={{width: '100%'}}>
@@ -308,7 +308,7 @@ export default function CreateCollection() {
                     title: name,
                     detail: description,
                     avatar: getUrlfromFile(avatarFile),
-                    coverImage: getUrlfromFile(coverFile)
+                    background: getUrlfromFile(backgroundFile)
                   }}/>
               </Grid>
             </Grid>

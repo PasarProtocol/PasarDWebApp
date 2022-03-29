@@ -63,7 +63,7 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
 }));
 
 const CollectionImgBox = (props) => {
-  const { cover, avatar } = props;
+  const { backgroundImg, avatar } = props;
   const imageStyle = {
     // borderRadius: 1,
     // boxShadow: (theme)=>theme.customShadows.z16,
@@ -75,9 +75,9 @@ const CollectionImgBox = (props) => {
     <Stack sx={{position: 'relative', height: '120px', mb: '25px'}}>
       <Stack sx={{height: '100%', overflow: 'hidden'}}>
         {
-          cover?
-          <Box className='cover-image' sx={{...imageStyle, background: `url(${cover}) no-repeat center`, backgroundSize: 'cover'}} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
-          // <Box className='cover-image' draggable = {false} component="img" src={cover} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
+          backgroundImg?
+          <Box className='cover-image' sx={{...imageStyle, background: `url(${backgroundImg}) no-repeat center`, backgroundSize: 'cover'}} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
+          // <Box className='cover-image' draggable = {false} component="img" src={backgroundImg} sx={imageStyle} onError={(e) => e.target.src = '/static/broken-image.svg'}/>:
           <Box
             className='cover-image'
             sx={{
@@ -101,7 +101,7 @@ const CollectionImgBox = (props) => {
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider } = props
-  const {title, avatar, coverImage, detail} = info
+  const {title, avatar, background, detail} = info
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
   
 
@@ -135,7 +135,7 @@ const CollectionCardPaper = (props) => {
           //     />
           //   </Link>
           // ):(
-            <CollectionImgBox avatar={avatar} cover={coverImage}/>
+            <CollectionImgBox avatar={avatar} backgroundImg={background}/>
           // )
         }
         </Box>
