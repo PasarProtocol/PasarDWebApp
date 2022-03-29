@@ -11,6 +11,7 @@ import { essentialsConnector } from '../components/signin-dlg/EssentialConnectiv
 import { stickerContract as STICKER_ADDRESS, marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS, blankAddress, ipfsURL, rpcURL } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { DIAMOND_CONTRACT_ABI } from '../abi/diamondABI';
+import { COMMON_CONTRACT_ABI } from '../abi/commonABI';
 
 const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS]
 // Get Abbrevation of hex addres //
@@ -304,6 +305,33 @@ export function callContractMethod(type, coinType, paramObj) {
         reject(error);
       });
   });
+}
+
+export function getContractInfo(strAddress) {
+  return new Promise((resolve, reject) => {
+    try{
+      let walletConnectWeb3
+      if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+        walletConnectWeb3 = new Web3(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+      else
+        walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
+      
+      const tokenContract = new walletConnectWeb3.eth.Contract(COMMON_CONTRACT_ABI, strAddress)
+      tokenContract.methods.name().call()
+        .then(resultName=>{
+          tokenContract.methods.symbol().call()
+            .then(resultSymbol=>{
+              resolve({name: resultName, symbol: resultSymbol})
+            }).catch((error) => {
+              reject(error)
+            })
+        }).catch((error) => {
+          reject(error)
+        })
+    } catch(e) {
+      reject(e)
+    }
+  })
 }
 
 export const MethodList = [

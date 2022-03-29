@@ -22,7 +22,7 @@ import TransLoadingButton from '../../components/TransLoadingButton';
 import CollectionCard from '../../components/collection/CollectionCard';
 import CategorySelect from '../../components/collection/CategorySelect';
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
-import { isInAppBrowser, removeLeadingZero } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, getContractInfo } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -46,6 +46,7 @@ const CheckIcon = ({loaded})=>{
 const socialTypes = ['Website', 'Twitter', 'Discord', 'Telegram', 'Medium']
 export default function ImportCollection() {
   const [address, setAddress] = React.useState('')
+  const [collectionInfo, setCollectionInfo] = React.useState({name: '', symbol: ''})
   const [description, setDescription] = React.useState('');
   const [category, setCategory] = React.useState(0);
   const [avatarFile, setAvatarFile] = React.useState(null);
@@ -68,6 +69,8 @@ export default function ImportCollection() {
   const handleInputAddress = (e)=>{
     const inputAddress = e.target.value
     if(inputAddress.length>=42){
+      if(address===inputAddress.substring(0,42))
+        return
       getCollectionInfo(inputAddress.substring(0,42))
     }
     setAddress(inputAddress.substring(0,42))
@@ -139,7 +142,13 @@ export default function ImportCollection() {
     return isString(file)?file:file.preview
   }
   const getCollectionInfo = (inputAddress) => {
-    setAutoLoaded(true)
+    getContractInfo(inputAddress).then(res=>{
+      setCollectionInfo(res)
+      setAutoLoaded(true)
+    }).catch(e=>{
+      setCollectionInfo({name: '', symbol: ''})
+      setAutoLoaded(false)
+    })
   }
   const handleImportAction = () => {
 
@@ -181,7 +190,7 @@ export default function ImportCollection() {
                 <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Collection Name</Typography>
                 <InputStyle
                   endAdornment={<CheckIcon loaded={autoLoaded}/>}
-                  value="Bunny Punk"
+                  value={collectionInfo.name}
                   readOnly={Boolean(true)}
                   sx={{width: '100%'}}
                 />
@@ -191,7 +200,7 @@ export default function ImportCollection() {
                 <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Symbol</Typography>
                 <InputStyle
                   endAdornment={<CheckIcon loaded={autoLoaded}/>}
-                  value="BUNNY"
+                  value={collectionInfo.symbol}
                   readOnly={Boolean(true)}
                   sx={{width: '100%'}}
                 />
@@ -319,7 +328,7 @@ export default function ImportCollection() {
                 <CollectionCard 
                   isPreview={Boolean(true)}
                   info={{
-                    title: 'Collection Name',
+                    title: collectionInfo.name,
                     detail: description,
                     avatar: getUrlfromFile(avatarFile),
                     coverImage: getUrlfromFile(coverFile)
