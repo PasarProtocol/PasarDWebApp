@@ -108,7 +108,7 @@ export default function MarketHome() {
   return (
     <RootStyle title="Explorer | PASAR">
       <Box draggable = {false} component="img" src="/static/corner-logo.png" sx={{ width: '50%', maxWidth: '550px', position: 'absolute', top: 0, right: 0 }} />
-      <Container maxWidth='xl' sx={{pt: 4, mb: 3, position: 'relative'}}>
+      <Container maxWidth='xl' sx={{pt: 4, pb: 8, px: {sm: 3, md: 6, lg: 9}, position: 'relative'}}>
         <StackStyle>
           <Box sx={{ flexGrow: 1 }}>
             <Stack sx={{height: '100%'}}>
@@ -135,8 +135,8 @@ export default function MarketHome() {
           <HomeAssetCarousel/>
         </StackStyle>
       </Container>
-      <Container maxWidth='xl'>
-        <Stack spacing={3}>
+      <Container maxWidth='xl' sx={{px: {sm: 3, md: 6, lg: 9}}}>
+        <Stack spacing={6}>
           {/* <MotionInView variants={varFadeInUp}> */}
             <Box>
               <TitleStyle component="h1">
