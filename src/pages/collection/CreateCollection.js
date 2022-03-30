@@ -21,6 +21,7 @@ import ProgressBar from '../../components/ProgressBar'
 import TransLoadingButton from '../../components/TransLoadingButton';
 import CollectionCard from '../../components/collection/CollectionCard';
 import CategorySelect from '../../components/collection/CategorySelect';
+import StandardTypeButton from '../../components/collection/StandardTypeButton';
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import { isInAppBrowser, removeLeadingZero } from '../../utils/common';
 // ----------------------------------------------------------------------
@@ -47,6 +48,7 @@ const socialTypes = ['Website', 'Twitter', 'Discord', 'Telegram', 'Medium']
 export default function CreateCollection() {
   const [name, setName] = React.useState('')
   const [symbol, setSymbol] = React.useState('')
+  const [standard, setStandard] = React.useState("ERC-721");
   const [description, setDescription] = React.useState('');
   const [category, setCategory] = React.useState(0);
   const [avatarFile, setAvatarFile] = React.useState(null);
@@ -150,6 +152,28 @@ export default function CreateCollection() {
             <Typography variant="h5" sx={{fontWeight: 'normal', color: 'text.secondary'}}>
               Create an ERC-1155 collection on the Elastos Smart Chain Mainnet Network
             </Typography>
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Token Standard</Typography>
+            <Stack direction='row' spacing={2} sx={{alignItems: 'end'}}>
+              <Box>
+                <Typography variant="subtitle2" align="center" sx={{mb: 0.5}}>
+                  <span role="img" aria-label="">🔥</span> Recommended
+                </Typography>
+                <StandardTypeButton
+                  type="ERC-721"
+                  description="Non-fungible token"
+                  onClick={()=>{setStandard("ERC-721")}}
+                  current={standard}
+                />
+              </Box>
+              <StandardTypeButton
+                type="ERC-1155"
+                description="Multi-token standard"
+                onClick={()=>{setStandard("ERC-1155")}}
+                current={standard}
+              />
+            </Stack>
           </Grid>
           <Grid item xs={12} sm={8}>
             <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Collection Name</Typography>
