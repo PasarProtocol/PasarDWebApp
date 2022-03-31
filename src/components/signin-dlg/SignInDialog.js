@@ -243,7 +243,7 @@ export default function SignInDialog() {
     let currentConnector = null;
     if (wallet === 'metamask') {
       currentConnector = injected;
-      activate(currentConnector);
+      await activate(currentConnector);
     }
     else if (wallet === 'walletconnect') {
       currentConnector = walletconnect;
