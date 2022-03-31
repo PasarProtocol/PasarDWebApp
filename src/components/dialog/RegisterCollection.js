@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import TransLoadingButton from '../TransLoadingButton';
 
 export default function RegisterCollection(props) {
-  const {type=0, isOpenDlg, setOpenDlg, isReadySign} = props
+  const {type=0, current=0, isOpenDlg, setOpenDlg, isReadySign} = props
   const theme = useTheme();
 
   const handleClose = () => {
@@ -38,7 +38,17 @@ export default function RegisterCollection(props) {
           isReadySign?
           <TransLoadingButton loading={Boolean(true)}/>:
           <Typography variant="subtitle2" align="center">
-            Creating item on the blockchain...
+            {
+              type!==0 && current===1?
+              "Deploying contract ont the blockchain...":
+              "Registering collection on the PASAR..."
+            }
+          </Typography>
+        }
+        {
+          type!==0&&
+          <Typography variant="subtitle2" align="center" color='origin.main' sx={{my: '10px'}}>
+            Step {current} of 2
           </Typography>
         }
         <Typography variant="caption" display="block" sx={{ color: 'text.secondary', mt: '10px' }} gutterBottom align="center">
