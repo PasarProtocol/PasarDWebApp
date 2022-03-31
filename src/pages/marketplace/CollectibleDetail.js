@@ -485,7 +485,7 @@ export default function CollectibleDetail() {
                   collectionType?
                   <Stack direction='row'>
                     <AvatarStyle draggable = {false} component="img" src={collectionType.avatar} sx={{ p: 1 }} />
-                    <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>{collectionType.title} ({collectionType.name})</Typography>
+                    <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>{collectionType.name} ({collectionType.shortName})</Typography>
                   </Stack>:
                   <AvatarStyle sx={{ p: 1 }} />
                 }

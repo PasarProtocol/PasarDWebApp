@@ -46,7 +46,7 @@ export default function AssetFilterPan(props){
 
   const searchCollections = (inputStr)=>{
     if(inputStr.length){
-      setFilterCollections(collections.filter(el=>el.title.includes(inputStr)))
+      setFilterCollections(collections.filter(el=>el.name.includes(inputStr)))
     } else {
       setFilterCollections(collections)
     }
@@ -60,8 +60,8 @@ export default function AssetFilterPan(props){
     }
   }
 
-  const selectCollection = (title)=>{
-    handleFilter('collection', title)
+  const selectCollection = (name)=>{
+    handleFilter('collection', name)
   }
   
   const selectToken = (name)=>{
@@ -179,13 +179,13 @@ export default function AssetFilterPan(props){
                   >
                     {
                       filterCollections.map((el, i)=>(
-                        <ListItemButton key={i} onClick={()=>{selectCollection(el.title)}} selected={filterProps.selectedCollections.includes(el.title)}>
+                        <ListItemButton key={i} onClick={()=>{selectCollection(el.name)}} selected={filterProps.selectedCollections.includes(el.name)}>
                           <ListItemIcon>
                             <Box draggable = {false} component="img" src={el.avatar} sx={{ width: 24, height: 24, borderRadius: 2, p: el.avatar.startsWith('/static')?.5:0, backgroundColor: 'black' }} />
                           </ListItemIcon>
-                          <ListItemText primary={el.title} />
+                          <ListItemText primary={el.name} />
                           {
-                            filterProps.selectedCollections.includes(el.title)&&<CheckIcon/>
+                            filterProps.selectedCollections.includes(el.name)&&<CheckIcon/>
                           }
                         </ListItemButton>
                       ))

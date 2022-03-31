@@ -6,12 +6,13 @@ import { Link as RouterLink } from 'react-router-dom';
 import { motion } from "framer-motion";
 import { Icon } from '@iconify/react';
 import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip } from '@mui/material';
+import jwtDecode from 'jwt-decode';
 
 import PaperRecord from '../PaperRecord';
 // import Badge from '../Badge';
 // import BadgeProfile from './BadgeProfile'
 // import useSingin from '../../hooks/useSignin';
-import { getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
+import { getDidInfoFromAddress, reduceHexAddress, getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const avatarStyle = {
@@ -101,9 +102,9 @@ const CollectionImgBox = (props) => {
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider } = props
-  const {title, avatar, background, detail} = info
+  const { name, description, address='', avatar, background } = info
+  const [didName, setDidName] = React.useState('');
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
-  
 
   React.useEffect(() => {
     // if(holder) {
@@ -118,6 +119,23 @@ const CollectionCardPaper = (props) => {
     // }
   }, []);
 
+  React.useEffect(() => {
+    if(isPreview) {
+      const token = sessionStorage.getItem("PASAR_TOKEN");
+      if(token) {
+        const user = jwtDecode(token);
+        const {name} = user;
+        setDidName(name)
+      }
+    }      
+    else if(address)
+      getDidInfoFromAddress(address)
+        .then((info) => {
+          if(info.name)
+            setDidName(info.name)
+        })
+        .catch((e) => {})
+  }, [address]);
   return (
       <PaperRecord sx={isPreview?{ overflow: 'hidden' } : { overflow: 'hidden', ...paperStyle }}>
         <Box>
@@ -141,9 +159,9 @@ const CollectionCardPaper = (props) => {
         </Box>
         <Box sx={{p:2}}>
           <Stack direction="column" sx={{justifyContent: 'center', textAlign: 'center'}}>
-            <TypographyStyle variant="h5" noWrap>{title}</TypographyStyle>
+            <TypographyStyle variant="h5" noWrap>{name}</TypographyStyle>
             <Typography variant="subtitle2" component='div' sx={{fontWeight: 'normal'}}>
-              by{' '}<Typography variant="subtitle2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline-flex'}}>Various Creators</Typography>
+              by{' '}<Typography variant="subtitle2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline-flex'}}>{didName || reduceHexAddress(address) || 'Anonym'}</Typography>
             </Typography>
             {
               isOnSlider?
@@ -159,10 +177,10 @@ const CollectionCardPaper = (props) => {
                   display: '-webkit-box !important'
                 }}
               >
-                {detail}
+                {description}
               </TypographyStyle>:
               <TypographyStyle variant="subtitle2" color='text.secondary'>
-                {detail.length>200?`${detail.substring(0, 200)}...`:detail}
+                {description.length>200?`${description.substring(0, 200)}...`:description}
               </TypographyStyle>
             }
           </Stack>
