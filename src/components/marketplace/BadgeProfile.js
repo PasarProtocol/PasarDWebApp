@@ -44,13 +44,13 @@ export default function BadgeProfile(props) {
     setOpen(false);
   };
 
-  let {title, description} = collectionTypes[collection]
+  let {name, shortDescription} = collectionTypes[collection]
   const {avatar} = collectionTypes[collection]
   let dispAddress = reduceHexAddress(STICKER_ADDRESS)
   if(type===2){
-    title = didInfo.name || reduceHexAddress(walletAddress)
+    name = didInfo.name || reduceHexAddress(walletAddress)
     dispAddress = didInfo.name?reduceHexAddress(walletAddress):''
-    description = didInfo.description
+    shortDescription = didInfo.description
   }
 
   return (
@@ -103,10 +103,10 @@ export default function BadgeProfile(props) {
                 </Box>
                 {
                   type===1?
-                  <Typography variant='h5' sx={{ pt: 2 }}>{title}</Typography>:
+                  <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>:
 
                   <Link to={`/profile/others/${walletAddress}`} component={RouterLink} color='text.primary'>
-                    <Typography variant='h5' sx={{ pt: 2 }}>{title}</Typography>
+                    <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
                   </Link>
                 }
                 {
@@ -120,8 +120,8 @@ export default function BadgeProfile(props) {
                   )
                 }
                 {
-                  description&&
-                  <Typography variant='subtitle2' sx={{fontWeight: 'normal', color: 'text.secondary', pt: 2, lineHeight: 1, fontSize: '0.925em'}}>{description}</Typography>
+                  shortDescription&&
+                  <Typography variant='subtitle2' sx={{fontWeight: 'normal', color: 'text.secondary', pt: 2, lineHeight: 1, fontSize: '0.925em'}}>{shortDescription}</Typography>
                 }
                 {
                   type===2&&

@@ -40,7 +40,7 @@ export default function RegisterCollection(props) {
           <Typography variant="subtitle2" align="center">
             {
               type!==0 && current===1?
-              "Deploying contract ont the blockchain...":
+              "Deploying contract on the blockchain...":
               "Registering collection on the PASAR..."
             }
           </Typography>

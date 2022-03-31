@@ -54,6 +54,7 @@ const CheckIcon = ({loaded})=>{
 const socialTypes = ['Website', 'Twitter', 'Discord', 'Telegram', 'Medium']
 export default function ImportCollection() {
   const [address, setAddress] = React.useState('')
+  const [contractAddress, setContractAddress] = React.useState('')
   const [collectionInfo, setCollectionInfo] = React.useState({name: '', symbol: ''})
   const [description, setDescription] = React.useState('');
   const [category, setCategory] = React.useState('General');
@@ -82,6 +83,11 @@ export default function ImportCollection() {
   React.useEffect(async () => {
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
       navigate('/marketplace')
+      
+    if(isInAppBrowser())
+      setAddress(await window.elastos.getWeb3Provider().address)
+    else if(essentialsConnector.getWalletConnectProvider())
+      setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
   }, []);
 
   React.useEffect(() => {
@@ -94,11 +100,11 @@ export default function ImportCollection() {
   const handleInputAddress = (e)=>{
     const inputAddress = e.target.value
     if(inputAddress.length>=42){
-      if(address===inputAddress.substring(0,42))
+      if(contractAddress===inputAddress.substring(0,42))
         return
       getCollectionInfo(inputAddress.substring(0,42))
     }
-    setAddress(inputAddress.substring(0,42))
+    setContractAddress(inputAddress.substring(0,42))
   }
   
   const dropFileAction = (acceptedFiles, type) => {
@@ -308,7 +314,7 @@ export default function ImportCollection() {
               'value': 0
             };
             setReadySignForRegister(true)
-            registerContract.methods.registerToken(address, collectionInfo.name, paramObj._uri, propertiesObj.owners, propertiesObj.feeRates).send(transactionParams)
+            registerContract.methods.registerToken(contractAddress, collectionInfo.name, paramObj._uri, propertiesObj.owners, propertiesObj.feeRates).send(transactionParams)
               .on('receipt', (receipt) => {
                   setReadySignForRegister(false)
                   console.log("receipt", receipt);
@@ -365,7 +371,7 @@ export default function ImportCollection() {
   }
   const handleImportAction = () => {
     setOnValidation(true)
-    if(!address.length || !autoLoaded)
+    if(!contractAddress.length || !autoLoaded)
       scrollToRef(contractRef)
     else if(!avatarFile)
       scrollToRef(uploadAvatarRef)
@@ -392,7 +398,7 @@ export default function ImportCollection() {
           </Grid>
           <Grid item xs={12} sm={8} ref={contractRef}>
             <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Contract/Collection Address</Typography>
-            <FormControl error={isOnValidation&&(!address.length||!autoLoaded)} variant="standard" sx={{width: '100%'}}>
+            <FormControl error={isOnValidation&&(!contractAddress.length||!autoLoaded)} variant="standard" sx={{width: '100%'}}>
               <InputLabelStyle htmlFor="input-with-address">
                 Enter your ERC-721 or ERC-1155 contract/collection address
               </InputLabelStyle>
@@ -400,11 +406,11 @@ export default function ImportCollection() {
                 id="input-with-address"
                 startAdornment={' '}
                 endAdornment={<CheckIcon loaded={autoLoaded}/>}
-                value={address}
+                value={contractAddress}
                 onChange={handleInputAddress}
                 aria-describedby="address-error-text"
               />
-              <FormHelperText id="address-error-text" hidden={!isOnValidation||(isOnValidation&&address.length>0&&autoLoaded)}>Address is required</FormHelperText>
+              <FormHelperText id="address-error-text" hidden={!isOnValidation||(isOnValidation&&contractAddress.length>0&&autoLoaded)}>Address is required</FormHelperText>
             </FormControl>
             <Divider/>
           </Grid>
@@ -553,8 +559,9 @@ export default function ImportCollection() {
                 <CollectionCard 
                   isPreview={Boolean(true)}
                   info={{
-                    title: collectionInfo.name,
-                    detail: description,
+                    name: collectionInfo.name,
+                    description,
+                    address,
                     avatar: getUrlfromFile(avatarFile),
                     background: getUrlfromFile(backgroundFile)
                   }}/>

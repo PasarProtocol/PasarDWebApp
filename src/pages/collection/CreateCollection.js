@@ -94,6 +94,11 @@ export default function CreateCollection() {
   React.useEffect(async () => {
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
       navigate('/marketplace')
+
+    if(isInAppBrowser())
+      setAddress(await window.elastos.getWeb3Provider().address)
+    else if(essentialsConnector.getWalletConnectProvider())
+      setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
   }, []);
 
   React.useEffect(() => {
@@ -622,8 +627,9 @@ export default function CreateCollection() {
                 <CollectionCard 
                   isPreview={Boolean(true)}
                   info={{
-                    title: name,
-                    detail: description,
+                    name,
+                    description,
+                    address,
                     avatar: getUrlfromFile(avatarFile),
                     background: getUrlfromFile(backgroundFile)
                   }}/>
