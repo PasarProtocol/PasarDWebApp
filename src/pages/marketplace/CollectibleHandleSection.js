@@ -113,8 +113,8 @@ export default function CollectibleHandleSection(props) {
           </Typography>
     }
     else
-      if(!currentBid){
-        statusText = 'Starting Price'
+      if(!currentBid || currentBid<collectible.reservePrice){
+        statusText = !currentBid?'Starting Price':'Top Bid'
         if(address === collectible.holder)
           handleField = 
             didSignin?
@@ -127,7 +127,7 @@ export default function CollectibleHandleSection(props) {
         else
           auctionTextField = 
             <Typography variant="h4" color="origin.main" align='center' sx={{pt: 2}}>
-              Auction Has Ended
+              {!currentBid?"Auction Has Ended":"Reserve Price Not Met"}
             </Typography>
       }
       else {

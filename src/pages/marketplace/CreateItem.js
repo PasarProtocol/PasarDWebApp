@@ -767,12 +767,34 @@ export default function CreateItem() {
         </Typography>
         <Grid container direction="row" spacing={2}>
           <Grid item xs={12}>
+            <Typography variant="h4" sx={{fontWeight: 'normal'}}>Collection</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Stack spacing={1} direction="row">
+              <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{setCollection("PSRC")}} current={collection}/>
+              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+                <div>
+                  <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose")}} current={collection} disabled={1&&true}/>
+                </div>
+              </Tooltip>
+              {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+                <div>
+                  <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
+                </div>
+              </Tooltip> */}
+            </Stack>
+          </Grid>
+          <Grid item xs={12}>
             <Typography variant="h4" sx={{fontWeight: 'normal'}}>Minting Type</Typography>
           </Grid>
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
               <MintingTypeButton type="Single" description="Single item" onClick={()=>{setMintType("Single")}} current={mintype}/>
-              <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype}/>
+              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+                <div>
+                  <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype} disabled={Boolean(true)}/>
+                </div>
+              </Tooltip>
               <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
             </Stack>
           </Grid>
@@ -1112,24 +1134,6 @@ export default function CreateItem() {
                   />
                 </FormControl>
                 <Divider/>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Collection</Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Stack spacing={1} direction="row">
-                  <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{setCollection("PSRC")}} current={collection}/>
-                  <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                    <div>
-                      <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose")}} current={collection} disabled={1&&true}/>
-                    </div>
-                  </Tooltip>
-                  {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                    <div>
-                      <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
-                    </div>
-                  </Tooltip> */}
-                </Stack>
               </Grid>
               {
                 mintype!=="Batch"?
