@@ -119,10 +119,10 @@ export default function CollectibleHandleSection(props) {
           handleField = 
             didSignin?
             <StyledButton variant="contained" fullWidth onClick={(e)=>{}}>
-              Remove Listing
+              Cancel sale
             </StyledButton>:
             <StyledButton variant="contained" actiontype='remove' fullWidth onClick={openSignin}>
-              Sign in to Remove Listing
+              Sign in to Cancel sale
             </StyledButton>
         else
           auctionTextField = 
@@ -138,16 +138,21 @@ export default function CollectibleHandleSection(props) {
         const seller = collectible.listBid[0].sellerAddr
         if(address === topBuyer)
           statusText = 'You Won!'
-        if(address!==topBuyer && address!==seller)
+        if(address===seller)
+          handleField = 
+            <StyledButton variant="contained" fullWidth onClick={(e)=>{}}>
+              Accept Bid
+            </StyledButton>
+        else if(address===topBuyer)
+          handleField = 
+            <StyledButton variant="contained" fullWidth onClick={(e)=>{}}>
+              Claim Item
+            </StyledButton>
+        else
           auctionTextField = 
             <Typography variant="h4" color="origin.main" align='center' sx={{pt: 2}}>
               Auction Has Ended
             </Typography>
-        else
-          handleField = 
-            <StyledButton variant="contained" fullWidth onClick={(e)=>{}}>
-              Close Order
-            </StyledButton>
       }
   }
   else
