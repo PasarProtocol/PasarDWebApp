@@ -18,15 +18,21 @@ function zoomImgSize(imgWidth, imgHeight, maxWidth, maxHeight) {
 
 export default function(file, maxWidth, maxHeight, quality = 1) {
   return new Promise((resolve, reject) => {
-      if(!file.name)
-          resolve({success: 1})
+      if(!file.name) {
+        resolve({success: 1})
+        return
+      }
       const imageType = file.name.split(".").reverse()[0].toLowerCase()
       const allow = ['jpg', 'gif', 'bmp', 'png', 'jpeg', 'svg'];
       try {
-          if (!imageType || !allow.includes(imageType) || !file.size || !file.type)
+          if (!imageType || !allow.includes(imageType) || !file.size || !file.type) {
             resolve({success: 1})
-          if(file.size < 10*1000*1000 && imageType === "gif")
+            return
+          }
+          if(file.size < 10*1000*1000 && imageType === "gif") {
             resolve({success: 2})
+            return
+          }
             
           const fileName = file.name;
           const reader = new FileReader();
@@ -35,14 +41,18 @@ export default function(file, maxWidth, maxHeight, quality = 1) {
               const img = new Image();
               img.src = event.target.result;
               img.onload = () => {
-                  if(img.src.length < maxWidth * maxHeight)
+                  if(img.src.length < maxWidth * maxHeight) {
                     resolve({success: 2})
+                    return
+                  }
 
                   const imgWidth = img.width;
                   const imgHeight = img.height;
 
-                  if (imgWidth <= 0 || imgHeight <= 0)
+                  if (imgWidth <= 0 || imgHeight <= 0) {
                     resolve({success: 2})
+                    return
+                  }
 
                   const canvasSize = zoomImgSize(imgWidth, imgHeight, maxWidth, maxHeight);
                   

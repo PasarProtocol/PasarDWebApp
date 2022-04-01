@@ -459,8 +459,8 @@ export default function CreateItem() {
           console.log(added)
           if(thumbnail.success === 0){
             const addedThumbnail = await client.add(thumbnail.fileContent)
-            resolve({'origin': {...added}, 'thumbnail': {...addedThumbnail}, 'type':f.type})
             console.log(addedThumbnail)
+            resolve({'origin': {...added}, 'thumbnail': {...addedThumbnail}, 'type':f.type})
           }
           resolve({'origin': {...added}, 'thumbnail': {...added}, 'type':f.type})
         } catch (error) {
