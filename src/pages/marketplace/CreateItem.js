@@ -37,6 +37,8 @@ import ProgressBar from '../../components/ProgressBar'
 import StartingDateSelect from '../../components/marketplace/StartingDateSelect'
 import ExpirationDateSelect from '../../components/marketplace/ExpirationDateSelect'
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
+import CoinTypeLabel from '../../components/CoinTypeLabel';
+
 import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice } from '../../utils/common';
 import {requestSigndataOnTokenID} from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
@@ -1045,7 +1047,7 @@ export default function CreateItem() {
                               onChange={handleChangeReservePrice}
                               startAdornment={' '}
                               endAdornment={
-                                <CoinSelect selected={coinType} onChange={setCoinType}/>
+                                <CoinTypeLabel type={coinType}/>
                               }
                             />
                           </FormControl>
@@ -1086,7 +1088,7 @@ export default function CreateItem() {
                               onChange={handleChangeBuynowPrice}
                               startAdornment={' '}
                               endAdornment={
-                                <CoinSelect selected={coinType} onChange={setCoinType}/>
+                                <CoinTypeLabel type={coinType}/>
                               }
                             />
                           </FormControl>
