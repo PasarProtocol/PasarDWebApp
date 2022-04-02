@@ -10,7 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import MethodLabel from '../../MethodLabel';
 import CopyButton from '../../CopyButton';
 import { MethodList, reduceHexAddress, getTime } from '../../../utils/common';
-import {marketContract} from '../../../config'
+import {escURL, marketContract} from '../../../config'
 
 TransactionOrderDetail.propTypes = {
     item: PropTypes.object.isRequired
@@ -140,7 +140,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                             Tx Hash&nbsp;
                                         </TypographyStyle>
                                         <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
-                                            <Link href={`https://esc.elastos.io/tx/${tHash}`} sx={{ color: 'text.secondary', borderRadius: 1 }} target="_blank">
+                                            <Link href={`${escURL}/tx/${tHash}`} sx={{ color: 'text.secondary', borderRadius: 1 }} target="_blank">
                                                 {reduceHexAddress(tHash)}
                                                 <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                                                     <Icon icon={externalLinkFill} width="17px"/>

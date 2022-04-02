@@ -7,6 +7,7 @@ import { styled } from '@mui/material/styles';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import MethodLabel from '../../MethodLabel';
 import { reduceHexAddress, getAssetImage, MethodList } from '../../../utils/common';
+import { escURL } from '../../../config';
 
 TransactionListItem.propTypes = {
     item: PropTypes.object.isRequired
@@ -69,7 +70,7 @@ export default function TransactionListItem({ item }) {
                         Tx Hash
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="left">
-                        <Link href={`https://esc.elastos.io/tx/${item.tHash}`} color='text.secondary' target="_blank">
+                        <Link href={`${escURL}/tx/${item.tHash}`} color='text.secondary' target="_blank">
                             {reduceHexAddress(item.tHash)}
                             <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                                 <Icon icon={externalLinkFill} width="17px"/>

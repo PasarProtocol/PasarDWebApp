@@ -48,10 +48,14 @@ const addressForTest = {
 const rpcUrlForMain = "https://api.elastos.io/eth"
 const rpcUrlForTest = "https://api-testnet.elastos.io/eth"
 
+const escServerForMain = "https://esc.elastos.io"
+const escServerForTest = "https://esc-testnet.elastos.io"
+
 export const {stickerContract, marketContract, registerContract, diaContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
 
 export const ipfsURL = process.env.REACT_APP_ENV==="production"?process.env.REACT_APP_IPFS_URL_PRODUCTION:process.env.REACT_APP_IPFS_URL_TEST
 export const rpcURL = process.env.REACT_APP_ENV==="production"?rpcUrlForMain:rpcUrlForTest
+export const escURL = process.env.REACT_APP_ENV==="production"?escServerForMain:escServerForTest
 
 export const trustedProviders = [
   "did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK" // Trinity Tech KYC
