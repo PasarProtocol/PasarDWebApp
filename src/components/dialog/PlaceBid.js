@@ -13,15 +13,11 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
+import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, coinTypes } from '../../utils/common';
 
-const CoinTypeLabel = ({type})=>(
-  <Box sx={{display: 'contents'}}>
-    <Box draggable={false} component="img" src={`/static/${coinTypes[type].icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&type===0?'invert(1)':'none' }} />&nbsp;{coinTypes[type].name}
-  </Box>
-)
 export default function PlaceBid(props) {
   const navigate = useNavigate();
   const [balance, setBalance] = useState(0);
