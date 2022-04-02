@@ -125,7 +125,7 @@ export default function ImportCollection() {
   const handleRecipientRoyaltiesGroup = (key, index, e) => {
     let inputValue = e.target.value
     if(key==='royalties') {
-      if(inputValue<0)
+      if(inputValue<0 || inputValue>30)
         return
       inputValue = removeLeadingZero(inputValue)
     }
@@ -381,6 +381,8 @@ export default function ImportCollection() {
       scrollToRef(descriptionRef)
     else if(duproperties.length || recipientRoyaltiesGroup.filter(el=>el.address.length>0&&!el.royalties.length).length)
       enqueueSnackbar('Fee recipient properties are invalid.', { variant: 'warning' });
+    else if(recipientRoyaltiesGroup.reduce((sum, el)=>sum+=el.royalties*1, 0)>30)
+      enqueueSnackbar('Total royalties must not be more than 30%', { variant: 'warning' });
     else
       importCollection()
   }
@@ -482,17 +484,17 @@ export default function ImportCollection() {
               Fee Recipient Address & Royalties
             </Typography>
             <Grid container spacing={1}>
-              <Grid item xs={6}>
+              <Grid item xs={8}>
                 <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Fee Recipient Address</Typography>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={4}>
                 <Typography variant="caption" sx={{display: 'block', pl: '15px', pb: '10px'}}>Royalties (%)</Typography>
               </Grid>
             </Grid>
             {
               recipientRoyaltiesGroup.map((item, index)=>(
                 <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
-                  <Grid item xs={6}>
+                  <Grid item xs={8}>
                     <TextFieldStyle
                       label="Example: 0x012...ABC"
                       size="small"
@@ -503,7 +505,7 @@ export default function ImportCollection() {
                       helperText={isOnValidation&&duproperties.includes(item.address)?'Duplicated address':''}
                     />
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={4}>
                     <TextFieldStyle
                       type="number"
                       label="Example: 10"
