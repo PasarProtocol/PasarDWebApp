@@ -490,7 +490,15 @@ export const coinTypes = [
     address: DIA_CONTRACT_ADDRESS
   }
 ]
-
+export const getCoinTypeFromToken = (item) => {
+  let coinType = 0
+  if(item) {
+    const { quoteToken=blankAddress } = item
+    coinType = coinTypes.findIndex(el=>el.address===quoteToken)
+    coinType = coinType<0?0:coinType
+  }
+  return coinType
+}
 export const sendIpfsDidJson = async () => {
   const client = create(`${ipfsURL}/`);
   // create the metadata object we'll be storing

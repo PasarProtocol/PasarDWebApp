@@ -14,7 +14,7 @@ import PlaceBidDlg from '../../components/dialog/PlaceBid'
 import SettleOrderDlg from '../../components/dialog/SettleOrder'
 import Countdown from '../../components/Countdown';
 import useSingin from '../../hooks/useSignin';
-import { getTime } from '../../utils/common';
+import { getTime, coinTypes, getCoinTypeFromToken, getCoinUSD, getDiaTokenPrice } from '../../utils/common';
 import { auctionOrderType } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -29,13 +29,14 @@ const StickyPaperStyle = styled(Paper)(({ theme }) => ({
 
 export default function CollectibleHandleSection(props) {
   const navigate = useNavigate();
-  const {collectible, coinUSD, address, onlyHandle=false} = props
+  const {collectible, address, onlyHandle=false} = props
   const [clickedType, setClickedType] = useState('');
   const [didSignin, setSignin] = useState(false);
   const [auctionEnded, setAuctionEnded] = useState(false);
   const [isOpenPurchase, setPurchaseOpen] = useState(false);
   const [isOpenPlaceBid, setPlaceBidOpen] = useState(false);
   const [isOpenSettleOrder, setSettleOrderOpen] = useState(false);
+  const [coinPrice, setCoinPrice] = useState([0,0]);
   const { pasarLinkAddress } = useSingin()
 
   useEffect(async() => {
@@ -52,7 +53,21 @@ export default function CollectibleHandleSection(props) {
 
   useEffect(() => {
     checkHasEnded()
+    getCoinUSD().then((res) => {
+      setCoinPriceByType(0, res)
+    });
+    getDiaTokenPrice().then((res) => {
+      setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
+    })
   }, []);
+
+  const setCoinPriceByType = (type, value) => {
+    setCoinPrice((prevState) => {
+      const tempPrice = [...prevState];
+      tempPrice[type] = value;
+      return tempPrice;
+    });
+  }
 
   const openSignin = (e)=>{
     const actionType = e.target.getAttribute("actiontype")
@@ -71,9 +86,11 @@ export default function CollectibleHandleSection(props) {
     else
       setTimeout(()=>checkHasEnded(), 1000)
   }
-
+  const coinType = getCoinTypeFromToken(collectible)
+  const coinName = coinTypes[coinType].name
+  const coinUSD = coinPrice[coinType]
   let statusText = 'On sale for a fixed price of'
-  let priceText = `${round(collectible.Price/1e18, 3)} ELA`
+  let priceText = `${round(collectible.Price/1e18, 3)} ${coinName}`
   let usdPriceText = `≈ USD ${round(coinUSD*collectible.Price/1e18, 3)}`
   let handleField = null
   const currentBid = collectible.listBid&&collectible.listBid.length?collectible.listBid[0].price:0
@@ -87,7 +104,7 @@ export default function CollectibleHandleSection(props) {
         statusText = 'Starting Price'
       else {
         statusText = 'Current Bid'
-        priceText = `${round(currentBid/1e18, 3)} ELA`
+        priceText = `${round(currentBid/1e18, 3)} ${coinName}`
         usdPriceText = `≈ USD ${round(coinUSD*currentBid/1e18, 3)}`
       }
 
@@ -101,7 +118,7 @@ export default function CollectibleHandleSection(props) {
             {
               collectible.buyoutPrice&&
               <StyledButton variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
-                Buy now for {round(collectible.buyoutPrice/1e18, 3)} ELA
+                Buy now for {round(collectible.buyoutPrice/1e18, 3)} {coinName}
               </StyledButton>
             }
           </Stack>:
@@ -111,7 +128,7 @@ export default function CollectibleHandleSection(props) {
       else
         auctionTextField = 
           <Typography variant="h4" component='div' align='center' sx={{pt: 2}}>
-            Your Buy Now Price: <Typography variant="h4" color="origin.main" sx={{display: 'inline'}}>{round(collectible.buyoutPrice/1e18, 3)} ELA</Typography>
+            Your Buy Now Price: <Typography variant="h4" color="origin.main" sx={{display: 'inline'}}>{round(collectible.buyoutPrice/1e18, 3)} {coinName}</Typography>
           </Typography>
     }
     else
@@ -134,7 +151,7 @@ export default function CollectibleHandleSection(props) {
       }
       else {
         statusText = 'Top Bid'
-        priceText = `${round(currentBid/1e18, 3)} ELA`
+        priceText = `${round(currentBid/1e18, 3)} ${coinName}`
         usdPriceText = `≈ USD ${round(coinUSD*currentBid/1e18, 3)}`
         const topBuyer = collectible.listBid[0].buyerAddr
         const seller = collectible.listBid[0].sellerAddr

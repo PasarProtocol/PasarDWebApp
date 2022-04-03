@@ -32,7 +32,7 @@ import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
 import useSingin from '../../hooks/useSignin';
 import { blankAddress, marketContract } from '../../config'
-import { reduceHexAddress, getAssetImage, getCoinUSD, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl,
+import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl,
   getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes, getShortUrl } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -100,7 +100,6 @@ export default function CollectibleDetail() {
   const [isFullScreen, setFullScreen] = React.useState(false);
   const [isOpenSharePopup, setOpenSharePopup] = React.useState(null);
   const [isOpenMorePopup, setOpenMorePopup] = React.useState(null);
-  const [coinUSD, setCoinUSD] = React.useState(0);
   const [address, setAddress] = React.useState('');
   const [shareUrl, setShareUrl] = React.useState(window.location.href);
 
@@ -144,7 +143,6 @@ export default function CollectibleDetail() {
   }, [account, pasarLinkAddress]);
   React.useEffect(async () => {
     window.scrollTo(0,0)
-    setCoinUSD(await getCoinUSD())
     const resCollectible = await fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${params.collection}`);
     const jsonCollectible = await resCollectible.json();
     if(jsonCollectible.data){
@@ -495,7 +493,7 @@ export default function CollectibleDetail() {
             {
               isLoadingCollectible?
               <LoadingScreen/>:
-              <CollectibleHandleSection {...{collectible, coinUSD, address}}/>
+              <CollectibleHandleSection {...{collectible, address}}/>
             }
             </PaperStyle>
           </Grid>
@@ -594,7 +592,7 @@ export default function CollectibleDetail() {
             </Link>
           </Grid>
         </Grid>
-        <CollectibleHandleSection {...{collectible, coinUSD, address}} onlyHandle={Boolean(true)}/>
+        <CollectibleHandleSection {...{collectible, address}} onlyHandle={Boolean(true)}/>
       </Container>
     </RootStyle>
   );
