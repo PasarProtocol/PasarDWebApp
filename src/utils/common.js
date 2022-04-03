@@ -279,6 +279,10 @@ export function callContractMethod(type, coinType, paramObj) {
               console.log('buyOrder');
               const { _orderId, _didUri } = paramObj;
               method = marketContract.methods.buyOrder(_orderId, _didUri);
+            } else if (type === 'settleAuctionOrder') {
+              console.log('settleAuctionOrder');
+              const { _orderId } = paramObj;
+              method = marketContract.methods.settleAuctionOrder(_orderId);
             } else {
               reject(new Error());
               return;
