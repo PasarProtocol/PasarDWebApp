@@ -15,7 +15,7 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 
 
 export default function UpdatePrice(props) {
-  const { isOpen, setOpen, title, orderId, orderType, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, orderId, orderType, updateCount, handleUpdate } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [price, setPrice] = React.useState('');
@@ -127,7 +127,7 @@ export default function UpdatePrice(props) {
           Item:
         </Typography>
         <Typography variant="subtitle1" sx={{ display: 'inline' }}>
-          {title}
+          {name}
         </Typography>
         <Grid container>
           <Grid item xs={12}>

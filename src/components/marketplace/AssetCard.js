@@ -50,7 +50,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 export default function AssetCard(props) {
-  const { title="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId, orderType, endTime, currentBid,
+  const { name="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId, orderType, endTime, currentBid,
    saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, collection, isDragging=false } = props
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
@@ -155,7 +155,7 @@ export default function AssetCard(props) {
     }
     setOpenPopup(null);
   };
-  const dlgProps = {title, tokenId, orderId, updateCount, handleUpdate}
+  const dlgProps = {name, tokenId, orderId, updateCount, handleUpdate}
   const currentBidPrice = currentBid&&currentBid.length>0?currentBid[0].price:0
   return (
       <Box>
@@ -328,11 +328,11 @@ export default function AssetCard(props) {
           </Box>
           <Box sx={{p:2}}>
             <Stack direction="row">
-              <Typography variant="h5" noWrap sx={{flexGrow: 1}}>{title}</Typography>
+              <Typography variant="h5" noWrap sx={{flexGrow: 1}}>{name}</Typography>
               <Typography variant="subtitle2" sx={{pt: '3px', display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
                 {
                   orderType===auctionOrderType?
-                  `${math.round((currentBidPrice)/1e18, 3) || price} ELA`:
+                  `${math.round((currentBidPrice)/1e18, 3) || price} ${coinTypes[coinType].name}`:
                   `1/${quantity}`
                 }
               </Typography>
