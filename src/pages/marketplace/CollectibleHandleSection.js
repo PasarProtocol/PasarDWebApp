@@ -12,6 +12,7 @@ import StyledButton from '../../components/signin-dlg/StyledButton';
 import PurchaseDlg from '../../components/dialog/Purchase'
 import PlaceBidDlg from '../../components/dialog/PlaceBid'
 import SettleOrderDlg from '../../components/dialog/SettleOrder'
+import CancelDlg from '../../components/dialog/CancelSale';
 import Countdown from '../../components/Countdown';
 import useSingin from '../../hooks/useSignin';
 import { getTime, coinTypes, getCoinTypeFromToken, getCoinUSD, getDiaTokenPrice } from '../../utils/common';
@@ -36,6 +37,7 @@ export default function CollectibleHandleSection(props) {
   const [isOpenPurchase, setPurchaseOpen] = useState(false);
   const [isOpenPlaceBid, setPlaceBidOpen] = useState(false);
   const [isOpenSettleOrder, setSettleOrderOpen] = useState(false);
+  const [isOpenCancel, setCancelOpen] = useState(false);
   const [coinPrice, setCoinPrice] = useState([0,0]);
   const { pasarLinkAddress } = useSingin()
 
@@ -137,7 +139,7 @@ export default function CollectibleHandleSection(props) {
         if(address === collectible.holder)
           handleField = 
             didSignin?
-            <StyledButton variant="contained" fullWidth onClick={(e)=>{}}>
+            <StyledButton variant="contained" fullWidth onClick={(e)=>{setCancelOpen(true)}}>
               Cancel sale
             </StyledButton>:
             <StyledButton variant="contained" actiontype='remove' fullWidth onClick={openSignin}>
@@ -259,6 +261,11 @@ export default function CollectibleHandleSection(props) {
         setOpen={setSettleOrderOpen}
         info={collectible}
         address={address}
+      />
+      <CancelDlg
+        isOpen={isOpenCancel}
+        setOpen={setCancelOpen}
+        {...collectible}
       />
     </>
   )
