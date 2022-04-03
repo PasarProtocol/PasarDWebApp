@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
 import AssetCardSkeleton from './AssetCardSkeleton';
-import { getAssetImage, getCoinUSD, getDiaTokenPrice, getCollectionTypeFromImageUrl, coinTypes } from '../../utils/common';
+import { getAssetImage, getCoinUSD, getDiaTokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken } from '../../utils/common';
 import { blankAddress } from '../../config';
 // ----------------------------------------------------------------------
 const StackedGrid = ({
@@ -37,12 +37,7 @@ const GridItems = (props) => {
   }
   return <AnimatePresence>
       {props.items.map((item, index) => {
-        let coinType = 0
-        if(item) {
-          const { quoteToken=blankAddress } = item
-          coinType = coinTypes.findIndex(el=>el.address===quoteToken)
-          coinType = coinType<0?0:coinType
-        }
+        const coinType = getCoinTypeFromToken(item)
 
         return <motion.div
           key={index}
