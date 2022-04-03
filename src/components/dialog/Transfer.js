@@ -22,7 +22,7 @@ import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
 
 export default function Transfer(props) {
-    const {isOpen, setOpen, title, tokenId, updateCount, handleUpdate} = props
+    const {isOpen, setOpen, name, tokenId, updateCount, handleUpdate} = props
     const { enqueueSnackbar } = useSnackbar();
     const [onProgress, setOnProgress] = React.useState(false);
     const [address, setAddress] = React.useState('');
@@ -119,7 +119,7 @@ export default function Transfer(props) {
               <Typography variant="body1" sx={{color: 'text.secondary', display: 'inline', pr: 1, py: 2}}>
                   Item: 
               </Typography>
-              <Typography variant="subtitle1" sx={{display: 'inline'}}>{title}</Typography>
+              <Typography variant="subtitle1" sx={{display: 'inline'}}>{name}</Typography>
               <Grid container>
                 <Grid item xs={12}>
                   <Typography variant="h4" sx={{fontWeight: 'normal'}}>Wallet Address</Typography>

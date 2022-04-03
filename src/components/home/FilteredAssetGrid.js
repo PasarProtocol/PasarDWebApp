@@ -8,12 +8,13 @@ import { Box, Button } from '@mui/material';
 import { MHidden } from '../@material-extend';
 import AssetCard from '../marketplace/AssetCard';
 import AssetCardSkeleton from '../marketplace/AssetCardSkeleton';
-import { fetchFrom, getAssetImage, getCoinUSD, getCollectionTypeFromImageUrl } from '../../utils/common';
+import { fetchFrom, getAssetImage, getCoinUSD, getDiaTokenPrice, getCollectionTypeFromImageUrl, coinTypes } from '../../utils/common';
+import { blankAddress } from '../../config'
 // ----------------------------------------------------------------------
 
 const AssetGroupSlider = (props)=>{
   const {isLoading, assets} = props
-  const [coinUSD, setCoinUSD] = React.useState(0);
+  const [coinPrice, setCoinPrice] = React.useState([0,0]);
   const [isDragging, setDragging] = React.useState(false);
   const settings = {
     beforeChange: () => {setDragging(true)},
@@ -79,11 +80,21 @@ const AssetGroupSlider = (props)=>{
     swipeable: true
   }
 
-  React.useEffect(async () => {
+  React.useEffect(()=>{
     getCoinUSD().then((res) => {
-      setCoinUSD(res);
+      setCoinPriceByType(0, res)
     });
-  }, []);
+    getDiaTokenPrice().then((res) => {
+      setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
+    })
+  }, [])
+  const setCoinPriceByType = (type, value) => {
+    setCoinPrice((prevState) => {
+      const tempPrice = [...prevState];
+      tempPrice[type] = value;
+      return tempPrice;
+    });
+  }
   const loadingSkeletons = Array(10).fill(null)
   return (
     <Box sx={{ mx: 0 }}>
@@ -95,8 +106,15 @@ const AssetGroupSlider = (props)=>{
               <AssetCardSkeleton key={index}/>
             </Box>
           )):
-          assets.map((item, index)=>(
-            <Box key={index} sx={{
+          assets.map((item, index)=>{
+            let coinType = 0
+            if(item) {
+              const { quoteToken=blankAddress } = item
+              coinType = coinTypes.findIndex(el=>el.address===quoteToken)
+              coinType = coinType<0?0:coinType
+            }
+
+            return <Box key={index} sx={{
               p: 2,
               '& h5 img': {
                 display: 'inline'
@@ -105,17 +123,18 @@ const AssetGroupSlider = (props)=>{
               <AssetCard
                 {...item}
                 thumbnail={getAssetImage(item, true)}
-                title={item.name && item.name}
+                name={item.name && item.name}
                 price={round(item.price/1e18, 3)}
                 saleType={item.SaleType || item.saleType}
                 type={0}
                 isLink={1&&true}
-                coinUSD={coinUSD}
+                coinUSD={coinPrice[coinType]}
+                coinType={coinType}
                 isDragging={isDragging}
                 collection={getCollectionTypeFromImageUrl(item)}
               />
             </Box>
-          ))
+          })
         }
       </Carousel>
     </Box>

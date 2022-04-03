@@ -18,7 +18,7 @@ import { InputStyle, InputLabelStyle } from '../CustomInput';
 import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes } from '../../utils/common';
 
 export default function Sell(props) {
-  const { isOpen, setOpen, title, tokenId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, tokenId, updateCount, handleUpdate } = props;
   const [price, setPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [coinType, setCoinType] = React.useState(0);
@@ -141,7 +141,7 @@ export default function Sell(props) {
           Item:
         </Typography>
         <Typography variant="subtitle1" sx={{ display: 'inline' }}>
-          {title}
+          {name}
         </Typography>
         <Grid container>
           <Grid item xs={12}>

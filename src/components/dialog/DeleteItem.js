@@ -16,7 +16,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 
 export default function DeleteItem(props) {
-  const { isOpen, setOpen, title, tokenId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, tokenId, updateCount, handleUpdate } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const handleClose = () => {
@@ -91,7 +91,7 @@ export default function DeleteItem(props) {
         <Typography variant="h5" sx={{ color: 'text.secondary' }}>
           You are about to send{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-            {title}
+            {name}
           </Typography>{' '}
           to the burn address below
         </Typography>

@@ -25,7 +25,7 @@ const GridItems = (props) => (
         >
           <AssetCard
             thumbnail={src}
-            title={props.multiNames[index]}
+            name={props.multiNames[index]}
             description={props.description}
             price={props.price}
             quantity={props.quantity}

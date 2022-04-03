@@ -478,7 +478,18 @@ export const collectionTypes = [
     description: 'Bunny Punk is a collection of 1,000 unique 3D well-designed Bunnies united together to get on the Elastos Smart chain Each Bunny Punk is unique and exclusive based on a hundred traits. The objective is to build the strongest Elastos NFT community and project.'
   }
 ]
-export const coinTypes = [{icon: 'elastos.svg', name: 'ELA'}, {icon: 'badges/diamond.svg', name: 'DIA'}]
+export const coinTypes = [
+  {
+    icon: 'elastos.svg',
+    name: 'ELA',
+    address: blankAddress
+  },
+  {
+    icon: 'badges/diamond.svg',
+    name: 'DIA',
+    address: DIA_CONTRACT_ADDRESS
+  }
+]
 
 export const sendIpfsDidJson = async () => {
   const client = create(`${ipfsURL}/`);
@@ -520,7 +531,8 @@ export const emptyCache = () => {
 
 export const getInfoFromDID = (did) =>
   new Promise((resolve, reject) => {
-    DIDBackend.initialize(new DefaultDIDAdapter('https://api.elastos.io/eid'));
+    if(!DIDBackend.isInitialized())
+      DIDBackend.initialize(new DefaultDIDAdapter('https://api.elastos.io/eid'));
     const didObj = new DID(did);
     didObj
       .resolve(true)

@@ -1263,7 +1263,7 @@ export default function CreateItem() {
                     ):(
                       <AssetCard
                         thumbnail={isString(file) ? file : file.preview}
-                        title={singleName}
+                        name={singleName}
                         type={0}
                         collection={0}
                         {...{description, price, coinType, quantity, coinUSD}}

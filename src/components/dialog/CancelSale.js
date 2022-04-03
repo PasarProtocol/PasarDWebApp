@@ -11,7 +11,7 @@ import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { isInAppBrowser } from '../../utils/common';
 
 export default function CancelSale(props) {
-  const { isOpen, setOpen, title, orderId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, orderId, updateCount, handleUpdate } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const handleClose = () => {
@@ -87,7 +87,7 @@ export default function CancelSale(props) {
         <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }}>
           You are about to remove{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-            {title}
+            {name}
           </Typography>{' '}
           from the marketplace
         </Typography>

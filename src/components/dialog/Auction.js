@@ -24,7 +24,7 @@ import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString } from '../../utils/common';
 
 export default function Auction(props) {
-  const { isOpen, setOpen, title, tokenId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, tokenId, updateCount, handleUpdate } = props;
   const navigate = useNavigate();
   // const [balance, setBalance] = useState(0);
   const [onProgress, setOnProgress] = useState(false);
@@ -187,7 +187,7 @@ export default function Auction(props) {
           Auction
         </Typography>
         <Typography variant="h6" component="div" sx={{ color: 'text.secondary', lineHeight: 1.1, fontWeight: 'normal' }}>
-          Item: <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{title}</Typography>
+          Item: <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{name}</Typography>
         </Typography>
         <Typography variant="h5" sx={{ fontWeight: 'normal', mt:1 }}>
           Starting Price
