@@ -156,7 +156,6 @@ export default function SettleOrder(props) {
   const price = currentBid / 1e18;
   const platformFee = math.round((price * 2) / 100, 4);
   const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royalties) / 10 ** 6, 4);
-  console.log(address, seller)
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <DialogTitle>

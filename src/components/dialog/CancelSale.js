@@ -11,7 +11,7 @@ import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { isInAppBrowser } from '../../utils/common';
 
 export default function CancelSale(props) {
-  const { isOpen, setOpen, name, orderId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, orderId, OrderId, updateCount, handleUpdate } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const handleClose = () => {
@@ -45,8 +45,9 @@ export default function CancelSale(props) {
       })
       .on('receipt', (receipt) => {
         console.log('receipt', receipt);
-        setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
-        enqueueSnackbar('Cancel sale success!', { variant: 'success' });
+        if(handleUpdate)
+          setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
+        enqueueSnackbar('Cancel sale Success!', { variant: 'success' });
         setOpen(false);
       })
       .on('confirmation', (confirmationNumber, receipt) => {
@@ -54,15 +55,16 @@ export default function CancelSale(props) {
       })
       .on('error', (error, receipt) => {
         console.error('error', error);
-        enqueueSnackbar('Cancel sale error!', { variant: 'warning' });
+        enqueueSnackbar('Cancel sale Error!', { variant: 'warning' });
         setOnProgress(false);
       });
   };
 
   const cancelSale = async () => {
     setOnProgress(true);
-    console.log('orderId:', orderId);
-    await callCancelOrder(orderId);
+    const _orderId = orderId!==undefined?orderId:OrderId
+    console.log('orderId:', _orderId);
+    await callCancelOrder(_orderId);
   };
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -84,11 +86,11 @@ export default function CancelSale(props) {
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
           Unlist Item
         </Typography>
-        <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }}>
+        <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }} align="center">
           You are about to remove{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
             {name}
-          </Typography>{' '}
+          </Typography><br/>
           from the marketplace
         </Typography>
         <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
