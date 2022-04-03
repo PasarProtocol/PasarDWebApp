@@ -11,6 +11,7 @@ import { MHidden } from '../../components/@material-extend';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import PurchaseDlg from '../../components/dialog/Purchase'
 import PlaceBidDlg from '../../components/dialog/PlaceBid'
+import SettleOrderDlg from '../../components/dialog/SettleOrder'
 import Countdown from '../../components/Countdown';
 import useSingin from '../../hooks/useSignin';
 import { getTime } from '../../utils/common';
@@ -34,6 +35,7 @@ export default function CollectibleHandleSection(props) {
   const [auctionEnded, setAuctionEnded] = useState(false);
   const [isOpenPurchase, setPurchaseOpen] = useState(false);
   const [isOpenPlaceBid, setPlaceBidOpen] = useState(false);
+  const [isOpenSettleOrder, setSettleOrderOpen] = useState(false);
   const { pasarLinkAddress } = useSingin()
 
   useEffect(async() => {
@@ -136,18 +138,19 @@ export default function CollectibleHandleSection(props) {
         usdPriceText = `≈ USD ${round(coinUSD*currentBid/1e18, 3)}`
         const topBuyer = collectible.listBid[0].buyerAddr
         const seller = collectible.listBid[0].sellerAddr
-        if(address === topBuyer)
-          statusText = 'You Won!'
+        
         if(address===seller)
           handleField = 
-            <StyledButton variant="contained" fullWidth onClick={(e)=>{}}>
+            <StyledButton variant="contained" fullWidth onClick={(e)=>{setSettleOrderOpen(true)}}>
               Accept Bid
             </StyledButton>
-        else if(address===topBuyer)
+        else if(address===topBuyer) {
+          statusText = 'You Won!'
           handleField = 
-            <StyledButton variant="contained" fullWidth onClick={(e)=>{}}>
+            <StyledButton variant="contained" fullWidth onClick={(e)=>{setSettleOrderOpen(true)}}>
               Claim Item
             </StyledButton>
+        }
         else
           auctionTextField = 
             <Typography variant="h4" color="origin.main" align='center' sx={{pt: 2}}>
@@ -233,6 +236,12 @@ export default function CollectibleHandleSection(props) {
         isOpen={isOpenPlaceBid}
         setOpen={setPlaceBidOpen}
         info={{ ...collectible, currentBid }}
+      />
+      <SettleOrderDlg
+        isOpen={isOpenSettleOrder}
+        setOpen={setSettleOrderOpen}
+        info={collectible}
+        address={address}
       />
     </>
   )
