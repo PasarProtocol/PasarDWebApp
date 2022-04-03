@@ -1,5 +1,6 @@
 import { styled } from '@mui/material/styles';
 import { Paper, Typography, ButtonBase, Box } from '@mui/material';
+import useSettings from '../../hooks/useSettings';
 
 const SvgStyle = styled('svg')(({ theme }) => ({
     width: 40,
@@ -12,12 +13,13 @@ const SvgStyle = styled('svg')(({ theme }) => ({
 
 const StandardTypeButton = (props)=>{
     const {type, description, current, disabled=false} = props
-
+    const { themeMode } = useSettings();
+    const filterStyle = themeMode==='dark'&&current===type?'invert(.7)':'none'
     return(
         <Paper
             component={ButtonBase}
             align="center"
-            disabled={1&&disabled}
+            disabled={disabled}
             sx={{
                 color: current===type?'text.primary':'text.disabled',
                 width: {xs: 140, sm: 180},
@@ -37,7 +39,7 @@ const StandardTypeButton = (props)=>{
             onClick={props.onClick}
         >
             <Box sx={{ width: {xs: 42, sm: 50}, height: {xs: 42, sm: 50}, borderRadius: 2, p: {xs: 1.2, sm: 1.5}, m: 'auto', backgroundColor: current===type?'text.primary':'text.disabled' }}>
-                <Box draggable = {false} component="img" src="/static/collection.svg" sx={{ width: {xs: 22, sm: 26}, height: {xs: 22, sm: 26} }} />
+                <Box draggable = {false} component="img" src="/static/collection.svg" sx={{ width: {xs: 22, sm: 26}, height: {xs: 22, sm: 26}, filter: filterStyle }} />
             </Box>
             <Typography variant="body2" sx={{ fontSize: {xs: 14, sm: ''}, lineHeight: {xs: 2.5, sm: 3} }}>{type}</Typography>
             <Typography variant="body2" sx={{ height: 30, fontSize: {xs: 14, sm: ''}, lineHeight: {xs: 1.2, sm: ''} }}>{description}</Typography>
