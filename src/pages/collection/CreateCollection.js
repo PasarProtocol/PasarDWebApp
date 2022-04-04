@@ -450,7 +450,7 @@ export default function CreateCollection() {
         <Grid container direction="row" spacing={2}>
           <Grid item xs={12} sm={8}>
             <Typography variant="h5" sx={{fontWeight: 'normal', color: 'text.secondary'}}>
-              Create an ERC-1155 collection on the Elastos Smart Chain Mainnet Network
+              Create an ERC-721 or ERC-1155 collection on the Elastos Smart Chain Mainnet Network
             </Typography>
           </Grid>
           <Grid item xs={12} sm={8}>
