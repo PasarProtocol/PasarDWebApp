@@ -198,7 +198,7 @@ export default function SettleOrder(props) {
           <br />
           from{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-            {reduceHexAddress(info.holder)}
+            {reduceHexAddress(address===seller?topBuyer:seller)}
           </Typography>
         </Typography>
         <Typography variant='h4' sx={{mt: 1}}>
