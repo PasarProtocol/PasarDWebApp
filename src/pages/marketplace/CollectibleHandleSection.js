@@ -197,54 +197,58 @@ export default function CollectibleHandleSection(props) {
         </StyledButton>
     }
   return (
-    onlyHandle?
-    <MHidden width="smUp">
-      {
-        handleField!==null&&
-        <StickyPaperStyle>
-          {handleField}
-        </StickyPaperStyle>
-      }
-    </MHidden>:
     <>
       {
-        collectible.orderType===auctionOrderType?
-        <Box>
-          <Stack direction="row">
-            <Box sx={{flexGrow: 1}}>
+        onlyHandle?
+        <MHidden width="smUp">
+          {
+            handleField!==null&&
+            <StickyPaperStyle>
+              {handleField}
+            </StickyPaperStyle>
+          }
+        </MHidden>:
+        <>
+          {
+            collectible.orderType===auctionOrderType?
+            <Box>
+              <Stack direction="row">
+                <Box sx={{flexGrow: 1}}>
+                  <Typography variant="h4">{statusText}</Typography>
+                  <Typography variant="h3" color="origin.main">{priceText}</Typography>
+                  <Typography variant="body2" color='text.secondary'>{usdPriceText}</Typography>
+                </Box>
+                <Box>
+                  <Stack direction="row" sx={{minHeight: {xs: 30, md: 36}, alignItems: 'center'}}>
+                    <AccessTimeIcon/>&nbsp;
+                    <Typography variant="body2" color='text.secondary'>{deadline}</Typography>
+                  </Stack>
+                  <Countdown deadline={collectible.endTime*1000}/>
+                </Box>
+              </Stack>
+              {auctionTextField}
+              <MHidden width="smDown">
+                <Box sx={{mt: 2}}>
+                  {handleField}
+                </Box>
+              </MHidden>
+            </Box>:
+
+            <Box>
               <Typography variant="h4">{statusText}</Typography>
               <Typography variant="h3" color="origin.main">{priceText}</Typography>
-              <Typography variant="body2" color='text.secondary'>{usdPriceText}</Typography>
+              {
+                collectible.SaleType!=="Not on sale" &&
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>{usdPriceText}</Typography>
+              }
+              <MHidden width="smDown">
+                <Box sx={{mt: 2}}>
+                  {handleField}
+                </Box>
+              </MHidden>
             </Box>
-            <Box>
-              <Stack direction="row" sx={{minHeight: {xs: 30, md: 36}, alignItems: 'center'}}>
-                <AccessTimeIcon/>&nbsp;
-                <Typography variant="body2" color='text.secondary'>{deadline}</Typography>
-              </Stack>
-              <Countdown deadline={collectible.endTime*1000}/>
-            </Box>
-          </Stack>
-          {auctionTextField}
-          <MHidden width="smDown">
-            <Box sx={{mt: 2}}>
-              {handleField}
-            </Box>
-          </MHidden>
-        </Box>:
-
-        <Box>
-          <Typography variant="h4">{statusText}</Typography>
-          <Typography variant="h3" color="origin.main">{priceText}</Typography>
-          {
-            collectible.SaleType!=="Not on sale" &&
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>{usdPriceText}</Typography>
           }
-          <MHidden width="smDown">
-            <Box sx={{mt: 2}}>
-              {handleField}
-            </Box>
-          </MHidden>
-        </Box>
+        </>
       }
       <PurchaseDlg
         isOpen={isOpenPurchase}
