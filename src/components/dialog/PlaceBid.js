@@ -16,20 +16,26 @@ import TransLoadingButton from '../TransLoadingButton';
 import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
-import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, coinTypes } from '../../utils/common';
+import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, coinTypes } from '../../utils/common';
 
 export default function PlaceBid(props) {
   const navigate = useNavigate();
-  const [balance, setBalance] = useState(0);
+  // const [balance, setBalance] = useState(0);
+  const [balanceArray, setBalanceArray] = useState([0, 0]);
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = useState(false);
   const [bidPrice, setBidPrice] = useState('');
+  const [isBuynow, setBuynow] = useState(false);
 
   const context = useWeb3React();
   const { pasarLinkAddress } = useSingin()
   const { library, chainId, account } = context;
 
   const { isOpen, setOpen, info, coinType=0 } = props;
+  const coinBalance = balanceArray[coinType]
+  const coinName = coinTypes[coinType].name
+  const actionText = isBuynow?"Buy NFT":"Bid NFT"
+
   const handleClose = () => {
     setOpen(false);
   }
@@ -38,6 +44,10 @@ export default function PlaceBid(props) {
     let priceValue = event.target.value;
     if (priceValue < 0) return;
     priceValue = removeLeadingZero(priceValue);
+    if(info.buyoutPrice && priceValue>=info.buyoutPrice/1e18)
+      setBuynow(true)
+    else
+      setBuynow(false)
     setBidPrice(priceValue);
   }
 
@@ -54,13 +64,19 @@ export default function PlaceBid(props) {
             const transactionParams = {
               'from': userAddress,
               'gasPrice': gasPrice,
-              'value': 0
+              'gas': 5000000,
+              'value': isBuynow?_price:0
             };
-            pasarContract.bidForOrder(_orderId, _price, _didUri, transactionParams).then((nftTxn)=>{
+            
+            let contractMethod = pasarContract.bidForOrder(_orderId, _price, _didUri, transactionParams)
+            if(isBuynow)
+              contractMethod = pasarContract.buyOrder(_orderId, _didUri, transactionParams)
+              
+            contractMethod.then((nftTxn)=>{
               console.log("Biding... please wait")
               nftTxn.wait().then(()=>{
                 // console.log("bought")
-                enqueueSnackbar('Bid NFT Success!', { variant: 'success' });
+                enqueueSnackbar(`${actionText} Success!`, { variant: 'success' });
                 setOpen(false);
                 setOnProgress(false);
                 // setTimeout(()=>{
@@ -68,33 +84,33 @@ export default function PlaceBid(props) {
                 // }, 3000)
               }).catch((error) => {
                 console.log(error)
-                enqueueSnackbar('Bid NFT Error!', { variant: 'error' });
+                enqueueSnackbar(`${actionText} Error!`, { variant: 'error' });
                 setOnProgress(false);
               })
             }).catch((error) => {
               console.log(error)
-              enqueueSnackbar('Bid NFT Error!', { variant: 'error' });
+              enqueueSnackbar(`${actionText} Error!`, { variant: 'error' });
               setOnProgress(false);
             })
           }).catch((error) => {
             console.log(error)
-            enqueueSnackbar('Bid NFT Error!', { variant: 'error' });
+            enqueueSnackbar(`${actionText} Error!`, { variant: 'error' });
             setOnProgress(false);
           })
         }).catch((error) => {
           console.log(error)
-          enqueueSnackbar('Bid NFT Error!', { variant: 'error' });
+          enqueueSnackbar(`${actionText} Error!`, { variant: 'error' });
           setOnProgress(false);
         })
         
       } else {
         console.log("Ethereum object does not exist");
-        enqueueSnackbar('Bid NFT Error!', { variant: 'error' });
+        enqueueSnackbar(`${actionText} Error!`, { variant: 'error' });
         setOnProgress(false);
       }
     } catch (err) {
       setOnProgress(false);
-      enqueueSnackbar('Bid NFT Error!', { variant: 'error' });
+      enqueueSnackbar(`${actionText} Error!`, { variant: 'error' });
       console.log(err);
     }
   }
@@ -115,18 +131,19 @@ export default function PlaceBid(props) {
       'from': accounts[0],
       'gasPrice': gasPrice,
       'gas': 5000000,
-      'value': _price
+      'value': isBuynow?_price:0
     };
-    console.log(_orderId, _price, _didUri)
-    pasarContract.methods
-      .bidForOrder(_orderId, _price, _didUri)
-      .send(transactionParams)
+    // console.log(_orderId, _price, _didUri)
+    let contractMethod = pasarContract.methods.bidForOrder(_orderId, _price, _didUri)
+    if(isBuynow)
+      contractMethod = pasarContract.methods.buyOrder(_orderId, _didUri)
+    contractMethod.send(transactionParams)
       .on('transactionHash', (hash) => {
         console.log('transactionHash', hash);
       })
       .on('receipt', (receipt) => {
         console.log('receipt', receipt);
-        enqueueSnackbar('Bid NFT Success!', { variant: 'success' });
+        enqueueSnackbar(`${actionText} Success!`, { variant: 'success' });
         setOpen(false);
         setOnProgress(false);
         // setTimeout(()=>{
@@ -138,7 +155,7 @@ export default function PlaceBid(props) {
       })
       .on('error', (error, receipt) => {
         console.error('error', error);
-        enqueueSnackbar('Bid NFT Error!', { variant: 'error' });
+        enqueueSnackbar(`${actionText} Error!`, { variant: 'error' });
         setOnProgress(false);
       });
 
@@ -166,33 +183,31 @@ export default function PlaceBid(props) {
     }
   };
 
+  const setBalanceByCoinType = (coindex, balance) => {
+    setBalanceArray((prevState) => {
+      const tempBalance = [...prevState];
+      tempBalance[coindex] = balance;
+      return tempBalance;
+    });
+  }
   React.useEffect(async () => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library)
-        getBalance(library.provider).then((res) => {
-          setBalance(math.round(res / 1e18, 4));
-        })
+        getBalanceByAllCoinTypes(library.provider, setBalanceByCoinType)
       else if (sessionLinkFlag === '2'){
         if (isInAppBrowser()) {
-          const elastosWeb3Provider = await window.elastos.getWeb3Provider();
-          getBalance(elastosWeb3Provider).then((res) => {
-            setBalance(math.round(res / 1e18, 4));
-          });
+          const elastosWeb3Provider = await window.elastos.getWeb3Provider()
+          getBalanceByAllCoinTypes(elastosWeb3Provider, setBalanceByCoinType)
         } else if(essentialsConnector.getWalletConnectProvider()) {
-          getBalance(essentialsConnector.getWalletConnectProvider()).then((res) => {
-            setBalance(math.round(res / 1e18, 4));
-          })
+          getBalanceByAllCoinTypes(essentialsConnector.getWalletConnectProvider(), setBalanceByCoinType)
         }
       }
       else if (sessionLinkFlag === '3')
-        getBalance(walletconnect.getProvider()).then((res) => {
-          setBalance(math.round(res / 1e18, 4));
-        });
+        getBalanceByAllCoinTypes(walletconnect.getProvider(), setBalanceByCoinType)
     }
   }, [account, chainId, pasarLinkAddress]);
-
-  const price = info.Price / 1e18;
+  const price = Math.max(info.Price / 1e18, bidPrice);
   const platformFee = math.round((price * 2) / 100, 4);
   const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royalties) / 10 ** 6, 4);
   const TypographyStyle = {display: 'inline', lineHeight: 1.1}
@@ -214,16 +229,23 @@ export default function PlaceBid(props) {
       </DialogTitle>
       <DialogContent>
         <Typography variant="h3" component="div" sx={{ color: 'text.primary', pb: 1 }} align="center">
-          Place Bid
+          {isBuynow?"Checkout":"Place Bid"}
         </Typography>
         <Typography variant="h6" component="div" sx={{ color: 'text.secondary', lineHeight: 1.1, fontWeight: 'normal', pb: 1 }}>
-          You are about to bid <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{info.name}</Typography>
+          You are about to {isBuynow?"purchase":"bid"} <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{info.name}</Typography>
           <br />
           from <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{reduceHexAddress(info.holder)}</Typography>
+          {
+            isBuynow&&
+            <>
+              <br />
+              for <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{math.round((info.buyoutPrice) / 1e18, 3)} {coinName}</Typography>
+            </>
+          }
         </Typography>
         <Typography variant="h6" sx={{ ...TypographyStyle, color: 'origin.main', fontWeight: 'normal' }}>{info.currentBid?'Current Bid:':'Starting Price:'}</Typography>{' '}
         <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>
-          {math.round((info.currentBid || info.Price) / 1e18, 3)} ELA
+          {math.round((info.currentBid || info.Price) / 1e18, 3)} {coinName}
         </Typography>
         <Grid container sx={{pt: 2, pb: 3}}>
           <Grid item xs={12}>
@@ -244,6 +266,12 @@ export default function PlaceBid(props) {
               />
             </FormControl>
             <Divider />
+            {
+              isBuynow&&
+              <Typography variant="body2" display="block" color="red" gutterBottom>
+                Your bid is equal or higher than the Buy Now price - {math.round((info.buyoutPrice) / 1e18, 3)} {coinName}
+              </Typography>
+            }
           </Grid>
         </Grid>
         <Grid container sx={{display: 'block' }}>
@@ -259,23 +287,26 @@ export default function PlaceBid(props) {
                 align="right"
                 sx={{ color: 'text.secondary', mb: 0.5 }}
               >
-                {balance} ELA
+                {coinBalance} {coinName}
               </Typography>
             </Stack>
             <Divider sx={{ mb: 0.5 }} />
           </Grid>
-          <Grid item xs={12}>
-            <Typography variant="body2" display="block" sx={{color: 'origin.main'}}>
-              In the case of a successful bid
-            </Typography>
-          </Grid>
+          {
+            !isBuynow&&
+            <Grid item xs={12}>
+              <Typography variant="body2" display="block" sx={{color: 'origin.main'}}>
+                In the case of a successful bid
+              </Typography>
+            </Grid>
+          }
           <Grid item xs={12}>
             <Stack direction="row">
               <Typography variant="body2" display="block" gutterBottom sx={{ flex: 1 }}>
                 Platform fee 2%
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {platformFee} ELA
+                {platformFee} {coinName}
               </Typography>
             </Stack>
           </Grid>
@@ -285,7 +316,7 @@ export default function PlaceBid(props) {
                 Creator will get (royalties)
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {royalties} ELA
+                {royalties} {coinName}
               </Typography>
             </Stack>
           </Grid>
@@ -295,7 +326,7 @@ export default function PlaceBid(props) {
                 Seller will get
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {price - platformFee - royalties} ELA
+                {price - platformFee - royalties} {coinName}
               </Typography>
             </Stack>
           </Grid>
@@ -305,25 +336,27 @@ export default function PlaceBid(props) {
                 You will pay
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right">
-                {price} ELA
+                {price} {coinName}
               </Typography>
             </Stack>
           </Grid>
         </Grid>
-        {/* {price <= balance ? ( */}
+        {Math.max(bidPrice, info.Price/1e18) <= coinBalance ? (
           <>
             <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
               <TransLoadingButton
                 loading={onProgress}
                 onClick={bidNft}>
-                Bid
+                {
+                  isBuynow?`Buy Now for ${bidPrice} ${coinName}`:'Bid'
+                }
               </TransLoadingButton>
             </Box>
             <Typography variant="body2" display="block" color="red" gutterBottom align="center">
-              Please check all item details before making a bid
+              Please check all item details before making a {isBuynow?'purchase':'bid'}
             </Typography>
           </>
-        {/* ) : (
+        ) : (
           <>
             <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
               <Button
@@ -336,10 +369,10 @@ export default function PlaceBid(props) {
               </Button>
             </Box>
             <Typography variant="body2" display="block" color="red" gutterBottom align="center">
-              Insufficient funds in ELA
+              Insufficient funds in {coinName}
             </Typography>
           </>
-        )} */}
+        )}
         <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
           We do not own your private keys and cannot access your funds
           <br />

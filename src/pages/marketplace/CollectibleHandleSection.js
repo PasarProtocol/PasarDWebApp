@@ -255,6 +255,7 @@ export default function CollectibleHandleSection(props) {
         isOpen={isOpenPlaceBid}
         setOpen={setPlaceBidOpen}
         info={{ ...collectible, currentBid }}
+        coinType={coinType}
       />
       <SettleOrderDlg
         isOpen={isOpenSettleOrder}
