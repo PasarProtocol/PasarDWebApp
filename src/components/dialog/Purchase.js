@@ -15,18 +15,20 @@ import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import StyledButton from '../signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
-import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser } from '../../utils/common';
+import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes } from '../../utils/common';
 
 export default function Purchase(props) {
   const navigate = useNavigate();
-  const [balance, setBalance] = useState(0);
+  const [balanceArray, setBalanceArray] = useState([0, 0]);
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const context = useWeb3React();
   const { pasarLinkAddress } = useSingin()
   const { library, chainId, account } = context;
+  const { isOpen, setOpen, info, coinType=0 } = props;
 
-  const { isOpen, setOpen, info } = props;
+  const coinBalance = balanceArray[coinType]
+  const coinName = coinTypes[coinType].name
   let priceInfo = info.Price;
   if(info.orderType===auctionOrderType && info.buyoutPrice)
     priceInfo = info.buyoutPrice
@@ -151,29 +153,29 @@ export default function Purchase(props) {
     }
   };
 
+  const setBalanceByCoinType = (coindex, balance) => {
+    setBalanceArray((prevState) => {
+      const tempBalance = [...prevState];
+      tempBalance[coindex] = balance;
+      return tempBalance;
+    });
+  }
+
   React.useEffect(async () => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library)
-        getBalance(library.provider).then((res) => {
-          setBalance(math.round(res / 1e18, 4));
-        })
+        getBalanceByAllCoinTypes(library.provider, setBalanceByCoinType)
       else if (sessionLinkFlag === '2'){
         if (isInAppBrowser()) {
-          const elastosWeb3Provider = await window.elastos.getWeb3Provider();
-          getBalance(elastosWeb3Provider).then((res) => {
-            setBalance(math.round(res / 1e18, 4));
-          });
+          const elastosWeb3Provider = await window.elastos.getWeb3Provider()
+          getBalanceByAllCoinTypes(elastosWeb3Provider, setBalanceByCoinType)
         } else if(essentialsConnector.getWalletConnectProvider()) {
-          getBalance(essentialsConnector.getWalletConnectProvider()).then((res) => {
-            setBalance(math.round(res / 1e18, 4));
-          })
+          getBalanceByAllCoinTypes(essentialsConnector.getWalletConnectProvider(), setBalanceByCoinType)
         }
       }
       else if (sessionLinkFlag === '3')
-        getBalance(walletconnect.getProvider()).then((res) => {
-          setBalance(math.round(res / 1e18, 4));
-        });
+        getBalanceByAllCoinTypes(walletconnect.getProvider(), setBalanceByCoinType)
     }
   }, [account, chainId, pasarLinkAddress]);
 
@@ -213,7 +215,7 @@ export default function Purchase(props) {
           <br />
           for{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-            {math.round(priceInfo / 1e18, 3)} ELA
+            {math.round(priceInfo / 1e18, 3)} {coinName}
           </Typography>
         </Typography>
         <Grid container sx={{ mt: 2, display: 'block' }}>
@@ -229,7 +231,7 @@ export default function Purchase(props) {
                 align="right"
                 sx={{ color: 'text.secondary', mb: 0.5 }}
               >
-                {balance} ELA
+                {coinBalance} {coinName}
               </Typography>
             </Stack>
             <Divider sx={{ mb: 0.5 }} />
@@ -240,7 +242,7 @@ export default function Purchase(props) {
                 Platform fee 2%
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {platformFee} ELA
+                {platformFee} {coinName}
               </Typography>
             </Stack>
           </Grid>
@@ -250,7 +252,7 @@ export default function Purchase(props) {
                 Creator will get (royalties)
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {royalties} ELA
+                {royalties} {coinName}
               </Typography>
             </Stack>
           </Grid>
@@ -260,7 +262,7 @@ export default function Purchase(props) {
                 Seller will get
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {price - platformFee - royalties} ELA
+                {price - platformFee - royalties} {coinName}
               </Typography>
             </Stack>
           </Grid>
@@ -270,12 +272,12 @@ export default function Purchase(props) {
                 You will pay
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right">
-                {price} ELA
+                {price} {coinName}
               </Typography>
             </Stack>
           </Grid>
         </Grid>
-        {price <= balance ? (
+        {price <= coinBalance ? (
           <>
             <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
               <TransLoadingButton
@@ -301,7 +303,7 @@ export default function Purchase(props) {
               </StyledButton>
             </Box>
             <Typography variant="body2" display="block" color="red" gutterBottom align="center">
-              Insufficient funds in ELA
+              Insufficient funds in {coinName}
             </Typography>
           </>
         )}

@@ -20,7 +20,6 @@ import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMet
 
 export default function PlaceBid(props) {
   const navigate = useNavigate();
-  // const [balance, setBalance] = useState(0);
   const [balanceArray, setBalanceArray] = useState([0, 0]);
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = useState(false);
@@ -30,8 +29,8 @@ export default function PlaceBid(props) {
   const context = useWeb3React();
   const { pasarLinkAddress } = useSingin()
   const { library, chainId, account } = context;
-
   const { isOpen, setOpen, info, coinType=0 } = props;
+
   const coinBalance = balanceArray[coinType]
   const coinName = coinTypes[coinType].name
   const actionText = isBuynow?"Buy NFT":"Bid NFT"
@@ -71,7 +70,7 @@ export default function PlaceBid(props) {
             let contractMethod = pasarContract.bidForOrder(_orderId, _price, _didUri, transactionParams)
             if(isBuynow)
               contractMethod = pasarContract.buyOrder(_orderId, _didUri, transactionParams)
-              
+
             contractMethod.then((nftTxn)=>{
               console.log("Biding... please wait")
               nftTxn.wait().then(()=>{
@@ -207,6 +206,7 @@ export default function PlaceBid(props) {
         getBalanceByAllCoinTypes(walletconnect.getProvider(), setBalanceByCoinType)
     }
   }, [account, chainId, pasarLinkAddress]);
+
   const price = Math.max(info.Price / 1e18, bidPrice);
   const platformFee = math.round((price * 2) / 100, 4);
   const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royalties) / 10 ** 6, 4);

@@ -250,6 +250,7 @@ export default function CollectibleHandleSection(props) {
         isOpen={isOpenPurchase}
         setOpen={setPurchaseOpen}
         info={collectible}
+        coinType={coinType}
       />
       <PlaceBidDlg 
         isOpen={isOpenPlaceBid}
