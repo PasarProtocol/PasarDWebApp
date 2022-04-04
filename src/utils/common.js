@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Web3 from 'web3';
+import * as math from 'mathjs';
 import { createHash } from 'crypto';
 import { create, urlSource } from 'ipfs-http-client';
 import { subDays, differenceInDays } from 'date-fns';
@@ -114,6 +115,34 @@ export const getBalance = async (connectProvider) => {
   const balance = await walletConnectWeb3.eth.getBalance(accounts[0]);
   return balance;
 };
+
+export const getBalanceByAllCoinTypes = (connectProvider, balanceHandler) =>
+  new Promise((resolve, reject) => {
+    if (!connectProvider) {
+      resolve(false)
+      return
+    }
+    
+    let count = 0
+    // const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
+    const walletConnectWeb3 = new Web3(connectProvider);
+    walletConnectWeb3.eth.getAccounts().then(accounts=>{
+      walletConnectWeb3.eth.getBalance(accounts[0]).then(balance=>{
+        balanceHandler(0, math.round(balance / 1e18, 4))
+        count+=1
+        if(count === 2)
+          resolve(true)
+      }).catch(err=>{})
+      getDiaTokenInfo(accounts[0], connectProvider).then(balance=>{
+        balanceHandler(1, balance*1)
+        count+=1
+        if(count === 2)
+          resolve(true)
+      }).catch(err=>{})
+    }).catch(err=>{
+      reject(err)
+    })
+  })
 
 export function dateRangeBeforeDays(days) {
   return [...Array(days).keys()].map((i) => subDays(new Date(), i).toISOString().slice(0, 10));
