@@ -33,6 +33,7 @@ export default function PlaceBid(props) {
 
   const coinBalance = balanceArray[coinType]
   const coinName = coinTypes[coinType].name
+  const targetPrice = isBuynow?math.round(info.buyoutPrice / 1e18, 3):bidPrice
   const actionText = isBuynow?"Buy NFT":"Bid NFT"
 
   const handleClose = () => {
@@ -173,7 +174,7 @@ export default function PlaceBid(props) {
     setOnProgress(true);
     const biderDidUri = await sendIpfsDidJson();
     console.log('didUri:', biderDidUri);
-    const bidPriceStr = BigInt(bidPrice*1e18).toString();
+    const bidPriceStr = BigInt(targetPrice*1e18).toString();
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
         callEthBidOrder(info.OrderId, biderDidUri, bidPriceStr);
     }
@@ -207,7 +208,7 @@ export default function PlaceBid(props) {
     }
   }, [account, chainId, pasarLinkAddress]);
 
-  const price = Math.max(info.Price / 1e18, bidPrice);
+  const price = Math.max(info.Price / 1e18, targetPrice);
   const platformFee = math.round((price * 2) / 100, 4);
   const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royalties) / 10 ** 6, 4);
   const TypographyStyle = {display: 'inline', lineHeight: 1.1}
@@ -239,7 +240,7 @@ export default function PlaceBid(props) {
             isBuynow&&
             <>
               <br />
-              for <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{math.round((info.buyoutPrice) / 1e18, 3)} {coinName}</Typography>
+              for <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>{math.round(info.buyoutPrice / 1e18, 3)} {coinName}</Typography>
             </>
           }
         </Typography>
@@ -269,7 +270,7 @@ export default function PlaceBid(props) {
             {
               isBuynow&&
               <Typography variant="body2" display="block" color="red" gutterBottom>
-                Your bid is equal or higher than the Buy Now price - {math.round((info.buyoutPrice) / 1e18, 3)} {coinName}
+                Your bid is equal or higher than the Buy Now price - {math.round(info.buyoutPrice / 1e18, 3)} {coinName}
               </Typography>
             }
           </Grid>
@@ -341,14 +342,14 @@ export default function PlaceBid(props) {
             </Stack>
           </Grid>
         </Grid>
-        {Math.max(bidPrice, info.Price/1e18) <= coinBalance ? (
+        {Math.max(targetPrice, info.Price/1e18) <= coinBalance ? (
           <>
             <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
               <TransLoadingButton
                 loading={onProgress}
                 onClick={bidNft}>
                 {
-                  isBuynow?`Buy Now for ${bidPrice} ${coinName}`:'Bid'
+                  isBuynow?`Buy Now for ${math.round(info.buyoutPrice / 1e18, 3)} ${coinName}`:'Bid'
                 }
               </TransLoadingButton>
             </Box>
