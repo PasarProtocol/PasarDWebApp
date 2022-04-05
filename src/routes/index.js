@@ -5,6 +5,7 @@ import MainLayout from '../layouts/main';
 import LogoOnlyLayout from '../layouts/LogoOnlyLayout';
 // components
 import LoadingScreen from '../components/LoadingScreen';
+import { AuctionDlgProvider } from '../contexts/AuctionDlgContext';
 import { MintDlgProvider } from '../contexts/MintDlgContext';
 
 // ----------------------------------------------------------------------
@@ -56,7 +57,7 @@ export default function Router() {
           children: [
             { path: 'collectible', element: <Collectible /> },
             { path: 'collectible/:collection', element: <Collectible /> },
-            { path: 'collectible/detail/:collection', element: <CollectibleDetail /> },
+            { path: 'collectible/detail/:collection', element: <AuctionDlgProvider><CollectibleDetail /></AuctionDlgProvider> },
             { path: 'transaction', element: <Transaction /> },
             { path: 'transaction/:transaction', element: <Transaction /> },
             { path: 'transaction/detail/:address', element: <AddressDetail /> },

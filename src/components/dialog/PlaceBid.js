@@ -16,6 +16,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
+import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, coinTypes } from '../../utils/common';
 
 export default function PlaceBid(props) {
@@ -28,6 +29,8 @@ export default function PlaceBid(props) {
 
   const context = useWeb3React();
   const { pasarLinkAddress } = useSingin()
+  const { updateCount, setUpdateCount } = useAuctionDlg()
+
   const { library, chainId, account } = context;
   const { isOpen, setOpen, info, coinType=0 } = props;
 
@@ -79,9 +82,10 @@ export default function PlaceBid(props) {
                 enqueueSnackbar(`${actionText} Success!`, { variant: 'success' });
                 setOpen(false);
                 setOnProgress(false);
-                // setTimeout(()=>{
-                //   navigate('/profile/myitem/1')
-                // }, 3000)
+                setTimeout(()=>{
+                  // navigate('/profile/myitem/1')
+                  setUpdateCount(updateCount+1)
+                }, 1000)
               }).catch((error) => {
                 console.log(error)
                 enqueueSnackbar(`${actionText} Error!`, { variant: 'error' });
@@ -146,9 +150,10 @@ export default function PlaceBid(props) {
         enqueueSnackbar(`${actionText} Success!`, { variant: 'success' });
         setOpen(false);
         setOnProgress(false);
-        // setTimeout(()=>{
-        //   navigate('/profile/myitem/1')
-        // }, 3000)
+        setTimeout(()=>{
+          // navigate('/profile/myitem/1')
+          setUpdateCount(updateCount+1)
+        }, 1000)
       })
       .on('confirmation', (confirmationNumber, receipt) => {
         console.log('confirmation', confirmationNumber, receipt);

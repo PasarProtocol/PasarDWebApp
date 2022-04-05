@@ -31,6 +31,7 @@ import { essentialsConnector } from '../../components/signin-dlg/EssentialConnec
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
 import useSingin from '../../hooks/useSignin';
+import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { blankAddress, marketContract } from '../../config'
 import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl,
   getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes, getShortUrl } from '../../utils/common';
@@ -113,6 +114,7 @@ export default function CollectibleDetail() {
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const { pasarLinkAddress } = useSingin()
+  const { updateCount } = useAuctionDlg()
   
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
@@ -196,7 +198,7 @@ export default function CollectibleDetail() {
       }
     }
     setLoadingCollectible(false);
-  }, []);
+  }, [updateCount]);
   
   React.useEffect(async () => {
     setLoadingTransRecord(true);
@@ -211,7 +213,7 @@ export default function CollectibleDetail() {
       if(e.code !== e.ABORT_ERR)
         setLoadingTransRecord(false);
     });
-  }, []);
+  }, [updateCount]);
 
   const onImgLoad = ({target:img}) => {
     if(img.alt)
