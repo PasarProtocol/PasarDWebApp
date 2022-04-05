@@ -329,13 +329,17 @@ export default function AssetCard(props) {
           <Box sx={{p:2}}>
             <Stack direction="row">
               <Typography variant="h5" noWrap sx={{flexGrow: 1}}>{name}</Typography>
-              <Typography variant="subtitle2" sx={{pt: '3px', display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
-                {
-                  orderType===auctionOrderType?
-                  `${math.round((currentBidPrice)/1e18, 3) || price} ${coinTypes[coinType].name}`:
-                  `1/${quantity}`
-                }
-              </Typography>
+              {
+                orderType===auctionOrderType?
+                <Tooltip title={currentBidPrice?"Top Bid":"Starting Price"} arrow enterTouchDelay={0}>
+                  <Typography variant="subtitle2" sx={{pt: '3px', display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
+                    {math.round((currentBidPrice)/1e18, 3) || price} {coinTypes[coinType].name}
+                  </Typography>
+                </Tooltip>:
+                <Typography variant="subtitle2" sx={{pt: '3px', display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
+                  1/{quantity}
+                </Typography>
+              }
             </Stack>
             {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography> */}
             {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography> */}
