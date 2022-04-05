@@ -67,7 +67,7 @@ export default function PlaceBid(props) {
             const transactionParams = {
               'from': userAddress,
               'gasPrice': gasPrice,
-              'gas': 5000000,
+              // 'gas': 5000000,
               'value': isBuynow?_price:0
             };
             
@@ -134,7 +134,7 @@ export default function PlaceBid(props) {
     const transactionParams = {
       'from': accounts[0],
       'gasPrice': gasPrice,
-      'gas': 5000000,
+      // 'gas': 5000000,
       'value': isBuynow?_price:0
     };
     // console.log(_orderId, _price, _didUri)
