@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Box, Stack, Typography, Menu, Popover, Popper, Tooltip, Link, Fade } from '@mui/material';
+import { Box, Stack, Typography, Menu, Popover, Popper, Tooltip, Link, Fade, SvgIcon } from '@mui/material';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import BoltIcon from '@mui/icons-material/Bolt';
 
 import Badge from '../Badge';
 import Jazzicon from '../Jazzicon';
@@ -23,7 +25,7 @@ const AvatarBoxStyle = {
 }
 
 export default function BadgeProfile(props) {
-  const {type, walletAddress, badge, collection=0} = props
+  const {type, walletAddress, badge, collection=0, reservePriceFlag=false, hasBuynow=false} = props
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = React.useState(false);
   const [didInfo, setDidInfo] = useState({name: '', description: ''});
@@ -53,13 +55,15 @@ export default function BadgeProfile(props) {
     shortDescription = didInfo.description
   }
 
+  const badgeAction = type>=3?{}:{
+    onClick: handlePopoverOpen,
+    onMouseEnter: handlePopoverOpen,
+    onMouseLeave: handlePopoverClose
+  }
+  
   return (
     <>
-      <Box
-        onClick={handlePopoverOpen}
-        onMouseEnter={handlePopoverOpen}
-        onMouseLeave={handlePopoverClose}
-      >
+      <Box {...badgeAction}>
         {
           type===1&&
           <Box sx={{ width: 26, height: 26, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
@@ -69,6 +73,26 @@ export default function BadgeProfile(props) {
         {
           type===2&&
           <Jazzicon address={walletAddress} size={26} sx={{mr: 0}}/>
+        }
+        {
+          type===3&&
+          <Tooltip title={`Reserve Price ${reservePriceFlag?'Met':'Not Met'}`} arrow enterTouchDelay={0}>
+            <Box sx={{ width: 26, height: 26, borderRadius: 2, p: '5px', backgroundColor: reservePriceFlag?'#7CB342':'#D60000', display: 'flex' }}>
+              <SvgIcon sx={{fontSize: 18, color:'success.contrastText'}}>
+                <ShoppingCartIcon/>
+              </SvgIcon>
+            </Box>
+          </Tooltip>
+        }
+        {
+          type===4&&
+          <Tooltip title="Has Buy Now" arrow enterTouchDelay={0}>
+            <Box sx={{ width: 26, height: 26, borderRadius: 2, p: '2px', backgroundColor: '#F6D31B', display: 'flex' }}>
+              <SvgIcon sx={{fontSize: 22, color:'success.contrastText'}}>
+                <BoltIcon/>
+              </SvgIcon>
+            </Box>
+          </Tooltip>
         }
       </Box>
       <Popper

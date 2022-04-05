@@ -51,7 +51,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 
 export default function AssetCard(props) {
   const { name="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId, orderType, endTime, currentBid,
-   saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, collection, isDragging=false } = props
+   saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, collection, isDragging=false, reservePrice=0, buyoutPrice=0 } = props
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
@@ -182,6 +182,8 @@ export default function AssetCard(props) {
               {
                 holder&&<BadgeProfile type={2} walletAddress={holder} badge={badge}/>
               }
+              {!!(reservePrice*1)&&<BadgeProfile type={3} reservePriceFlag={currentBidPrice>=reservePrice}/>}
+              {!!(buyoutPrice*1)&&<BadgeProfile type={4}/>}
             </Stack>
             <Box>
               {
