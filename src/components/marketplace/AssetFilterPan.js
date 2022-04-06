@@ -32,7 +32,7 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
   backgroundColor: 'unset'
 }))
 export default function AssetFilterPan(props){
-  const {sx, scrollMaxHeight, btnNames, btnGroup, collections, filterProps, handleFilter} = props
+  const {sx, scrollMaxHeight, btnGroup, collections, filterProps, handleFilter} = props
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
   const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
@@ -93,14 +93,18 @@ export default function AssetFilterPan(props){
                 <Typography variant="body2">Status</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Stack spacing={1} direction='row'>
+                <Stack direction="row" sx={{flexWrap: 'wrap'}}>
                 {
                   btnGroup.status.map((name, index)=>(
-                    filterProps.selectedBtns?
-                    <Button key={index} variant={filterProps.selectedBtns.includes(index)?"contained":"outlined"} color="inherit" onClick={()=>handleFilter('statype', index)}>
-                      {name}
-                    </Button>:
-                    <Button key={index} variant="outlined" color="inherit" onClick={()=>handleFilter('statype', index)}>
+                    <Button 
+                      key={index}
+                      variant={
+                        filterProps.selectedBtns&&filterProps.selectedBtns.includes(index)?"contained":"outlined"
+                      }
+                      color="inherit"
+                      onClick={()=>handleFilter('statype', index)}
+                      sx={{mr: .5, mb: .5}}
+                    >
                       {name}
                     </Button>
                   ))
