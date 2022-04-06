@@ -20,7 +20,7 @@ export default function FilteredCollectionGrid(props){
     arrows: true,
     nextArrow: <Button>next</Button>,
     autoplay: true,
-    autoplaySpeed: 1000,
+    autoplaySpeed: 2500,
     infinite: true,
     slidesToShow: 3,
     slidesToScroll: 1,
