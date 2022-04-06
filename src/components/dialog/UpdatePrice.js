@@ -5,12 +5,14 @@ import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, Form
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
+
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import CoinSelect from '../marketplace/CoinSelect';
 import TransLoadingButton from '../TransLoadingButton';
+import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
-import { removeLeadingZero, isInAppBrowser, coinTypes } from '../../utils/common';
+import { removeLeadingZero, isInAppBrowser, coinTypes, callContractMethod } from '../../utils/common';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
 
 
@@ -32,8 +34,6 @@ export default function UpdatePrice(props) {
     if (priceValue < 0) return;
     priceValue = removeLeadingZero(priceValue);
     return priceValue
-    // setPrice(priceValue);
-    // setRcvPrice(math.round((priceValue * 98) / 100, 3));
   };
 
   const handleChangePrice = (event) => {
@@ -53,54 +53,26 @@ export default function UpdatePrice(props) {
   };
 
   const callChangeOrderPrice = async (_orderId, _price, _reservePrice, _buyoutPrice) => {
-    const walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
-    const walletConnectWeb3 = new Web3(walletConnectProvider);
-    const accounts = await walletConnectWeb3.eth.getAccounts();
-
-    const contractAbi = PASAR_CONTRACT_ABI;
-    const contractAddress = MARKET_CONTRACT_ADDRESS;
-    const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-
-    const gasPrice = await walletConnectWeb3.eth.getGasPrice();
-
-    console.log('Sending transaction with account address:', accounts[0]);
-    const transactionParams = {
-      'from': accounts[0],
-      'gasPrice': gasPrice,
-      'gas': 5000000,
-      'value': 0
-    };
-
-    pasarContract.methods
-      .changeOrderPrice(_orderId, _price, _reservePrice, _buyoutPrice)
-      .send(transactionParams)
-      .on('transactionHash', (hash) => {
-        console.log('transactionHash', hash);
-      })
-      .on('receipt', (receipt) => {
-        console.log('receipt', receipt);
+    callContractMethod(orderType===auctionOrderType?'changeAuctionOrderPrice':'changeSaleOrderPrice', coinType, {_orderId, _price, _reservePrice, _buyoutPrice})
+      .then((success) => {
         setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
         enqueueSnackbar('Update price success!', { variant: 'success' });
         setOpen(false);
       })
-      .on('confirmation', (confirmationNumber, receipt) => {
-        console.log('confirmation', confirmationNumber, receipt);
-      })
-      .on('error', (error, receipt) => {
-        console.error('error', error);
+      .catch(error=>{
         enqueueSnackbar('Update price error!', { variant: 'warning' });
         setOnProgress(false);
-      });
+      })
   };
 
   const changePrice = async () => {
     setOnProgress(true);
     console.log('orderId:', orderId);
-    const updatedPrice = BigInt(price*1e18).toString();
-    const reservePrice = BigInt(reservePrice*1e18).toString();
-    const buyoutPrice = BigInt(buyoutPrice*1e18).toString();
-    console.log(updatedPrice);
-    callChangeOrderPrice(orderId, updatedPrice, reservePrice, buyoutPrice);
+    const _updatedPrice = BigInt(price*1e18).toString();
+    const _reservePrice = BigInt(reservePrice*1e18).toString();
+    const _buyoutPrice = BigInt(buyoutPrice*1e18).toString();
+    console.log(_updatedPrice);
+    callChangeOrderPrice(orderId, _updatedPrice, _reservePrice, _buyoutPrice);
   };
 
   return (
@@ -185,7 +157,7 @@ export default function UpdatePrice(props) {
                   value={reservePrice}
                   onChange={handleChangeReservePrice}
                   startAdornment={' '}
-                  endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
+                  endAdornment={<CoinTypeLabel type={coinType}/>}
                 />
               </FormControl>
               <Divider />
@@ -204,7 +176,7 @@ export default function UpdatePrice(props) {
                   value={buyoutPrice}
                   onChange={handleChangeBuyoutPrice}
                   startAdornment={' '}
-                  endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
+                  endAdornment={<CoinTypeLabel type={coinType}/>}
                 />
               </FormControl>
               <Divider />

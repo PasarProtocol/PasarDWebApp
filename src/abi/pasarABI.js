@@ -505,6 +505,18 @@ module.exports.PASAR_CONTRACT_ABI = [
         "internalType": "uint256",
         "name": "_newBuyoutPrice",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldQuoteToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_newQuoteToken",
+        "type": "address"
       }
     ],
     "name": "OrderPriceChanged",
@@ -627,9 +639,37 @@ module.exports.PASAR_CONTRACT_ABI = [
         "internalType": "uint256",
         "name": "_buyoutPrice",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
       }
     ],
-    "name": "changeOrderPrice",
+    "name": "changeAuctionOrderPrice",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_orderId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
+      }
+    ],
+    "name": "changeSaleOrderPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -312,6 +312,14 @@ export function callContractMethod(type, coinType, paramObj) {
               console.log('settleAuctionOrder');
               const { _orderId } = paramObj;
               method = marketContract.methods.settleAuctionOrder(_orderId);
+            } else if (type === 'changeAuctionOrderPrice') {
+              console.log('changeAuctionOrderPrice');
+              const { _orderId, _price, _reservePrice, _buyoutPrice } = paramObj;
+              method = marketContract.methods.changeAuctionOrderPrice(_orderId, _price, _reservePrice, _buyoutPrice, pricingContract[coinType]);
+            } else if (type === 'changeSaleOrderPrice') {
+              console.log('changeSaleOrderPrice');
+              const { _orderId, _price } = paramObj;
+              method = marketContract.methods.changeSaleOrderPrice(_orderId, _price, pricingContract[coinType]);
             } else {
               reject(new Error());
               return;
