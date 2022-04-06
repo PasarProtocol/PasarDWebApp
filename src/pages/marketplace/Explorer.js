@@ -102,9 +102,13 @@ export default function MarketExplorer() {
   const sessionFilterProps = JSON.parse(sessionStorage.getItem("filter-props")) || {}
   const params = useParams(); // params.key
   const drawerWidth = 360;
-  const btnNames = ["Buy Now", "On Auction", "Has Bids", "General", "Avatar", "ELA", "Explicit & Sensitive Content"]
-  const rangeBtnId = 4
-  const adultBtnId = 5
+  const btnGroup = {
+    status: ["Buy Now", "On Auction", "Has Bids", "Has Ended"],
+    type: ["General", "Avatar"],
+    
+  }
+  const rangeBtnId = 10
+  const adultBtnId = 11
   const emptyRange = {min: '', max: ''}
   const defaultDispMode = isMobile?1:0
   const isOffset = useOffSetTop(20);
@@ -147,9 +151,9 @@ export default function MarketExplorer() {
     const newController = new AbortController();
     const {signal} = newController;
     setAbortController(newController);
-    let statusFilter = [...btnNames].splice(0, 3).filter((name, index)=>selectedBtns.indexOf(index)>=0)
+    let statusFilter = btnGroup.status.filter((name, index)=>selectedBtns.indexOf(index)>=0)
     statusFilter = (statusFilter.length===2 || statusFilter.length===0)?'All':statusFilter[0]
-    let itemTypeFilter = [...btnNames].splice(3, 2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
+    let itemTypeFilter = btnGroup.type.filter((name, index)=>selectedBtns.indexOf(index+btnGroup.status.length)>=0)
     itemTypeFilter = (itemTypeFilter.length===2 || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
@@ -400,7 +404,7 @@ export default function MarketExplorer() {
                       <Stack spacing={1} sx={{display: 'inline', pl: 1}} direction="row">
                         {
                           selectedBtns.map((nameId, index)=>{
-                            let buttonName = btnNames[nameId]
+                            let buttonName = [...btnGroup.status, ...btnGroup.type][nameId]
                             if(nameId === rangeBtnId){
                               buttonName = `${range.min || 0} to ${range.max === ''?'inf':range.max} ELA`
                             }
@@ -460,7 +464,7 @@ export default function MarketExplorer() {
                     }}
                     scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
                     filterProps = {{selectedBtns, selectedCollections, selectedTokens, range, adult, order}}
-                    {...{btnNames, collections, handleFilter}}
+                    {...{btnGroup, collections, handleFilter}}
                   />
                 </Box>
                 <Box
@@ -546,7 +550,7 @@ export default function MarketExplorer() {
                     <Box sx={{ pt: 2, pb: 1, pr: 1, pl: 2.5 }}>
                       {
                         filterForm.selectedBtns.map((nameId, index)=>{
-                          let buttonName = btnNames[nameId]
+                          let buttonName = [...btnGroup.status, ...btnGroup.type][nameId]
                           if(nameId === rangeBtnId){
                             buttonName = `${filterForm.range.min || 0} to ${filterForm.range.max === ''?'inf':filterForm.range.max} ELA`
                           }
@@ -580,7 +584,7 @@ export default function MarketExplorer() {
                       }}
                       filterProps = {filterForm}
                       handleFilter = {handleFilterMobile}
-                      {...{btnNames, collections}}
+                      {...{btnGroup, collections}}
                     />
                   </Scrollbar>
                 </Box>

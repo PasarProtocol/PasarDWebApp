@@ -32,7 +32,7 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
   backgroundColor: 'unset'
 }))
 export default function AssetFilterPan(props){
-  const {sx, scrollMaxHeight, btnNames, collections, filterProps, handleFilter} = props
+  const {sx, scrollMaxHeight, btnNames, btnGroup, collections, filterProps, handleFilter} = props
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
   const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
@@ -95,7 +95,7 @@ export default function AssetFilterPan(props){
               <AccordionDetails>
                 <Stack spacing={1} direction='row'>
                 {
-                  [...btnNames].splice(0,3).map((name, index)=>(
+                  btnGroup.status.map((name, index)=>(
                     filterProps.selectedBtns?
                     <Button key={index} variant={filterProps.selectedBtns.includes(index)?"contained":"outlined"} color="inherit" onClick={()=>handleFilter('statype', index)}>
                       {name}
@@ -206,12 +206,12 @@ export default function AssetFilterPan(props){
               <AccordionDetails>
                 <Stack spacing={1} direction='row'>
                 {
-                  [...btnNames].splice(3,2).map((name, index)=>(
+                  btnGroup.type.map((name, index)=>(
                     filterProps.selectedBtns?
-                    <Button key={index} variant={filterProps.selectedBtns.includes(index+2)?"contained":"outlined"} color="inherit" onClick={()=>handleFilter('statype', index+2)}>
+                    <Button key={index} variant={filterProps.selectedBtns.includes(index+4)?"contained":"outlined"} color="inherit" onClick={()=>handleFilter('statype', index+4)}>
                       {name}
                     </Button>:
-                    <Button key={index} variant="outlined" color="inherit" onClick={()=>handleFilter('statype', index+2)}>
+                    <Button key={index} variant="outlined" color="inherit" onClick={()=>handleFilter('statype', index+4)}>
                       {name}
                     </Button>
                   ))
