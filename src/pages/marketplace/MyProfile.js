@@ -10,10 +10,14 @@ import SquareIcon from '@mui/icons-material/Square';
 import AppsIcon from '@mui/icons-material/Apps';
 import GridViewSharpIcon from '@mui/icons-material/GridViewSharp';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
+import sharpContentCopy from '@iconify/icons-ic/sharp-content-copy';
 import { Icon } from '@iconify/react';
 import editIcon from '@iconify-icons/akar-icons/edit';
 import { useWeb3React } from '@web3-react/core';
 import jwtDecode from 'jwt-decode';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { useSnackbar } from 'notistack';
+
 // components
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
@@ -25,6 +29,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
 import RingAvatar from '../../components/RingAvatar';
 import Badge from '../../components/Badge';
+import CopyButton from '../../components/CopyButton';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
@@ -63,6 +68,26 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(1)
   }
 }));
+const CopyAddressButton = ({address}) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const onCopy = () => {
+      enqueueSnackbar('Copied to clipboard', { variant: 'success' });
+  };
+  return (
+      <CopyToClipboard text={address} onCopy={onCopy}>
+          <Button
+            variant="outlined"
+            endIcon={
+              <Icon icon={sharpContentCopy} width="17px"/>
+            }
+            color='inherit'
+            onClick={(e)=>{e.preventDefault(); e.stopPropagation()}}
+          >
+            {reduceHexAddress(address)}
+          </Button>
+      </CopyToClipboard>
+  )
+}
 // ----------------------------------------------------------------------
 export default function MyProfile() {
   const defaultDispMode = isMobile?1:0
@@ -229,21 +254,6 @@ export default function MyProfile() {
     <RootStyle title="MyProfile | PASAR">
       <Container maxWidth={false}>
         <Box sx={{ position: 'relative', justifyContent: 'center' }}>
-          {
-            sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
-            <Button
-              variant="outlined"
-              component={RouterLink}
-              endIcon={
-                <Icon icon={editIcon}/>
-              }
-              to='edit'
-              sx={{position: 'absolute'}}
-              color='inherit'
-            >
-              Edit Profile
-            </Button>
-          }
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: isMobile?1:1.5 }}>
             <RingAvatar
               address={walletAddress}
@@ -257,12 +267,31 @@ export default function MyProfile() {
               </span>
             </Link>
             {
-              didInfo.name.length>0 &&
-              <Typography variant="subtitle2" noWrap>{reduceHexAddress(walletAddress)}</Typography>
+              (didInfo.name.length>0 || sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2') &&
+              <Stack direction='row' spacing={1} sx={{justifyContent: 'center', mt: 1.5}}>
+                {
+                  didInfo.name.length>0 &&
+                  <CopyAddressButton address={walletAddress} />
+                }
+                {
+                  sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
+                  <Button
+                    variant="outlined"
+                    component={RouterLink}
+                    endIcon={
+                      <Icon icon={editIcon}/>
+                    }
+                    to='edit'
+                    color='inherit'
+                  >
+                    Edit Profile
+                  </Button>
+                }
+              </Stack>
             }
             {
               didInfo.description.length>0 &&
-              <Typography variant="subtitle2" noWrap sx={{color: 'text.secondary'}}>{didInfo.description}</Typography>
+              <Typography variant="subtitle2" noWrap sx={{color: 'text.secondary', pt: 1}}>{didInfo.description}</Typography>
             }
           </Typography>
           <Box sx={{py: 1.5}}>
