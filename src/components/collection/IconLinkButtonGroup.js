@@ -15,6 +15,7 @@ import { MFab } from '../@material-extend';
 import Discord from '../LinkIcons/Discord'
 // ----------------------------------------------------------------------
 export default function IconLinkButtonGroup(props) {
+  const {website='', twitter='', discord='', telegram='', medium=''} = props
   const { themeMode } = useSettings();
   const colorType = themeMode==='light'?'primary':'default'
   return (
@@ -23,21 +24,36 @@ export default function IconLinkButtonGroup(props) {
       direction="row"
       justifyContent='center'
     >
-      <MFab size="small" color= {colorType}>
-        <Icon icon={languageIcon} width={24} height={24} />
-      </MFab>
-      <MFab size="small" color= {colorType}>
-        <Icon icon={twitterIcon} width={24} height={24} />
-      </MFab>
-      <MFab size="small" color= {colorType}>
-        <Icon icon={discordIcon} width={24} height={24} />
-      </MFab>
-      <MFab size="small" color= {colorType}>
-        <TelegramIcon />
-      </MFab>
-      <MFab size="small" color= {colorType}>
-        <Icon icon={mediumIcon} width={24} height={24} />
-      </MFab>
+      {
+        !!website&&
+        <MFab size="small" color= {colorType} href={website} target='_blank'>
+          <Icon icon={languageIcon} width={24} height={24} />
+        </MFab>
+      }
+      {
+        !!twitter&&
+        <MFab size="small" color= {colorType} href={twitter} target='_blank'>
+          <Icon icon={twitterIcon} width={24} height={24} />
+        </MFab>
+      }
+      {
+        !!discord&&
+        <MFab size="small" color= {colorType} href={discord} target='_blank'>
+          <Icon icon={discordIcon} width={24} height={24} />
+        </MFab>
+      }
+      {
+        !!telegram&&
+        <MFab size="small" color= {colorType} href={telegram} target='_blank'>
+          <TelegramIcon />
+        </MFab>
+      }
+      {
+        !!medium&&
+        <MFab size="small" color= {colorType} href={medium} target='_blank'>
+          <Icon icon={mediumIcon} width={24} height={24} />
+        </MFab>
+      }
     </Stack>
   );
 }

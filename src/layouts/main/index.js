@@ -60,7 +60,8 @@ export default function MainLayout() {
   const { themeMode } = useSettings();
   const { pathname } = useLocation();
   const isHome = pathname === '/';
-  const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create' || pathname === '/create/' || pathname.startsWith('/marketplace/search');
+  const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create'
+   || pathname === '/create/' || pathname.startsWith('/marketplace/search') || pathname.startsWith('/collection/detail');
   return (
     <>
       <MainNavbar />

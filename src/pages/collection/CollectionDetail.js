@@ -31,7 +31,7 @@ import AddressPaper from '../../components/AddressPaper';
 import StatisticPanel from '../../components/collection/StatisticPanel'
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import Badge from '../../components/Badge';
-import { fetchFrom, collectionTypes, reduceHexAddress } from '../../utils/common';
+import { fetchFrom, getIpfsUrl, reduceHexAddress } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ export default function CollectionDetail() {
   const sessionFilterProps = JSON.parse(sessionStorage.getItem("filter-props")) || {}
   const params = useParams(); // params.key
   const drawerWidth = 360;
-  const btnNames = ["Buy Now", "On Auction", "General", "Avatar", "ELA", "Explicit & Sensitive Content"]
+  const btnNames = ["Buy Now", "On Auction"]
   const rangeBtnId = 4
   const adultBtnId = 5
   const emptyRange = {min: '', max: ''}
@@ -79,10 +79,14 @@ export default function CollectionDetail() {
 
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
-  const collectionAddress = '0x530ae098df40fb33a89d2c5f7f2d4319ee72721d'
-  const collectionDescription = 'The Phantz Club is a collection of up to 2822 Mutant Phantz that can only be created by exposing an existing Phantz'
+  let description = ''
+  let avatar = ''
+  let socials = {}
+
+  const [isLoadingCollection, setLoadingCollection] = React.useState(true);
+  const [collection, setCollection] = React.useState({});
+  const [metaObj, setMetaObj] = React.useState({});
   const [assets, setAssets] = React.useState([]);
-  const [collections, setCollections] = React.useState(collectionTypes);
   const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
   const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
   const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
@@ -115,50 +119,81 @@ export default function CollectionDetail() {
       setPage(page+1)
     }
   }
+  
   React.useEffect(async () => {
-    controller.abort(); // cancel the previous request
-    const newController = new AbortController();
-    const {signal} = newController;
-    setAbortController(newController);
-    let statusFilter = [...btnNames].splice(0, 2).filter((name, index)=>selectedBtns.indexOf(index)>=0)
-    statusFilter = (statusFilter.length===2 || statusFilter.length===0)?'All':statusFilter[0]
-    let itemTypeFilter = [...btnNames].splice(2, 2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
-    itemTypeFilter = (itemTypeFilter.length===2 || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
-    if(itemTypeFilter==='general')
-      itemTypeFilter = itemTypeFilter.concat(',image')
-    setLoadingAssets(true);
-    fetchFrom(`sticker/api/v1/getDetailedCollectibles?`+
-      `collectionType=&`+
-      `status=${statusFilter}&`+
-      `itemType=${itemTypeFilter}&`+
-      `adult=${adult}&`+
-      `minPrice=${range.min!==''?range.min*1e18:''}&`+
-      `maxPrice=${range.max!==''?range.max*1e18:''}&`+
-      `order=${order}&`+
-      `keyword=${params.key?params.key:''}&`+
-      `pageNum=${page}&`+
-      `pageSize=${showCount}`, { signal }).then(response => {
-      response.json().then(jsonAssets => {
-        if(jsonAssets.data){
-          setTotalCount(jsonAssets.data.total)
-          setPages(Math.ceil(jsonAssets.data.total/showCount));
-          if(loadNext)
-            setAssets([...assets, ...jsonAssets.data.result]);
-          else {
-            setAssets(jsonAssets.data.result);
-            // window.scrollTo(0,0)
+    setLoadingCollection(true);
+    fetchFrom(`api/v2/sticker/getCollection/${params.collection}`)
+      .then((response) => {
+        response.json().then((jsonAssets) => {
+          setCollection(jsonAssets.data);
+          const metaUri = getIpfsUrl(jsonAssets.data.uri)
+          if(metaUri) {
+            fetch(metaUri)
+              .then(response => response.json())
+              .then(data => {
+                setMetaObj(data)
+              });
           }
-        }
-        setAlreadyMounted(false)
-        setLoadNext(false)
-        setLoadingAssets(false)
+          setLoadingCollection(false);
+        }).catch((e) => {
+          setLoadingCollection(false);
+        });
       })
-    }).catch(e => {
-      if(e.code !== e.ABORT_ERR)
-        setLoadingAssets(false);
-    });
-    sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, selectedCollections, selectedTokens, adult, order}))
-    setFilterForm({selectedBtns, range, selectedCollections, selectedTokens, adult, order})
+      .catch((e) => {
+        if (e.code !== e.ABORT_ERR) setLoadingCollection(false);
+      });
+  }, []);
+  
+  if(metaObj.data) {
+    avatar = getIpfsUrl(metaObj.data.avatar)
+    description = metaObj.data.description
+    socials = metaObj.data.socials
+  }
+
+  React.useEffect(async () => {
+    // controller.abort(); // cancel the previous request
+    // const newController = new AbortController();
+    // const {signal} = newController;
+    // setAbortController(newController);
+    // let statusFilter = [...btnNames].splice(0, 2).filter((name, index)=>selectedBtns.indexOf(index)>=0)
+    // statusFilter = (statusFilter.length===2 || statusFilter.length===0)?'All':statusFilter[0]
+    // let itemTypeFilter = [...btnNames].splice(2, 2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
+    // itemTypeFilter = (itemTypeFilter.length===2 || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
+    // if(itemTypeFilter==='general')
+    //   itemTypeFilter = itemTypeFilter.concat(',image')
+    // setLoadingAssets(true);
+    // fetchFrom(`sticker/api/v1/getDetailedCollectibles?`+
+    //   `collectionType=&`+
+    //   `status=${statusFilter}&`+
+    //   `itemType=${itemTypeFilter}&`+
+    //   `adult=${adult}&`+
+    //   `minPrice=${range.min!==''?range.min*1e18:''}&`+
+    //   `maxPrice=${range.max!==''?range.max*1e18:''}&`+
+    //   `order=${order}&`+
+    //   `keyword=${params.key?params.key:''}&`+
+    //   `pageNum=${page}&`+
+    //   `pageSize=${showCount}`, { signal }).then(response => {
+    //   response.json().then(jsonAssets => {
+    //     if(jsonAssets.data){
+    //       setTotalCount(jsonAssets.data.total)
+    //       setPages(Math.ceil(jsonAssets.data.total/showCount));
+    //       if(loadNext)
+    //         setAssets([...assets, ...jsonAssets.data.result]);
+    //       else {
+    //         setAssets(jsonAssets.data.result);
+    //         // window.scrollTo(0,0)
+    //       }
+    //     }
+    //     setAlreadyMounted(false)
+    //     setLoadNext(false)
+    //     setLoadingAssets(false)
+    //   })
+    // }).catch(e => {
+    //   if(e.code !== e.ABORT_ERR)
+    //     setLoadingAssets(false);
+    // });
+    // sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, selectedCollections, selectedTokens, adult, order}))
+    // setFilterForm({selectedBtns, range, selectedCollections, selectedTokens, adult, order})
   }, [page, showCount, selectedBtns, selectedCollections, selectedTokens, adult, range, order, params.key]);
   
   const handleDispmode = (event, mode) => {
@@ -345,32 +380,44 @@ export default function CollectionDetail() {
   }
   const loadingSkeletons = Array(25).fill(null)
   return (
-    <ScrollManager scrollKey="asset-list-key" isAlreadyMounted={isAlreadyMounted}>
+    <ScrollManager scrollKey="collection-asset-key" isAlreadyMounted={isAlreadyMounted}>
       {({ connectScrollTarget, ...props }) => 
         <RootStyle title="CollectionDetail | PASAR">
           <Stack direction="row">
             <Container maxWidth={false}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: isMobile?1:1.5 }}>
                 <RingAvatar
-                  address={collectionAddress}
+                  isImage={Boolean(true)}
                   size={isMobile ? 80 : 100}
+                  avatar={avatar}
                 />
               </Box>
               <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
-                Phantz Club
+                {collection.name}
               </Typography>
               <Stack spacing={2}>
-                <Stack direction="row" spacing={1} sx={{justifyContent: 'center', mt: 1}}>
-                  <AddressPaper type='diamond' address={collectionAddress}/>
-                  <AddressPaper type='contract' address={collectionAddress}/>
-                </Stack>
+                {
+                  !!collection.owner && !!collection.token &&
+                  <Stack direction="row" spacing={1} sx={{justifyContent: 'center', mt: 1}}>
+                    <Tooltip title="Owner Address" arrow enterTouchDelay={0}>
+                      <div>
+                        <AddressPaper type='diamond' address={collection.owner}/>
+                      </div>
+                    </Tooltip>
+                    <Tooltip title="Contract Address" arrow enterTouchDelay={0}>
+                      <div>
+                        <AddressPaper type='contract' address={collection.token}/>
+                      </div>
+                    </Tooltip>
+                  </Stack>
+                }
                 <Box>
                   <StatisticPanel />
                 </Box>
                 <Typography variant="body2" component="div" align="center" color='text.secondary'>
-                  {collectionDescription}
+                  {description}
                 </Typography>
-                <IconLinkButtonGroup/>
+                <IconLinkButtonGroup {...socials}/>
                 <Stack sx={{justifyContent: 'center'}} spacing={1} direction="row">
                   {
                     badge.dia&&
@@ -450,9 +497,10 @@ export default function CollectionDetail() {
                         width: drawerWidth,
                         left: drawerWidth*(isFilterView-1)-24,
                         transition: 'all ease .5s',
+                        p: 1
                       }}
                       filterProps = {{selectedBtns, selectedCollections, selectedTokens, range, adult, order}}
-                      {...{btnNames, collections, handleFilter}}
+                      {...{btnNames, handleFilter}}
                     />
                   </Box>
                   <Box
@@ -573,7 +621,7 @@ export default function CollectionDetail() {
                       }}
                       filterProps = {filterForm}
                       handleFilter = {handleFilterMobile}
-                      {...{btnNames, collections}}
+                      {...{btnNames}}
                     />
                   </Scrollbar>
                 </Box>

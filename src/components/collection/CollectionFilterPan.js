@@ -28,41 +28,15 @@ const DrawerStyle = styled(Drawer)(({ theme }) => ({
 }));
 
 export default function CollectionFilterPan(props){
-  const {sx, scrollMaxHeight, btnNames, collections, filterProps, handleFilter} = props
+  const {sx, scrollMaxHeight, btnNames, filterProps, handleFilter} = props
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
   const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
-  const [filterCollections, setFilterCollections] = React.useState(collections);
-  const [filterTokens, setFilterTokens] = React.useState(coinTypes);
 
   React.useEffect(()=>{
     setMinVal(filterProps.range.min)
     setMaxVal(filterProps.range.max)
   }, [filterProps.range])
-
-  const searchCollections = (inputStr)=>{
-    if(inputStr.length){
-      setFilterCollections(collections.filter(el=>el.name.includes(inputStr)))
-    } else {
-      setFilterCollections(collections)
-    }
-  }
-
-  const searchTokens = (inputStr)=>{
-    if(inputStr.length){
-      setFilterTokens(coinTypes.filter(el=>el.shortName.includes(inputStr)))
-    } else {
-      setFilterTokens(coinTypes)
-    }
-  }
-
-  const selectCollection = (title)=>{
-    handleFilter('collection', title)
-  }
-  
-  const selectToken = (name)=>{
-    handleFilter('token', name)
-  }
 
   const applyRange = (e)=>{
     const range = {min: minVal, max: maxVal}
@@ -153,118 +127,6 @@ export default function CollectionFilterPan(props){
                   Apply
                 </Button>
               </Stack>
-            </AccordionDetails>
-          </Accordion>
-          <Divider />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Accordion
-            defaultExpanded={1&&true}
-          >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-              <Typography variant="body2">Collections</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <SearchBox sx={{width: '100%', mb: 1}} placeholder="Search collections" onChange={searchCollections}/>
-              <Scrollbar sx={{maxHeight: 200}}>
-                <List
-                  sx={{ width: '100%', bgcolor: 'background.paper', pt: 0 }}
-                  component="nav"
-                  aria-labelledby="nested-list-subheader"
-                >
-                  {
-                    filterCollections.map((el, i)=>(
-                      <ListItemButton key={i} onClick={()=>{selectCollection(el.name)}} selected={filterProps.selectedCollections.includes(el.name)}>
-                        <ListItemIcon>
-                          <Box draggable = {false} component="img" src={`/static/${el.icon}`} sx={{ width: 24, height: 24, borderRadius: 2, p: .5, backgroundColor: 'black' }} />
-                        </ListItemIcon>
-                        <ListItemText primary={el.name} />
-                        {
-                          filterProps.selectedCollections.includes(el.name)&&<CheckIcon/>
-                        }
-                      </ListItemButton>
-                    ))
-                  }
-                </List>
-              </Scrollbar>
-            </AccordionDetails>
-          </Accordion>
-          <Divider />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Accordion
-            defaultExpanded={1&&true}
-          >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-              <Typography variant="body2">Item Type</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Stack spacing={1} direction='row'>
-              {
-                [...btnNames].splice(2,2).map((name, index)=>(
-                  filterProps.selectedBtns?
-                  <Button key={index} variant={filterProps.selectedBtns.includes(index+2)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index+2)}>
-                    {name}
-                  </Button>:
-                  <Button key={index} variant="outlined" color="primary" onClick={()=>handleFilter('statype', index+2)}>
-                    {name}
-                  </Button>
-                ))
-              }
-              </Stack>
-            </AccordionDetails>
-          </Accordion>
-          <Divider />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Accordion
-            defaultExpanded={1&&true}
-          >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-              <Typography variant="body2">Tokens</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <SearchBox sx={{width: '100%', mb: 1}} placeholder="Search tokens" onChange={searchTokens}/>
-              <Scrollbar sx={{maxHeight: 200}}>
-                <List
-                  sx={{ width: '100%', bgcolor: 'background.paper', pt: 0 }}
-                  component="nav"
-                  aria-labelledby="nested-list-subheader"
-                >
-                  {
-                    filterTokens.map((el, i)=>(
-                      <ListItemButton key={i} onClick={()=>{selectToken(el.name)}} selected={filterProps.selectedTokens.includes(el.name)}>
-                        <ListItemIcon>
-                          <Box draggable = {false} component="img" src={`/static/${el.icon}`} sx={{ width: 24, height: 24 }} />
-                        </ListItemIcon>
-                        <ListItemText primary={el.name} />
-                        {
-                          filterProps.selectedTokens.includes(el.name)&&<CheckIcon/>
-                        }
-                      </ListItemButton>
-                    ))
-                  }
-                </List>
-              </Scrollbar>
-            </AccordionDetails>
-          </Accordion>
-          <Divider />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <Accordion
-            defaultExpanded={1&&true}
-          >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
-              <Typography variant="body2">Explicit & Sensitive Content</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <FormControlLabel
-                checked={filterProps.adult || false}
-                control={<CustomSwitch onChange={(e)=>{handleFilter('adult', e.target.checked)}}/>}
-                label={filterProps.adult?"On":"Off"}
-                labelPlacement="end"
-                sx={{ml:2, pr:2}}
-              />
             </AccordionDetails>
           </Accordion>
           <Divider />
