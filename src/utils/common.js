@@ -51,7 +51,7 @@ export const getTimeZone = () => {
   return e.includes("-") ? e : "+".concat(e)
 }
 
-const getIpfsUrl = (id) => {
+export const getIpfsUrl = (id) => {
   if (!id) return '';
   const prefixLen = id.split(':', 2).join(':').length;
   if (prefixLen >= id.length) return '';

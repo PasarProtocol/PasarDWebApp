@@ -631,7 +631,7 @@ export default function CreateCollection() {
                   info={{
                     name,
                     description,
-                    address,
+                    owner: address,
                     avatar: getUrlfromFile(avatarFile),
                     background: getUrlfromFile(backgroundFile)
                   }}/>

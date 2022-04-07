@@ -12,7 +12,7 @@ import PaperRecord from '../PaperRecord';
 // import Badge from '../Badge';
 // import BadgeProfile from './BadgeProfile'
 // import useSingin from '../../hooks/useSignin';
-import { getDidInfoFromAddress, reduceHexAddress, getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
+import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const avatarStyle = {
@@ -102,8 +102,10 @@ const CollectionImgBox = (props) => {
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider } = props
-  const { name, description, address='', avatar, background } = info
+  const { name, uri='', owner='' } = info
+  let { description='', avatar='', background='' } = info
   const [didName, setDidName] = React.useState('');
+  const [metaObj, setMetaObj] = React.useState({});
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
 
   React.useEffect(() => {
@@ -117,7 +119,22 @@ const CollectionCardPaper = (props) => {
     //       setBadgeFlag('kyc', true)
     //   })
     // }
-  }, []);
+    
+    const metaUri = getIpfsUrl(uri)
+    if(metaUri) {
+      fetch(metaUri)
+        .then(response => response.json())
+        .then(data => {
+          setMetaObj(data)
+        });
+    }
+  }, [uri]);
+
+  if(metaObj.data) {
+    description = metaObj.data.description
+    avatar = getIpfsUrl(metaObj.data.avatar)
+    background = getIpfsUrl(metaObj.data.background)
+  }
 
   React.useEffect(() => {
     if(isPreview) {
@@ -128,14 +145,14 @@ const CollectionCardPaper = (props) => {
         setDidName(name)
       }
     }      
-    else if(address)
-      getDidInfoFromAddress(address)
+    else if(owner)
+      getDidInfoFromAddress(owner)
         .then((info) => {
           if(info.name)
             setDidName(info.name)
         })
         .catch((e) => {})
-  }, [address]);
+  }, [owner]);
   return (
       <PaperRecord sx={isPreview?{ overflow: 'hidden' } : { overflow: 'hidden', ...paperStyle }}>
         <Box>
@@ -161,7 +178,7 @@ const CollectionCardPaper = (props) => {
           <Stack direction="column" sx={{justifyContent: 'center', textAlign: 'center'}}>
             <TypographyStyle variant="h5" noWrap>{name}</TypographyStyle>
             <Typography variant="subtitle2" component='div' sx={{fontWeight: 'normal'}}>
-              by{' '}<Typography variant="subtitle2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline-flex'}}>{didName || reduceHexAddress(address) || 'Anonym'}</Typography>
+              by{' '}<Typography variant="subtitle2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline-flex'}}>{didName || reduceHexAddress(owner) || 'Anonym'}</Typography>
             </Typography>
             {
               isOnSlider?

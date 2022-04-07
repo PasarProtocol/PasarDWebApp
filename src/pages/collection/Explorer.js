@@ -15,6 +15,7 @@ import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import MyItemsSortSelect from '../../components/MyItemsSortSelect';
 import CollectionCard from '../../components/collection/CollectionCard';
+import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import Jazzicon from '../../components/Jazzicon';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
@@ -47,19 +48,19 @@ export default function Explorer() {
     const newController = new AbortController();
     const { signal } = newController;
     setAbortController(newController);
-  
-    // fetchFrom(`sticker/api/v1/getCollections?address=${walletAddress}&orderType=${orderType}`, { signal })
-    //   .then((response) => {
-    //     response.json().then((jsonAssets) => {
-    //       setAssetsOfType(i, jsonAssets.data);
-    //       setLoadingCollections(false);
-    //     }).catch((e) => {
-    //       setLoadingCollections(false);
-    //     });
-    //   })
-    //   .catch((e) => {
-    //     if (e.code !== e.ABORT_ERR) setLoadingCollections(false);
-    //   });
+    setLoadingCollections(true);
+    fetchFrom('api/v2/sticker/getCollection', { signal })
+      .then((response) => {
+        response.json().then((jsonAssets) => {
+          setCollections(jsonAssets.data);
+          setLoadingCollections(false);
+        }).catch((e) => {
+          setLoadingCollections(false);
+        });
+      })
+      .catch((e) => {
+        if (e.code !== e.ABORT_ERR) setLoadingCollections(false);
+      });
   }, [orderType]);
 
   const handleNavlink = (e)=>{
@@ -75,7 +76,7 @@ export default function Explorer() {
     setAfterSigninPath(path)
   }
 
-  const loadingSkeletons = Array(10).fill(null)
+  const loadingSkeletons = Array(3).fill(null)
 
   return (
     <RootStyle title="Collections | PASAR">
@@ -101,6 +102,12 @@ export default function Explorer() {
         </Stack>
         <Grid container spacing={2}>
           {
+            isLoadingCollections?
+            loadingSkeletons.map((item, index)=>(
+              <Grid item key={index} xs={12} sm={6} md={4}>
+                <CollectionCardSkeleton key={index}/>
+              </Grid>
+            )):
             collections.map((info, index)=>
               <Grid item key={index} xs={12} sm={6} md={4}>
                 <CollectionCard info={info}/>

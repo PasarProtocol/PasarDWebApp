@@ -563,7 +563,7 @@ export default function ImportCollection() {
                   info={{
                     name: collectionInfo.name,
                     description,
-                    address,
+                    owner: address,
                     avatar: getUrlfromFile(avatarFile),
                     background: getUrlfromFile(backgroundFile)
                   }}/>
