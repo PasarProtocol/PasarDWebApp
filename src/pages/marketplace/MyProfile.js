@@ -4,7 +4,7 @@ import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import SwipeableViews from 'react-swipeable-views';
 import { isMobile } from 'react-device-detect';
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Typography, Tab, Tabs, Link, Button, Box, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material';
+import { Container, Stack, Typography, Tab, Tabs, Link, Button, Box, ToggleButtonGroup, ToggleButton, Tooltip, Grid } from '@mui/material';
 // import { TabContext, TabList, TabPanel } from '@mui/lab';
 import SquareIcon from '@mui/icons-material/Square';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -26,6 +26,9 @@ import { useEagerConnect } from '../../components/signin-dlg/hook';
 import RingAvatar from '../../components/RingAvatar';
 import Badge from '../../components/Badge';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
+import CollectionCard from '../../components/collection/CollectionCard';
+import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
+
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -66,8 +69,10 @@ export default function MyProfile() {
   const sessionDispMode = sessionStorage.getItem("disp-mode")
   const params = useParams(); // params.address
   const navigate = useNavigate();
-  const [assets, setAssets] = React.useState([[], [], [], []]);
+  const [assets, setAssets] = React.useState([[], [], []]);
+  const [collections, setCollections] = React.useState([]);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
+  const [isLoadingCollection, setLoadingCollection] = React.useState(false);
   const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):defaultDispMode);
   const [orderType, setOrderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
@@ -191,6 +196,24 @@ export default function MyProfile() {
       });
   }, [walletAddress, orderType, updateCount]);
 
+  React.useEffect(async () => {
+    if(walletAddress) {
+      setLoadingCollection(true);
+      fetchFrom(`api/v2/sticker/getCollectionByOwner/${walletAddress}`)
+        .then((response) => {
+          response.json().then((jsonAssets) => {
+            setCollections(jsonAssets.data);
+            setLoadingCollection(false);
+          }).catch((e) => {
+            setLoadingCollection(false);
+          });
+        })
+        .catch((e) => {
+          if (e.code !== e.ABORT_ERR) setLoadingCollection(false);
+        });
+    }
+  }, [walletAddress]);
+  
   const handleDispmode = (event, mode) => {
     if (mode === null)
       return
@@ -278,7 +301,7 @@ export default function MyProfile() {
             <Tab label={`Listed (${assets[0].length})`} value={0} />
             <Tab label={`Owned (${assets[1].length})`} value={1} />
             <Tab label={`Created (${assets[2].length})`} value={2} />
-            <Tab label={`Collections (${assets[3].length})`} value={3} />
+            <Tab label={`Collections (${collections.length})`} value={3} />
           </Tabs>
           {/* <MHidden width="smDown">
             <ToolGroupStyle>
@@ -297,7 +320,7 @@ export default function MyProfile() {
         <Box
           sx={{
             width: '100%',
-            m: '-10px'
+            // m: '-10px'
           }}
         >
           <SwipeableViews
@@ -312,33 +335,14 @@ export default function MyProfile() {
                 {/* {isLoadingAssets[i] && <LoadingScreen sx={{ background: 'transparent' }} />} */}
                 {!isLoadingAssets[i]?
                   <Box component="main">
-                    {group.length > 0 ? (
-                      <AssetGrid assets={group} type={i + 1} dispmode={dispmode} myaddress={myAddress} updateCount={updateCount} handleUpdate={setUpdateCount}/>
-                    ) : (
-                      <>
-                        {
-                          i===3?
-                          <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
-                            <Typography variant="h3" align="center"> No Collections Found </Typography>
-                            <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>We could not find any of your collections</Typography>
-                            {
-                              sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
-                              <>
-                                <Button variant="contained" component={RouterLink} to='/collection/create' sx={{mb: 2}}>
-                                  Create new collection
-                                </Button>
-                                <Button variant="contained" component={RouterLink} to='/collection/import'>
-                                  Import existing collection
-                                </Button>
-                              </>
-                            }
-                          </Stack>:
-                          <Typography variant="subtitle2" align="center" sx={{ mb: 3 }}>
-                            No {typeNames[i]} collectible found!
-                          </Typography>
-                        }
-                      </>
-                    )}
+                    {
+                      group.length > 0 ?
+                      <AssetGrid assets={group} type={i + 1} dispmode={dispmode} myaddress={myAddress} updateCount={updateCount} handleUpdate={setUpdateCount}/>:
+                      
+                      <Typography variant="subtitle2" align="center" sx={{ mb: 3 }}>
+                        No {typeNames[i]} collectible found!
+                      </Typography>
+                    }
                   </Box>:
                   <Box component="main">
                     <AssetGrid assets={loadingSkeletons} type={i + 1} dispmode={dispmode} myaddress={myAddress} updateCount={updateCount} handleUpdate={setUpdateCount}/>
@@ -346,6 +350,62 @@ export default function MyProfile() {
                 }
               </Box>
             ))}
+            <Box sx={{ minHeight: 200, p: '10px' }}>
+              {
+                !isLoadingCollection?
+                <Box component="main">
+                  {
+                    collections.length > 0 ?
+                    <Grid container spacing={2}>
+                      {
+                        collections.map((info, index)=>
+                          <Grid item key={index} xs={12} sm={6} md={4}>
+                            <CollectionCard info={info}/>
+                          </Grid>
+                        )
+                      }
+                      {
+                        sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
+                        <Grid item xs={12} sm={6} md={4} sx={{display: 'flex', justifyContent: 'center'}}>
+                          <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
+                            <Button variant="contained" component={RouterLink} to='/collection/create' sx={{mb: 2}}>
+                              Create new collection
+                            </Button>
+                            <Button variant="contained" component={RouterLink} to='/collection/import'>
+                              Import existing collection
+                            </Button>
+                          </Stack>
+                        </Grid>
+                      }
+                    </Grid>:
+                    <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
+                      <Typography variant="h3" align="center"> No Collections Found </Typography>
+                      <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>We could not find any of your collections</Typography>
+                      {
+                        sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
+                        <>
+                          <Button variant="contained" component={RouterLink} to='/collection/create' sx={{mb: 2}}>
+                            Create new collection
+                          </Button>
+                          <Button variant="contained" component={RouterLink} to='/collection/import'>
+                            Import existing collection
+                          </Button>
+                        </>
+                      }
+                    </Stack>
+                  }
+                </Box>:
+                <Grid container spacing={2}>
+                  {
+                    Array(3).fill(0).map((item, index)=>(
+                      <Grid item key={index} xs={12} sm={6} md={4}>
+                        <CollectionCardSkeleton key={index}/>
+                      </Grid>
+                    ))
+                  }
+                </Grid>
+              }
+            </Box>
           </SwipeableViews>
         </Box>
       </Container>
