@@ -9,7 +9,7 @@ import palette from '../../theme/palette'
 
 // material
 import LoadingScreen from '../LoadingScreen';
-import { MethodList, reduceHexAddress, getDidInfoFromAddress } from '../../utils/common';
+import { MethodList, reduceHexAddress, getDidInfoFromAddress, getCoinTypeFromToken, coinTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired
@@ -21,6 +21,8 @@ function TransItem(props) {
   if(!methodItem)
       methodItem = {color: 'grey', icon: 'tag', detail: []}
   const subject = trans[methodItem.verb.subject]
+  const coinType = getCoinTypeFromToken(trans)
+  const coinName = coinTypes[coinType].name
   
   React.useEffect(() => {
     if(subject) {
@@ -49,7 +51,7 @@ function TransItem(props) {
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Typography variant="body2" noWrap>
                 {methodItem.verb.description}
-                {methodItem.verb.withPrice?` ${parseFloat((trans.price/10**18).toFixed(7))} ELA`:''}
+                {methodItem.verb.withPrice?` ${parseFloat((trans.price/10**18).toFixed(7))} ${coinName}`:''}
               </Typography>
               <Link to={`/explorer/transaction/detail/${subject}`} component={RouterLink}>
                 <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
