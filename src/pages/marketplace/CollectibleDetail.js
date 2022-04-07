@@ -202,7 +202,7 @@ export default function CollectibleDetail() {
   
   React.useEffect(async () => {
     setLoadingTransRecord(true);
-    fetchFrom(`sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=&timeOrder=-1`).then(response => {
+    fetchFrom(`api/v2/sticker/getTranDetailsByTokenId?tokenId=${params.collection}&method=&timeOrder=-1`).then(response => {
       response.json().then(jsonTransactions => {
         setTransRecord(jsonTransactions.data.filter((trans)=>
           !((trans.event==="SafeTransferFrom"||trans.event==="SafeTransferFromWithMemo") && (trans.to===blankAddress||trans.to===marketContract))
