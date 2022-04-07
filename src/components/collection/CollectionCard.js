@@ -213,8 +213,7 @@ export default function CollectionCard(props) {
     <CollectionCardPaper {...props}/>:
     <Link
       component={RouterLink}
-      // to={`/marketplace/detail/${tokenId}`}
-      to='#'
+      to={`/collection/detail/${info.token}`}
       alt=""
       underline="none"
     >

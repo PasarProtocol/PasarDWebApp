@@ -2,7 +2,11 @@ import {Box} from '@mui/material'
 import Jazzicon from './Jazzicon';
 
 export default function RingAvatar(props) {
-  const {size, outersx} = props
+  const {size, outersx, isImage=false} = props
+  let {avatar=''} = props
+  if(!avatar)
+    avatar = '/static/circle-loading.svg'
+    
   return <Box sx={{
     borderRadius: '50%',
     width: size+18,
@@ -15,6 +19,10 @@ export default function RingAvatar(props) {
     border: '4px solid transparent',
     ...outersx
   }}>
-    <Jazzicon {...props}/>
+    {
+      isImage?
+      <Box draggable = {false} component="img" src={avatar} sx={{width: size, height: size, borderRadius: '100%'}} onError={(e) => {e.target.src = '/static/circle-loading.svg';}}/>:
+      <Jazzicon {...props}/>
+    }
   </Box>
 }

@@ -48,7 +48,7 @@ export default class ScrollPositionManager extends React.Component {
     // console.log("-----prev----")
     // console.log(prevProps)
     // console.log(this.props.scrollKey)
-    if (this.props.isAlreadyMounted && this.props.scrollKey === "asset-list-key") {
+    if (this.props.isAlreadyMounted && (this.props.scrollKey === "asset-list-key" || this.props.scrollKey === "collection-asset-key")) {
       this.restoreScrollPosition()
     }
   }
