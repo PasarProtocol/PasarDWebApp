@@ -1,75 +1,101 @@
 import React from 'react';
 import Slider from 'react-slick';
 import {isMobile} from 'react-device-detect';
-import Carousel from 'react-grid-carousel'
+import Carousel from 'react-multi-carousel';
 import { Box, Button } from '@mui/material';
 
 import CollectionCard from '../collection/CollectionCard';
+import CollectionCardSkeleton from '../collection/CollectionCardSkeleton';
 import { fetchFrom, getAssetImage, getCoinUSD, getCollectionTypeFromImageUrl, collectionTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 export default function FilteredCollectionGrid(props){
-  const {type} = props
   const [collections, setCollections] = React.useState(collectionTypes);
-  const [isDragging, setDragging] = React.useState(false);
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
-  const [coinUSD, setCoinUSD] = React.useState(0);
+  const [isDragging, setDragging] = React.useState(false);
 
   const settings = {
-    dots: false,
-    arrows: true,
-    nextArrow: <Button>next</Button>,
-    autoplay: true,
-    autoplaySpeed: 2500,
-    infinite: true,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    swipeToSlide: true,
     beforeChange: () => {setDragging(true)},
     afterChange: () => {setDragging(false)},
-    responsive: [
-      {breakpoint: 1200, settings: {slidesToShow: 3}},
-      {breakpoint: 750, settings: {slidesToShow: 2}},
-      {breakpoint: 450, settings: {slidesToShow: 1}}
-    ]
-  };
+    additionalTransfrom: 0,
+    arrows: false,
+    pauseOnHover: false,
+    autoPlay: true,
+    autoPlaySpeed: 2500,
+    centerMode: false,
+    containerClass: "container-with-dots",
+    draggable: true,
+    focusOnSelect: false,
+    infinite: true,
+    keyBoardControl: true,
+    minimumTouchDrag: 80,
+    renderButtonGroupOutside: false,
+    renderDotsOutside: false,
+    responsive: {
+      desktop: {
+        breakpoint: {
+          max: 3000,
+          min: 1200
+        },
+        items: 3,
+        partialVisibilityGutter: 50
+      },
+      desktop_sm: {
+        breakpoint: {
+          max: 1200,
+          min: 750
+        },
+        items: 2,
+        partialVisibilityGutter: 40
+      },
+      mobile: {
+        breakpoint: {
+          max: 750,
+          min: 0
+        },
+        items: 1,
+        partialVisibilityGutter: 30
+      }
+    },
+    showDots: false,
+    slidesToSlide: 1,
+    swipeable: true
+  }
   
   React.useEffect(async () => {
     setLoadingCollections(true);
-    // fetchFrom(`api/v2/sticker/getDetailedCollectibles?collectionType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=5`)
-    //   .then((response) => {
-    //     response.json().then((jsonAssets) => {
-    //       if(jsonAssets.data){
-    //         setRecentSoldCollectibles(jsonAssets.data.result);
-    //       }
-    //       setLoadingCollections(false);
-    //     }).catch((e) => {
-    //       setLoadingCollections(false);
-    //     });
-    //   })
-    //   .catch((e) => {
-    //     if (e.code !== e.ABORT_ERR)
-    //       setLoadingCollections(false);
-    //   });
+    fetchFrom('api/v2/sticker/getCollection')
+      .then((response) => {
+        response.json().then((jsonAssets) => {
+          setCollections(jsonAssets.data);
+          setLoadingCollections(false);
+        }).catch((e) => {
+          setLoadingCollections(false);
+        });
+      })
+      .catch((e) => {
+        if (e.code !== e.ABORT_ERR) setLoadingCollections(false);
+      });
   }, []);
-  const loadingSkeletons = Array(3).fill(null)
+  const loadingSkeletons = Array(3).fill(0)
+  
   return (
     <Box sx={{ mx: 0 }}>
-      <Slider {...settings}>
+      <Carousel {...settings}>
         {
-          // isLoadingCollections?
-          // loadingSkeletons.map((item, index)=>(
-          //   <Box sx={{p: 1}}>
-          //     <AssetCardSkeleton key={index}/>
-          //   </Box>
-          // )):
+          isLoadingCollections?
+          loadingSkeletons.map((item, index)=>(
+            <Box sx={{p: 2}}>
+              <CollectionCardSkeleton key={index}/>
+            </Box>
+          )):
           collections.map((item, index)=>(
             <Box key={index} sx={{ p: 2, height: 330 }}>
-              <CollectionCard info={item} isOnSlider={Boolean(true)}/>
+              <CollectionCard info={item} isOnSlider={Boolean(true)} isDragging={isDragging}/>
             </Box>
           ))
         }
-      </Slider>
+      </Carousel>
     </Box>
   )
 }

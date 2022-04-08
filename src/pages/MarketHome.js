@@ -64,7 +64,7 @@ const CardStyle = styled(Box)(({ theme }) => ({
     flexGrow: 1,
     position: 'relative',
     // [theme.breakpoints.up('sm')]: {
-      paddingBottom: 48
+      paddingBottom: 80
     // }
   }
 }));
@@ -169,7 +169,8 @@ export default function MarketHome() {
                   Your DID and wallet address allows you to explore Elastos’ complete Web3.0 tech stack, including: 
                   Hive decentralized storage, Carrier’s P2P network, Ecosystem DAO Cyber Republic, and much more!<br/>
                   <br/>
-                  Download the wallet, follow the instructions and you’re set. If you need help then visit our friendly Discord Server 
+                  Download the wallet, follow the instructions and you’re set. If you need help then visit our friendly{' '}
+                  <ExternalLink linkURL="https://discord.gg/RPbcBv8ckh" title="Discord Server"/>{' '}
                   where you will find experience, a friendly community, and more information about the delights of Elastos and NFTs.
                 </Typography>
               </Box>

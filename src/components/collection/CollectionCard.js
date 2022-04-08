@@ -207,7 +207,7 @@ const CollectionCardPaper = (props) => {
 };
 
 export default function CollectionCard(props) {
-  const { info, isPreview=false } = props
+  const { info, isPreview=false, isDragging } = props
   return (
     isPreview?
     <CollectionCardPaper {...props}/>:
@@ -216,6 +216,7 @@ export default function CollectionCard(props) {
       to={`/collection/detail/${info.token}`}
       alt=""
       underline="none"
+      onClick={(e)=>{if(isDragging) e.preventDefault()}}
     >
       <CollectionCardPaper {...props}/>
     </Link>
