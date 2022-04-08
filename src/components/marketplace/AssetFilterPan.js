@@ -145,7 +145,7 @@ export default function AssetFilterPan(props){
                       }
                       color="inherit"
                       onClick={()=>handleFilter('statype', index)}
-                      sx={{mr: .5, mb: .5}}
+                      sx={{mr: 1, mb: 1}}
                     >
                       {name}
                     </Button>
