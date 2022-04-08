@@ -497,23 +497,25 @@ export const collectionTypes = [
     name: 'Pasar Collection',
     avatar: '/static/logo-icon.svg',
     shortDescription: 'Pasar default collection',
-    description: 'A collection of all items minted using the Pasar Collection Contract'
+    description: 'A collection of all items minted using the Pasar Collection Contract',
+    token: 2
   },
   {
     shortName: 'FSTK',
     name: 'Feeds NFT Sticker',
     avatar: '/static/feeds-sticker.svg',
     shortDescription: 'Feeds default collection',
-    description: 'A collection of all items minted using the Feeds NFT Stickers Contract'
+    description: 'A collection of all items minted using the Feeds NFT Stickers Contract',
+    token: 1
   },
-  {
-    shortName: 'Bunny',
-    name: 'Bunny Punk',
-    avatar: 'https://ipfs-test.trinity-feeds.app/ipfs/QmVGaCENQCFKm1cJhRWBJ6Wj41LWh1Ev4gjkTBTZCyH7YC',
-    background: 'https://lh3.googleusercontent.com/fItcL7Th5tjT-54xPOMDWOWWxlAUvROhpH6SiJigUihUa0BusEPFJKI8UkkLyvFEh9Oxl1OBRrv0mZHgPndNf7QocVnqwLxECKlr=h600',
-    shortDescription: 'Bunny Punk collection',
-    description: 'Bunny Punk is a collection of 1,000 unique 3D well-designed Bunnies united together to get on the Elastos Smart chain Each Bunny Punk is unique and exclusive based on a hundred traits. The objective is to build the strongest Elastos NFT community and project.'
-  }
+  // {
+  //   shortName: 'Bunny',
+  //   name: 'Bunny Punk',
+  //   avatar: 'https://ipfs-test.trinity-feeds.app/ipfs/QmVGaCENQCFKm1cJhRWBJ6Wj41LWh1Ev4gjkTBTZCyH7YC',
+  //   background: 'https://lh3.googleusercontent.com/fItcL7Th5tjT-54xPOMDWOWWxlAUvROhpH6SiJigUihUa0BusEPFJKI8UkkLyvFEh9Oxl1OBRrv0mZHgPndNf7QocVnqwLxECKlr=h600',
+  //   shortDescription: 'Bunny Punk collection',
+  //   description: 'Bunny Punk is a collection of 1,000 unique 3D well-designed Bunnies united together to get on the Elastos Smart chain Each Bunny Punk is unique and exclusive based on a hundred traits. The objective is to build the strongest Elastos NFT community and project.'
+  // }
 ]
 export const coinTypes = [
   {
