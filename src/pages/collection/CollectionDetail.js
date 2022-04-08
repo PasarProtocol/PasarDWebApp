@@ -414,7 +414,7 @@ export default function CollectionDetail() {
                 <Box>
                   <StatisticPanel />
                 </Box>
-                <Typography variant="body2" component="div" align="center" color='text.secondary'>
+                <Typography variant="body2" component="div" align="center" color='text.secondary' sx={{maxWidth: 900, m: 'auto !important', pt: 2}}>
                   {description}
                 </Typography>
                 <IconLinkButtonGroup {...socials}/>
