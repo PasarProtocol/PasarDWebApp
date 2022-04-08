@@ -11,7 +11,7 @@ import CustomSwitch from '../custom-switch';
 import SearchBox from '../SearchBox';
 import Scrollbar from '../Scrollbar';
 import StyledButton from '../signin-dlg/StyledButton';
-import {coinTypes} from '../../utils/common'
+import { coinTypes, collectionTypes, fetchFrom, getIpfsUrl } from '../../utils/common'
 // ----------------------------------------------------------------------
 const DrawerStyle = styled(Drawer)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -32,12 +32,54 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
   backgroundColor: 'unset'
 }))
 export default function AssetFilterPan(props){
-  const {sx, scrollMaxHeight, btnGroup, collections, filterProps, handleFilter} = props
+  const {sx, scrollMaxHeight, btnGroup, filterProps, handleFilter} = props
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
   const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
-  const [filterCollections, setFilterCollections] = React.useState(collections);
+  const [collections, setCollections] = React.useState(collectionTypes);
+  const [filterCollections, setFilterCollections] = React.useState(collectionTypes);
   const [filterTokens, setFilterTokens] = React.useState(coinTypes);
+
+  React.useEffect(()=>{
+    fetchFrom('api/v2/sticker/getCollection')
+      .then((response) => {
+        response.json().then((jsonCollections) => {
+          const resCollections = [...jsonCollections.data].map(item=>{
+            const tempItem = {...item, avatar: ''}
+            return tempItem
+          })
+
+          const allCollections = [...collectionTypes, ...resCollections]
+          setCollections(allCollections);
+          setFilterCollections(allCollections)
+        })
+      })
+  }, [])
+
+  React.useEffect(() => {
+    collections.forEach((item, _id)=>{
+      if(!item.uri || item.avatar)
+        return
+      const metaUri = getIpfsUrl(item.uri)
+      if(metaUri) {
+        fetch(metaUri)
+          .then(response => response.json())
+          .then(data => {
+            setCollections((prevStatus)=>{
+              const tempCollections = [...prevStatus]
+              tempCollections[_id].avatar = getIpfsUrl(data.data.avatar)
+              return tempCollections
+            })
+            setFilterCollections((prevStatus)=>{
+              const tempCollections = [...prevStatus]
+              tempCollections[_id].avatar = getIpfsUrl(data.data.avatar)
+              return tempCollections
+            })
+          });
+      }
+    })
+    
+  }, [collections]);
 
   React.useEffect(()=>{
     setMinVal(filterProps.range.min)
@@ -60,12 +102,12 @@ export default function AssetFilterPan(props){
     }
   }
 
-  const selectCollection = (name)=>{
-    handleFilter('collection', name)
+  const selectCollection = (address)=>{
+    handleFilter('collection', address)
   }
   
-  const selectToken = (name)=>{
-    handleFilter('token', name)
+  const selectToken = (address)=>{
+    handleFilter('token', address)
   }
 
   const applyRange = (e)=>{
@@ -183,13 +225,13 @@ export default function AssetFilterPan(props){
                   >
                     {
                       filterCollections.map((el, i)=>(
-                        <ListItemButton key={i} onClick={()=>{selectCollection(el.name)}} selected={filterProps.selectedCollections.includes(el.name)}>
+                        <ListItemButton key={i} onClick={()=>{selectCollection(el.token)}} selected={filterProps.selectedCollections.includes(el.token)}>
                           <ListItemIcon>
-                            <Box draggable = {false} component="img" src={el.avatar} sx={{ width: 24, height: 24, borderRadius: 2, p: el.avatar.startsWith('/static')?.5:0, backgroundColor: 'black' }} />
+                            <Box draggable = {false} component={el.avatar?"img":"div"} src={el.avatar} sx={{ width: 24, height: 24, borderRadius: 2, p: el.avatar.startsWith('/static')?.5:0, backgroundColor: 'black' }} />
                           </ListItemIcon>
                           <ListItemText primary={el.name} />
                           {
-                            filterProps.selectedCollections.includes(el.name)&&<CheckIcon/>
+                            filterProps.selectedCollections.includes(el.token)&&<CheckIcon/>
                           }
                         </ListItemButton>
                       ))
@@ -242,7 +284,7 @@ export default function AssetFilterPan(props){
                   >
                     {
                       filterTokens.map((el, i)=>(
-                        <ListItemButton key={i} onClick={()=>{selectToken(el.name)}} selected={filterProps.selectedTokens.includes(el.name)}>
+                        <ListItemButton key={i} onClick={()=>{selectToken(el.address)}} selected={filterProps.selectedTokens.includes(el.address)}>
                           <ListItemIcon>
                             <Box 
                               draggable = {false}
@@ -257,7 +299,7 @@ export default function AssetFilterPan(props){
                           </ListItemIcon>
                           <ListItemText primary={el.name} />
                           {
-                            filterProps.selectedTokens.includes(el.name)&&<CheckIcon/>
+                            filterProps.selectedTokens.includes(el.address)&&<CheckIcon/>
                           }
                         </ListItemButton>
                       ))

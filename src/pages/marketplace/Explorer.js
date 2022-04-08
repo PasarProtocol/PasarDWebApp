@@ -26,7 +26,7 @@ import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
-import { fetchFrom, collectionTypes } from '../../utils/common';
+import { fetchFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -114,7 +114,6 @@ export default function MarketExplorer() {
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([]);
-  const [collections, setCollections] = React.useState(collectionTypes);
   const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
   const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
   const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
@@ -159,7 +158,8 @@ export default function MarketExplorer() {
       itemTypeFilter = itemTypeFilter.concat(',image')
     setLoadingAssets(true);
     fetchFrom(`api/v2/sticker/getDetailedCollectibles?`+
-      `collectionType=&`+
+      `collectionType=${selectedCollections.join(',')}&`+
+      `tokenType=${selectedTokens.join(',')}&`+
       `status=${statusFilter}&`+
       `itemType=${itemTypeFilter}&`+
       `adult=${adult}&`+
@@ -464,7 +464,7 @@ export default function MarketExplorer() {
                     }}
                     scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
                     filterProps = {{selectedBtns, selectedCollections, selectedTokens, range, adult, order}}
-                    {...{btnGroup, collections, handleFilter}}
+                    {...{btnGroup, handleFilter}}
                   />
                 </Box>
                 <Box
@@ -584,7 +584,7 @@ export default function MarketExplorer() {
                       }}
                       filterProps = {filterForm}
                       handleFilter = {handleFilterMobile}
-                      {...{btnGroup, collections}}
+                      {...{btnGroup}}
                     />
                   </Scrollbar>
                 </Box>
