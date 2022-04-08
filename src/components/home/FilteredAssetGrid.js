@@ -95,7 +95,7 @@ const AssetGroupSlider = (props)=>{
       return tempPrice;
     });
   }
-  const loadingSkeletons = Array(10).fill(null)
+  const loadingSkeletons = Array(10).fill(0)
   return (
     <Box sx={{ mx: 0 }}>
       <Carousel {...settings}>
