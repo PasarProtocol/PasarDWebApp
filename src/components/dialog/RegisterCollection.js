@@ -13,6 +13,9 @@ export default function RegisterCollection(props) {
     setOpenDlg(false)
   };
 
+  let promptTitle = type===0?"Import Collection":"Deploy Contract"
+  if(type!==0 && current!==1)
+    promptTitle = "Register Info"
   return (
     <Dialog open={isOpenDlg} onClose={handleClose}>
       <DialogTitle>
@@ -31,7 +34,7 @@ export default function RegisterCollection(props) {
       </DialogTitle>
       <DialogContent>
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
-          {type===0?"Import Collection":"Create Collection"}
+          {promptTitle}
         </Typography>
         <Box draggable = {false} component="img" src={`/static/loading-${theme.palette.mode}.gif`} sx={{width: 100, m:'auto'}} />
         {
@@ -40,8 +43,8 @@ export default function RegisterCollection(props) {
           <Typography variant="subtitle2" align="center">
             {
               type!==0 && current===1?
-              "Deploying contract on the blockchain...":
-              "Registering collection on the PASAR..."
+              "Deploying new collection contract...":
+              "Registering collection info..."
             }
           </Typography>
         }

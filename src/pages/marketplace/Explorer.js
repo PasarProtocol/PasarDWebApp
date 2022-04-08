@@ -103,7 +103,7 @@ export default function MarketExplorer() {
   const params = useParams(); // params.key
   const drawerWidth = 360;
   const btnGroup = {
-    status: ["Buy Now", "On Auction", "Has Bids", "Has Ended"],
+    status: ["Buy Now", "On Auction", "Not Met", "Has Bids", "Has Ended"],
     type: ["General", "Avatar"],
     
   }
