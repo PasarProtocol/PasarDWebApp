@@ -239,6 +239,26 @@ export function getDiaTokenInfo(strAddress, connectProvider = null) {
   })
 }
 
+export async function getERCType(contractAddress, connectProvider = null) {
+  try{
+    let walletConnectWeb3
+    if(connectProvider)
+      walletConnectWeb3 = new Web3(connectProvider)
+    else if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+      walletConnectWeb3 = new Web3(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+    else
+      walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
+
+    const ercContract = new walletConnectWeb3.eth.Contract(COMMON_CONTRACT_ABI, contractAddress)
+    const is721 = await ercContract.methods.supportsInterface('0x80ac58cd').call()
+    if(is721)
+      return 0
+    return 1
+  } catch(e) {
+    return 1
+  }
+}
+
 export function getCredentialInfo(strAddress) {
   return new Promise((resolve, reject) => {
     fetchFrom(`auth/api/v1/getCredentials?address=${strAddress}`).then(response=>{

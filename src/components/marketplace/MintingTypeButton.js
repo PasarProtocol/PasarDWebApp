@@ -2,6 +2,7 @@ import { styled } from '@mui/material/styles';
 import { Paper, Typography, ButtonBase, Box } from '@mui/material';
 import PhotoSizeSelectActualOutlinedIcon from '@mui/icons-material/PhotoSizeSelectActualOutlined';
 import AddIcon from '@mui/icons-material/Add';
+import useSettings from '../../hooks/useSettings';
 
 const SvgStyle = styled('svg')(({ theme }) => ({
     width: 40,
@@ -14,7 +15,15 @@ const SvgStyle = styled('svg')(({ theme }) => ({
 
 const MintingTypeButton = (props)=>{
     const {type, description, current, disabled=false} = props
-
+    const { themeMode } = useSettings();
+    const commonSx = {
+        width: {xs: 35, sm: 50},
+        height: {xs: 35, sm: 50},
+        borderRadius: 2,
+        p: {xs: 1, sm: 1.5},
+        m: 'auto',
+        backgroundColor: current===type?'text.primary':'text.disabled'
+    }
     return(
         <Paper
             component={ButtonBase}
@@ -55,25 +64,25 @@ const MintingTypeButton = (props)=>{
             }
             {
                 type==="PSRC"&&
-                <Box sx={{ width: {xs: 35, sm: 50}, height: {xs: 35, sm: 50}, borderRadius: 2, p: {xs: 1, sm: 1.5}, m: 'auto', backgroundColor: current===type?'text.primary':'text.disabled' }}>
-                    <Box draggable = {false} component="img" src="/static/logo-icon.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26} }} />
+                <Box sx={commonSx}>
+                    <Box draggable = {false} component="img" src="/static/logo-icon.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26}, filter: current===type?'none':'brightness(5)' }} />
                 </Box>
             }
             {
                 type==="FSTK"&&
-                <Box sx={{ width: {xs: 35, sm: 50}, height: {xs: 35, sm: 50}, borderRadius: 2, p: {xs: 1, sm: 1.5}, m: 'auto', backgroundColor: current===type?'text.primary':'text.disabled' }}>
+                <Box sx={commonSx}>
                     <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26} }} />
                 </Box>
             }
             {
                 type==="Choose"&&
-                <Box sx={{ width: {xs: 35, sm: 50}, height: {xs: 35, sm: 50}, borderRadius: 2, p: {xs: 1, sm: 1.5}, m: 'auto', backgroundColor: current===type?'text.primary':'text.disabled' }}>
-                    <Box draggable = {false} component="img" src="/static/collection.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26} }} />
+                <Box sx={commonSx}>
+                    <Box draggable = {false} component="img" src="/static/collection.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26}, filter: current===type&&themeMode==='dark'?'invert(.7)':'none' }} />
                 </Box>
             }
             {
                 type==="ERC-1155"&&
-                <Box sx={{ width: {xs: 35, sm: 50}, height: {xs: 35, sm: 50}, borderRadius: 2, p: {xs: .7, sm: 1}, m: 'auto', backgroundColor: current===type?'text.primary':'text.disabled' }}>
+                <Box sx={{ ...commonSx, p: {xs: .7, sm: 1} }}>
                     <AddIcon sx={{ fontSize: {xs: 24.5, sm: 34}, color: 'white' }} />
                 </Box>
             }
