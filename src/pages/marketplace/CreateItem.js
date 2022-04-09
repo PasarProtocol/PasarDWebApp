@@ -30,8 +30,7 @@ import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
 import MintDlg from '../../components/dialog/Mint';
 import AccessDlg from '../../components/dialog/Access';
-import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL} from '../../config'
-import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
+import ChooseCollectionDlg from '../../components/dialog/ChooseCollection';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ProgressBar from '../../components/ProgressBar'
 import StartingDateSelect from '../../components/marketplace/StartingDateSelect'
@@ -39,6 +38,10 @@ import ExpirationDateSelect from '../../components/marketplace/ExpirationDateSel
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import CoinTypeLabel from '../../components/CoinTypeLabel';
 
+import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
+import {TOKEN_721_ABI} from '../../abi/token721ABI'
+import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
+import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL} from '../../config'
 import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice } from '../../utils/common';
 import {requestSigndataOnTokenID} from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
@@ -64,6 +67,7 @@ const LoadingButtonStyled = styled(LoadingButton)(({ theme }) => ({
     backgroundColor: theme.palette.action.active
   }:{}
 }));
+const ercAbiArr = [TOKEN_721_ABI, TOKEN_1155_ABI]
 // ----------------------------------------------------------------------
 
 export default function CreateItem() {
@@ -71,6 +75,8 @@ export default function CreateItem() {
   const [itemtype, setItemType] = React.useState("General");
   const [saletype, setSaleType] = React.useState("FixedPrice");
   const [collection, setCollection] = React.useState("PSRC");
+  const [selectedCollection, handleChooseCollection] = React.useState("");
+  const [selectedERCtype, setSelectedERCtype] = React.useState(1);
   const [file, setFile] = React.useState(null);
   const [files, setFiles] = React.useState([]);
   const [singleName, setSingleName] = React.useState("");
@@ -97,6 +103,7 @@ export default function CreateItem() {
   const [currentPromise, setCurrentPromise] = React.useState(null);
   const [coinType, setCoinType] = React.useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
+  const [chooseCollectionOpen, setChooseCollectionOpen] = React.useState(false);
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
   const { enqueueSnackbar } = useSnackbar();
   
@@ -329,7 +336,10 @@ export default function CreateItem() {
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           // console.log(accounts)
-          const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
+          let stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
+          if(collection === 'Choose')
+            stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection)
+
           setProgress(progressStep(50, index))
           walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
             console.log("Gas price:", gasPrice); 
@@ -344,7 +354,18 @@ export default function CreateItem() {
             };
             setProgress(progressStep(60, index))
             setReadySignForMint(true)
-            stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee).send(transactionParams)
+
+            let mintMethod
+            if(collection === 'Choose') {
+              if(selectedERCtype === 0) // ERC721
+                mintMethod = stickerContract.methods.mint(paramObj._id, paramObj._uri)
+              else // ERC1155
+                mintMethod = stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri)
+            }
+            else
+              mintMethod = stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee)
+            
+            mintMethod.send(transactionParams)
               .on('receipt', (receipt) => {
                   setReadySignForMint(false)
                   console.log("receipt", receipt);
@@ -729,6 +750,7 @@ export default function CreateItem() {
     fixedHeight = isMobile?APP_BAR_MOBILE:fixedHeight
     window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
   }
+  
   let duproperties = {};
   singleProperties.forEach((item,index) => {
     if(!item.type.length) return
@@ -736,11 +758,11 @@ export default function CreateItem() {
     duproperties[item.type].push(index);
   });
   duproperties = Object.keys(duproperties)
-  .filter(key => duproperties[key].length>1)
-  .reduce((obj, key) => {
-    obj.push(key)
-    return obj
-  }, []);
+    .filter(key => duproperties[key].length>1)
+    .reduce((obj, key) => {
+      obj.push(key)
+      return obj
+    }, []);
 
   const handleMintAction = (e) => {
     setOnValidation(true)
@@ -774,11 +796,7 @@ export default function CreateItem() {
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
               <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{setCollection("PSRC")}} current={collection}/>
-              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                <div>
-                  <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose")}} current={collection} disabled={1&&true}/>
-                </div>
-              </Tooltip>
+              <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose"); setChooseCollectionOpen(true);}} current={collection}/>
               {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
                   <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
@@ -797,7 +815,10 @@ export default function CreateItem() {
                   <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype} disabled={Boolean(true)}/>
                 </div>
               </Tooltip>
-              <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
+              {
+                !(collection==="Choose" && selectedERCtype===0) && 
+                <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
+              }
             </Stack>
           </Grid>
           <Grid item xs={12}>
@@ -1307,6 +1328,13 @@ export default function CreateItem() {
       </Container>
       <MintDlg totalSteps={isPutOnSale?2:1}/>
       <AccessDlg/>
+      <ChooseCollectionDlg 
+        isOpen={chooseCollectionOpen}
+        setOpen={setChooseCollectionOpen}
+        thisCollection = {selectedCollection}
+        handleChoose = {handleChooseCollection}
+        setERCtype = {setSelectedERCtype}
+      />
     </RootStyle>
   );
 }
