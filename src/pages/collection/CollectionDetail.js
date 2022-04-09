@@ -31,7 +31,7 @@ import AddressPaper from '../../components/AddressPaper';
 import StatisticPanel from '../../components/collection/StatisticPanel'
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import Badge from '../../components/Badge';
-import { fetchFrom, getIpfsUrl, reduceHexAddress } from '../../utils/common';
+import { fetchFrom, getIpfsUrl, reduceHexAddress, getDidInfoFromAddress } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -86,6 +86,7 @@ export default function CollectionDetail() {
   const [isLoadingCollection, setLoadingCollection] = React.useState(true);
   const [collection, setCollection] = React.useState({});
   const [metaObj, setMetaObj] = React.useState({});
+  const [didName, setDidName] = React.useState('');
   const [assets, setAssets] = React.useState([]);
   const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
   const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
@@ -126,6 +127,12 @@ export default function CollectionDetail() {
       .then((response) => {
         response.json().then((jsonAssets) => {
           setCollection(jsonAssets.data);
+          getDidInfoFromAddress(jsonAssets.data.owner)
+            .then((info) => {
+              if(info.name)
+                setDidName(info.name)
+            })
+            .catch((e) => {})
           const metaUri = getIpfsUrl(jsonAssets.data.uri)
           if(metaUri) {
             fetch(metaUri)
@@ -395,6 +402,12 @@ export default function CollectionDetail() {
               <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
                 {collection.name}
               </Typography>
+              {
+                !!didName&&
+                <Typography variant="body2" component='div' align='center'>
+                  by <Typography variant="body2" color='origin.main' sx={{ display: 'inline'}}>{didName}</Typography>
+                </Typography>
+              }
               <Stack spacing={2}>
                 {
                   !!collection.owner && !!collection.token &&
