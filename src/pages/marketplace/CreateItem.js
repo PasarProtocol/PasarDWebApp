@@ -336,9 +336,12 @@ export default function CreateItem() {
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           // console.log(accounts)
+          let baseAddress = CONTRACT_ADDRESS
           let stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
-          if(collection === 'Choose')
+          if(collection === 'Choose') {
             stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection)
+            baseAddress = selectedCollection
+          }
 
           setProgress(progressStep(50, index))
           walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
@@ -364,7 +367,12 @@ export default function CreateItem() {
             }
             else
               mintMethod = stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee)
-            
+            const commonArgs = {
+              '_baseAddress': baseAddress,
+              '_amount': _tokenSupply,
+              'beforeSendFunc': ()=>{setReadySignForMint(true)},
+              'afterSendFunc': ()=>{setReadySignForMint(false)}
+            }
             mintMethod.send(transactionParams)
               .on('receipt', (receipt) => {
                   setReadySignForMint(false)
@@ -384,10 +392,8 @@ export default function CreateItem() {
                                 if(saletype === 'FixedPrice')
                                   callContractMethod('createOrderForSale', coinType, {
                                     ...paramObj,
-                                    '_amount': _tokenSupply,
-                                    '_price': BigInt(price*1e18).toString(),
-                                    'beforeSendFunc': ()=>{setReadySignForMint(true)},
-                                    'afterSendFunc': ()=>{setReadySignForMint(false)}
+                                    ...commonArgs,
+                                    '_price': BigInt(price*1e18).toString()
                                   }).then((success) => {
                                     resolve(success)
                                   }).catch(error=>{
@@ -396,13 +402,11 @@ export default function CreateItem() {
                                 else
                                   callContractMethod('createOrderForAuction', coinType, {
                                     ...paramObj,
-                                    '_amount': _tokenSupply,
+                                    ...commonArgs,
                                     '_minPrice': BigInt(price*1e18).toString(),
                                     '_reservePrice': BigInt(reservePrice*1e18).toString(),
                                     '_buyoutPrice': BigInt(buynowPrice*1e18).toString(),
-                                    '_endTime': (expirationDate.getTime()/1000).toFixed(),
-                                    'beforeSendFunc': ()=>{setReadySignForMint(true)},
-                                    'afterSendFunc': ()=>{setReadySignForMint(false)}
+                                    '_endTime': (expirationDate.getTime()/1000).toFixed()
                                   }).then((success) => {
                                     resolve(success)
                                   }).catch(error=>{
@@ -420,10 +424,8 @@ export default function CreateItem() {
                         if(saletype === 'FixedPrice')
                           callContractMethod('createOrderForSale', coinType, {
                             ...paramObj,
-                            '_amount': _tokenSupply,
-                            '_price': BigInt(price*1e18).toString(),
-                            'beforeSendFunc': ()=>{setReadySignForMint(true)},
-                            'afterSendFunc': ()=>{setReadySignForMint(false)}
+                            ...commonArgs,
+                            '_price': BigInt(price*1e18).toString()
                           }).then((success) => {
                             resolve(success)
                           }).catch(error=>{
@@ -432,13 +434,11 @@ export default function CreateItem() {
                         else
                           callContractMethod('createOrderForAuction', coinType, {
                             ...paramObj,
-                            '_amount': _tokenSupply,
+                            ...commonArgs,
                             '_minPrice': BigInt(price*1e18).toString(),
                             '_reservePrice': BigInt(reservePrice*1e18).toString(),
                             '_buyoutPrice': BigInt(buynowPrice*1e18).toString(),
-                            '_endTime': (expirationDate.getTime()/1000).toFixed(),
-                            'beforeSendFunc': ()=>{setReadySignForMint(true)},
-                            'afterSendFunc': ()=>{setReadySignForMint(false)}
+                            '_endTime': (expirationDate.getTime()/1000).toFixed()
                           }).then((success) => {
                             resolve(success)
                           }).catch(error=>{

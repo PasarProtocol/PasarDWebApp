@@ -316,14 +316,14 @@ export function callContractMethod(type, coinType, paramObj) {
             let method = null;
             if (type === 'createOrderForSale') {
               console.log('createOrderForSale');
-              const { _id, _amount, _price, _didUri } = paramObj;
-              console.log(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri)
-              method = marketContract.methods.createOrderForSale(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri);
+              const { _id, _amount, _price, _didUri, _baseAddress = STICKER_ADDRESS } = paramObj;
+              console.log(_baseAddress, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri)
+              method = marketContract.methods.createOrderForSale(_baseAddress, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri);
             } else if (type === 'createOrderForAuction') {
               console.log('createOrderForAuction');
-              const { _id, _amount, _minPrice, _reservePrice, _buyoutPrice, _endTime, _didUri } = paramObj;
-              console.log(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _minPrice, _reservePrice, _buyoutPrice, (new Date().getTime()/1000).toFixed(), _endTime, _didUri)
-              method = marketContract.methods.createOrderForAuction(STICKER_ADDRESS, _id, _amount, pricingContract[coinType], _minPrice, _reservePrice, _buyoutPrice, (new Date().getTime()/1000).toFixed(), _endTime, _didUri);
+              const { _id, _amount, _minPrice, _reservePrice, _buyoutPrice, _endTime, _didUri, _baseAddress = STICKER_ADDRESS } = paramObj;
+              console.log(_baseAddress, _id, _amount, pricingContract[coinType], _minPrice, _reservePrice, _buyoutPrice, (new Date().getTime()/1000).toFixed(), _endTime, _didUri)
+              method = marketContract.methods.createOrderForAuction(_baseAddress, _id, _amount, pricingContract[coinType], _minPrice, _reservePrice, _buyoutPrice, (new Date().getTime()/1000).toFixed(), _endTime, _didUri);
             } else if (type === 'buyOrder') {
               console.log('buyOrder');
               const { _orderId, _didUri } = paramObj;
