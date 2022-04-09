@@ -292,7 +292,7 @@ export default function AssetCard(props) {
             </Box>
           </Stack>
           {
-            orderType===auctionOrderType&&
+            orderType===auctionOrderType && endTime &&
             <TimeCountBoxStyle>
               {
                 auctionEnded?
