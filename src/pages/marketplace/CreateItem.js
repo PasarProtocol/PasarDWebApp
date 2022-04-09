@@ -115,6 +115,7 @@ export default function CreateItem() {
   const uploadRef = React.useRef();
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
+  const priceRef = React.useRef();
   const navigate = useNavigate();
   
   React.useEffect(async () => {
@@ -772,6 +773,14 @@ export default function CreateItem() {
       scrollToRef(nameRef)
     else if(!description.length)
       scrollToRef(descriptionRef)
+    else if(isPutOnSale && !price)
+      scrollToRef(priceRef)
+    else if(isPutOnSale && reservePrice.length && price>reservePrice)
+      enqueueSnackbar('Starting price must be less than Reserve price.', { variant: 'warning' });
+    else if(isPutOnSale && buyoutPrice.length && price>=buyoutPrice)
+      enqueueSnackbar('Starting price must be less than Buy Now price.', { variant: 'warning' });
+    else if(isPutOnSale && reservePrice.length && buyoutPrice.length && reservePrice>=buyoutPrice)
+      enqueueSnackbar('Reserve price must be less than Buy Now price.', { variant: 'warning' });
     else
       if(mintype!=="Batch"){
         if(duproperties.length || singleProperties.filter(el=>el.type.length>0&&!el.name.length).length)
@@ -965,11 +974,11 @@ export default function CreateItem() {
                 (
                   saletype==="FixedPrice"?
                   <>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} ref={priceRef}>
                       <Typography variant="h4" sx={{fontWeight: 'normal'}}>Price</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                      <FormControl variant="standard" sx={{width: '100%'}}>
+                      <FormControl error={isOnValidation&&isPutOnSale&&!price} variant="standard" sx={{width: '100%'}}>
                         <InputLabelStyle htmlFor="input-with-price">
                           Enter a fixed price of each item
                         </InputLabelStyle>
@@ -982,7 +991,9 @@ export default function CreateItem() {
                           endAdornment={
                             <CoinSelect selected={coinType} onChange={setCoinType}/>
                           }
+                          aria-describedby="price-error-text"
                         />
+                        <FormHelperText id="price-error-text" hidden={!isOnValidation||(isOnValidation&&isPutOnSale&&price)}>Price is required</FormHelperText>
                       </FormControl>
                       <Divider/>
                       <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Platform fee 2%&nbsp;
@@ -1001,11 +1012,11 @@ export default function CreateItem() {
                   </>:
 
                   <>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} ref={priceRef}>
                       <Typography variant="h4" sx={{fontWeight: 'normal'}}>Starting Price</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                      <FormControl variant="standard" sx={{width: '100%'}}>
+                      <FormControl error={isOnValidation&&isPutOnSale&&!price} variant="standard" sx={{width: '100%'}}>
                         <InputLabelStyle htmlFor="input-with-price">
                           Enter starting price
                         </InputLabelStyle>
@@ -1018,7 +1029,9 @@ export default function CreateItem() {
                           endAdornment={
                             <CoinSelect selected={coinType} onChange={setCoinType}/>
                           }
+                          aria-describedby="price-error-text"
                         />
+                        <FormHelperText id="price-error-text" hidden={!isOnValidation||(isOnValidation&&isPutOnSale&&price)}>Price is required</FormHelperText>
                       </FormControl>
                       <Divider/>
                       <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>Bids below this amount won't be allowed</Typography>
