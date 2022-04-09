@@ -41,7 +41,7 @@ import CoinTypeLabel from '../../components/CoinTypeLabel';
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import {TOKEN_721_ABI} from '../../abi/token721ABI'
 import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
-import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL} from '../../config'
+import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL, auctionOrderType} from '../../config'
 import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice } from '../../utils/common';
 import {requestSigndataOnTokenID} from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
@@ -85,7 +85,7 @@ export default function CreateItem() {
   const [isPutOnSale, setPutOnSale] = React.useState(false);
   const [isBuynowForAuction, setBuynowForAuction] = React.useState(false);
   const [isReserveForAuction, setReserveForAuction] = React.useState(false);
-  const [buynowPrice, setBuynowPrice] = React.useState('');
+  const [buyoutPrice, setBuyoutPrice] = React.useState('');
   const [reservePrice, setReservePrice] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [quantity, setQuantity] = React.useState(1);
@@ -228,7 +228,7 @@ export default function CreateItem() {
 
   const handleBuynowForAuction = (event) => {
     if(!event.target.checked)
-      setBuynowPrice('')
+      setBuyoutPrice('')
     setBuynowForAuction(event.target.checked);
   };
 
@@ -255,12 +255,12 @@ export default function CreateItem() {
     setReservePrice(priceValue)
   };
 
-  const handleChangeBuynowPrice = (event) => {
+  const handleChangeBuyoutPrice = (event) => {
     let priceValue = event.target.value
     if(priceValue<0)
       return
     priceValue = removeLeadingZero(priceValue)
-    setBuynowPrice(priceValue)
+    setBuyoutPrice(priceValue)
   };
 
   const handleChangeRoyalties = (event) => {
@@ -405,7 +405,7 @@ export default function CreateItem() {
                                     ...commonArgs,
                                     '_minPrice': BigInt(price*1e18).toString(),
                                     '_reservePrice': BigInt(reservePrice*1e18).toString(),
-                                    '_buyoutPrice': BigInt(buynowPrice*1e18).toString(),
+                                    '_buyoutPrice': BigInt(buyoutPrice*1e18).toString(),
                                     '_endTime': (expirationDate.getTime()/1000).toFixed()
                                   }).then((success) => {
                                     resolve(success)
@@ -437,7 +437,7 @@ export default function CreateItem() {
                             ...commonArgs,
                             '_minPrice': BigInt(price*1e18).toString(),
                             '_reservePrice': BigInt(reservePrice*1e18).toString(),
-                            '_buyoutPrice': BigInt(buynowPrice*1e18).toString(),
+                            '_buyoutPrice': BigInt(buyoutPrice*1e18).toString(),
                             '_endTime': (expirationDate.getTime()/1000).toFixed()
                           }).then((success) => {
                             resolve(success)
@@ -810,15 +810,15 @@ export default function CreateItem() {
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
               <MintingTypeButton type="Single" description="Single item" onClick={()=>{setMintType("Single")}} current={mintype}/>
-              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                <div>
-                  <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype} disabled={Boolean(true)}/>
-                </div>
-              </Tooltip>
               {
                 !(collection==="Choose" && selectedERCtype===0) && 
-                <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
+                <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+                  <div>
+                    <MintingTypeButton type="Multiple" description="Multiple identical items" onClick={()=>{setMintType("Multiple")}} current={mintype} disabled={Boolean(true)}/>
+                  </div>
+                </Tooltip>
               }
+              <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
             </Stack>
           </Grid>
           <Grid item xs={12}>
@@ -1105,8 +1105,8 @@ export default function CreateItem() {
                             <InputStyle
                               type="number"
                               id="input-buynow-price"
-                              value={buynowPrice}
-                              onChange={handleChangeBuynowPrice}
+                              value={buyoutPrice}
+                              onChange={handleChangeBuyoutPrice}
                               startAdornment={' '}
                               endAdornment={
                                 <CoinTypeLabel type={coinType}/>
@@ -1287,7 +1287,8 @@ export default function CreateItem() {
                         name={singleName}
                         type={0}
                         collection={0}
-                        {...{description, price, coinType, quantity, coinUSD}}
+                        orderType={saletype==='Auction'?auctionOrderType:1}
+                        {...{description, price, coinType, quantity, coinUSD, reservePrice, buyoutPrice}}
                       />
                     )
                   )
@@ -1309,7 +1310,8 @@ export default function CreateItem() {
                     ):(
                       <MultiMintGrid
                         assets={previewFiles}
-                        {...{multiNames, description, quantity, price, coinType, coinUSD}}
+                        orderType={saletype==='Auction'?auctionOrderType:1}
+                        {...{multiNames, description, quantity, price, coinType, coinUSD, reservePrice, buyoutPrice}}
                       />
                     )
                   )

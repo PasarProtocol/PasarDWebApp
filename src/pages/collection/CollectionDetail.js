@@ -133,6 +133,7 @@ export default function CollectionDetail() {
                 setDidName(info.name)
             })
             .catch((e) => {})
+          
           const metaUri = getIpfsUrl(jsonAssets.data.uri)
           if(metaUri) {
             fetch(metaUri)
