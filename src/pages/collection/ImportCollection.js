@@ -61,6 +61,7 @@ export default function ImportCollection() {
   const [avatarFile, setAvatarFile] = React.useState(null);
   const [backgroundFile, setBackgroundFile] = React.useState(null);
   const [isOnValidation, setOnValidation] = React.useState(false);
+  const [isFilledAddress, setFilledAddress] = React.useState(false);
   const [recipientRoyaltiesGroup, setRecipientRoyaltiesGroup] = React.useState([{address: '', royalties: ''}]);
   const [socialUrl, setSocialUrl] = React.useState({website: '', twitter: '', discord: '', telegram: '', medium: ''});
   const [onProgress, setOnProgress] = React.useState(false);
@@ -103,6 +104,8 @@ export default function ImportCollection() {
       if(contractAddress===inputAddress.substring(0,42))
         return
       getCollectionInfo(inputAddress.substring(0,42))
+    } else {
+      setFilledAddress(false)
     }
     setContractAddress(inputAddress.substring(0,42))
   }
@@ -179,6 +182,7 @@ export default function ImportCollection() {
     }).catch(e=>{
       setCollectionInfo({name: '', symbol: ''})
       setAutoLoaded(false)
+      setFilledAddress(true)
     })
   }
   const sendIpfsImage = (f)=>(
@@ -400,7 +404,7 @@ export default function ImportCollection() {
           </Grid>
           <Grid item xs={12} sm={8} ref={contractRef}>
             <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Contract/Collection Address</Typography>
-            <FormControl error={isOnValidation&&(!contractAddress.length||!autoLoaded)} variant="standard" sx={{width: '100%'}}>
+            <FormControl error={(isOnValidation&&(!contractAddress.length||!autoLoaded))||(isFilledAddress&&!autoLoaded)} variant="standard" sx={{width: '100%'}}>
               <InputLabelStyle htmlFor="input-with-address">
                 Enter your ERC-721 or ERC-1155 contract/collection address
               </InputLabelStyle>
@@ -412,7 +416,16 @@ export default function ImportCollection() {
                 onChange={handleInputAddress}
                 aria-describedby="address-error-text"
               />
-              <FormHelperText id="address-error-text" hidden={!isOnValidation||(isOnValidation&&contractAddress.length>0&&autoLoaded)}>Address is required</FormHelperText>
+              <FormHelperText
+                id="address-error-text"
+                hidden={
+                  !(isOnValidation&&(!contractAddress.length||!autoLoaded))&&!(isFilledAddress&&!autoLoaded)
+                }
+              >
+                {
+                  isFilledAddress&&!autoLoaded?"Address not found":"Address is required"
+                }
+              </FormHelperText>
             </FormControl>
             <Divider/>
           </Grid>
