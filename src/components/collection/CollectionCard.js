@@ -1,12 +1,15 @@
 import React from 'react';
 import * as math from 'mathjs';
 import Imgix from "react-imgix";
+import jwtDecode from 'jwt-decode';
 import { alpha, styled } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { motion } from "framer-motion";
 import { Icon } from '@iconify/react';
+import editIcon from '@iconify-icons/akar-icons/edit';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip } from '@mui/material';
-import jwtDecode from 'jwt-decode';
 
 import PaperRecord from '../PaperRecord';
 // import Badge from '../Badge';
@@ -45,6 +48,14 @@ const paperStyle = {
     transform: 'scale(1.2)'
   }
 }
+const forceHoverStyle = {
+  boxShadow: '0 4px 8px 0px rgb(0 0 0 / 30%)',
+  transform: 'translateY(-4px)',
+  '& .cover-image': {
+    OTransform: 'scale(1.2)',
+    transform: 'scale(1.2)'
+  },
+}
 const MarkBoxStyle = styled(Box)(({ theme }) => ({
   ...avatarStyle,
   borderColor: theme.palette.background.paper,
@@ -68,10 +79,11 @@ const CollectionImgBox = (props) => {
   const imageStyle = {
     // borderRadius: 1,
     // boxShadow: (theme)=>theme.customShadows.z16,
-    display: 'inline-flex',
     // maxHeight: '100%',
+    display: 'inline-flex',
     height: '100%',
   }
+
   return (
     <Stack sx={{position: 'relative', height: '120px', mb: '25px'}}>
       <Stack sx={{height: '100%', overflow: 'hidden'}}>
@@ -101,11 +113,12 @@ const CollectionImgBox = (props) => {
 };
 
 const CollectionCardPaper = (props) => {
-  const { info, isPreview, isOnSlider } = props
+  const { info, isPreview, isOnSlider, isOwned=false } = props
   const { name, uri='', owner='' } = info
   let { description='', avatar='', background='' } = info
   const [didName, setDidName] = React.useState('');
   const [metaObj, setMetaObj] = React.useState({});
+  const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
 
   React.useEffect(() => {
@@ -153,26 +166,50 @@ const CollectionCardPaper = (props) => {
         })
         .catch((e) => {})
   }, [owner]);
+  
+  const openPopupMenu = (event) => {
+    event.preventDefault()
+    setOpenPopup(event.currentTarget);
+  };
+
+  const handleClosePopup = (event) => {
+    event.preventDefault()
+    setOpenPopup(null);
+  };
+
   return (
-      <PaperRecord sx={isPreview?{ overflow: 'hidden' } : { overflow: 'hidden', ...paperStyle }}>
+      <PaperRecord sx={isPreview?{ overflow: 'hidden' } : { overflow: 'hidden', ...paperStyle, ...(isOpenPopup?forceHoverStyle:{}) }}>
         <Box>
-        {
-          // isLink?(
-          //   <Link
-          //     component={RouterLink}
-          //     to={`/collection/detail/${tokenId}`}
-          //     alt=""
-          //     underline="none"
-          //   >
-          //     <CardImgBox
-          //       src={props.thumbnail}
-          //       {...props}
-          //     />
-          //   </Link>
-          // ):(
-            <CollectionImgBox avatar={avatar} backgroundImg={background}/>
-          // )
-        }
+          <CollectionImgBox avatar={avatar} backgroundImg={background}/>
+          {
+            isOwned&&
+            <Box sx={{position: 'absolute', right: 10, top: 10}}>
+              <IconButton
+                color="inherit"
+                size="small"
+                sx={{background: '#ffffff80'}}
+                onClick={openPopupMenu}
+              >
+                <MoreHorizIcon />
+              </IconButton>
+              <Menu 
+                keepMounted
+                id="simple-menu"
+                anchorEl={isOpenPopup}
+                onClose={handleClosePopup}
+                open={Boolean(isOpenPopup)}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              >
+                <MenuItem onClick={handleClosePopup}>
+                  <AddCircleOutlineIcon/>&nbsp;Create Item
+                </MenuItem>
+                <MenuItem onClick={handleClosePopup}>
+                  <Icon icon={editIcon} width={24}/>&nbsp;Edit Collection
+                </MenuItem>
+              </Menu>
+            </Box>
+          }
         </Box>
         <Box sx={{p:2}}>
           <Stack direction="column" sx={{justifyContent: 'center', textAlign: 'center'}}>
