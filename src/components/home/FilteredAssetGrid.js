@@ -126,7 +126,7 @@ const AssetGroupSlider = (props)=>{
                 coinUSD={coinPrice[coinType]}
                 coinType={coinType}
                 isDragging={isDragging}
-                collection={getCollectionTypeFromImageUrl(item)}
+                defaultCollectionType={getCollectionTypeFromImageUrl(item)}
               />
             </Box>
           })

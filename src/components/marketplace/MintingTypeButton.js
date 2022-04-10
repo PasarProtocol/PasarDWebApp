@@ -14,7 +14,7 @@ const SvgStyle = styled('svg')(({ theme }) => ({
 }));
 
 const MintingTypeButton = (props)=>{
-    const {type, description, current, disabled=false} = props
+    const {type, description, current, disabled=false, selectedCollection} = props
     const { themeMode } = useSettings();
     const commonSx = {
         width: {xs: 35, sm: 50},
@@ -76,9 +76,17 @@ const MintingTypeButton = (props)=>{
             }
             {
                 type==="Choose"&&
-                <Box sx={commonSx}>
-                    <Box draggable = {false} component="img" src="/static/collection.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26}, filter: current===type&&themeMode==='dark'?'invert(.7)':'none' }} />
-                </Box>
+                <>
+                {
+                    selectedCollection.avatar.length?
+                    <Box sx={{...commonSx, p: 0, overflow: 'hidden'}}>
+                        <Box draggable = {false} component="img" src={selectedCollection.avatar} sx={{ width: {xs: 35, sm: 50}, height: {xs: 35, sm: 50} }} />:
+                    </Box>:
+                    <Box sx={commonSx}>
+                        <Box draggable = {false} component="img" src="/static/collection.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26}, filter: current===type&&themeMode==='dark'?'invert(.7)':'none' }} />
+                    </Box>
+                }
+                </>
             }
             {
                 type==="ERC-1155"&&
@@ -86,8 +94,17 @@ const MintingTypeButton = (props)=>{
                     <AddIcon sx={{ fontSize: {xs: 24.5, sm: 34}, color: 'white' }} />
                 </Box>
             }
-            <Typography variant="body2" sx={{ fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1.6, sm: 3} }}>{type}</Typography>
-            <Typography variant="body2" sx={{ height: 30, fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1, sm: ''} }}>{description}</Typography>
+            <Typography variant="body2" sx={{ fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1.6, sm: 3} }}>
+                {
+                    type==="Choose"&&selectedCollection.avatar.length?'TEMP':type
+                    // type==="Choose"&&selectedCollection.avatar.length?selectedCollection.symbol:type
+                }
+            </Typography>
+            <Typography variant="body2" sx={{ height: 30, fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1, sm: ''} }}>
+                {
+                    type==="Choose"&&selectedCollection.avatar.length?selectedCollection.name:description
+                }
+            </Typography>
         </Paper>
     )
 }
