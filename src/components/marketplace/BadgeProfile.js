@@ -83,7 +83,7 @@ export default function BadgeProfile(props) {
                 <Box draggable = {false} component="img" src={avatar} sx={{ width: 24 }} />
               </Box>:
 
-              <Box sx={{ width: 26, height: 26, borderRadius: 2, display: 'flex', overflow: 'hidden' }}>
+              <Box sx={{ width: 26, height: 26, borderRadius: 2, backgroundColor: 'black', display: 'flex', overflow: 'hidden' }}>
                 <Box draggable = {false} component="img" src={avatar} sx={{ width: 26 }} />
               </Box>
             }

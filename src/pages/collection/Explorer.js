@@ -13,7 +13,7 @@ import { essentialsConnector } from '../../components/signin-dlg/EssentialConnec
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
-import MyItemsSortSelect from '../../components/MyItemsSortSelect';
+import CollectionSortSelect from '../../components/CollectionSortSelect';
 import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import Jazzicon from '../../components/Jazzicon';
@@ -49,7 +49,7 @@ export default function Explorer() {
     const { signal } = newController;
     setAbortController(newController);
     setLoadingCollections(true);
-    fetchFrom('api/v2/sticker/getCollection', { signal })
+    fetchFrom(`api/v2/sticker/getCollection?orderType=${orderType}`, { signal })
       .then((response) => {
         response.json().then((jsonAssets) => {
           setCollections(jsonAssets.data);
@@ -86,7 +86,7 @@ export default function Explorer() {
             Collections
           </Typography>
         </Box>
-        <Stack direction='row' sx={{mb: 1}}>
+        <Stack direction='row' sx={{mb: 2}}>
           <Typography variant="subtitle2" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
             {collections.length} collections
           </Typography>
@@ -97,7 +97,7 @@ export default function Explorer() {
             <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
               Import
             </StyledButton>
-            <MyItemsSortSelect onChange={setOrderType} />
+            <CollectionSortSelect onChange={setOrderType} />
           </Stack>
         </Stack>
         <Grid container spacing={2}>
