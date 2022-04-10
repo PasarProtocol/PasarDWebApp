@@ -32,8 +32,8 @@ import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
 import BadgeProfile from './BadgeProfile'
 import StyledButton from '../signin-dlg/StyledButton';
-import { auctionOrderType } from '../../config';
-import { getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
+import { auctionOrderType, stickerContract as STICKER_ADDRESS } from '../../config';
+import { getDiaTokenInfo, getCredentialInfo, coinTypes, fetchFrom, collectionTypes, getIpfsUrl } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
@@ -50,9 +50,14 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 export default function AssetCard(props) {
-  const { name="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId, orderType, endTime, currentBid,
-   saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, collection, isDragging=false, reservePrice=0, buyoutPrice=0 } = props
-  const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
+  const { name="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId, orderType, endTime, currentBid, baseToken='',
+   saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, defaultCollectionType, isDragging=false, reservePrice=0, buyoutPrice=0 } = props
+  const defaultCollection = {
+    ...collectionTypes[defaultCollectionType],
+    token: STICKER_ADDRESS,
+    description: collectionTypes[defaultCollectionType].shortDescription
+  }
+  const [collection, setCollection] = React.useState(defaultCollection);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [sellOpen, setOpenSell] = React.useState(false);
   const [auctionOpen, setOpenAuction] = React.useState(false);
@@ -63,6 +68,7 @@ export default function AssetCard(props) {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [auctionEnded, setAuctionEnded] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
+  const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   
   const isCreatedByMe = myaddress===royaltyOwner
   const isListedOwnedByMe = (myaddress===royaltyOwner&&saleType==="Primary Sale") || (myaddress===holder&&saleType==="Secondary Sale")
@@ -84,6 +90,36 @@ export default function AssetCard(props) {
     const interval = setInterval(()=>checkHasEnded(), 1000)
     return () => clearInterval(interval);
   }, []);
+
+  React.useEffect(() => {
+    if(baseToken && baseToken===STICKER_ADDRESS) {
+      setCollection(defaultCollection);
+    }
+    else if(baseToken && baseToken!==STICKER_ADDRESS) {
+      fetchFrom(`api/v2/sticker/getCollection/${baseToken}`)
+        .then((response) => {
+          response.json().then((jsonAssets) => {
+            if(!jsonAssets.data)
+              return
+            setCollection(jsonAssets.data);
+            const metaUri = getIpfsUrl(jsonAssets.data.uri)
+            if(metaUri) {
+              fetch(metaUri)
+                .then(response => response.json())
+                .then(data => {
+                  setCollection((prevState)=>{
+                    const tempState = {...prevState}
+                    tempState.avatar = getIpfsUrl(data.data.avatar)
+                    tempState.description = data.data.description
+                    return tempState
+                  });
+                });
+            }
+          }).catch((e) => {
+          });
+        })
+    }
+  }, [baseToken]);
 
   const checkHasEnded  = () => {
     const tempEndTime = endTime*1000

@@ -75,7 +75,7 @@ export default function CreateItem() {
   const [itemtype, setItemType] = React.useState("General");
   const [saletype, setSaleType] = React.useState("FixedPrice");
   const [collection, setCollection] = React.useState("PSRC");
-  const [selectedCollection, handleChooseCollection] = React.useState("");
+  const [selectedCollection, handleChooseCollection] = React.useState({token: "", name: "", symbol: "", avatar: ""});
   const [selectedERCtype, setSelectedERCtype] = React.useState(1);
   const [file, setFile] = React.useState(null);
   const [files, setFiles] = React.useState([]);
@@ -340,8 +340,8 @@ export default function CreateItem() {
           let baseAddress = CONTRACT_ADDRESS
           let stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
           if(collection === 'Choose') {
-            stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection)
-            baseAddress = selectedCollection
+            stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection.token)
+            baseAddress = selectedCollection.token
           }
 
           setProgress(progressStep(50, index))
@@ -805,7 +805,7 @@ export default function CreateItem() {
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
               <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{setCollection("PSRC")}} current={collection}/>
-              <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose"); setChooseCollectionOpen(true);}} current={collection}/>
+              <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose"); setChooseCollectionOpen(true);}} current={collection} selectedCollection={selectedCollection}/>
               {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
                   <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
@@ -1299,7 +1299,8 @@ export default function CreateItem() {
                         thumbnail={isString(file) ? file : file.preview}
                         name={singleName}
                         type={0}
-                        collection={0}
+                        defaultCollectionType={0}
+                        baseToken={collection==="Choose"?selectedCollection.token:CONTRACT_ADDRESS}
                         orderType={saletype==='Auction'?auctionOrderType:1}
                         {...{description, price, coinType, quantity, coinUSD, reservePrice, buyoutPrice}}
                       />
@@ -1346,7 +1347,7 @@ export default function CreateItem() {
       <ChooseCollectionDlg 
         isOpen={chooseCollectionOpen}
         setOpen={setChooseCollectionOpen}
-        thisCollection = {selectedCollection}
+        // thisCollection = {selectedCollection}
         handleChoose = {handleChooseCollection}
         setERCtype = {setSelectedERCtype}
       />

@@ -55,7 +55,7 @@ const GridItems = (props) => {
               isLink={Boolean(true)}
               coinUSD={coinPrice[coinType]}
               coinType={coinType}
-              collection={getCollectionTypeFromImageUrl(item)}
+              defaultCollectionType={getCollectionTypeFromImageUrl(item)}
               {...props}
             />:
             <AssetCardSkeleton/>

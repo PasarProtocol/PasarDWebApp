@@ -24,8 +24,18 @@ const AvatarBoxStyle = {
   border: '2px solid transparent'
 }
 
+const DescriptionStyle = {
+  WebkitLineClamp: 3,
+  WebkitBoxOrient: 'vertical',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  display: '-webkit-box !important',
+  fontWeight: 'normal',
+  whiteSpace: 'pre-wrap',
+  wordWrap: 'break-word'
+}
 export default function BadgeProfile(props) {
-  const {type, walletAddress, badge, collection=0, reservePriceFlag=false, hasBuynow=false} = props
+  const {type, walletAddress, badge, collection={}, reservePriceFlag=false, hasBuynow=false} = props
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = React.useState(false);
   const [didInfo, setDidInfo] = useState({name: '', description: ''});
@@ -46,13 +56,13 @@ export default function BadgeProfile(props) {
     setOpen(false);
   };
 
-  let {name, shortDescription} = collectionTypes[collection]
-  const {avatar} = collectionTypes[collection]
-  let dispAddress = reduceHexAddress(STICKER_ADDRESS)
+  const {avatar, token} = collection
+  let {name, description} = collection
+  let dispAddress = reduceHexAddress(token)
   if(type===2){
     name = didInfo.name || reduceHexAddress(walletAddress)
     dispAddress = didInfo.name?reduceHexAddress(walletAddress):''
-    shortDescription = didInfo.description
+    description = didInfo.description
   }
 
   const badgeAction = type>=3?{}:{
@@ -66,9 +76,18 @@ export default function BadgeProfile(props) {
       <Box {...badgeAction}>
         {
           type===1&&
-          <Box sx={{ width: 26, height: 26, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
-            <Box draggable = {false} component="img" src={avatar} sx={{ width: 24 }} />
-          </Box>
+          <>
+            {
+              avatar&&avatar.startsWith('/static')?
+              <Box sx={{ width: 26, height: 26, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
+                <Box draggable = {false} component="img" src={avatar} sx={{ width: 24 }} />
+              </Box>:
+
+              <Box sx={{ width: 26, height: 26, borderRadius: 2, display: 'flex', overflow: 'hidden' }}>
+                <Box draggable = {false} component="img" src={avatar} sx={{ width: 26 }} />
+              </Box>
+            }
+          </>
         }
         {
           type===2&&
@@ -110,8 +129,8 @@ export default function BadgeProfile(props) {
                 <Box sx={{...AvatarBoxStyle}}>
                   {
                     type===1&&
-                    <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center' }}>
-                      <Box draggable = {false} component="img" src={avatar} sx={{ width: 35 }} />
+                    <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+                      <Box draggable = {false} component="img" src={avatar} sx={{ width: avatar&&avatar.startsWith('/static')?35:60 }} />
                     </Box>
                   }
                   {
@@ -144,8 +163,8 @@ export default function BadgeProfile(props) {
                   )
                 }
                 {
-                  shortDescription&&
-                  <Typography variant='subtitle2' sx={{fontWeight: 'normal', color: 'text.secondary', pt: 2, lineHeight: 1, fontSize: '0.925em'}}>{shortDescription}</Typography>
+                  description&&
+                  <Typography variant='subtitle2' sx={{fontWeight: 'normal', color: 'text.secondary', pt: 2, lineHeight: 1, fontSize: '0.925em', maxWidth: 270, ...DescriptionStyle}}>{description}</Typography>
                 }
                 {
                   type===2&&

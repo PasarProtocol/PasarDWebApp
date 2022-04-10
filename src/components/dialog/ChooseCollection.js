@@ -10,8 +10,8 @@ import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { reduceHexAddress, isInAppBrowser, fetchFrom, getIpfsUrl, getERCType } from '../../utils/common';
 
 export default function ChooseCollection(props) {
-  const { isOpen, setOpen, thisCollection, handleChoose, setERCtype } = props;
-  const [selectedCollection, setSelected] = React.useState(thisCollection);
+  const { isOpen, setOpen, handleChoose, setERCtype } = props;
+  const [selectedId, setSelectedId] = React.useState(-1);
   const [collections, setCollections] = React.useState([]);
 
   React.useEffect(async () => {
@@ -51,8 +51,8 @@ export default function ChooseCollection(props) {
   }, [collections]);
 
   const choose = () => {
-    getERCType(selectedCollection).then(setERCtype)
-    handleChoose(selectedCollection)
+    getERCType(collections[selectedId].token).then(setERCtype)
+    handleChoose(collections[selectedId])
     setOpen(false);
   }
 
@@ -91,7 +91,7 @@ export default function ChooseCollection(props) {
           {/* <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2, textAlign: 'center' }}> */}
           {
             collections.map((el, i)=>(
-              <ListItemButton key={i} onClick={()=>{setSelected(el.token)}} selected={selectedCollection === el.token}>
+              <ListItemButton key={i} onClick={()=>{setSelectedId(i)}} selected={selectedId === i}>
                 <Stack direction="row" alignItems="center" spacing={2}>
                   <Box
                       draggable = {false}
@@ -111,7 +111,7 @@ export default function ChooseCollection(props) {
                     </Typography>
                   </Box>
                   {
-                    selectedCollection === el.token &&
+                    selectedId === i &&
                     <Box sx={{color: 'origin.main'}}><Icon icon={checkCircleIcon} width={20}/></Box>
                   }
                 </Stack>
@@ -121,7 +121,7 @@ export default function ChooseCollection(props) {
           {/* </Box> */}
         </List>
         {
-          !!selectedCollection&&
+          selectedId>=0&&
           <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
             <StyledButton variant='contained' onClick={choose}>
               OK
