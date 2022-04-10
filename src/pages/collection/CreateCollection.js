@@ -563,7 +563,7 @@ export default function CreateCollection() {
             </Grid>
             {
               recipientRoyaltiesGroup.map((item, index)=>{
-                const addressErrFlag = isOnValidation && (duproperties.includes(item.address) || item.address.length%42)
+                const addressErrFlag = isOnValidation && (duproperties.includes(item.address) || item.address.length%42>0)
                 let addressErrText = ''
                 if(isOnValidation && item.address.length%42)
                   addressErrText = 'Not a valid address'
