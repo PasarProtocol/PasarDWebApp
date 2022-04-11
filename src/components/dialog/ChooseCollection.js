@@ -44,7 +44,8 @@ export default function ChooseCollection(props) {
       if(tokenIndex>=0) {
         // console.log(collections[tokenIndex])
         setSelectedId(tokenIndex)
-        getERCType(collections[tokenIndex].token).then(setERCtype)
+        setERCtype(collections[tokenIndex].is721?0:1)
+        // getERCType(collections[tokenIndex].token).then(setERCtype)
         handleChoose(collections[tokenIndex])
       }
     }
@@ -68,7 +69,8 @@ export default function ChooseCollection(props) {
   }, [collections]);
 
   const choose = () => {
-    getERCType(collections[selectedId].token).then(setERCtype)
+    setERCtype(collections[selectedId].is721?0:1)
+    // getERCType(collections[selectedId].token).then(setERCtype)
     handleChoose(collections[selectedId])
     setOpen(false);
   }
@@ -77,6 +79,7 @@ export default function ChooseCollection(props) {
     setOpen(false);
   };
 
+  const collectionClasses = [{type: "ERC-721", collections: collections.filter(el=>el.is721)}, {type: "ERC-1155", collections: collections.filter(el=>!el.is721)}]
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <DialogTitle>
@@ -97,46 +100,51 @@ export default function ChooseCollection(props) {
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
           My Collections
         </Typography>
-        <Typography variant="h5" color="origin.main" sx={{px: 2, pt: 1}}>
-          ERC-721
-        </Typography>
-        <List
-          sx={{ width: '100%', bgcolor: 'unset', pt: 0 }}
-          component="nav"
-          aria-labelledby="nested-list-subheader"
-        >
-          {/* <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2, textAlign: 'center' }}> */}
-          {
-            collections.map((el, i)=>(
-              <ListItemButton key={i} onClick={()=>{setSelectedId(i)}} selected={selectedId === i}>
-                <Stack direction="row" alignItems="center" spacing={2}>
-                  <Box
-                      draggable = {false}
-                      component={el.avatar?"img":"div"}
-                      alt=''
-                      src={el.avatar}
-                      onError={(e) => e.target.src = '/static/broken-image.svg'}
-                      sx={{ width: 56, height: 56, borderRadius: '100%', backgroundColor: 'black' }}
-                  />
-                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                    <Typography variant="h5" noWrap>
-                      {el.name}
-                    </Typography>
-                    <Typography variant="subtitle2" color="text.secondary" sx={{lineHeight: 1.2, fontWeight: 'normal'}} noWrap>
-                      Contract Address : {reduceHexAddress(el.token)}<br/>
-                      Items : 0
-                    </Typography>
-                  </Box>
-                  {
-                    selectedId === i &&
-                    <Box sx={{color: 'origin.main'}}><Icon icon={checkCircleIcon} width={20}/></Box>
-                  }
-                </Stack>
-              </ListItemButton>
-            ))
-          }
-          {/* </Box> */}
-        </List>
+        {
+          collectionClasses.map((classEl) => (
+            classEl.collections.length>0&&
+            <>
+              <Typography variant="h5" color="origin.main" sx={{px: 2, pt: 1}}>
+                {classEl.type}
+              </Typography>
+              <List
+                sx={{ width: '100%', bgcolor: 'unset', pt: 0 }}
+                component="nav"
+                aria-labelledby="nested-list-subheader"
+              >
+                {
+                  classEl.collections.map((el, i)=>(
+                    <ListItemButton key={i} onClick={()=>{setSelectedId(i)}} selected={selectedId === i}>
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                        <Box
+                            draggable = {false}
+                            component={el.avatar?"img":"div"}
+                            alt=''
+                            src={el.avatar}
+                            onError={(e) => e.target.src = '/static/broken-image.svg'}
+                            sx={{ width: 56, height: 56, borderRadius: '100%', backgroundColor: 'black' }}
+                        />
+                        <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                          <Typography variant="h5" noWrap>
+                            {el.name}
+                          </Typography>
+                          <Typography variant="subtitle2" color="text.secondary" sx={{lineHeight: 1.2, fontWeight: 'normal'}} noWrap>
+                            Contract Address : {reduceHexAddress(el.token)}<br/>
+                            Items : 0
+                          </Typography>
+                        </Box>
+                        {
+                          selectedId === i &&
+                          <Box sx={{color: 'origin.main'}}><Icon icon={checkCircleIcon} width={20}/></Box>
+                        }
+                      </Stack>
+                    </ListItemButton>
+                  ))
+                }
+              </List>
+            </>
+          ))
+        }
         {
           selectedId>=0&&
           <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>

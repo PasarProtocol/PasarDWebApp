@@ -96,7 +96,7 @@ const MintingTypeButton = (props)=>{
             }
             <Typography variant="body2" sx={{ fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1.6, sm: 3} }}>
                 {
-                    type==="Choose"&&selectedCollection.avatar.length?'TEMP':type
+                    type==="Choose"&&selectedCollection.avatar.length?selectedCollection.symbol:type
                     // type==="Choose"&&selectedCollection.avatar.length?selectedCollection.symbol:type
                 }
             </Typography>
