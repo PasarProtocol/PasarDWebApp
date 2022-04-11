@@ -1,5 +1,7 @@
 import React from 'react';
 import Web3 from 'web3';
+import { useLocation } from 'react-router-dom';
+
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, List, ListItemButton, Button, Box, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Icon } from '@iconify/react';
@@ -10,6 +12,8 @@ import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { reduceHexAddress, isInAppBrowser, fetchFrom, getIpfsUrl, getERCType } from '../../utils/common';
 
 export default function ChooseCollection(props) {
+  const location = useLocation();
+  const { token } = location.state || {}
   const { isOpen, setOpen, handleChoose, setERCtype } = props;
   const [selectedId, setSelectedId] = React.useState(-1);
   const [collections, setCollections] = React.useState([]);
@@ -23,14 +27,27 @@ export default function ChooseCollection(props) {
       if(essentialAddress)
         fetchFrom(`api/v2/sticker/getCollectionByOwner/${essentialAddress}`)
           .then((response) => {
-            response.json().then((jsonAssets) => {
-              setCollections(jsonAssets.data)
+            response.json().then((jsonCollections) => {
+              const tempCollections = jsonCollections.data.map(item=>{
+                const tempItem = {...item, avatar: ''}
+                return tempItem
+              })
+              setCollections(tempCollections)
             })
           })
     }
   }, [])
 
   React.useEffect(() => {
+    if(token) {
+      const tokenIndex = collections.findIndex(item=>item.token===token)
+      if(tokenIndex>=0) {
+        // console.log(collections[tokenIndex])
+        setSelectedId(tokenIndex)
+        getERCType(collections[tokenIndex].token).then(setERCtype)
+        handleChoose(collections[tokenIndex])
+      }
+    }
     collections.forEach((item, _id)=>{
       if(!item.uri || item.avatar)
         return
