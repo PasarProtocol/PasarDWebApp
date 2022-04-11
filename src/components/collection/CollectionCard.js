@@ -1,12 +1,12 @@
 import React from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import * as math from 'mathjs';
 import Imgix from "react-imgix";
 import jwtDecode from 'jwt-decode';
-import { alpha, styled } from '@mui/material/styles';
-import { Link as RouterLink } from 'react-router-dom';
 import { motion } from "framer-motion";
 import { Icon } from '@iconify/react';
 import editIcon from '@iconify-icons/akar-icons/edit';
+import { alpha, styled } from '@mui/material/styles';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip } from '@mui/material';
@@ -114,12 +114,14 @@ const CollectionImgBox = (props) => {
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider, isOwned=false } = props
-  const { name, uri='', owner='' } = info
+  const { name, uri='', owner='', token } = info
   let { description='', avatar='', background='' } = info
+
   const [didName, setDidName] = React.useState('');
   const [metaObj, setMetaObj] = React.useState({});
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     // if(holder) {
@@ -174,6 +176,16 @@ const CollectionCardPaper = (props) => {
 
   const handleClosePopup = (event) => {
     event.preventDefault()
+    const type = event.target.getAttribute("value")
+    switch(type){
+      case 'create':
+        navigate(`/create`, {state: {token}});
+        break;
+      case 'edit':
+        break;
+      default:
+        break;
+    }
     setOpenPopup(null);
   };
 
@@ -201,10 +213,10 @@ const CollectionCardPaper = (props) => {
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
-                <MenuItem onClick={handleClosePopup}>
+                <MenuItem value='create' onClick={handleClosePopup}>
                   <AddCircleOutlineIcon/>&nbsp;Create Item
                 </MenuItem>
-                <MenuItem onClick={handleClosePopup}>
+                <MenuItem value='edit' onClick={handleClosePopup}>
                   <Icon icon={editIcon} width={24}/>&nbsp;Edit Collection
                 </MenuItem>
               </Menu>

@@ -1,6 +1,6 @@
 import React from 'react';
 import Web3 from 'web3';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { isString } from 'lodash';
 import {isMobile} from 'react-device-detect';
 import * as math from 'mathjs';
@@ -71,10 +71,12 @@ const ercAbiArr = [TOKEN_721_ABI, TOKEN_1155_ABI]
 // ----------------------------------------------------------------------
 
 export default function CreateItem() {
+  const location = useLocation();
+  const { token: baseToken } = location.state || {}
   const [mintype, setMintType] = React.useState("Single");
   const [itemtype, setItemType] = React.useState("General");
   const [saletype, setSaleType] = React.useState("FixedPrice");
-  const [collection, setCollection] = React.useState("PSRC");
+  const [collection, setCollection] = React.useState(baseToken?"Choose":"PSRC");
   const [selectedCollection, handleChooseCollection] = React.useState({token: "", name: "", symbol: "", avatar: ""});
   const [selectedERCtype, setSelectedERCtype] = React.useState(1);
   const [file, setFile] = React.useState(null);
