@@ -35,7 +35,7 @@ export default function CreateItem(props) {
         </Typography>
         <Typography variant="h5" sx={{ color: 'text.secondary', py: 1 }} align='center'>
           You have successfully created a collection!<br/>
-          Do you want to proceed to ther next step and<br/>
+          Do you want to proceed to the next step and<br/>
           create/mint new item(s) onto your collections?
         </Typography>
         <Stack direction='column' spacing={1.5} sx={{ maxWidth: 200, m: 'auto', py: 2 }}>

@@ -183,6 +183,8 @@ const CollectionCardPaper = (props) => {
         break;
       case 'edit':
         break;
+      case 'royalties':
+        break;
       default:
         break;
     }
@@ -218,6 +220,9 @@ const CollectionCardPaper = (props) => {
                 </MenuItem>
                 <MenuItem value='edit' onClick={handleClosePopup}>
                   <Icon icon={editIcon} width={24}/>&nbsp;Edit Collection
+                </MenuItem>
+                <MenuItem value='royalties' onClick={handleClosePopup}>
+                  <Icon icon="fluent:money-hand-20-filled" width={24}/>&nbsp;Royalties
                 </MenuItem>
               </Menu>
             </Box>
