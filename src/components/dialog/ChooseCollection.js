@@ -28,8 +28,8 @@ export default function ChooseCollection(props) {
         fetchFrom(`api/v2/sticker/getCollectionByOwner/${essentialAddress}`)
           .then((response) => {
             response.json().then((jsonCollections) => {
-              const tempCollections = jsonCollections.data.map(item=>{
-                const tempItem = {...item, avatar: ''}
+              const tempCollections = jsonCollections.data.map((item, index)=>{
+                const tempItem = {...item, avatar: '', index}
                 return tempItem
               })
               setCollections(tempCollections)
@@ -101,9 +101,9 @@ export default function ChooseCollection(props) {
           My Collections
         </Typography>
         {
-          collectionClasses.map((classEl) => (
+          collectionClasses.map((classEl, _i) => (
             classEl.collections.length>0&&
-            <>
+            <Box key={_i}>
               <Typography variant="h5" color="origin.main" sx={{px: 2, pt: 1}}>
                 {classEl.type}
               </Typography>
@@ -114,7 +114,7 @@ export default function ChooseCollection(props) {
               >
                 {
                   classEl.collections.map((el, i)=>(
-                    <ListItemButton key={i} onClick={()=>{setSelectedId(i)}} selected={selectedId === i}>
+                    <ListItemButton key={i} onClick={()=>{setSelectedId(el.index)}} selected={selectedId === el.index}>
                       <Stack direction="row" alignItems="center" spacing={2}>
                         <Box
                             draggable = {false}
@@ -134,7 +134,7 @@ export default function ChooseCollection(props) {
                           </Typography>
                         </Box>
                         {
-                          selectedId === i &&
+                          selectedId === el.index &&
                           <Box sx={{color: 'origin.main'}}><Icon icon={checkCircleIcon} width={20}/></Box>
                         }
                       </Stack>
@@ -142,7 +142,7 @@ export default function ChooseCollection(props) {
                   ))
                 }
               </List>
-            </>
+            </Box>
           ))
         }
         {

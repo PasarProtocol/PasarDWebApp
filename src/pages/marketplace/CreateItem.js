@@ -106,7 +106,7 @@ export default function CreateItem() {
   const [coinType, setCoinType] = React.useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [chooseCollectionOpen, setChooseCollectionOpen] = React.useState(false);
-  const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent } = useMintDlg()
+  const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps } = useMintDlg()
   const { enqueueSnackbar } = useSnackbar();
   
   const isOffset = useOffSetTop(40);
@@ -382,6 +382,7 @@ export default function CreateItem() {
                   console.log("receipt", receipt);
                   if(isPutOnSale){
                     setProgress(progressStep(70, index))
+                    setCurrent(2)
                     stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
                       console.log("isApprovalForAll=", isApproval);
                       if (!isApproval) {
@@ -390,7 +391,7 @@ export default function CreateItem() {
                           stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
                             .on('receipt', (receipt) => {
                                 setOpenAccessDlg(false)
-                                setCurrent(2)
+                                setCurrent(3)
                                 console.log("setApprovalForAll-receipt", receipt);
                                 if(saletype === 'FixedPrice')
                                   callContractMethod('createOrderForSale', coinType, {
@@ -422,9 +423,8 @@ export default function CreateItem() {
                                 reject(error)
                             })
                         // })
-                      } else {
-                        setCurrent(2)
-                        if(saletype === 'FixedPrice')
+                      }
+                      else if(saletype === 'FixedPrice')
                           callContractMethod('createOrderForSale', coinType, {
                             ...paramObj,
                             ...commonArgs,
@@ -434,20 +434,19 @@ export default function CreateItem() {
                           }).catch(error=>{
                             reject(error)
                           })
-                        else
-                          callContractMethod('createOrderForAuction', coinType, {
-                            ...paramObj,
-                            ...commonArgs,
-                            '_minPrice': BigInt(price*1e18).toString(),
-                            '_reservePrice': BigInt(reservePrice*1e18).toString(),
-                            '_buyoutPrice': BigInt(buyoutPrice*1e18).toString(),
-                            '_endTime': (expirationDate.getTime()/1000).toFixed()
-                          }).then((success) => {
-                            resolve(success)
-                          }).catch(error=>{
-                            reject(error)
-                          })
-                      }
+                      else
+                        callContractMethod('createOrderForAuction', coinType, {
+                          ...paramObj,
+                          ...commonArgs,
+                          '_minPrice': BigInt(price*1e18).toString(),
+                          '_reservePrice': BigInt(reservePrice*1e18).toString(),
+                          '_buyoutPrice': BigInt(buyoutPrice*1e18).toString(),
+                          '_endTime': (expirationDate.getTime()/1000).toFixed()
+                        }).then((success) => {
+                          resolve(success)
+                        }).catch(error=>{
+                          reject(error)
+                        })
                     })
                   }
                   else
@@ -768,6 +767,24 @@ export default function CreateItem() {
     }, []);
 
   const handleMintAction = (e) => {
+    if(isPutOnSale) {
+      const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+      walletConnectWeb3.eth.getAccounts().then((accounts)=>{
+        // console.log(accounts)
+        let stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
+        if(collection === 'Choose') {
+          stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection.token)
+        }
+        stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
+          if(!isApproval)
+            setTotalSteps(3)
+          else
+            setTotalSteps(2)
+        })
+      })
+    } else {
+      setTotalSteps(1)
+    }
     setOnValidation(true)
     if(mintype!=="Batch"&&!file || mintype==="Batch"&&!files.length)
       scrollToRef(uploadRef)
@@ -777,11 +794,11 @@ export default function CreateItem() {
       scrollToRef(descriptionRef)
     else if(isPutOnSale && !price)
       scrollToRef(priceRef)
-    else if(isPutOnSale && reservePrice.length && price>reservePrice)
+    else if(isPutOnSale && reservePrice.length && price*1>reservePrice*1)
       enqueueSnackbar('Starting price must be less than Reserve price.', { variant: 'warning' });
-    else if(isPutOnSale && buyoutPrice.length && price>=buyoutPrice)
+    else if(isPutOnSale && buyoutPrice.length && price*1>=buyoutPrice*1)
       enqueueSnackbar('Starting price must be less than Buy Now price.', { variant: 'warning' });
-    else if(isPutOnSale && reservePrice.length && buyoutPrice.length && reservePrice>=buyoutPrice)
+    else if(isPutOnSale && reservePrice.length && buyoutPrice.length && reservePrice*1>=buyoutPrice*1)
       enqueueSnackbar('Reserve price must be less than Buy Now price.', { variant: 'warning' });
     else
       if(mintype!=="Batch"){
@@ -1344,7 +1361,7 @@ export default function CreateItem() {
           </MHidden>
         </Grid>
       </Container>
-      <MintDlg totalSteps={isPutOnSale?2:1}/>
+      <MintDlg/>
       <AccessDlg/>
       <ChooseCollectionDlg 
         isOpen={chooseCollectionOpen}
