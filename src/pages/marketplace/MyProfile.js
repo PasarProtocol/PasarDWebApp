@@ -19,8 +19,10 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSnackbar } from 'notistack';
 
 // components
+import PaperRecord from '../../components/PaperRecord';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
+import StyledButton from '../../components/signin-dlg/StyledButton';
 import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
@@ -387,24 +389,26 @@ export default function MyProfile() {
                     collections.length > 0 ?
                     <Grid container spacing={2}>
                       {
+                        sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
+                        <Grid item xs={12} sm={6} md={4}>
+                          <PaperRecord sx={{display: 'flex', justifyContent: 'center', width: '100%', height: '100%', borderStyle: 'dashed', minHeight: 250}}>
+                            <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
+                              <StyledButton variant="contained" component={RouterLink} to='/collection/create' sx={{mb: 2}}>
+                                Create new collection
+                              </StyledButton>
+                              <StyledButton variant="contained" component={RouterLink} to='/collection/import'>
+                                Import existing collection
+                              </StyledButton>
+                            </Stack>
+                          </PaperRecord>
+                        </Grid>
+                      }
+                      {
                         collections.map((info, index)=>
                           <Grid item key={index} xs={12} sm={6} md={4}>
                             <CollectionCard info={info} isOwned={Boolean(true)}/>
                           </Grid>
                         )
-                      }
-                      {
-                        sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
-                        <Grid item xs={12} sm={6} md={4} sx={{display: 'flex', justifyContent: 'center'}}>
-                          <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
-                            <Button variant="contained" component={RouterLink} to='/collection/create' sx={{mb: 2}}>
-                              Create new collection
-                            </Button>
-                            <Button variant="contained" component={RouterLink} to='/collection/import'>
-                              Import existing collection
-                            </Button>
-                          </Stack>
-                        </Grid>
                       }
                     </Grid>:
                     <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
