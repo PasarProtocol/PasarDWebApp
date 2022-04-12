@@ -145,6 +145,22 @@ export default function MarketExplorer() {
       setPage(page+1)
     }
   }
+  const handleDispInLaptopSize = ()=>{
+    const sessionDispMode = sessionStorage.getItem("disp-mode")
+    if(sessionDispMode!==null)
+      return
+    const hypotenuse = Math.sqrt(window.innerWidth**2 + window.innerHeight**2)
+    const hypotenuseInch = hypotenuse / 96
+    let tempDefaultDispMode = defaultDispMode
+    if(hypotenuseInch>12 && hypotenuseInch<16)
+      tempDefaultDispMode = 1
+    if(dispmode!==tempDefaultDispMode)
+      setDispmode(tempDefaultDispMode)
+  }
+  window.addEventListener('resize', handleDispInLaptopSize);
+  React.useEffect(() => {
+    handleDispInLaptopSize()
+  }, [])
   React.useEffect(async () => {
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
