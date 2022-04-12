@@ -25,6 +25,7 @@ import CollectionCard from '../../components/collection/CollectionCard';
 import CategorySelect from '../../components/collection/CategorySelect';
 import StandardTypeButton from '../../components/collection/StandardTypeButton';
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
+import CreateItemDlg from '../../components/dialog/CreateItem';
 import RegisterCollectionDlg from '../../components/dialog/RegisterCollection';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 
@@ -77,6 +78,8 @@ export default function CreateCollection() {
   const [current, setCurrent] = React.useState(1)
   const [currentPromise, setCurrentPromise] = React.useState(null);
   const [isOpenRegCollection, setOpenRegCollectionDlg] = React.useState(false);
+  const [isCreateItemOpen, setOpenCreateItem] = React.useState(false);
+  const [baseToken, setBaseToken] = React.useState('');
   const [isReadySignForRegister, setReadySignForRegister] = React.useState(false);
   
   const nameRef = React.useRef();
@@ -363,6 +366,7 @@ export default function CreateCollection() {
             registerContract.methods.registerToken(paramObj._address, name, paramObj._uri, propertiesObj.owners, propertiesObj.feeRates).send(transactionParams)
               .on('receipt', (receipt) => {
                   setReadySignForRegister(false)
+                  setBaseToken(paramObj._address)
                   console.log("receipt", receipt);
                   resolve(true)
               })
@@ -397,6 +401,7 @@ export default function CreateCollection() {
     }).then((success) => {
       if(success){
         enqueueSnackbar('Create collection success!', { variant: 'success' });
+        setOpenCreateItem(true)
         // setTimeout(()=>{
         //   navigate('/marketplace')
         // }, 3000)
@@ -663,6 +668,11 @@ export default function CreateCollection() {
         isOpenDlg={isOpenRegCollection}
         setOpenDlg={setOpenRegCollectionDlg}
         isReadySign={isReadySignForRegister}
+      />
+      <CreateItemDlg
+        isOpen={isCreateItemOpen}
+        setOpen={setOpenCreateItem}
+        token={baseToken}
       />
     </RootStyle>
   );

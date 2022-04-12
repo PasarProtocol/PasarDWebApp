@@ -46,7 +46,19 @@ export default function ChooseCollection(props) {
         setSelectedId(tokenIndex)
         setERCtype(collections[tokenIndex].is721?0:1)
         // getERCType(collections[tokenIndex].token).then(setERCtype)
-        handleChoose(collections[tokenIndex])
+        const tempCollection = collections[tokenIndex]
+        if(!tempCollection.uri || tempCollection.avatar) {
+          handleChoose(tempCollection)
+        } else {
+          const metaUri = getIpfsUrl(tempCollection.uri)
+          if(metaUri) {
+            fetch(metaUri)
+              .then(response => response.json())
+              .then(data => {
+                handleChoose({...tempCollection, avatar: getIpfsUrl(data.data.avatar)})
+              });
+          }
+        }
       }
     }
     collections.forEach((item, _id)=>{
