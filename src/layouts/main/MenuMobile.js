@@ -1,6 +1,6 @@
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
-import { useState, useEffect } from 'react';
 import menu2Fill from '@iconify/icons-eva/menu-2-fill';
 import twitterIcon from '@iconify/icons-ant-design/twitter';
 // import telegramIcon from '@iconify/icons-ic/outline-telegram';
@@ -20,6 +20,7 @@ import Scrollbar from '../../components/Scrollbar';
 import ModeSwitch from '../../components/mode-switch';
 import { MIconButton, MFab } from '../../components/@material-extend';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import DonateDlg from '../../components/dialog/Donate';
 import useSingin from '../../hooks/useSignin';
 import useSettings from '../../hooks/useSettings';
 import { isInAppBrowser } from '../../utils/common';
@@ -179,6 +180,7 @@ export default function MenuMobile(props) {
   const { isOffset, isHome, navConfig } = props
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
+  const [donateOpen, setDonateOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   
   const { themeMode } = useSettings();
@@ -272,7 +274,10 @@ export default function MenuMobile(props) {
             <ModeSwitch/>
           </Box>
           <CopyRight>
-            Pasar Protocol 2021 | Donate <span role="img" aria-label="">❤️</span>
+            Pasar Protocol 2021 |{' '}
+            <Link onClick={()=>{setDonateOpen(true)}} color='GrayText' sx={{cursor: 'pointer'}}>
+              Donate <span role="img" aria-label="">❤️</span>
+            </Link>
           </CopyRight>
           <CopyRight>
             Privacy Policy | Disclaimer️
@@ -281,6 +286,7 @@ export default function MenuMobile(props) {
             v1 - {generatedGitInfo.gitCommitHash}
           </CopyRight>
         </Container>
+        <DonateDlg isOpen={donateOpen} setOpen={setDonateOpen}/>
       </Drawer>
     </>
   );
