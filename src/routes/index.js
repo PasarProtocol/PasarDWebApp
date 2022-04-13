@@ -57,7 +57,7 @@ export default function Router() {
           children: [
             { path: 'collectible', element: <Collectible /> },
             { path: 'collectible/:collection', element: <Collectible /> },
-            { path: 'collectible/detail/:collection', element: <AuctionDlgProvider><CollectibleDetail /></AuctionDlgProvider> },
+            { path: 'collectible/detail/:collection', element: <CollectibleDetail /> },
             { path: 'transaction', element: <Transaction /> },
             { path: 'transaction/:transaction', element: <Transaction /> },
             { path: 'transaction/detail/:address', element: <AddressDetail /> },
@@ -69,7 +69,7 @@ export default function Router() {
         {
           path: 'marketplace',
           children: [
-            { path: 'detail/:collection', element: <MarketCollectibleDetail /> },
+            { path: 'detail/:collection', element: <AuctionDlgProvider><MarketCollectibleDetail /></AuctionDlgProvider> },
             { path: 'search', element: <Navigate to="/marketplace" replace /> },
             { path: 'search/:key', element: <MarketExplorer /> },
           ]
