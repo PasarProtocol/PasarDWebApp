@@ -49,7 +49,7 @@ export default function Purchase(props) {
             const transactionParams = {
               'from': userAddress,
               'gasPrice': gasPrice.toBigInt(),
-              'value': _price
+              'value': coinType===0?_price:0
             };
             pasarContract.buyOrder(_orderId, _didUri, transactionParams).then((nftTxn)=>{
               console.log("Buying... please wait")
@@ -109,8 +109,8 @@ export default function Purchase(props) {
     const transactionParams = {
       'from': accounts[0],
       'gasPrice': gasPrice,
-      'gas': 5000000,
-      'value': _price
+      // 'gas': 5000000,
+      'value': coinType===0?_price:0
     };
 
     pasarContract.methods
