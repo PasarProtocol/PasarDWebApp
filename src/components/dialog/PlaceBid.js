@@ -68,7 +68,7 @@ export default function PlaceBid(props) {
               'from': userAddress,
               'gasPrice': gasPrice,
               // 'gas': 5000000,
-              'value': isBuynow?_price:0
+              'value': coinType===0?_price:0
             };
             
             let contractMethod = pasarContract.bidForOrder(_orderId, _price, _didUri, transactionParams)
@@ -135,7 +135,7 @@ export default function PlaceBid(props) {
       'from': accounts[0],
       'gasPrice': gasPrice,
       // 'gas': 5000000,
-      'value': _price
+      'value': coinType===0?_price:0
     };
     // console.log(_orderId, _price, _didUri)
     let contractMethod = pasarContract.methods.bidForOrder(_orderId, _price, _didUri)
