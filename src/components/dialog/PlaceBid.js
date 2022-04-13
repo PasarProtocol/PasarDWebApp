@@ -135,7 +135,7 @@ export default function PlaceBid(props) {
       'from': accounts[0],
       'gasPrice': gasPrice,
       // 'gas': 5000000,
-      'value': isBuynow?_price:0
+      'value': _price
     };
     // console.log(_orderId, _price, _didUri)
     let contractMethod = pasarContract.methods.bidForOrder(_orderId, _price, _didUri)
@@ -156,7 +156,7 @@ export default function PlaceBid(props) {
         }, 1000)
       })
       .on('confirmation', (confirmationNumber, receipt) => {
-        console.log('confirmation', confirmationNumber, receipt);
+        // console.log('confirmation', confirmationNumber, receipt);
       })
       .on('error', (error, receipt) => {
         console.error('error', error);
