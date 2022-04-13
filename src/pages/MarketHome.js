@@ -122,13 +122,13 @@ export default function MarketHome() {
       <Box draggable = {false} component="img" src="/static/corner-logo.png" sx={{ width: '50%', maxWidth: '550px', position: 'absolute', top: 0, right: 0 }} />
       <Container maxWidth="xl" sx={{pt: 4, pb: 8, px: {sm: 3, md: 6, lg: 9}, position: 'relative'}}>
         <StackStyle>
-          <Box sx={{ flexGrow: 1 }}>
+          <Box sx={{ flexGrow: 1, pr: {xs: 0, sm: 3, md: 4, lg: 12, xl: 15} }}>
             <Stack sx={{height: '100%'}}>
               <Box sx={{ flexGrow: 1 }}>
-                <HeadTitleStyle variant="h1">
+                <HeadTitleStyle variant="h1" sx={{fontSize: {md: '3.9rem', lg: '5rem', xl: '6.5rem'}}}>
                   Dawn of the DeMKT
                 </HeadTitleStyle>
-                <Typography variant="h4" component="div" sx={{fontWeight: 'normal', pr: 4, pb: 2}}>
+                <Typography variant="h4" component="div" sx={{fontWeight: 'normal', pr: 4, pb: 2, fontSize: {sm: '1.1rem', md: '1.3rem', lg: '1.5rem'}}}>
                   Pasar is open-sourced, community-centric, and one
                   of the first truly Web3.0 decentralized marketplaces (DeMKT)
                   for exchanging data and Non-fungible Tokens (NFTs).
