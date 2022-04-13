@@ -85,8 +85,8 @@ export default function FilteredCollectionGrid(props){
         {
           isLoadingCollections?
           loadingSkeletons.map((item, index)=>(
-            <Box sx={{p: 2}}>
-              <CollectionCardSkeleton key={index}/>
+            <Box key={index} sx={{p: 2}}>
+              <CollectionCardSkeleton/>
             </Box>
           )):
           collections.map((item, index)=>(

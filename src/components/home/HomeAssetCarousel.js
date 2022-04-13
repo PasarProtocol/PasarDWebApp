@@ -5,7 +5,7 @@ import { Fade } from "react-slideshow-image";
 import "react-slideshow-image/dist/styles.css";
 
 const BoxStyle = styled(Box)(({ theme }) => ({
-    width: '80%',
+    width: '100%',
     height: '100%',
     maxWidth: 500,
     borderRadius: theme.spacing(2),
