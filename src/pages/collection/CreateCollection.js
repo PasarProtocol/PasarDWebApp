@@ -35,7 +35,7 @@ import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
 import {registerContract as CONTRACT_ADDRESS, diaContract as DIA_TOKEN_ADDRESS, ipfsURL, tokenConf} from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, getContractInfo } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -134,7 +134,10 @@ export default function CreateCollection() {
 
   const handleRecipientRoyaltiesGroup = (key, index, e) => {
     let inputValue = e.target.value
+    
     if(key==='royalties') {
+      if(inputValue.length>0 && !isNumberString(inputValue))
+        return
       if(inputValue<0 || inputValue>30)
         return
       inputValue = removeLeadingZero(inputValue)
@@ -591,7 +594,7 @@ export default function CreateCollection() {
                     </Grid>
                     <Grid item xs={4}>
                       <TextFieldStyle
-                        type="number"
+                        // type="number"
                         label="Example: 10"
                         size="small"
                         fullWidth
