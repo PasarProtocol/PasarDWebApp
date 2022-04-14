@@ -487,17 +487,19 @@ export default function CollectionDetail() {
                       }
                     </Stack>
                   </Box>
-                  <Box sx={{display: 'flex'}}>
-                    <AssetSortSelect selected={order} onChange={setOrder}/>
-                    <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-                      <ToggleButton value={0}>
-                        <GridViewSharpIcon />
-                      </ToggleButton>
-                      <ToggleButton value={1}>
-                        <AppsIcon />
-                      </ToggleButton>
-                    </ToggleButtonGroup>
-                  </Box>
+                  <MHidden width="smDown">
+                    <Box sx={{display: 'flex'}}>
+                      <AssetSortSelect selected={order} onChange={setOrder}/>
+                      <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                        <ToggleButton value={0}>
+                          <GridViewSharpIcon />
+                        </ToggleButton>
+                        <ToggleButton value={1}>
+                          <AppsIcon />
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                    </Box>
+                  </MHidden>
                 </Stack>
                 {/* {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>} */}
                 <Box sx={{ display: 'flex' }}>
@@ -521,7 +523,7 @@ export default function CollectionDetail() {
                     component="main"
                     sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth*isFilterView}px)` } }}
                   >
-                    <MHidden width="mdUp">
+                    <MHidden width="smUp">
                       <Box sx={{display: 'flex', pb: 1}}>
                         <AssetSortSelect selected={order} onChange={setOrder} sx={{flex: 1}}/>
                         <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
