@@ -277,6 +277,10 @@ export function removeLeadingZero(value) {
   return value.replace(/-/g, '').replace(/^0+(?!\.|$)/, '');
 }
 
+export function isNumberString(value) {
+  return /^\d+\.?\d*$/.test(value)
+}
+
 export function getShortUrl(url) {
   return new Promise((resolve, reject) => {
     fetch(`${process.env.REACT_APP_SHORTEN_SERVICE_URL}/api/v2/action/shorten?key=d306f2eda6b16d9ecf8a40c74e9e91&url=${url}&is_secret=false`).then(resShorternUrl=>{
