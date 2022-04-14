@@ -7,7 +7,7 @@ import { Icon } from '@iconify/react';
 import { useWeb3React } from "@web3-react/core";
 import { styled } from '@mui/material/styles';
 import { Link, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Tooltip,
-  Typography, Box, Modal, Backdrop, Menu, MenuItem, Button, IconButton, Toolbar } from '@mui/material';
+  Typography, Box, Modal, Backdrop, Menu, MenuItem, Button, IconButton, Toolbar, SvgIcon } from '@mui/material';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
@@ -15,6 +15,7 @@ import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CloseIcon from '@mui/icons-material/Close';
 
 // components
@@ -93,6 +94,18 @@ const Property = ({type, name}) => (
 const BackdropStyle = styled(Backdrop)(({ theme }) => ({
   background: 'rgba(0, 0, 0, 0.8)'
 }));
+const BidStatus = ({isReserveMet}) => (
+  <Typography variant="h5" component='div' color='origin.main' sx={{ display: 'inline-flex', alignItems: 'center' }}>
+    {
+      `Reserve Price ${isReserveMet?'Met':'Not Met'}`
+    }
+    <Box sx={{ width: 26, height: 26, borderRadius: 2, ml: 1, p: '5px', backgroundColor: isReserveMet?'#7CB342':'#D60000', display: 'inline-flex' }}>
+      <SvgIcon sx={{fontSize: 18, color:'success.contrastText'}}>
+        <ShoppingCartIcon/>
+      </SvgIcon>
+    </Box>
+  </Typography>
+)
 
 // ----------------------------------------------------------------------
 export default function CollectibleDetail() {
@@ -519,7 +532,9 @@ export default function CollectibleDetail() {
             collectible.listBid&&collectible.listBid.length>0&&(
               <Grid item xs={12}>
                 <PaperStyle>
-                  <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>Bids</Typography>
+                  <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>
+                    Bids - <BidStatus isReserveMet={collectible.listBid[0].price/1e18 >= collectible.reservePrice/1e18}/>
+                  </Typography>
                   <BidList dataList={collectible.listBid}/>
                 </PaperStyle>
               </Grid>
