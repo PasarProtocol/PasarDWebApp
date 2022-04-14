@@ -31,7 +31,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
 import RingAvatar from '../../components/RingAvatar';
 import Badge from '../../components/Badge';
-import CopyButton from '../../components/CopyButton';
+import AddressCopyButton from '../../components/AddressCopyButton';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
@@ -70,26 +70,6 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(1)
   }
 }));
-const CopyAddressButton = ({address}) => {
-  const { enqueueSnackbar } = useSnackbar();
-  const onCopy = () => {
-      enqueueSnackbar('Copied to clipboard', { variant: 'success' });
-  };
-  return (
-      <CopyToClipboard text={address} onCopy={onCopy}>
-          <Button
-            variant="outlined"
-            endIcon={
-              <Icon icon={sharpContentCopy} width="17px"/>
-            }
-            color='inherit'
-            onClick={(e)=>{e.preventDefault(); e.stopPropagation()}}
-          >
-            {reduceHexAddress(address)}
-          </Button>
-      </CopyToClipboard>
-  )
-}
 // ----------------------------------------------------------------------
 export default function MyProfile() {
   const defaultDispMode = isMobile?1:0
@@ -273,7 +253,7 @@ export default function MyProfile() {
               <Stack direction='row' spacing={1} sx={{justifyContent: 'center', mt: 1.5}}>
                 {
                   didInfo.name.length>0 &&
-                  <CopyAddressButton address={walletAddress} />
+                  <AddressCopyButton address={walletAddress} />
                 }
                 {
                   sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&

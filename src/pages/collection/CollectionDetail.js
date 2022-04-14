@@ -27,7 +27,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
 import RingAvatar from '../../components/RingAvatar';
-import AddressPaper from '../../components/AddressPaper';
+import AddressCopyButton from '../../components/AddressCopyButton';
 import StatisticPanel from '../../components/collection/StatisticPanel'
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import Badge from '../../components/Badge';
@@ -415,12 +415,12 @@ export default function CollectionDetail() {
                   <Stack direction="row" spacing={1} sx={{justifyContent: 'center', mt: 1}}>
                     <Tooltip title="Owner Address" arrow enterTouchDelay={0}>
                       <div>
-                        <AddressPaper type='diamond' address={collection.owner}/>
+                        <AddressCopyButton type='diamond' address={collection.owner}/>
                       </div>
                     </Tooltip>
                     <Tooltip title="Contract Address" arrow enterTouchDelay={0}>
                       <div>
-                        <AddressPaper type='contract' address={collection.token}/>
+                        <AddressCopyButton type='contract' address={collection.token}/>
                       </div>
                     </Tooltip>
                   </Stack>

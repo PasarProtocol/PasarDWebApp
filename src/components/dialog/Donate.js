@@ -5,7 +5,7 @@ import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Stack, Box 
 import CloseIcon from '@mui/icons-material/Close';
 
 import { MHidden } from '../@material-extend';
-import AddressPaper from '../AddressPaper';
+import AddressCopyButton from '../AddressCopyButton';
 import useSettings from '../../hooks/useSettings';
 import { isInAppBrowser } from '../../utils/common';
 import { donationAddress } from '../../config';
@@ -56,7 +56,7 @@ export default function Donate(props) {
                 </Box>
               </Box>
             </MHidden>
-            <AddressPaper address={donationAddress}/>
+            <AddressCopyButton address={donationAddress}/>
           </Box>
         </Stack>
       </DialogContent>
