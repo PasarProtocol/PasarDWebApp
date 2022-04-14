@@ -232,7 +232,23 @@ const CollectionCardPaper = (props) => {
           <Stack direction="column" sx={{justifyContent: 'center', textAlign: 'center'}}>
             <TypographyStyle variant="h5" noWrap>{name}</TypographyStyle>
             <Typography variant="subtitle2" component='div' sx={{fontWeight: 'normal'}}>
-              by{' '}<Typography variant="subtitle2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline-flex'}}>{didName || reduceHexAddress(owner) || 'Anonym'}</Typography>
+              by{' '}
+              {
+                owner?
+                <Link
+                  component={RouterLink}
+                  to={`/profile/others/${owner}`}
+                  alt=""
+                  color="origin.main"
+                  onClick={(e)=>{e.stopPropagation()}}
+                >
+                  {didName || reduceHexAddress(owner)}
+                </Link>:
+
+                <Typography variant="subtitle2" sx={{fontWeight: 'normal', color: 'origin.main', display: 'inline-flex'}}>
+                  Anonym
+                </Typography>
+              }
             </Typography>
             {
               isOnSlider?
@@ -262,17 +278,19 @@ const CollectionCardPaper = (props) => {
 
 export default function CollectionCard(props) {
   const { info, isPreview=false, isDragging } = props
+  const navigate = useNavigate();
+
+  const route2Detail = () => {
+    if(!isDragging)
+      navigate(`/collection/detail/${info.token}`);
+  }
+
   return (
     isPreview?
     <CollectionCardPaper {...props}/>:
-    <Link
-      component={RouterLink}
-      to={`/collection/detail/${info.token}`}
-      alt=""
-      underline="none"
-      onClick={(e)=>{if(isDragging) e.preventDefault()}}
-    >
+    
+    <Box onClick={route2Detail} sx={{display: 'contents', cursor: 'pointer'}}>
       <CollectionCardPaper {...props}/>
-    </Link>
+    </Box>
   );
 };
