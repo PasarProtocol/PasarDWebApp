@@ -446,48 +446,48 @@ export default function CollectionDetail() {
                     </Tooltip>
                   }
                 </Stack>
-                <Stack width="100%" direction="row">
-                  <Box sx={{flex:1}}>
-                    <Button
-                      variant="contained"
-                      color="origin"
-                      startIcon={isFilterView?<Icon icon={arrowIosBackFill} />:''}
-                      endIcon={isFilterView?'':<Icon icon={arrowIosForwardFill} />}
-                      onClick={closeFilter}
-                    >
-                      Filters
-                    </Button>
-                    <Typography variant="body2" sx={{ ml: 1, display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
-                    <Stack spacing={1} sx={{display: 'inline', pl: 1}} direction="row">
-                      {
-                        selectedBtns.map((nameId, index)=>{
-                          let buttonName = btnNames[nameId]
-                          if(nameId === rangeBtnId){
-                            buttonName = `${range.min || 0} to ${range.max === ''?'inf':range.max} ELA`
-                          }
-                          return <Button
-                            key={index}
-                            variant="outlined"
-                            color="origin"
-                            endIcon={<CloseIcon />}
-                            onClick={()=>{handleBtns(nameId)}}
+                <MHidden width="smDown">
+                  <Stack width="100%" direction="row">
+                    <Box sx={{flex:1}}>
+                      <Button
+                        variant="contained"
+                        color="origin"
+                        startIcon={isFilterView?<Icon icon={arrowIosBackFill} />:''}
+                        endIcon={isFilterView?'':<Icon icon={arrowIosForwardFill} />}
+                        onClick={closeFilter}
+                      >
+                        Filters
+                      </Button>
+                      <Typography variant="body2" sx={{ ml: 1, display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
+                      <Stack spacing={1} sx={{display: 'inline', pl: 1}} direction="row">
+                        {
+                          selectedBtns.map((nameId, index)=>{
+                            let buttonName = btnNames[nameId]
+                            if(nameId === rangeBtnId){
+                              buttonName = `${range.min || 0} to ${range.max === ''?'inf':range.max} ELA`
+                            }
+                            return <Button
+                              key={index}
+                              variant="outlined"
+                              color="origin"
+                              endIcon={<CloseIcon />}
+                              onClick={()=>{handleBtns(nameId)}}
+                            >
+                              {buttonName}
+                            </Button>
+                          })
+                        }
+                        {
+                          selectedBtns.length>0&&
+                          <Button
+                            color="inherit"
+                            onClick={handleClearAll}
                           >
-                            {buttonName}
+                            Clear All
                           </Button>
-                        })
-                      }
-                      {
-                        selectedBtns.length>0&&
-                        <Button
-                          color="inherit"
-                          onClick={handleClearAll}
-                        >
-                          Clear All
-                        </Button>
-                      }
-                    </Stack>
-                  </Box>
-                  <MHidden width="smDown">
+                        }
+                      </Stack>
+                    </Box>
                     <Box sx={{display: 'flex'}}>
                       <AssetSortSelect selected={order} onChange={setOrder}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
@@ -499,8 +499,8 @@ export default function CollectionDetail() {
                         </ToggleButton>
                       </ToggleButtonGroup>
                     </Box>
-                  </MHidden>
-                </Stack>
+                  </Stack>
+                </MHidden>
                 {/* {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>} */}
                 <Box sx={{ display: 'flex' }}>
                   <Box

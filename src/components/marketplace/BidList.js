@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
-import { Box, Stack, Link, Typography, IconButton } from '@mui/material';
+import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import palette from '../../theme/palette'
 
 // material
@@ -11,12 +11,10 @@ import Jazzicon from '../Jazzicon';
 import { reduceHexAddress, getTime, getDidInfoFromAddress } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
-  trans: PropTypes.object.isRequired,
-  isLast: PropTypes.bool.isRequired
+  trans: PropTypes.object.isRequired
 };
-function TransItem({ trans, isLast }) {
+function TransItem({ trans }) {
   const [didName, setDidName] = React.useState('');
-  const sx = isLast?{}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2};
   const timeObj = getTime(trans.timestamp)
   React.useEffect(() => {
     if(trans.buyerAddr) {
@@ -30,8 +28,8 @@ function TransItem({ trans, isLast }) {
   }, [trans]);
 
   return (
-      <Stack direction="row" spacing={2} sx={sx}>
-          <Box sx={{minWidth: 48}}>
+      <Stack direction="row" spacing={2}>
+          <Box sx={{minWidth: 48, display: 'flex'}}>
             <Jazzicon
               address={trans.buyerAddr}
               size={48}
@@ -58,11 +56,15 @@ export default function BitList(props) {
     <Stack spacing={2}>
       {/* {props.isLoading && <LoadingScreen />} */}
       {props.dataList.map((trans, index) => (
+        <Box key={index}>
           <TransItem 
-            key={index}
             trans={trans}
-            isLast={index===props.dataList.length-1}
           />
+          {
+            index<props.dataList.length-1&&
+            <Divider sx={{pb: 2}}/>
+          }
+        </Box>
       ))}
     </Stack>
   );
