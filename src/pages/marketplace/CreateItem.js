@@ -1152,30 +1152,35 @@ export default function CreateItem() {
                   </>
                 )
               }
-              <Grid item xs={12}>
-                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Royalties&nbsp;
-                  <Tooltip title="Royalties are the percentage cut of the total value of item sold and will be paid to the original creator" arrow disableInteractive enterTouchDelay={0}>
-                    <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
-                  </Tooltip>
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <FormControl variant="standard" sx={{width: '100%'}}>
-                  <InputLabelStyle htmlFor="input-with-royalties">
-                    Enter royalties (Suggested: 10%, Maximum: 20%)
-                  </InputLabelStyle>
-                  <InputStyle
-                    type="number"
-                    id="input-with-royalties"
-                    value={royalties}
-                    onChange={handleChangeRoyalties}
-                    startAdornment={' '}
-                    endAdornment='%'
-                  />
-                </FormControl>
-                <Divider/>
-                <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>You will receive royalties for every secondary sales on Pasar</Typography>
-              </Grid>
+              {
+                collection !== 'Choose' &&
+                <>
+                  <Grid item xs={12}>
+                    <Typography variant="h4" sx={{fontWeight: 'normal'}}>Royalties&nbsp;
+                      <Tooltip title="Royalties are the percentage cut of the total value of item sold and will be paid to the original creator" arrow disableInteractive enterTouchDelay={0}>
+                        <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
+                      </Tooltip>
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControl variant="standard" sx={{width: '100%'}}>
+                      <InputLabelStyle htmlFor="input-with-royalties">
+                        Enter royalties (Suggested: 10%, Maximum: 20%)
+                      </InputLabelStyle>
+                      <InputStyle
+                        type="number"
+                        id="input-with-royalties"
+                        value={royalties}
+                        onChange={handleChangeRoyalties}
+                        startAdornment={' '}
+                        endAdornment='%'
+                      />
+                    </FormControl>
+                    <Divider/>
+                    <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>You will receive royalties for every secondary sales on Pasar</Typography>
+                  </Grid>
+                </>
+              }
               <Grid item xs={12}>
                 <Typography variant="h4" sx={{fontWeight: 'normal'}}>Quantity</Typography>
               </Grid>
