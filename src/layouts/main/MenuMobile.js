@@ -24,6 +24,7 @@ import DonateDlg from '../../components/dialog/Donate';
 import useSingin from '../../hooks/useSignin';
 import useSettings from '../../hooks/useSettings';
 import { isInAppBrowser } from '../../utils/common';
+import { PATH_DOCS } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -275,12 +276,20 @@ export default function MenuMobile(props) {
           </Box>
           <CopyRight>
             Pasar Protocol 2021 |{' '}
-            <Link onClick={()=>{setDonateOpen(true)}} color='GrayText' sx={{cursor: 'pointer'}}>
+            <Link onClick={()=>{setDonateOpen(true)}} underline="always" sx={{color: 'inherit'}}>
               Donate <span role="img" aria-label="">❤️</span>
             </Link>
           </CopyRight>
           <CopyRight>
-            Privacy Policy | Disclaimer️
+            <Link
+              href={PATH_DOCS}
+              target="_blank"
+              underline="always"
+              sx={{color: 'inherit'}}
+            >
+              Docs
+            </Link>
+            {' '}| Privacy Policy | Disclaimer️
           </CopyRight>
           <CopyRight>
             v1 - {generatedGitInfo.gitCommitHash}

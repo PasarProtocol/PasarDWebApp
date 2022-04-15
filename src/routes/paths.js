@@ -23,7 +23,8 @@ export const PATH_PAGE = {
   explorer: '/explorer',
   marketplace: '/marketplace',
   create: '/create',
-  collection: '/collection'
+  collection: '/collection',
+  rewards: '/rewards'
 };
 
 export const PATH_DOCS = 'https://docs.pasarprotocol.io';

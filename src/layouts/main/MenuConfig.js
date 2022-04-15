@@ -39,11 +39,17 @@ const menuConfig = [
     disable: false
   },
   {
-    title: 'Docs',
+    title: 'Rewards',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
-    path: PATH_DOCS,
+    path: PATH_PAGE.rewards,
     disable: true
-  }
+  },
+  // {
+  //   title: 'Docs',
+  //   icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
+  //   path: PATH_DOCS,
+  //   disable: true
+  // }
 ];
 
 export default menuConfig;
