@@ -10,6 +10,8 @@ import generatedGitInfo from '../../generatedGitInfo.json';
 import palette from '../../theme/palette';
 import DonateDlg from '../../components/dialog/Donate';
 import ModeSwitch from '../../components/mode-switch';
+import { PATH_DOCS } from '../../routes/paths';
+
 // ----------------------------------------------------------------------
 
 const SOCIALS = [
@@ -163,7 +165,16 @@ export default function MainFooter({ hidden, isHome }) {
             </CopyRight>
           </Grid>
           <Grid item xs={12} md={6}>
-            <CopyRight textAlign="right">Privacy Policy | Disclaimer️</CopyRight>
+            <CopyRight textAlign="right">
+              <Link
+                href={PATH_DOCS}
+                target="_blank"
+                sx={{color: 'inherit'}}
+              >
+                Docs
+              </Link>
+              {' '}| Privacy Policy | Disclaimer️
+            </CopyRight>
           </Grid>
         </Grid>
       </Container>
