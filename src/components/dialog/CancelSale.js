@@ -55,7 +55,7 @@ export default function CancelSale(props) {
       })
       .on('error', (error, receipt) => {
         console.error('error', error);
-        enqueueSnackbar('Cancel sale Error!', { variant: 'warning' });
+        enqueueSnackbar('Cancel sale Error!', { variant: 'error' });
         setOnProgress(false);
       });
   };
