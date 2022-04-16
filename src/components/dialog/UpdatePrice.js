@@ -60,7 +60,7 @@ export default function UpdatePrice(props) {
         setOpen(false);
       })
       .catch(error=>{
-        enqueueSnackbar('Update price error!', { variant: 'warning' });
+        enqueueSnackbar('Update price error!', { variant: 'error' });
         setOnProgress(false);
       })
   };

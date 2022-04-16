@@ -59,7 +59,7 @@ export default function DeleteItem(props) {
       })
       .on('error', (error, receipt) => {
         console.error('error', error);
-        enqueueSnackbar('Burn NFT error!', { variant: 'warning' });
+        enqueueSnackbar('Burn NFT error!', { variant: 'error' });
         setOnProgress(false);
       });
   };

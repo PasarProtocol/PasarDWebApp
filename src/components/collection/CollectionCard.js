@@ -12,9 +12,11 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip } from '@mui/material';
 
 import PaperRecord from '../PaperRecord';
+import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
+
 // import Badge from '../Badge';
 // import BadgeProfile from './BadgeProfile'
-// import useSingin from '../../hooks/useSignin';
+import useSingin from '../../hooks/useSignin';
 import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -113,7 +115,7 @@ const CollectionImgBox = (props) => {
 };
 
 const CollectionCardPaper = (props) => {
-  const { info, isPreview, isOnSlider, isOwned=false } = props
+  const { info, isPreview, isOnSlider, isOwned=false, openRoyaltiesDlg } = props
   const { name, uri='', owner='', token } = info
   let { description='', avatar='', background='' } = info
 
@@ -121,6 +123,7 @@ const CollectionCardPaper = (props) => {
   const [metaObj, setMetaObj] = React.useState({});
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
+  const { setOpenDownloadEssentialDlg } = useSingin()
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -185,6 +188,12 @@ const CollectionCardPaper = (props) => {
         navigate(`/collection/edit`, {state: {token}});
         break;
       case 'royalties':
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
+          setOpenDownloadEssentialDlg(true)
+          return
+        }
+        if(openRoyaltiesDlg)
+          openRoyaltiesDlg(true)
         break;
       default:
         break;
@@ -279,6 +288,7 @@ const CollectionCardPaper = (props) => {
 
 export default function CollectionCard(props) {
   const { info, isPreview=false, isDragging } = props
+  const [isOpenUpdateRoyalties, setUpdateRoyaltiesOpen] = React.useState(false);
   const navigate = useNavigate();
 
   const route2Detail = () => {
@@ -290,8 +300,11 @@ export default function CollectionCard(props) {
     isPreview?
     <CollectionCardPaper {...props}/>:
     
-    <Box onClick={route2Detail} sx={{display: 'contents', cursor: 'pointer'}}>
-      <CollectionCardPaper {...props}/>
-    </Box>
+    <>
+      <Box onClick={route2Detail} sx={{display: 'contents', cursor: 'pointer'}}>
+        <CollectionCardPaper {...props} openRoyaltiesDlg = {setUpdateRoyaltiesOpen}/>
+      </Box>
+      <UpdateRoyaltiesDlg isOpen={isOpenUpdateRoyalties} setOpen={setUpdateRoyaltiesOpen} {...info}/>
+    </>
   );
 };
