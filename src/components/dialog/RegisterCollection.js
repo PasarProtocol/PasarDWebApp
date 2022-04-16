@@ -13,9 +13,16 @@ export default function RegisterCollection(props) {
     setOpenDlg(false)
   };
 
-  let promptTitle = type===0?"Import Collection":"Deploy Contract"
-  if(type!==0 && current!==1)
+  const titleArr = ["Import Collection", "Deploy Contract", "Update Info"]
+  let promptTitle = titleArr[type]
+  if(type===1 && current!==1)
     promptTitle = "Register Info"
+
+  let stateString = "Registering collection info..."
+  if(type===1 && current===1)
+    stateString = "Deploying new collection contract..."
+  else if(type===2)
+    stateString = "Updating collection info..."
   return (
     <Dialog open={isOpenDlg} onClose={handleClose}>
       <DialogTitle>
@@ -40,16 +47,10 @@ export default function RegisterCollection(props) {
         {
           isReadySign?
           <TransLoadingButton loading={Boolean(true)}/>:
-          <Typography variant="subtitle2" align="center">
-            {
-              type!==0 && current===1?
-              "Deploying new collection contract...":
-              "Registering collection info..."
-            }
-          </Typography>
+          <Typography variant="subtitle2" align="center">{stateString}</Typography>
         }
         {
-          type!==0&&
+          type===1&&
           <Typography variant="subtitle2" align="center" color='origin.main' sx={{my: '10px'}}>
             Step {current} of 2
           </Typography>

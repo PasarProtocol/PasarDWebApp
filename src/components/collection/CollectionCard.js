@@ -170,18 +170,19 @@ const CollectionCardPaper = (props) => {
   }, [owner]);
   
   const openPopupMenu = (event) => {
-    event.preventDefault()
+    event.stopPropagation()
     setOpenPopup(event.currentTarget);
   };
 
   const handleClosePopup = (event) => {
-    event.preventDefault()
+    event.stopPropagation()
     const type = event.target.getAttribute("value")
     switch(type){
       case 'create':
         navigate(`/create`, {state: {token}});
         break;
       case 'edit':
+        navigate(`/collection/edit`, {state: {token}});
         break;
       case 'royalties':
         break;
