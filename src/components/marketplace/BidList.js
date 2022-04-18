@@ -8,12 +8,12 @@ import palette from '../../theme/palette'
 // material
 import LoadingScreen from '../LoadingScreen';
 import Jazzicon from '../Jazzicon';
-import { reduceHexAddress, getTime, getDidInfoFromAddress } from '../../utils/common';
+import { reduceHexAddress, getTime, getDidInfoFromAddress, coinTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired
 };
-function TransItem({ trans }) {
+function TransItem({ trans, coinType }) {
   const [didName, setDidName] = React.useState('');
   const timeObj = getTime(trans.timestamp)
   React.useEffect(() => {
@@ -26,6 +26,7 @@ function TransItem({ trans }) {
           })
     }
   }, [trans]);
+  const coinName = coinTypes[coinType].name
 
   return (
       <Stack direction="row" spacing={2}>
@@ -37,7 +38,7 @@ function TransItem({ trans }) {
           </Box>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Typography variant="body2" noWrap>
-                {parseFloat((trans.price/10**18).toFixed(7))} ELA
+                {parseFloat((trans.price/10**18).toFixed(7))} {coinName}
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
                   by {didName || reduceHexAddress(trans.buyerAddr)}
@@ -59,6 +60,7 @@ export default function BitList(props) {
         <Box key={index}>
           <TransItem 
             trans={trans}
+            coinType={props.coinType}
           />
           {
             index<props.dataList.length-1&&
