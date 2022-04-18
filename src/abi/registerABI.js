@@ -60,6 +60,31 @@ module.exports.REGISTER_CONTRACT_ABI = [
         "type": "address"
       },
       {
+        "indexed": false,
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "_uri",
+        "type": "string"
+      }
+    ],
+    "name": "TokenInfoUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
         "indexed": true,
         "internalType": "address",
         "name": "_owner",
@@ -476,6 +501,29 @@ module.exports.REGISTER_CONTRACT_ABI = [
       }
     ],
     "name": "updateCodeAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_uri",
+        "type": "string"
+      }
+    ],
+    "name": "updateTokenInfo",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
