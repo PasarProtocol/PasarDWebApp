@@ -136,6 +136,10 @@ export default function EditCollection() {
     }
   }, [isOpenRegCollection]);
   
+  const handleInputName = (e)=>{
+    setCollectionName(e.target.value)
+  }
+
   const dropFileAction = (acceptedFiles, type) => {
     const accepted = acceptedFiles[0];
     if (accepted) {
@@ -287,18 +291,19 @@ export default function EditCollection() {
               'gas': _gasLimit,
               'value': 0
             };
-            // setReadySignForRegister(true)
-            // registerContract.methods.updateTokenUri(paramObj._uri).send(transactionParams)
-            //   .on('receipt', (receipt) => {
-            //       setReadySignForRegister(false)
-            //       console.log("receipt", receipt);
-            //       resolve(true)
-            //   })
-            //   .on('error', (error, receipt) => {
-            //       console.error("error", error);
-            //       reject(error)
-            //   });
-            resolve(false) // temporary
+            setReadySignForRegister(true)
+            console.log(collectionName)
+            registerContract.methods.updateTokenInfo(baseToken, collectionName, paramObj._uri).send(transactionParams)
+              .on('receipt', (receipt) => {
+                  setReadySignForRegister(false)
+                  console.log("receipt", receipt);
+                  resolve(true)
+              })
+              .on('error', (error, receipt) => {
+                  console.error("error", error);
+                  reject(error)
+              });
+            // resolve(false) // temporary
           }).catch((error) => {
             reject(error);
           })
@@ -365,12 +370,13 @@ export default function EditCollection() {
             <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Collection Name</Typography>
             <FormControl error={isOnValidation&&!collectionName.length} variant="standard" sx={{width: '100%'}}>
               <InputStyle
+                id="input-with-name"
                 startAdornment={' '}
                 value={collectionName}
-                readOnly={Boolean(true)}
+                onChange={handleInputName}
                 aria-describedby="name-error-text"
               />
-              <FormHelperText id="name-error-text" hidden={!isOnValidation||(isOnValidation&&collectionName.length>0)}>Name is not exist</FormHelperText>
+              <FormHelperText id="name-error-text" hidden={!isOnValidation||(isOnValidation&&collectionName.length>0)}>Name is required</FormHelperText>
             </FormControl>
             <Divider/>
           </Grid>
