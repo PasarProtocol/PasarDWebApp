@@ -9,6 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
+import { ERC20_CONTRACT_ABI } from '../../abi/erc20ABI';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
@@ -102,7 +103,24 @@ export default function Purchase(props) {
     const contractAbi = PASAR_CONTRACT_ABI;
     const contractAddress = MARKET_CONTRACT_ADDRESS;
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-
+    if(coinType) {
+      const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinTypes[coinType].address);
+      const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MARKET_CONTRACT_ADDRESS).call())
+      const gasPrice = await walletConnectWeb3.eth.getGasPrice();
+      if(erc20BidderApproved < _price*1){
+        console.log('Pasar marketplace not enough ERC20 allowance from bidder');
+        const txParams = {
+          'from': accounts[0],
+          'gasPrice': gasPrice,
+          'value': 0,
+        };
+        const erc20BidderApproveStatus = await erc20Contract.methods.approve(MARKET_CONTRACT_ADDRESS, _price).send(txParams)
+        if(!erc20BidderApproveStatus) {
+          enqueueSnackbar(`Approve Transaction Error!`, { variant: 'error' });
+          setOnProgress(false);
+        }
+      }
+    }
     const gasPrice = await walletConnectWeb3.eth.getGasPrice();
 
     console.log('Sending transaction with account address:', accounts[0]);

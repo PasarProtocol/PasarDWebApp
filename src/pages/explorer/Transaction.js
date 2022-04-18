@@ -61,7 +61,7 @@ export default function Transaction() {
     setAbortController(newController);
 
     setLoadingTransactions(true);
-    fetchFrom(`sticker/api/v1/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetchFrom(`api/v2/sticker/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
         setTotalCount(jsonTransactions.data.total)
         setPages(Math.ceil(jsonTransactions.data.total/showCount));
