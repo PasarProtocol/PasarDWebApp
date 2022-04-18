@@ -34,7 +34,7 @@ import ScrollManager from '../../components/ScrollManager'
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { blankAddress, marketContract } from '../../config'
-import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl,
+import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl, getCoinTypeFromToken,
   getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes, getShortUrl } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -535,7 +535,7 @@ export default function CollectibleDetail() {
                   <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>
                     Bids - <BidStatus isReserveMet={collectible.listBid[0].price/1e18 >= collectible.reservePrice/1e18}/>
                   </Typography>
-                  <BidList dataList={collectible.listBid}/>
+                  <BidList dataList={collectible.listBid} coinType={getCoinTypeFromToken(collectible)}/>
                 </PaperStyle>
               </Grid>
             )
