@@ -39,9 +39,9 @@ export default function UpdateRoyalties(props) {
     const walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
-    const gasPrice = await walletConnectWeb3.eth.getGasPrice();
-
+    
     const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, CONTRACT_ADDRESS)
+    const gasPrice = await walletConnectWeb3.eth.getGasPrice();
 
     console.log('Sending transaction with account address:', accounts[0]);
     const transactionParams = {

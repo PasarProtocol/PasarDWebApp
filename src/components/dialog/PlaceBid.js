@@ -9,6 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
+import { ERC20_CONTRACT_ABI } from '../../abi/erc20ABI';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
@@ -62,7 +63,27 @@ export default function PlaceBid(props) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const pasarContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, PASAR_CONTRACT_ABI, signer);
-        signer.getAddress().then(userAddress=>{
+        signer.getAddress().then(async userAddress=>{
+          if(coinType) {
+            const erc20Contract = new ethers.Contract(coinTypes[coinType].address, ERC20_CONTRACT_ABI, signer);
+            const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MARKET_CONTRACT_ADDRESS))
+            console.log(erc20BidderApproved)
+            const gasPrice = await provider.getGasPrice();
+            if(erc20BidderApproved < _price*1){
+              console.log('Pasar marketplace not enough ERC20 allowance from bidder');
+              const txParams = {
+                'from': userAddress,
+                'gasPrice': gasPrice,
+                'value': 0,
+              };
+              const erc20BidderApproveStatus = await(await erc20Contract.approve(MARKET_CONTRACT_ADDRESS, _price, txParams))
+              if(!erc20BidderApproveStatus) {
+                enqueueSnackbar(`Approve Transaction Error!`, { variant: 'error' });
+                setOnProgress(false);
+              }
+            }
+          }
+          
           provider.getGasPrice().then(gasPrice=>{
             const transactionParams = {
               'from': userAddress,
@@ -124,12 +145,27 @@ export default function PlaceBid(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
-    const contractAbi = PASAR_CONTRACT_ABI;
-    const contractAddress = MARKET_CONTRACT_ADDRESS;
-    const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-
+    const pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, MARKET_CONTRACT_ADDRESS);
+    if(coinType) {
+      const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinTypes[coinType].address);
+      const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MARKET_CONTRACT_ADDRESS).call())
+      const gasPrice = await walletConnectWeb3.eth.getGasPrice();
+      if(erc20BidderApproved < _price*1){
+        console.log('Pasar marketplace not enough ERC20 allowance from bidder');
+        const txParams = {
+          'from': accounts[0],
+          'gasPrice': gasPrice,
+          'value': 0,
+        };
+        const erc20BidderApproveStatus = await erc20Contract.methods.approve(MARKET_CONTRACT_ADDRESS, _price).send(txParams)
+        if(!erc20BidderApproveStatus) {
+          enqueueSnackbar(`Approve Transaction Error!`, { variant: 'error' });
+          setOnProgress(false);
+        }
+      }
+    }
     const gasPrice = await walletConnectWeb3.eth.getGasPrice();
-
+    
     console.log('Sending transaction with account address:', accounts[0]);
     const transactionParams = {
       'from': accounts[0],
@@ -168,23 +204,23 @@ export default function PlaceBid(props) {
   };
 
   const bidNft = async () => {
-    if(!bidPrice){
-      enqueueSnackbar('Bid amount is required', { variant: 'warning' });
-      return
-    }
-    if(bidPrice<Math.max(info.currentBid, info.Price)/1e18){
-      enqueueSnackbar('Your Bid amount cannot be lower than Starting Price and Current Bid', { variant: 'warning' });
-      return
-    }
-    setOnProgress(true);
-    const biderDidUri = await sendIpfsDidJson();
-    console.log('didUri:', biderDidUri);
-    const bidPriceStr = BigInt(targetPrice*1e18).toString();
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
-        callEthBidOrder(info.OrderId, biderDidUri, bidPriceStr);
-    }
-    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-        callBidOrder(info.OrderId, biderDidUri, bidPriceStr);
+      enqueueSnackbar('Please sign in with your DID', { variant: 'warning' });
+    } else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+      if(!bidPrice){
+        enqueueSnackbar('Bid amount is required', { variant: 'warning' });
+        return
+      }
+      if(bidPrice<Math.max(info.currentBid, info.Price)/1e18){
+        enqueueSnackbar('Your Bid amount cannot be lower than Starting Price and Current Bid', { variant: 'warning' });
+        return
+      }
+      setOnProgress(true);
+      const biderDidUri = await sendIpfsDidJson();
+      console.log('didUri:', biderDidUri);
+      const bidPriceStr = BigInt(targetPrice*1e18).toString();
+      
+      callBidOrder(info.OrderId, biderDidUri, bidPriceStr);
     }
   };
 
