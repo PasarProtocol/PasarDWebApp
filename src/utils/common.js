@@ -74,9 +74,8 @@ export const getCollectionTypeFromImageUrl = (metaObj) => {
   const { asset, tokenJsonVersion, data } = metaObj
   let cid = asset
   if (tokenJsonVersion === '2') {
-    if (!data)
-      return 1
-    cid = data.image
+    if (data)
+      cid = data.image
   }
   if(!cid)
     return 1

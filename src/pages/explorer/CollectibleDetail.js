@@ -17,7 +17,8 @@ import TransactionCollectibleDetail from '../../components/explorer/TransactionL
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { reduceHexAddress, getAssetImage, fetchFrom } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, fetchFrom, getCollectionTypeFromImageUrl, collectionTypes } from '../../utils/common';
+import { stickerContract as STICKER_ADDRESS } from '../../config';
 
 // ----------------------------------------------------------------------
 
@@ -63,7 +64,31 @@ export default function CollectibleDetail() {
   React.useEffect(async () => {
     const resCollectible = await fetchFrom(`sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`);
     const jsonCollectible = await resCollectible.json();
-    setCollectible(jsonCollectible.data);
+    const jsonData = jsonCollectible.data
+    if(jsonData.baseToken && jsonData.baseToken===STICKER_ADDRESS) {
+      const defaultCollection = getCollectionTypeFromImageUrl(jsonData)
+      jsonData.collection = collectionTypes[defaultCollection].name
+      jsonData.is721 = false
+    }
+    else if(jsonData.baseToken && jsonData.baseToken!==STICKER_ADDRESS) {
+      jsonData.collection = ''
+      jsonData.is721 = false
+      fetchFrom(`api/v2/sticker/getCollection/${jsonData.baseToken}`)
+        .then((response) => {
+          response.json().then((jsonAssets) => {
+            if(!jsonAssets.data)
+              return
+            setCollectible((prevState)=>{
+              const tempCollectible = {...prevState}
+              tempCollectible.collection = jsonAssets.data.name
+              tempCollectible.is721 = jsonAssets.data.is721
+              return tempCollectible
+            });
+          }).catch((e) => {
+          });
+        })
+    }
+    setCollectible(jsonData);
     setLoadingCollectible(false);
 
     
@@ -89,7 +114,7 @@ export default function CollectibleDetail() {
     setAbortController(newController);
 
     setLoadingTransRecord(true);
-    fetchFrom(`sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetchFrom(`api/v2/sticker/getTranDetailsByTokenId?tokenId=${params.collection}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
         setTotalCount(jsonTransactions.data.length)
         const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {

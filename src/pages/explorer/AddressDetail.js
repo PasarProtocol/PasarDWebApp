@@ -77,7 +77,7 @@ export default function AddressDetail() {
 
     setLoadingTransactions(true);
     const bytoKey = byto===0?"By":"To"
-    fetchFrom(`sticker/api/v1/getTranDetailsByWalletAddr?walletAddr=${params.address}&pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}&performer=${bytoKey}&keyword=${keyword}`, { signal }).then(response => {
+    fetchFrom(`api/v2/sticker/getTranDetailsByWalletAddr/${params.address}?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}&performer=${bytoKey}&keyword=${keyword}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
         setTotalCount(jsonTransactions.data.total)
         setPages(Math.ceil(jsonTransactions.data.total/showCount));
