@@ -48,14 +48,14 @@ export default function PlaceBid(props) {
     let priceValue = event.target.value;
     if (priceValue < 0) return;
     priceValue = removeLeadingZero(priceValue);
-    if(info.buyoutPrice && priceValue>=info.buyoutPrice/1e18)
+    if(!!(info.buyoutPrice*1) && priceValue>=info.buyoutPrice/1e18)
       setBuynow(true)
     else
       setBuynow(false)
     setBidPrice(priceValue);
   }
 
-  const callEthBidOrder = async (_orderId, _didUri, _price) => {
+  const callEthBidOrder = async (_orderId, _price) => {
     try {
       const { ethereum } = window;
 
@@ -76,7 +76,8 @@ export default function PlaceBid(props) {
                 'gasPrice': gasPrice,
                 'value': 0,
               };
-              const erc20BidderApproveStatus = await(await erc20Contract.approve(MARKET_CONTRACT_ADDRESS, _price, txParams))
+              const approveTxn = await erc20Contract.approve(MARKET_CONTRACT_ADDRESS, _price, txParams)
+              const erc20BidderApproveStatus = await approveTxn.wait()
               if(!erc20BidderApproveStatus) {
                 enqueueSnackbar(`Approve Transaction Error!`, { variant: 'error' });
                 setOnProgress(false);
@@ -92,9 +93,9 @@ export default function PlaceBid(props) {
               'value': coinType===0?_price:0
             };
             
-            let contractMethod = pasarContract.bidForOrder(_orderId, _price, _didUri, transactionParams)
+            let contractMethod = pasarContract.bidForOrder(_orderId, _price, null, transactionParams)
             if(isBuynow)
-              contractMethod = pasarContract.buyOrder(_orderId, _didUri, transactionParams)
+              contractMethod = pasarContract.buyOrder(_orderId, null, transactionParams)
 
             contractMethod.then((nftTxn)=>{
               console.log("Biding... please wait")
@@ -204,22 +205,22 @@ export default function PlaceBid(props) {
   };
 
   const bidNft = async () => {
+    if(!bidPrice){
+      enqueueSnackbar('Bid amount is required', { variant: 'warning' });
+      return
+    }
+    if(bidPrice<Math.max(info.currentBid, info.Price)/1e18){
+      enqueueSnackbar('Your Bid amount cannot be lower than Starting Price and Current Bid', { variant: 'warning' });
+      return
+    }
+    setOnProgress(true);
+    const bidPriceStr = BigInt(targetPrice*1e18).toString();
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
-      enqueueSnackbar('Please sign in with your DID', { variant: 'warning' });
-    } else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      if(!bidPrice){
-        enqueueSnackbar('Bid amount is required', { variant: 'warning' });
-        return
-      }
-      if(bidPrice<Math.max(info.currentBid, info.Price)/1e18){
-        enqueueSnackbar('Your Bid amount cannot be lower than Starting Price and Current Bid', { variant: 'warning' });
-        return
-      }
-      setOnProgress(true);
+      callEthBidOrder(info.OrderId, bidPriceStr);
+    }
+    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
       const biderDidUri = await sendIpfsDidJson();
       console.log('didUri:', biderDidUri);
-      const bidPriceStr = BigInt(targetPrice*1e18).toString();
-      
       callBidOrder(info.OrderId, biderDidUri, bidPriceStr);
     }
   };
