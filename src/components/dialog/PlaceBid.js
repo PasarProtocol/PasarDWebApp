@@ -88,14 +88,14 @@ export default function PlaceBid(props) {
           provider.getGasPrice().then(gasPrice=>{
             const transactionParams = {
               'from': userAddress,
-              'gasPrice': gasPrice,
+              'gasPrice': gasPrice.toBigInt(),
               // 'gas': 5000000,
               'value': coinType===0?_price:0
             };
             
-            let contractMethod = pasarContract.bidForOrder(_orderId, _price, null, transactionParams)
+            let contractMethod = pasarContract.bidForOrder(_orderId, _price, '', transactionParams)
             if(isBuynow)
-              contractMethod = pasarContract.buyOrder(_orderId, null, transactionParams)
+              contractMethod = pasarContract.buyOrder(_orderId, '', transactionParams)
 
             contractMethod.then((nftTxn)=>{
               console.log("Biding... please wait")
