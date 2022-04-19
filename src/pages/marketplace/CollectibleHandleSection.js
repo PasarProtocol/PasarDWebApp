@@ -118,7 +118,7 @@ export default function CollectibleHandleSection(props) {
               Place bid
             </StyledButton>
             {
-              collectible.buyoutPrice&&
+              !!(collectible.buyoutPrice*1)&&
               <StyledButton variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
                 Buy now for {round(collectible.buyoutPrice/1e18, 3)} {coinName}
               </StyledButton>
