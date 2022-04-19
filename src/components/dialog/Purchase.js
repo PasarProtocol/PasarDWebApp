@@ -37,7 +37,7 @@ export default function Purchase(props) {
     setOpen(false);
   };
 
-  const callEthBuyOrder = async (_orderId, _didUri, _price) => {
+  const callEthBuyOrder = async (_orderId, _price) => {
     try {
       const { ethereum } = window;
 
@@ -52,7 +52,7 @@ export default function Purchase(props) {
               'gasPrice': gasPrice.toBigInt(),
               'value': coinType===0?_price:0
             };
-            pasarContract.buyOrder(_orderId, _didUri, transactionParams).then((nftTxn)=>{
+            pasarContract.buyOrder(_orderId, '', transactionParams).then((nftTxn)=>{
               console.log("Buying... please wait")
               nftTxn.wait().then(()=>{
                 // console.log("bought")
@@ -160,13 +160,13 @@ export default function Purchase(props) {
 
   const buyNft = async () => {
     setOnProgress(true);
-    const buyerDidUri = await sendIpfsDidJson();
-    console.log('didUri:', buyerDidUri);
     const buyPrice = BigInt(priceInfo).toString();
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
-        callEthBuyOrder(info.OrderId, buyerDidUri, buyPrice);
+        callEthBuyOrder(info.OrderId, buyPrice);
     }
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+        const buyerDidUri = await sendIpfsDidJson();
+        console.log('didUri:', buyerDidUri);
         callBuyOrder(info.OrderId, buyerDidUri, buyPrice);
     }
   };
