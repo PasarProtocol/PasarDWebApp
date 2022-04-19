@@ -185,6 +185,10 @@ const CollectionCardPaper = (props) => {
         navigate(`/create`, {state: {token}});
         break;
       case 'edit':
+        if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
+          setOpenDownloadEssentialDlg(true)
+          return
+        }
         navigate(`/collection/edit`, {state: {token}});
         break;
       case 'royalties':

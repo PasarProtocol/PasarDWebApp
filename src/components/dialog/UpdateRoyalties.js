@@ -17,8 +17,15 @@ import { TextFieldStyle } from '../CustomInput';
 import { removeLeadingZero, isNumberString, reduceHexAddress, isInAppBrowser } from '../../utils/common';
 
 export default function UpdateRoyalties(props) {
-  const { isOpen, setOpen, name, token } = props;
-  const [recipientRoyaltiesGroup, setRecipientRoyaltiesGroup] = React.useState([{address: '', royalties: ''}]);
+  const { isOpen, setOpen, name, token, owners=[], feeRates=[] } = props;
+  const originRoyalties = owners.map((address, _i)=>{
+    const tempItem = {address, royalties: 0}
+    if(feeRates[_i])
+      tempItem.royalties = (feeRates[_i]*100/10**6).toString()
+    return tempItem
+  })
+  originRoyalties.push({address: '', royalties: ''})
+  const [recipientRoyaltiesGroup, setRecipientRoyaltiesGroup] = React.useState(originRoyalties);
   const [onProgress, setOnProgress] = React.useState(false);
   const [isOnValidation, setOnValidation] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
