@@ -132,8 +132,8 @@ export default function CarouselCustom({pgsize, detail}) {
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
     contractAddr: stickerContract,
     holder: detail.holder===marketContract?detail.royaltyOwner:detail.holder,
-    collection: 'Feeds NFT Sticker - FSTK',
-    tokenStandard: 'ERC-1155',
+    // collection: 'Feeds NFT Sticker - FSTK',
+    tokenStandard: detail.is721?'ERC-721':'ERC-1155',
     'blockchain': blockchain,
     // status: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?'Not on sale':'Listed on Pasar'
     status: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?0:1
