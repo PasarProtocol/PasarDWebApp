@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import MethodLabel from '../../MethodLabel';
 import CopyButton from '../../CopyButton';
-import { MethodList, reduceHexAddress, getTime } from '../../../utils/common';
+import { MethodList, reduceHexAddress, getTime, getCoinTypeFromToken, coinTypes } from '../../../utils/common';
 import {escURL, marketContract} from '../../../config'
 
 TransactionOrderDetail.propTypes = {
@@ -67,6 +67,8 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
     const platformFee = item.platformfee!==undefined?parseFloat((item.platformfee/ 10 ** 18).toFixed(7)):0
     const royalties = item.royalties!==undefined?parseFloat((item.royalties/ 10 ** 18).toFixed(7)):0
     const royaltyFee = item.royaltyFee?parseFloat((item.royaltyFee/ 10 ** 18).toFixed(7)):0
+    const coinType = getCoinTypeFromToken(item)
+    const coinName = coinTypes[coinType].name
     let methodItem = MethodList.find((item)=>item.method===method)
     if(!methodItem)
         methodItem = {color: 'grey', icon: 'tag', detail: []}
@@ -106,7 +108,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                                             </Link>:
                                                             displayValue
                                                         }
-                                                        {el.copyable?<CopyButton text={value}/>:' ELA'}
+                                                        {el.copyable?<CopyButton text={value}/>:` ${coinName}`}
                                                     </Typography>
                                                 )
                                             }
