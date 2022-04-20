@@ -308,7 +308,25 @@ export default function MyProfile() {
           </MHidden> */}
         </Box>
         <Box sx={{ display: 'flex', position: 'relative', mb: 2, justifyContent: 'center' }} align="center">
-          <Tabs value={tabValue} onChange={handleSwitchTab} TabIndicatorProps={{ style: { background: '#FF5082' } }}>
+          <Tabs 
+            value={tabValue}
+            variant="scrollable"
+            scrollButtons="auto"
+            onChange={handleSwitchTab}
+            TabIndicatorProps={{ 
+              style: { background: '#FF5082' } 
+            }}
+            TabScrollButtonProps={{
+              sx: {
+                '&.MuiTabs-scrollButtons': {
+                  display: 'inherit',
+                  '&.Mui-disabled': {
+                    display: 'none'
+                  }
+                }
+              }
+            }}
+          >
             <Tab label={`Listed (${assets[0].length})`} value={0} />
             <Tab label={`Owned (${assets[1].length})`} value={1} />
             <Tab label={`Created (${assets[2].length})`} value={2} />
