@@ -61,7 +61,7 @@ export default function CollectibleHandleSection(props) {
     getDiaTokenPrice().then((res) => {
       setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
     })
-  }, []);
+  }, [collectible]);
 
   const setCoinPriceByType = (type, value) => {
     setCoinPrice((prevState) => {
