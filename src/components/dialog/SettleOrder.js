@@ -15,6 +15,7 @@ import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import StyledButton from '../signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
+import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser } from '../../utils/common';
 
 export default function SettleOrder(props) {
@@ -24,6 +25,7 @@ export default function SettleOrder(props) {
   const [onProgress, setOnProgress] = React.useState(false);
   const context = useWeb3React();
   const { pasarLinkAddress } = useSingin()
+  const { updateCount, setUpdateCount } = useAuctionDlg()
   const { library, chainId, account } = context;
 
   const { isOpen, setOpen, info, address } = props;
@@ -67,9 +69,9 @@ export default function SettleOrder(props) {
                 enqueueSnackbar('Settle auction order success!', { variant: 'success' });
                 setOpen(false);
                 setOnProgress(false);
-                // setTimeout(()=>{
-                //   navigate('/profile/myitem/1')
-                // }, 3000)
+                setTimeout(()=>{
+                  setUpdateCount(updateCount+1)
+                }, 1000)
               }).catch((error) => {
                 console.log(error)
                 enqueueSnackbar('Settle auction order error!', { variant: 'error' });
@@ -110,9 +112,9 @@ export default function SettleOrder(props) {
       enqueueSnackbar('Settle auction order success!', { variant: 'success' });
       setOnProgress(false)
       setOpen(false)
-      // setTimeout(()=>{
-      //   navigate('/profile/myitem/1')
-      // }, 3000)
+      setTimeout(()=>{
+        setUpdateCount(updateCount+1)
+      }, 1000)
     }).catch(error=>{
       enqueueSnackbar('Settle auction order error!', { variant: 'error' })
       setOnProgress(false)

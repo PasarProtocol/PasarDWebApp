@@ -9,9 +9,11 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { isInAppBrowser } from '../../utils/common';
+import useAuctionDlg from '../../hooks/useAuctionDlg';
 
 export default function CancelSale(props) {
   const { isOpen, setOpen, name, orderId, OrderId, updateCount, handleUpdate } = props;
+  const { updateCount: updateCount2, setUpdateCount } = useAuctionDlg()
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const handleClose = () => {
@@ -47,6 +49,10 @@ export default function CancelSale(props) {
         console.log('receipt', receipt);
         if(handleUpdate)
           setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
+        else
+          setTimeout(()=>{
+            setUpdateCount(updateCount2+1)
+          }, 1000)
         enqueueSnackbar('Cancel sale Success!', { variant: 'success' });
         setOpen(false);
       })
