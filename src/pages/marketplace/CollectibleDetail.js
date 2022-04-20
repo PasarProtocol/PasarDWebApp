@@ -636,7 +636,10 @@ export default function CollectibleDetail() {
             </Link>
           </Grid>
         </Grid>
-        <CollectibleHandleSection {...{collectible, address}} onlyHandle={Boolean(true)}/>
+        {
+          !isLoadingCollectible&&
+          <CollectibleHandleSection {...{collectible, address}} onlyHandle={Boolean(true)}/>
+        }
       </Container>
     </RootStyle>
   );
