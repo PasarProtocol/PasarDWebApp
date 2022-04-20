@@ -517,7 +517,7 @@ export default function CollectibleDetail() {
                 <Typography variant="subtitle2">Collection</Typography>
                 {
                   collection?
-                  <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex' }}>
+                  <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
                     <Stack direction='row'>
                       {
                         collection.avatar?
