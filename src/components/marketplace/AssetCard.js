@@ -218,8 +218,8 @@ export default function AssetCard(props) {
               {
                 holder&&<BadgeProfile type={2} walletAddress={holder} badge={badge}/>
               }
-              {!!(reservePrice*1)&&<BadgeProfile type={3} reservePriceFlag={currentBidPrice/1e18 >= reservePrice/1e18}/>}
-              {!!(buyoutPrice*1)&&<BadgeProfile type={4}/>}
+              {!!(reservePrice*1)&&saleType!=="Not on sale"&&<BadgeProfile type={3} reservePriceFlag={currentBidPrice/1e18 >= reservePrice/1e18}/>}
+              {!!(buyoutPrice*1)&&saleType!=="Not on sale"&&<BadgeProfile type={4}/>}
             </Stack>
             <Box>
               {
