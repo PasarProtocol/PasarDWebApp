@@ -81,9 +81,7 @@ export default function CollectibleHandleSection(props) {
 
   const checkHasEnded  = () => {
     const tempEndTime = collectible.endTime*1000
-    if(!tempEndTime)
-      return
-    if(!auctionEnded&&tempEndTime<=Date.now())
+    if(!auctionEnded&&(!tempEndTime || tempEndTime<=Date.now()))
       setAuctionEnded(true)
     else
       setTimeout(()=>checkHasEnded(), 1000)
@@ -136,7 +134,7 @@ export default function CollectibleHandleSection(props) {
     else
       if(!currentBid || currentBid<collectible.reservePrice){
         statusText = !currentBid?'Starting Price':'Top Bid'
-        if(address === collectible.holder)
+        if(address === collectible.holder && collectible.SaleType !== "Not on sale")
           handleField = 
             didSignin?
             <StyledButton variant="contained" fullWidth onClick={(e)=>{setCancelOpen(true)}}>
@@ -158,12 +156,12 @@ export default function CollectibleHandleSection(props) {
         const topBuyer = collectible.listBid[0].buyerAddr
         const seller = collectible.listBid[0].sellerAddr
         
-        if(address===seller)
+        if(address===seller && collectible.SaleType !== "Not on sale")
           handleField = 
             <StyledButton variant="contained" fullWidth onClick={(e)=>{setSettleOrderOpen(true)}}>
               Accept Bid
             </StyledButton>
-        else if(address===topBuyer) {
+        else if(address===topBuyer && collectible.SaleType !== "Not on sale") {
           statusText = 'You Won!'
           handleField = 
             <StyledButton variant="contained" fullWidth onClick={(e)=>{setSettleOrderOpen(true)}}>
