@@ -81,7 +81,7 @@ export default function Explorer() {
   return (
     <RootStyle title="Collections | PASAR">
       <Container maxWidth="lg">
-        <Box sx={{ position: 'relative', justifyContent: 'center' }}>
+        <Box sx={{ position: 'relative', justifyContent: 'center', mb: 3 }}>
           <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
             Collections
           </Typography>

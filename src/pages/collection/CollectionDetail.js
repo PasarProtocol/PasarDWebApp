@@ -36,10 +36,13 @@ import { fetchFrom, getIpfsUrl, reduceHexAddress, getDidInfoFromAddress } from '
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
-  paddingTop: theme.spacing(11),
+  paddingTop: theme.spacing(10),
   paddingBottom: theme.spacing(12),
+  [theme.breakpoints.up('md')]: {
+    paddingTop: theme.spacing(13)
+  },
   [theme.breakpoints.down('md')]: {
-    paddingBottom: theme.spacing(8)
+    paddingBottom: theme.spacing(3)
   }
 }));
 
@@ -388,8 +391,8 @@ export default function CollectionDetail() {
   }
   const loadingSkeletons = Array(25).fill(null)
   return (
-    <ScrollManager scrollKey="collection-asset-key" isAlreadyMounted={isAlreadyMounted}>
-      {({ connectScrollTarget, ...props }) => 
+    // <ScrollManager scrollKey="collection-asset-key" isAlreadyMounted={isAlreadyMounted}>
+    //   {({ connectScrollTarget, ...props }) => 
         <RootStyle title="CollectionDetail | PASAR">
           <Stack direction="row">
             <Container maxWidth={false}>
@@ -655,7 +658,7 @@ export default function CollectionDetail() {
             </Box>
           </MHidden>
         </RootStyle>
-      }
-    </ScrollManager>
+    //   }
+    // </ScrollManager>
   );
 }
