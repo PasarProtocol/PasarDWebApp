@@ -175,7 +175,7 @@ export default function MyItems() {
       .fill(0)
       .forEach((_, i) => {
         setLoadingAssetsOfType(i, true);
-        fetchFrom(`sticker/api/v1/${apiNames[i]}?address=${walletAddress}&orderType=${orderType}`, { signal })
+        fetchFrom(`api/v2/sticker/${apiNames[i]}/${walletAddress}?orderType=${orderType}`, { signal })
           .then((response) => {
             response.json().then((jsonAssets) => {
               setAssetsOfType(i, jsonAssets.data);

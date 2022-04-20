@@ -34,8 +34,8 @@ import ScrollManager from '../../components/ScrollManager'
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { blankAddress, marketContract } from '../../config'
-import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCollectionTypeFromImageUrl, getCoinTypeFromToken,
-  getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes, getShortUrl } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCoinTypeFromToken,
+  getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes, getShortUrl, getIpfsUrl } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -71,11 +71,11 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
     right: 0
   }
 }));
-const AvatarStyle = styled(Box)(({ theme }) => ({
+const AvatarStyle = styled(Box)(({ theme, src }) => ({
   width: 40,
   height: 40,
   borderRadius: '100%',
-  backgroundColor: 'black',
+  backgroundColor: src?'unset':'black',
   marginRight: 8
 }));
 const Property = ({type, name}) => (
@@ -118,7 +118,7 @@ export default function CollectibleDetail() {
   const [shareUrl, setShareUrl] = React.useState(window.location.href);
 
   const [collectible, setCollectible] = React.useState({});
-  const [collectionType, setCollectionType] = React.useState(null);
+  const [collection, setCollection] = React.useState(null);
   const [badge, setBadge] = React.useState({creator: {dia: false, kyc: false}, owner: {dia: false, kyc: false}});
   const [didName, setDidName] = React.useState({creator: '', owner: ''});
   const [transRecord, setTransRecord] = React.useState([]);
@@ -163,8 +163,29 @@ export default function CollectibleDetail() {
     if(jsonCollectible.data){
       try{
         setCollectible(jsonCollectible.data);
-        const collectionTypeId = getCollectionTypeFromImageUrl(jsonCollectible.data)
-        setCollectionType(collectionTypes[collectionTypeId])
+
+        fetchFrom(`api/v2/sticker/getCollection/${jsonCollectible.data.baseToken}`)
+          .then((response) => {
+            response.json().then((jsonAssets) => {
+              if(!jsonAssets.data)
+                return
+              setCollection({...jsonAssets.data, avatar: ''});
+              const metaUri = getIpfsUrl(jsonAssets.data.uri)
+              if(metaUri) {
+                fetch(metaUri)
+                  .then(response => response.json())
+                  .then(data => {
+                    setCollection((prevState)=>{
+                      const tempState = {...prevState}
+                      tempState.avatar = getIpfsUrl(data.data.avatar)
+                      return tempState
+                    });
+                  });
+              }
+            }).catch((e) => {
+            });
+          })
+
         getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
           if(dia!=='0')
             setBadgeOfUser('creator', 'dia', true)
@@ -495,11 +516,17 @@ export default function CollectibleDetail() {
                 </Stack>
                 <Typography variant="subtitle2">Collection</Typography>
                 {
-                  collectionType?
-                  <Stack direction='row'>
-                    <AvatarStyle draggable = {false} component="img" src={collectionType.avatar} sx={{ p: 1 }} />
-                    <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>{collectionType.name} ({collectionType.shortName})</Typography>
-                  </Stack>:
+                  collection?
+                  <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex' }}>
+                    <Stack direction='row'>
+                      {
+                        collection.avatar?
+                        <AvatarStyle draggable = {false} component="img" src={collection.avatar} />:
+                        <AvatarStyle sx={{ p: 1 }} />
+                      }
+                      <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>{collection.name} ({collection.symbol})</Typography>
+                    </Stack>
+                  </Link>:
                   <AvatarStyle sx={{ p: 1 }} />
                 }
               </Stack>
