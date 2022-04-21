@@ -26,7 +26,9 @@ const DrawerStyle = styled(Drawer)(({ theme }) => ({
     }),
   }
 }));
-
+const AccordionStyle = styled(Accordion)(({ theme }) => ({
+  backgroundColor: 'unset'
+}))
 export default function CollectionFilterPan(props){
   const {sx, scrollMaxHeight, btnNames, filterProps, handleFilter} = props
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
@@ -55,7 +57,7 @@ export default function CollectionFilterPan(props){
     >
       <Grid container width="100%">
         <Grid item xs={12} md={12}>
-          <Accordion
+          <AccordionStyle
             defaultExpanded={1&&true}
           >
             <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
@@ -66,21 +68,21 @@ export default function CollectionFilterPan(props){
               {
                 [...btnNames].splice(0,2).map((name, index)=>(
                   filterProps.selectedBtns?
-                  <Button key={index} variant={filterProps.selectedBtns.includes(index)?"contained":"outlined"} color="primary" onClick={()=>handleFilter('statype', index)}>
+                  <Button key={index} variant={filterProps.selectedBtns.includes(index)?"contained":"outlined"} color="inherit" onClick={()=>handleFilter('statype', index)}>
                     {name}
                   </Button>:
-                  <Button key={index} variant="outlined" color="primary" onClick={()=>handleFilter('statype', index)}>
+                  <Button key={index} variant="outlined" color="inherit" onClick={()=>handleFilter('statype', index)}>
                     {name}
                   </Button>
                 ))
               }
               </Stack>
             </AccordionDetails>
-          </Accordion>
+          </AccordionStyle>
           <Divider />
         </Grid>
         <Grid item xs={12} md={12}>
-          <Accordion
+          <AccordionStyle
             defaultExpanded={1&&true}
           >
             <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
@@ -128,8 +130,8 @@ export default function CollectionFilterPan(props){
                 </Button>
               </Stack>
             </AccordionDetails>
-          </Accordion>
-          <Divider />
+          </AccordionStyle>
+          {/* <Divider /> */}
         </Grid>
       </Grid>
     </Box>
