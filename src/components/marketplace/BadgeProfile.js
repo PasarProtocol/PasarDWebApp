@@ -5,6 +5,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Box, Stack, Typography, Menu, Popover, Popper, Tooltip, Link, Fade, SvgIcon } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BoltIcon from '@mui/icons-material/Bolt';
+import { Icon } from '@iconify/react';
 
 import Badge from '../Badge';
 import Jazzicon from '../Jazzicon';
@@ -129,9 +130,11 @@ export default function BadgeProfile(props) {
                 <Box sx={{...AvatarBoxStyle}}>
                   {
                     type===1&&
-                    <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
-                      <Box draggable = {false} component="img" src={avatar} sx={{ width: avatar&&avatar.startsWith('/static')?35:60 }} />
-                    </Box>
+                    <Link to={`/collection/detail/${token}`} component={RouterLink} color='text.primary'>
+                      <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+                        <Box draggable = {false} component="img" src={avatar} sx={{ width: avatar&&avatar.startsWith('/static')?35:60 }} />
+                      </Box>
+                    </Link>
                   }
                   {
                     type===2&&
@@ -146,7 +149,9 @@ export default function BadgeProfile(props) {
                 </Box>
                 {
                   type===1?
-                  <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>:
+                  <Link to={`/collection/detail/${token}`} component={RouterLink} color='text.primary'>
+                    <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
+                  </Link>:
 
                   <Link to={`/profile/others/${walletAddress}`} component={RouterLink} color='text.primary'>
                     <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
@@ -155,7 +160,9 @@ export default function BadgeProfile(props) {
                 {
                   dispAddress&&(
                     type===1?
-                    <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{dispAddress}</Typography>:
+                    <Typography variant='subtitle2' sx={{fontWeight: 'normal', display: 'flex', alignItems: 'center'}}>
+                      <Icon icon="teenyicons:contract-outline" width="14px" style={{marginRight: 4}}/>{dispAddress}
+                    </Typography>:
 
                     <Link to={`/profile/others/${walletAddress}`} component={RouterLink} color='text.primary'>
                       <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{dispAddress}</Typography>
