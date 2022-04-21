@@ -5,7 +5,8 @@ import { ethers } from 'ethers';
 import { addDays } from 'date-fns';
 import * as math from 'mathjs';
 import { useWeb3React } from '@web3-react/core';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, Divider, FormControl, Input, InputLabel, Tooltip } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, 
+  Divider, FormControl, Input, InputLabel, Tooltip, FormControlLabel,  } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { Icon } from '@iconify/react';
@@ -15,21 +16,27 @@ import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
-import useSingin from '../../hooks/useSignin';
 import StartingDateSelect from '../marketplace/StartingDateSelect'
 import ExpirationDateSelect from '../marketplace/ExpirationDateSelect'
 import CoinSelect from '../marketplace/CoinSelect';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
+import CustomSwitch from '../custom-switch';
+import CoinTypeLabel from '../CoinTypeLabel';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString } from '../../utils/common';
+import useSingin from '../../hooks/useSignin';
 
 export default function Auction(props) {
-  const { isOpen, setOpen, name, tokenId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate } = props;
   const navigate = useNavigate();
   // const [balance, setBalance] = useState(0);
   const [onProgress, setOnProgress] = useState(false);
-  const [price, setPrice] = useState('');
+  const [startingPrice, setStartingPrice] = useState('');
+  const [buyoutPrice, setBuyoutPrice] = React.useState('');
+  const [reservePrice, setReservePrice] = React.useState('');
   const [startingDate, setStartingDate] = React.useState(0);
+  const [isBuynowForAuction, setBuynowForAuction] = React.useState(false);
+  const [isReserveForAuction, setReserveForAuction] = React.useState(false);
   const [expirationDate, setExpirationDate] = React.useState(addDays(new Date(), 1));
   const [dateCount, setDateCount] = React.useState(0);
   const [coinType, setCoinType] = React.useState(0);
@@ -71,19 +78,37 @@ export default function Auction(props) {
     setExpirationDate(date)
     setDateCount(dateCount+1)
   }
+
   const handleClose = () => {
     setOpen(false);
     setOnProgress(false);
   }
 
-  const handleChangePrice = (event) => {
+  const handleChangePrice = (event, type) => {
     let priceValue = event.target.value;
     if (priceValue < 0) return;
     priceValue = removeLeadingZero(priceValue);
-    setPrice(priceValue);
+    if(type==="starting")
+      setStartingPrice(priceValue);
+    else if(type==="reserve")
+      setReservePrice(priceValue);
+    else if(type==="buyout")
+      setBuyoutPrice(priceValue);
   }
 
-  const callSetApprovalForAllAndAuction = (_operator, _price, _didUri) => (
+  const handleBuynowForAuction = (event) => {
+    if(!event.target.checked)
+      setBuyoutPrice('')
+    setBuynowForAuction(event.target.checked);
+  };
+
+  const handleReserveForAuction = (event) => {
+    if(!event.target.checked)
+      setReservePrice('')
+    setReserveForAuction(event.target.checked);
+  };
+
+  const callSetApprovalForAllAndAuction = (_operator, _startingPrice, _reservePrice, _buyoutPrice, _didUri) => (
     new Promise((resolve, reject) => {
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       // const accounts = await walletConnectWeb3.eth.getAccounts();
@@ -112,7 +137,10 @@ export default function Auction(props) {
                   callContractMethod('createOrderForAuction', coinType, {
                     '_id': tokenId,
                     '_amount': 1,
-                    '_minPrice': _price,
+                    '_baseAddress': baseToken,
+                    '_minPrice': _startingPrice,
+                    '_reservePrice': _reservePrice,
+                    '_buyoutPrice': _buyoutPrice,
                     '_endTime': (expirationDate.getTime() / 1000).toFixed(),
                     '_didUri': _didUri
                   }).then((success) => {
@@ -129,7 +157,10 @@ export default function Auction(props) {
               callContractMethod('createOrderForAuction', coinType, {
                 '_id': tokenId,
                 '_amount': 1,
-                '_minPrice': _price,
+                '_baseAddress': baseToken,
+                '_minPrice': _startingPrice,
+                '_reservePrice': _reservePrice,
+                '_buyoutPrice': _buyoutPrice,
                 '_endTime': (expirationDate.getTime() / 1000).toFixed(),
                 '_didUri': _didUri
               }).then((success) => {
@@ -145,24 +176,36 @@ export default function Auction(props) {
   )
 
   const auctionNft = async () => {
-    setOnProgress(true);
-    const didUri = await sendIpfsDidJson();
-    const bidPrice = BigInt(price*1e18).toString();
-    console.log('--------', tokenId, '--', bidPrice, '--', didUri, '--');
-    callSetApprovalForAllAndAuction(MARKET_CONTRACT_ADDRESS, bidPrice, didUri).then(result=>{
-      if(result){
-        setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
-        enqueueSnackbar('Auction success!', { variant: 'success' });
-        setOpen(false);
-      } else {
+    if(!startingPrice)
+      enqueueSnackbar('Starting price is required.', { variant: 'warning' });
+    else if(reservePrice.length && startingPrice*1>reservePrice*1)
+      enqueueSnackbar('Starting price must be less than Reserve price.', { variant: 'warning' });
+    else if(buyoutPrice.length && startingPrice*1>=buyoutPrice*1)
+      enqueueSnackbar('Starting price must be less than Buy Now price.', { variant: 'warning' });
+    else if(reservePrice.length && buyoutPrice.length && reservePrice*1>=buyoutPrice*1)
+      enqueueSnackbar('Reserve price must be less than Buy Now price.', { variant: 'warning' });
+    else {
+      setOnProgress(true);
+      const didUri = await sendIpfsDidJson();
+      const _startingPrice = BigInt(startingPrice*1e18).toString();
+      const _reservePrice = BigInt(reservePrice*1e18).toString();
+      const _buyoutPrice = BigInt(buyoutPrice*1e18).toString();
+      console.log('--------', tokenId, '--', _startingPrice, '--', _reservePrice, '--', _buyoutPrice, '--', didUri, '--');
+      callSetApprovalForAllAndAuction(MARKET_CONTRACT_ADDRESS, _startingPrice, _reservePrice, _buyoutPrice, didUri).then(result=>{
+        if(result){
+          setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
+          enqueueSnackbar('Auction success!', { variant: 'success' });
+          setOpen(false);
+        } else {
+          enqueueSnackbar('Auction error!', { variant: 'error' });
+          setOnProgress(false);
+        }
+      }).catch(e=>{
         enqueueSnackbar('Auction error!', { variant: 'error' });
         setOnProgress(false);
-      }
-    }).catch(e=>{
-      enqueueSnackbar('Auction error!', { variant: 'error' });
-      setOnProgress(false);
-      console.log(e)
-    });
+        console.log(e)
+      });
+    }
   }
 
   const TypographyStyle = {display: 'inline', lineHeight: 1.1}
@@ -197,8 +240,8 @@ export default function Auction(props) {
           <InputStyle
             type="number"
             id="input-with-price"
-            value={price}
-            onChange={handleChangePrice}
+            value={startingPrice}
+            onChange={(e)=>{handleChangePrice(e, 'starting')}}
             startAdornment={' '}
             endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
           />
@@ -229,6 +272,89 @@ export default function Auction(props) {
         <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main' }}>
           Auction ends on {getDateTimeString(expirationDate)}
         </Typography>
+
+        <Grid item xs={12}>
+          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Reserve Price</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Stack direction="row">
+            <InputLabelStyle sx={{ fontSize: 12, flex: 1 }}>
+              Set a minimum price before auction can complete
+            </InputLabelStyle>
+            <FormControlLabel
+              control={<CustomSwitch onChange={handleReserveForAuction}/>}
+              sx={{mt:-2, mr: 0}}
+              label=""
+            />
+          </Stack>
+        </Grid>
+        {
+          isReserveForAuction&&
+          <>
+            <Grid item xs={12}>
+              <Typography variant="h4" sx={{fontWeight: 'normal'}}>Reserve Price</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl variant="standard" sx={{width: '100%'}}>
+                <InputLabelStyle htmlFor="input-reserve-price">
+                  Enter reserve price
+                </InputLabelStyle>
+                <InputStyle
+                  type="number"
+                  id="input-reserve-price"
+                  value={reservePrice}
+                  onChange={(e)=>{handleChangePrice(e, 'reserve')}}
+                  startAdornment={' '}
+                  endAdornment={
+                    <CoinTypeLabel type={coinType}/>
+                  }
+                />
+              </FormControl>
+              <Divider/>
+            </Grid>
+          </>
+        }
+        <Grid item xs={12}>
+          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Buy Now Price</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Stack direction="row">
+            <InputLabelStyle sx={{ fontSize: 12, flex: 1, pr: 1 }}>
+              Set instant purchase price (auction ends immediately after a sale)
+            </InputLabelStyle>
+            <FormControlLabel
+              control={<CustomSwitch onChange={handleBuynowForAuction}/>}
+              sx={{mt:-2, mr: 0}}
+              label=""
+            />
+          </Stack>
+        </Grid>
+        {
+          isBuynowForAuction&&
+          <>
+            <Grid item xs={12}>
+              <Typography variant="h4" sx={{fontWeight: 'normal'}}>Buy Now Price</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl variant="standard" sx={{width: '100%'}}>
+                <InputLabelStyle htmlFor="input-buynow-price">
+                  Enter buy now price
+                </InputLabelStyle>
+                <InputStyle
+                  type="number"
+                  id="input-buynow-price"
+                  value={buyoutPrice}
+                  onChange={(e)=>{handleChangePrice(e, 'buyout')}}
+                  startAdornment={' '}
+                  endAdornment={
+                    <CoinTypeLabel type={coinType}/>
+                  }
+                />
+              </FormControl>
+              <Divider/>
+            </Grid>
+          </>
+        }
         <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
           <TransLoadingButton
             loading={onProgress}
