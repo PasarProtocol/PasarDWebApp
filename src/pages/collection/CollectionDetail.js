@@ -175,6 +175,7 @@ export default function CollectionDetail() {
       `status=${statusFilter}&`+
       `tokenType=${selectedTokens.join(',')}&`+
       `itemType=${itemTypeFilter}&`+
+      `minPrice=${range.min!==''?range.min*1e18:''}&`+
       `maxPrice=${range.max!==''?range.max*1e18:''}&`+
       `order=${order}&`+
       `keyword=${params.key?params.key:''}&`+
