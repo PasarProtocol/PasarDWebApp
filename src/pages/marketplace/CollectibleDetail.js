@@ -460,7 +460,7 @@ export default function CollectibleDetail() {
               <Typography variant="h4">
                   {collectible.name}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>{collectible.description}</Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', wordBreak: 'break-word' }}>{collectible.description}</Typography>
               <Stack sx={{mt: 2}} spacing={1}>
                 <Typography variant="subtitle2">Creator</Typography>
                 <Stack direction='row'>
@@ -560,7 +560,13 @@ export default function CollectibleDetail() {
               <Grid item xs={12}>
                 <PaperStyle>
                   <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>
-                    Bids - <BidStatus isReserveMet={collectible.listBid[0].price/1e18 >= collectible.reservePrice/1e18}/>
+                    Bids
+                    {
+                      !!(collectible.reservePrice*1)&&
+                      <>
+                        {' '}- <BidStatus isReserveMet={collectible.listBid[0].price/1e18 >= collectible.reservePrice/1e18}/>
+                      </>
+                    }
                   </Typography>
                   <BidList dataList={collectible.listBid} coinType={getCoinTypeFromToken(collectible)}/>
                 </PaperStyle>
