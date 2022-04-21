@@ -71,7 +71,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 export default function CollectionDetail() {
   const sessionDispMode = sessionStorage.getItem("disp-mode")
-  const sessionFilterProps = JSON.parse(sessionStorage.getItem("filter-props")) || {}
+  const sessionFilterProps = JSON.parse(sessionStorage.getItem("filter-props-other")) || {}
   const params = useParams(); // params.key
   const drawerWidth = 360;
   const btnNames = ["Buy Now", "On Auction"]
@@ -91,7 +91,6 @@ export default function CollectionDetail() {
   const [metaObj, setMetaObj] = React.useState({});
   const [didName, setDidName] = React.useState('');
   const [assets, setAssets] = React.useState([]);
-  const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
   const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
   const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
   const [range, setRange] = React.useState(sessionFilterProps.range || {min:'', max:''});
@@ -101,7 +100,6 @@ export default function CollectionDetail() {
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({
     selectedBtns: sessionFilterProps.selectedBtns || [],
-    selectedCollections: sessionFilterProps.selectedCollections || [],
     selectedTokens: sessionFilterProps.selectedTokens || [],
     range: sessionFilterProps.range || {min:'', max:''},
     ...sessionFilterProps
@@ -162,50 +160,48 @@ export default function CollectionDetail() {
   }
 
   React.useEffect(async () => {
-    // controller.abort(); // cancel the previous request
-    // const newController = new AbortController();
-    // const {signal} = newController;
-    // setAbortController(newController);
-    // let statusFilter = [...btnNames].splice(0, 2).filter((name, index)=>selectedBtns.indexOf(index)>=0)
-    // statusFilter = (statusFilter.length===2 || statusFilter.length===0)?'All':statusFilter[0]
-    // let itemTypeFilter = [...btnNames].splice(2, 2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
-    // itemTypeFilter = (itemTypeFilter.length===2 || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
-    // if(itemTypeFilter==='general')
-    //   itemTypeFilter = itemTypeFilter.concat(',image')
-    // setLoadingAssets(true);
-    // fetchFrom(`sticker/api/v1/getDetailedCollectibles?`+
-    //   `collectionType=&`+
-    //   `status=${statusFilter}&`+
-    //   `itemType=${itemTypeFilter}&`+
-    //   `adult=${adult}&`+
-    //   `minPrice=${range.min!==''?range.min*1e18:''}&`+
-    //   `maxPrice=${range.max!==''?range.max*1e18:''}&`+
-    //   `order=${order}&`+
-    //   `keyword=${params.key?params.key:''}&`+
-    //   `pageNum=${page}&`+
-    //   `pageSize=${showCount}`, { signal }).then(response => {
-    //   response.json().then(jsonAssets => {
-    //     if(jsonAssets.data){
-    //       setTotalCount(jsonAssets.data.total)
-    //       setPages(Math.ceil(jsonAssets.data.total/showCount));
-    //       if(loadNext)
-    //         setAssets([...assets, ...jsonAssets.data.result]);
-    //       else {
-    //         setAssets(jsonAssets.data.result);
-    //         // window.scrollTo(0,0)
-    //       }
-    //     }
-    //     setAlreadyMounted(false)
-    //     setLoadNext(false)
-    //     setLoadingAssets(false)
-    //   })
-    // }).catch(e => {
-    //   if(e.code !== e.ABORT_ERR)
-    //     setLoadingAssets(false);
-    // });
-    // sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, selectedCollections, selectedTokens, adult, order}))
-    // setFilterForm({selectedBtns, range, selectedCollections, selectedTokens, adult, order})
-  }, [page, showCount, selectedBtns, selectedCollections, selectedTokens, adult, range, order, params.key]);
+    controller.abort(); // cancel the previous request
+    const newController = new AbortController();
+    const {signal} = newController;
+    setAbortController(newController);
+    let statusFilter = [...btnNames].splice(0, 2).filter((name, index)=>selectedBtns.indexOf(index)>=0)
+    statusFilter = (statusFilter.length===2 || statusFilter.length===0)?'All':statusFilter[0]
+    let itemTypeFilter = [...btnNames].splice(2, 2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
+    itemTypeFilter = (itemTypeFilter.length===2 || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
+    if(itemTypeFilter==='general')
+      itemTypeFilter = itemTypeFilter.concat(',image')
+    setLoadingAssets(true);
+    fetchFrom(`api/v2/sticker/getDetailedCollectiblesInCollection/${params.collection}?`+
+      `status=${statusFilter}&`+
+      `tokenType=${selectedTokens.join(',')}&`+
+      `itemType=${itemTypeFilter}&`+
+      `maxPrice=${range.max!==''?range.max*1e18:''}&`+
+      `order=${order}&`+
+      `keyword=${params.key?params.key:''}&`+
+      `pageNum=${page}&`+
+      `pageSize=${showCount}`, { signal }).then(response => {
+      response.json().then(jsonAssets => {
+        if(jsonAssets.data){
+          setTotalCount(jsonAssets.data.total)
+          setPages(Math.ceil(jsonAssets.data.total/showCount));
+          if(loadNext)
+            setAssets([...assets, ...jsonAssets.data.result]);
+          else {
+            setAssets(jsonAssets.data.result);
+            // window.scrollTo(0,0)
+          }
+        }
+        setAlreadyMounted(false)
+        setLoadNext(false)
+        setLoadingAssets(false)
+      })
+    }).catch(e => {
+      if(e.code !== e.ABORT_ERR)
+        setLoadingAssets(false);
+    });
+    sessionStorage.setItem("filter-props-other", JSON.stringify({selectedBtns, range, selectedTokens, adult, order}))
+    setFilterForm({selectedBtns, range, selectedTokens, adult, order})
+  }, [page, showCount, selectedBtns, selectedTokens, adult, range, order, params.key]);
   
   const handleDispmode = (event, mode) => {
     if(mode===null)
@@ -254,18 +250,6 @@ export default function CollectionDetail() {
       return tempBtns
     })
   }
-  const handleSelectedCollections = (value)=>{
-    setSelectedCollections((prevState) => {
-      const tempCollections = [...prevState]
-      if(!tempCollections.includes(value)){
-        tempCollections.push(value)
-      } else {
-        const findIndex = tempCollections.indexOf(value)
-        tempCollections.splice(findIndex, 1)
-      }
-      return tempCollections
-    })
-  }
   const handleSelectedTokens = (value)=>{
     setSelectedTokens((prevState) => {
       const tempTokens = [...prevState]
@@ -292,14 +276,8 @@ export default function CollectionDetail() {
         setSelectedByValue(value.min || value.max, rangeBtnId)
         setRange(value)
         break
-      case 'collection':
-        handleSelectedCollections(value)
-        break
       case 'token':
         handleSelectedTokens(value)
-        break
-      case 'selectedCollections':
-        setSelectedCollections(value)
         break
       case 'selectedTokens':
         setSelectedTokens(value)
@@ -338,14 +316,6 @@ export default function CollectionDetail() {
       } else if(tempBtns.includes(rangeBtnId)){
         const findIndex = tempBtns.indexOf(rangeBtnId)
         tempBtns.splice(findIndex, 1)
-      }
-    }
-    else if(key==='collection'){
-      if(!tempForm.selectedCollections.includes(value)){
-        tempForm.selectedCollections.push(value)
-      } else {
-        const findIndex = tempForm.selectedCollections.indexOf(value)
-        tempForm.selectedCollections.splice(findIndex, 1)
       }
     }
     else if(key==='token'){
@@ -518,7 +488,7 @@ export default function CollectionDetail() {
                         transition: 'all ease .5s',
                         p: 1
                       }}
-                      filterProps = {{selectedBtns, selectedCollections, selectedTokens, range, adult, order}}
+                      filterProps = {{selectedBtns, selectedTokens, range, adult, order}}
                       {...{btnNames, handleFilter}}
                     />
                   </Box>
