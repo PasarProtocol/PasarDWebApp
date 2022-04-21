@@ -24,13 +24,9 @@ const GridItems = (props) => (
           exit={{ opacity: 0 }}
         >
           <AssetCard
+            {...props}
             thumbnail={src}
             name={props.multiNames[index]}
-            description={props.description}
-            price={props.price}
-            quantity={props.quantity}
-            coinType={props.coinType}
-            coinUSD={props.coinUSD}
             isLink={false}
             type={0}
             defaultCollectionType={0}

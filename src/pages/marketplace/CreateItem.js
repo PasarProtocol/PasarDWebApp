@@ -1348,6 +1348,7 @@ export default function CreateItem() {
                     ):(
                       <MultiMintGrid
                         assets={previewFiles}
+                        baseToken={collection==="Choose"?selectedCollection.token:CONTRACT_ADDRESS}
                         orderType={saletype==='Auction'?auctionOrderType:1}
                         {...{multiNames, description, quantity, price, coinType, coinUSD, reservePrice, buyoutPrice}}
                       />
