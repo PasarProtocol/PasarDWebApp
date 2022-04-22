@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { isMobile } from 'react-device-detect';
 import * as math from 'mathjs';
 import Imgix from "react-imgix";
 import jwtDecode from 'jwt-decode';
@@ -9,7 +10,7 @@ import editIcon from '@iconify-icons/akar-icons/edit';
 import { alpha, styled } from '@mui/material/styles';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip } from '@mui/material';
+import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip, Popper, Fade } from '@mui/material';
 
 import PaperRecord from '../PaperRecord';
 import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
@@ -77,7 +78,9 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
 }));
 
 const CollectionImgBox = (props) => {
-  const { backgroundImg, avatar } = props;
+  const { name, backgroundImg, avatar } = props;
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [openGroupBox, setOpenGroupBox] = React.useState(false);
   const imageStyle = {
     // borderRadius: 1,
     // boxShadow: (theme)=>theme.customShadows.z16,
@@ -85,7 +88,27 @@ const CollectionImgBox = (props) => {
     display: 'inline-flex',
     height: '100%',
   }
-
+  const handlePopoverOpen = (event) => {
+    if (isMobile && event.type === 'mouseenter') return;
+    setAnchorEl(event.currentTarget)
+    setOpenGroupBox(true);
+  };
+  const handlePopoverClose = () => {
+    setOpenGroupBox(false);
+  };
+  const avatarAction = {
+    onClick: handlePopoverOpen,
+    onMouseEnter: handlePopoverOpen,
+    onMouseLeave: handlePopoverClose
+  }
+  const tempImages = [
+    "https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
+    "https://images.unsplash.com/photo-1506710507565-203b9f24669b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1536&q=80",
+    "https://images.unsplash.com/photo-1536987333706-fc9adfb10d91?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
+    "https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
+    "https://images.unsplash.com/photo-1506710507565-203b9f24669b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1536&q=80",
+    "https://images.unsplash.com/photo-1536987333706-fc9adfb10d91?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
+  ];
   return (
     <Stack sx={{position: 'relative', height: '120px', mb: '25px'}}>
       <Stack sx={{height: '100%', overflow: 'hidden'}}>
@@ -108,8 +131,65 @@ const CollectionImgBox = (props) => {
         <MarkBoxStyle>
           <Box draggable = {false} component="img" src={avatar} />
         </MarkBoxStyle>:
-        <AvatarBoxStyle draggable = {false} component="img" src={avatar} />
+        <AvatarBoxStyle draggable = {false} component="img" src={avatar} {...avatarAction}/>
       }
+      <Popper
+        open={openGroupBox}
+        anchorEl={anchorEl}
+        onMouseEnter={()=>{setOpenGroupBox(true)}}
+        onMouseLeave={()=>{setOpenGroupBox(false)}}
+        onClick={(e)=>{e.stopPropagation()}}
+        placement="bottom"
+        transition
+      >
+        {
+          ({ TransitionProps }) => (
+            <Fade {...TransitionProps}>
+              <Stack sx={{minWidth: 180, maxWidth: 400, py: 2, alignItems: 'center', borderRadius: 1, boxShadow: (theme) => theme.customShadows.z12, background: (theme) => theme.palette.background.paper}}>
+                <Typography variant="h5" noWrap>{name}</Typography>
+                <TypographyStyle variant="subtitle2" color="text.secondary" noWrap>200 items</TypographyStyle>
+                <Grid container sx={{pt: 2}}>
+                  <Grid item sm={4} textAlign="center">
+                    <Typography variant="h6" noWrap>{(2500).toLocaleString("en-US")}</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline-flex' }}>
+                      <Box component="img" src="/static/elastos.svg" sx={{ width: 14, mr: .5, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
+                      {' '}Volume
+                    </Typography>
+                  </Grid>
+                  <Grid item sm={4} textAlign="center">
+                    <Typography variant="h6" noWrap>1000</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline-flex' }}>
+                      <span role="img" aria-label="">🔻</span> Floor Price
+                    </Typography>
+                  </Grid>
+                  <Grid item sm={4} textAlign="center">
+                    <Typography variant="h6" noWrap>100</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline-flex' }}>
+                      <span role="img" aria-label="">💪</span> Owners
+                    </Typography>
+                  </Grid>
+                </Grid>
+                <Grid container sx={{py: 2}}>
+                  {
+                    tempImages.map((imgSrc, _i)=>(
+                      <Grid item sm={4} key={_i}>
+                        {
+                          _i===5?
+                          <Box sx={{position: 'relative', background: '#161c24'}}>
+                            <Box component="img" src={imgSrc} sx={{height: "100%", maxHeight: 100, opacity: .5, filter: 'blur(2px)'}}/>
+                            <Typography variant="h6" align='center' sx={{width: '100%', top: '50%', color: 'white', position: 'absolute', transform: 'translateY(-50%)'}}>+ more</Typography>
+                          </Box>:
+                          <Box component="img" src={imgSrc} sx={{height: "100%", maxHeight: 100}}/>
+                        }
+                      </Grid>
+                    ))
+                  }
+                </Grid>
+              </Stack>
+            </Fade>
+          )
+        }
+      </Popper>
     </Stack>
   );
 };
@@ -208,7 +288,7 @@ const CollectionCardPaper = (props) => {
   return (
       <PaperRecord sx={isPreview?{ overflow: 'hidden' } : { overflow: 'hidden', ...paperStyle, ...(isOpenPopup?forceHoverStyle:{}) }}>
         <Box>
-          <CollectionImgBox avatar={avatar} backgroundImg={background}/>
+          <CollectionImgBox avatar={avatar} backgroundImg={background} name={name}/>
           {
             isOwned&&
             <Box sx={{position: 'absolute', right: 10, top: 10}}>
