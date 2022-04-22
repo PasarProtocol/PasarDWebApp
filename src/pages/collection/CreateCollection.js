@@ -148,7 +148,7 @@ export default function CreateCollection() {
     if(!temp[index].address.length&&!temp[index].royalties.length){
       if(temp.length>1&&index<temp.length-1)
         temp.splice(index, 1)
-      if(temp.findIndex((item)=>(!item.address.length||!item.royalties.length))<0)
+      if(temp.findIndex((item)=>(!item.address.length||!item.royalties.length))<0 && temp.length<3)
         temp.push({address: '', royalties: ''})
     }
     else if(!temp[index].address.length||!temp[index].royalties.length){
@@ -156,7 +156,7 @@ export default function CreateCollection() {
         temp.splice(temp.length-1, 1)
     }
     else if(temp[index].address.length&&temp[index].royalties.length){
-      if(temp.findIndex((item)=>(!item.address.length||!item.royalties.length))<0)
+      if(temp.findIndex((item)=>(!item.address.length||!item.royalties.length))<0 && temp.length<3)
         temp.push({address: '', royalties: ''})
     }
     setRecipientRoyaltiesGroup(temp)
