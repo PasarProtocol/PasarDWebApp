@@ -3,8 +3,11 @@ import { Link as RouterLink, useLocation } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
 import { Box, Button, AppBar, Toolbar, Container, Tooltip } from '@mui/material';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 // hooks
 import useOffSetTop from '../../hooks/useOffSetTop';
+import useSettings from '../../hooks/useSettings';
 // components
 import { MHidden } from '../../components/@material-extend';
 import SearchBox from '../../components/SearchBox';
@@ -49,6 +52,8 @@ const ToolbarShadowStyle = styled('div')(({ theme }) => ({
 export default function MainNavbar() {
   const isOffset = useOffSetTop(40);
   const { pathname } = useLocation();
+  const { themeMode, changeMode } = useSettings();
+  const isLight = themeMode === 'light';
   const isHome = pathname === '/explorer';
   const isMarketHome = pathname === '' || pathname === '/';
 
@@ -104,6 +109,20 @@ export default function MainNavbar() {
             />
           </MHidden>
           <SignInDialog/>
+          <MHidden width="mdDown">
+            <Button
+              variant="outlined"
+              value="light"
+              onClick={(e)=>{changeMode(isLight?"dark":"light")}}
+              sx={{ padding: 0, minWidth: 40, height: 40, borderRadius: '100%', ml: 1, color: 'text.primary', borderColor: 'text.secondary' }}
+            >
+              {
+                isLight?
+                <LightModeIcon/>:
+                <DarkModeIcon/>
+              }
+            </Button>
+          </MHidden>
           <MHidden width="mdUp">
             <MenuMobile
               isOffset={isOffset}
