@@ -400,7 +400,7 @@ export default function CollectionDetail() {
                   </Stack>
                 }
                 <Box>
-                  <StatisticPanel />
+                  <StatisticPanel address={collection.token}/>
                 </Box>
                 <Typography variant="body2" component="div" align="center" color='text.secondary' sx={{maxWidth: 900, m: 'auto !important', pt: 2}}>
                   {description}
