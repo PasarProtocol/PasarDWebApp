@@ -2,24 +2,17 @@
 import React from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { isMobile } from 'react-device-detect';
-
 import { styled } from '@mui/material/styles';
 import { Grid, Container, Stack, Typography, Link, Button, Box, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material';
-import { Icon } from '@iconify/react';
-import { useWeb3React } from '@web3-react/core';
-import jwtDecode from 'jwt-decode';
 // components
-import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
-import { walletconnect } from '../../components/signin-dlg/connectors';
-import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import CollectionSortSelect from '../../components/CollectionSortSelect';
 import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
-import Jazzicon from '../../components/Jazzicon';
+import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
-import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, collectionTypes } from '../../utils/common';
+import { fetchFrom, collectionTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -40,8 +33,9 @@ export default function Explorer() {
   const [collections, setCollections] = React.useState(collectionTypes);
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
   const [orderType, setOrderType] = React.useState(0);
+  const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [controller, setAbortController] = React.useState(new AbortController());
-  const { setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
+  const { diaBalance, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
 
   React.useEffect(() => {
     controller.abort(); // cancel the previous request
@@ -66,7 +60,10 @@ export default function Explorer() {
   const handleNavlink = (e)=>{
     const path = e.target.getAttribute('to')
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
-      navigate(path)
+      if(diaBalance>=0.01)
+        navigate(path)
+      else
+        setOpenBuyDIA(true)
       return
     }
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3')
@@ -77,7 +74,6 @@ export default function Explorer() {
   }
 
   const loadingSkeletons = Array(3).fill(null)
-
   return (
     <RootStyle title="Collections | PASAR">
       <Container maxWidth="lg">
@@ -116,6 +112,7 @@ export default function Explorer() {
           }
         </Grid>
       </Container>
+      <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance} actionText="create collections"/>
     </RootStyle>
   );
 }

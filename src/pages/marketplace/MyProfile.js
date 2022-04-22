@@ -35,7 +35,8 @@ import AddressCopyButton from '../../components/AddressCopyButton';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
-
+import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
+import useSingin from '../../hooks/useSignin';
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -88,7 +89,9 @@ export default function MyProfile() {
   const [myAddress, setMyAddress] = React.useState(null);
   const [didInfo, setDidInfo] = React.useState({name: '', description: ''});
   const [updateCount, setUpdateCount] = React.useState(0);
+  const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
+  const { diaBalance } = useSingin()
 
   const context = useWeb3React();
   const { account } = context;
@@ -230,6 +233,14 @@ export default function MyProfile() {
   const link2Detail = (tokenId) => {
     navigate(`/explorer/collectible/detail/${tokenId}`);
   };
+
+  const handleNavlink = (e)=>{
+    const path = e.target.getAttribute('to')
+    if(diaBalance>=0.01)
+      navigate(path)
+    else
+      setOpenBuyDIA(true)
+  }
   const loadingSkeletons = Array(10).fill(null)
 
   return (
@@ -391,10 +402,10 @@ export default function MyProfile() {
                         <Grid item xs={12} sm={6} md={4}>
                           <PaperRecord sx={{display: 'flex', justifyContent: 'center', width: '100%', height: '100%', borderStyle: 'dashed', minHeight: 250}}>
                             <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
-                              <StyledButton variant="contained" component={RouterLink} to='/collection/create' sx={{mb: 2}}>
+                              <StyledButton variant="contained" onClick={handleNavlink} to='/collection/create' sx={{mb: 2}}>
                                 Create new collection
                               </StyledButton>
-                              <StyledButton variant="contained" component={RouterLink} to='/collection/import'>
+                              <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
                                 Import existing collection
                               </StyledButton>
                             </Stack>
@@ -415,12 +426,12 @@ export default function MyProfile() {
                       {
                         sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
                         <>
-                          <Button variant="contained" component={RouterLink} to='/collection/create' sx={{mb: 2}}>
+                          <StyledButton variant="contained" onClick={handleNavlink} to='/collection/create' sx={{mb: 2}}>
                             Create new collection
-                          </Button>
-                          <Button variant="contained" component={RouterLink} to='/collection/import'>
+                          </StyledButton>
+                          <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
                             Import existing collection
-                          </Button>
+                          </StyledButton>
                         </>
                       }
                     </Stack>
@@ -440,6 +451,7 @@ export default function MyProfile() {
           </SwipeableViews>
         </Box>
       </Container>
+      <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance} actionText="create collections"/>
     </RootStyle>
   );
 }

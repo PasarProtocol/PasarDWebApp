@@ -8,7 +8,7 @@ export default function NeedBuyDIA(props) {
   const context = useWeb3React();
   const { library, chainId, account } = context;
 
-  const { isOpen, setOpen, balance } = props;
+  const { isOpen, setOpen, balance, actionText="transfer items" } = props;
   const handleClose = () => {
     setOpen(false);
   };
@@ -41,7 +41,7 @@ export default function NeedBuyDIA(props) {
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
             0.01 DIA
           </Typography>
-          {' '}in order to transfer items
+          {' '}in order to {actionText}
         </Typography>
         <Grid container sx={{ mt: 2, display: 'block' }}>
           <Grid item xs={12}>
