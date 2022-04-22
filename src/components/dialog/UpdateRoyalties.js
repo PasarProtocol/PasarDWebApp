@@ -24,7 +24,8 @@ export default function UpdateRoyalties(props) {
       tempItem.royalties = (feeRates[_i]*100/10**6).toString()
     return tempItem
   })
-  originRoyalties.push({address: '', royalties: ''})
+  if(originRoyalties.length<3)
+    originRoyalties.push({address: '', royalties: ''})
   const [recipientRoyaltiesGroup, setRecipientRoyaltiesGroup] = React.useState(originRoyalties);
   const [onProgress, setOnProgress] = React.useState(false);
   const [isOnValidation, setOnValidation] = React.useState(false);
@@ -96,7 +97,7 @@ export default function UpdateRoyalties(props) {
     if(!temp[index].address.length&&!temp[index].royalties.length){
       if(temp.length>1&&index<temp.length-1)
         temp.splice(index, 1)
-      if(temp.findIndex((item)=>(!item.address.length||!item.royalties.length))<0)
+      if(temp.findIndex((item)=>(!item.address.length||!item.royalties.length))<0 && temp.length<3)
         temp.push({address: '', royalties: ''})
     }
     else if(!temp[index].address.length||!temp[index].royalties.length){
@@ -104,7 +105,7 @@ export default function UpdateRoyalties(props) {
         temp.splice(temp.length-1, 1)
     }
     else if(temp[index].address.length&&temp[index].royalties.length){
-      if(temp.findIndex((item)=>(!item.address.length||!item.royalties.length))<0)
+      if(temp.findIndex((item)=>(!item.address.length||!item.royalties.length))<0 && temp.length<3)
         temp.push({address: '', royalties: ''})
     }
     setRecipientRoyaltiesGroup(temp)
