@@ -7,7 +7,7 @@ import { Typography, Grid, Card, Stack } from '@mui/material';
 
 import { fetchFrom } from '../../../utils/common';
 // ----------------------------------------------------------------------
-const apikey = ['gettv', 'nftnumber', 'relatednftnum', 'owneraddressnum']
+const apikey = ['getTotalPriceCollectibles', 'getTotalCountCollectibles', 'getFloorPriceCollectibles', 'getOwnersOfCollection']
 const RootStyle = styled('div')(({ theme, index }) => {
   let sm = {};
   if(index%2===0)
@@ -25,17 +25,20 @@ const RootStyle = styled('div')(({ theme, index }) => {
   }
 });
 export default function StatisticItem(props) {
+  const {index, address, field} = props
   const [realData, setRealData] = React.useState(0);
-  const api = apikey[props.index-1];
+  const api = apikey[index-1];
   
   React.useEffect(async () => {
-    // const resRealData = await fetchFrom(`sticker/api/v1/${api}`)
-    // const jsonData = await resRealData.json()
-    // setTimeout(()=>{setRealData(jsonData.data)}, 100)
-  }, []);
+    if(address) {
+      const resRealData = await fetchFrom(`api/v2/sticker/${api}/${address}`)
+      const jsonData = await resRealData.json()
+      setTimeout(()=>{setRealData(jsonData.data[field])}, 100)
+    }
+  }, [address]);
 
   return (
-    <RootStyle index={props.index}>
+    <RootStyle index={index}>
         <Stack spacing={2}>
             <AnimatedNumber
                 component="h2"
