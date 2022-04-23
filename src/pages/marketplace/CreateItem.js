@@ -303,7 +303,7 @@ export default function CreateItem() {
   const progressStep = (pos, index)=>{
     if(mintype!=="Batch")
       return pos
-    return pos/files.length + 100*index/files.length
+    return pos/files.length + 60*index/files.length
   }
 
   // const getCurrentWeb3Provider = async() => (
@@ -321,7 +321,7 @@ export default function CreateItem() {
   //   })
   // );
 
-  const mint2net = (paramObj, index=0)=>(
+  const mint2net = (paramObj)=>(
     new CancelablePromise((resolve, reject, onCancel) => {
       const _tokenSupply = quantity
       const _royaltyFee = royalties*10000
@@ -346,7 +346,7 @@ export default function CreateItem() {
             baseAddress = selectedCollection.token
           }
 
-          setProgress(progressStep(50, index))
+          setProgress(50)
           walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
             console.log("Gas price:", gasPrice); 
     
@@ -358,7 +358,7 @@ export default function CreateItem() {
               'gas': _gasLimit,
               'value': 0
             };
-            setProgress(progressStep(60, index))
+            setProgress(60)
             setReadySignForMint(true)
 
             let mintMethod
@@ -381,7 +381,7 @@ export default function CreateItem() {
                   setReadySignForMint(false)
                   console.log("receipt", receipt);
                   if(isPutOnSale){
-                    setProgress(progressStep(70, index))
+                    setProgress(70)
                     setCurrent(2)
                     stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
                       console.log("isApprovalForAll=", isApproval);
@@ -447,6 +447,118 @@ export default function CreateItem() {
                         }).catch(error=>{
                           reject(error)
                         })
+                    })
+                  }
+                  else
+                    resolve(true)
+              })
+              .on('error', (error, receipt) => {
+                  console.error("error", error);
+                  reject(error)
+              });
+  
+          }).catch((error) => {
+            reject(error);
+          })
+        }).catch((error) => {
+          reject(error);
+        })
+      // }) 
+    })
+  )
+  const mint2netBatch = (paramObj)=>(
+    new CancelablePromise((resolve, reject, onCancel) => {
+      onCancel(() => {
+        console.log("cancel mint2net")
+        cancelAction()
+      });
+    
+      if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2'){
+        reject(new Error)
+        return
+      }
+      const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+      // getCurrentWeb3Provider().then((walletConnectWeb3) => {
+        walletConnectWeb3.eth.getAccounts().then((accounts)=>{
+          // console.log(accounts)
+          let baseAddress = CONTRACT_ADDRESS
+          let stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
+          if(collection === 'Choose') {
+            stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection.token)
+            baseAddress = selectedCollection.token
+          }
+
+          walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+            console.log("Gas price:", gasPrice); 
+    
+            const _gasLimit = 5000000;
+            console.log("Sending transaction with account address:", accounts[0]);
+            const transactionParams = {
+              'from': accounts[0],
+              'gasPrice': gasPrice,
+              'gas': _gasLimit,
+              'value': 0
+            };
+            setProgress(70)
+            setReadySignForMint(true)
+
+            const {_ids, _tokenSupplies, _uris, _royaltyFees} = paramObj
+            let mintMethod
+            if(collection === 'Choose') {
+              if(selectedERCtype === 0) // ERC721
+                mintMethod = stickerContract.methods.mintBatch(_ids, _uris)
+              else // ERC1155
+                mintMethod = stickerContract.methods.mintBatch(_ids, _tokenSupplies, _uris)
+            }
+            else
+              mintMethod = stickerContract.methods.mintBatch(_ids, _tokenSupplies, _uris, _royaltyFees)
+            const commonArgs = {
+              '_baseAddress': baseAddress,
+              '_amounts': _tokenSupplies,
+              'beforeSendFunc': ()=>{setReadySignForMint(true)},
+              'afterSendFunc': ()=>{setReadySignForMint(false)}
+            }
+            mintMethod.send(transactionParams)
+              .on('receipt', (receipt) => {
+                  setReadySignForMint(false)
+                  console.log("receipt", receipt);
+                  if(isPutOnSale){
+                    setProgress(80)
+                    setCurrent(2)
+                    stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
+                      console.log("isApprovalForAll=", isApproval);
+                      if (!isApproval) {
+                          stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
+                            .on('receipt', (receipt) => {
+                                setOpenAccessDlg(false)
+                                setCurrent(3)
+                                console.log("setApprovalForAll-receipt", receipt);
+                                callContractMethod('createOrderForSaleBatch', coinType, {
+                                  ...paramObj,
+                                  ...commonArgs,
+                                  '_price': BigInt(price*1e18).toString()
+                                }).then((success) => {
+                                  resolve(success)
+                                }).catch(error=>{
+                                  reject(error)
+                                })
+                            })
+                            .on('error', (error, receipt) => {
+                                console.error("setApprovalForAll-error", error);
+                                setOpenAccessDlg(false)
+                                reject(error)
+                            })
+                        // })
+                      }
+                      callContractMethod('createOrderForSaleBatch', coinType, {
+                        ...paramObj,
+                        ...commonArgs,
+                        '_price': BigInt(price*1e18).toString()
+                      }).then((success) => {
+                        resolve(success)
+                      }).catch(error=>{
+                        reject(error)
+                      })
                     })
                   }
                   else
@@ -631,7 +743,7 @@ export default function CreateItem() {
       })
     })
   )
-  const uploadOneOfBatch = (f, _didUri, index)=>(
+  const uploadOneOfBatch = (f, index)=>(
     new CancelablePromise((resolve, reject, onCancel) => {
       let _id = ''
       let _uri = ''
@@ -645,13 +757,14 @@ export default function CreateItem() {
       setProgress(progressStep(10, index))
       sendIpfsImage(f).then((added) => {
         _id = `0x${hash(added.origin.path)}`
-        setProgress(progressStep(20, index))
+        setProgress(progressStep(35, index))
         return sendIpfsMetaJson(added, index)
       }).then((metaRecv) => {
-        setProgress(progressStep(40, index))
+        setProgress(progressStep(60, index))
         _uri = `pasar:json:${metaRecv.path}`
-        resolve({ _id, _uri, _didUri })
+        resolve({ _id, _uri })
       }).catch((error) => {
+        setProgress(progressStep(60, index))
         reject(error);
       })
     })
@@ -710,31 +823,45 @@ export default function CreateItem() {
   }
 
   const mintBatchMain = (_didUri) => {
-    // const delay = file => new Promise(resolve => setTimeout(resolve, ms));
-    files.reduce( (p, f, i) => 
-      p.then(() => 
-        uploadOneOfBatch(f, _didUri, i)
-      ).then((paramObj) => 
-        mint2net(paramObj, i)
-      ).then((success) => {
-        setProgress(progressStep(100, i))
-        if(success){
-          if((i+1)===files.length){
-            setTimeout(()=>{
-              navigate('/marketplace')
-            }, 3000)
-          }
-          enqueueSnackbar(`Mint token_${(i+1)} success!`, { variant: 'success' });
-        }
-        else
-          enqueueSnackbar(`Mint token_${(i+1)} error!`, { variant: 'warning' });
-        if((i+1)===files.length){
-          setOnProgress(false)
-          setOpenMintDlg(false)
-        }
-        setCurrent(1)
+    const _royaltyFee = royalties*10000
+    const mintedObjs = { _ids: [], _tokenSupplies: [], _uris: [], _royaltyFees: [], _didUri }
+    files.reduce((p, f, i) => 
+      p.then(() => {
+        const temPromise = uploadOneOfBatch(f, i)
+        setCurrentPromise(temPromise)
+        return temPromise
+      }).then((paramObj) => {
+        mintedObjs._ids.push(paramObj._id)
+        mintedObjs._tokenSupplies.push(quantity)
+        mintedObjs._uris.push(paramObj._uri)
+        mintedObjs._royaltyFees.push(_royaltyFee)
+        
+        if((i+1)===files.length)
+          mint2netBatch(mintedObjs)
+            .then((success) => {
+              setProgress(100)
+              if(success){
+                enqueueSnackbar('Mint batch success!', { variant: 'success' });
+                setTimeout(()=>{
+                  navigate('/marketplace')
+                }, 3000)
+              }
+              else
+                enqueueSnackbar('Mint batch error!', { variant: 'warning' });
+              setOnProgress(false)
+              setOpenMintDlg(false)
+              setCurrentPromise(null)
+              setCurrent(1)
+            })
+            .catch((error) => {
+              setProgress(100)
+              enqueueSnackbar('Mint batch error!', { variant: 'error' });
+              setOnProgress(false)
+              setOpenMintDlg(false)
+              setCurrentPromise(null)
+              setCurrent(1)
+            });
       }).catch((error) => {
-        setProgress(progressStep(100, i))
         enqueueSnackbar(`Mint token_${(i+1)} error!`, { variant: 'error' });
         if((i+1)===files.length){
           setOnProgress(false)
