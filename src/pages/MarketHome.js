@@ -241,9 +241,9 @@ export default function MarketHome() {
                 <StyledButton to="/marketplace" variant="contained" component={RouterLink}>
                   Marketplace
                 </StyledButton>
-                <StyledButton variant="outlined" to="/explorer" component={RouterLink} color="inherit">
+                <Button variant="outlined" to="/explorer" component={RouterLink} color="inherit">
                   Explorer
-                </StyledButton>
+                </Button>
               </Stack>
             </CardStyle>
             <Box>
@@ -285,9 +285,9 @@ export default function MarketHome() {
                 <StyledButton variant="contained" onClick={openSignin}>
                   Sign in with DID
                 </StyledButton>
-                <StyledButton variant="outlined" href="https://www.elastos.org/did" target="_blank" color="inherit">
+                <Button variant="outlined" href="https://www.elastos.org/did" target="_blank" color="inherit">
                   Learn more about DID
-                </StyledButton>
+                </Button>
               </Stack>
             </CardStyle>
             <Box>
@@ -334,9 +334,9 @@ export default function MarketHome() {
                 <StyledButton variant="contained" href="https://glidefinance.io/swap" target="_blank">
                   Get ELA 
                 </StyledButton>
-                <StyledButton variant="outlined" href="https://www.elastos.org/esc" target="_blank">
+                <Button variant="outlined" href="https://www.elastos.org/esc" target="_blank" color="inherit">
                   Learn more about ESC
-                </StyledButton>
+                </Button>
               </Stack>
             </CardStyle>
           {/* </MotionInView> */}

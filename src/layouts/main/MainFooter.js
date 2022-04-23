@@ -151,7 +151,8 @@ export default function MainFooter({ hidden, isContainerXl }) {
             textAlign: { xs: 'center', md: 'left' },
             mt: 2,
             borderTop: '1px solid',
-            borderColor: palette.light.grey['300']
+            // borderColor: palette.light.grey['300']
+            borderColor: (theme)=>theme.palette.mode==='light'?theme.palette.grey['300']:'#343b44'
           }}
         >
           <Grid item xs={12} md={6}>
