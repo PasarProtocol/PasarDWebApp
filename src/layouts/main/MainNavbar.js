@@ -114,7 +114,7 @@ export default function MainNavbar() {
               variant="outlined"
               value="light"
               onClick={(e)=>{changeMode(isLight?"dark":"light")}}
-              sx={{ padding: 0, minWidth: 40, height: 40, borderRadius: '100%', ml: 1, color: 'text.primary', borderColor: 'text.secondary' }}
+              sx={{ padding: 0, minWidth: 40, height: 40, borderRadius: '100%', ml: 1, color: 'text.primary', borderColor: (theme)=>theme.palette.grey[500_32] }}
             >
               {
                 isLight?

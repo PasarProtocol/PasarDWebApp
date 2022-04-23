@@ -137,11 +137,11 @@ export default function MainFooter({ hidden, isContainerXl }) {
                 </svg>
               </IconButton>
             </Stack>
-            <Stack
+            {/* <Stack
               direction="row"
               justifyContent={{ xs: 'center', md: 'flex-end' }}>
                 <ModeSwitch />
-            </Stack>
+            </Stack> */}
           </Grid>
         </Grid>
         <Grid
