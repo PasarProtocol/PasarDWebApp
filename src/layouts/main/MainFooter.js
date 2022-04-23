@@ -48,7 +48,7 @@ function CopyRight(prop) {
     </Typography>
   );
 }
-export default function MainFooter({ hidden, isHome }) {
+export default function MainFooter({ hidden, isContainerXl }) {
   const [donateOpen, setOpenDonate] = React.useState(false);
 
   const sx = hidden ? { display: 'none' } : {};
@@ -56,7 +56,7 @@ export default function MainFooter({ hidden, isHome }) {
   return (
     <RootStyle sx={sx}>
       <Divider />
-      <Container maxWidth={isHome?"xl":"lg"} sx={{ pt: 6, px: isHome?{sm: 3, md: 6, lg: 9}:{}}}>
+      <Container maxWidth={isContainerXl?"xl":"lg"} sx={{ pt: 6, px: isContainerXl?{sm: 3, md: 6, lg: 9}:{}}}>
         <Grid
           container
           justifyContent={{ xs: 'center', md: 'space-between' }}

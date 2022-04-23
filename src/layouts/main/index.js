@@ -60,6 +60,7 @@ export default function MainLayout() {
   const { themeMode } = useSettings();
   const { pathname } = useLocation();
   const isHome = pathname === '/';
+  const isContainerXl = isHome || pathname === '/collection';
   const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create'
    || pathname === '/create/' || pathname.startsWith('/marketplace/search') || pathname.startsWith('/collection/detail');
   return (
@@ -68,7 +69,7 @@ export default function MainLayout() {
       <BodyStyle footerhidden={isFooterHiddenPage?1:0}>
         <Outlet />
       </BodyStyle>
-      <MainFooter hidden={isFooterHiddenPage} isHome={isHome}/>
+      <MainFooter hidden={isFooterHiddenPage} isContainerXl={isContainerXl}/>
       <ScrollTop>
         <Fab variant="contained" size="small" aria-label="scroll back to top" color={themeMode==='light'?'primary':'default'}>
           <KeyboardArrowUpIcon />

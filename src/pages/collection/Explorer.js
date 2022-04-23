@@ -76,7 +76,7 @@ export default function Explorer() {
   const loadingSkeletons = Array(3).fill(null)
   return (
     <RootStyle title="Collections | PASAR">
-      <Container maxWidth="lg">
+      <Container maxWidth="xl" sx={{px: {sm: 3, md: 6, lg: 9}}}>
         <Box sx={{ position: 'relative', justifyContent: 'center', mb: 3 }}>
           <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
             Collections
