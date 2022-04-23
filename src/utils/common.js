@@ -322,6 +322,13 @@ export function callContractMethod(type, coinType, paramObj) {
               const { _id, _amount, _price, _didUri, _baseAddress = STICKER_ADDRESS } = paramObj;
               console.log(_baseAddress, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri)
               method = marketContract.methods.createOrderForSale(_baseAddress, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri);
+            } else if (type === 'createOrderForSaleBatch') {
+              console.log('createOrderForSaleBatch');
+              const { _ids, _amounts, _price, _didUri, _baseAddress = STICKER_ADDRESS } = paramObj;
+              const _prices = Array(_ids.length).fill(_price)
+              const _startTimes = Array(_ids.length).fill((new Date().getTime()/1000).toFixed())
+              console.log(_baseAddress, _ids, _amounts, pricingContract[coinType], _prices, _startTimes, _didUri)
+              method = marketContract.methods.createOrderForSaleBatch(_baseAddress, _ids, _amounts, pricingContract[coinType], _prices, _startTimes, _didUri);
             } else if (type === 'createOrderForAuction') {
               console.log('createOrderForAuction');
               const { _id, _amount, _minPrice, _reservePrice, _buyoutPrice, _endTime, _didUri, _baseAddress = STICKER_ADDRESS } = paramObj;
