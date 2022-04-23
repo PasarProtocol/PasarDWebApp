@@ -18,7 +18,7 @@ import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
 // import Badge from '../Badge';
 // import BadgeProfile from './BadgeProfile'
 import useSingin from '../../hooks/useSignin';
-import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, coinTypes } from '../../utils/common';
+import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, fetchFrom, coinTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const avatarStyle = {
@@ -78,7 +78,7 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
 }));
 
 const CollectionImgBox = (props) => {
-  const { name, backgroundImg, avatar } = props;
+  const { name, background: backgroundImg, avatar, realData } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openGroupBox, setOpenGroupBox] = React.useState(false);
   const imageStyle = {
@@ -150,20 +150,20 @@ const CollectionImgBox = (props) => {
                 <TypographyStyle variant="subtitle2" color="text.secondary" noWrap>200 items</TypographyStyle>
                 <Grid container sx={{pt: 2}}>
                   <Grid item sm={4} textAlign="center">
-                    <Typography variant="h6" noWrap>{(2500).toLocaleString("en-US")}</Typography>
+                    <Typography variant="h6" noWrap>{realData[0].toLocaleString("en-US")}</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline-flex' }}>
                       <Box component="img" src="/static/elastos.svg" sx={{ width: 14, mr: .5, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
                       {' '}Volume
                     </Typography>
                   </Grid>
                   <Grid item sm={4} textAlign="center">
-                    <Typography variant="h6" noWrap>1000</Typography>
+                    <Typography variant="h6" noWrap>{realData[1]}</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline-flex' }}>
                       <span role="img" aria-label="">🔻</span> Floor Price
                     </Typography>
                   </Grid>
                   <Grid item sm={4} textAlign="center">
-                    <Typography variant="h6" noWrap>100</Typography>
+                    <Typography variant="h6" noWrap>{realData[2]}</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline-flex' }}>
                       <span role="img" aria-label="">💪</span> Owners
                     </Typography>
@@ -201,10 +201,36 @@ const CollectionCardPaper = (props) => {
 
   const [didName, setDidName] = React.useState('');
   const [metaObj, setMetaObj] = React.useState({});
+  const [realData, setRealData] = React.useState([0, 0, 0]);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
   const { setOpenDownloadEssentialDlg } = useSingin()
   const navigate = useNavigate();
+  const apikey = [
+    {api: 'getTotalPriceCollectibles', field: 'total'},
+    {api: 'getFloorPriceCollectibles', field: 'price'},
+    {api: 'getOwnersOfCollection', field: 'total'}
+  ]
+
+  React.useEffect(() => {
+    if(token) {
+      apikey.forEach((item, _i)=>{
+        fetchFrom(`api/v2/sticker/${item.api}/${token}`)
+          .then((response) => {
+            response.json().then((jsonData) => {
+              setRealData((prevState)=>{
+                const tempData = [...prevState]
+                tempData[_i] = jsonData.data[item.field] || 0
+                return tempData
+              })
+            }).catch((e) => {
+            });
+          })
+          .catch((e) => {
+          });
+      })
+    }
+  }, [token]);
 
   React.useEffect(() => {
     // if(holder) {
@@ -285,10 +311,11 @@ const CollectionCardPaper = (props) => {
     setOpenPopup(null);
   };
 
+  const imgBoxProps = {avatar, background, name, realData}
   return (
       <PaperRecord sx={isPreview?{ overflow: 'hidden' } : { overflow: 'hidden', ...paperStyle, ...(isOpenPopup?forceHoverStyle:{}) }}>
         <Box>
-          <CollectionImgBox avatar={avatar} backgroundImg={background} name={name}/>
+          <CollectionImgBox {...imgBoxProps}/>
           {
             isOwned&&
             <Box sx={{position: 'absolute', right: 10, top: 10}}>
