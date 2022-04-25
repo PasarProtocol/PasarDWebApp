@@ -88,7 +88,7 @@ export default function MainNavbar() {
                   <RouterLink to="/">
                     <Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
                   </RouterLink>
-                  <SearchBox sx={{flexGrow: 1, width: '100%', mx: 3}} needbgcolor={!isOffset && isMarketHome}/>
+                  <SearchBox sx={{flexGrow: 1, width: '100%'}} needbgcolor={!isOffset && isMarketHome} needAutocomplete={Boolean(true)}/>
                 </MHidden>
               }
             </>:
