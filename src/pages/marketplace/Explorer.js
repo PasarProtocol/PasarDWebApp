@@ -397,7 +397,7 @@ export default function MarketExplorer() {
         <RootStyle title="Marketplace | PASAR">
           <Stack direction="row">
             <Container maxWidth={false}>
-              <AppBarStyle sx={{ boxShadow: 0, bgcolor: 'transparent', top: isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP }}>
+              <AppBarStyle sx={{ boxShadow: 0, bgcolor: 'transparent', top: isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP, zIndex: 1099 }}>
                 <ToolbarStyle
                   sx={{
                     ...(isOffset && {
@@ -459,7 +459,7 @@ export default function MarketExplorer() {
                     </Box>
                   </Stack>
                 </ToolbarStyle>
-                {isOffset && <ToolbarShadowStyle />}
+                {/* {isOffset && <ToolbarShadowStyle />} */}
               </AppBarStyle>
               {/* {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>} */}
               <Box sx={{ display: 'flex' }}>

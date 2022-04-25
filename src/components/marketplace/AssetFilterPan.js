@@ -20,6 +20,7 @@ const DrawerStyle = styled(Drawer)(({ theme }) => ({
     }
   },
   '& .MuiDrawer-paper': {
+    zIndex: 1099,
     backgroundColor: 'unset',
     boxSizing: 'border-box',
     transition: theme.transitions.create(['top'], {
