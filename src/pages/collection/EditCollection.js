@@ -35,7 +35,7 @@ import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
 import {registerContract as CONTRACT_ADDRESS, diaContract as DIA_TOKEN_ADDRESS, ipfsURL, tokenConf} from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, fetchFrom, getIpfsUrl, isNumberString, getContractInfo } from '../../utils/common';
+import { isInAppBrowser, fetchFrom, getIpfsUrl, isNumberString, getContractInfo, socialTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -56,7 +56,6 @@ const CheckIcon = ({loaded})=>{
   return ''
 }
 // ----------------------------------------------------------------------
-const socialTypes = ['Website', 'Twitter', 'Discord', 'Telegram', 'Medium']
 const tokenStandard = {
   "ERC-721": {abi: TOKEN_721_ABI, code: 'token721.code'},
   "ERC-1155": {abi: TOKEN_1155_ABI, code: 'token1155.code'}
@@ -75,7 +74,7 @@ export default function EditCollection() {
   const [avatarFile, setAvatarFile] = React.useState(null);
   const [backgroundFile, setBackgroundFile] = React.useState(null);
   const [isOnValidation, setOnValidation] = React.useState(false);
-  const [socialUrl, setSocialUrl] = React.useState({website: '', twitter: '', discord: '', telegram: '', medium: ''});
+  const [socialUrl, setSocialUrl] = React.useState({website: '', profile: '', feeds: '', twitter: '', discord: '', telegram: '', medium: ''});
   const [onProgress, setOnProgress] = React.useState(false);
   const [currentPromise, setCurrentPromise] = React.useState(null);
   const [isOpenRegCollection, setOpenRegCollectionDlg] = React.useState(false);

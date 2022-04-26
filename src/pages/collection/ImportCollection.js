@@ -30,7 +30,7 @@ import {REGISTER_CONTRACT_ABI} from '../../abi/registerABI'
 import {registerContract as CONTRACT_ADDRESS, ipfsURL} from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, getContractInfo } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, getContractInfo, socialTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -51,7 +51,6 @@ const CheckIcon = ({loaded})=>{
   return ''
 }
 // ----------------------------------------------------------------------
-const socialTypes = ['Website', 'Twitter', 'Discord', 'Telegram', 'Medium']
 export default function ImportCollection() {
   const [address, setAddress] = React.useState('')
   const [contractAddress, setContractAddress] = React.useState('')
@@ -63,7 +62,7 @@ export default function ImportCollection() {
   const [isOnValidation, setOnValidation] = React.useState(false);
   const [isFilledAddress, setFilledAddress] = React.useState(false);
   const [recipientRoyaltiesGroup, setRecipientRoyaltiesGroup] = React.useState([{address: '', royalties: ''}]);
-  const [socialUrl, setSocialUrl] = React.useState({website: '', twitter: '', discord: '', telegram: '', medium: ''});
+  const [socialUrl, setSocialUrl] = React.useState({website: '', profile: '', feeds: '', twitter: '', discord: '', telegram: '', medium: ''});
   const [onProgress, setOnProgress] = React.useState(false);
   const [autoLoaded, setAutoLoaded] = React.useState(false);
   const [currentPromise, setCurrentPromise] = React.useState(null);

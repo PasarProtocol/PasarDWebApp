@@ -559,6 +559,7 @@ export const coinTypes = [
     address: DIA_CONTRACT_ADDRESS
   }
 ]
+export const socialTypes = ['Website', 'Profile', 'Feeds', 'Twitter', 'Discord', 'Telegram', 'Medium']
 export const getCoinTypeFromToken = (item) => {
   let coinType = 0
   if(item) {
