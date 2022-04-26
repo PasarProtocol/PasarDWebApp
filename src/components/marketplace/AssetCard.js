@@ -28,6 +28,7 @@ import DeleteDlg from '../dialog/DeleteItem';
 import TransferDlg from '../dialog/Transfer';
 import NeedBuyDIADlg from '../dialog/NeedBuyDIA';
 import AuctionDlg from '../dialog/Auction';
+import SettleOrderDlg from '../dialog/SettleOrder'
 import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
 import BadgeProfile from './BadgeProfile'
@@ -66,6 +67,7 @@ export default function AssetCard(props) {
   const [deleteOpen, setOpenDelete] = React.useState(false);
   const [transferOpen, setOpenTransfer] = React.useState(false);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
+  const [settleOpen, setSettleOrderOpen] = React.useState(false);
   const [auctionEnded, setAuctionEnded] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
@@ -382,7 +384,13 @@ export default function AssetCard(props) {
             {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3}} noWrap>{description}</Typography> */}
             {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography> */}
             {
-              (type===0||type===1||type===2&&(isListedOwnedByMe)||type===2&&isListedByOthers)&&
+              (
+                type===0||
+                type===1||
+                type===2&&(isListedOwnedByMe)||
+                type===2&&isListedByOthers||
+                type===3&&!auctionEnded
+              ) &&
               <Typography variant="h5" sx={{color: "origin.main"}} noWrap>
                 <Box component="img" src={`/static/${coinTypes[coinType].icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType===0?'invert(1)':'none' }} />
                 &nbsp;{price} {coinTypes[coinType].name}&nbsp;
@@ -398,6 +406,10 @@ export default function AssetCard(props) {
             {
               (type===2&&isUnlistedOwnedByMe)&&
               <StyledButton variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={handleSell}>Sell</StyledButton>
+            }
+            {
+              (type===3&&auctionEnded)&&
+              <StyledButton variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={(e)=>{setSettleOrderOpen(true)}}>Claim Item</StyledButton>
             }
             {/* {
               type===0&&
@@ -425,6 +437,7 @@ export default function AssetCard(props) {
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps}/>
         <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance}/>
         <AuctionDlg isOpen={auctionOpen} setOpen={setOpenAuction} {...dlgProps} baseToken={baseToken}/>
+        <SettleOrderDlg isOpen={settleOpen} setOpen={setSettleOrderOpen} info={props} address={myaddress}/>
       </Box>
   );
 };
