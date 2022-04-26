@@ -61,6 +61,10 @@ export const getIpfsUrl = (id) => {
 
 export const getAssetImage = (metaObj, isThumbnail = false) => {
   const { asset, thumbnail, tokenJsonVersion, data } = metaObj;
+  if (tokenJsonVersion === null) {
+    return isThumbnail?thumbnail:asset
+  }
+  
   let cid = asset;
   if (tokenJsonVersion === '2' && !asset) {
     if (!data) cid = '';

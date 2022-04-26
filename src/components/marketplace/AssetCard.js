@@ -385,7 +385,7 @@ export default function AssetCard(props) {
             {/* <Typography variant="body2" display="block" sx={{lineHeight: 1.3, color: 'text.secondary'}}>Quantity: 1/{quantity}</Typography> */}
             {
               (
-                type===0||
+                (type===0&&saleType!=="Not on sale")||
                 type===1||
                 type===2&&(isListedOwnedByMe)||
                 type===2&&isListedByOthers||
@@ -398,7 +398,10 @@ export default function AssetCard(props) {
               </Typography>
             }
             {
-              (type===2&&isUnlistedByOthers)&&
+              (
+                (type===0&&saleType==="Not on sale")||
+                (type===2&&isUnlistedByOthers)
+              ) &&
               <Typography variant="h4" sx={{color: "origin.main"}} align='center'>
                 Not on Sale
               </Typography>

@@ -495,10 +495,10 @@ export default function CollectionDetail() {
                   </Box>
                   <Box
                     component="main"
-                    sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth*isFilterView}px)` } }}
+                    sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth*isFilterView}px)`, m: '-10px' } }}
                   >
                     <MHidden width="smUp">
-                      <Box sx={{display: 'flex', pb: 1}}>
+                      <Box sx={{display: 'flex', p: '10px', pb: 1}}>
                         <AssetSortSelect selected={order} onChange={setOrder} sx={{flex: 1}}/>
                         <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                           <ToggleButton value={0}>
@@ -518,6 +518,7 @@ export default function CollectionDetail() {
                       endMessage={
                         !isLoadingAssets&&!assets.length&&<Typography variant="h4" align='center'>No matching collectible found!</Typography>
                       }
+                      style={{padding: '10px'}}
                     >
                       {
                         !isLoadingAssets?
