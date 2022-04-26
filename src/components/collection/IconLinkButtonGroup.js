@@ -1,8 +1,7 @@
 import React from 'react';
 // material
-import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
-import { Typography, Grid, IconButton, Stack, Link } from '@mui/material';
+import { Typography, Box, IconButton, Stack, Link } from '@mui/material';
 import { Icon } from '@iconify/react';
 import twitterIcon from '@iconify/icons-ant-design/twitter';
 import mediumIcon from '@iconify/icons-ant-design/medium';
@@ -15,7 +14,7 @@ import { MFab } from '../@material-extend';
 import Discord from '../LinkIcons/Discord'
 // ----------------------------------------------------------------------
 export default function IconLinkButtonGroup(props) {
-  const {website='', twitter='', discord='', telegram='', medium=''} = props
+  const {website='', profile='', feeds='', twitter='', discord='', telegram='', medium=''} = props
   const { themeMode } = useSettings();
   const colorType = themeMode==='light'?'primary':'default'
   return (
@@ -28,6 +27,18 @@ export default function IconLinkButtonGroup(props) {
         !!website&&
         <MFab size="small" color= {colorType} href={website} target='_blank'>
           <Icon icon={languageIcon} width={24} height={24} />
+        </MFab>
+      }
+      {
+        !!profile&&
+        <MFab size="small" color= {colorType} href={profile} target='_blank'>
+          <Box component="img" src='/static/profile-icon.svg' width={20} height={20} sx={{filter: themeMode==='light'?'unset':'invert(1)'}}/>
+        </MFab>
+      }
+      {
+        !!feeds&&
+        <MFab size="small" color= {colorType} href={feeds} target='_blank'>
+          <Box component="img" src='/static/empty-feeds-icon.svg' width={22} height={22} sx={{filter: themeMode==='light'?'unset':'invert(1)'}}/>
         </MFab>
       }
       {
