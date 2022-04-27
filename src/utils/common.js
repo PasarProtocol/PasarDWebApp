@@ -654,6 +654,28 @@ export const getDidInfoFromAddress = (address) =>
       });
   });
 
+export const getCollectiblesInCollection4Preview = (address, count) =>
+  new Promise((resolve, reject) => {
+    fetchFrom(`api/v2/sticker/getDetailedCollectiblesInCollection/${address}?`+
+      `status=All&itemType=All&pageNum=1&pageSize=${count}`)
+      .then(response => {
+        response
+          .json()
+          .then(jsonAssets => {
+            if(jsonAssets.data){
+              resolve(jsonAssets.data.result);
+            }
+            else resolve([])
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+
 export const getFullUrl = (url) => `${window.location.protocol}//${window.location.host}/${url}`;
 
 export const checkIsMobile = () =>
