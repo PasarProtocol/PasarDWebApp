@@ -14,14 +14,14 @@ import { MFab } from '../@material-extend';
 import Discord from '../LinkIcons/Discord'
 // ----------------------------------------------------------------------
 export default function IconLinkButtonGroup(props) {
-  const {website='', profile='', feeds='', twitter='', discord='', telegram='', medium=''} = props
+  const {website='', profile='', feeds='', twitter='', discord='', telegram='', medium='', align='center'} = props
   const { themeMode } = useSettings();
   const colorType = themeMode==='light'?'primary':'default'
   return (
     <Stack
       spacing={1}
       direction="row"
-      justifyContent='center'
+      justifyContent={align}
     >
       {
         !!website&&
