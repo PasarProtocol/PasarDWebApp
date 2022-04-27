@@ -51,7 +51,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 export default function AssetCard(props) {
-  const { name="???", description, quantity=1, price=0, coinType=0, isLink, tokenId, type, orderId, orderType, endTime, currentBid, baseToken='',
+  const { name="???", description, quantity=1, price=0, coinType=0, isLink, isMoreLink, tokenId, type, orderId, orderType, endTime, currentBid, baseToken='',
    saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, defaultCollectionType, isDragging=false, reservePrice=0, buyoutPrice=0 } = props
   const defaultCollection = {
     ...collectionTypes[defaultCollectionType],
@@ -348,15 +348,25 @@ export default function AssetCard(props) {
             isLink?(
               <Link
                 component={RouterLink}
-                to={`/marketplace/detail/${tokenId}`}
+                to={isMoreLink?`/collection/detail/${baseToken}`:`/marketplace/detail/${tokenId}`}
                 alt=""
                 underline="none"
                 onClick={(e)=>{if(isDragging) e.preventDefault()}}
               >
-                <CardImgBox
-                  src={props.thumbnail}
-                  {...props}
-                />
+                {
+                  isMoreLink?
+                  <Box sx={{position: 'relative', background: '#161c24'}}>
+                    <CardImgBox
+                      src={props.thumbnail}
+                      {...props}
+                    />
+                    <Typography variant="h5" align='center' sx={{width: '100%', top: '50%', color: 'white', position: 'absolute', transform: 'translateY(-50%)'}}>+ more</Typography>
+                  </Box>:
+                  <CardImgBox
+                    src={props.thumbnail}
+                    {...props}
+                  />
+                }
               </Link>
             ):(
               <CardImgBox

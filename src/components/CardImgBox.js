@@ -34,7 +34,7 @@ const BoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 const CardImgBox = (props) => {
-    const { src } = props;
+    const { src, isMoreLink=false } = props;
     const imageRef = React.useRef();
 
     const handleResize = ()=>{
@@ -55,7 +55,7 @@ const CardImgBox = (props) => {
       p: '1px'
     }
     return (
-      <BoxStyle className='card-img'>
+      <BoxStyle className='card-img' sx={{opacity: isMoreLink?.5:1}}>
         <Box className='img-box'>
           <Box draggable = {false} component="img" src={src} sx={imageStyle} ref={imageRef} onLoad={handleResize} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
         </Box>
