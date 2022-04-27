@@ -670,21 +670,21 @@ export default function CollectibleDetail() {
                         <Typography variant="body2" color='text.secondary'>{collection.description}</Typography>
                         {
                           !!collection.owner && !!collection.token &&
-                          <Stack direction="row" spacing={1} sx={{mt: 1}}>
+                          <Box>
                             <Tooltip title="Owner Address" arrow enterTouchDelay={0}>
-                              <div>
+                              <Box sx={{mr: 1, mb: 1, display: 'inline-flex'}}>
                                 <AddressCopyButton type='diamond' address={collection.owner}/>
-                              </div>
+                              </Box>
                             </Tooltip>
                             <Tooltip title="Contract Address" arrow enterTouchDelay={0}>
-                              <div>
+                              <Box sx={{display: 'inline-flex'}}>
                                 <AddressCopyButton type='contract' address={collection.token}/>
-                              </div>
+                              </Box>
                             </Tooltip>
-                          </Stack>
+                          </Box>
                         }
                         <IconLinkButtonGroup {...collection.socials}/>
-                        <Stack spacing={1} sx={{flexDirection: {xs: 'column', sm: 'row'}}}>
+                        <Stack spacing={1} sx={{}}>
                         {
                           badge.dia&&
                           <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
@@ -701,12 +701,11 @@ export default function CollectibleDetail() {
                           collectiblesInCollection.length>2&&
                           <Stack direction="column" spacing={1} sx={{width: '100%'}}>
                             <Typography variant="subtitle2">More from this collection</Typography>
-                            <Stack spacing={1} direction="row">
+                            <Box display="grid" gridTemplateColumns='repeat(auto-fill, minmax(200px, 1fr))' gap={1.5}>
                               {
                                 collectiblesInCollection.map((item, _i)=>{
                                   const coinType = getCoinTypeFromToken(item)
-                                  return <Box sx={{flexGrow: 1}} key={_i}>
-                                    <AssetCard
+                                  return <AssetCard
                                       {...item}
                                       thumbnail={getAssetImage(item, true)}
                                       price={round(item.price/1e18, 3)}
@@ -717,10 +716,9 @@ export default function CollectibleDetail() {
                                       coinType={coinType}
                                       defaultCollectionType={getCollectionTypeFromImageUrl(item)}
                                     />
-                                  </Box>
                                 })
                               }
-                            </Stack>
+                            </Box>
                           </Stack>
                         }
                       </Stack>
