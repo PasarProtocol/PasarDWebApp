@@ -134,6 +134,7 @@ export default function CollectibleDetail() {
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState([0,0]);
+  const [dispCountInCollection, setDispCountInCollection] = React.useState(3);
   const { pasarLinkAddress } = useSingin()
   const { updateCount } = useAuctionDlg()
   
@@ -153,7 +154,19 @@ export default function CollectibleDetail() {
     getDiaTokenPrice().then((res) => {
       setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
     })
+    determineDispCount()
   }, [])
+
+  function determineDispCount() {
+    const { innerWidth: width } = window;
+    if(width>900) // in case of md
+      setDispCountInCollection(4)
+    else if(width>700)
+      setDispCountInCollection(3)
+    else
+      setDispCountInCollection(2)
+  }
+
   const setCoinPriceByType = (type, value) => {
     setCoinPrice((prevState) => {
       const tempPrice = [...prevState];
@@ -208,7 +221,7 @@ export default function CollectibleDetail() {
             }).catch((e) => {
             });
           })
-        getCollectiblesInCollection4Preview(jsonCollectible.data.baseToken, 3).then(res=>{
+        getCollectiblesInCollection4Preview(jsonCollectible.data.baseToken, 4).then(res=>{
           setCollectiblesInCollection(res)
         })
         getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
@@ -311,6 +324,7 @@ export default function CollectibleDetail() {
   };
 
   function handleResize() {
+    determineDispCount()
     if(!imageRef.current)
       return
     const { innerWidth: winWidth, innerHeight: winHeight } = window;
@@ -658,15 +672,28 @@ export default function CollectibleDetail() {
                 </AccordionSummary>
                 <AccordionDetails sx={{pb: '50px', position: 'relative', px: '20px'}}>
                   <Stack direction="row" spacing={2}>
-                    <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
-                        {
-                          collection.avatar?
-                          <AvatarStyle draggable = {false} component="img" src={collection.avatar} sx={{ minWidth: 40 }} />:
-                          <AvatarStyle sx={{ p: 1, minWidth: 40 }} />
-                        }
-                    </Link>
+                    <MHidden width="smDown">
+                      <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
+                          {
+                            collection.avatar?
+                            <AvatarStyle draggable = {false} component="img" src={collection.avatar} sx={{ minWidth: 40 }} />:
+                            <AvatarStyle sx={{ p: 1, minWidth: 40 }} />
+                          }
+                      </Link>
+                    </MHidden>
                     <Stack spacing={1} sx={{ minWidth: 0, flexGrow: 1 }}>
-                        <Typography variant="subtitle2">{collection.name}</Typography>
+                        <Stack direction="row">
+                          <MHidden width="smUp">
+                            <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
+                                {
+                                  collection.avatar?
+                                  <AvatarStyle draggable = {false} component="img" src={collection.avatar} sx={{ minWidth: 40 }} />:
+                                  <AvatarStyle sx={{ p: 1, minWidth: 40 }} />
+                                }
+                            </Link>
+                          </MHidden>
+                          <Typography variant="subtitle2" sx={{display: 'flex', alignItems: 'center'}}>{collection.name}</Typography>
+                        </Stack>
                         <Typography variant="body2" color='text.secondary'>{collection.description}</Typography>
                         {
                           !!collection.owner && !!collection.token &&
@@ -683,7 +710,7 @@ export default function CollectibleDetail() {
                             </Tooltip>
                           </Box>
                         }
-                        <IconLinkButtonGroup {...collection.socials}/>
+                        <IconLinkButtonGroup {...collection.socials} align='left'/>
                         <Stack spacing={1} sx={{}}>
                         {
                           badge.dia&&
@@ -701,9 +728,9 @@ export default function CollectibleDetail() {
                           collectiblesInCollection.length>2&&
                           <Stack direction="column" spacing={1} sx={{width: '100%'}}>
                             <Typography variant="subtitle2">More from this collection</Typography>
-                            <Box display="grid" gridTemplateColumns='repeat(auto-fill, minmax(200px, 1fr))' gap={1.5}>
+                            <Box display="grid" gridTemplateColumns={`repeat(${dispCountInCollection}, minmax(0px, 1fr))`} gap={1.5}>
                               {
-                                collectiblesInCollection.map((item, _i)=>{
+                                collectiblesInCollection.slice(0, dispCountInCollection).map((item, _i)=>{
                                   const coinType = getCoinTypeFromToken(item)
                                   return <AssetCard
                                       {...item}
