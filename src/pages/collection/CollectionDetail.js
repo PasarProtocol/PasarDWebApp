@@ -171,35 +171,50 @@ export default function CollectionDetail() {
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
     setLoadingAssets(true);
-    fetchFrom(`api/v2/sticker/getDetailedCollectiblesInCollection/${params.collection}?`+
-      `status=${statusFilter}&`+
-      `tokenType=${selectedTokens.join(',')}&`+
-      `itemType=${itemTypeFilter}&`+
-      `minPrice=${range.min!==''?range.min*1e18:''}&`+
-      `maxPrice=${range.max!==''?range.max*1e18:''}&`+
-      `order=${order}&`+
-      `keyword=${params.key?params.key:''}&`+
-      `pageNum=${page}&`+
-      `pageSize=${showCount}`, { signal }).then(response => {
-      response.json().then(jsonAssets => {
-        if(jsonAssets.data){
-          setTotalCount(jsonAssets.data.total)
-          setPages(Math.ceil(jsonAssets.data.total/showCount));
-          if(loadNext)
-            setAssets([...assets, ...jsonAssets.data.result]);
-          else {
-            setAssets(jsonAssets.data.result);
-            // window.scrollTo(0,0)
+
+    const bodyParams = {
+      baseToken: params.collection,
+      // attribute: {"Pupil": ["Heart Pupil"], "Background": ["Red Background"]},
+      status: statusFilter,
+      itemType: itemTypeFilter,
+      minPrice: range.min!==''?range.min*1e18:'',
+      maxPrice: range.max!==''?range.max*1e18:'',
+      order,
+      keyword: params.key?params.key:'',
+      pageNum: page,
+      pageSize: showCount,
+      tokenType: selectedTokens.join(',')
+    }
+    fetchFrom('api/v2/sticker/getDetailedCollectiblesInCollection', {
+      method: 'POST',
+      cache: 'no-cache',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bodyParams),
+      signal
+    })
+      .then(response => {
+        response.json().then(jsonAssets => {
+          if(jsonAssets.data){
+            setTotalCount(jsonAssets.data.total)
+            setPages(Math.ceil(jsonAssets.data.total/showCount));
+            if(loadNext)
+              setAssets([...assets, ...jsonAssets.data.result]);
+            else {
+              setAssets(jsonAssets.data.result);
+              // window.scrollTo(0,0)
+            }
           }
-        }
-        setAlreadyMounted(false)
-        setLoadNext(false)
-        setLoadingAssets(false)
+          setAlreadyMounted(false)
+          setLoadNext(false)
+          setLoadingAssets(false)
+        })
       })
-    }).catch(e => {
-      if(e.code !== e.ABORT_ERR)
-        setLoadingAssets(false);
-    });
+      .catch(e => {
+        if(e.code !== e.ABORT_ERR)
+          setLoadingAssets(false);
+      });
     sessionStorage.setItem("filter-props-other", JSON.stringify({selectedBtns, range, selectedTokens, adult, order}))
     setFilterForm({selectedBtns, range, selectedTokens, adult, order})
   }, [page, showCount, selectedBtns, selectedTokens, adult, range, order, params.key]);

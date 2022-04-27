@@ -656,8 +656,21 @@ export const getDidInfoFromAddress = (address) =>
 
 export const getCollectiblesInCollection4Preview = (address, count) =>
   new Promise((resolve, reject) => {
-    fetchFrom(`api/v2/sticker/getDetailedCollectiblesInCollection/${address}?`+
-      `status=All&itemType=All&pageNum=1&pageSize=${count}`)
+    const bodyParams = {
+      baseToken: address,
+      status: 'All',
+      itemType: 'All',
+      pageNum: 1,
+      pageSize: count,
+    }
+    fetchFrom('api/v2/sticker/getDetailedCollectiblesInCollection', {
+      method: 'POST',
+      cache: 'no-cache',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bodyParams)
+    })
       .then(response => {
         response
           .json()
