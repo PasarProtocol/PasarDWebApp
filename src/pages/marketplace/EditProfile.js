@@ -10,6 +10,7 @@ import { Icon } from '@iconify/react';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 
 // components
+import { MHidden } from '../../components/@material-extend';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import Page from '../../components/Page';
@@ -148,14 +149,24 @@ export default function EditProfile() {
           Edit Profile
         </Typography>
         <Grid container direction="row" spacing={2}>
-          <Grid item xs={7}>
+          <Grid item xs={12} sm={7}>
             <Typography variant="subtitle2" sx={{fontWeight: 'normal'}}>
               We do not store you personal information.
               Therefore, please choose your credentials from DID to display them on your public profile.
               The credentials must first be published on the blockchain.
             </Typography>
           </Grid>
-          <Grid item xs={7}>
+          <MHidden width="smUp">
+            <Grid item xs={12}>
+              <Typography variant="h4" sx={{fontWeight: 'normal'}}>Avatar</Typography>
+              <RingAvatar
+                address={walletAddress}
+                size={80}
+                outersx={{m: 1}}
+              />
+            </Grid>
+          </MHidden>
+          <Grid item xs={12} sm={7}>
             <Stack direction='column' spacing={1} sx={{mb: 2}}>
               {
                 credentialItems.map((item, i)=>(
@@ -189,14 +200,16 @@ export default function EditProfile() {
               Save Credentials
             </TransLoadingButton>
           </Grid>
-          <Grid item xs={5}>
-            <Typography variant="h4" sx={{fontWeight: 'normal'}}>Avatar</Typography>
-            <RingAvatar
-              address={walletAddress}
-              size={110}
-              outersx={{m: 4}}
-            />
-          </Grid>
+          <MHidden width="smDown">
+            <Grid item sm={5}>
+              <Typography variant="h4" sx={{fontWeight: 'normal'}}>Avatar</Typography>
+              <RingAvatar
+                address={walletAddress}
+                size={110}
+                outersx={{m: 4}}
+              />
+            </Grid>
+          </MHidden>
         </Grid>
       </Container>
     </RootStyle>
