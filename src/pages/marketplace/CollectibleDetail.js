@@ -221,8 +221,8 @@ export default function CollectibleDetail() {
             }).catch((e) => {
             });
           })
-        getCollectiblesInCollection4Preview(jsonCollectible.data.baseToken, 4).then(res=>{
-          setCollectiblesInCollection(res)
+        getCollectiblesInCollection4Preview(jsonCollectible.data.baseToken, 5).then(res=>{
+          setCollectiblesInCollection(res.filter(item=>item.tokenId !== params.collection))
         })
         getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
           if(dia!=='0')
