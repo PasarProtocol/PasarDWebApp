@@ -93,6 +93,7 @@ export default function CollectionDetail() {
   const [assets, setAssets] = React.useState([]);
   const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
   const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
+  const [selectedAttributes, setSelectedAttributes] = React.useState(sessionFilterProps.selectedAttributes || {});
   const [range, setRange] = React.useState(sessionFilterProps.range || {min:'', max:''});
   const [adult, setAdult] = React.useState(sessionFilterProps.adult || false);
   const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
@@ -100,6 +101,7 @@ export default function CollectionDetail() {
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({
     selectedBtns: sessionFilterProps.selectedBtns || [],
+    selectedAttributes: sessionFilterProps.selectedAttributes || [],
     selectedTokens: sessionFilterProps.selectedTokens || [],
     range: sessionFilterProps.range || {min:'', max:''},
     ...sessionFilterProps
@@ -174,7 +176,7 @@ export default function CollectionDetail() {
 
     const bodyParams = {
       baseToken: params.collection,
-      // attribute: {"Pupil": ["Heart Pupil"], "Background": ["Red Background"]},
+      attribute: Object.keys(selectedAttributes).length?selectedAttributes:"",
       status: statusFilter,
       itemType: itemTypeFilter,
       minPrice: range.min!==''?range.min*1e18:'',
@@ -215,9 +217,9 @@ export default function CollectionDetail() {
         if(e.code !== e.ABORT_ERR)
           setLoadingAssets(false);
       });
-    sessionStorage.setItem("filter-props-other", JSON.stringify({selectedBtns, range, selectedTokens, adult, order}))
-    setFilterForm({selectedBtns, range, selectedTokens, adult, order})
-  }, [page, showCount, selectedBtns, selectedTokens, adult, range, order, params.key]);
+    sessionStorage.setItem("filter-props-other", JSON.stringify({selectedBtns, selectedAttributes, range, selectedTokens, adult, order}))
+    setFilterForm({selectedBtns, selectedAttributes, range, selectedTokens, adult, order})
+  }, [page, showCount, selectedBtns, selectedAttributes, selectedTokens, adult, range, order, params.key]);
   
   const handleDispmode = (event, mode) => {
     if(mode===null)
@@ -266,6 +268,26 @@ export default function CollectionDetail() {
       return tempBtns
     })
   }
+  const handleSelectedAttributes = (value)=>{
+    const {groupName, field} = value
+    setSelectedAttributes((prevState) => {
+      const tempAttributes = {...prevState}
+      const tempSubGroup = tempAttributes[groupName]
+      if(tempSubGroup){
+        if(tempSubGroup.includes(field)){
+          const findIndex = tempSubGroup.indexOf(field)
+          tempSubGroup.splice(findIndex, 1)
+          if(!tempSubGroup.length)
+            delete tempAttributes[groupName]
+        } else {
+          tempSubGroup.push(field)
+        }
+      } else {
+        tempAttributes[groupName] = [field]
+      }
+      return tempAttributes
+    })
+  }
   const handleSelectedTokens = (value)=>{
     setSelectedTokens((prevState) => {
       const tempTokens = [...prevState]
@@ -291,6 +313,9 @@ export default function CollectionDetail() {
       case 'range':
         setSelectedByValue(value.min || value.max, rangeBtnId)
         setRange(value)
+        break
+      case 'attributes':
+        handleSelectedAttributes(value)
         break
       case 'token':
         handleSelectedTokens(value)
@@ -504,7 +529,7 @@ export default function CollectionDetail() {
                         transition: 'all ease .5s',
                         p: 1
                       }}
-                      filterProps = {{selectedBtns, selectedTokens, range, adult, order}}
+                      filterProps = {{selectedBtns, selectedTokens, selectedAttributes, range, adult, order}}
                       {...{btnNames, handleFilter, address: params.collection}}
                     />
                   </Box>

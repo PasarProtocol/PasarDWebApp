@@ -94,6 +94,7 @@ export default function AssetCard(props) {
   }, []);
 
   React.useEffect(() => {
+    let isMounted = true;
     if(baseToken && baseToken===STICKER_ADDRESS) {
       setCollection(defaultCollection);
     }
@@ -101,7 +102,7 @@ export default function AssetCard(props) {
       fetchFrom(`api/v2/sticker/getCollection/${baseToken}`)
         .then((response) => {
           response.json().then((jsonAssets) => {
-            if(!jsonAssets.data)
+            if(!jsonAssets.data || !isMounted)
               return
             setCollection(jsonAssets.data);
             const metaUri = getIpfsUrl(jsonAssets.data.uri)
@@ -121,6 +122,7 @@ export default function AssetCard(props) {
           });
         })
     }
+    return () => { isMounted = false };
   }, [baseToken]);
 
   const checkHasEnded  = () => {
