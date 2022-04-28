@@ -42,11 +42,14 @@ export default function BadgeProfile(props) {
   const [didInfo, setDidInfo] = useState({name: '', description: ''});
 
   useEffect(()=>{
+    let isMounted = true;
     if(walletAddress)
       getDidInfoFromAddress(walletAddress)
         .then((info) => {
-          setDidInfo({'name': info.name || '', 'description': info.description || ''})
+          if(isMounted)
+            setDidInfo({'name': info.name || '', 'description': info.description || ''})
         })
+    return () => { isMounted = false };
   }, [walletAddress])
   const handlePopoverOpen = (event) => {
     if (isMobile && event.type === 'mouseenter') return;

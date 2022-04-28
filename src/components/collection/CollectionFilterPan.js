@@ -31,7 +31,7 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
 }))
 export default function CollectionFilterPan(props){
   const {sx, scrollMaxHeight, btnNames, filterProps, handleFilter, address} = props
-  const {range, selectedBtns, attributes={}} = filterProps
+  const {range, selectedBtns, selectedAttributes={}} = filterProps
   const [minVal, setMinVal] = React.useState(range?range.min:'');
   const [maxVal, setMaxVal] = React.useState(range?range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
@@ -41,15 +41,17 @@ export default function CollectionFilterPan(props){
   const [filterAttributes, setFilterAttributes] = React.useState({});
 
   React.useEffect(()=>{
+    let isMounted = true;
     fetchFrom(`api/v2/sticker/getAttributeOfCollection/${address}`)
       .then((response) => {
         response.json().then((jsonData) => {
-          if(jsonData.data.result){
+          if(jsonData.data.result && isMounted){
             setFilterAttributes(jsonData.data.result)
             setCollectionAttributes(jsonData.data.result)
           }
         })
       })
+    return () => { isMounted = false };
   }, [])
   React.useEffect(()=>{
     setMinVal(range.min)
@@ -65,8 +67,8 @@ export default function CollectionFilterPan(props){
     setErrRangeInput(false)
     handleFilter('range', range)
   }
-  const selectAttributes = (group, field)=>{
-    handleFilter('attributes', {group, field})
+  const selectAttributes = (groupName, field)=>{
+    handleFilter('attributes', {groupName, field})
   }
   const searchAttributes = (inputStr, groupName)=>{
     const tempAttributes = {...filterAttributes}
@@ -165,9 +167,8 @@ export default function CollectionFilterPan(props){
         </Grid>
         {
           filterGroupNames.map((groupName, _i)=>{
-            const originGroup = filterAttributes[groupName]
             const filterGroup = filterAttributes[groupName]
-            return <Grid item xs={12} md={12}>
+            return <Grid key={_i} item xs={12} md={12}>
               <AccordionStyle
                 defaultExpanded={1&&true}
               >
@@ -183,14 +184,16 @@ export default function CollectionFilterPan(props){
                       aria-labelledby="nested-list-subheader"
                     >
                       {
-                        filterGroup.map((el, _j)=>(
-                          <ListItemButton key={_j} onClick={()=>{selectAttributes(groupName, el)}} selected={attributes[groupName]&&attributes[groupName].includes(el)}>
+                        filterGroup.map((el, _j)=>{
+                          const selectedSubGroup = selectedAttributes[groupName]
+                          const isSelected = selectedSubGroup&&selectedSubGroup.includes(el)
+                          return <ListItemButton key={_j} onClick={()=>{selectAttributes(groupName, el)}} selected={isSelected}>
                             <ListItemIcon>
-                              <Icon icon={`fluent:checkbox-${attributes[groupName]&&attributes[groupName].includes(el)?'checked':'unchecked'}-20-regular`} width={20}/>
+                              <Icon icon={`fluent:checkbox-${isSelected?'checked':'unchecked'}-20-regular`} width={20}/>
                             </ListItemIcon>
                             <ListItemText primary={el} />
                           </ListItemButton>
-                        ))
+                        })
                       }
                     </List>
                   </Scrollbar>
