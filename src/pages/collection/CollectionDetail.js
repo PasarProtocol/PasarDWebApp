@@ -505,7 +505,7 @@ export default function CollectionDetail() {
                         p: 1
                       }}
                       filterProps = {{selectedBtns, selectedTokens, range, adult, order}}
-                      {...{btnNames, handleFilter}}
+                      {...{btnNames, handleFilter, address: params.collection}}
                     />
                   </Box>
                   <Box
@@ -627,7 +627,7 @@ export default function CollectionDetail() {
                       }}
                       filterProps = {filterForm}
                       handleFilter = {handleFilterMobile}
-                      {...{btnNames}}
+                      {...{btnNames, address: params.collection}}
                     />
                   </Scrollbar>
                 </Box>
