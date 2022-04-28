@@ -37,8 +37,8 @@ export default function AssetFilterPan(props){
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
   const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
-  const [collections, setCollections] = React.useState(collectionTypes);
-  const [filterCollections, setFilterCollections] = React.useState(collectionTypes);
+  const [collections, setCollections] = React.useState([]);
+  const [filterCollections, setFilterCollections] = React.useState([]);
   const [filterTokens, setFilterTokens] = React.useState(coinTypes);
 
   React.useEffect(()=>{
@@ -50,7 +50,7 @@ export default function AssetFilterPan(props){
             return tempItem
           })
 
-          const allCollections = [...collectionTypes, ...resCollections]
+          const allCollections = [...resCollections]
           setCollections(allCollections);
           setFilterCollections(allCollections)
         })
