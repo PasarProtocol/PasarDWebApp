@@ -263,7 +263,10 @@ export default function CollectibleDetail() {
             .catch((e) => {
             })
         }
-        if(jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0)
+        if(
+          (jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0) ||
+          (jsonCollectible.data.attribute && Object.keys(jsonCollectible.data.attribute).length>0)
+        )
           setPropertiesAccordionOpen(true)
       } catch(e) {
         console.log(e)
@@ -342,8 +345,9 @@ export default function CollectibleDetail() {
   }
   
   window.addEventListener('resize', handleResize);
-  const properties = collectible&&collectible.properties?collectible.properties:{}
-
+  let properties = {}
+  if(collectible && (collectible.properties || collectible.attribute))
+    properties = collectible.properties || collectible.attribute
   return (
     <RootStyle title="Collectible | PASAR">
       <ScrollManager scrollKey="asset-detail-key"/>
@@ -733,6 +737,7 @@ export default function CollectibleDetail() {
                                 collectiblesInCollection.slice(0, dispCountInCollection).map((item, _i)=>{
                                   const coinType = getCoinTypeFromToken(item)
                                   return <AssetCard
+                                      key={_i}
                                       {...item}
                                       thumbnail={getAssetImage(item, true)}
                                       price={round(item.price/1e18, 3)}

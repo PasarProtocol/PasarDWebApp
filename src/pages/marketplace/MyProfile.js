@@ -169,7 +169,7 @@ export default function MyProfile() {
       return tempFlag
     })
   }
-  const apiNames = ['getListedCollectiblesByAddress', 'getOwnCollectiblesByAddress', 'getBidsByAddress', 'getCreatedCollectiblesByAddress', 'getSoldCollectiblesByAddress'];
+  const apiNames = ['getListedCollectiblesByAddress', 'getOwnCollectiblesByAddress', 'getBidCollectiblesByAddress', 'getCreatedCollectiblesByAddress', 'getSoldCollectiblesByAddress'];
   const typeNames = ['listed', 'owned', "bid", 'created', 'sold'];
   React.useEffect(async () => {
     if(walletAddress){
