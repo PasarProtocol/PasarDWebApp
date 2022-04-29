@@ -30,7 +30,7 @@ const RootStyle = styled(Page)(({ theme }) => ({
 // ----------------------------------------------------------------------
 export default function Explorer() {
   const navigate = useNavigate();
-  const [collections, setCollections] = React.useState(collectionTypes);
+  const [collections, setCollections] = React.useState([]);
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
   const [orderType, setOrderType] = React.useState(0);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
@@ -43,7 +43,7 @@ export default function Explorer() {
     const { signal } = newController;
     setAbortController(newController);
     setLoadingCollections(true);
-    fetchFrom(`api/v2/sticker/getCollection?orderType=${orderType}`, { signal })
+    fetchFrom(`api/v2/sticker/getCollection?sort=${orderType}`, { signal })
       .then((response) => {
         response.json().then((jsonAssets) => {
           setCollections(jsonAssets.data);
