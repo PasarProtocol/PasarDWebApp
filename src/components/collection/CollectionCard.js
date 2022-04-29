@@ -18,7 +18,7 @@ import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
 // import Badge from '../Badge';
 // import BadgeProfile from './BadgeProfile'
 import useSingin from '../../hooks/useSignin';
-import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, fetchFrom, coinTypes } from '../../utils/common';
+import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, fetchFrom, coinTypes, getAssetImage } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const avatarStyle = {
@@ -78,7 +78,7 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
 }));
 
 const CollectionImgBox = (props) => {
-  const { name, background: backgroundImg, avatar, realData } = props;
+  const { name, background: backgroundImg, avatar, totalCount, realData, collectibles } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openGroupBox, setOpenGroupBox] = React.useState(false);
   const imageStyle = {
@@ -101,14 +101,6 @@ const CollectionImgBox = (props) => {
     onMouseEnter: handlePopoverOpen,
     onMouseLeave: handlePopoverClose
   }
-  const tempImages = [
-    "https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
-    "https://images.unsplash.com/photo-1506710507565-203b9f24669b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1536&q=80",
-    "https://images.unsplash.com/photo-1536987333706-fc9adfb10d91?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
-    "https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
-    "https://images.unsplash.com/photo-1506710507565-203b9f24669b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1536&q=80",
-    "https://images.unsplash.com/photo-1536987333706-fc9adfb10d91?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
-  ];
   return (
     <Stack sx={{position: 'relative', height: '120px', mb: '25px'}}>
       <Stack sx={{height: '100%', overflow: 'hidden'}}>
@@ -145,9 +137,9 @@ const CollectionImgBox = (props) => {
         {
           ({ TransitionProps }) => (
             <Fade {...TransitionProps}>
-              <Stack sx={{minWidth: 180, maxWidth: 400, py: 2, alignItems: 'center', borderRadius: 1, boxShadow: (theme) => theme.customShadows.z12, background: (theme) => theme.palette.background.paper}}>
+              <Stack sx={{minWidth: 300, maxWidth: 400, p: 2, alignItems: 'center', borderRadius: 1, boxShadow: (theme) => theme.customShadows.z12, background: (theme) => theme.palette.background.paper}}>
                 <Typography variant="h5" noWrap>{name}</Typography>
-                <TypographyStyle variant="subtitle2" color="text.secondary" noWrap>200 items</TypographyStyle>
+                <TypographyStyle variant="subtitle2" color="text.secondary" noWrap>{totalCount} items</TypographyStyle>
                 <Grid container sx={{pt: 2}}>
                   <Grid item sm={4} textAlign="center">
                     <Typography variant="h6" noWrap>{realData[0].toLocaleString("en-US")}</Typography>
@@ -169,22 +161,28 @@ const CollectionImgBox = (props) => {
                     </Typography>
                   </Grid>
                 </Grid>
-                <Grid container sx={{py: 2}}>
-                  {
-                    tempImages.map((imgSrc, _i)=>(
-                      <Grid item sm={4} key={_i}>
-                        {
-                          _i===5?
-                          <Box sx={{position: 'relative', background: '#161c24'}}>
-                            <Box component="img" src={imgSrc} sx={{height: "100%", maxHeight: 100, opacity: .5, filter: 'blur(2px)'}}/>
-                            <Typography variant="h6" align='center' sx={{width: '100%', top: '50%', color: 'white', position: 'absolute', transform: 'translateY(-50%)'}}>+ more</Typography>
-                          </Box>:
-                          <Box component="img" src={imgSrc} sx={{height: "100%", maxHeight: 100}}/>
-                        }
-                      </Grid>
-                    ))
-                  }
-                </Grid>
+                {
+                  collectibles.length>5 &&
+                  <Grid container sx={{py: 2, mx: -2, width: 'calc(100% + 32px)'}}>
+                    {
+                      collectibles.map((item, _i)=>{
+                        const thumbnail = getAssetImage(item)
+                        return <Grid item sm={4} key={_i} sx={{height: 80}}>
+                          {
+                            _i===5?
+                            <Box sx={{position: 'relative', background: '#161c24', height: '100%'}}>
+                              <Box sx={{...imageStyle, width: '100%', background: `url(${thumbnail}) no-repeat center`, backgroundSize: 'cover', opacity: .5, filter: 'blur(2px)'}} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
+                              {/* <Box component="img" src={thumbnail} sx={{height: "100%", maxHeight: 100, opacity: .5, filter: 'blur(2px)'}}/> */}
+                              <Typography variant="h6" align='center' sx={{width: '100%', top: '50%', color: 'white', position: 'absolute', transform: 'translateY(-50%)'}}>+ more</Typography>
+                            </Box>:
+                            <Box sx={{...imageStyle, width: '100%', background: `url(${thumbnail}) no-repeat center`, backgroundSize: 'cover'}} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
+                            // <Box component="img" src={thumbnail} sx={{height: "100%", maxHeight: 100}}/>
+                          }
+                        </Grid>
+                      })
+                    }
+                  </Grid>
+                }
               </Stack>
             </Fade>
           )
@@ -196,41 +194,42 @@ const CollectionImgBox = (props) => {
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider, isOwned=false, openRoyaltiesDlg } = props
-  const { name, uri='', owner='', token } = info
+  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, collectibles=[] } = info
   let { description='', avatar='', background='' } = info
+  const realData = [totalPrice, floorPrice, totalOwner]
 
   const [didName, setDidName] = React.useState('');
   const [metaObj, setMetaObj] = React.useState({});
-  const [realData, setRealData] = React.useState([0, 0, 0]);
+  // const [realData, setRealData] = React.useState([0, 0, 0]);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
   const { setOpenDownloadEssentialDlg } = useSingin()
   const navigate = useNavigate();
-  const apikey = [
-    {api: 'getTotalPriceCollectibles', field: 'total'},
-    {api: 'getFloorPriceCollectibles', field: 'price'},
-    {api: 'getOwnersOfCollection', field: 'total'}
-  ]
+  // const apikey = [
+  //   {api: 'getTotalPriceCollectibles', field: 'total'},
+  //   {api: 'getFloorPriceCollectibles', field: 'price'},
+  //   {api: 'getOwnersOfCollection', field: 'total'}
+  // ]
 
-  React.useEffect(() => {
-    if(token) {
-      apikey.forEach((item, _i)=>{
-        fetchFrom(`api/v2/sticker/${item.api}/${token}`)
-          .then((response) => {
-            response.json().then((jsonData) => {
-              setRealData((prevState)=>{
-                const tempData = [...prevState]
-                tempData[_i] = jsonData.data[item.field] || 0
-                return tempData
-              })
-            }).catch((e) => {
-            });
-          })
-          .catch((e) => {
-          });
-      })
-    }
-  }, [token]);
+  // React.useEffect(() => {
+  //   if(token) {
+  //     apikey.forEach((item, _i)=>{
+  //       fetchFrom(`api/v2/sticker/${item.api}/${token}`)
+  //         .then((response) => {
+  //           response.json().then((jsonData) => {
+  //             setRealData((prevState)=>{
+  //               const tempData = [...prevState]
+  //               tempData[_i] = jsonData.data[item.field] || 0
+  //               return tempData
+  //             })
+  //           }).catch((e) => {
+  //           });
+  //         })
+  //         .catch((e) => {
+  //         });
+  //     })
+  //   }
+  // }, [token]);
 
   React.useEffect(() => {
     // if(holder) {
@@ -311,7 +310,7 @@ const CollectionCardPaper = (props) => {
     setOpenPopup(null);
   };
 
-  const imgBoxProps = {avatar, background, name, realData}
+  const imgBoxProps = {avatar, background, name, totalCount, realData, collectibles}
   return (
       <PaperRecord sx={isPreview?{ overflow: 'hidden' } : { overflow: 'hidden', ...paperStyle, ...(isOpenPopup?forceHoverStyle:{}) }}>
         <Box>
