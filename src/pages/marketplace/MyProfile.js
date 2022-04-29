@@ -77,7 +77,7 @@ export default function MyProfile() {
   const sessionDispMode = sessionStorage.getItem("disp-mode")
   const params = useParams(); // params.address
   const navigate = useNavigate();
-  const [assets, setAssets] = React.useState([[], [], [], []]);
+  const [assets, setAssets] = React.useState([[], [], [], [], []]);
   const [collections, setCollections] = React.useState([]);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
   const [isLoadingCollection, setLoadingCollection] = React.useState(false);
@@ -169,8 +169,8 @@ export default function MyProfile() {
       return tempFlag
     })
   }
-  const apiNames = ['getListedCollectiblesByAddress', 'getOwnCollectiblesByAddress', 'getBidsByAddress', 'getCreatedCollectiblesByAddress'];
-  const typeNames = ['listed', 'owned', "bid", 'created'];
+  const apiNames = ['getListedCollectiblesByAddress', 'getOwnCollectiblesByAddress', 'getBidsByAddress', 'getCreatedCollectiblesByAddress', 'getSoldCollectiblesByAddress'];
+  const typeNames = ['listed', 'owned', "bid", 'created', 'sold'];
   React.useEffect(async () => {
     if(walletAddress){
       getDiaTokenInfo(walletAddress).then(dia=>{
@@ -187,7 +187,7 @@ export default function MyProfile() {
     const { signal } = newController;
     setAbortController(newController);
 
-    Array(4)
+    Array(5)
       .fill(0)
       .forEach((_, i) => {
         setLoadingAssetsOfType(i, true);
@@ -342,7 +342,8 @@ export default function MyProfile() {
             <Tab label={`Owned (${assets[1].length})`} value={1} />
             <Tab label={`Bids (${assets[2].length})`} value={2} />
             <Tab label={`Created (${assets[3].length})`} value={3} />
-            <Tab label={`Collections (${collections.length})`} value={4} />
+            <Tab label={`Sold (${assets[4].length})`} value={4} />
+            <Tab label={`Collections (${collections.length})`} value={5} />
           </Tabs>
           {/* <MHidden width="smDown">
             <ToolGroupStyle>
