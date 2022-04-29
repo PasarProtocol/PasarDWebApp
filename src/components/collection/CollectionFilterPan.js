@@ -45,9 +45,13 @@ export default function CollectionFilterPan(props){
     fetchFrom(`api/v2/sticker/getAttributeOfCollection/${address}`)
       .then((response) => {
         response.json().then((jsonData) => {
-          if(jsonData.data.result && isMounted){
-            setFilterAttributes(jsonData.data.result)
-            setCollectionAttributes(jsonData.data.result)
+          if(jsonData.data && isMounted){
+            setCollectionAttributes(jsonData.data)
+            const tempData = {...jsonData.data}
+            Object.keys(tempData).forEach(groupName=>{
+              tempData[groupName] = Object.keys(tempData[groupName])
+            })
+            setFilterAttributes(tempData)
           }
         })
       })
@@ -73,9 +77,9 @@ export default function CollectionFilterPan(props){
   const searchAttributes = (inputStr, groupName)=>{
     const tempAttributes = {...filterAttributes}
     if(inputStr.length)
-      tempAttributes[groupName] = collectionAttributes[groupName].filter(el=>el.includes(inputStr))
+      tempAttributes[groupName] = Object.keys(collectionAttributes[groupName]).filter(el=>el.includes(inputStr))
     else
-      tempAttributes[groupName] = collectionAttributes[groupName]
+      tempAttributes[groupName] = Object.keys(collectionAttributes[groupName])
     setFilterAttributes(tempAttributes)
   }
   const filterGroupNames = Object.keys(filterAttributes)
@@ -168,6 +172,7 @@ export default function CollectionFilterPan(props){
         {
           filterGroupNames.map((groupName, _i)=>{
             const filterGroup = filterAttributes[groupName]
+            const originGroup = collectionAttributes[groupName]
             return <Grid key={_i} item xs={12} md={12}>
               <AccordionStyle
                 defaultExpanded={1&&true}
@@ -192,6 +197,7 @@ export default function CollectionFilterPan(props){
                               <Icon icon={`fluent:checkbox-${isSelected?'checked':'unchecked'}-20-regular`} width={20}/>
                             </ListItemIcon>
                             <ListItemText primary={el} />
+                            <Typography variant="body2">{originGroup[el]}</Typography>
                           </ListItemButton>
                         })
                       }
