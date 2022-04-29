@@ -323,6 +323,9 @@ export default function CollectionDetail() {
       case 'selectedTokens':
         setSelectedTokens(value)
         break
+      case 'selectedAttributes':
+        setSelectedAttributes(value)
+        break
       case 'adult':
         setSelectedByValue(value, adultBtnId)
         setAdult(value)
@@ -367,6 +370,22 @@ export default function CollectionDetail() {
         tempForm.selectedTokens.splice(findIndex, 1)
       }
     }
+    else if(key==='attributes'){
+      const {groupName, field} = value
+      const tempSubGroup = tempForm.selectedAttributes[groupName]
+      if(tempSubGroup){
+        if(tempSubGroup.includes(field)){
+          const findIndex = tempSubGroup.indexOf(field)
+          tempSubGroup.splice(findIndex, 1)
+          if(!tempSubGroup.length)
+            delete tempForm.selectedAttributes[groupName]
+        } else {
+          tempSubGroup.push(field)
+        }
+      } else {
+        tempForm.selectedAttributes[groupName] = [field]
+      }
+    }
     else if(key==='adult'){
       if(value){
         if(!tempBtns.includes(adultBtnId))
@@ -383,7 +402,7 @@ export default function CollectionDetail() {
     const tempForm = {...filterForm}
     delete tempForm.statype
     delete tempForm.clear_all
-    delete tempForm.collection
+    delete tempForm.attributes
     delete tempForm.token
     Object.keys(tempForm).forEach(key => handleFilter(key, tempForm[key]))
     setFilterForm(tempForm)
