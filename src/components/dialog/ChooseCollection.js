@@ -1,7 +1,6 @@
 import React from 'react';
 import Web3 from 'web3';
-import { useLocation } from 'react-router-dom';
-
+import { useLocation, Link as RouterLink } from 'react-router-dom';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, List, ListItemButton, Button, Box, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Icon } from '@iconify/react';
@@ -110,7 +109,7 @@ export default function ChooseCollection(props) {
       </DialogTitle>
       <DialogContent>
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
-          My Collections
+          {collections.length>0?"My Collections":"No Collections Found"}
         </Typography>
         {
           collectionClasses.map((classEl, _i) => (
@@ -164,6 +163,17 @@ export default function ChooseCollection(props) {
               OK
             </StyledButton>
           </Box>
+        }
+        {
+          collections.length===0&&
+          <>
+            <Typography variant="h5" sx={{ color: 'text.secondary', py: 2 }} align='center'>We could not find any of your collections</Typography>
+            <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
+              <StyledButton variant='contained' component={RouterLink} to="/collection/create">
+                Create New Collection
+              </StyledButton>
+            </Box>
+          </>
         }
       </DialogContent>
     </Dialog>

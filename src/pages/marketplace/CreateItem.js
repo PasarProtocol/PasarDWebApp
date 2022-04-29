@@ -126,6 +126,11 @@ export default function CreateItem() {
   }, []);
 
   React.useEffect(async () => {
+    if(selectedCollection.token)
+      setCollection("Choose")
+  }, [selectedCollection.token]);
+
+  React.useEffect(async () => {
     if(mintype!=="Multiple")
       setQuantity(1)
   }, [mintype]);
@@ -951,7 +956,7 @@ export default function CreateItem() {
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
               <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{setCollection("PSRC")}} current={collection}/>
-              <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setCollection("Choose"); setChooseCollectionOpen(true);}} current={collection} selectedCollection={selectedCollection}/>
+              <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setChooseCollectionOpen(true)}} current={collection} selectedCollection={selectedCollection}/>
               {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
                   <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
@@ -1499,7 +1504,6 @@ export default function CreateItem() {
       <ChooseCollectionDlg 
         isOpen={chooseCollectionOpen}
         setOpen={setChooseCollectionOpen}
-        // thisCollection = {selectedCollection}
         handleChoose = {handleChooseCollection}
         setERCtype = {setSelectedERCtype}
       />
