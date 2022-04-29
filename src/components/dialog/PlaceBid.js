@@ -207,21 +207,24 @@ export default function PlaceBid(props) {
   const bidNft = async () => {
     if(!bidPrice){
       enqueueSnackbar('Bid amount is required', { variant: 'warning' });
-      return
     }
-    if(bidPrice<Math.max(info.currentBid, info.Price)/1e18){
-      enqueueSnackbar('Your Bid amount cannot be lower than Starting Price and Current Bid', { variant: 'warning' });
-      return
+    else if(bidPrice <= info.currentBid/1e18 && info.currentBid){
+      enqueueSnackbar('Your Bid amount must be higher than Current Bid', { variant: 'warning' });
     }
-    setOnProgress(true);
-    const bidPriceStr = BigInt(targetPrice*1e18).toString();
-    if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
-      callEthBidOrder(info.OrderId, bidPriceStr);
+    else if(bidPrice < info.Price/1e18){
+      enqueueSnackbar('Your Bid amount cannot be lower than Starting Price', { variant: 'warning' });
     }
-    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      const biderDidUri = await sendIpfsDidJson();
-      console.log('didUri:', biderDidUri);
-      callBidOrder(info.OrderId, biderDidUri, bidPriceStr);
+    else {
+      setOnProgress(true);
+      const bidPriceStr = BigInt(targetPrice*1e18).toString();
+      if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
+        callEthBidOrder(info.OrderId, bidPriceStr);
+      }
+      else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+        const biderDidUri = await sendIpfsDidJson();
+        console.log('didUri:', biderDidUri);
+        callBidOrder(info.OrderId, biderDidUri, bidPriceStr);
+      }
     }
   };
 
