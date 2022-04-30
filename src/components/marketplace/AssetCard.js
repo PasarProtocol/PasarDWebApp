@@ -195,7 +195,7 @@ export default function AssetCard(props) {
     }
     setOpenPopup(null);
   };
-  const dlgProps = {name, tokenId, orderId, updateCount, handleUpdate}
+  const dlgProps = {name, tokenId, orderId, updateCount, handleUpdate, baseToken}
   const currentBidPrice = currentBid&&currentBid.length>0?currentBid[0].price:0
   return (
       <Box>
