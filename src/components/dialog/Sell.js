@@ -6,8 +6,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import { TOKEN_721_ABI } from '../../abi/token721ABI'
-import { TOKEN_1155_ABI } from '../../abi/token1155ABI'
 import {
   stickerContract as CONTRACT_ADDRESS,
   marketContract as MARKET_CONTRACT_ADDRESS,
@@ -18,8 +16,6 @@ import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes } from '../../utils/common';
-
-const ercAbiArr = [TOKEN_721_ABI, TOKEN_1155_ABI]
 
 export default function Sell(props) {
   const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate } = props;
@@ -47,13 +43,7 @@ export default function Sell(props) {
       // const accounts = await walletConnectWeb3.eth.getAccounts();
       walletConnectWeb3.eth.getAccounts().then((accounts)=>{
 
-        let contractAbi = STICKER_CONTRACT_ABI;
-        const contractAddress = baseToken;
-        if(contractAddress !== CONTRACT_ADDRESS) {
-          const ERCtype = 0 // await getERCType(contractAddress)
-          contractAbi = ercAbiArr[ERCtype]
-        }
-        const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+        const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, baseToken);
         
         walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
           console.log("Gas price:", gasPrice);

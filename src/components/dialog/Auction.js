@@ -114,9 +114,7 @@ export default function Auction(props) {
       // const accounts = await walletConnectWeb3.eth.getAccounts();
       walletConnectWeb3.eth.getAccounts().then((accounts)=>{
 
-        const contractAbi = STICKER_CONTRACT_ABI;
-        const contractAddress = CONTRACT_ADDRESS; // Elastos Testnet
-        const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+        const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, baseToken);
         
         walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
           console.log("Gas price:", gasPrice);
