@@ -451,7 +451,7 @@ export default function AssetCard(props) {
         <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} {...dlgProps}/>
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps}/>
         <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance}/>
-        <AuctionDlg isOpen={auctionOpen} setOpen={setOpenAuction} {...dlgProps} baseToken={baseToken}/>
+        <AuctionDlg isOpen={auctionOpen} setOpen={setOpenAuction} {...dlgProps}/>
         <SettleOrderDlg isOpen={settleOpen} setOpen={setSettleOrderOpen} info={props} address={myaddress}/>
       </Box>
   );
