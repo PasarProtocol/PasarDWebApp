@@ -14,11 +14,9 @@ import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack,
 
 import PaperRecord from '../PaperRecord';
 import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
-
-// import Badge from '../Badge';
-// import BadgeProfile from './BadgeProfile'
+import Badge from '../Badge';
 import useSingin from '../../hooks/useSignin';
-import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, fetchFrom, coinTypes, getAssetImage } from '../../utils/common';
+import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, coinTypes, getAssetImage } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const avatarStyle = {
@@ -231,18 +229,7 @@ const CollectionCardPaper = (props) => {
   //   }
   // }, [token]);
 
-  React.useEffect(() => {
-    // if(holder) {
-    //   getDiaTokenInfo(holder).then(dia=>{
-    //     if(dia!=='0')
-    //       setBadgeFlag('dia', true)
-    //   })
-    //   getCredentialInfo(holder).then(proofData=>{
-    //     if(proofData)
-    //       setBadgeFlag('kyc', true)
-    //   })
-    // }
-    
+  React.useEffect(() => {    
     const metaUri = getIpfsUrl(uri)
     if(metaUri) {
       fetch(metaUri)
@@ -268,15 +255,33 @@ const CollectionCardPaper = (props) => {
         setDidName(name)
       }
     }      
-    else if(owner)
+    else if(owner) {
       getDidInfoFromAddress(owner)
         .then((info) => {
           if(info.name)
             setDidName(info.name)
         })
         .catch((e) => {})
+      
+      getDiaTokenInfo(owner).then(dia=>{
+        if(dia!=='0')
+          setBadgeFlag('dia', true)
+      })
+      getCredentialInfo(owner).then(proofData=>{
+        if(proofData)
+          setBadgeFlag('kyc', true)
+      })
+    }
   }, [owner]);
   
+  const setBadgeFlag = (type, value) => {
+    setBadge((prevState) => {
+      const tempFlag = {...prevState}
+      tempFlag[type] = value
+      return tempFlag
+    })
+  }
+
   const openPopupMenu = (event) => {
     event.stopPropagation()
     setOpenPopup(event.currentTarget);
@@ -387,9 +392,23 @@ const CollectionCardPaper = (props) => {
                 {description}
               </TypographyStyle>:
               <TypographyStyle variant="subtitle2" color='text.secondary'>
-                {description.length>200?`${description.substring(0, 200)}...`:description}
+                {description.length>100?`${description.substring(0, 100)}...`:description}
               </TypographyStyle>
             }
+            <Stack sx={{justifyContent: 'center', pt: 1}} spacing={1} direction="row">
+            {
+              badge.dia&&
+              <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
+                <Box sx={{display: 'inline-flex'}}><Badge name="diamond"/></Box>
+              </Tooltip>
+            }
+            {
+              badge.kyc&&
+              <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
+                <Box sx={{display: 'inline-flex'}}><Badge name="user"/></Box>
+              </Tooltip>
+            }
+          </Stack>
           </Stack>
         </Box>
       </PaperRecord>
