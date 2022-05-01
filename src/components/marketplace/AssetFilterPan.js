@@ -137,21 +137,21 @@ export default function AssetFilterPan(props){
               </AccordionSummary>
               <AccordionDetails>
                 <Stack direction="row" sx={{flexWrap: 'wrap'}}>
-                {
-                  btnGroup.status.map((name, index)=>(
-                    <Button 
-                      key={index}
-                      variant={
-                        filterProps.selectedBtns&&filterProps.selectedBtns.includes(index)?"contained":"outlined"
-                      }
-                      color="inherit"
-                      onClick={()=>handleFilter('statype', index)}
-                      sx={{mr: 1, mb: 1}}
-                    >
-                      {name}
-                    </Button>
-                  ))
-                }
+                  {
+                    btnGroup.status.map((name, index)=>(
+                      <Button 
+                        key={index}
+                        variant={
+                          filterProps.selectedBtns&&filterProps.selectedBtns.includes(index)?"contained":"outlined"
+                        }
+                        color="inherit"
+                        onClick={()=>handleFilter('statype', index)}
+                        sx={{mr: 1, mb: 1}}
+                      >
+                        {name}
+                      </Button>
+                    ))
+                  }
                 </Stack>
               </AccordionDetails>
             </AccordionStyle>

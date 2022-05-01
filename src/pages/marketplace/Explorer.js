@@ -105,7 +105,6 @@ export default function MarketExplorer() {
   const btnGroup = {
     status: ["Buy Now", "On Auction", "Not Met", "Has Bids", "Has Ended"],
     type: ["General", "Avatar"],
-    
   }
   const rangeBtnId = 10
   const adultBtnId = 11
@@ -167,9 +166,9 @@ export default function MarketExplorer() {
     const {signal} = newController;
     setAbortController(newController);
     let statusFilter = btnGroup.status.filter((name, index)=>selectedBtns.indexOf(index)>=0)
-    statusFilter = (statusFilter.length===2 || statusFilter.length===0)?'All':statusFilter[0]
+    statusFilter = (statusFilter.length===btnGroup.status.length || statusFilter.length===0)?'All':statusFilter[0]
     let itemTypeFilter = btnGroup.type.filter((name, index)=>selectedBtns.indexOf(index+btnGroup.status.length)>=0)
-    itemTypeFilter = (itemTypeFilter.length===2 || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
+    itemTypeFilter = (itemTypeFilter.length===btnGroup.type.length || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
     setLoadingAssets(true);
