@@ -76,7 +76,7 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
 }));
 
 const CollectionImgBox = (props) => {
-  const { name, background: backgroundImg, avatar, totalCount, realData, collectibles } = props;
+  const { name, background: backgroundImg, avatar, totalCount, realData, collectibles, token } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openGroupBox, setOpenGroupBox] = React.useState(false);
   const imageStyle = {
@@ -168,11 +168,18 @@ const CollectionImgBox = (props) => {
                         return <Grid item sm={4} key={_i} sx={{height: 80}}>
                           {
                             _i===5?
-                            <Box sx={{position: 'relative', background: '#161c24', height: '100%'}}>
-                              <Box sx={{...imageStyle, width: '100%', background: `url(${thumbnail}) no-repeat center`, backgroundSize: 'cover', opacity: .5, filter: 'blur(2px)'}} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
-                              {/* <Box component="img" src={thumbnail} sx={{height: "100%", maxHeight: 100, opacity: .5, filter: 'blur(2px)'}}/> */}
-                              <Typography variant="h6" align='center' sx={{width: '100%', top: '50%', color: 'white', position: 'absolute', transform: 'translateY(-50%)'}}>+ more</Typography>
-                            </Box>:
+                            <Link
+                              component={RouterLink}
+                              to={`detail/${token}`}
+                              alt=""
+                              color="origin.main"
+                            >
+                              <Box sx={{position: 'relative', background: '#161c24', height: '100%'}}>
+                                <Box sx={{...imageStyle, width: '100%', background: `url(${thumbnail}) no-repeat center`, backgroundSize: 'cover', opacity: .5, filter: 'blur(2px)'}} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
+                                {/* <Box component="img" src={thumbnail} sx={{height: "100%", maxHeight: 100, opacity: .5, filter: 'blur(2px)'}}/> */}
+                                <Typography variant="h6" align='center' sx={{width: '100%', top: '50%', color: 'white', position: 'absolute', transform: 'translateY(-50%)'}}>+ more</Typography>
+                              </Box>
+                            </Link>:
                             <Box sx={{...imageStyle, width: '100%', background: `url(${thumbnail}) no-repeat center`, backgroundSize: 'cover'}} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
                             // <Box component="img" src={thumbnail} sx={{height: "100%", maxHeight: 100}}/>
                           }
@@ -315,7 +322,7 @@ const CollectionCardPaper = (props) => {
     setOpenPopup(null);
   };
 
-  const imgBoxProps = {avatar, background, name, totalCount, realData, collectibles}
+  const imgBoxProps = {avatar, background, name, totalCount, realData, collectibles, token}
   return (
       <PaperRecord sx={isPreview?{ overflow: 'hidden' } : { overflow: 'hidden', ...paperStyle, ...(isOpenPopup?forceHoverStyle:{}) }}>
         <Box>
