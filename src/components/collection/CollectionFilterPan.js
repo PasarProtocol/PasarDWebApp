@@ -30,15 +30,14 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
   backgroundColor: 'unset'
 }))
 export default function CollectionFilterPan(props){
-  const {sx, scrollMaxHeight, btnNames, filterProps, handleFilter, address} = props
+  const {sx, scrollMaxHeight, btnGroup, filterProps, handleFilter, address} = props
   const {range, selectedBtns, selectedAttributes={}} = filterProps
   const [minVal, setMinVal] = React.useState(range?range.min:'');
   const [maxVal, setMaxVal] = React.useState(range?range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
-  // const attr = ['Gold', 'Metal', 'Furry']
-  // const group = "Skin"
   const [collectionAttributes, setCollectionAttributes] = React.useState({});
   const [filterAttributes, setFilterAttributes] = React.useState({});
+  const [filterTokens, setFilterTokens] = React.useState(coinTypes);
 
   React.useEffect(()=>{
     let isMounted = true;
@@ -61,6 +60,18 @@ export default function CollectionFilterPan(props){
     setMinVal(range.min)
     setMaxVal(range.max)
   }, [range])
+
+  const searchTokens = (inputStr)=>{
+    if(inputStr.length){
+      setFilterTokens(coinTypes.filter(el=>el.name.includes(inputStr)))
+    } else {
+      setFilterTokens(coinTypes)
+    }
+  }
+  
+  const selectToken = (address)=>{
+    handleFilter('token', address)
+  }
 
   const applyRange = (e)=>{
     const range = {min: minVal, max: maxVal}
@@ -93,25 +104,28 @@ export default function CollectionFilterPan(props){
       <Grid container width="100%">
         <Grid item xs={12} md={12}>
           <AccordionStyle
-            defaultExpanded={1&&true}
+            defaultExpanded={Boolean(true)}
           >
             <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
               <Typography variant="body2">Status</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Stack spacing={1} direction='row'>
-              {
-                [...btnNames].splice(0,2).map((name, index)=>(
-                  selectedBtns?
-                  <Button key={index} variant={selectedBtns.includes(index)?"contained":"outlined"} color="inherit" onClick={()=>handleFilter('statype', index)}>
-                    {name}
-                  </Button>:
-
-                  <Button key={index} variant="outlined" color="inherit" onClick={()=>handleFilter('statype', index)}>
-                    {name}
-                  </Button>
-                ))
-              }
+              <Stack direction="row" sx={{flexWrap: 'wrap'}}>
+                {
+                  btnGroup.status.map((name, index)=>(
+                    <Button 
+                      key={index}
+                      variant={
+                        filterProps.selectedBtns&&filterProps.selectedBtns.includes(index)?"contained":"outlined"
+                      }
+                      color="inherit"
+                      onClick={()=>handleFilter('statype', index)}
+                      sx={{mr: 1, mb: 1}}
+                    >
+                      {name}
+                    </Button>
+                  ))
+                }
               </Stack>
             </AccordionDetails>
           </AccordionStyle>
@@ -119,7 +133,7 @@ export default function CollectionFilterPan(props){
         </Grid>
         <Grid item xs={12} md={12}>
           <AccordionStyle
-            defaultExpanded={1&&true}
+            defaultExpanded={Boolean(true)}
           >
             <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
               <Typography variant="body2">Price Range</Typography>
@@ -169,13 +183,56 @@ export default function CollectionFilterPan(props){
           </AccordionStyle>
           <Divider />
         </Grid>
+        <Grid item xs={12} md={12}>
+          <AccordionStyle
+            defaultExpanded={Boolean(true)}
+          >
+            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+              <Typography variant="body2">Tokens</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <SearchBox sx={{width: '100%', mb: 1}} placeholder="Search tokens" onChange={searchTokens}/>
+              <Scrollbar sx={{maxHeight: 200}}>
+                <List
+                  sx={{ width: '100%', bgcolor: 'unset', pt: 0 }}
+                  component="nav"
+                  aria-labelledby="nested-list-subheader"
+                >
+                  {
+                    filterTokens.map((el, i)=>(
+                      <ListItemButton key={i} onClick={()=>{selectToken(el.address)}} selected={filterProps.selectedTokens.includes(el.address)}>
+                        <ListItemIcon>
+                          <Box 
+                            draggable = {false}
+                            component="img"
+                            src={`/static/${el.icon}`}
+                            sx={{
+                              width: 24,
+                              height: 24,
+                              filter: (theme)=>theme.palette.mode==='dark'&&el.icon==='elastos.svg'?'invert(1)':'none'
+                            }} 
+                          />
+                        </ListItemIcon>
+                        <ListItemText primary={el.name} />
+                        {
+                          filterProps.selectedTokens.includes(el.address)&&<CheckIcon/>
+                        }
+                      </ListItemButton>
+                    ))
+                  }
+                </List>
+              </Scrollbar>
+            </AccordionDetails>
+          </AccordionStyle>
+          <Divider />
+        </Grid>
         {
           filterGroupNames.map((groupName, _i)=>{
             const filterGroup = filterAttributes[groupName]
             const originGroup = collectionAttributes[groupName]
             return <Grid key={_i} item xs={12} md={12}>
               <AccordionStyle
-                defaultExpanded={1&&true}
+                defaultExpanded={Boolean(true)}
               >
                 <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
                   <Typography variant="body2">{groupName}</Typography>

@@ -74,7 +74,10 @@ export default function CollectionDetail() {
   const sessionFilterProps = JSON.parse(sessionStorage.getItem("filter-props-other")) || {}
   const params = useParams(); // params.key
   const drawerWidth = 360;
-  const btnNames = ["Buy Now", "On Auction"]
+  const btnGroup = {
+    status: ["Buy Now", "On Auction", "Not Met", "Has Bids", "Has Ended"],
+    type: ["General", "Avatar"],
+  }
   const rangeBtnId = 4
   const adultBtnId = 5
   const emptyRange = {min: '', max: ''}
@@ -166,10 +169,10 @@ export default function CollectionDetail() {
     const newController = new AbortController();
     const {signal} = newController;
     setAbortController(newController);
-    let statusFilter = [...btnNames].splice(0, 2).filter((name, index)=>selectedBtns.indexOf(index)>=0)
-    statusFilter = (statusFilter.length===2 || statusFilter.length===0)?'All':statusFilter[0]
-    let itemTypeFilter = [...btnNames].splice(2, 2).filter((name, index)=>selectedBtns.indexOf(index+2)>=0)
-    itemTypeFilter = (itemTypeFilter.length===2 || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
+    let statusFilter = btnGroup.status.filter((name, index)=>selectedBtns.indexOf(index)>=0)
+    statusFilter = (statusFilter.length===btnGroup.status.length || statusFilter.length===0)?'All':statusFilter[0]
+    let itemTypeFilter = btnGroup.type.filter((name, index)=>selectedBtns.indexOf(index+btnGroup.status.length)>=0)
+    itemTypeFilter = (itemTypeFilter.length===btnGroup.type.length || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
     setLoadingAssets(true);
@@ -495,7 +498,7 @@ export default function CollectionDetail() {
                       <Stack spacing={1} sx={{display: 'inline', pl: 1}} direction="row">
                         {
                           selectedBtns.map((nameId, index)=>{
-                            let buttonName = btnNames[nameId]
+                            let buttonName = btnGroup.status[nameId]
                             if(nameId === rangeBtnId){
                               buttonName = `${range.min || 0} to ${range.max === ''?'inf':range.max} ELA`
                             }
@@ -549,7 +552,7 @@ export default function CollectionDetail() {
                         p: 1
                       }}
                       filterProps = {{selectedBtns, selectedTokens, selectedAttributes, range, adult, order}}
-                      {...{btnNames, handleFilter, address: params.collection}}
+                      {...{btnGroup, handleFilter, address: params.collection}}
                     />
                   </Box>
                   <Box
@@ -637,7 +640,7 @@ export default function CollectionDetail() {
                     <Box sx={{ pt: 2, pb: 1, pr: 1, pl: 2.5 }}>
                       {
                         filterForm.selectedBtns.map((nameId, index)=>{
-                          let buttonName = btnNames[nameId]
+                          let buttonName = btnGroup.status[nameId]
                           if(nameId === rangeBtnId){
                             buttonName = `${filterForm.range.min || 0} to ${filterForm.range.max === ''?'inf':filterForm.range.max} ELA`
                           }
@@ -671,7 +674,7 @@ export default function CollectionDetail() {
                       }}
                       filterProps = {filterForm}
                       handleFilter = {handleFilterMobile}
-                      {...{btnNames, address: params.collection}}
+                      {...{btnGroup, address: params.collection}}
                     />
                   </Scrollbar>
                 </Box>
