@@ -40,6 +40,7 @@ export default function CollectionSortSelect({ onChange, sx={} }) {
       <MenuItem value={7}>Floor Price: High to Low</MenuItem>
       <MenuItem value={8}>Number of Owner: Low to High</MenuItem>
       <MenuItem value={9}>Number of Owner: High to Low</MenuItem>
+      <MenuItem value={10}>Diamond (DIA) Holdings: High to Low</MenuItem>
     </Select>
   );
 }
