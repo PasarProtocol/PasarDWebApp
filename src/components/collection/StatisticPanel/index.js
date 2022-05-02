@@ -26,7 +26,7 @@ export default function StatisticPanel({address}) {
           </StatisticItem>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="🖼 ️Items" index={2} address={address} field="total"/>
+          <StatisticItem title="🖼 Items" index={2} address={address} field="total"/>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
           <StatisticItem title="🔻 Floor Price" index={3} address={address} field="price"/>

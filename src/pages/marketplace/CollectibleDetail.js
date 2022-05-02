@@ -84,17 +84,22 @@ const AvatarStyle = styled(Box)(({ theme, src }) => ({
   backgroundColor: src?'unset':'black',
   marginRight: 8
 }));
-const Property = ({type, name}) => (
+const Property = ({type, name, percentage}) => (
   <Paper
     sx={{
         border: '1px solid',
         borderColor: 'action.disabledBackground',
         p: '20px',
-        display: 'inline-block'
+        display: 'inline-block',
+        textAlign: 'center'
     }}
   >
-    <Typography variant="body2" color="origin.main">{type}</Typography>
+    <Typography variant="subtitle2" color="origin.main">{type}</Typography>
     <Typography variant="body2">{name}</Typography>
+    {
+      !!percentage&&
+      <Typography variant="body2" color="text.secondary">{percentage}% trait</Typography>
+    }
   </Paper>
 )
 const BackdropStyle = styled(Backdrop)(({ theme }) => ({
@@ -135,6 +140,8 @@ export default function CollectibleDetail() {
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState([0,0]);
   const [dispCountInCollection, setDispCountInCollection] = React.useState(3);
+  const [totalCountInCollection, setTotalCountInCollection] = React.useState(0);
+  const [collectionAttributes, setCollectionAttributes] = React.useState({});
   const { pasarLinkAddress } = useSingin()
   const { updateCount } = useAuctionDlg()
   
@@ -175,6 +182,25 @@ export default function CollectibleDetail() {
     });
   }
   
+  React.useEffect(() => {
+    if(collectible.baseToken) {
+      fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${collectible.baseToken}`)
+        .then((response) => {
+          response.json().then((jsonData) => {
+            if(jsonData.data)
+              setTotalCountInCollection(jsonData.data.total)
+          })
+        })
+      fetchFrom(`api/v2/sticker/getAttributeOfCollection/${collectible.baseToken}`)
+        .then((response) => {
+          response.json().then((jsonData) => {
+            if(jsonData.data)
+              setCollectionAttributes(jsonData.data)
+          })
+        })
+    }
+  }, [collectible]);
+
   React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
     if(sessionLinkFlag){
@@ -630,11 +656,16 @@ export default function CollectibleDetail() {
                 <AccordionDetails sx={{px: '20px'}}>
                   <Grid container spacing={1}>
                     {
-                      Object.keys(properties).map((type, index)=>(
-                        <Grid item key={index}>
-                          <Property type={type} name={properties[type]}/>
+                      Object.keys(properties).map((type, index)=>{
+                        let countInTrait = 0
+                        const typeValue = properties[type]
+                        if(collectionAttributes[type] && collectionAttributes[type][typeValue])
+                          countInTrait = collectionAttributes[type][typeValue]
+                        const percentage = totalCountInCollection?round(countInTrait*100 / totalCountInCollection, 2):0
+                        return <Grid item key={index}>
+                          <Property type={type} name={typeValue} percentage={percentage}/>
                         </Grid>
-                      ))
+                      })
                     }
                   </Grid>
                 </AccordionDetails>
