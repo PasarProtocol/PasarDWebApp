@@ -94,6 +94,7 @@ export default function Router() {
             { path: 'others/:address', element: <MyItems /> },
           ]
         },
+        { path: 'rewards', element: <Rewards /> },
       ]
     },
     { path: '*', element: <Navigate to="/404" replace /> }
@@ -121,5 +122,7 @@ const CollectionDetail = Loadable(lazy(() => import('../pages/collection/Collect
 const CreateCollection = Loadable(lazy(() => import('../pages/collection/CreateCollection')));
 const EditCollection = Loadable(lazy(() => import('../pages/collection/EditCollection')));
 const ImportCollection = Loadable(lazy(() => import('../pages/collection/ImportCollection')));
+// Rewards
+const Rewards = Loadable(lazy(() => import('../pages/rewards/Rewards')));
 
 const NotFound = Loadable(lazy(() => import('../pages/Page404')));

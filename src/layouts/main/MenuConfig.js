@@ -42,7 +42,7 @@ const menuConfig = [
     title: 'Rewards',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
     path: PATH_PAGE.rewards,
-    disable: true
+    disable: false
   },
   // {
   //   title: 'Docs',
