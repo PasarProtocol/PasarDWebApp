@@ -162,7 +162,7 @@ export default function CollectibleDetail() {
       setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
     })
     determineDispCount()
-  }, [])
+  }, [params.collection])
 
   function determineDispCount() {
     const { innerWidth: width } = window;
@@ -294,12 +294,14 @@ export default function CollectibleDetail() {
           (jsonCollectible.data.attribute && Object.keys(jsonCollectible.data.attribute).length>0)
         )
           setPropertiesAccordionOpen(true)
+        else 
+          setPropertiesAccordionOpen(false)
       } catch(e) {
         console.log(e)
       }
     }
     setLoadingCollectible(false);
-  }, [updateCount]);
+  }, [updateCount, params.collection]);
   
   React.useEffect(async () => {
     setLoadingTransRecord(true);
@@ -314,7 +316,7 @@ export default function CollectibleDetail() {
       if(e.code !== e.ABORT_ERR)
         setLoadingTransRecord(false);
     });
-  }, [updateCount]);
+  }, [updateCount, params.collection]);
 
   const onImgLoad = ({target:img}) => {
     if(img.alt)
