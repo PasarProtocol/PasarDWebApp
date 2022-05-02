@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link } from '@mui/material';
+import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Icon } from '@iconify/react';
 
@@ -70,7 +70,9 @@ const ClaimCard = ({item})=>(
         0
       </EarnedValueStyle>
       <Typography variant="body2" color='text.secondary'>≈ USD 0</Typography>
-      <StyledButton variant="contained" sx={{mt: 3, width: '100%'}}>Claim</StyledButton>
+      <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+        <div><StyledButton variant="contained" sx={{mt: 3, width: '100%'}}>Claim</StyledButton></div>
+      </Tooltip>
     </Box>
   </PaperStyle>
 )
@@ -114,10 +116,8 @@ export default function Rewards() {
               }}/>
           </Box>
           <Typography variant="body2" component='div' sx={{lineHeight: 1.1, py: 2}}>
-            Once a buy transaction is completed, the{' '}
-            <Typography variant="body2" color='origin.main' sx={{display: 'inline'}}>PASAR</Typography>{' '}mining rewards will be distributed accordingly.
-            Mining rewards to earn{' '}
-            <Typography variant="body2" color='origin.main' sx={{display: 'inline'}}>PASAR</Typography>{' '}will last 4 years and will be supported by 30% of platform fees.<br/>
+            Once a buy transaction is completed, the{' '}<PinkLabel text="PASAR"/>{' '}mining rewards will be distributed accordingly.
+            Mining rewards to earn{' '}<PinkLabel text="PASAR"/>{' '}will last 4 years and will be supported by 30% of platform fees.<br/>
             <br/>
             Users can claim rewards every day, or accumulate a one-time claim. Rewards never disappear nor expire.
           </Typography>
@@ -131,7 +131,9 @@ export default function Rewards() {
             </Box>
             <Box sx={{textAlign: 'center', m: 'auto'}}>
               <Typography variant="body2" align='center' sx={{pb: 2}}>to collect from 4 mining rewards</Typography>
-              <StyledButton variant="contained" sx={{minWidth: 150}}>Claim All</StyledButton>
+              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+                <div><StyledButton variant="contained" sx={{minWidth: 150}}>Claim All</StyledButton></div>
+              </Tooltip>
             </Box>
           </StackStyle>
         </PaperStyle>
@@ -163,7 +165,7 @@ export default function Rewards() {
             In order to stake{' '}<PinkLabel text="PASAR"/>{' '}tokens, you first need to create a LP (Liquidity Pool) token{' '}<PinkLabel text="(PASAR-GLIDE)"/>{' '}on Glide DEX.
           </Typography>
           <Box sx={{justifyContent: 'center', display: 'grid'}}>
-            <Box sx={{display: 'inline-flex', py: 2}}>
+            <Box sx={{display: 'inline-flex', py: 2, alignItems: 'center'}}>
               <Box
                 component="img"
                 src='/static/logo-icon-white.svg'
@@ -190,7 +192,12 @@ export default function Rewards() {
                   borderRadius: '100%'
                 }}/>
             </Box>
-            <StyledButton variant="contained" sx={{minWidth: 150}}>Create LP Token</StyledButton>
+            <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+              <div style={{minWidth: 150}}>
+                {/* <StyledButton variant="contained" sx={{minWidth: 150}}>Create LP Token</StyledButton> */}
+                <StyledButton variant="contained" sx={{width: '100%'}}>Create LP Token</StyledButton>
+              </div>
+            </Tooltip>
           </Box>
         </PaperStyle>
       </Container>
