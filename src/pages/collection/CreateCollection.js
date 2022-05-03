@@ -27,6 +27,7 @@ import StandardTypeButton from '../../components/collection/StandardTypeButton';
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import CreateItemDlg from '../../components/dialog/CreateItem';
 import RegisterCollectionDlg from '../../components/dialog/RegisterCollection';
+import NeedMoreDIADlg from '../../components/dialog/NeedMoreDIA';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 
 import {REGISTER_CONTRACT_ABI} from '../../abi/registerABI'
@@ -34,8 +35,10 @@ import {TOKEN_721_ABI} from '../../abi/token721ABI'
 import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
 import {registerContract as CONTRACT_ADDRESS, diaContract as DIA_TOKEN_ADDRESS, ipfsURL, tokenConf} from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
+import useSingin from '../../hooks/useSignin';
+
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, socialTypes } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, socialTypes, getDiaBalanceDegree, fetchFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -81,6 +84,8 @@ export default function CreateCollection() {
   const [isCreateItemOpen, setOpenCreateItem] = React.useState(false);
   const [baseToken, setBaseToken] = React.useState('');
   const [isReadySignForRegister, setReadySignForRegister] = React.useState(false);
+  const [moreDIAOpen, setOpenMoreDIA] = React.useState(false);
+  const [collectionCount, setCollectionCount] = React.useState(0);
   
   const nameRef = React.useRef();
   const symbolRef = React.useRef();
@@ -88,6 +93,7 @@ export default function CreateCollection() {
   const uploadBackgroundRef = React.useRef();
   const descriptionRef = React.useRef();
 
+  const { diaBalance } = useSingin()
   const { enqueueSnackbar } = useSnackbar();
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
@@ -103,6 +109,16 @@ export default function CreateCollection() {
     else if(essentialsConnector.getWalletConnectProvider())
       setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0])
   }, []);
+
+  React.useEffect(() => {
+    fetchFrom(`api/v2/sticker/getCollectionByOwner/${address}`)
+      .then((response) => {
+        response.json().then((jsonAssets) => {
+          setCollectionCount(jsonAssets.data.length)
+        }).catch((e) => {})
+      })
+      .catch((e) => {});
+  }, [address]);
 
   React.useEffect(() => {
     if(!isOpenRegCollection){
@@ -431,6 +447,7 @@ export default function CreateCollection() {
     window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
   }
   const handleCreateAction = () => {
+    const degree = getDiaBalanceDegree(diaBalance)
     setOnValidation(true)
     if(!name.length)
       scrollToRef(nameRef)
@@ -448,6 +465,8 @@ export default function CreateCollection() {
       enqueueSnackbar('Fee recipient address is invalid.', { variant: 'warning' });
     else if(recipientRoyaltiesGroup.reduce((sum, el)=>sum+=el.royalties*1, 0)>30)
       enqueueSnackbar('Total royalties must not be more than 30%', { variant: 'warning' });
+    else if(degree===0 || degree===1&&collectionCount>=1 || degree===2&&collectionCount>=4 || degree===3&&collectionCount>=8)
+      setOpenMoreDIA(true)
     else
       createCollection()
   }
@@ -677,6 +696,7 @@ export default function CreateCollection() {
         setOpen={setOpenCreateItem}
         token={baseToken}
       />
+      <NeedMoreDIADlg isOpen={moreDIAOpen} setOpen={setOpenMoreDIA} balance={diaBalance} actionText="create more collections"/>
     </RootStyle>
   );
 }
