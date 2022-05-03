@@ -28,16 +28,19 @@ const RootStyle = styled(Page)(({ theme }) => ({
 }));
 
 // ----------------------------------------------------------------------
+const sortOptions = ["Diamond (DIA) Holdings: High to Low", "Latest", "Oldest", "Trading Volume: Low to High", "Trading Volume: High to Low", "Number of Item: Low to High", "Number of Item: High to Low", "Floor Price: Low to High", "Floor Price: High to Low", "Number of Owner: Low to High", "Number of Owner: High to Low"]
 export default function Explorer() {
   const navigate = useNavigate();
   const [collections, setCollections] = React.useState([]);
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
   const [orderType, setOrderType] = React.useState(0);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
+  const [needOptionToBelow, setOptionToBelow] = React.useState(false);
   const [controller, setAbortController] = React.useState(new AbortController());
   const { diaBalance, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
 
   React.useEffect(() => {
+    handleResize()
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
     const { signal } = newController;
@@ -56,7 +59,13 @@ export default function Explorer() {
         if (e.code !== e.ABORT_ERR) setLoadingCollections(false);
       });
   }, [orderType]);
-
+  function handleResize() {
+    if(sortOptions[orderType].length>15 && window.innerWidth<600)
+      setOptionToBelow(true)
+    else
+      setOptionToBelow(false)
+  }
+  window.addEventListener('resize', handleResize);
   const handleNavlink = (e)=>{
     const path = e.target.getAttribute('to')
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
@@ -82,20 +91,29 @@ export default function Explorer() {
             Collections
           </Typography>
         </Box>
-        <Stack direction='row' sx={{mb: 2}}>
-          <Typography variant="subtitle2" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-            {collections.length} collections
-          </Typography>
-          <Stack direction='row' spacing={1}>
-            <StyledButton variant="contained" onClick={handleNavlink} to='/collection/create'>
-              Create
-            </StyledButton>
-            <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
-              Import
-            </StyledButton>
-            <CollectionSortSelect onChange={setOrderType} />
+        <Box sx={{mb: 2}}>
+          <Stack direction='row'>
+            <Typography variant="subtitle2" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+              {collections.length} collections
+            </Typography>
+            <Stack direction='row' spacing={1}>
+              <StyledButton variant="contained" onClick={handleNavlink} to='/collection/create'>
+                Create
+              </StyledButton>
+              <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
+                Import
+              </StyledButton>
+              {
+                !needOptionToBelow&&
+                <CollectionSortSelect onChange={setOrderType} orderType={orderType} sortOptions={sortOptions} />
+              }
+            </Stack>
           </Stack>
-        </Stack>
+          {
+            needOptionToBelow&&
+            <CollectionSortSelect onChange={setOrderType} orderType={orderType} sortOptions={sortOptions} sx={{mt: 1, width: '100%'}}/>
+          }
+        </Box>
         <Grid container spacing={2}>
           {
             isLoadingCollections?
