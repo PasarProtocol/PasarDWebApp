@@ -150,6 +150,19 @@ export const getBalanceByAllCoinTypes = (connectProvider, balanceHandler) =>
     })
   })
 
+export const getDiaBalanceDegree = (balance) => {
+  const diaBalance = balance*1
+  if(diaBalance >= 10)
+    return 4
+  if(diaBalance >= 1)
+    return 3
+  if(diaBalance >= 0.1)
+    return 2
+  if(diaBalance >= 0.01)
+    return 1
+  return 0
+}
+
 export function dateRangeBeforeDays(days) {
   return [...Array(days).keys()].map((i) => subDays(new Date(), i).toISOString().slice(0, 10));
 }
@@ -228,17 +241,17 @@ export function getDiaTokenInfo(strAddress, connectProvider = null) {
 
       const diamondContract = new walletConnectWeb3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS)
       diamondContract.methods.balanceOf(strAddress).call()
-      .then(result=>{
-        // console.log(result)
-        if(result === '0'){
-          resolve(result)
-          return
-        }
-        const balance = walletConnectWeb3.utils.fromWei(result, 'ether');
-        resolve(balance)
-      }).catch((error) => {
-        reject(error);
-      })
+        .then(result=>{
+          // console.log(result)
+          if(result === '0'){
+            resolve(result)
+            return
+          }
+          const balance = walletConnectWeb3.utils.fromWei(result, 'ether');
+          resolve(balance)
+        }).catch((error) => {
+          reject(error);
+        })
     } catch(e) {
       reject(e)
     }
