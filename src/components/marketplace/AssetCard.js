@@ -414,7 +414,7 @@ export default function AssetCard(props) {
                 (type===0&&saleType==="Not on sale")||
                 (type===2&&isUnlistedByOthers)
               ) &&
-              <Typography variant="h4" sx={{color: "origin.main"}} align='center'>
+              <Typography variant="h5" sx={{color: "origin.main"}} align='center'>
                 Not on Sale
               </Typography>
             }
