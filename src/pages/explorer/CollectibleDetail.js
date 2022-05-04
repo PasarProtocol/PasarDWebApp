@@ -62,7 +62,7 @@ export default function CollectibleDetail() {
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const imageRef = React.useRef();
   React.useEffect(async () => {
-    const resCollectible = await fetchFrom(`sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`);
+    const resCollectible = await fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${params.collection}`);
     const jsonCollectible = await resCollectible.json();
     const jsonData = jsonCollectible.data
     if(jsonData.baseToken && jsonData.baseToken===STICKER_ADDRESS) {
