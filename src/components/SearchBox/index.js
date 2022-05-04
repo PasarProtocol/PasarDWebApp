@@ -1,16 +1,19 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { motion } from 'framer-motion';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, NavLink as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import searchFill from '@iconify/icons-eva/search-fill';
 import closeFill from '@iconify/icons-eva/close-fill';
 // material
 import { styled } from '@mui/material/styles';
+import CircularProgress from '@mui/material/CircularProgress';
 import { Box, alpha, Container, OutlinedInput, InputAdornment, IconButton, List, ListItem, Divider, ListItemButton, 
   ListItemIcon, ListItemText, ListItemAvatar, Avatar, Paper } from '@mui/material';
 //
 import { customShadows } from '../../theme/shadows';
+import Jazzicon from '../Jazzicon';
+import { fetchFrom, getIpfsUrl, reduceHexAddress, getAssetImage } from '../../utils/common';
 
 const ContentStyle = styled('div')(({ theme }) => ({
   textAlign: 'center',
@@ -71,6 +74,10 @@ export default function SearchBox(props) {
   const [needClose, setShowClose] = useState(false)
   const [showAutocomplete, setShowAutocomplete] = useState(false)
   const [isOutOfSearchField, setLeaveSearchField] = useState(false)
+  const [controller, setAbortController] = useState(new AbortController());
+  const [instanceSearchResult, setInstanceSearchResult] = useState(null);
+  const [instanceCollectionAvatar, setInstanceCollectionAvatar] = useState({});
+  const [isLoadingInstanceSearch, setLoadingInstanceSearch] = useState(false);
   const [searchStr, setSearchStr] = useState("")
   const ref = useRef()
   if(placeholder === defaultPlaceHolder && !pathname.startsWith('/explorer'))
@@ -97,9 +104,57 @@ export default function SearchBox(props) {
       else
         navigate(`/marketplace/search/${value}`);
   }
+  React.useEffect(()=>{
+    setInstanceCollectionAvatar({})
+    if(!instanceSearchResult)
+      return
+    instanceSearchResult.collections.forEach((item, _i)=>{
+      const metaUri = getIpfsUrl(item.uri)
+      if(metaUri) {
+        fetch(metaUri)
+          .then(response => response.json())
+          .then(res => {
+            setInstanceCollectionAvatar((prevState)=>{
+              const tempState = {...prevState}
+              tempState[_i] = getIpfsUrl(res.data.avatar)
+              return tempState
+            })
+          });
+      }
+    })
+  }, [instanceSearchResult])
   const determineClose = (e)=>{
     if(e.target.value.length){
+      controller.abort(); // cancel the previous request
+      const newController = new AbortController();
+      const {signal} = newController;
+      setAbortController(newController);
+      setLoadingInstanceSearch(true);
+
+      fetchFrom(`api/v2/sticker/getInstanceSearchResult?search=${e.target.value}`, { signal })
+        .then((response) => {
+          response.json().then((jsonAssets) => {
+            setLoadingInstanceSearch(false);
+            if(!jsonAssets.data){
+              setInstanceSearchResult(null)
+              return
+            }
+            const tempResult = {...jsonAssets.data}
+            tempResult.items = tempResult.items.map((item)=>{
+              const tempItem = {...item, avatar: getAssetImage(item, true)}
+              return tempItem
+            })
+            setInstanceSearchResult(tempResult)
+          }).catch((e) => {
+            setLoadingInstanceSearch(false);
+          });
+        })
+        .catch(e => {
+          setLoadingInstanceSearch(false);
+        });
       setShowAutocomplete(true)
+    } else {
+      setInstanceSearchResult(null)
     }
     setSearchStr(e.target.value)
     setShowClose(e.target.value.length>0)
@@ -131,63 +186,104 @@ export default function SearchBox(props) {
           </InputAdornment>
         }
         endAdornment={
-          needClose &&
-          <InputAdornment position="end">
-            <IconButton size='small' onClick={clearSearch}>
-              <Box component={Icon} icon={closeFill} sx={{ color: 'text.disabled' }}/>
-            </IconButton>
-          </InputAdornment>
+          <>
+            {
+              isLoadingInstanceSearch &&
+              <Box sx={{ display: 'flex' }}>
+                <CircularProgress size={25}/>
+              </Box>
+            }
+            {
+              needClose &&
+              <InputAdornment position="end">
+                <IconButton size='small' onClick={clearSearch}>
+                  <Box component={Icon} icon={closeFill} sx={{ color: 'text.disabled' }}/>
+                </IconButton>
+              </InputAdornment>
+            }
+          </>
         }
         sx = {{width: 550, ...sx}}
         needbgcolor = {needbgcolor?1:0}
       />
       {
-        searchStr.length>0 && showAutocomplete &&  
+        searchStr.length>0 && 
+        showAutocomplete && 
+        !isLoadingInstanceSearch && 
+        instanceSearchResult &&
+        (instanceSearchResult.collections.length>0 || instanceSearchResult.items.length>0 || instanceSearchResult.accounts.length>0) &&
         <Box sx={{position: 'absolute', width: '100%', left: 0, px: 3}}>
           <ListWrapperStyle>
             <List
               component="nav"
               aria-labelledby="nested-list-subheader"
             >
-              <ListItem>
-                <ListItemText
-                  primary="Collections"
-                  sx={{color: 'text.secondary'}}
-                />
-              </ListItem>
-              <Divider />
-              <ListItemButton>
-                <ListItemAvatar>
-                  <Avatar alt="Remy Sharp" src="/static/icons/ic_chrome.svg" sx={{width: 30, height: 30}} />
-                </ListItemAvatar>
-                <ListItemText primary="Test Collection" secondary="by 0x123...6789" />
-              </ListItemButton>
-              <ListItem>
-                <ListItemText
-                  primary="Items"
-                  sx={{color: 'text.secondary'}}
-                />
-              </ListItem>
-              <Divider />
-              <ListItemButton>
-                <ListItemAvatar>
-                  <Avatar alt="Remy Sharp" src="/static/icons/ic_drive.svg" sx={{width: 30, height: 30}} />
-                </ListItemAvatar>
-                <ListItemText primary="Test NFT" secondary="Not for sale" />
-              </ListItemButton>
-              <ListItem>
-                <ListItemText
-                  primary="Accounts"
-                  sx={{color: 'text.secondary'}}
-                />
-              </ListItem>
-              <Divider />
-              <ListItemButton>
-                <ListItemAvatar>
-                  <Avatar alt="Remy Sharp" src="/static/icons/ic_evernote.svg" sx={{width: 30, height: 30}} />
-                </ListItemAvatar>
-                <ListItemText primary="Test Account"/>
-              </ListItemButton>
+              {
+                instanceSearchResult.collections.length>0 &&
+                <>
+                  <ListItem>
+                    <ListItemText
+                      primary="Collections"
+                      sx={{color: 'text.secondary'}}
+                    />
+                  </ListItem>
+                  <Divider />
+                  {
+                    instanceSearchResult.collections.map((item, _i)=>(
+                      <ListItemButton key={_i} component={RouterLink} to={`/collection/detail/${item.token}`}>
+                        <ListItemAvatar>
+                          <Avatar alt="Collection" src={instanceCollectionAvatar[_i]} sx={{width: 30, height: 30}} />
+                        </ListItemAvatar>
+                        <ListItemText primary={item.name} secondary={`by ${reduceHexAddress(item.owner)}`} />
+                      </ListItemButton>
+                    ))
+                  }
+                </>
+              }
+              {
+                instanceSearchResult.items.length>0 &&
+                <>
+                  <ListItem>
+                    <ListItemText
+                      primary="Items"
+                      sx={{color: 'text.secondary'}}
+                    />
+                  </ListItem>
+                  <Divider />
+                  {
+                    instanceSearchResult.items.map((item, _i)=>(
+                      <ListItemButton key={_i} component={RouterLink} to={`/marketplace/detail/${item.tokenId}`}>
+                        <ListItemAvatar>
+                          <Avatar alt="NFT" src={item.avatar} sx={{width: 30, height: 30}} />
+                        </ListItemAvatar>
+                        <ListItemText primary={item.name} secondary={item.status} />
+                      </ListItemButton>
+                    ))
+                  }
+                </>
+              }
+              {
+                instanceSearchResult.accounts.length>0 &&
+                <>
+                  <ListItem>
+                    <ListItemText
+                      primary="Accounts"
+                      sx={{color: 'text.secondary'}}
+                    />
+                  </ListItem>
+                  <Divider />
+                  {
+                    instanceSearchResult.accounts.map((item, _i)=>(
+                      <ListItemButton key={_i} component={RouterLink} to={`/profile/others/${item.address}`}>
+                        <ListItemAvatar>
+                          <Jazzicon address={item.address} size={30} sx={{mr: 0}}/>
+                        </ListItemAvatar>
+                        <ListItemText primary={reduceHexAddress(item.address)}/>
+                      </ListItemButton>
+                    ))
+                  }
+                </>
+              }
             </List>
           </ListWrapperStyle>
         </Box>
