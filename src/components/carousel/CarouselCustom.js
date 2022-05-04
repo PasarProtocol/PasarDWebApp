@@ -17,7 +17,7 @@ import {stickerContract, marketContract, blockchain} from '../../config'
 
 const CAROUSEL_ICONS = ['marketplace', 'description', 'hammer', 'diamond', 'hash', 'cash-hand', 'basket', 'collection', 'contract-address', 'calendar-hammer', 'ethereum', 'blockchain']
 const CAROUSEL_TITLE = ['Status', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Collection', 'Contract Address', 'Created Date', 'Token Standard', 'Blockchain']
-const CAROUSEL_KEYS = ['status', 'description', 'royaltyOwner', 'holder', 'tokenIdHex', 'royalties', 'quantity', 'collection', 'contractAddr', 'createTime', 'tokenStandard', 'blockchain']
+const CAROUSEL_KEYS = ['status', 'description', 'royaltyOwner', 'holder', 'tokenIdHex', 'royalties', 'quantity', 'collection', 'baseToken', 'createTime', 'tokenStandard', 'blockchain']
 const CAROUSEL_COPYABLE = [false, false, true, true, true, false, false, false, true, false, false, false, false]
 
 const RootStyle = styled('div')(({ theme }) => ({
@@ -130,7 +130,6 @@ export default function CarouselCustom({pgsize, detail}) {
     ...detail,
     royalties: `${detail.royalties*100/10**6} %`,
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
-    contractAddr: stickerContract,
     holder: detail.holder===marketContract?detail.royaltyOwner:detail.holder,
     // collection: 'Feeds NFT Sticker - FSTK',
     tokenStandard: detail.is721?'ERC-721':'ERC-1155',
