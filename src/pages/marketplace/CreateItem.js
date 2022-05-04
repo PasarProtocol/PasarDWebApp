@@ -31,6 +31,8 @@ import MintBatchName from '../../components/marketplace/MintBatchName';
 import MintDlg from '../../components/dialog/Mint';
 import AccessDlg from '../../components/dialog/Access';
 import ChooseCollectionDlg from '../../components/dialog/ChooseCollection';
+import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
+import NeedMoreDIADlg from '../../components/dialog/NeedMoreDIA';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import ProgressBar from '../../components/ProgressBar'
 import StartingDateSelect from '../../components/marketplace/StartingDateSelect'
@@ -42,11 +44,13 @@ import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import {TOKEN_721_ABI} from '../../abi/token721ABI'
 import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
 import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL, auctionOrderType} from '../../config'
-import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice } from '../../utils/common';
+import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree } from '../../utils/common';
 import {requestSigndataOnTokenID} from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useMintDlg from '../../hooks/useMintDlg';
+import useSingin from '../../hooks/useSignin';
+
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -106,7 +110,10 @@ export default function CreateItem() {
   const [coinType, setCoinType] = React.useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [chooseCollectionOpen, setChooseCollectionOpen] = React.useState(false);
+  const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
+  const [moreDIAOpen, setOpenMoreDIA] = React.useState(false);
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps } = useMintDlg()
+  const { diaBalance } = useSingin()
   const { enqueueSnackbar } = useSnackbar();
   
   const isOffset = useOffSetTop(40);
@@ -936,11 +943,18 @@ export default function CreateItem() {
       if(mintype!=="Batch"){
         if(duproperties.length || singleProperties.filter(el=>el.type.length>0&&!el.name.length).length)
           enqueueSnackbar('Properties are invalid.', { variant: 'warning' });
+        else if(collection==='Choose' && diaBalance*1===0)
+          setOpenBuyDIA(true)
         else
           mintSingle()
       }
-      else
-        mintBatch()
+      else {
+        const degree = getDiaBalanceDegree(diaBalance)
+        if(degree===0 || degree===1&&files.length>=5 || degree===2&&files.length>=20 || degree===3&&files.length>=50 || degree===4&&files.length>=50)
+          setOpenMoreDIA(true)
+        else
+          mintBatch()
+      }
   }
   return (
     <RootStyle title="CreateItem | PASAR">
@@ -1507,6 +1521,8 @@ export default function CreateItem() {
         handleChoose = {handleChooseCollection}
         setERCtype = {setSelectedERCtype}
       />
+      <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance} actionText="mint NFT from dedicated collection"/>
+      <NeedMoreDIADlg isOpen={moreDIAOpen} setOpen={setOpenMoreDIA} balance={diaBalance} actionText="mint and sell more tokens in batch"/>
     </RootStyle>
   );
 }

@@ -15,6 +15,7 @@ import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
+import useSingin from '../../hooks/useSignin';
 import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes } from '../../utils/common';
 
 export default function Sell(props) {
@@ -24,6 +25,8 @@ export default function Sell(props) {
   const [coinType, setCoinType] = React.useState(0);
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
+  const { diaBalance } = useSingin()
+
   const handleClose = () => {
     setOpen(false);
     setOnProgress(false);
@@ -97,6 +100,10 @@ export default function Sell(props) {
   )
 
   const putOnSale = async () => {
+    if(coinType!==0 && diaBalance*1===0) {
+      enqueueSnackbar('Sorry, you need to hold a minimum of 0.01 DIA to sell nft via other ERC20 tokens.', { variant: 'warning' });
+      return
+    }
     setOnProgress(true);
     const didUri = await sendIpfsDidJson();
     const sellPrice = BigInt(price*1e18).toString();
