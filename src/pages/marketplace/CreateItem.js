@@ -1090,6 +1090,7 @@ export default function CreateItem() {
                     onChange={(e)=>setDescription(e.target.value)}
                     aria-describedby="description-error-text"
                     sx={{mt: '-5px !important'}}
+                    multiline={Boolean(true)}
                   />
                   <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
                 </FormControl>
