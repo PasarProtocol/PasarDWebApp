@@ -134,6 +134,8 @@ export default function CollectibleHandleSection(props) {
     else
       if(!currentBid || currentBid<collectible.reservePrice){
         statusText = !currentBid?'Starting Price':'Top Bid'
+        if(currentBid)
+          priceText = `${round(currentBid/1e18, 3)} ${coinName}`
         if(address === collectible.holder && collectible.SaleType !== "Not on sale")
           handleField = 
             didSignin?
