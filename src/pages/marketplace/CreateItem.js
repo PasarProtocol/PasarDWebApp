@@ -125,6 +125,8 @@ export default function CreateItem() {
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
   const priceRef = React.useRef();
+  const reservePriceRef = React.useRef();
+  const buyoutPriceRef = React.useRef();
   const navigate = useNavigate();
   
   React.useEffect(async () => {
@@ -933,6 +935,10 @@ export default function CreateItem() {
       scrollToRef(descriptionRef)
     else if(isPutOnSale && !price)
       scrollToRef(priceRef)
+    else if(isPutOnSale && isReserveForAuction && !reservePrice)
+      scrollToRef(reservePriceRef)
+    else if(isPutOnSale && isBuynowForAuction && !buyoutPrice)
+      scrollToRef(buyoutPriceRef)  
     else if(isPutOnSale && reservePrice.length && price*1>reservePrice*1)
       enqueueSnackbar('Starting price must be less than Reserve price.', { variant: 'warning' });
     else if(isPutOnSale && buyoutPrice.length && price*1>=buyoutPrice*1)
@@ -1231,11 +1237,11 @@ export default function CreateItem() {
                     {
                       isReserveForAuction&&
                       <>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} ref={reservePriceRef}>
                           <Typography variant="h4" sx={{fontWeight: 'normal'}}>Reserve Price</Typography>
                         </Grid>
                         <Grid item xs={12}>
-                          <FormControl variant="standard" sx={{width: '100%'}}>
+                          <FormControl error={isOnValidation&&isPutOnSale&&!reservePrice} variant="standard" sx={{width: '100%'}}>
                             <InputLabelStyle htmlFor="input-reserve-price">
                               Enter reserve price
                             </InputLabelStyle>
@@ -1248,7 +1254,9 @@ export default function CreateItem() {
                               endAdornment={
                                 <CoinTypeLabel type={coinType}/>
                               }
+                              aria-describedby="reserve-price-error-text"
                             />
+                            <FormHelperText id="reserve-price-error-text" hidden={!(isOnValidation&&isPutOnSale&&!reservePrice)}>Please input Reserve Price</FormHelperText>
                           </FormControl>
                           <Divider/>
                         </Grid>
@@ -1272,11 +1280,11 @@ export default function CreateItem() {
                     {
                       isBuynowForAuction&&
                       <>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} ref={buyoutPriceRef}>
                           <Typography variant="h4" sx={{fontWeight: 'normal'}}>Buy Now Price</Typography>
                         </Grid>
                         <Grid item xs={12}>
-                          <FormControl variant="standard" sx={{width: '100%'}}>
+                          <FormControl error={isOnValidation&&isPutOnSale&&!buyoutPrice} variant="standard" sx={{width: '100%'}}>
                             <InputLabelStyle htmlFor="input-buynow-price">
                               Enter buy now price
                             </InputLabelStyle>
@@ -1289,7 +1297,9 @@ export default function CreateItem() {
                               endAdornment={
                                 <CoinTypeLabel type={coinType}/>
                               }
+                              aria-describedby="buyout-price-error-text"
                             />
+                            <FormHelperText id="buyout-price-error-text" hidden={!(isOnValidation&&isPutOnSale&&!buyoutPrice)}>Please input Buy Now Price</FormHelperText>
                           </FormControl>
                           <Divider/>
                         </Grid>
