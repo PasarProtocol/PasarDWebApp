@@ -45,15 +45,35 @@ export default function Purchase(props) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const pasarContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, PASAR_CONTRACT_ABI, signer);
-        signer.getAddress().then(userAddress=>{
+        signer.getAddress().then(async userAddress=>{
+          if(coinType) {
+            const erc20Contract = new ethers.Contract(coinTypes[coinType].address, ERC20_CONTRACT_ABI, signer);
+            const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MARKET_CONTRACT_ADDRESS))
+            const gasPrice = await provider.getGasPrice();
+            if(erc20BidderApproved < _price*1){
+              console.log('Pasar marketplace not enough ERC20 allowance from bidder');
+              const txParams = {
+                'from': userAddress,
+                'gasPrice': gasPrice,
+                'value': 0,
+              };
+              const approveTxn = await erc20Contract.approve(MARKET_CONTRACT_ADDRESS, _price, txParams)
+              const erc20BidderApproveStatus = await approveTxn.wait()
+              if(!erc20BidderApproveStatus) {
+                enqueueSnackbar(`Approve Transaction Error!`, { variant: 'error' });
+                setOnProgress(false);
+              }
+            }
+          }
+
           provider.getGasPrice().then(gasPrice=>{
             const transactionParams = {
               'from': userAddress,
               'gasPrice': gasPrice.toBigInt(),
               'value': coinType===0?_price:0
             };
-            
-            let contractMethod = pasarContract.buyOrder(_orderId, '', transactionParams)
+
+            let contractMethod = pasarContract.buyOrder(_orderId, 'did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK', transactionParams)
             if(info.orderType===auctionOrderType)
               contractMethod = pasarContract.bidForOrder(_orderId, _price, '', transactionParams)
               
