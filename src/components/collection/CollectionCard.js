@@ -199,11 +199,11 @@ const CollectionImgBox = (props) => {
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider, isOwned=false, openRoyaltiesDlg } = props
-  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, collectibles=[] } = info
+  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, collectibles=[], tokenJson={} } = info
   let { description='', avatar='', background='' } = info
   const realData = [totalPrice, floorPrice, totalOwner]
 
-  const [didName, setDidName] = React.useState('');
+  const [didName, setDidName] = React.useState(tokenJson&&tokenJson.creator&&tokenJson.creator.name?tokenJson.creator.name:'');
   const [metaObj, setMetaObj] = React.useState({});
   // const [realData, setRealData] = React.useState([0, 0, 0]);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
@@ -266,12 +266,13 @@ const CollectionCardPaper = (props) => {
       }
     }      
     else if(owner) {
-      getDidInfoFromAddress(owner)
-        .then((info) => {
-          if(info.name)
-            setDidName(info.name)
-        })
-        .catch((e) => {})
+      if(!didName)
+        getDidInfoFromAddress(owner)
+          .then((info) => {
+            if(info.name)
+              setDidName(info.name)
+          })
+          .catch((e) => {})
       
       getDiaTokenInfo(owner).then(dia=>{
         if(dia!=='0')
