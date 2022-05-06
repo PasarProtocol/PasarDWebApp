@@ -18,7 +18,7 @@ import PropTypes from 'prop-types';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import jwtDecode from 'jwt-decode';
-import { isUndefined } from 'lodash';
+import { isUndefined, update } from 'lodash';
 import { DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
 import jwt from 'jsonwebtoken';
@@ -34,6 +34,7 @@ import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
 import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
+import { createProfileCollection, prepareConnectToHive, registerAllScript } from './HiveAPI';
 
 export default function SignInDialog() {
   const {
@@ -322,6 +323,15 @@ export default function SignInDialog() {
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
         setPasarLinkAddress(2)
         setOpenSigninDlg(false);
+
+        // HIVE START
+        // TODO: IMPROVE HIVE LOGIN
+        await prepareConnectToHive()
+
+        await registerAllScript()
+        await createProfileCollection()
+        // HIVE END
+
         let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0]
         if (isInAppBrowser())
           essentialAddress = await window.elastos.getWeb3Provider().address
@@ -332,6 +342,7 @@ export default function SignInDialog() {
         })
         setActivatingConnector(essentialsConnector);
         setSigninEssentialSuccess(true);
+        
         if (afterSigninPath) {
           setOpenSigninEssentialDlg(false);
           navigate(afterSigninPath);
