@@ -16,7 +16,7 @@ import PaperRecord from '../PaperRecord';
 import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
 import Badge from '../Badge';
 import useSingin from '../../hooks/useSignin';
-import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, coinTypes, getAssetImage } from '../../utils/common';
+import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, coinTypes, getAssetImage, checkWhetherGeneralCollection } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const avatarStyle = {
@@ -207,6 +207,7 @@ const CollectionCardPaper = (props) => {
   const [metaObj, setMetaObj] = React.useState({});
   // const [realData, setRealData] = React.useState([0, 0, 0]);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
+  const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: false, kyc: false});
   const { setOpenDownloadEssentialDlg } = useSingin()
   const navigate = useNavigate();
@@ -235,8 +236,10 @@ const CollectionCardPaper = (props) => {
   //     })
   //   }
   // }, [token]);
-
-  React.useEffect(() => {    
+  React.useEffect(() => {
+    checkWhetherGeneralCollection(token).then(setIsGeneralCollection)
+  }, [token]);
+  React.useEffect(() => {
     const metaUri = getIpfsUrl(uri)
     if(metaUri) {
       fetch(metaUri)
@@ -342,6 +345,7 @@ const CollectionCardPaper = (props) => {
                 keepMounted
                 id="simple-menu"
                 anchorEl={isOpenPopup}
+                onClick={(e)=>{e.stopPropagation()}}
                 onClose={handleClosePopup}
                 open={Boolean(isOpenPopup)}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
@@ -353,7 +357,7 @@ const CollectionCardPaper = (props) => {
                 <MenuItem value='edit' onClick={handleClosePopup}>
                   <Icon icon={editIcon} width={24}/>&nbsp;Edit Collection
                 </MenuItem>
-                <MenuItem value='royalties' onClick={handleClosePopup}>
+                <MenuItem value='royalties' onClick={handleClosePopup} disabled={isGeneralCollection}>
                   <Icon icon="fluent:money-hand-20-filled" width={24}/>&nbsp;Royalties
                 </MenuItem>
               </Menu>

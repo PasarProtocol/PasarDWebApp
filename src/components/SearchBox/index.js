@@ -67,7 +67,7 @@ const defaultPlaceHolder = "Search name, description, address and token ID"
 // ----------------------------------------------------------------------
 export default function SearchBox(props) {
   const { sx, onChange, needbgcolor=false, needAutocomplete=false } = props
-  let { placeholder } = props
+  const { placeholder } = props
   const params = useParams(); // params.key
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -80,8 +80,8 @@ export default function SearchBox(props) {
   const [isLoadingInstanceSearch, setLoadingInstanceSearch] = useState(false);
   const [searchStr, setSearchStr] = useState("")
   const ref = useRef()
-  if(placeholder === defaultPlaceHolder && !pathname.startsWith('/explorer'))
-    placeholder = 'Search items, creators and token ID'
+  // if(placeholder === defaultPlaceHolder && !pathname.startsWith('/explorer'))
+  //   placeholder = 'Search items, creators and token ID'
   const handleChange = (e)=>{
     if(e.which===13) { // press enter
       changeAction(e.target.value)

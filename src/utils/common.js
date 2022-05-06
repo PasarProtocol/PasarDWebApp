@@ -9,9 +9,15 @@ import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sd
 import jwtDecode from 'jwt-decode';
 
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
-import { stickerContract as STICKER_ADDRESS, marketContract as CONTRACT_ADDRESS, diaContract as DIA_CONTRACT_ADDRESS, blankAddress, ipfsURL, rpcURL } from '../config';
+import { 
+  stickerContract as STICKER_ADDRESS, 
+  marketContract as CONTRACT_ADDRESS, 
+  diaContract as DIA_CONTRACT_ADDRESS, 
+  registerContract as REG_CONTRACT_ADDRESS,
+  blankAddress, ipfsURL, rpcURL } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { DIAMOND_CONTRACT_ABI } from '../abi/diamondABI';
+import { REGISTER_CONTRACT_ABI } from '../abi/registerABI';
 import { COMMON_CONTRACT_ABI } from '../abi/commonABI';
 
 const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS]
@@ -275,6 +281,24 @@ export async function getERCType(contractAddress, connectProvider = null) {
     return 1
   } catch(e) {
     return 1
+  }
+}
+
+export async function checkWhetherGeneralCollection(contractAddress, connectProvider = null) {
+  try{
+    let walletConnectWeb3
+    if(connectProvider)
+      walletConnectWeb3 = new Web3(connectProvider)
+    else if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+      walletConnectWeb3 = new Web3(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+    else
+      walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
+
+    const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, REG_CONTRACT_ADDRESS)
+    const _isGeneralToken = await registerContract.methods.isGeneralToken(contractAddress).call()
+    return _isGeneralToken
+  } catch(e) {
+    return false
   }
 }
 
