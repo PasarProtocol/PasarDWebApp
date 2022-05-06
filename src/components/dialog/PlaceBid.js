@@ -93,9 +93,9 @@ export default function PlaceBid(props) {
               'value': coinType===0?_price:0
             };
             
-            let contractMethod = pasarContract.bidForOrder(_orderId, _price, '', transactionParams)
-            if(isBuynow)
-              contractMethod = pasarContract.buyOrder(_orderId, '', transactionParams)
+            const contractMethod = pasarContract.bidForOrder(_orderId, _price, '', transactionParams)
+            // if(isBuynow)
+            //   contractMethod = pasarContract.buyOrder(_orderId, '', transactionParams)
 
             contractMethod.then((nftTxn)=>{
               console.log("Biding... please wait")
@@ -175,9 +175,9 @@ export default function PlaceBid(props) {
       'value': coinType===0?_price:0
     };
     // console.log(_orderId, _price, _didUri)
-    let contractMethod = pasarContract.methods.bidForOrder(_orderId, _price, _didUri)
-    if(isBuynow)
-      contractMethod = pasarContract.methods.buyOrder(_orderId, _didUri)
+    const contractMethod = pasarContract.methods.bidForOrder(_orderId, _price, _didUri)
+    // if(isBuynow)
+    //   contractMethod = pasarContract.methods.buyOrder(_orderId, _didUri)
     contractMethod.send(transactionParams)
       .on('transactionHash', (hash) => {
         console.log('transactionHash', hash);
