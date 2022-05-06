@@ -255,10 +255,10 @@ export default function AssetFilterPan(props){
                 {
                   btnGroup.type.map((name, index)=>(
                     filterProps.selectedBtns?
-                    <Button key={index} variant={filterProps.selectedBtns.includes(index+4)?"contained":"outlined"} color="inherit" onClick={()=>handleFilter('statype', index+4)}>
+                    <Button key={index} variant={filterProps.selectedBtns.includes(index+btnGroup.status.length)?"contained":"outlined"} color="inherit" onClick={()=>handleFilter('statype', index+btnGroup.status.length)}>
                       {name}
                     </Button>:
-                    <Button key={index} variant="outlined" color="inherit" onClick={()=>handleFilter('statype', index+4)}>
+                    <Button key={index} variant="outlined" color="inherit" onClick={()=>handleFilter('statype', index+btnGroup.status.length)}>
                       {name}
                     </Button>
                   ))
