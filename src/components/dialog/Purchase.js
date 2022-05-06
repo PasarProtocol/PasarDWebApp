@@ -52,7 +52,12 @@ export default function Purchase(props) {
               'gasPrice': gasPrice.toBigInt(),
               'value': coinType===0?_price:0
             };
-            pasarContract.buyOrder(_orderId, '', transactionParams).then((nftTxn)=>{
+            
+            let contractMethod = pasarContract.buyOrder(_orderId, '', transactionParams)
+            if(info.orderType===auctionOrderType)
+              contractMethod = pasarContract.bidForOrder(_orderId, _price, '', transactionParams)
+              
+            contractMethod.then((nftTxn)=>{
               console.log("Buying... please wait")
               nftTxn.wait().then(()=>{
                 // console.log("bought")
@@ -130,10 +135,11 @@ export default function Purchase(props) {
       // 'gas': 5000000,
       'value': coinType===0?_price:0
     };
+    let contractMethod = pasarContract.methods.buyOrder(_orderId, _didUri)
+    if(info.orderType===auctionOrderType)
+      contractMethod = pasarContract.methods.bidForOrder(_orderId, _price, _didUri)
 
-    pasarContract.methods
-      .buyOrder(_orderId, _didUri)
-      .send(transactionParams)
+    contractMethod.send(transactionParams)
       .on('transactionHash', (hash) => {
         console.log('transactionHash', hash);
       })
