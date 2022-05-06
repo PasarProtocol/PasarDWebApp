@@ -148,9 +148,6 @@ export default class ElastosConnectivityService {
   async requestCustomCredentials(claimItems) {
     const didAccess = new ConnDID.DIDAccess();
     const claimArray = claimItems.reduce((arr, item)=>{
-      let id=item.description
-      if(item.description === 'description')
-        id="bio"
       if(item.title==='KYC-me') {
         arr=[
           ...arr,
@@ -172,7 +169,7 @@ export default class ElastosConnectivityService {
         ];
         return arr
       }
-      arr.push(ConnDID.simpleIdClaim(`Your ${item.title}`, id, true));
+      arr.push(ConnDID.simpleIdClaim(`Your ${item.title}`, item.id, true));
       return arr
     }, [])
     const presentation = await didAccess.requestCredentials({

@@ -19,6 +19,9 @@ import CustomSwitch from '../../components/custom-switch';
 import ElastosConnectivityService from '../../utils/elastosConnectivityService';
 import useSingin from '../../hooks/useSignin';
 import TransLoadingButton from '../../components/TransLoadingButton';
+import { queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, 
+  deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe, 
+  updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe } from '../../components/signin-dlg/HiveAPI';
 import { isInAppBrowser, getCredentialInfo } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -35,14 +38,14 @@ const RootStyle = styled(Page)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 const credentialItems = [
-  {title: 'Name', description: 'name'},
-  {title: 'Description', description: 'description'},
-  {title: 'Website', description: 'website'},
-  {title: 'Twitter', description: 'Twitter account'},
-  {title: 'Discord', description: 'Discord account'},
-  {title: 'Telegram', description: 'Telegram account'},
-  {title: 'Medium', description: 'Medium account'},
-  {title: 'KYC-me', description: 'KYC-me badge'},
+  {title: 'Name', description: 'name', id: 'name'},
+  {title: 'Description', description: 'description', id: 'bio'},
+  {title: 'Website', description: 'website', id: 'website'},
+  {title: 'Twitter', description: 'Twitter account', id: 'twitter'},
+  {title: 'Discord', description: 'Discord account', id: 'discord'},
+  {title: 'Telegram', description: 'Telegram account', id: 'telegram'},
+  {title: 'Medium', description: 'Medium account', id: 'medium'},
+  {title: 'KYC-me', description: 'KYC-me badge', id: 'KYC'},
 ]
 export default function EditProfile() {
   const [checkedItem, setCheckedItem] = React.useState(Array(7).fill(false));
@@ -53,6 +56,9 @@ export default function EditProfile() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
+  const updateProfileData = [updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium]
+  const deleteProfileData = [deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium]
+  const queryProfileData = [queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe]
   React.useEffect(async () => {
     const connectivityService = new ElastosConnectivityService()
     setElastosConnectivityService(connectivityService)
@@ -62,7 +68,20 @@ export default function EditProfile() {
     else {
       const strWalletAddress = isInAppBrowser() ? await window.elastos.getWeb3Provider().address : essentialsConnector.getWalletConnectProvider().wc.accounts[0];
       setWalletAddress(strWalletAddress);
+      const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`
+      queryProfileData.forEach((queryFunc, _i)=>{
+        queryFunc(targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length)
+            setCheckedItem((prevState) => {
+              const tempState = [...prevState]
+              tempState[_i] = true
+              return tempState
+            })
+        })
+      })
+
     }
+
   }, []);
 
   const handleCheckItem = (event, i) => {
@@ -128,17 +147,35 @@ export default function EditProfile() {
       return
     }
 
+    const profileData = credentials.reduce((props, c) => {
+      props[c.id.fragment] = c.subject.properties[c.id.fragment];
+      return props;
+    }, {});
     const birthDateCredential = credentials.find(c => c.getType().indexOf("BirthDateCredential") >= 0);
     const genderCredential = credentials.find(c => c.getType().indexOf("GenderCredential") >= 0);
     const countryCredential = credentials.find(c => c.getType().indexOf("CountryCredential") >= 0);
-    if (!birthDateCredential && !genderCredential && !countryCredential){
+    if (!birthDateCredential && !genderCredential && !countryCredential && checkedItem[7]){
       stopProvide("Nothing to provide KYC-me credentials")
       return
     }
-
-    const vpBuffer = Buffer.from(kycVerifiablePresentation.serialize())
-    const encodedPresentation = bs58.encode(vpBuffer)
-    sessionStorage.setItem('KYCedProof', encodedPresentation)
+    credentialItems.slice(0, credentialItems.length-1).forEach((item, _i)=>{
+      if(profileData[item.id] && checkedItem[_i])
+        updateProfileData[_i](profileData[item.id])
+      else
+        deleteProfileData[_i]()
+    })
+    // console.log(profileData)
+    // updateName(profileData.name)
+    if(checkedItem[7] && profileData){
+      const {BirthDateCredential, GenderCredential, CountryCredential} = profileData
+      const tempKYCdata = { birthdate: BirthDateCredential, gender: GenderCredential, country: CountryCredential }
+      updateKycMe(JSON.stringify(tempKYCdata))
+      // const vpBuffer = Buffer.from(kycVerifiablePresentation.serialize())
+      // const encodedPresentation = bs58.encode(vpBuffer)
+      // sessionStorage.setItem('KYCedProof', encodedPresentation)
+    } else {
+      deleteKycMe()
+    }
     enqueueSnackbar('Save action success', { variant: 'success' });
     setOnProgress(false)
   }
@@ -153,7 +190,6 @@ export default function EditProfile() {
             <Typography variant="subtitle2" sx={{fontWeight: 'normal'}}>
               We do not store you personal information.
               Therefore, please choose your credentials from DID to display them on your public profile.
-              The credentials must first be published on the blockchain.
             </Typography>
           </Grid>
           <MHidden width="smUp">
@@ -177,6 +213,7 @@ export default function EditProfile() {
                         Display {item.description}
                       </InputLabel>
                       <FormControlLabel
+                        checked={checkedItem[i]}
                         control={<CustomSwitch onChange={(event)=>handleCheckItem(event, i)}/>}
                         sx={{mt:-1, mr: 0}}
                         label=""
