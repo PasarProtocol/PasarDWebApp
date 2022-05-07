@@ -81,6 +81,11 @@ export default function Auction(props) {
 
   const handleClose = () => {
     setOpen(false);
+    setStartingPrice('');
+    setReservePrice('');
+    setBuyoutPrice('');
+    setBuynowForAuction(false)
+    setReserveForAuction(false)
     setOnProgress(false);
   }
 

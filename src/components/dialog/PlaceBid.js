@@ -42,6 +42,8 @@ export default function PlaceBid(props) {
 
   const handleClose = () => {
     setOpen(false);
+    setBuynow(false)
+    setBidPrice('');
   }
 
   const handleChangeBidPrice = (event) => {
