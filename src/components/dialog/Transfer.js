@@ -31,9 +31,12 @@ export default function Transfer(props) {
     const [isOnValidation, setOnValidation] = React.useState(false);
 
     const handleClose = () => {
-        setOnValidation(false)
-        setOnProgress(false)
-        setOpen(false);
+      setOnValidation(false)
+      setOnProgress(false)
+      setOpen(false);
+      setAddress('')
+      setMemo('')
+      setOpenAdvanced(false)
     }
 
     const callSafeTransferFrom = (_to, _id, _value) => {

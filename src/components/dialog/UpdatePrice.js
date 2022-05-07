@@ -27,6 +27,12 @@ export default function UpdatePrice(props) {
   const [coinType, setCoinType] = React.useState(0);
   const handleClose = () => {
     setOpen(false);
+    setOnProgress(false)
+    setPrice('')
+    setReservePrice('')
+    setBuyoutPrice('')
+    setRcvPrice(0)
+    setCoinType(0)
   };
 
   const handlePrice = (event) => {

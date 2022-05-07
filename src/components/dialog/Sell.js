@@ -30,6 +30,8 @@ export default function Sell(props) {
   const handleClose = () => {
     setOpen(false);
     setOnProgress(false);
+    setPrice('')
+    setRcvPrice(0)
   };
 
   const handleChangePrice = (event) => {
