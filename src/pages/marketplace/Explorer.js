@@ -166,7 +166,7 @@ export default function MarketExplorer() {
     const {signal} = newController;
     setAbortController(newController);
     let statusFilter = btnGroup.status.filter((name, index)=>selectedBtns.indexOf(index)>=0)
-    statusFilter = (statusFilter.length===btnGroup.status.length || statusFilter.length===0)?'All':statusFilter[0]
+    statusFilter = (statusFilter.length===btnGroup.status.length || statusFilter.length===0)?'All':statusFilter.join(",")
     let itemTypeFilter = btnGroup.type.filter((name, index)=>selectedBtns.indexOf(index+btnGroup.status.length)>=0)
     itemTypeFilter = (itemTypeFilter.length===btnGroup.type.length || itemTypeFilter.length===0)?'All':itemTypeFilter[0].toLowerCase()
     if(itemTypeFilter==='general')
