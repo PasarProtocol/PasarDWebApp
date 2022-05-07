@@ -70,6 +70,7 @@ export default function Purchase(props) {
             const transactionParams = {
               'from': userAddress,
               'gasPrice': gasPrice.toBigInt(),
+              'gasLimit': 5000000,
               'value': coinType===0?_price:0
             };
 
