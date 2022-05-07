@@ -91,7 +91,7 @@ export default function PlaceBid(props) {
             const transactionParams = {
               'from': userAddress,
               'gasPrice': gasPrice.toBigInt(),
-              // 'gas': 5000000,
+              'gasLimit': 5000000,
               'value': coinType===0?_price:0
             };
             
