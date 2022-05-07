@@ -78,8 +78,8 @@ export default function CollectionDetail() {
     status: ["Buy Now", "On Auction", "Not Met", "Has Bids", "Has Ended"],
     type: ["General", "Avatar"],
   }
-  const rangeBtnId = 4
-  const adultBtnId = 5
+  const rangeBtnId = 10
+  const adultBtnId = 11
   const emptyRange = {min: '', max: ''}
   const defaultDispMode = isMobile?1:0
 
