@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
 import * as math from 'mathjs';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, Grid, Tooltip, Icon, Button, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, Grid, Tooltip, Icon, Button, Box, FormHelperText } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
@@ -25,6 +25,7 @@ export default function Sell(props) {
   const [coinType, setCoinType] = React.useState(0);
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
+  const [isOnValidation, setOnValidation] = React.useState(false);
   const { diaBalance } = useSingin()
 
   const handleClose = () => {
@@ -32,6 +33,7 @@ export default function Sell(props) {
     setOnProgress(false);
     setPrice('')
     setRcvPrice(0)
+    setOnValidation(false)
   };
 
   const handleChangePrice = (event) => {
@@ -102,6 +104,9 @@ export default function Sell(props) {
   )
 
   const putOnSale = async () => {
+    setOnValidation(true)
+    if(!(price*1))
+      return
     if(coinType!==0 && diaBalance*1===0) {
       enqueueSnackbar('Sorry, you need to hold a minimum of 0.01 DIA to sell nft via other ERC20 tokens.', { variant: 'warning' });
       return
@@ -159,7 +164,7 @@ export default function Sell(props) {
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <FormControl variant="standard" sx={{ width: '100%' }}>
+            <FormControl error={isOnValidation && !(price*1)} variant="standard" sx={{ width: '100%' }}>
               <InputLabelStyle htmlFor="input-with-price">Enter a fixed price of each item</InputLabelStyle>
               <InputStyle
                 type="number"
@@ -168,7 +173,9 @@ export default function Sell(props) {
                 onChange={handleChangePrice}
                 startAdornment={' '}
                 endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
+                aria-describedby="price-error-text"
               />
+              <FormHelperText id="price-error-text" hidden={!isOnValidation || (isOnValidation && (price*1))}>Price is required</FormHelperText>
             </FormControl>
             <Divider />
             <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main' }}>

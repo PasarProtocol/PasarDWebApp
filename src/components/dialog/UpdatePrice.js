@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
 import * as math from 'mathjs';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, Grid, Tooltip, Icon, Button, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, 
+  Grid, Tooltip, Icon, Button, Box, FormHelperText } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
@@ -25,6 +26,8 @@ export default function UpdatePrice(props) {
   const [buyoutPrice, setBuyoutPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [coinType, setCoinType] = React.useState(0);
+  const [isOnValidation, setOnValidation] = React.useState(false);
+  
   const handleClose = () => {
     setOpen(false);
     setOnProgress(false)
@@ -33,6 +36,7 @@ export default function UpdatePrice(props) {
     setBuyoutPrice('')
     setRcvPrice(0)
     setCoinType(0)
+    setOnValidation(false)
   };
 
   const handlePrice = (event) => {
@@ -72,6 +76,10 @@ export default function UpdatePrice(props) {
   };
 
   const changePrice = async () => {
+    setOnValidation(true)
+    if(!(price*1))
+      return
+
     setOnProgress(true);
     console.log('orderId:', orderId);
     const _updatedPrice = BigInt(price*1e18).toString();
@@ -114,7 +122,7 @@ export default function UpdatePrice(props) {
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <FormControl variant="standard" sx={{ width: '100%' }}>
+            <FormControl error={isOnValidation && !(price*1)} variant="standard" sx={{ width: '100%' }}>
               <InputLabelStyle htmlFor="input-with-price">Enter a {orderType===auctionOrderType?'starting':'fixed'} price of each item</InputLabelStyle>
               <InputStyle
                 type="number"
@@ -123,7 +131,9 @@ export default function UpdatePrice(props) {
                 onChange={handleChangePrice}
                 startAdornment={' '}
                 endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
+                aria-describedby="price-error-text"
               />
+              <FormHelperText id="price-error-text" hidden={!isOnValidation || (isOnValidation && (price*1))}>Price is required</FormHelperText>
             </FormControl>
             <Divider />
             <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main' }}>
