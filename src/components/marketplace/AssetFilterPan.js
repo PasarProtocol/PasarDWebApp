@@ -89,7 +89,7 @@ export default function AssetFilterPan(props){
 
   const searchCollections = (inputStr)=>{
     if(inputStr.length){
-      setFilterCollections(collections.filter(el=>el.name.includes(inputStr)))
+      setFilterCollections(collections.filter(el=>el.name.toLowerCase().includes(inputStr.toLowerCase())))
     } else {
       setFilterCollections(collections)
     }
@@ -97,7 +97,7 @@ export default function AssetFilterPan(props){
 
   const searchTokens = (inputStr)=>{
     if(inputStr.length){
-      setFilterTokens(coinTypes.filter(el=>el.name.includes(inputStr)))
+      setFilterTokens(coinTypes.filter(el=>el.name.toLowerCase().includes(inputStr.toLowerCase())))
     } else {
       setFilterTokens(coinTypes)
     }

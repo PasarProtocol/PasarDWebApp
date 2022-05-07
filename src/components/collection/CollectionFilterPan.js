@@ -63,7 +63,7 @@ export default function CollectionFilterPan(props){
 
   const searchTokens = (inputStr)=>{
     if(inputStr.length){
-      setFilterTokens(coinTypes.filter(el=>el.name.includes(inputStr)))
+      setFilterTokens(coinTypes.filter(el=>el.name.toLowerCase().includes(inputStr.toLowerCase())))
     } else {
       setFilterTokens(coinTypes)
     }
@@ -88,7 +88,7 @@ export default function CollectionFilterPan(props){
   const searchAttributes = (inputStr, groupName)=>{
     const tempAttributes = {...filterAttributes}
     if(inputStr.length)
-      tempAttributes[groupName] = Object.keys(collectionAttributes[groupName]).filter(el=>el.includes(inputStr))
+      tempAttributes[groupName] = Object.keys(collectionAttributes[groupName]).filter(el=>el.toLowerCase().includes(inputStr.toLowerCase()))
     else
       tempAttributes[groupName] = Object.keys(collectionAttributes[groupName])
     setFilterAttributes(tempAttributes)
