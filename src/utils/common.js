@@ -22,8 +22,13 @@ import { COMMON_CONTRACT_ABI } from '../abi/commonABI';
 
 const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS]
 // Get Abbrevation of hex addres //
-export const reduceHexAddress = (strAddress) =>
-  strAddress ? `${strAddress.substring(0, 6)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}` : '';
+export const reduceHexAddress = (strAddress) => {
+  if(!strAddress)
+    return ''
+  if(strAddress.length<10)
+    return strAddress
+  return `${strAddress.substring(0, 6)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`;
+}
 
 export const fetchFrom = (uri, props = {}) => {
   const backendURL =
