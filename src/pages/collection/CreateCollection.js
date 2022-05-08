@@ -465,7 +465,7 @@ export default function CreateCollection() {
       enqueueSnackbar('Fee recipient address is invalid.', { variant: 'warning' });
     else if(recipientRoyaltiesGroup.reduce((sum, el)=>sum+=el.royalties*1, 0)>30)
       enqueueSnackbar('Total royalties must not be more than 30%', { variant: 'warning' });
-    else if(degree===0 || degree===1&&collectionCount>=1 || degree===2&&collectionCount>=4 || degree===3&&collectionCount>=8)
+    else if(degree===0 || degree===1&&collectionCount>=1 || degree===2&&collectionCount>=5)
       setOpenMoreDIA(true)
     else
       createCollection()

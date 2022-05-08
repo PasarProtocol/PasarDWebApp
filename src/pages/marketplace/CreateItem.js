@@ -927,6 +927,8 @@ export default function CreateItem() {
       setTotalSteps(1)
     }
     setOnValidation(true)
+    const degree = getDiaBalanceDegree(diaBalance)
+    
     if(mintype!=="Batch"&&!file || mintype==="Batch"&&!files.length)
       scrollToRef(uploadRef)
     else if(mintype!=="Batch"&&!singleName.length)
@@ -945,6 +947,10 @@ export default function CreateItem() {
       enqueueSnackbar('Starting price must be less than Buy Now price.', { variant: 'warning' });
     else if(isPutOnSale && reservePrice.length && buyoutPrice.length && reservePrice*1>=buyoutPrice*1)
       enqueueSnackbar('Reserve price must be less than Buy Now price.', { variant: 'warning' });
+    else if(isPutOnSale && isReserveForAuction && degree===0)
+      enqueueSnackbar('Reserve Price is not supported due to lack of DIA balance.', { variant: 'warning' });
+    else if(isPutOnSale && isBuynowForAuction && (degree===0 || degree===1))
+      enqueueSnackbar('Buy Now Price is not supported due to lack of DIA balance.', { variant: 'warning' });
     else
       if(mintype!=="Batch"){
         if(duproperties.length || singleProperties.filter(el=>el.type.length>0&&!el.name.length).length)
@@ -955,8 +961,7 @@ export default function CreateItem() {
           mintSingle()
       }
       else {
-        const degree = getDiaBalanceDegree(diaBalance)
-        if(degree===0 || degree===1&&files.length>=5 || degree===2&&files.length>=20 || degree===3&&files.length>=50 || degree===4&&files.length>=50)
+        if(degree===0 || degree===1&&files.length>5 || degree===2&&files.length>10)
           setOpenMoreDIA(true)
         else
           mintBatch()
