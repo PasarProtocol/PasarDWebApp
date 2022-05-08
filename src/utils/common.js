@@ -163,8 +163,6 @@ export const getBalanceByAllCoinTypes = (connectProvider, balanceHandler) =>
 
 export const getDiaBalanceDegree = (balance) => {
   const diaBalance = balance*1
-  if(diaBalance >= 10)
-    return 4
   if(diaBalance >= 1)
     return 3
   if(diaBalance >= 0.1)
