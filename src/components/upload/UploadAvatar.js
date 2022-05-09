@@ -7,17 +7,18 @@ import roundAddAPhoto from '@iconify/icons-ic/round-add-a-photo';
 import { alpha, styled } from '@mui/material/styles';
 import { Box, Typography, Paper } from '@mui/material';
 // utils
+import Jazzicon from '../Jazzicon';
 import { fData } from '../../utils/formatNumber';
 
 // ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
-  width: 144,
-  height: 144,
   margin: 'auto',
   borderRadius: '50%',
-  padding: theme.spacing(1),
-  border: `1px dashed ${theme.palette.grey[500_32]}`
+  // padding: theme.spacing(1),
+  padding: '5px',
+  background: `linear-gradient(${theme.palette.background.paper}, ${theme.palette.background.paper}) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box`,
+  border: '4px solid transparent',
 }));
 
 const DropZoneStyle = styled('div')({
@@ -64,7 +65,7 @@ UploadAvatar.propTypes = {
   sx: PropTypes.object
 };
 
-export default function UploadAvatar({ error, file, caption, sx, ...other }) {
+export default function UploadAvatar({ error, file, caption, address, size, sx, ...other }) {
   const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
     multiple: false,
     ...other
@@ -101,7 +102,11 @@ export default function UploadAvatar({ error, file, caption, sx, ...other }) {
 
   return (
     <>
-      <RootStyle sx={sx}>
+      <RootStyle sx={{
+        width: size+18,
+        height: size+18,
+        ...sx
+      }}>
         <DropZoneStyle
           {...getRootProps()}
           sx={{
@@ -124,15 +129,15 @@ export default function UploadAvatar({ error, file, caption, sx, ...other }) {
             />
           )}
 
+          {!file && <Jazzicon address={address} size={size} sx={{mr: 0}}/>}
+
           <PlaceholderStyle
             className="placeholder"
             sx={{
-              ...(file && {
-                opacity: 0,
-                color: 'common.white',
-                bgcolor: 'grey.900',
-                '&:hover': { opacity: 0.72 }
-              })
+              opacity: 0,
+              color: 'common.white',
+              bgcolor: 'grey.900',
+              '&:hover': { opacity: 0.72 }
             }}
           >
             <Box component={Icon} icon={roundAddAPhoto} sx={{ width: 24, height: 24, mb: 1 }} />
