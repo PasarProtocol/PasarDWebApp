@@ -25,6 +25,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
 import RingAvatar from '../../components/RingAvatar';
 import Badge from '../../components/Badge';
+import DIABadge from '../../components/DIABadge';
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -75,7 +76,7 @@ export default function MyItems() {
   const [myAddress, setMyAddress] = React.useState(null);
   const [didInfo, setDidInfo] = React.useState({name: '', description: ''});
   const [updateCount, setUpdateCount] = React.useState(0);
-  const [badge, setBadge] = React.useState({dia: false, kyc: false});
+  const [badge, setBadge] = React.useState({dia: 0, kyc: false});
 
   const context = useWeb3React();
   const { account } = context;
@@ -159,7 +160,8 @@ export default function MyItems() {
     if(walletAddress){
       getDiaTokenInfo(walletAddress).then(dia=>{
         if(dia!=='0')
-          setBadgeFlag('dia', true)
+          setBadgeFlag('dia', dia)
+        else setBadgeFlag('dia', 0)
       })
       getCredentialInfo(walletAddress).then(proofData=>{
         if(proofData)
@@ -228,10 +230,7 @@ export default function MyItems() {
           </Typography>
           <Stack sx={{justifyContent: 'center', pt: 1}} spacing={1} direction="row">
             {
-              badge.dia&&
-              <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                <Box sx={{display: 'inline-flex'}}><Badge name="diamond"/></Box>
-              </Tooltip>
+              badge.dia>0 && <DIABadge balance={badge.dia}/>
             }
             {
               badge.kyc&&
