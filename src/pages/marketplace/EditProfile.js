@@ -1,5 +1,6 @@
 import React from 'react';
 import bs58 from 'bs58'
+import { isString } from 'lodash';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip, Box } from '@mui/material';
@@ -15,13 +16,14 @@ import { essentialsConnector } from '../../components/signin-dlg/EssentialConnec
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import Page from '../../components/Page';
 import RingAvatar from '../../components/RingAvatar';
+import { UploadAvatar } from '../../components/upload';
 import CustomSwitch from '../../components/custom-switch';
 import ElastosConnectivityService from '../../utils/elastosConnectivityService';
 import useSingin from '../../hooks/useSignin';
 import TransLoadingButton from '../../components/TransLoadingButton';
 import { queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, 
   deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe, 
-  updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe } from '../../components/signin-dlg/HiveAPI';
+  updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe, uploadAvatar, downloadAvatar } from '../../components/signin-dlg/HiveAPI';
 import { isInAppBrowser, getCredentialInfo } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -51,6 +53,7 @@ export default function EditProfile() {
   const [checkedItem, setCheckedItem] = React.useState(Array(7).fill(false));
   const [walletAddress, setWalletAddress] = React.useState(null);
   const [onProgress, setOnProgress] = React.useState(false);
+  const [avatarUrl, setAvatarUrl] = React.useState(null);
   
   const { elaConnectivityService, setElastosConnectivityService } = useSingin();
   const navigate = useNavigate();
@@ -79,7 +82,17 @@ export default function EditProfile() {
             })
         })
       })
-
+      downloadAvatar(targetDid).then((res)=>{
+        console.log(res)
+        if(res && res.length) {
+          const base64Content = res.reduce((content, code)=>{
+            content=`${content}${String.fromCharCode(code)}`;
+            return content
+          }, '')
+          setAvatarUrl(`data:image/png;base64,${base64Content}`)
+          console.log("--2-- ", base64Content)
+        }
+      })
     }
 
   }, []);
@@ -91,6 +104,14 @@ export default function EditProfile() {
       return tempState
     })
   };
+
+  const handleDropAvatar = React.useCallback((acceptedFiles) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      const tempFileObj = Object.assign(file, {preview: URL.createObjectURL(file)})
+      setAvatarUrl(tempFileObj);
+    }
+  }, []);
 
   const stopProvide = (errMsg)=>{
     setOnProgress(false)
@@ -176,8 +197,26 @@ export default function EditProfile() {
     } else {
       deleteKycMe()
     }
-    enqueueSnackbar('Save action success', { variant: 'success' });
-    setOnProgress(false)
+    if(avatarUrl && !isString(avatarUrl)){
+      const reader = new window.FileReader();
+      reader.readAsArrayBuffer(avatarUrl);
+      reader.onloadend = async() => {
+        try {
+          const fileContent = Buffer.from(reader.result)
+          console.log(fileContent)
+          const bs64Content = fileContent.toString('base64')
+          await uploadAvatar(bs64Content)
+          enqueueSnackbar('Save action success', { variant: 'success' });
+          setOnProgress(false)
+        } catch (error) {
+          enqueueSnackbar('Save avatar error', { variant: 'error' });
+          setOnProgress(false)
+        }
+      }
+    } else {
+      enqueueSnackbar('Save action success', { variant: 'success' });
+      setOnProgress(false)
+    }
   }
   return (
     <RootStyle title="EditProfile | PASAR">
@@ -195,10 +234,13 @@ export default function EditProfile() {
           <MHidden width="smUp">
             <Grid item xs={12}>
               <Typography variant="h4" sx={{fontWeight: 'normal'}}>Avatar</Typography>
-              <RingAvatar
+              <UploadAvatar
+                accept="image/*"
+                file={avatarUrl}
+                onDrop={handleDropAvatar}
+                size={90}
                 address={walletAddress}
-                size={80}
-                outersx={{m: 1}}
+                sx={{m: 1.5}}
               />
             </Grid>
           </MHidden>
@@ -240,10 +282,13 @@ export default function EditProfile() {
           <MHidden width="smDown">
             <Grid item sm={5}>
               <Typography variant="h4" sx={{fontWeight: 'normal'}}>Avatar</Typography>
-              <RingAvatar
-                address={walletAddress}
+              <UploadAvatar
+                accept="image/*"
+                file={avatarUrl}
+                onDrop={handleDropAvatar}
                 size={110}
-                outersx={{m: 4}}
+                address={walletAddress}
+                sx={{m: 4}}
               />
             </Grid>
           </MHidden>
