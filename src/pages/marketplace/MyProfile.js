@@ -38,6 +38,7 @@ import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import useSingin from '../../hooks/useSignin';
+import { queryName, queryDescription } from '../../components/signin-dlg/HiveAPI'
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -128,15 +129,35 @@ export default function MyProfile() {
         })
     }
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+      const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`
       const token = sessionStorage.getItem("PASAR_TOKEN");
       const user = jwtDecode(token);
       const {name, bio} = user;
-      setDidInfo({'name': name, 'description': bio})
+      queryName(targetDid).then((res)=>{
+        if(res.find_message && res.find_message.items.length)
+          setDidInfoValue('name', res.find_message.items[0].display_name)
+        else
+          setDidInfoValue('name', name)
+      })
+      queryDescription(targetDid).then((res)=>{
+        if(res.find_message && res.find_message.items.length)
+          setDidInfoValue('description', res.find_message.items[0].display_name)
+        else
+          setDidInfoValue('description', bio)
+      })
     }
     else {
       setDidInfo({'name': '', 'description': ''})
     }
   }, [account, params.address]);
+
+  const setDidInfoValue = (field, value)=>{
+    setDidInfo((prevState)=>{
+      const tempState = {...prevState}
+      tempState[field] = value
+      return tempState
+    })
+  }
 
   const handleSwitchTab = (event, newValue) => {
     setTabValue(newValue);
