@@ -69,7 +69,7 @@ export default function AssetCard(props) {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [settleOpen, setSettleOrderOpen] = React.useState(false);
   const [auctionEnded, setAuctionEnded] = React.useState(false);
-  const [badge, setBadge] = React.useState({dia: false, kyc: false});
+  const [badge, setBadge] = React.useState({dia: 0, kyc: false});
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   
   const isCreatedByMe = myaddress===royaltyOwner
@@ -82,7 +82,8 @@ export default function AssetCard(props) {
     if(holder) {
       getDiaTokenInfo(holder).then(dia=>{
         if(dia!=='0')
-          setBadgeFlag('dia', true)
+          setBadgeFlag('dia', dia)
+        else setBadgeFlag('dia', 0)
       })
       getCredentialInfo(holder).then(proofData=>{
         if(proofData)

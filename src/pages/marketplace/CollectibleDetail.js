@@ -29,6 +29,7 @@ import CollectibleHistory from '../../components/marketplace/CollectibleHistory'
 import BidList from '../../components/marketplace/BidList';
 import AssetCard from '../../components/marketplace/AssetCard';
 import Badge from '../../components/Badge';
+import DIABadge from '../../components/DIABadge';
 import Jazzicon from '../../components/Jazzicon';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
@@ -130,7 +131,8 @@ export default function CollectibleDetail() {
 
   const [collectible, setCollectible] = React.useState({});
   const [collection, setCollection] = React.useState(null);
-  const [badge, setBadge] = React.useState({creator: {dia: false, kyc: false}, owner: {dia: false, kyc: false}});
+  const [badge, setBadge] = React.useState({creator: {dia: 0, kyc: false}, owner: {dia: 0, kyc: false}});
+  const [collectionBadge, setCollectionBadge] = React.useState({dia: 0, kyc: false});
   const [didName, setDidName] = React.useState({creator: '', owner: ''});
   const [transRecord, setTransRecord] = React.useState([]);
   const [collectiblesInCollection, setCollectiblesInCollection] = React.useState([]);
@@ -252,11 +254,13 @@ export default function CollectibleDetail() {
         })
         getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
           if(dia!=='0')
-            setBadgeOfUser('creator', 'dia', true)
+            setBadgeOfUser('creator', 'dia', dia)
+          else setBadgeOfUser('creator', 'dia', 0)
         })
         getDiaTokenInfo(jsonCollectible.data.holder).then(dia=>{
           if(dia!=='0')
-            setBadgeOfUser('owner', 'dia', true)
+            setBadgeOfUser('owner', 'dia', dia)
+          else setBadgeOfUser('owner', 'dia', 0)
         })
         getCredentialInfo(jsonCollectible.data.royaltyOwner).then(proofData=>{
           if(proofData)
@@ -542,10 +546,7 @@ export default function CollectibleDetail() {
                     </Link>
                     <Stack spacing={.6} direction="row">
                       {
-                        badge.creator.dia&&
-                        <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                          <Box><Badge name="diamond"/></Box>
-                        </Tooltip>
+                        badge.creator.dia>0 && <DIABadge balance={badge.creator.dia}/>
                       }
                       {
                         badge.creator.kyc&&
@@ -570,10 +571,7 @@ export default function CollectibleDetail() {
                     </Link>
                     <Stack spacing={.6} direction="row">
                       {
-                        badge.owner.dia&&
-                        <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                          <Box><Badge name="diamond"/></Box>
-                        </Tooltip>
+                        badge.owner.dia>0 && <DIABadge balance={badge.owner.dia}/>
                       }
                       {
                         badge.owner.kyc&&
@@ -750,13 +748,10 @@ export default function CollectibleDetail() {
                         <IconLinkButtonGroup {...collection.socials} align='left'/>
                         <Stack spacing={1} sx={{}}>
                         {
-                          badge.dia&&
-                          <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                            <Box sx={{display: 'inline-flex'}}><Badge name="diamond"/></Box>
-                          </Tooltip>
+                          collectionBadge.dia>0 && <DIABadge balance={collectionBadge.dia}/>
                         }
                         {
-                          badge.kyc&&
+                          collectionBadge.kyc&&
                           <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
                             <Box sx={{display: 'inline-flex'}}><Badge name="user"/></Box>
                           </Tooltip>
