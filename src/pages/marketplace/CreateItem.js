@@ -960,12 +960,11 @@ export default function CreateItem() {
         else
           mintSingle()
       }
-      else {
-        if(degree===0 || degree===1&&files.length>5 || degree===2&&files.length>10)
-          setOpenMoreDIA(true)
-        else
-          mintBatch()
+      else if(degree===0 || degree===1&&files.length>5 || degree===2&&files.length>10) {
+        setOpenMoreDIA(true)
       }
+      else
+        mintBatch()
   }
   return (
     <RootStyle title="CreateItem | PASAR">
