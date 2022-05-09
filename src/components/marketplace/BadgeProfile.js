@@ -8,6 +8,7 @@ import BoltIcon from '@mui/icons-material/Bolt';
 import { Icon } from '@iconify/react';
 
 import Badge from '../Badge';
+import DIABadge from '../DIABadge';
 import Jazzicon from '../Jazzicon';
 import { reduceHexAddress, getDidInfoFromAddress, collectionTypes } from '../../utils/common';
 import { stickerContract as STICKER_ADDRESS } from '../../config';
@@ -178,12 +179,9 @@ export default function BadgeProfile(props) {
                 }
                 {
                   type===2&&
-                  <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia||badge.kyc)?2:0}}>
+                  <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia>0 || badge.kyc)?2:0}}>
                     {
-                      badge.dia&&
-                      <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                        <Box><Badge name="diamond"/></Box>
-                      </Tooltip>
+                      badge.dia>0 && <DIABadge balance={badge.dia}/>
                     }
                     {
                       badge.kyc&&

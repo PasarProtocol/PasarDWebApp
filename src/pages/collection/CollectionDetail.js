@@ -31,6 +31,7 @@ import AddressCopyButton from '../../components/AddressCopyButton';
 import StatisticPanel from '../../components/collection/StatisticPanel'
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import Badge from '../../components/Badge';
+import DIABadge from '../../components/DIABadge';
 import { fetchFrom, getIpfsUrl, reduceHexAddress, getDidInfoFromAddress } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -118,7 +119,7 @@ export default function CollectionDetail() {
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
   const [showCount, setShowCount] = React.useState(30);
-  const [badge, setBadge] = React.useState({dia: false, kyc: false});
+  const [badge, setBadge] = React.useState({dia: 0, kyc: false});
 
   const fetchMoreData = () => {
     if(!loadNext){
@@ -470,10 +471,7 @@ export default function CollectionDetail() {
                 <IconLinkButtonGroup {...socials}/>
                 <Stack sx={{justifyContent: 'center'}} spacing={1} direction="row">
                   {
-                    badge.dia&&
-                    <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                      <Box sx={{display: 'inline-flex'}}><Badge name="diamond"/></Box>
-                    </Tooltip>
+                    badge.dia>0 && <DIABadge balance={badge.dia}/>
                   }
                   {
                     badge.kyc&&

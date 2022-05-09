@@ -7,7 +7,7 @@ import {getDiaBalanceDegree} from '../utils/common'
 // ----------------------------------------------------------------------
 
 const ColorSet = [
-  {background: 'linear-gradient(0deg, #363636 3%, #a6a6a6 100%)', afterBackground: '#9d9d9d', afterShadowColor: '#3a3a3a', name: 'None'},
+  {background: 'linear-gradient(0deg, #363636 3%, #a6a6a6 100%)', afterBackground: '#9d9d9d', afterShadowColor: '#3a3a3a', name: ''},
   {background: 'linear-gradient(0deg, #B37E59 3%, #FFD2B3 100%)', afterBackground: '#F2C7AA', afterShadowColor: '#b5815c', name: 'Bronze'},
   {background: 'linear-gradient(0deg, #B6B6BF 3%, #EDF4FA 100%)', afterBackground: '#DADCE6', afterShadowColor: '#b6b6bf', name: 'Silver'},
   {background: 'linear-gradient(0deg, #FFBB33 3%, #FFEDA6 100%)', afterBackground: '#FFDF80', afterShadowColor: '#f2ba49', name: 'Gold'}

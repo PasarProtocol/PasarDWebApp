@@ -15,6 +15,7 @@ import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack,
 import PaperRecord from '../PaperRecord';
 import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
 import Badge from '../Badge';
+import DIABadge from '../DIABadge';
 import useSingin from '../../hooks/useSignin';
 import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, coinTypes, getAssetImage, checkWhetherGeneralCollection } from '../../utils/common';
 
@@ -208,7 +209,7 @@ const CollectionCardPaper = (props) => {
   // const [realData, setRealData] = React.useState([0, 0, 0]);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
-  const [badge, setBadge] = React.useState({dia: false, kyc: false});
+  const [badge, setBadge] = React.useState({dia: 0, kyc: false});
   const { setOpenDownloadEssentialDlg } = useSingin()
   const navigate = useNavigate();
   // const apikey = [
@@ -276,7 +277,8 @@ const CollectionCardPaper = (props) => {
       
       getDiaTokenInfo(owner).then(dia=>{
         if(dia!=='0')
-          setBadgeFlag('dia', true)
+          setBadgeFlag('dia', dia)
+        else setBadgeFlag('dia', 0)
       })
       getCredentialInfo(owner).then(proofData=>{
         if(proofData)
@@ -409,10 +411,7 @@ const CollectionCardPaper = (props) => {
             }
             <Stack sx={{justifyContent: 'center', pt: 1}} spacing={1} direction="row">
             {
-              badge.dia&&
-              <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                <Box sx={{display: 'inline-flex'}}><Badge name="diamond"/></Box>
-              </Tooltip>
+              badge.dia>0 && <DIABadge balance={badge.dia}/>
             }
             {
               badge.kyc&&
