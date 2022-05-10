@@ -26,6 +26,9 @@ import { useEagerConnect } from '../../components/signin-dlg/hook';
 import RingAvatar from '../../components/RingAvatar';
 import Badge from '../../components/Badge';
 import DIABadge from '../../components/DIABadge';
+import AddressCopyButton from '../../components/AddressCopyButton';
+import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
+import { queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -75,11 +78,44 @@ export default function MyItems() {
   const [walletAddress, setWalletAddress] = React.useState(null);
   const [myAddress, setMyAddress] = React.useState(null);
   const [didInfo, setDidInfo] = React.useState({name: '', description: ''});
+  const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [updateCount, setUpdateCount] = React.useState(0);
   const [badge, setBadge] = React.useState({dia: 0, kyc: false});
+  const [socials, setSocials] = React.useState({});
 
   const context = useWeb3React();
   const { account } = context;
+
+  const queryProfileSocials = {
+    website: queryWebsite,
+    twitter: queryTwitter,
+    discord: queryDiscord,
+    telegram: queryTelegram,
+    medium: queryMedium
+  }
+  React.useEffect(()=>{
+    if(!myAddress)
+      return
+    if(params.address && params.address!==myAddress){
+      setWalletAddress(params.address)
+      getDidInfoFromAddress(params.address)
+        .then((info) => {
+          fetchProfileData(info.did, {name: info.name || '', bio: info.description || ''})
+        })
+        .catch((e) => {
+        })
+    }
+    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+      const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`
+      const token = sessionStorage.getItem("PASAR_TOKEN");
+      const user = jwtDecode(token);
+      const {name, bio} = user;
+      fetchProfileData(targetDid, user)
+    }
+    else{
+      setDidInfo({'name': '', 'description': ''})
+    }
+  }, [myAddress])
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   // const triedEager = useEagerConnect();
@@ -102,25 +138,58 @@ export default function MyItems() {
       navigate('/marketplace');
     }
     // ----------------------------------------------------------
-    if (params.address){
-      setWalletAddress(params.address)
-      getDidInfoFromAddress(params.address)
-        .then((info) => {
-          setDidInfo({'name': info.name || '', 'description': info.description || ''})
-        })
-        .catch((e) => {
-        })
-    }
-    else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
-      const token = sessionStorage.getItem("PASAR_TOKEN");
-      const user = jwtDecode(token);
-      const {name, bio} = user;
-      setDidInfo({'name': name, 'description': bio})
-    }
-    else {
-      setDidInfo({'name': '', 'description': ''})
-    }
+    
   }, [account, params.address]);
+
+  const fetchProfileData = (targetDid, didInfo)=>{
+    queryName(targetDid).then((res)=>{
+      if(res.find_message && res.find_message.items.length)
+        setDidInfoValue('name', res.find_message.items[0].display_name)
+      else
+        setDidInfoValue('name', didInfo.name)
+    }).catch(e=>{
+      console.log(e)
+    })
+    queryDescription(targetDid).then((res)=>{
+      if(res.find_message && res.find_message.items.length)
+        setDidInfoValue('description', res.find_message.items[0].display_name)
+      else
+        setDidInfoValue('description', didInfo.bio)
+    })
+    downloadAvatar(targetDid).then((res)=>{
+      if(res && res.length) {
+        const base64Content = res.reduce((content, code)=>{
+          content=`${content}${String.fromCharCode(code)}`;
+          return content
+        }, '')
+        setAvatarUrl(`data:image/png;base64,${base64Content}`)
+      }
+    })
+    queryKycMe(targetDid).then((res)=>{
+      if(res.find_message && res.find_message.items.length)
+        setBadgeFlag('kyc', true)
+      else
+        setBadgeFlag('kyc', false)
+    })
+    Object.keys(queryProfileSocials).forEach(field=>{
+      queryProfileSocials[field](targetDid).then((res)=>{
+        if(res.find_message && res.find_message.items.length)
+          setSocials((prevState) => {
+            const tempState = {...prevState}
+            tempState[field] = res.find_message.items[0].display_name
+            return tempState
+          })
+      })
+    })
+  }
+
+  const setDidInfoValue = (field, value)=>{
+    setDidInfo((prevState)=>{
+      const tempState = {...prevState}
+      tempState[field] = value
+      return tempState
+    })
+  }
 
   const handleSwitchTab = (event, newValue) => {
     setTabValue(newValue);
@@ -162,10 +231,6 @@ export default function MyItems() {
         if(dia!=='0')
           setBadgeFlag('dia', dia)
         else setBadgeFlag('dia', 0)
-      })
-      getCredentialInfo(walletAddress).then(proofData=>{
-        if(proofData)
-          setBadgeFlag('kyc', true)
       })
     }
     controller.abort(); // cancel the previous request
@@ -209,6 +274,8 @@ export default function MyItems() {
         <Box sx={{ position: 'relative', justifyContent: 'center' }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: isMobile?1:1.5 }}>
             <RingAvatar
+              avatar={avatarUrl}
+              isImage={!!avatarUrl}
               address={walletAddress}
               size={isMobile ? 80 : 100}
             />
@@ -228,6 +295,12 @@ export default function MyItems() {
               <Typography variant="subtitle2" noWrap sx={{color: 'text.secondary'}}>{didInfo.description}</Typography>
             }
           </Typography>
+          {
+            Object.keys(socials).length>0 && 
+            <Box sx={{py: 1.5}}>
+              <IconLinkButtonGroup {...socials}/>
+            </Box>
+          }
           <Stack sx={{justifyContent: 'center', pt: 1}} spacing={1} direction="row">
             {
               badge.dia>0 && <DIABadge balance={badge.dia}/>
@@ -235,7 +308,7 @@ export default function MyItems() {
             {
               badge.kyc&&
               <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
-                <Box sx={{display: 'inline-flex'}}><Badge name="user"/></Box>
+                <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
               </Tooltip>
             }
           </Stack>

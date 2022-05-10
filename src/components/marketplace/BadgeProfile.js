@@ -186,7 +186,7 @@ export default function BadgeProfile(props) {
                     {
                       badge.kyc&&
                       <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
-                        <Box><Badge name="user"/></Box>
+                        <Box><Badge name="kyc"/></Box>
                       </Tooltip>
                     }
                   </Stack>

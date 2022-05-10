@@ -163,6 +163,12 @@ export default function MyProfile() {
           setAvatarUrl(`data:image/png;base64,${base64Content}`)
         }
       })
+      queryKycMe(targetDid).then((res)=>{
+        if(res.find_message && res.find_message.items.length)
+          setBadgeFlag('kyc', true)
+        else
+          setBadgeFlag('kyc', false)
+      })
       Object.keys(queryProfileSocials).forEach(field=>{
         queryProfileSocials[field](targetDid).then((res)=>{
           if(res.find_message && res.find_message.items.length)
@@ -227,10 +233,6 @@ export default function MyProfile() {
         if(dia!=='0')
           setBadgeFlag('dia', dia)
         else setBadgeFlag('dia', 0)
-      })
-      getCredentialInfo(walletAddress).then(proofData=>{
-        if(proofData)
-          setBadgeFlag('kyc', true)
       })
     }
     controller.abort(); // cancel the previous request
@@ -340,9 +342,12 @@ export default function MyProfile() {
               <Typography variant="subtitle2" noWrap sx={{color: 'text.secondary', pt: 1}}>{didInfo.description}</Typography>
             }
           </Typography>
-          <Box sx={{py: 1.5}}>
-            <IconLinkButtonGroup {...socials}/>
-          </Box>
+          {
+            Object.keys(socials).length>0 && 
+            <Box sx={{py: 1.5}}>
+              <IconLinkButtonGroup {...socials}/>
+            </Box>
+          }
           <Stack sx={{justifyContent: 'center'}} spacing={1} direction="row">
             {
               badge.dia>0 && <DIABadge balance={badge.dia}/>
@@ -350,7 +355,7 @@ export default function MyProfile() {
             {
               badge.kyc&&
               <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
-                <Box sx={{display: 'inline-flex'}}><Badge name="user"/></Box>
+                <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
               </Tooltip>
             }
           </Stack>

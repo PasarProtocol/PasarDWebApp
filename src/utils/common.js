@@ -684,7 +684,7 @@ export const getDidInfoFromAddress = (address) =>
           .then((jsonData) => {
             if (jsonData.data && jsonData.data.did.did)
               getInfoFromDID(jsonData.data.did.did).then((info) => {
-                resolve(info);
+                resolve({...info, did: jsonData.data.did.did});
               });
             else resolve({})
           })
