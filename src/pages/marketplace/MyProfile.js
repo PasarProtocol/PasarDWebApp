@@ -38,7 +38,7 @@ import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import useSingin from '../../hooks/useSignin';
-import { queryName, queryDescription } from '../../components/signin-dlg/HiveAPI'
+import { queryName, queryDescription, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -90,6 +90,7 @@ export default function MyProfile() {
   const [walletAddress, setWalletAddress] = React.useState(null);
   const [myAddress, setMyAddress] = React.useState(null);
   const [didInfo, setDidInfo] = React.useState({name: '', description: ''});
+  const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [updateCount, setUpdateCount] = React.useState(0);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: 0, kyc: false});
@@ -144,6 +145,15 @@ export default function MyProfile() {
           setDidInfoValue('description', res.find_message.items[0].display_name)
         else
           setDidInfoValue('description', bio)
+      })
+      downloadAvatar(targetDid).then((res)=>{
+        if(res && res.length) {
+          const base64Content = res.reduce((content, code)=>{
+            content=`${content}${String.fromCharCode(code)}`;
+            return content
+          }, '')
+          setAvatarUrl(`data:image/png;base64,${base64Content}`)
+        }
       })
     }
     else {
@@ -272,6 +282,8 @@ export default function MyProfile() {
         <Box sx={{ position: 'relative', justifyContent: 'center' }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: isMobile?1:1.5 }}>
             <RingAvatar
+              avatar={avatarUrl}
+              isImage={!!avatarUrl}
               address={walletAddress}
               size={isMobile ? 80 : 100}
             />
