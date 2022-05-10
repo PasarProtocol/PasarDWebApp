@@ -83,14 +83,12 @@ export default function EditProfile() {
         })
       })
       downloadAvatar(targetDid).then((res)=>{
-        console.log(res)
         if(res && res.length) {
           const base64Content = res.reduce((content, code)=>{
             content=`${content}${String.fromCharCode(code)}`;
             return content
           }, '')
           setAvatarUrl(`data:image/png;base64,${base64Content}`)
-          console.log("--2-- ", base64Content)
         }
       })
     }
@@ -203,7 +201,6 @@ export default function EditProfile() {
       reader.onloadend = async() => {
         try {
           const fileContent = Buffer.from(reader.result)
-          console.log(fileContent)
           const bs64Content = fileContent.toString('base64')
           await uploadAvatar(bs64Content)
           enqueueSnackbar('Save action success', { variant: 'success' });

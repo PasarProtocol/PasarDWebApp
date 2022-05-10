@@ -5,7 +5,7 @@ export default function RingAvatar(props) {
   const {size, outersx, isImage=false} = props
   let {avatar=''} = props
   if(!avatar)
-    avatar = '/static/circle-loading.svg'
+    avatar = '/static/broken-image.svg'
     
   return <Box sx={{
     borderRadius: '50%',
