@@ -38,7 +38,7 @@ import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import useSingin from '../../hooks/useSignin';
-import { queryName, queryDescription, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
+import { queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -94,11 +94,19 @@ export default function MyProfile() {
   const [updateCount, setUpdateCount] = React.useState(0);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: 0, kyc: false});
+  const [socials, setSocials] = React.useState({});
   const { diaBalance } = useSingin()
 
   const context = useWeb3React();
   const { account } = context;
 
+  const queryProfileSocials = {
+    website: queryWebsite,
+    twitter: queryTwitter,
+    discord: queryDiscord,
+    telegram: queryTelegram,
+    medium: queryMedium
+  }
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   // const triedEager = useEagerConnect();
   React.useEffect(async() => {
@@ -154,6 +162,16 @@ export default function MyProfile() {
           }, '')
           setAvatarUrl(`data:image/png;base64,${base64Content}`)
         }
+      })
+      Object.keys(queryProfileSocials).forEach(field=>{
+        queryProfileSocials[field](targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length)
+            setSocials((prevState) => {
+              const tempState = {...prevState}
+              tempState[field] = res.find_message.items[0].display_name
+              return tempState
+            })
+        })
       })
     }
     else {
@@ -323,7 +341,7 @@ export default function MyProfile() {
             }
           </Typography>
           <Box sx={{py: 1.5}}>
-            <IconLinkButtonGroup/>
+            <IconLinkButtonGroup {...socials}/>
           </Box>
           <Stack sx={{justifyContent: 'center'}} spacing={1} direction="row">
             {
