@@ -307,7 +307,7 @@ export default function MyItems() {
             }
             {
               badge.kyc&&
-              <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
+              <Tooltip title="KYC-ed by kyc-me.io" arrow enterTouchDelay={0}>
                 <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
               </Tooltip>
             }

@@ -550,7 +550,7 @@ export default function CollectibleDetail() {
                       }
                       {
                         badge.creator.kyc&&
-                        <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
+                        <Tooltip title="KYC-ed by kyc-me.io" arrow enterTouchDelay={0}>
                           <Box><Badge name="kyc"/></Box>
                         </Tooltip>
                       }
@@ -575,7 +575,7 @@ export default function CollectibleDetail() {
                       }
                       {
                         badge.owner.kyc&&
-                        <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
+                        <Tooltip title="KYC-ed by kyc-me.io" arrow enterTouchDelay={0}>
                           <Box><Badge name="kyc"/></Box>
                         </Tooltip>
                       }
@@ -752,7 +752,7 @@ export default function CollectibleDetail() {
                         }
                         {
                           collectionBadge.kyc&&
-                          <Tooltip title="KYC-ed user" arrow enterTouchDelay={0}>
+                          <Tooltip title="KYC-ed by kyc-me.io" arrow enterTouchDelay={0}>
                             <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
                           </Tooltip>
                         }
