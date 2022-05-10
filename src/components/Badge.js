@@ -9,7 +9,7 @@ import { customShadows } from '../theme/shadows';
 Badge.propTypes = {
   name: PropTypes.string
 };
-const backColor = {"pasar": "#FF5082", "diamond": "#E5E5E5", "user": "#E8EC21", "thumbup": "#25CD7C", "thumbdown": "#D60000", "custom": "#2B86DA"}
+const backColor = {"pasar": "#FF5082", "diamond": "#E5E5E5", "user": "#E8EC21", "kyc": "#000", "thumbup": "#25CD7C", "thumbdown": "#D60000", "custom": "#2B86DA"}
 export default function Badge({ name, value="", sx }) {
   const src = `/static/badges/${name}.svg`
   const color = backColor[name]

@@ -207,7 +207,7 @@ export default function Credentials() {
                     <Box
                       component="img"
                       alt="kyc"
-                      src="/static/kyc.svg"
+                      src="/static/badges/kyc.svg"
                       sx={{ width: 24, height: 24, p: '3px' }}
                     />
                   }
@@ -237,7 +237,7 @@ export default function Credentials() {
                 draggable={false}
                 component="img"
                 alt="kyc"
-                src="/static/kyc.svg"
+                src="/static/badges/kyc.svg"
                 sx={{ width: 80, height: 80 }}
               />
             </Box>
