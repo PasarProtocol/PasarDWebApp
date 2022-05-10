@@ -1,9 +1,9 @@
 import {InsertOptions, File as HiveFile, VaultServices, AppContext, Logger as HiveLogger } from "@elastosfoundation/hive-js-sdk";
 import {JWTParserBuilder, JWTHeader, DID as DID2, DIDBackend, DefaultDIDAdapter, JSONObject, VerifiablePresentation  } from '@elastosfoundation/did-js-sdk';
 import {connectivity, DID as ConDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
+import { ApplicationDID } from '../../config'
 
 let vaults 
-const ApplicationDID = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 
 const creatAppContext = async (appInstanceDidDocument, userDidString) => {
   try {
@@ -133,7 +133,7 @@ export const registerScript = async(scriptName, executable, condition, allowAnon
   }
 }
 
-export const callScript = async(scriptName, document, targetDid, appid = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY") => {
+export const callScript = async(scriptName, document, targetDid, appid = ApplicationDID) => {
   const scriptingService = await getScriptingService(targetDid)
   const result = await scriptingService.callScript(scriptName, document, targetDid, appid)
   return result

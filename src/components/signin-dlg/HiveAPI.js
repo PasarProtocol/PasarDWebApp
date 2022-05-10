@@ -1,5 +1,6 @@
 import { FileDownloadExecutable, FindExecutable, UpdateOptions } from "@elastosfoundation/hive-js-sdk";
 import { deleateOneDBData, deleteCollection, queryDBData, downloadScripting, uploadFileWithString, createCollection, registerScript, callScript, insertDBData, updateOneDBData } from './HiveService';
+import { ApplicationDID } from '../../config'
 
 const COLLECTION_NAME = "Profile"
 const NAME = "name"
@@ -77,47 +78,47 @@ const registerFileDownloadScripting = async(scriptName) => {
   }
 }
 
-export const queryName = async(targetDid, appid = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY") => {
+export const queryName = async(targetDid, appid = ApplicationDID) => {
   const result = await callQueryScript(NAME, targetDid, appid)
   return result
 }
 
-export const queryDescription = async(targetDid, appid = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY") => {
+export const queryDescription = async(targetDid, appid = ApplicationDID) => {
   const result = await callQueryScript(DESCRIPTION, targetDid, appid)
   return result
 }
 
-export const queryWebsite = async(targetDid, appid = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY") => {
+export const queryWebsite = async(targetDid, appid = ApplicationDID) => {
   const result = await callQueryScript(WEBSITE, targetDid, appid)
   return result
 }
 
-export const queryTwitter = async(targetDid, appid = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY") => {
+export const queryTwitter = async(targetDid, appid = ApplicationDID) => {
   const result = await callQueryScript(TWITTER, targetDid, appid)
   return result
 }
 
-export const queryDiscord = async(targetDid, appid = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY") => {
+export const queryDiscord = async(targetDid, appid = ApplicationDID) => {
   const result = await callQueryScript(DISCORD, targetDid, appid)
   return result
 }
 
-export const queryTelegram = async(targetDid, appid = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY") => {
+export const queryTelegram = async(targetDid, appid = ApplicationDID) => {
   const result = await callQueryScript(TELEGRAM, targetDid, appid)
   return result
 }
 
-export const queryMedium = async(targetDid, appid = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY") => {
+export const queryMedium = async(targetDid, appid = ApplicationDID) => {
   const result = await callQueryScript(MEDIUM, targetDid, appid)
   return result
 }
 
-export const queryKycMe = async(targetDid, appid = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY") => {
+export const queryKycMe = async(targetDid, appid = ApplicationDID) => {
   const result = await callQueryScript(KYC_ME, targetDid, appid)
   return result
 }
 
-const callQueryScript = async(propertyIdentity, targetDid, appid = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY") => {
+const callQueryScript = async(propertyIdentity, targetDid, appid = ApplicationDID) => {
   try {
     const doc = {"property_identity": propertyIdentity }
     const result = await callScript(propertyIdentity, doc, targetDid, appid)
