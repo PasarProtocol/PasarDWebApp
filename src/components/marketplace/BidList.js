@@ -34,19 +34,20 @@ function TransItem({ trans, coinType }) {
             <Jazzicon
               address={trans.buyerAddr}
               size={48}
+              sx={{mr: 0}}
             />
           </Box>
-          <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+          <Box sx={{ minWidth: 0, width: '100%' }}>
               <Typography variant="body2" noWrap>
                 {parseFloat((trans.price/10**18).toFixed(7))} {coinName}
               </Typography>
-              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
+              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }}>
                   by {didName || reduceHexAddress(trans.buyerAddr)}
               </Typography>
           </Box>
-          <Box>
+          <Box sx={{ whiteSpace: 'nowrap' }}>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right">
-                  {timeObj.date} {timeObj.time}
+                  {timeObj.date} <wbr/>{timeObj.time}
               </Typography>
           </Box>
       </Stack>
