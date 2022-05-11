@@ -311,14 +311,42 @@ export default function EditProfile() {
           <MHidden width="smUp">
             <Grid item xs={12}>
               <Typography variant="h4" sx={{fontWeight: 'normal'}}>Avatar</Typography>
-              <UploadAvatar
-                accept="image/*"
-                file={avatarUrl}
-                onDrop={handleDropAvatar}
-                size={90}
-                address={walletAddress}
-                sx={{m: 1.5}}
-              />
+              <Paper sx={{ border: '1px solid', borderColor: 'action.disabledBackground', p: 3, mt: 3, textAlign: 'center' }}>
+                <UploadAvatar
+                  accept="image/*"
+                  file={avatarUrl}
+                  onDrop={handleDropAvatar}
+                  size={90}
+                  address={walletAddress}
+                  sx={{}}
+                />
+                <Typography variant='h3' sx={{ pt: 2 }}>{didInfo.name || reduceHexAddress(walletAddress)}</Typography>
+                {
+                  didInfo.name&&
+                  <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{reduceHexAddress(walletAddress)}</Typography>
+                }
+                {
+                  didInfo.description&&
+                  <Typography variant='subtitle2' sx={{fontWeight: 'normal', color: 'text.secondary', pt: 1, lineHeight: 1, fontSize: '0.925em', ...DescriptionStyle}}>{didInfo.description}</Typography>
+                }
+                {
+                  Object.keys(socials).length>0 &&
+                  <Box sx={{pt: 1.5}}>
+                    <IconLinkButtonGroup {...socials}/>
+                  </Box>
+                }
+                <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia>0 || badge.kyc)?2:0}}>
+                  {
+                    badge.dia>0 && <DIABadge balance={badge.dia}/>
+                  }
+                  {
+                    badge.kyc&&
+                    <Tooltip title="KYC-ed by kyc-me.io" arrow enterTouchDelay={0}>
+                      <Box><Badge name="kyc"/></Box>
+                    </Tooltip>
+                  }
+                </Stack>
+              </Paper>
             </Grid>
           </MHidden>
           <Grid item xs={12} sm={7}>
