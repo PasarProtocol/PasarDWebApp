@@ -94,8 +94,6 @@ export default function MyItems() {
     medium: queryMedium
   }
   React.useEffect(()=>{
-    if(!myAddress)
-      return
     if(params.address && params.address!==myAddress){
       setWalletAddress(params.address)
       getDidInfoFromAddress(params.address)
@@ -106,6 +104,7 @@ export default function MyItems() {
         })
     }
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
+      setWalletAddress(myAddress)
       const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`
       const token = sessionStorage.getItem("PASAR_TOKEN");
       const user = jwtDecode(token);
@@ -113,6 +112,7 @@ export default function MyItems() {
       fetchProfileData(targetDid, user)
     }
     else{
+      setWalletAddress(myAddress)
       setDidInfo({'name': '', 'description': ''})
     }
   }, [myAddress])
@@ -122,17 +122,17 @@ export default function MyItems() {
   React.useEffect(async() => {
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1') {
       setMyAddress(account)
-      setWalletAddress(account);
+      // setWalletAddress(account);
     }
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2') {
       const strWalletAddress = isInAppBrowser() ? await window.elastos.getWeb3Provider().address : essentialsConnector.getWalletConnectProvider().wc.accounts[0];
       setMyAddress(strWalletAddress)
-      setWalletAddress(strWalletAddress);
+      // setWalletAddress(strWalletAddress);
     }
     else if (sessionStorage.getItem("PASAR_LINK_ADDRESS") === '3') {
       const strWalletAddress = await walletconnect.getAccount()
       setMyAddress(strWalletAddress)
-      setWalletAddress(strWalletAddress);
+      // setWalletAddress(strWalletAddress);
     }
     else if(!params.address) {
       navigate('/marketplace');

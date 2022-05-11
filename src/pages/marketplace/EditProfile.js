@@ -69,6 +69,7 @@ export default function EditProfile() {
   const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [badge, setBadge] = React.useState({dia: 0, kyc: false});
   const [socials, setSocials] = React.useState({});
+  const [updateState, setUpdateState] = React.useState(false);
   const [didInfo, setDidInfo] = React.useState({name: '', description: ''});
   
   const { elaConnectivityService, setElastosConnectivityService } = useSingin();
@@ -76,7 +77,7 @@ export default function EditProfile() {
   const { enqueueSnackbar } = useSnackbar();
 
   const updateProfileData = [updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium]
-  const deleteProfileData = [deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium]
+  const deleteProfileData = [deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe]
   const queryProfileSocials = {
     website: queryWebsite,
     twitter: queryTwitter,
@@ -84,7 +85,6 @@ export default function EditProfile() {
     telegram: queryTelegram,
     medium: queryMedium
   }
-  const socialFiels = ['website', 'twitter', 'discord', 'telegram', 'medium']
     
   React.useEffect(async () => {
     const connectivityService = new ElastosConnectivityService()
@@ -104,15 +104,19 @@ export default function EditProfile() {
 
       const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`
       queryName(targetDid).then((res)=>{
-        if(res.find_message && res.find_message.items.length){
+        if(res.find_message && res.find_message.items.length) {
           setDidInfoValue('name', res.find_message.items[0].display_name)
           handleSetChecked(0)
+        } else {
+          setDidInfoValue('name', '')
         }
       })
       queryDescription(targetDid).then((res)=>{
-        if(res.find_message && res.find_message.items.length){
+        if(res.find_message && res.find_message.items.length) {
           setDidInfoValue('description', res.find_message.items[0].display_name)
           handleSetChecked(1)
+        } else {
+          setDidInfoValue('description', '')
         }
       })
       downloadAvatar(targetDid).then((res)=>{
@@ -141,11 +145,17 @@ export default function EditProfile() {
               return tempState
             })
             handleSetChecked(_i+2)
+          } else {
+            setSocials((prevState) => {
+              const tempState = {...prevState}
+              delete tempState[field]
+              return tempState
+            })
           }
         })
       })
     }
-  }, []);
+  }, [updateState]);
 
   const handleSetChecked = (_i)=>{
     setCheckedItem((prevState) => {
@@ -195,17 +205,101 @@ export default function EditProfile() {
   const handleSaveAction = async() => {
     setOnProgress(true)
     let kycVerifiablePresentation
+    const customItems = credentialItems.filter((item, i)=>checkedItem[i])
     try {
-      const customItems = credentialItems.filter((item, i)=>checkedItem[i])
-      kycVerifiablePresentation = await elaConnectivityService.requestCustomCredentials(customItems);
-
-      if (!kycVerifiablePresentation) {
-        setOnProgress(false)
-        return
-        // return Promise.reject(new Error("Error while trying to get the presentation"))
+      if(customItems.length) {
+        kycVerifiablePresentation = await elaConnectivityService.requestCustomCredentials(customItems);
+  
+        if (!kycVerifiablePresentation) {
+          setOnProgress(false)
+          return
+          // return Promise.reject(new Error("Error while trying to get the presentation"))
+        }
+        if(!DIDBackend.isInitialized()) {
+          const resolverUrl = 'https://api.trinity-tech.cn/eid';
+          DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
+        }
+  
+        // Check presentation validity (genuine, not tampered)
+        const valid = await kycVerifiablePresentation.isValid();
+        if (!valid) {
+          stopProvide("Invalid presentation")
+          return
+        }
+  
+        // Get the presentation holder
+        const presentationDID = kycVerifiablePresentation.getHolder().getMethodSpecificId();
+        if (!presentationDID) {
+          stopProvide("Unable to extract owner DID from the presentation")
+          return
+        }
+  
+        // Make sure the holder of this presentation is the currently authentified user
+        if (sessionStorage.getItem('PASAR_DID') !== presentationDID) {
+          stopProvide("Presentation not issued by the currently authenticated user")
+          return
+        }
+  
+        const credentials = kycVerifiablePresentation.getCredentials();
+        if (!credentials.length) {
+          stopProvide("Nothing to provide")
+          return
+        }
+  
+        const profileData = credentials.reduce((props, c) => {
+          props[c.id.fragment] = c.subject.properties[c.id.fragment];
+          return props;
+        }, {});
+        const birthDateCredential = credentials.find(c => c.getType().indexOf("BirthDateCredential") >= 0);
+        const genderCredential = credentials.find(c => c.getType().indexOf("GenderCredential") >= 0);
+        const countryCredential = credentials.find(c => c.getType().indexOf("CountryCredential") >= 0);
+        if (!birthDateCredential && !genderCredential && !countryCredential && checkedItem[7]){
+          stopProvide("Nothing to provide KYC-me credentials")
+          return
+        }
+        credentialItems.slice(0, credentialItems.length-1).forEach((item, _i)=>{
+          if(profileData[item.id] && checkedItem[_i])
+            updateProfileData[_i](profileData[item.id])
+          else
+            deleteProfileData[_i]()
+        })
+        // console.log(profileData)
+        // updateName(profileData.name)
+        if(checkedItem[7] && profileData){
+          const {BirthDateCredential, GenderCredential, CountryCredential} = profileData
+          const tempKYCdata = { birthdate: BirthDateCredential, gender: GenderCredential, country: CountryCredential }
+          updateKycMe(JSON.stringify(tempKYCdata))
+          // const vpBuffer = Buffer.from(kycVerifiablePresentation.serialize())
+          // const encodedPresentation = bs58.encode(vpBuffer)
+          // sessionStorage.setItem('KYCedProof', encodedPresentation)
+        } else {
+          deleteKycMe()
+        }
+      } else {
+        const deleteProfileFuncArr = deleteProfileData.map(func=>func())
+        await Promise.all(deleteProfileFuncArr)
       }
-      const resolverUrl = 'https://api.trinity-tech.cn/eid';
-      DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
+      if(avatarUrl && !isString(avatarUrl)) {
+        const reader = new window.FileReader();
+        reader.readAsArrayBuffer(avatarUrl);
+        reader.onloadend = async() => {
+          try {
+            const fileContent = Buffer.from(reader.result)
+            const bs64Content = fileContent.toString('base64')
+            await uploadAvatar(bs64Content)
+            enqueueSnackbar('Save action success', { variant: 'success' });
+            setUpdateState(!updateState)
+            setOnProgress(false)
+          } catch (error) {
+            enqueueSnackbar('Save avatar error', { variant: 'error' });
+            setOnProgress(false)
+          }
+        }
+      } else {
+        enqueueSnackbar('Save action success', { variant: 'success' });
+        setUpdateState(!updateState)
+        setOnProgress(false)
+      }
     } catch (error) {
       stopProvide("Request credentials error")
       try {
@@ -215,85 +309,7 @@ export default function EditProfile() {
       }
       return Promise.reject(error);
     }
-
-    // Check presentation validity (genuine, not tampered)
-    const valid = await kycVerifiablePresentation.isValid();
-    if (!valid) {
-      stopProvide("Invalid presentation")
-      return
-    }
-
-    // Get the presentation holder
-    const presentationDID = kycVerifiablePresentation.getHolder().getMethodSpecificId();
-    if (!presentationDID) {
-      stopProvide("Unable to extract owner DID from the presentation")
-      return
-    }
-
-    // Make sure the holder of this presentation is the currently authentified user
-    if (sessionStorage.getItem('PASAR_DID') !== presentationDID) {
-      stopProvide("Presentation not issued by the currently authenticated user")
-      return
-    }
-
-    const credentials = kycVerifiablePresentation.getCredentials();
-    if (!credentials.length) {
-      stopProvide("Nothing to provide")
-      return
-    }
-
-    const profileData = credentials.reduce((props, c) => {
-      props[c.id.fragment] = c.subject.properties[c.id.fragment];
-      return props;
-    }, {});
-    const birthDateCredential = credentials.find(c => c.getType().indexOf("BirthDateCredential") >= 0);
-    const genderCredential = credentials.find(c => c.getType().indexOf("GenderCredential") >= 0);
-    const countryCredential = credentials.find(c => c.getType().indexOf("CountryCredential") >= 0);
-    if (!birthDateCredential && !genderCredential && !countryCredential && checkedItem[7]){
-      stopProvide("Nothing to provide KYC-me credentials")
-      return
-    }
-    credentialItems.slice(0, credentialItems.length-1).forEach((item, _i)=>{
-      if(profileData[item.id] && checkedItem[_i])
-        updateProfileData[_i](profileData[item.id])
-      else
-        deleteProfileData[_i]()
-    })
-    // console.log(profileData)
-    // updateName(profileData.name)
-    if(checkedItem[7] && profileData){
-      const {BirthDateCredential, GenderCredential, CountryCredential} = profileData
-      const tempKYCdata = { birthdate: BirthDateCredential, gender: GenderCredential, country: CountryCredential }
-      updateKycMe(JSON.stringify(tempKYCdata))
-      // const vpBuffer = Buffer.from(kycVerifiablePresentation.serialize())
-      // const encodedPresentation = bs58.encode(vpBuffer)
-      // sessionStorage.setItem('KYCedProof', encodedPresentation)
-    } else {
-      deleteKycMe()
-    }
-    if(avatarUrl && !isString(avatarUrl)){
-      const reader = new window.FileReader();
-      reader.readAsArrayBuffer(avatarUrl);
-      reader.onloadend = async() => {
-        try {
-          const fileContent = Buffer.from(reader.result)
-          const bs64Content = fileContent.toString('base64')
-          await uploadAvatar(bs64Content)
-          enqueueSnackbar('Save action success', { variant: 'success' });
-          setOnProgress(false)
-        } catch (error) {
-          enqueueSnackbar('Save avatar error', { variant: 'error' });
-          setOnProgress(false)
-        }
-      }
-    } else {
-      enqueueSnackbar('Save action success', { variant: 'success' });
-      setOnProgress(false)
-    }
   }
-  // const name="amana"
-  // const dispAddress="0x---0000"
-  // const description="asdfewfe asdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfe asdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfe"
   
   return (
     <RootStyle title="EditProfile | PASAR">
