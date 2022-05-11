@@ -39,6 +39,7 @@ import StartingDateSelect from '../../components/marketplace/StartingDateSelect'
 import ExpirationDateSelect from '../../components/marketplace/ExpirationDateSelect'
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import CoinTypeLabel from '../../components/CoinTypeLabel';
+import DIABadge from '../../components/DIABadge';
 
 import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import {TOKEN_721_ABI} from '../../abi/token721ABI'
@@ -949,7 +950,7 @@ export default function CreateItem() {
       enqueueSnackbar('Reserve price must be less than Buy Now price.', { variant: 'warning' });
     else if(isPutOnSale && isReserveForAuction && degree===0)
       enqueueSnackbar('Reserve Price is not supported due to lack of DIA balance.', { variant: 'warning' });
-    else if(isPutOnSale && isBuynowForAuction && (degree===0 || degree===1))
+    else if(isPutOnSale && isBuynowForAuction && degree===0)
       enqueueSnackbar('Buy Now Price is not supported due to lack of DIA balance.', { variant: 'warning' });
     else
       if(mintype!=="Batch"){
@@ -1225,7 +1226,17 @@ export default function CreateItem() {
                       </Grid>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Reserve Price</Typography>
+                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>
+                        Include Reserve Price
+                        {
+                          diaBalance*1===0 &&
+                          <Stack direction="row" spacing={1} sx={{display: 'inline-flex', pl: 2}}>
+                            <DIABadge degree={1} isRequire={Boolean(true)}/>
+                            <DIABadge degree={2} isRequire={Boolean(true)}/>
+                            <DIABadge degree={3} isRequire={Boolean(true)}/>
+                          </Stack>
+                        }
+                      </Typography>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack direction="row">
@@ -1233,11 +1244,20 @@ export default function CreateItem() {
                           Set a minimum price before auction can complete
                         </InputLabelStyle>
                         <FormControlLabel
-                          control={<CustomSwitch onChange={handleReserveForAuction}/>}
+                          control={<CustomSwitch onChange={handleReserveForAuction} disabled={diaBalance*1===0}/>}
                           sx={{mt:-1, mr: 0}}
                           label=""
                         />
                       </Stack>
+                      {
+                        diaBalance*1===0 &&
+                        <>
+                          <Divider/>
+                          <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
+                            Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info here
+                          </Typography>
+                        </>
+                      }
                     </Grid>
                     {
                       isReserveForAuction&&
@@ -1268,7 +1288,17 @@ export default function CreateItem() {
                       </>
                     }
                     <Grid item xs={12}>
-                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Buy Now Price</Typography>
+                      <Typography variant="h4" sx={{fontWeight: 'normal'}}>
+                        Include Buy Now Price
+                        {
+                          diaBalance*1===0 &&
+                          <Stack direction="row" spacing={1} sx={{display: 'inline-flex', pl: 2}}>
+                            <DIABadge degree={1} isRequire={Boolean(true)}/>
+                            <DIABadge degree={2} isRequire={Boolean(true)}/>
+                            <DIABadge degree={3} isRequire={Boolean(true)}/>
+                          </Stack>
+                        }
+                      </Typography>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack direction="row">
@@ -1276,11 +1306,20 @@ export default function CreateItem() {
                           Set instant purchase price (auction ends immediately after a sale)
                         </InputLabelStyle>
                         <FormControlLabel
-                          control={<CustomSwitch onChange={handleBuynowForAuction}/>}
+                          control={<CustomSwitch onChange={handleBuynowForAuction} disabled={diaBalance*1===0}/>}
                           sx={{mt:-1, mr: 0}}
                           label=""
                         />
                       </Stack>
+                      {
+                        diaBalance*1===0 &&
+                        <>
+                          <Divider/>
+                          <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
+                            Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info here
+                          </Typography>
+                        </>
+                      }
                     </Grid>
                     {
                       isBuynowForAuction&&
