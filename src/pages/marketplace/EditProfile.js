@@ -3,7 +3,7 @@ import bs58 from 'bs58'
 import { isString } from 'lodash';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip, Box } from '@mui/material';
+import { Container, Stack, Grid, Typography, Link, FormControl, InputLabel, Input, Divider, FormControlLabel, TextField, Button, Tooltip, Box, Paper } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useSnackbar } from 'notistack';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
@@ -19,12 +19,15 @@ import RingAvatar from '../../components/RingAvatar';
 import { UploadAvatar } from '../../components/upload';
 import CustomSwitch from '../../components/custom-switch';
 import ElastosConnectivityService from '../../utils/elastosConnectivityService';
-import useSingin from '../../hooks/useSignin';
 import TransLoadingButton from '../../components/TransLoadingButton';
+import Badge from '../../components/Badge';
+import DIABadge from '../../components/DIABadge';
+import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import { queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, 
   deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe, 
   updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe, uploadAvatar, downloadAvatar } from '../../components/signin-dlg/HiveAPI';
-import { isInAppBrowser, getCredentialInfo } from '../../utils/common';
+import { isInAppBrowser, getCredentialInfo, getDiaTokenInfo, reduceHexAddress } from '../../utils/common';
+import useSingin from '../../hooks/useSignin';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -49,11 +52,24 @@ const credentialItems = [
   {title: 'Medium', description: 'Medium account', id: 'medium'},
   {title: 'KYC-me', description: 'KYC-me badge', id: 'KYC'},
 ]
+const DescriptionStyle = {
+  WebkitLineClamp: 3,
+  WebkitBoxOrient: 'vertical',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  display: '-webkit-box !important',
+  fontWeight: 'normal',
+  whiteSpace: 'pre-wrap',
+  wordWrap: 'break-word'
+}
 export default function EditProfile() {
   const [checkedItem, setCheckedItem] = React.useState(Array(7).fill(false));
   const [walletAddress, setWalletAddress] = React.useState(null);
   const [onProgress, setOnProgress] = React.useState(false);
   const [avatarUrl, setAvatarUrl] = React.useState(null);
+  const [badge, setBadge] = React.useState({dia: 0, kyc: false});
+  const [socials, setSocials] = React.useState({});
+  const [didInfo, setDidInfo] = React.useState({name: '', description: ''});
   
   const { elaConnectivityService, setElastosConnectivityService } = useSingin();
   const navigate = useNavigate();
@@ -61,7 +77,15 @@ export default function EditProfile() {
 
   const updateProfileData = [updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium]
   const deleteProfileData = [deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium]
-  const queryProfileData = [queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe]
+  const queryProfileSocials = {
+    website: queryWebsite,
+    twitter: queryTwitter,
+    discord: queryDiscord,
+    telegram: queryTelegram,
+    medium: queryMedium
+  }
+  const socialFiels = ['website', 'twitter', 'discord', 'telegram', 'medium']
+    
   React.useEffect(async () => {
     const connectivityService = new ElastosConnectivityService()
     setElastosConnectivityService(connectivityService)
@@ -71,16 +95,25 @@ export default function EditProfile() {
     else {
       const strWalletAddress = isInAppBrowser() ? await window.elastos.getWeb3Provider().address : essentialsConnector.getWalletConnectProvider().wc.accounts[0];
       setWalletAddress(strWalletAddress);
+      
+      getDiaTokenInfo(strWalletAddress).then(dia=>{
+        if(dia!=='0')
+          setBadgeFlag('dia', dia)
+        else setBadgeFlag('dia', 0)
+      })
+
       const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`
-      queryProfileData.forEach((queryFunc, _i)=>{
-        queryFunc(targetDid).then((res)=>{
-          if(res.find_message && res.find_message.items.length)
-            setCheckedItem((prevState) => {
-              const tempState = [...prevState]
-              tempState[_i] = true
-              return tempState
-            })
-        })
+      queryName(targetDid).then((res)=>{
+        if(res.find_message && res.find_message.items.length){
+          setDidInfoValue('name', res.find_message.items[0].display_name)
+          handleSetChecked(0)
+        }
+      })
+      queryDescription(targetDid).then((res)=>{
+        if(res.find_message && res.find_message.items.length){
+          setDidInfoValue('description', res.find_message.items[0].display_name)
+          handleSetChecked(1)
+        }
       })
       downloadAvatar(targetDid).then((res)=>{
         if(res && res.length) {
@@ -91,9 +124,52 @@ export default function EditProfile() {
           setAvatarUrl(`data:image/png;base64,${base64Content}`)
         }
       })
+      queryKycMe(targetDid).then((res)=>{
+        if(res.find_message && res.find_message.items.length) {
+          setBadgeFlag('kyc', true)
+          handleSetChecked(7)
+        }
+        else
+          setBadgeFlag('kyc', false)
+      })
+      Object.keys(queryProfileSocials).forEach((field, _i)=>{
+        queryProfileSocials[field](targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length) {
+            setSocials((prevState) => {
+              const tempState = {...prevState}
+              tempState[field] = res.find_message.items[0].display_name
+              return tempState
+            })
+            handleSetChecked(_i+2)
+          }
+        })
+      })
     }
-
   }, []);
+
+  const handleSetChecked = (_i)=>{
+    setCheckedItem((prevState) => {
+      const tempState = [...prevState]
+      tempState[_i] = true
+      return tempState
+    })
+  }
+  
+  const setDidInfoValue = (field, value)=>{
+    setDidInfo((prevState)=>{
+      const tempState = {...prevState}
+      tempState[field] = value
+      return tempState
+    })
+  }
+
+  const setBadgeFlag = (type, value) => {
+    setBadge((prevState) => {
+      const tempFlag = {...prevState}
+      tempFlag[type] = value
+      return tempFlag
+    })
+  }
 
   const handleCheckItem = (event, i) => {
     setCheckedItem((prevState) => {
@@ -215,6 +291,10 @@ export default function EditProfile() {
       setOnProgress(false)
     }
   }
+  // const name="amana"
+  // const dispAddress="0x---0000"
+  // const description="asdfewfe asdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfe asdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfeasdfewfe"
+  
   return (
     <RootStyle title="EditProfile | PASAR">
       <Container maxWidth="lg">
@@ -278,15 +358,43 @@ export default function EditProfile() {
           </Grid>
           <MHidden width="smDown">
             <Grid item sm={5}>
-              <Typography variant="h4" sx={{fontWeight: 'normal'}}>Avatar</Typography>
-              <UploadAvatar
-                accept="image/*"
-                file={avatarUrl}
-                onDrop={handleDropAvatar}
-                size={110}
-                address={walletAddress}
-                sx={{m: 4}}
-              />
+              <Typography variant="h4" sx={{fontWeight: 'normal'}}>Preview</Typography>
+              <Paper sx={{ border: '1px solid', borderColor: 'action.disabledBackground', p: 3, mt: 3, textAlign: 'center' }}>
+                <UploadAvatar
+                  accept="image/*"
+                  file={avatarUrl}
+                  onDrop={handleDropAvatar}
+                  size={110}
+                  address={walletAddress}
+                  sx={{}}
+                />
+                <Typography variant='h3' sx={{ pt: 2 }}>{didInfo.name || reduceHexAddress(walletAddress)}</Typography>
+                {
+                  didInfo.name&&
+                  <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{reduceHexAddress(walletAddress)}</Typography>
+                }
+                {
+                  didInfo.description&&
+                  <Typography variant='subtitle2' sx={{fontWeight: 'normal', color: 'text.secondary', pt: 1, lineHeight: 1, fontSize: '0.925em', ...DescriptionStyle}}>{didInfo.description}</Typography>
+                }
+                {
+                  Object.keys(socials).length>0 &&
+                  <Box sx={{pt: 1.5}}>
+                    <IconLinkButtonGroup {...socials}/>
+                  </Box>
+                }
+                <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia>0 || badge.kyc)?2:0}}>
+                  {
+                    badge.dia>0 && <DIABadge balance={badge.dia}/>
+                  }
+                  {
+                    badge.kyc&&
+                    <Tooltip title="KYC-ed by kyc-me.io" arrow enterTouchDelay={0}>
+                      <Box><Badge name="kyc"/></Box>
+                    </Tooltip>
+                  }
+                </Stack>
+              </Paper>
             </Grid>
           </MHidden>
         </Grid>
