@@ -7,17 +7,21 @@ import {getDiaBalanceDegree} from '../utils/common'
 // ----------------------------------------------------------------------
 
 const ColorSet = [
-  {background: 'linear-gradient(0deg, #363636 3%, #a6a6a6 100%)', afterBackground: '#9d9d9d', afterShadowColor: '#3a3a3a', name: ''},
-  {background: 'linear-gradient(0deg, #B37E59 3%, #FFD2B3 100%)', afterBackground: '#F2C7AA', afterShadowColor: '#b5815c', name: 'Bronze'},
-  {background: 'linear-gradient(0deg, #B6B6BF 3%, #EDF4FA 100%)', afterBackground: '#DADCE6', afterShadowColor: '#b6b6bf', name: 'Silver'},
-  {background: 'linear-gradient(0deg, #FFBB33 3%, #FFEDA6 100%)', afterBackground: '#FFDF80', afterShadowColor: '#f2ba49', name: 'Gold'}
+  {background: 'linear-gradient(0deg, #363636 3%, #a6a6a6 100%)', afterBackground: '#9d9d9d', afterShadowColor: '#3a3a3a', name: '', min: 0},
+  {background: 'linear-gradient(0deg, #B37E59 3%, #FFD2B3 100%)', afterBackground: '#F2C7AA', afterShadowColor: '#b5815c', name: 'Bronze', min: 0.01},
+  {background: 'linear-gradient(0deg, #B6B6BF 3%, #EDF4FA 100%)', afterBackground: '#DADCE6', afterShadowColor: '#b6b6bf', name: 'Silver', min: 0.1},
+  {background: 'linear-gradient(0deg, #FFBB33 3%, #FFEDA6 100%)', afterBackground: '#FFDF80', afterShadowColor: '#f2ba49', name: 'Gold', min: 1}
 ]
-export default function DIABadge({ balance, sx }) {
+export default function DIABadge(props) {
+  const { balance=0, sx, isRequire=false } = props
+  let { degree=0 } = props
   const src = '/static/badges/diamond.svg'
-  const degree = getDiaBalanceDegree(balance)
-  const {background, afterBackground, afterShadowColor, name} = ColorSet[degree]
+  if(!degree)
+    degree = getDiaBalanceDegree(balance)
+  const {background, afterBackground, afterShadowColor, name, min} = ColorSet[degree]
+  const tooltipText = isRequire?`Hold a minimum of ${min} DIA (Diamond)`:`${name} Diamond (DIA) token holder`
   return (
-    <Tooltip title={`${name} Diamond (DIA) token holder`} arrow enterTouchDelay={0}>
+    <Tooltip title={tooltipText} arrow enterTouchDelay={0}>
       <Box sx={{display: 'inline-flex'}}>
         <Stack
           direction='row'
