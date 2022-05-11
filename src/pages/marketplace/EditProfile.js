@@ -357,7 +357,7 @@ export default function EditProfile() {
                   }
                   {
                     badge.kyc&&
-                    <Tooltip title="KYC-ed by kyc-me.io" arrow enterTouchDelay={0}>
+                    <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
                       <Box><Badge name="kyc"/></Box>
                     </Tooltip>
                   }
@@ -433,7 +433,7 @@ export default function EditProfile() {
                   }
                   {
                     badge.kyc&&
-                    <Tooltip title="KYC-ed by kyc-me.io" arrow enterTouchDelay={0}>
+                    <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
                       <Box><Badge name="kyc"/></Box>
                     </Tooltip>
                   }
