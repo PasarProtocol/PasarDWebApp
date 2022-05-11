@@ -94,6 +94,7 @@ export default function Router() {
             { path: 'others/:address', element: <MyItems /> },
           ]
         },
+        { path: 'features', element: <Features /> },
         { path: 'rewards', element: <Rewards /> },
       ]
     },
@@ -122,6 +123,8 @@ const CollectionDetail = Loadable(lazy(() => import('../pages/collection/Collect
 const CreateCollection = Loadable(lazy(() => import('../pages/collection/CreateCollection')));
 const EditCollection = Loadable(lazy(() => import('../pages/collection/EditCollection')));
 const ImportCollection = Loadable(lazy(() => import('../pages/collection/ImportCollection')));
+// Features
+const Features = Loadable(lazy(() => import('../pages/features/Features')));
 // Rewards
 const Rewards = Loadable(lazy(() => import('../pages/rewards/Rewards')));
 
