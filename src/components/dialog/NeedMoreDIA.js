@@ -39,7 +39,7 @@ export default function NeedMoreDIA(props) {
           Insufficient Funds
         </Typography>
         <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }} align="center">
-          Sorry, You need to hold a minimum value of<br/>
+          Sorry, you need to hold a minimum value of<br/>
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
             {0.01*(10**degree)} DIA
           </Typography>

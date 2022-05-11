@@ -24,6 +24,7 @@ export const PATH_PAGE = {
   marketplace: '/marketplace',
   create: '/create',
   collection: '/collection',
+  features: '/features',
   rewards: '/rewards'
 };
 
