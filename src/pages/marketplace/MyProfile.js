@@ -342,12 +342,9 @@ export default function MyProfile() {
               <Typography variant="subtitle2" noWrap sx={{color: 'text.secondary', pt: 1}}>{didInfo.description}</Typography>
             }
           </Typography>
-          {
-            Object.keys(socials).length>0 && 
-            <Box sx={{py: 1.5}}>
-              <IconLinkButtonGroup {...socials}/>
-            </Box>
-          }
+          <Box sx={{py: 1.5}}>
+            <IconLinkButtonGroup {...socials}/>
+          </Box>
           <Stack sx={{justifyContent: 'center'}} spacing={1} direction="row">
             {
               badge.dia>0 && <DIABadge balance={badge.dia}/>

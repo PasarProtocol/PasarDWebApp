@@ -157,7 +157,7 @@ export default function CollectionDetail() {
       .catch((e) => {
         if (e.code !== e.ABORT_ERR) setLoadingCollection(false);
       });
-  }, []);
+  }, [params.collection]);
   
   if(metaObj.data) {
     avatar = getIpfsUrl(metaObj.data.avatar)
@@ -223,7 +223,7 @@ export default function CollectionDetail() {
       });
     sessionStorage.setItem("filter-props-other", JSON.stringify({selectedBtns, selectedAttributes, range, selectedTokens, adult, order}))
     setFilterForm({selectedBtns, selectedAttributes, range, selectedTokens, adult, order})
-  }, [page, showCount, selectedBtns, selectedAttributes, selectedTokens, adult, range, order, params.key]);
+  }, [page, showCount, selectedBtns, selectedAttributes, selectedTokens, adult, range, order, params.key, params.collection]);
   
   const handleDispmode = (event, mode) => {
     if(mode===null)
