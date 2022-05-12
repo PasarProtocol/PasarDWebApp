@@ -181,6 +181,10 @@ export default function Auction(props) {
   const auctionNft = async () => {
     if(!startingPrice)
       enqueueSnackbar('Starting price is required.', { variant: 'warning' });
+    else if(isReserveForAuction && !reservePrice.length)
+      enqueueSnackbar('Reserve price is required.', { variant: 'warning' });
+    else if(isBuynowForAuction && !buyoutPrice.length)
+      enqueueSnackbar('Buy Now price is required.', { variant: 'warning' });
     else if(reservePrice.length && startingPrice*1>reservePrice*1)
       enqueueSnackbar('Starting price must be less than Reserve price.', { variant: 'warning' });
     else if(buyoutPrice.length && startingPrice*1>=buyoutPrice*1)
