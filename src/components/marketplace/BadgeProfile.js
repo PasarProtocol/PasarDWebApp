@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Box, Stack, Typography, Menu, Popover, Popper, Tooltip, Link, Fade, SvgIcon } from '@mui/material';
+import { Box, Stack, Typography, Menu, Popover, Popper, Tooltip, Link, Fade, SvgIcon, Avatar } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BoltIcon from '@mui/icons-material/Bolt';
 import { Icon } from '@iconify/react';
@@ -10,7 +10,10 @@ import { Icon } from '@iconify/react';
 import Badge from '../Badge';
 import DIABadge from '../DIABadge';
 import Jazzicon from '../Jazzicon';
-import { reduceHexAddress, getDidInfoFromAddress, collectionTypes } from '../../utils/common';
+import RingAvatar from '../RingAvatar';
+import IconLinkButtonGroup from '../collection/IconLinkButtonGroup'
+import { queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, downloadAvatar } from '../signin-dlg/HiveAPI'
+import { reduceHexAddress, getDidInfoFromAddress, collectionTypes, getDiaTokenInfo } from '../../utils/common';
 import { stickerContract as STICKER_ADDRESS } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -36,22 +39,44 @@ const DescriptionStyle = {
   whiteSpace: 'pre-wrap',
   wordWrap: 'break-word'
 }
+
+const queryProfileSocials = {
+  website: queryWebsite,
+  twitter: queryTwitter,
+  discord: queryDiscord,
+  telegram: queryTelegram,
+  medium: queryMedium
+}
 export default function BadgeProfile(props) {
-  const {type, walletAddress, badge, collection={}, reservePriceFlag=false, hasBuynow=false} = props
+  const {type, walletAddress, collection={}, reservePriceFlag=false, hasBuynow=false} = props
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = React.useState(false);
   const [didInfo, setDidInfo] = useState({name: '', description: ''});
+  const [avatarUrl, setAvatarUrl] = React.useState(null);
+  const [badge, setBadge] = React.useState({dia: 0, kyc: false});
+  const [socials, setSocials] = React.useState({});
 
   useEffect(()=>{
     let isMounted = true;
-    if(walletAddress)
+    if(walletAddress) {
       getDidInfoFromAddress(walletAddress)
         .then((info) => {
-          if(isMounted)
+          if(isMounted){
             setDidInfo({'name': info.name || '', 'description': info.description || ''})
+            fetchProfileData(info.did, {name: info.name || '', bio: info.description || ''})
+          }
         })
+      
+      getDiaTokenInfo(walletAddress)
+        .then(dia=>{
+          if(dia!=='0')
+            setBadgeFlag('dia', dia)
+          else setBadgeFlag('dia', 0)
+        })
+    }
     return () => { isMounted = false };
   }, [walletAddress])
+  
   const handlePopoverOpen = (event) => {
     if (isMobile && event.type === 'mouseenter') return;
     setAnchorEl(event.currentTarget)
@@ -70,6 +95,64 @@ export default function BadgeProfile(props) {
     description = didInfo.description
   }
 
+  const fetchProfileData = (targetDid, didInfo)=>{
+    queryName(targetDid).then((res)=>{
+      if(res.find_message && res.find_message.items.length)
+        setDidInfoValue('name', res.find_message.items[0].display_name)
+      else
+        setDidInfoValue('name', didInfo.name)
+    }).catch(e=>{
+      console.log(e)
+    })
+    queryDescription(targetDid).then((res)=>{
+      if(res.find_message && res.find_message.items.length)
+        setDidInfoValue('description', res.find_message.items[0].display_name)
+      else
+        setDidInfoValue('description', didInfo.bio)
+    })
+    downloadAvatar(targetDid).then((res)=>{
+      if(res && res.length) {
+        const base64Content = res.reduce((content, code)=>{
+          content=`${content}${String.fromCharCode(code)}`;
+          return content
+        }, '')
+        setAvatarUrl(`data:image/png;base64,${base64Content}`)
+      }
+    })
+    queryKycMe(targetDid).then((res)=>{
+      if(res.find_message && res.find_message.items.length)
+        setBadgeFlag('kyc', true)
+      else
+        setBadgeFlag('kyc', false)
+    })
+    Object.keys(queryProfileSocials).forEach(field=>{
+      queryProfileSocials[field](targetDid).then((res)=>{
+        if(res.find_message && res.find_message.items.length)
+          setSocials((prevState) => {
+            const tempState = {...prevState}
+            tempState[field] = res.find_message.items[0].display_name
+            return tempState
+          })
+      })
+    })
+  }
+
+  const setDidInfoValue = (field, value)=>{
+    setDidInfo((prevState)=>{
+      const tempState = {...prevState}
+      tempState[field] = value
+      return tempState
+    })
+  }
+
+  const setBadgeFlag = (type, value) => {
+    setBadge((prevState) => {
+      const tempFlag = {...prevState}
+      tempFlag[type] = value
+      return tempFlag
+    })
+  }
+  
   const badgeAction = type>=3?{}:{
     onClick: handlePopoverOpen,
     onMouseEnter: handlePopoverOpen,
@@ -96,7 +179,13 @@ export default function BadgeProfile(props) {
         }
         {
           type===2&&
-          <Jazzicon address={walletAddress} size={26} sx={{mr: 0}}/>
+          <>
+            {
+              avatarUrl?
+              <Avatar alt="user" src={avatarUrl} sx={{width: 26, height: 26}} />:
+              <Jazzicon address={walletAddress} size={26} sx={{mr: 0}}/>
+            }
+          </>
         }
         {
           type===3&&
@@ -143,10 +232,11 @@ export default function BadgeProfile(props) {
                   {
                     type===2&&
                     <Link to={`/profile/others/${walletAddress}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      <Jazzicon
+                      <RingAvatar
+                        avatar={avatarUrl}
+                        isImage={!!avatarUrl}
                         address={walletAddress}
                         size={60}
-                        sx={{mr: 0}}
                       />
                     </Link>
                   }
@@ -178,6 +268,12 @@ export default function BadgeProfile(props) {
                   <Typography variant='subtitle2' sx={{fontWeight: 'normal', color: 'text.secondary', pt: 2, lineHeight: 1, fontSize: '0.925em', maxWidth: 270, ...DescriptionStyle}}>{description}</Typography>
                 }
                 {
+                  type===2 && Object.keys(socials).length>0 && 
+                  <Box sx={{pt: 1.5}}>
+                    <IconLinkButtonGroup {...socials}/>
+                  </Box>
+                }
+                {
                   type===2&&
                   <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia>0 || badge.kyc)?2:0}}>
                     {
@@ -196,39 +292,6 @@ export default function BadgeProfile(props) {
           )
         }
       </Popper>
-      {/* <Menu
-        // keepMounted
-        id="simple-menu"
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={handlePopoverClose}
-        transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-        MenuListProps={{ onMouseLeave: handlePopoverClose }}
-        hideBackdrop={Boolean(true)}
-      >123
-      </Menu> */}
-      {/* <Popover
-        id="mouse-over-popover"
-        sx={{
-          pointerEvents: 'none',
-          textAlign: 'center'
-        }}
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        onClose={handlePopoverClose}
-        // disableRestoreFocus
-      >
-        123
-      </Popover> */}
     </>
   )
 }
