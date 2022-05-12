@@ -70,7 +70,6 @@ export default function AssetCard(props) {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [settleOpen, setSettleOrderOpen] = React.useState(false);
   const [auctionEnded, setAuctionEnded] = React.useState(false);
-  const [badge, setBadge] = React.useState({dia: 0, kyc: false});
 
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const { enqueueSnackbar } = useSnackbar();
@@ -82,17 +81,6 @@ export default function AssetCard(props) {
   const isUnlistedByOthers = myaddress!==royaltyOwner&&myaddress!==holder&&saleType==="Not on sale"
 
   React.useEffect(() => {
-    if(holder) {
-      getDiaTokenInfo(holder).then(dia=>{
-        if(dia!=='0')
-          setBadgeFlag('dia', dia)
-        else setBadgeFlag('dia', 0)
-      })
-      getCredentialInfo(holder).then(proofData=>{
-        if(proofData)
-          setBadgeFlag('kyc', true)
-      })
-    }
     const interval = setInterval(()=>checkHasEnded(), 1000)
     return () => clearInterval(interval);
   }, []);
@@ -135,13 +123,6 @@ export default function AssetCard(props) {
       return
     if(!auctionEnded&&tempEndTime<=Date.now())
       setAuctionEnded(true)
-  }
-  const setBadgeFlag = (type, value) => {
-    setBadge((prevState) => {
-      const tempFlag = {...prevState}
-      tempFlag[type] = value
-      return tempFlag
-    })
   }
   
   const openPopupMenu = (event) => {
@@ -232,7 +213,7 @@ export default function AssetCard(props) {
             <Stack sx={{flexGrow:1}} direction="row" spacing={.5}>
               <BadgeProfile type={1} collection={collection}/>
               {
-                holder&&<BadgeProfile type={2} walletAddress={holder} badge={badge}/>
+                holder&&<BadgeProfile type={2} walletAddress={holder}/>
               }
               {!!(reservePrice*1)&&saleType!=="Not on sale"&&<BadgeProfile type={3} reservePriceFlag={currentBidPrice/1e18 >= reservePrice/1e18}/>}
               {!!(buyoutPrice*1)&&saleType!=="Not on sale"&&<BadgeProfile type={4}/>}
