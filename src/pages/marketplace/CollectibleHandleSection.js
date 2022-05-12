@@ -125,7 +125,7 @@ export default function CollectibleHandleSection(props) {
           <StyledButton variant="contained" actiontype='bid' fullWidth onClick={openSignin}>
             Sign in to Place bid
           </StyledButton>
-      else
+      else if(collectible.buyoutPrice*1)
         auctionTextField = 
           <Typography variant="h4" component='div' align='center' sx={{pt: 2}}>
             Your Buy Now Price: <Typography variant="h4" color="origin.main" sx={{display: 'inline'}}>{round(collectible.buyoutPrice/1e18, 3)} {coinName}</Typography>
