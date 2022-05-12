@@ -956,7 +956,7 @@ export default function CreateItem() {
       if(mintype!=="Batch"){
         if(duproperties.length || singleProperties.filter(el=>el.type.length>0&&!el.name.length).length)
           enqueueSnackbar('Properties are invalid.', { variant: 'warning' });
-        else if(collection==='Choose' && diaBalance*1===0)
+        else if(collection==='Choose' && degree===0)
           setOpenBuyDIA(true)
         else
           mintSingle()
@@ -967,6 +967,7 @@ export default function CreateItem() {
       else
         mintBatch()
   }
+  const DiaDegree = getDiaBalanceDegree(diaBalance)
   return (
     <RootStyle title="CreateItem | PASAR">
       <ProgressBar isFinished={(progress===0||progress===100||!onProgress)} progress={progress} />
@@ -1229,7 +1230,7 @@ export default function CreateItem() {
                       <Typography variant="h4" sx={{fontWeight: 'normal'}}>
                         Include Reserve Price
                         {
-                          diaBalance*1===0 &&
+                          DiaDegree===0 &&
                           <Stack direction="row" spacing={1} sx={{display: 'inline-flex', pl: 2}}>
                             <DIABadge degree={1} isRequire={Boolean(true)}/>
                             <DIABadge degree={2} isRequire={Boolean(true)}/>
@@ -1244,13 +1245,13 @@ export default function CreateItem() {
                           Set a minimum price before auction can complete
                         </InputLabelStyle>
                         <FormControlLabel
-                          control={<CustomSwitch onChange={handleReserveForAuction} disabled={diaBalance*1===0}/>}
+                          control={<CustomSwitch onChange={handleReserveForAuction} disabled={DiaDegree===0}/>}
                           sx={{mt:-1, mr: 0}}
                           label=""
                         />
                       </Stack>
                       {
-                        diaBalance*1===0 &&
+                        DiaDegree===0 &&
                         <>
                           <Divider/>
                           <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
@@ -1291,7 +1292,7 @@ export default function CreateItem() {
                       <Typography variant="h4" sx={{fontWeight: 'normal'}}>
                         Include Buy Now Price
                         {
-                          diaBalance*1===0 &&
+                          DiaDegree===0 &&
                           <Stack direction="row" spacing={1} sx={{display: 'inline-flex', pl: 2}}>
                             <DIABadge degree={1} isRequire={Boolean(true)}/>
                             <DIABadge degree={2} isRequire={Boolean(true)}/>
@@ -1306,13 +1307,13 @@ export default function CreateItem() {
                           Set instant purchase price (auction ends immediately after a sale)
                         </InputLabelStyle>
                         <FormControlLabel
-                          control={<CustomSwitch onChange={handleBuynowForAuction} disabled={diaBalance*1===0}/>}
+                          control={<CustomSwitch onChange={handleBuynowForAuction} disabled={DiaDegree===0}/>}
                           sx={{mt:-1, mr: 0}}
                           label=""
                         />
                       </Stack>
                       {
-                        diaBalance*1===0 &&
+                        DiaDegree===0 &&
                         <>
                           <Divider/>
                           <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
