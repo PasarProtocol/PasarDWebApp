@@ -38,7 +38,7 @@ import useOffSetTop from '../../hooks/useOffSetTop';
 import useSingin from '../../hooks/useSignin';
 
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, socialTypes, getDiaBalanceDegree, fetchFrom, isInAppBrowser } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, socialTypes, getDiaBalanceDegree, fetchFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
