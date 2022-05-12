@@ -78,6 +78,7 @@ export default function SearchBox(props) {
   const [instanceSearchResult, setInstanceSearchResult] = useState(null);
   const [instanceCollectionAvatar, setInstanceCollectionAvatar] = useState({});
   const [isLoadingInstanceSearch, setLoadingInstanceSearch] = useState(false);
+  const [linkToState, setLinkToState] = useState(false);
   const [searchStr, setSearchStr] = useState("")
   const ref = useRef()
   // if(placeholder === defaultPlaceHolder && !pathname.startsWith('/explorer'))
@@ -104,6 +105,11 @@ export default function SearchBox(props) {
       else
         navigate(`/marketplace/search/${value}`);
   }
+  
+  React.useEffect(()=>{
+    setShowAutocomplete(false)
+  }, [linkToState])
+
   React.useEffect(()=>{
     setInstanceCollectionAvatar({})
     if(!instanceSearchResult)
@@ -164,6 +170,9 @@ export default function SearchBox(props) {
       setShowAutocomplete(false)
     else
       ref.current.focus()
+  }
+  const handleLinkClick = (e)=>{
+    setLinkToState(!linkToState)
   }
   return (
     needAutocomplete?
@@ -230,7 +239,7 @@ export default function SearchBox(props) {
                   <Divider />
                   {
                     instanceSearchResult.collections.map((item, _i)=>(
-                      <ListItemButton key={_i} component={RouterLink} to={`/collection/detail/${item.token}`}>
+                      <ListItemButton key={_i} component={RouterLink} to={`/collection/detail/${item.token}`} onClick={handleLinkClick}>
                         <ListItemAvatar>
                           <Avatar alt="Collection" src={instanceCollectionAvatar[_i]} sx={{width: 30, height: 30}} />
                         </ListItemAvatar>
@@ -252,7 +261,7 @@ export default function SearchBox(props) {
                   <Divider />
                   {
                     instanceSearchResult.items.map((item, _i)=>(
-                      <ListItemButton key={_i} component={RouterLink} to={`/marketplace/detail/${item.tokenId}`}>
+                      <ListItemButton key={_i} component={RouterLink} to={`/marketplace/detail/${item.tokenId}`} onClick={handleLinkClick}>
                         <ListItemAvatar>
                           <Avatar alt="NFT" src={item.avatar} sx={{width: 30, height: 30}} />
                         </ListItemAvatar>
@@ -274,7 +283,7 @@ export default function SearchBox(props) {
                   <Divider />
                   {
                     instanceSearchResult.accounts.map((item, _i)=>(
-                      <ListItemButton key={_i} component={RouterLink} to={`/profile/others/${item.address}`}>
+                      <ListItemButton key={_i} component={RouterLink} to={`/profile/others/${item.address}`} onClick={handleLinkClick}>
                         <ListItemAvatar>
                           <Jazzicon address={item.address} size={30} sx={{mr: 0}}/>
                         </ListItemAvatar>
