@@ -32,7 +32,18 @@ const SelectedTitleStyle = styled(Typography)(({ theme }) => ({
   MozBackgroundClip: 'text',
   MozTextFillColor: 'transparent',
   display: 'inline',
-  fontSize: {xs: '1.85rem', sm: '2rem', md: '2.25rem', lg: '2.5rem'}
+  [theme.breakpoints.up('xs')]: {
+    fontSize: '1.85rem'
+  },
+  [theme.breakpoints.up('sm')]: {
+    fontSize: '2rem'
+  },
+  [theme.breakpoints.up('md')]: {
+    fontSize: '2.2rem'
+  },
+  [theme.breakpoints.up('lg')]: {
+    fontSize: '2.4rem'
+  },
 }))
 const CheckIcon = ({isSupported, selected=false})=>{
   if (typeof isSupported === 'string') {
