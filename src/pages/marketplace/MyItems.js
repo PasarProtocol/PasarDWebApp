@@ -115,7 +115,7 @@ export default function MyItems() {
       setWalletAddress(myAddress)
       setDidInfo({'name': '', 'description': ''})
     }
-  }, [myAddress])
+  }, [myAddress, params.address])
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   // const triedEager = useEagerConnect();
