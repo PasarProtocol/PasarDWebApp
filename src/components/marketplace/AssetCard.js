@@ -1,6 +1,7 @@
 import React from 'react';
 import * as math from 'mathjs';
 import Imgix from "react-imgix";
+import { useSnackbar } from 'notistack';
 import { alpha, styled } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import { motion } from "framer-motion";
@@ -70,7 +71,9 @@ export default function AssetCard(props) {
   const [settleOpen, setSettleOrderOpen] = React.useState(false);
   const [auctionEnded, setAuctionEnded] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: 0, kyc: false});
+
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
+  const { enqueueSnackbar } = useSnackbar();
   
   const isCreatedByMe = myaddress===royaltyOwner
   const isListedOwnedByMe = (myaddress===royaltyOwner&&saleType==="Primary Sale") || (myaddress===holder&&saleType==="Secondary Sale")
@@ -173,11 +176,19 @@ export default function AssetCard(props) {
           setOpenDownloadEssentialDlg(true)
           return
         }
+        if(currentBid.length && !auctionEnded){
+          enqueueSnackbar('Already have been bid', { variant: 'warning' });
+          return
+        }
         setOpenUpdate(true)
         break;
       case 'cancel':
         if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
           setOpenDownloadEssentialDlg(true)
+          return
+        }
+        if(currentBid.length && !auctionEnded){
+          enqueueSnackbar('Already have been bid', { variant: 'warning' });
           return
         }
         setOpenCancel(true)
