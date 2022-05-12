@@ -52,7 +52,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 export default function AssetCard(props) {
-  const { name="???", description, quantity=1, price=0, coinType=0, isLink, isMoreLink, tokenId, type, orderId, orderType, endTime, currentBid, baseToken='',
+  const { name="???", description, quantity=1, price=0, coinType=0, isLink, isMoreLink, tokenId, type, orderId, orderType, status, endTime, currentBid, baseToken='',
    saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, defaultCollectionType, isDragging=false, reservePrice=0, buyoutPrice=0 } = props
   const defaultCollection = {
     ...collectionTypes[defaultCollectionType],
@@ -344,7 +344,7 @@ export default function AssetCard(props) {
             </Box>
           </Stack>
           {
-            orderType===auctionOrderType && !!endTime &&
+            orderType===auctionOrderType && !!endTime && status!=='Not on sale' &&
             <TimeCountBoxStyle>
               {
                 auctionEnded?
