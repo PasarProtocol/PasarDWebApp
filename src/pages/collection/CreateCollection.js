@@ -38,7 +38,7 @@ import useOffSetTop from '../../hooks/useOffSetTop';
 import useSingin from '../../hooks/useSignin';
 
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, socialTypes, getDiaBalanceDegree, fetchFrom } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, socialTypes, getDiaBalanceDegree, fetchFrom, isInAppBrowser } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -327,11 +327,14 @@ export default function CreateCollection() {
               data: '0x'.concat(raw(`../../bytecode/${tokenCode}`)),
               arguments: [name, symbol, paramObj._uri, DIA_TOKEN_ADDRESS, diaTokenValue],
             })
-            registerContract.send({
+            const transactionParams = {
               'from': accounts[0],
               'gas': _gasLimit,
               'gasPrice': gasPrice
-            }).then(newContractInstance=>{
+            }
+            if(isInAppBrowser())
+              transactionParams.to = ""
+            registerContract.send(transactionParams).then(newContractInstance=>{
               console.log('Contract deployed at address: ', newContractInstance.options.address)
               resolve({_uri: paramObj._uri, _address: newContractInstance.options.address})
             }).catch((error) => {
