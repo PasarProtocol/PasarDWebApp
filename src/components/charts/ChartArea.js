@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { merge } from 'lodash';
+import * as math from 'mathjs';
 import { styled } from '@mui/material/styles';
 import { Card, CardHeader, Stack, Grid, ToggleButton, ToggleButtonGroup, Select, MenuItem } from '@mui/material';
 import ReactApexChart from 'react-apexcharts';
@@ -107,8 +108,9 @@ export default function ChartArea({by, is4Address}) {
   }, [volumeType, params.address]);
   
   useEffect(() => {
-    updateChart(period, volumeList);
-  }, [volumeList]);
+    if(!isLoadingVolumeChart)
+      updateChart(period, volumeList);
+  }, [isLoadingVolumeChart, volumeList]);
   
   const updateChart = (period, volumeList) => {
     let days = 0;
@@ -136,7 +138,7 @@ export default function ChartArea({by, is4Address}) {
       const indexOfDate = dates.indexOf(item.onlyDate.substring(0,10));
       const value = item.price!==undefined?item.price:item.value;
       if(indexOfDate>=0)
-        tempValueArray[indexOfDate] = parseFloat((value/10**18).toFixed(7));
+        tempValueArray[indexOfDate] = math.round(tempValueArray[indexOfDate]+math.round(value/10**18, 4), 4);
     })
     setOptionDates(dates)
     // setChartOptions(mergeChartOption(dates))
