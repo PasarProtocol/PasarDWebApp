@@ -96,7 +96,7 @@ export default function CollectibleHandleSection(props) {
   const currentBid = collectible.listBid&&collectible.listBid.length?collectible.listBid[0].price:0
   let deadline = ''
   let auctionTextField = null
-  if(collectible.orderType === auctionOrderType) {
+  if(collectible.orderType === auctionOrderType && collectible.SaleType !== 'Not on sale') {
     const tempDeadLine = getTime(collectible.endTime)
     deadline = `${auctionEnded?'Ended':'Ends'} ${tempDeadLine.date} ${tempDeadLine.time}`
     if(!auctionEnded) { // not end yet
@@ -210,7 +210,7 @@ export default function CollectibleHandleSection(props) {
         </MHidden>:
         <>
           {
-            collectible.orderType===auctionOrderType?
+            collectible.orderType===auctionOrderType && collectible.SaleType!=="Not on sale"?
             <Box>
               <Stack direction="row">
                 <Box sx={{flexGrow: 1}}>
