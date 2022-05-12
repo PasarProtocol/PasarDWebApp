@@ -23,6 +23,17 @@ const RootStyle = styled(Page)(({ theme }) => ({
     paddingBottom: theme.spacing(3)
   }
 }));
+const SelectedTitleStyle = styled(Typography)(({ theme }) => ({
+  backgroundImage: 'linear-gradient(90deg, #FF5082, #a951f4)',
+  backgroundSize: '100%',
+  backgroundRepeat: 'repeat',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  MozBackgroundClip: 'text',
+  MozTextFillColor: 'transparent',
+  display: 'inline',
+  fontSize: {xs: '1.85rem', sm: '2rem', md: '2.25rem', lg: '2.5rem'}
+}))
 const CheckIcon = ({isSupported, selected=false})=>{
   if (typeof isSupported === 'string') {
     return <Typography variant='body2' align="center" sx={{px: 2}} color={selected?'origin.main':'text.primary'}>{isSupported}</Typography>
@@ -129,7 +140,7 @@ export default function Features() {
             <CellBoxStyle isFirstColumn={Boolean(true)}>
               <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
                 <DIABadge degree={0} disableTooltip={Boolean(true)} zoomRate={1.4}/>
-                <Typography variant="h3" align="center">Basic</Typography>
+                <Typography variant="h3" align="center">BASIC</Typography>
                 <Typography variant="body2" align="center">
                   Hold 0 DIA (no badge) or less than 0.01 DIA
                 </Typography>
@@ -137,9 +148,9 @@ export default function Features() {
             </CellBoxStyle>
             <CellBoxStyle selected={Boolean(true)}>
               <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
-                <DIABadge degree={1} disableTooltip={Boolean(true)} zoomRate={1.4}/>
-                <Typography variant="h3" align="center">Bronze</Typography>
-                <Typography variant="body2" align="center">
+                <DIABadge degree={1} disableTooltip={Boolean(true)} zoomRate={1.6}/>
+                <SelectedTitleStyle variant="h3" align="center">BRONZE</SelectedTitleStyle>
+                <Typography variant="subtitle1" align="center" color='origin.main'>
                   Hold more than 0.01 DIA but less than 0.1 DIA
                 </Typography>
               </Stack>
@@ -147,7 +158,7 @@ export default function Features() {
             <CellBoxStyle>
               <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
                 <DIABadge degree={2} disableTooltip={Boolean(true)} zoomRate={1.4}/>
-                <Typography variant="h3" align="center">Silver</Typography>
+                <Typography variant="h3" align="center">SILVER</Typography>
                 <Typography variant="body2" align="center">
                   Hold more than 0.1 DIA but less than 1 DIA
                 </Typography>
@@ -156,7 +167,7 @@ export default function Features() {
             <CellBoxStyle isLastColumn={Boolean(true)}>
               <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
                 <DIABadge degree={3} disableTooltip={Boolean(true)} zoomRate={1.4}/>
-                <Typography variant="h3" align="center">Gold</Typography>
+                <Typography variant="h3" align="center">GOLD</Typography>
                 <Typography variant="body2" align="center">
                   Hold more than 1 DIA
                 </Typography>
