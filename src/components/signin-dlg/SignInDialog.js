@@ -279,7 +279,7 @@ export default function SignInDialog() {
     // let presentation;
     try {
       const presentation = await didAccess.requestCredentials({
-        claims: [DID.simpleIdClaim('Your name', 'name', false), DID.simpleIdClaim('Your description', 'bio', false)]
+        claims: [DID.simpleIdClaim('Your name', 'name', false), DID.simpleIdClaim('Your description', 'description', false)]
       });
       if (presentation) {
         const did = presentation.getHolder().getMethodSpecificId() || '';
@@ -302,8 +302,9 @@ export default function SignInDialog() {
         const nameCredential = vp.getCredential(`name`);
         const name = nameCredential ? nameCredential.getSubject().getProperty('name') : '';
         // Optional bio
-        const bioCredential = vp.getCredential(`bio`);
-        const bio = bioCredential ? bioCredential.getSubject().getProperty('bio') : '';
+        const bioCredential = vp.getCredential(`description`);
+        const bio = bioCredential ? bioCredential.getSubject().getProperty('description') : '';
+
         // Optional email
         // const emailCredential = vp.getCredential(`email`);
         // const email = emailCredential ? emailCredential.getSubject().getProperty('email') : '';
