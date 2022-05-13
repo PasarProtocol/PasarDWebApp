@@ -44,7 +44,7 @@ const RootStyle = styled(Page)(({ theme }) => ({
 
 const credentialItems = [
   {title: 'Name', description: 'name', id: 'name'},
-  {title: 'Description', description: 'description', id: 'bio'},
+  {title: 'Description', description: 'description', id: 'description'},
   {title: 'Website', description: 'website', id: 'website'},
   {title: 'Twitter', description: 'Twitter account', id: 'twitter'},
   {title: 'Discord', description: 'Discord account', id: 'discord'},
