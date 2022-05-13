@@ -8,9 +8,11 @@ import crossCircleFillIcon from '@iconify-icons/akar-icons/circle-x-fill';
 import crossCircleOutlineIcon from '@iconify-icons/akar-icons/circle-x';
 
 // components
+import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import DIABadge from '../../components/DIABadge';
 import StyledButton from '../../components/signin-dlg/StyledButton';
+import CarouselFeatures from '../../components/carousel/CarouselFeatures';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -145,80 +147,85 @@ export default function Features() {
             1 DIA ≈ USD 40
           </Typography>
         </Box>
-        <Stack sx={{mt: 3}}>
-          <Stack direction="row">
-            <Box sx={{display: 'flex', flex: 1, p: 2}}/>
-            <CellBoxStyle isFirstColumn={Boolean(true)}>
-              <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
-                <DIABadge degree={0} disableTooltip={Boolean(true)} zoomRate={1.4}/>
-                <Typography variant="h3" align="center">BASIC</Typography>
-                <Typography variant="body2" align="center">
-                  Hold 0 DIA (no badge) or less than 0.01 DIA
-                </Typography>
-              </Stack>
-            </CellBoxStyle>
-            <CellBoxStyle selected={Boolean(true)}>
-              <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
-                <DIABadge degree={1} disableTooltip={Boolean(true)} zoomRate={1.6}/>
-                <SelectedTitleStyle variant="h3" align="center">BRONZE</SelectedTitleStyle>
-                <Typography variant="subtitle1" align="center" color='origin.main'>
-                  Hold more than 0.01 DIA but less than 0.1 DIA
-                </Typography>
-              </Stack>
-            </CellBoxStyle>
-            <CellBoxStyle>
-              <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
-                <DIABadge degree={2} disableTooltip={Boolean(true)} zoomRate={1.4}/>
-                <Typography variant="h3" align="center">SILVER</Typography>
-                <Typography variant="body2" align="center">
-                  Hold more than 0.1 DIA but less than 1 DIA
-                </Typography>
-              </Stack>
-            </CellBoxStyle>
-            <CellBoxStyle isLastColumn={Boolean(true)}>
-              <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
-                <DIABadge degree={3} disableTooltip={Boolean(true)} zoomRate={1.4}/>
-                <Typography variant="h3" align="center">GOLD</Typography>
-                <Typography variant="body2" align="center">
-                  Hold more than 1 DIA
-                </Typography>
-              </Stack>
-            </CellBoxStyle>
+        <MHidden width="mdUp">
+          <CarouselFeatures featureArray={featureArray}/>
+        </MHidden>
+        <MHidden width="mdDown">
+          <Stack sx={{mt: 3}}>
+            <Stack direction="row">
+              <Box sx={{display: 'flex', flex: 1, p: 2}}/>
+              <CellBoxStyle isFirstColumn={Boolean(true)}>
+                <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
+                  <DIABadge degree={0} disableTooltip={Boolean(true)} zoomRate={1.4}/>
+                  <Typography variant="h3" align="center">BASIC</Typography>
+                  <Typography variant="body2" align="center">
+                    Hold 0 DIA (no badge) or less than 0.01 DIA
+                  </Typography>
+                </Stack>
+              </CellBoxStyle>
+              <CellBoxStyle selected={Boolean(true)}>
+                <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
+                  <DIABadge degree={1} disableTooltip={Boolean(true)} zoomRate={1.6}/>
+                  <SelectedTitleStyle variant="h3" align="center">BRONZE</SelectedTitleStyle>
+                  <Typography variant="subtitle1" align="center" color='origin.main'>
+                    Hold more than 0.01 DIA but less than 0.1 DIA
+                  </Typography>
+                </Stack>
+              </CellBoxStyle>
+              <CellBoxStyle>
+                <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
+                  <DIABadge degree={2} disableTooltip={Boolean(true)} zoomRate={1.4}/>
+                  <Typography variant="h3" align="center">SILVER</Typography>
+                  <Typography variant="body2" align="center">
+                    Hold more than 0.1 DIA but less than 1 DIA
+                  </Typography>
+                </Stack>
+              </CellBoxStyle>
+              <CellBoxStyle isLastColumn={Boolean(true)}>
+                <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
+                  <DIABadge degree={3} disableTooltip={Boolean(true)} zoomRate={1.4}/>
+                  <Typography variant="h3" align="center">GOLD</Typography>
+                  <Typography variant="body2" align="center">
+                    Hold more than 1 DIA
+                  </Typography>
+                </Stack>
+              </CellBoxStyle>
+            </Stack>
+            {
+              featureArray.map((feature, _i)=>{
+                const isLastItem = _i===(featureArray.length-1)
+                return <Stack direction="row" key={_i}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flex: 1,
+                      backgroundColor: 'origin.main',
+                      color: 'white',
+                      // border: '1px solid black',
+                      p: 2,
+                      borderTopLeftRadius: _i===0?16:0,
+                      borderBottomLeftRadius: isLastItem?16:0
+                    }}
+                  >
+                    {feature.title}
+                  </Box>
+                  <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem}>
+                    <CheckIcon isSupported={feature.allow[0]}/>
+                  </CellBoxStyle>
+                  <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem} selected={Boolean(true)}>
+                    <CheckIcon isSupported={feature.allow[1]} selected={Boolean(true)}/>
+                  </CellBoxStyle>
+                  <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem}>
+                    <CheckIcon isSupported={feature.allow[2]}/>
+                  </CellBoxStyle>
+                  <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem} isLastColumn={Boolean(true)}>
+                    <CheckIcon isSupported={feature.allow[3]}/>
+                  </CellBoxStyle>
+                </Stack>
+              })
+            }
           </Stack>
-          {
-            featureArray.map((feature, _i)=>{
-              const isLastItem = _i===(featureArray.length-1)
-              return <Stack direction="row" key={_i}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flex: 1,
-                    backgroundColor: 'origin.main',
-                    color: 'white',
-                    // border: '1px solid black',
-                    p: 2,
-                    borderTopLeftRadius: _i===0?16:0,
-                    borderBottomLeftRadius: isLastItem?16:0
-                  }}
-                >
-                  {feature.title}
-                </Box>
-                <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem}>
-                  <CheckIcon isSupported={feature.allow[0]}/>
-                </CellBoxStyle>
-                <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem} selected={Boolean(true)}>
-                  <CheckIcon isSupported={feature.allow[1]} selected={Boolean(true)}/>
-                </CellBoxStyle>
-                <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem}>
-                  <CheckIcon isSupported={feature.allow[2]}/>
-                </CellBoxStyle>
-                <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem} isLastColumn={Boolean(true)}>
-                  <CheckIcon isSupported={feature.allow[3]}/>
-                </CellBoxStyle>
-              </Stack>
-            })
-          }
-        </Stack>
+        </MHidden>
       </Container>
     </RootStyle>
   );
