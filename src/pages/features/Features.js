@@ -1,4 +1,5 @@
 import React from 'react';
+import * as math from 'mathjs';
 import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Icon } from '@iconify/react';
@@ -13,6 +14,8 @@ import Page from '../../components/Page';
 import DIABadge from '../../components/DIABadge';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import CarouselFeatures from '../../components/carousel/CarouselFeatures';
+import { getDiaTokenPrice, getDiaBalanceDegree } from '../../utils/common'
+import useSingin from '../../hooks/useSignin';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -107,7 +110,18 @@ const CellBoxStyle = styled(Box)((props) => {
 });
 
 export default function Features() {  
+  const [diaUSD, setDiaUSD] = React.useState(0);
+  const { diaBalance } = useSingin()
+  const degree = getDiaBalanceDegree(diaBalance)
+
   React.useEffect(() => {
+    getDiaTokenPrice()
+      .then((res) => {
+        setDiaUSD(math.round(res.token.derivedELA * res.bundle.elaPrice, 2));
+      })
+      .catch((error) => {
+        setDiaUSD(0);
+      });
   }, []);
 
   const featureArray = [
@@ -131,6 +145,12 @@ export default function Features() {
       ]
     },
   ]
+  const DiaBadgeTypes = [
+    {name: 'BASIC', range: 'Hold 0 DIA (no badge) or less than 0.01 DIA'},
+    {name: 'BRONZE', range: 'Hold more than 0.01 DIA but less than 0.1 DIA'},
+    {name: 'SILVER', range: 'Hold more than 0.1 DIA but less than 1 DIA'},
+    {name: 'GOLD', range: 'Hold more than 1 DIA'}
+  ]
   return (
     <RootStyle title="Features | PASAR">
       <Container maxWidth="lg">
@@ -142,54 +162,33 @@ export default function Features() {
           Just buy some DIA and hold a certain of amount to unlock exclusive features. See the table below for more information.
         </Typography>
         <Box sx={{width: 200}}>
-          <StyledButton variant='contained' fullWidth sx={{mb: 1}}>Get DIA</StyledButton>
+          <StyledButton variant='contained' fullWidth sx={{mb: 1}} href='https://glidefinance.io/info/token/0x2c8010ae4121212f836032973919e8aec9aeaee5' target="_blank">Get DIA</StyledButton>
           <Typography variant="body2" sx={{fontWeight: 'normal', color: 'text.secondary', mb: 1}} align="center">
-            1 DIA ≈ USD 40
+            1 DIA ≈ USD {diaUSD}
           </Typography>
         </Box>
         <MHidden width="mdUp">
-          <CarouselFeatures featureArray={featureArray}/>
+          <CarouselFeatures featureArray={featureArray} degree={degree}/>
         </MHidden>
         <MHidden width="mdDown">
           <Stack sx={{mt: 3}}>
             <Stack direction="row">
               <Box sx={{display: 'flex', flex: 1, p: 2}}/>
-              <CellBoxStyle isFirstColumn={Boolean(true)}>
-                <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
-                  <DIABadge degree={0} disableTooltip={Boolean(true)} zoomRate={1.4}/>
-                  <Typography variant="h3" align="center">BASIC</Typography>
-                  <Typography variant="body2" align="center">
-                    Hold 0 DIA (no badge) or less than 0.01 DIA
-                  </Typography>
-                </Stack>
-              </CellBoxStyle>
-              <CellBoxStyle selected={Boolean(true)}>
-                <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
-                  <DIABadge degree={1} disableTooltip={Boolean(true)} zoomRate={1.6}/>
-                  <SelectedTitleStyle variant="h3" align="center">BRONZE</SelectedTitleStyle>
-                  <Typography variant="subtitle1" align="center" color='origin.main'>
-                    Hold more than 0.01 DIA but less than 0.1 DIA
-                  </Typography>
-                </Stack>
-              </CellBoxStyle>
-              <CellBoxStyle>
-                <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
-                  <DIABadge degree={2} disableTooltip={Boolean(true)} zoomRate={1.4}/>
-                  <Typography variant="h3" align="center">SILVER</Typography>
-                  <Typography variant="body2" align="center">
-                    Hold more than 0.1 DIA but less than 1 DIA
-                  </Typography>
-                </Stack>
-              </CellBoxStyle>
-              <CellBoxStyle isLastColumn={Boolean(true)}>
-                <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
-                  <DIABadge degree={3} disableTooltip={Boolean(true)} zoomRate={1.4}/>
-                  <Typography variant="h3" align="center">GOLD</Typography>
-                  <Typography variant="body2" align="center">
-                    Hold more than 1 DIA
-                  </Typography>
-                </Stack>
-              </CellBoxStyle>
+              {
+                DiaBadgeTypes.map((item, _i)=>(
+                  <CellBoxStyle key={_i} isFirstColumn={_i===0} isLastColumn={_i===(DiaBadgeTypes.length-1)} selected={degree === _i}>
+                    <Stack sx={{alignItems: 'center', mt: 1}} spacing={2}>
+                      <DIABadge degree={_i} disableTooltip={Boolean(true)} zoomRate={degree===_i?1.6:1.4}/>
+                      {
+                        degree===_i?
+                        <SelectedTitleStyle variant="h3" align="center">{item.name}</SelectedTitleStyle>:
+                        <Typography variant="h3" align="center">{item.name}</Typography>
+                      }
+                      <Typography variant={degree===_i?"subtitle1":"body2"} align="center">{item.range}</Typography>
+                    </Stack>
+                  </CellBoxStyle>
+                ))
+              }
             </Stack>
             {
               featureArray.map((feature, _i)=>{
@@ -209,18 +208,13 @@ export default function Features() {
                   >
                     {feature.title}
                   </Box>
-                  <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem}>
-                    <CheckIcon isSupported={feature.allow[0]}/>
-                  </CellBoxStyle>
-                  <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem} selected={Boolean(true)}>
-                    <CheckIcon isSupported={feature.allow[1]} selected={Boolean(true)}/>
-                  </CellBoxStyle>
-                  <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem}>
-                    <CheckIcon isSupported={feature.allow[2]}/>
-                  </CellBoxStyle>
-                  <CellBoxStyle isHeaderCell={false} isLastRow={isLastItem} isLastColumn={Boolean(true)}>
-                    <CheckIcon isSupported={feature.allow[3]}/>
-                  </CellBoxStyle>
+                  {
+                    Array(4).fill(0).map((_, _j)=>(
+                      <CellBoxStyle key={_j} isHeaderCell={false} isLastRow={isLastItem} isLastColumn={_j===3} selected={degree===_j}>
+                        <CheckIcon isSupported={feature.allow[0]} selected={degree===_j}/>
+                      </CellBoxStyle>
+                    ))
+                  }
                 </Stack>
               })
             }

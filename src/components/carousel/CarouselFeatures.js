@@ -125,14 +125,13 @@ function CarouselItem({ index, headerRef, body, selected=false }) {
 }
 
 export default function CarouselFeatures(props) {
-  const { featureArray } = props
+  const { featureArray, degree } = props
   const theme = useTheme();
   const carouselRef = useRef();
   const caseRef = useRef();
   const bottomTitleRef = useRef();
   const headerRef = [useRef(), useRef(), useRef(), useRef()]
   const bottomRef = [useRef(), useRef(), useRef(), useRef()]
-  const selectedDegree = 0;
   const settings = {
     dots: true,
     arrows: false,
@@ -200,7 +199,7 @@ export default function CarouselFeatures(props) {
   React.useEffect(()=>{
     matchCasebarGap()
     matchBottomHeight()
-  }, [])
+  }, [degree])
   window.addEventListener('resize', ()=>{
     matchCasebarGap()
     matchBottomHeight()
@@ -216,13 +215,13 @@ export default function CarouselFeatures(props) {
     )
     trs.content.forEach((_, _j)=>{
       trs.content[_j].push(
-        <TableRow key={_j}>
+        <TableRow key={_i+_j}>
           <TableCell sx={{opacity: 0, width: titleWidth, px: 3}}>{feature.title}</TableCell>
           <TableCell
-            className={selectedDegree===_j?'selected':''}
+            className={degree===_j?'selected':''}
             ref={isLastItem?bottomRef[_j]:null}
             sx={
-              selectedDegree===_j?
+              degree===_j?
               {
                 ...styles.selectedTd, 
                 ...(isLastItem?{borderBottomLeftRadius: '1em', borderBottomRightRadius: '1em'}:{borderBottom: 0})
@@ -230,7 +229,7 @@ export default function CarouselFeatures(props) {
               }:
               styles.td
             }>
-            <CheckIcon isSupported={feature.allow[_j]} selected={selectedDegree===_j}/>
+            <CheckIcon isSupported={feature.allow[_j]} selected={degree===_j}/>
           </TableCell>
         </TableRow>
       )
@@ -250,7 +249,7 @@ export default function CarouselFeatures(props) {
         <Box sx={{pl: '170px'}}>
           <Slider ref={carouselRef} {...settings}>
             {Array(4).fill(0).map((_, _i) => (
-              <CarouselItem key={_i} index={_i} headerRef={headerRef} body={bodyTRs.content[_i]} selected={_i===0}/>
+              <CarouselItem key={_i} index={_i} headerRef={headerRef} body={bodyTRs.content[_i]} selected={_i===degree}/>
             ))}
           </Slider>
         </Box>
