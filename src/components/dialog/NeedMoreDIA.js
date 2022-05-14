@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { useWeb3React } from '@web3-react/core';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, Divider } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import StyledButton from '../signin-dlg/StyledButton';
 import { getDiaBalanceDegree } from '../../utils/common';
+import { PATH_PAGE } from '../../routes/paths';
 
 export default function NeedMoreDIA(props) {
   const context = useWeb3React();
@@ -44,7 +46,9 @@ export default function NeedMoreDIA(props) {
             {0.01*(10**degree)} DIA
           </Typography>
           {' '}in order to {actionText}<br/>
-          Click here to view the features available for DIA holders based on number of holdings
+          Click{' '}
+          <Link underline="always" component={RouterLink} to={PATH_PAGE.features}>here</Link>{' '}
+          to view the features available for DIA holders based on number of holdings
         </Typography>
         {/* <Grid container sx={{ mt: 2, display: 'block' }}>
           <Grid item xs={12}>
@@ -68,7 +72,7 @@ export default function NeedMoreDIA(props) {
         <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
           <StyledButton
             variant="contained"
-            href="https://glidefinance.io/swap"
+            href="https://glidefinance.io/info/token/0x2c8010ae4121212f836032973919e8aec9aeaee5"
             target="_blank"
             fullWidth
           >
