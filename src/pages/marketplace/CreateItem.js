@@ -1,6 +1,6 @@
 import React from 'react';
 import Web3 from 'web3';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { isString } from 'lodash';
 import {isMobile} from 'react-device-detect';
 import * as math from 'mathjs';
@@ -51,6 +51,7 @@ import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useMintDlg from '../../hooks/useMintDlg';
 import useSingin from '../../hooks/useSignin';
+import { PATH_PAGE } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -1255,7 +1256,10 @@ export default function CreateItem() {
                         <>
                           <Divider/>
                           <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
-                            Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info here
+                            Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info{' '}
+                            <Link underline="always" component={RouterLink} to={PATH_PAGE.features} color='origin.main'>
+                              here
+                            </Link>
                           </Typography>
                         </>
                       }
@@ -1317,7 +1321,10 @@ export default function CreateItem() {
                         <>
                           <Divider/>
                           <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
-                            Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info here
+                            Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info{' '}
+                            <Link underline="always" component={RouterLink} to={PATH_PAGE.features} color='origin.main'>
+                              here
+                            </Link>
                           </Typography>
                         </>
                       }
