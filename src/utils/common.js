@@ -3,7 +3,7 @@ import Web3 from 'web3';
 import * as math from 'mathjs';
 import { createHash } from 'crypto';
 import { create, urlSource } from 'ipfs-http-client';
-import { subDays, differenceInDays } from 'date-fns';
+import { format, subDays, differenceInDays } from 'date-fns';
 import Jazzicon from '@metamask/jazzicon';
 import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
 import jwtDecode from 'jwt-decode';
@@ -173,7 +173,7 @@ export const getDiaBalanceDegree = (balance) => {
 }
 
 export function dateRangeBeforeDays(days) {
-  return [...Array(days).keys()].map((i) => subDays(new Date(), i).toISOString().slice(0, 10));
+  return [...Array(days).keys()].map((i) => format(subDays(new Date(), i), 'yyyy-MM-dd'));
 }
 
 export function hash(string) {

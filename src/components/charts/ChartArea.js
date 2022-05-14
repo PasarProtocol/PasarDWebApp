@@ -126,10 +126,10 @@ export default function ChartArea({by, is4Address}) {
         days = 7;
         break;
       case 'd':
-        days = 1;
+        days = 3;
         break;
       default:
-        days = 1;
+        days = 3;
         break;
     }
     const dates = dateRangeBeforeDays(days)
