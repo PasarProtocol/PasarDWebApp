@@ -94,7 +94,7 @@ const MintingTypeButton = (props)=>{
                     <AddIcon sx={{ fontSize: {xs: 24.5, sm: 34}, color: 'white' }} />
                 </Box>
             }
-            <Typography variant="body2" sx={{ fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1.6, sm: 3} }}>
+            <Typography variant="body2" sx={{ fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1.6, sm: 3} }} noWrap>
                 {
                     type==="Choose"&&selectedCollection.avatar.length?selectedCollection.symbol:type
                     // type==="Choose"&&selectedCollection.avatar.length?selectedCollection.symbol:type

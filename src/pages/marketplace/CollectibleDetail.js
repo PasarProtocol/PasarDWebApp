@@ -586,14 +586,16 @@ export default function CollectibleDetail() {
                 <Typography variant="subtitle2">Collection</Typography>
                 {
                   collection?
-                  <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
+                  <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ color: 'inherit' }}>
                     <Stack direction='row'>
                       {
                         collection.avatar?
                         <AvatarStyle draggable = {false} component="img" src={collection.avatar} />:
                         <AvatarStyle sx={{ p: 1 }} />
                       }
-                      <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>{collection.name} ({collection.symbol})</Typography>
+                      <Box sx={{ minWidth: 0, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{alignItems: 'center', wordBreak: 'break-all'}}>{collection.name} ({collection.symbol})</Typography>
+                      </Box>
                     </Stack>
                   </Link>:
                   <AvatarStyle sx={{ p: 1 }} />
