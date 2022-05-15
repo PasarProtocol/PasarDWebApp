@@ -65,7 +65,9 @@ const styles = {
   header: {
     width: '100%',
     border: 1,
-    borderLeft: 0,
+    // borderLeft: 0,
+    borderTopLeftRadius: '1em',
+    borderTopRightRadius: '1em',
     borderColor: (theme)=>theme.palette.divider,
     p: 1,
     mt: 0
@@ -239,7 +241,7 @@ export default function CarouselFeatures(props) {
   
   return (
     <RootStyle>
-        <Box ref={caseRef} sx={{width: 170, position: 'absolute', mt: 3, boxShadow: '1px 0px 0px rgba(145, 158, 171, 0.24)'}}>
+        <Box ref={caseRef} sx={{width: 170, position: 'absolute', mt: 3}}>
           <Table sx={{borderTopLeftRadius: '1em', borderBottomLeftRadius: '1em', bgcolor: 'origin.main'}}>
             <TableBody>
               {bodyTRs.caseBar}
