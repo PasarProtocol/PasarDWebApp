@@ -14,7 +14,7 @@ import { marketContract } from '../../config'
 
 const DETAILINFO_ICONS = ['hash', 'cash-hand', 'basket', 'tag', 'calendar-hammer', 'calendar-market', 'qricon']
 const DETAILINFO_TITLE = ['Token ID', 'Royalties', 'Quantity', 'Sale Type', 'Created Date', 'Date on Market', 'Item Type']
-const DETAILINFO_KEYS = ['tokenIdHex', 'royalties', 'quantity', 'SaleType', 'createTime', 'dateOnMarket', 'type']
+const DETAILINFO_KEYS = ['tokenIdHex', 'royalties', 'quantity', 'SaleType', 'createTime', 'marketTime', 'type']
 
 const RootStyle = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -73,6 +73,7 @@ export default function AssetDetailInfo({ detail }) {
     'key': DETAILINFO_KEYS[index],
   }))
   const creatimestamp = getTime(detail.createTime)
+  const marketimestamp = getTime(detail.marketTime)
   let dateOnMarket = detail.DateOnMarket
   if(dateOnMarket!=='Not on sale'){
     const timestamp = getTime(dateOnMarket)
@@ -83,6 +84,7 @@ export default function AssetDetailInfo({ detail }) {
     ...detail,
     'royalties': `${detail.royalties*100/10**6} %`,
     'createTime': `${creatimestamp.date} ${creatimestamp.time}`,
+    'marketTime': `${marketimestamp.date} ${marketimestamp.time}`,
     'dateOnMarket': dateOnMarket,
     'holder': detail.holder===marketContract?detail.royaltyOwner:detail.holder
   }
