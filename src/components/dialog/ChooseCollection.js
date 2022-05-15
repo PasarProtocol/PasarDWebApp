@@ -38,6 +38,23 @@ export default function ChooseCollection(props) {
   }, [])
 
   React.useEffect(() => {
+    if(collections.length) {
+      collections.forEach((item, _i)=>{
+        fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${item.token}`)
+          .then((response) => {
+            response.json().then((jsonData) => {
+              setCollections((prevStatus)=>{
+                const tempCollections = [...prevStatus]
+                tempCollections[_i].items = jsonData.data.total
+                return tempCollections
+              })
+            })
+          })
+      })
+    }
+  }, [collections]);
+
+  React.useEffect(() => {
     if(token) {
       const tokenIndex = collections.findIndex(item=>item.token===token)
       if(tokenIndex>=0) {
@@ -141,7 +158,7 @@ export default function ChooseCollection(props) {
                           </Typography>
                           <Typography variant="subtitle2" color="text.secondary" sx={{lineHeight: 1.2, fontWeight: 'normal'}} noWrap>
                             Contract Address : {reduceHexAddress(el.token)}<br/>
-                            Items : 0
+                            Items : {el.items}
                           </Typography>
                         </Box>
                         {
