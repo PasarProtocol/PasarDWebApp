@@ -211,7 +211,7 @@ export default function Features() {
                   {
                     Array(4).fill(0).map((_, _j)=>(
                       <CellBoxStyle key={_j} isHeaderCell={false} isLastRow={isLastItem} isLastColumn={_j===3} selected={degree===_j}>
-                        <CheckIcon isSupported={feature.allow[0]} selected={degree===_j}/>
+                        <CheckIcon isSupported={feature.allow[_j]} selected={degree===_j}/>
                       </CellBoxStyle>
                     ))
                   }
