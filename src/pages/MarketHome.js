@@ -148,7 +148,7 @@ export default function MarketHome() {
         </StackStyle>
       </Container>
       <Container maxWidth="xl" sx={{px: {sm: 3, md: 6, lg: 9}}}>
-        <Stack spacing={6}>
+        <Stack spacing={10}>
           {/* <MotionInView variants={varFadeInUp}> */}
             <Box>
               <TitleStyle component="h1">
@@ -187,7 +187,7 @@ export default function MarketHome() {
             <Box>
               <Stack direction='row'>
                 <TitleStyle component="h1" sx={{flex: 1}}>
-                  Live Auctions <span role="img" aria-label="">⏰</span>
+                  Auctions <span role="img" aria-label="">⏰</span>
                 </TitleStyle>
                 <Button
                     to='/marketplace'
