@@ -70,6 +70,8 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
     const coinType = getCoinTypeFromToken(item)
     const coinName = coinTypes[coinType].name
     let methodItem = MethodList.find((item)=>item.method===method)
+    const eventStyle = event==='Burn'?{color: '#e45f14'}:{color: 'inherit'}
+    const eventBorderStyle = event==='Burn'?{borderColor: '#e45f14'}:{borderColor: 'text.secondary'}
     if(!methodItem)
         methodItem = {color: 'grey', icon: 'tag', detail: []}
     return (
@@ -80,7 +82,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                 src={`/static/${methodItem.icon}.svg`}
                 sx={{ width: 48, height: 48, borderRadius: 1, mr: 2, background: methodItem.color, p: 2 }}
             />
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={eventStyle}>
                 <FirstGridStyle item xs={12} sm={12} md={8}>
                     <Grid container>
                         <Grid item xs={12} sm={isAlone?8:12}>
@@ -100,15 +102,15 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                             {el.description}&nbsp;
                                             {
                                                 el.field&&(
-                                                    <Typography variant="span" sx={{ color: 'text.secondary', fontWeight: 'normal', display: 'inline-block' }}>
+                                                    <Typography variant="span" color='text.secondary' sx={{ fontWeight: 'normal', display: 'inline-block', ...eventStyle }}>
                                                         {
                                                             el.copyable?
-                                                            <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink} color='text.secondary'>
+                                                            <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink} color='text.secondary' sx={eventStyle}>
                                                                 {displayValue}
                                                             </Link>:
                                                             displayValue
                                                         }
-                                                        {el.copyable?<CopyButton text={value}/>:` ${coinName}`}
+                                                        {el.copyable?<CopyButton text={value} sx={eventStyle}/>:` ${coinName}`}
                                                     </Typography>
                                                 )
                                             }
@@ -121,7 +123,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                 <Typography color="inherit" variant="subtitle2" noWrap>
                                     On &nbsp;
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', flex: 1 }}>
+                                <Typography variant="body2" color='text.secondary' sx={{ flex: 1, ...eventStyle }}>
                                     {timestamp.date} {timestamp.time}
                                 </Typography>
                             </StackRowStyle>
@@ -141,11 +143,11 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                         <TypographyStyle color="inherit" variant="subtitle2" noWrap align="right" alignsm="left">
                                             Tx Hash&nbsp;
                                         </TypographyStyle>
-                                        <TypographyStyle variant="body2" sx={{ color: 'text.secondary', flex: 1 }} noWrap align="right" alignsm="left">
-                                            <Link href={`${escURL}/tx/${tHash}`} sx={{ color: 'text.secondary', borderRadius: 1 }} target="_blank">
+                                        <TypographyStyle variant="body2" sx={{ flex: 1 }} noWrap align="right" alignsm="left">
+                                            <Link href={`${escURL}/tx/${tHash}`} color='text.secondary' sx={{ borderRadius: 1, ...eventStyle }} target="_blank">
                                                 {reduceHexAddress(tHash)}
                                                 <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
-                                                    <Icon icon={externalLinkFill} width="17px"/>
+                                                    <Icon icon={externalLinkFill} width="17px" {...eventStyle}/>
                                                 </IconButton>
                                             </Link>
                                         </TypographyStyle>
@@ -222,7 +224,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                                 </Typography>
                                             </td>
                                             <td align="right">
-                                                <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                                <Typography variant="body2" color='text.secondary' sx={eventStyle} noWrap>
                                                     {gasFee} ELA
                                                 </Typography>
                                             </td>
@@ -232,10 +234,10 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                 
                                 <tr>
                                     <td colSpan={2} align="right">
-                                        <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderBottom: "1px solid", borderColor: 'text.secondary'}}>
+                                        <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderBottom: "1px solid", ...eventBorderStyle}}>
                                             {method==="BuyOrder"?(price + gasFee):gasFee} ELA
                                         </Typography>
-                                        <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderColor: 'text.secondary', marginTop: '1px'}}/>
+                                        <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", marginTop: '1px', ...eventBorderStyle}}/>
                                     </td>
                                 </tr>
                             </tbody>

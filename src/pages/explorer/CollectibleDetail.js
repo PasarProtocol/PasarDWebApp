@@ -225,7 +225,7 @@ export default function CollectibleDetail() {
                       // defaultExpanded={1&&true}
                       sx={{
                         border: '1px solid',
-                        borderColor: 'action.disabledBackground',
+                        borderColor: item[0].event==='Burn'?'#e45f14':'action.disabledBackground',
                         boxShadow: (theme) => theme.customShadows.z1
                       }}
                     >
@@ -244,7 +244,7 @@ export default function CollectibleDetail() {
                       </AccordionDetails>
                     </Accordion>:
                     
-                    <PaperRecord sx={{p:2}}>
+                    <PaperRecord sx={{p:2, borderColor: item.event==='Burn'?'#e45f14':'action.disabledBackground'}}>
                       <TransactionOrderDetail
                         isAlone={1&&true}
                         item={ item }
