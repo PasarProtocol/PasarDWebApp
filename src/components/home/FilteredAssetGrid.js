@@ -141,14 +141,18 @@ export default function FilteredAssetGrid(props){
   const [filteredCollectibles, setFilteredCollectibles] = React.useState([]);
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
   const count = type==='all'?20:10
-  
+  let filterApi = `api/v2/sticker/getDetailedCollectibles?collectionType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=${count}`
+  if(type === 'recent_sold')
+    filterApi = "api/v2/sticker/getRecentlySold"
+  else if(type === 'live_auction')
+    filterApi = `api/v2/sticker/getDetailedCollectibles?collectionType=&tokenType=&status=On Auction,Has Ended&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=${count}`
   React.useEffect(async () => {
     setLoadingCollectibles(true);
-    fetchFrom(`api/v2/sticker/getDetailedCollectibles?collectionType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=${count}`)
+    fetchFrom(filterApi)
       .then((response) => {
         response.json().then((jsonAssets) => {
           if(jsonAssets.data){
-            setFilteredCollectibles(jsonAssets.data.result);
+            setFilteredCollectibles(type==='recent_sold'?jsonAssets.data:jsonAssets.data.result);
           }
           setLoadingCollectibles(false);
         }).catch((e) => {
