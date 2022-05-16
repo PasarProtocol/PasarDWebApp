@@ -68,10 +68,17 @@ function TransItem(props) {
   );
 }
 export default function CollectibleHistory(props) {
+  const historyData = props.dataList
+  historyData.forEach((trans, _i)=>{
+    if(trans.event==='OrderBid' && _i < (historyData.length-1) && historyData[_i+1].event==='BuyOrder'){
+      historyData[_i] = historyData[_i+1]
+      historyData[_i+1] = trans
+    }
+  })
   return (
     <Stack spacing={2}>
       {props.isLoading && <LoadingScreen />}
-      {props.dataList.map((trans, index) => (
+      {historyData.map((trans, index) => (
         <Box key={index}>
           <TransItem 
             trans={trans}
