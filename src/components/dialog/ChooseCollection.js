@@ -38,20 +38,6 @@ export default function ChooseCollection(props) {
   }, [])
 
   React.useEffect(() => {
-    if(collections.length) {
-      collections.forEach((item, _i)=>{
-        fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${item.token}`)
-          .then((response) => {
-            response.json().then((jsonData) => {
-              setCollections((prevStatus)=>{
-                const tempCollections = [...prevStatus]
-                tempCollections[_i].items = jsonData.data.total
-                return tempCollections
-              })
-            })
-          })
-      })
-    }
   }, [collections]);
 
   React.useEffect(() => {
@@ -77,24 +63,37 @@ export default function ChooseCollection(props) {
         }
       }
     }
-    collections.forEach((item, _id)=>{
-      if(!item.uri || item.avatar)
-        return
-      const metaUri = getIpfsUrl(item.uri)
-      if(metaUri) {
-        fetch(metaUri)
-          .then(response => response.json())
-          .then(data => {
-            setCollections((prevStatus)=>{
-              const tempCollections = [...prevStatus]
-              tempCollections[_id].avatar = getIpfsUrl(data.data.avatar)
-              return tempCollections
-            })
-          });
-      }
-    })
     
-  }, [collections]);
+    if(collections.length) {
+      collections.forEach((item, _i)=>{
+        fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${item.token}`)
+          .then((response) => {
+            response.json().then((jsonData) => {
+              setCollections((prevStatus)=>{
+                const tempCollections = [...prevStatus]
+                tempCollections[_i].items = jsonData.data.total
+                return tempCollections
+              })
+            })
+          })
+        
+        if(!item.uri || item.avatar)
+          return
+        const metaUri = getIpfsUrl(item.uri)
+        if(metaUri) {
+          fetch(metaUri)
+            .then(response => response.json())
+            .then(data => {
+              setCollections((prevStatus)=>{
+                const tempCollections = [...prevStatus]
+                tempCollections[_i].avatar = getIpfsUrl(data.data.avatar)
+                return tempCollections
+              })
+            });
+        }
+      })
+    }
+  }, [collections.length]);
 
   const choose = () => {
     setERCtype(collections[selectedId].is721?0:1)
