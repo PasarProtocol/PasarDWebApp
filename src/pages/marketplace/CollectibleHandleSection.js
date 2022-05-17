@@ -9,6 +9,7 @@ import { styled } from '@mui/material/styles';
 
 import { MHidden } from '../../components/@material-extend';
 import StyledButton from '../../components/signin-dlg/StyledButton';
+import DisclaimerDlg from '../../components/dialog/Disclaimer'
 import PurchaseDlg from '../../components/dialog/Purchase'
 import PlaceBidDlg from '../../components/dialog/PlaceBid'
 import SettleOrderDlg from '../../components/dialog/SettleOrder'
@@ -34,10 +35,12 @@ export default function CollectibleHandleSection(props) {
   const [clickedType, setClickedType] = useState('');
   const [didSignin, setSignin] = useState(false);
   const [auctionEnded, setAuctionEnded] = useState(false);
+  const [disclaimerOpen, setOpenDisclaimer] = useState(false);
   const [isOpenPurchase, setPurchaseOpen] = useState(false);
   const [isOpenPlaceBid, setPlaceBidOpen] = useState(false);
   const [isOpenSettleOrder, setSettleOrderOpen] = useState(false);
   const [isOpenCancel, setCancelOpen] = useState(false);
+  const [continuePurchase, setContinuePurchase] = useState(false);
   const [coinPrice, setCoinPrice] = useState([0,0]);
   const { pasarLinkAddress } = useSingin()
 
@@ -47,7 +50,7 @@ export default function CollectibleHandleSection(props) {
     if(clickedType&&!!sessionLinkFlag){
       setClickedType('')
       if(clickedType === 'buy')
-        setTimeout(()=>{setPurchaseOpen(true)}, 300)
+        setTimeout(handlePurchase, 300)
       else if(clickedType === 'bid')
         setTimeout(()=>{setPlaceBidOpen(true)}, 300)
     }
@@ -63,6 +66,20 @@ export default function CollectibleHandleSection(props) {
     })
   }, [collectible]);
 
+  useEffect(() => {
+    if(continuePurchase && !disclaimerOpen){
+      setPurchaseOpen(true)
+    }
+  }, [disclaimerOpen]);
+
+  const handlePurchase = ()=>{
+    if(localStorage.getItem('pa-yes') === '1'){
+      setPurchaseOpen(true)
+      return
+    }
+    setOpenDisclaimer(true)
+    setContinuePurchase(true)
+  }
   const setCoinPriceByType = (type, value) => {
     setCoinPrice((prevState) => {
       const tempPrice = [...prevState];
@@ -117,7 +134,7 @@ export default function CollectibleHandleSection(props) {
             </StyledButton>
             {
               !!(collectible.buyoutPrice*1)&&
-              <StyledButton variant="outlined" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
+              <StyledButton variant="outlined" fullWidth onClick={handlePurchase}>
                 Buy now for {round(collectible.buyoutPrice/1e18, 3)} {coinName}
               </StyledButton>
             }
@@ -188,7 +205,7 @@ export default function CollectibleHandleSection(props) {
     } else if(address!==collectible.holder && address!==collectible.royaltyOwner) {
       handleField = 
         didSignin?
-        <StyledButton variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}}>
+        <StyledButton variant="contained" fullWidth onClick={handlePurchase}>
           Buy
         </StyledButton>:
 
@@ -250,6 +267,7 @@ export default function CollectibleHandleSection(props) {
           }
         </>
       }
+      <DisclaimerDlg isOpen={disclaimerOpen} setOpen={setOpenDisclaimer}/>
       <PurchaseDlg
         isOpen={isOpenPurchase}
         setOpen={setPurchaseOpen}
