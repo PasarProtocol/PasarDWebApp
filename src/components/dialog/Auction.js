@@ -179,7 +179,7 @@ export default function Auction(props) {
   )
 
   const auctionNft = async () => {
-    if(!startingPrice)
+    if(!(startingPrice*1))
       enqueueSnackbar('Starting price is required.', { variant: 'warning' });
     else if(isReserveForAuction && !reservePrice.length)
       enqueueSnackbar('Reserve price is required.', { variant: 'warning' });
