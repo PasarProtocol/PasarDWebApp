@@ -22,6 +22,7 @@ import GavelIcon from '@mui/icons-material/Gavel';
 
 import Badge from '../Badge';
 import PaperRecord from '../PaperRecord';
+import DisclaimerDlg from '../dialog/Disclaimer';
 import SellDlg from '../dialog/Sell';
 import UpdateDlg from '../dialog/UpdatePrice';
 import CancelDlg from '../dialog/CancelSale';
@@ -61,6 +62,7 @@ export default function AssetCard(props) {
   }
   const [collection, setCollection] = React.useState(defaultCollection);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
+  const [disclaimerOpen, setOpenDisclaimer] = React.useState(false);
   const [sellOpen, setOpenSell] = React.useState(false);
   const [auctionOpen, setOpenAuction] = React.useState(false);
   const [updateOpen, setOpenUpdate] = React.useState(false);
@@ -70,6 +72,7 @@ export default function AssetCard(props) {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [settleOpen, setSettleOrderOpen] = React.useState(false);
   const [auctionEnded, setAuctionEnded] = React.useState(false);
+  const [continueAction, setContinueAction] = React.useState('');
 
   const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
   const { enqueueSnackbar } = useSnackbar();
@@ -117,6 +120,27 @@ export default function AssetCard(props) {
     return () => { isMounted = false };
   }, [baseToken]);
 
+  React.useEffect(() => {
+    if(continueAction && !disclaimerOpen){
+      if(continueAction==='sell')
+        setOpenSell(true)
+      else if(continueAction==='auction')
+        setOpenAuction(true)
+    }
+  }, [disclaimerOpen]);
+
+  const handlePutOnAction = (type)=>{
+    if(localStorage.getItem('pa-yes') === '1'){
+      if(type==='sell')
+        setOpenSell(true)
+      else if(type==='auction')
+        setOpenAuction(true)
+      return
+    }
+    setOpenDisclaimer(true)
+    setContinueAction(type)
+  }
+
   const checkHasEnded  = () => {
     const tempEndTime = endTime*1000
     if(!tempEndTime)
@@ -133,7 +157,7 @@ export default function AssetCard(props) {
       setOpenDownloadEssentialDlg(true)
       return
     }
-    setOpenSell(true)
+    handlePutOnAction('sell')
   }
   const handleClosePopup = (e) => {
     const type = e.target.getAttribute("value")
@@ -143,14 +167,14 @@ export default function AssetCard(props) {
           setOpenDownloadEssentialDlg(true)
           return
         }
-        setOpenSell(true)
+        handlePutOnAction('sell')
         break;
       case 'auction':
         if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
           setOpenDownloadEssentialDlg(true)
           return
         }
-        setOpenAuction(true)
+        handlePutOnAction('auction')
         break;
       case 'update':
         if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
@@ -438,6 +462,7 @@ export default function AssetCard(props) {
             } */}
           </Box>
         </PaperRecord>
+        <DisclaimerDlg isOpen={disclaimerOpen} setOpen={setOpenDisclaimer}/>
         <SellDlg isOpen={sellOpen} setOpen={setOpenSell} {...dlgProps}/>
         <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} {...dlgProps} orderType={orderType}/>
         <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} {...dlgProps}/>
