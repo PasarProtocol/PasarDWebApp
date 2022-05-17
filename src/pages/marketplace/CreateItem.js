@@ -30,6 +30,7 @@ import CoinSelect from '../../components/marketplace/CoinSelect';
 import MintBatchName from '../../components/marketplace/MintBatchName';
 import MintDlg from '../../components/dialog/Mint';
 import AccessDlg from '../../components/dialog/Access';
+import DisclaimerDlg from '../../components/dialog/Disclaimer';
 import ChooseCollectionDlg from '../../components/dialog/ChooseCollection';
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import NeedMoreDIADlg from '../../components/dialog/NeedMoreDIA';
@@ -112,6 +113,7 @@ export default function CreateItem() {
   const [coinType, setCoinType] = React.useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [chooseCollectionOpen, setChooseCollectionOpen] = React.useState(false);
+  const [disclaimerOpen, setOpenDisclaimer] = React.useState(false);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [moreDIAOpen, setOpenMoreDIA] = React.useState(false);
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps } = useMintDlg()
@@ -134,6 +136,9 @@ export default function CreateItem() {
   React.useEffect(async () => {
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
       navigate('/marketplace')
+    if(localStorage.getItem('pa-yes') === '1')
+      return
+    setOpenDisclaimer(true)
   }, []);
 
   React.useEffect(async () => {
@@ -1577,6 +1582,7 @@ export default function CreateItem() {
       </Container>
       <MintDlg/>
       <AccessDlg/>
+      <DisclaimerDlg isOpen={disclaimerOpen} setOpen={setOpenDisclaimer}/>
       <ChooseCollectionDlg 
         isOpen={chooseCollectionOpen}
         setOpen={setChooseCollectionOpen}
