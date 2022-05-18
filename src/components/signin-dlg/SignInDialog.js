@@ -327,10 +327,16 @@ export default function SignInDialog() {
 
         // HIVE START
         // TODO: IMPROVE HIVE LOGIN
-        await prepareConnectToHive()
-
-        await registerAllScript()
-        await createProfileCollection()
+        prepareConnectToHive()
+          .then(res=>(
+            registerAllScript()
+          ))
+          .then(result=>{
+            createProfileCollection()
+          })
+          .catch(error=>{
+            console.log("Register scripting error: ", error)
+          })
         // HIVE END
 
         let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0]

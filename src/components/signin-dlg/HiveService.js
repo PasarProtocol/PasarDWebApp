@@ -120,24 +120,57 @@ export const createCollection = async(channelName) => {
   }
 }
 
-export const registerScript = async(scriptName, executable, condition, allowAnonymousUser, allowAnonymousApp) => {
-  try {
+// export const registerScript = async(scriptName, executable, condition, allowAnonymousUser, allowAnonymousApp) => {
+//   try {
+//     const pasarDid = sessionStorage.getItem('PASAR_DID')
+//     const userDid = `did:elastos:${pasarDid}`
+//     const scriptingService = await getScriptingService(userDid)
+//     await scriptingService.registerScript(scriptName, executable, condition, allowAnonymousUser, allowAnonymousApp)
+//     return null
+//   } catch (error) {
+//     console.log("regisregisterScriptter error: ", error)
+//    // TODO throw error 
+//   }
+// }
+
+// export const callScript = async(scriptName, document, targetDid, appid = ApplicationDID) => {
+//   const scriptingService = await getScriptingService(targetDid)
+//   const result = await scriptingService.callScript(scriptName, document, targetDid, appid)
+//   return result
+// }
+
+export const registerScript = (scriptName, executable, condition, allowAnonymousUser, allowAnonymousApp) => (
+  new Promise((resolve, reject) => {
     const pasarDid = sessionStorage.getItem('PASAR_DID')
     const userDid = `did:elastos:${pasarDid}`
-    const scriptingService = await getScriptingService(userDid)
-    await scriptingService.registerScript(scriptName, executable, condition, allowAnonymousUser, allowAnonymousApp)
-    return null
-  } catch (error) {
-    console.log("regisregisterScriptter error: ", error)
-   // TODO throw error 
-  }
-}
+    getScriptingService(userDid)
+      .then(scriptingService=>(
+        scriptingService.registerScript(scriptName, executable, condition, allowAnonymousUser, allowAnonymousApp)
+      ))
+      .then(res=>{
+        resolve(res)
+      })
+      .catch(error => {
+        reject(error)
+        console.log("registerScript error: ", error)
+      });
+  })
+)
 
-export const callScript = async(scriptName, document, targetDid, appid = ApplicationDID) => {
-  const scriptingService = await getScriptingService(targetDid)
-  const result = await scriptingService.callScript(scriptName, document, targetDid, appid)
-  return result
-}
+export const callScript = (scriptName, document, targetDid, appid = ApplicationDID) => (
+  new Promise((resolve, reject) => {
+    getScriptingService(targetDid)
+      .then(scriptingService=>(
+        scriptingService.callScript(scriptName, document, targetDid, appid)
+      ))
+      .then(res=>{
+        resolve(res)
+      })
+      .catch(error => {
+        reject(error)
+      });
+  })
+)
 
 export const insertDBData = async(collectName, doc) => {
   try {

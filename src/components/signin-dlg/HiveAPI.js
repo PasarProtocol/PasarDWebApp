@@ -20,15 +20,24 @@ export const createProfileCollection = async() => {
 
 export function registerAllScript() {
   return new Promise((resolve, reject) => {
-    const description = registerScripting(DESCRIPTION)
-    const website = registerScripting(WEBSITE)
-    const twitter = registerScripting(TWITTER)
-    const discord = registerScripting(DISCORD)
-    const telegram = registerScripting(TELEGRAM)
-    const medium = registerScripting(MEDIUM)
-    const kycMe = registerScripting(KYC_ME)
-    const avatar = registerAvatarDownloadScripting()
-    const array = [description, website, twitter, discord, telegram, medium, kycMe, avatar]
+    // const description = registerScripting(DESCRIPTION)
+    // const website = registerScripting(WEBSITE)
+    // const twitter = registerScripting(TWITTER)
+    // const discord = registerScripting(DISCORD)
+    // const telegram = registerScripting(TELEGRAM)
+    // const medium = registerScripting(MEDIUM)
+    // const kycMe = registerScripting(KYC_ME)
+    // const avatar = registerAvatarDownloadScripting()
+    const array = [
+      registerScripting(DESCRIPTION), 
+      registerScripting(WEBSITE), 
+      registerScripting(TWITTER), 
+      registerScripting(DISCORD), 
+      registerScripting(TELEGRAM), 
+      registerScripting(MEDIUM), 
+      registerScripting(KYC_ME), 
+      registerFileDownloadScripting(AVATAR)
+    ]
     Promise.all(array).then(values => {
       console.log("Register scripting all Success, vaules = ", values)
       resolve('FINISH')
@@ -44,39 +53,71 @@ export const prepareConnectToHive = async() => {
   return result
 }
 
-export const registerScripting = async(scriptName) => {
-  try {
-    const executablefilter = {"property_identity": scriptName, "type": "public" }
+// export const registerScripting = async(scriptName) => {
+//   try {
+//     const executablefilter = {"property_identity": scriptName, "type": "public" }
 
+//     const options = { "projection": { "_id": false }, "limit": 1 }
+//     const executable = new FindExecutable("find_message", COLLECTION_NAME, executablefilter, options).setOutput(true)
+//     const result = await registerScript(scriptName, executable, null, false)
+//     console.log(`register scripting with ${scriptName} result: ${result}`)
+//     return result
+//   } catch (error) {
+//     console.log(`register scripting with ${scriptName} error: ${error}`)
+//     // TODO: throw error
+//     return error
+//   }
+// }
+
+export const registerScripting = (scriptName) => (
+  new Promise((resolve, reject) => {
+    const executablefilter = {"property_identity": scriptName, "type": "public" }
     const options = { "projection": { "_id": false }, "limit": 1 }
     const executable = new FindExecutable("find_message", COLLECTION_NAME, executablefilter, options).setOutput(true)
-    const result = await registerScript(scriptName, executable, null, false)
-    console.log(`register scripting with ${scriptName} result: ${result}`)
-    return result
-  } catch (error) {
-    console.log(`register scripting with ${scriptName} error: ${error}`)
-    // TODO: throw error
-    return error
-  }
-}
+    registerScript(scriptName, executable, null, false)
+      .then(result=>{
+        console.log(`register scripting with ${scriptName} result: ${result}`)
+        resolve(result)
+      })
+      .catch(error => {
+        console.log(`register scripting with ${scriptName} error: ${error}`)
+        reject(error)
+      })
+  })
+)
 
 const registerAvatarDownloadScripting = async() => {
   const result = await registerFileDownloadScripting(AVATAR)
   return result
 }
 
-const registerFileDownloadScripting = async(scriptName) => {
-  try {
+// const registerFileDownloadScripting = async(scriptName) => {
+//   try {
+//     const executable = new FileDownloadExecutable(scriptName).setOutput(true)
+//     const result = registerScript(scriptName, executable, null, false)
+//     console.log(`register file download scripting with ${scriptName} result: ${result}`)
+//     return result
+//   } catch (error) {
+//     console.log(`register file download scripting with ${scriptName} error: ${error}`)
+//     // TODO: throw error
+//     return error
+//   }
+// }
+
+const registerFileDownloadScripting = (scriptName) => (
+  new Promise((resolve, reject) => {
     const executable = new FileDownloadExecutable(scriptName).setOutput(true)
-    const result = registerScript(scriptName, executable, null, false)
-    console.log(`register file download scripting with ${scriptName} result: ${result}`)
-    return result
-  } catch (error) {
-    console.log(`register file download scripting with ${scriptName} error: ${error}`)
-    // TODO: throw error
-    return error
-  }
-}
+    registerScript(scriptName, executable, null, false)
+      .then(result=>{
+        console.log(`register file download scripting with ${scriptName} result: ${result}`)
+        resolve(result)
+      })
+      .catch(error => {
+        console.log(`register file download scripting with ${scriptName} error: ${error}`)
+        reject(error)
+      })
+  })
+)
 
 export const queryName = async(targetDid, appid = ApplicationDID) => {
   const result = await callQueryScript(NAME, targetDid, appid)
@@ -118,18 +159,33 @@ export const queryKycMe = async(targetDid, appid = ApplicationDID) => {
   return result
 }
 
-const callQueryScript = async(propertyIdentity, targetDid, appid = ApplicationDID) => {
-  try {
+// const callQueryScript = async(propertyIdentity, targetDid, appid = ApplicationDID) => {
+//   try {
+//     const doc = {"property_identity": propertyIdentity }
+//     const result = await callScript(propertyIdentity, doc, targetDid, appid)
+//     console.log(`call query ${propertyIdentity} result: ${result}.`)
+//     return result
+//   } catch (error) {
+//     console.log(`call query ${propertyIdentity} error: ${error}.`)
+//     // TODO: throw error
+//     return error
+//   }
+// }
+
+const callQueryScript = (propertyIdentity, targetDid, appid = ApplicationDID) => (
+  new Promise((resolve, reject) => {
     const doc = {"property_identity": propertyIdentity }
-    const result = await callScript(propertyIdentity, doc, targetDid, appid)
-    console.log(`call query ${propertyIdentity} result: ${result}.`)
-    return result
-  } catch (error) {
-    console.log(`call query ${propertyIdentity} error: ${error}.`)
-    // TODO: throw error
-    return error
-  }
-}
+    callScript(propertyIdentity, doc, targetDid, appid)
+      .then(result=>{
+        console.log(`call query ${propertyIdentity} result: ${result}.`)
+        resolve(result)
+      })
+      .catch(error=>{
+        console.log(`call query ${propertyIdentity} error: ${error}.`)
+        reject(error)
+      })
+  })
+)
 
 export const insertName = async(displayName, type = "public") =>{
   const result = await insertProperty(NAME, displayName, type)
