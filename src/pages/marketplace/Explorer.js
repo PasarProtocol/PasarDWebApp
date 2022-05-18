@@ -423,6 +423,9 @@ export default function MarketExplorer() {
                             if(nameId === rangeBtnId){
                               buttonName = `${range.min || 0} to ${range.max === ''?'inf':range.max} ELA`
                             }
+                            else if(nameId === adultBtnId){
+                              buttonName = `Explicit & Sensitive`
+                            }
                             return <Button
                               key={index}
                               variant="outlined"
@@ -568,6 +571,9 @@ export default function MarketExplorer() {
                           let buttonName = [...btnGroup.status, ...btnGroup.type][nameId]
                           if(nameId === rangeBtnId){
                             buttonName = `${filterForm.range.min || 0} to ${filterForm.range.max === ''?'inf':filterForm.range.max} ELA`
+                          }
+                          else if(nameId === adultBtnId){
+                            buttonName = `Explicit & Sensitive`
                           }
                           return <Button
                             key={index}
