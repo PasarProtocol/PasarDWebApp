@@ -96,45 +96,48 @@ export default function BadgeProfile(props) {
   }
 
   const fetchProfileData = (targetDid, didInfo)=>{
-    queryName(targetDid).then((res)=>{
-      if(res.find_message && res.find_message.items.length)
-        setDidInfoValue('name', res.find_message.items[0].display_name)
-      else
-        setDidInfoValue('name', didInfo.name)
-    }).catch(e=>{
-      console.log(e)
-    })
-    queryDescription(targetDid).then((res)=>{
-      if(res.find_message && res.find_message.items.length)
-        setDidInfoValue('description', res.find_message.items[0].display_name)
-      else
-        setDidInfoValue('description', didInfo.bio)
-    })
-    downloadAvatar(targetDid).then((res)=>{
-      if(res && res.length) {
-        const base64Content = res.reduce((content, code)=>{
-          content=`${content}${String.fromCharCode(code)}`;
-          return content
-        }, '')
-        setAvatarUrl(`data:image/png;base64,${base64Content}`)
-      }
-    })
-    queryKycMe(targetDid).then((res)=>{
-      if(res.find_message && res.find_message.items.length)
-        setBadgeFlag('kyc', true)
-      else
-        setBadgeFlag('kyc', false)
-    })
-    Object.keys(queryProfileSocials).forEach(field=>{
-      queryProfileSocials[field](targetDid).then((res)=>{
+    queryName(targetDid)
+      .then((res)=>{
         if(res.find_message && res.find_message.items.length)
-          setSocials((prevState) => {
-            const tempState = {...prevState}
-            tempState[field] = res.find_message.items[0].display_name
-            return tempState
+          setDidInfoValue('name', res.find_message.items[0].display_name)
+        else
+          setDidInfoValue('name', didInfo.name)
+
+        queryDescription(targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length)
+            setDidInfoValue('description', res.find_message.items[0].display_name)
+          else
+            setDidInfoValue('description', didInfo.bio)
+        })
+        downloadAvatar(targetDid).then((res)=>{
+          if(res && res.length) {
+            const base64Content = res.reduce((content, code)=>{
+              content=`${content}${String.fromCharCode(code)}`;
+              return content
+            }, '')
+            setAvatarUrl(`data:image/png;base64,${base64Content}`)
+          }
+        })
+        queryKycMe(targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length)
+            setBadgeFlag('kyc', true)
+          else
+            setBadgeFlag('kyc', false)
+        })
+        Object.keys(queryProfileSocials).forEach(field=>{
+          queryProfileSocials[field](targetDid).then((res)=>{
+            if(res.find_message && res.find_message.items.length)
+              setSocials((prevState) => {
+                const tempState = {...prevState}
+                tempState[field] = res.find_message.items[0].display_name
+                return tempState
+              })
           })
+        })
       })
-    })
+      .catch(e=>{
+        console.log(e)
+      })
   }
 
   const setDidInfoValue = (field, value)=>{

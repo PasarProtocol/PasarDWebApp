@@ -103,57 +103,63 @@ export default function EditProfile() {
       })
 
       const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`
-      queryName(targetDid).then((res)=>{
-        if(res.find_message && res.find_message.items.length) {
-          setDidInfoValue('name', res.find_message.items[0].display_name)
-          handleSetChecked(0)
-        } else {
-          setDidInfoValue('name', '')
-        }
-      })
-      queryDescription(targetDid).then((res)=>{
-        if(res.find_message && res.find_message.items.length) {
-          setDidInfoValue('description', res.find_message.items[0].display_name)
-          handleSetChecked(1)
-        } else {
-          setDidInfoValue('description', '')
-        }
-      })
-      downloadAvatar(targetDid).then((res)=>{
-        if(res && res.length) {
-          const base64Content = res.reduce((content, code)=>{
-            content=`${content}${String.fromCharCode(code)}`;
-            return content
-          }, '')
-          setAvatarUrl(`data:image/png;base64,${base64Content}`)
-        }
-      })
-      queryKycMe(targetDid).then((res)=>{
-        if(res.find_message && res.find_message.items.length) {
-          setBadgeFlag('kyc', true)
-          handleSetChecked(7)
-        }
-        else
-          setBadgeFlag('kyc', false)
-      })
-      Object.keys(queryProfileSocials).forEach((field, _i)=>{
-        queryProfileSocials[field](targetDid).then((res)=>{
+      queryName(targetDid)
+        .then((res)=>{
           if(res.find_message && res.find_message.items.length) {
-            setSocials((prevState) => {
-              const tempState = {...prevState}
-              tempState[field] = res.find_message.items[0].display_name
-              return tempState
-            })
-            handleSetChecked(_i+2)
+            setDidInfoValue('name', res.find_message.items[0].display_name)
+            handleSetChecked(0)
           } else {
-            setSocials((prevState) => {
-              const tempState = {...prevState}
-              delete tempState[field]
-              return tempState
-            })
+            setDidInfoValue('name', '')
           }
+
+          queryDescription(targetDid).then((res)=>{
+            if(res.find_message && res.find_message.items.length) {
+              setDidInfoValue('description', res.find_message.items[0].display_name)
+              handleSetChecked(1)
+            } else {
+              setDidInfoValue('description', '')
+            }
+          })
+          downloadAvatar(targetDid).then((res)=>{
+            if(res && res.length) {
+              const base64Content = res.reduce((content, code)=>{
+                content=`${content}${String.fromCharCode(code)}`;
+                return content
+              }, '')
+              setAvatarUrl(`data:image/png;base64,${base64Content}`)
+            }
+          })
+          queryKycMe(targetDid).then((res)=>{
+            if(res.find_message && res.find_message.items.length) {
+              setBadgeFlag('kyc', true)
+              handleSetChecked(7)
+            }
+            else
+              setBadgeFlag('kyc', false)
+          })
+          Object.keys(queryProfileSocials).forEach((field, _i)=>{
+            queryProfileSocials[field](targetDid).then((res)=>{
+              if(res.find_message && res.find_message.items.length) {
+                setSocials((prevState) => {
+                  const tempState = {...prevState}
+                  tempState[field] = res.find_message.items[0].display_name
+                  return tempState
+                })
+                handleSetChecked(_i+2)
+              } else {
+                setSocials((prevState) => {
+                  const tempState = {...prevState}
+                  delete tempState[field]
+                  return tempState
+                })
+              }
+            })
+          })
         })
-      })
+        .catch(e=>{
+          enqueueSnackbar('Loading data failed', { variant: 'error' });
+          console.log(e)
+        })
     }
   }, [updateState]);
 
