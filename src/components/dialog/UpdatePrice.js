@@ -13,7 +13,7 @@ import CoinSelect from '../marketplace/CoinSelect';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
-import { removeLeadingZero, isInAppBrowser, coinTypes, callContractMethod } from '../../utils/common';
+import { removeLeadingZero, isInAppBrowser, coinTypes, callContractMethod, isValidLimitPrice } from '../../utils/common';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
 
 
@@ -39,26 +39,28 @@ export default function UpdatePrice(props) {
     setOnValidation(false)
   };
 
-  const handlePrice = (event) => {
+  const handleChangePrice = (event) => {
     let priceValue = event.target.value;
     if (priceValue < 0) return;
     priceValue = removeLeadingZero(priceValue);
-    return priceValue
-  };
-
-  const handleChangePrice = (event) => {
-    const priceValue = handlePrice(event);
+    if (!isValidLimitPrice(priceValue)) return;
     setPrice(priceValue);
     setRcvPrice(math.round((priceValue * 98) / 100, 3));
   };
 
   const handleChangeReservePrice = (event) => {
-    const priceValue = handlePrice(event);
+    let priceValue = event.target.value;
+    if (priceValue < 0) return;
+    priceValue = removeLeadingZero(priceValue);
+    if (!isValidLimitPrice(priceValue)) return;
     setReservePrice(priceValue);
   };
 
   const handleChangeBuyoutPrice = (event) => {
-    const priceValue = handlePrice(event);
+    let priceValue = event.target.value;
+    if (priceValue < 0) return;
+    priceValue = removeLeadingZero(priceValue);
+    if (!isValidLimitPrice(priceValue)) return;
     setBuyoutPrice(priceValue);
   };
 

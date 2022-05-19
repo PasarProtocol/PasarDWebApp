@@ -23,7 +23,7 @@ import { InputStyle, InputLabelStyle } from '../CustomInput';
 import CustomSwitch from '../custom-switch';
 import CoinTypeLabel from '../CoinTypeLabel';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString } from '../../utils/common';
+import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString, isValidLimitPrice } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 
 export default function Auction(props) {
@@ -93,6 +93,7 @@ export default function Auction(props) {
     let priceValue = event.target.value;
     if (priceValue < 0) return;
     priceValue = removeLeadingZero(priceValue);
+    if (!isValidLimitPrice(priceValue)) return;
     if(type==="starting")
       setStartingPrice(priceValue);
     else if(type==="reserve")
