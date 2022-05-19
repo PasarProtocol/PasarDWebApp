@@ -18,7 +18,7 @@ import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
-import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, coinTypes } from '../../utils/common';
+import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, coinTypes, isValidLimitPrice } from '../../utils/common';
 
 export default function PlaceBid(props) {
   const navigate = useNavigate();
@@ -50,6 +50,7 @@ export default function PlaceBid(props) {
     let priceValue = event.target.value;
     if (priceValue < 0) return;
     priceValue = removeLeadingZero(priceValue);
+    if (!isValidLimitPrice(priceValue)) return;
     if(!!(info.buyoutPrice*1) && priceValue>=info.buyoutPrice/1e18)
       setBuynow(true)
     else
