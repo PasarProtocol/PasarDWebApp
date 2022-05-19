@@ -76,7 +76,7 @@ export default function ChartArea({by, is4Address}) {
       return
     setLoadingStatisData(true)
 
-    const resRealData = await fetchFrom(`sticker/api/v1/getStastisDataByWalletAddr?walletAddr=${params.address}`)
+    const resRealData = await fetchFrom(`api/v2/sticker/getStastisDataByWalletAddr/${params.address}`)
     const jsonData = await resRealData.json()
     const statisData = [jsonData.data.assets, jsonData.data.sold, jsonData.data.purchased, jsonData.data.transactions]
     setStatisData(statisData)
@@ -92,10 +92,10 @@ export default function ChartArea({by, is4Address}) {
     setLoadingVolumeChart(true);
     let suburl = '';
     if(by==="collectible")
-      suburl = `getNftPriceByTokenId?tokenId=${params.collection}`
+      suburl = `getNftPriceByTokenId/${params.collection}`
     else if(by==="address")
-      suburl = `getTotalRoyaltyandTotalSaleByWalletAddr?walletAddr=${params.address}&type=${volumeType}`
-    fetchFrom(`sticker/api/v1/${suburl}`, { signal }).then(response => {
+      suburl = `getTotalRoyaltyandTotalSaleByWalletAddr/${params.address}?type=${volumeType}`
+    fetchFrom(`api/v2/sticker/${suburl}`, { signal }).then(response => {
       response.json().then(jsonVolume => {
         if(jsonVolume.data)
           setVolumeList(jsonVolume.data);

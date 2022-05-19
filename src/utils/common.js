@@ -307,7 +307,7 @@ export async function checkWhetherGeneralCollection(contractAddress, connectProv
 
 export function getCredentialInfo(strAddress) {
   return new Promise((resolve, reject) => {
-    fetchFrom(`auth/api/v1/getCredentials?address=${strAddress}`).then(response=>{
+    fetchFrom(`api/v2/auth/getCredentials/${strAddress}`).then(response=>{
       response.json().then(jsonData => {
         resolve(jsonData.data)
       }).catch((err)=>{
@@ -677,7 +677,7 @@ export const getInfoFromDID = (did) =>
 
 export const getDidInfoFromAddress = (address) =>
   new Promise((resolve, reject) => {
-    fetchFrom(`pasar/api/v1/getDidByAddress?address=${address}`)
+    fetchFrom(`api/v2/pasar/getDidByAddress/${address}`)
       .then((response) => {
         response
           .json()

@@ -41,7 +41,7 @@ export default function SearchResult() {
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
   React.useEffect(async () => {
     setLoadingCollectibles(true);
-    fetchFrom(`sticker/api/v1/search?key=${params.key}`).then(response => {
+    fetchFrom(`api/v2/sticker/search/${params.key}`).then(response => {
       response.json().then(jsonCollectibles => {
         setTotalCount(jsonCollectibles.data.result.length)
         setCollectibles(jsonCollectibles.data.result);

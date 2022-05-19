@@ -21,7 +21,7 @@ export default function HomeAssetCard() {
     const [isAssetLoading, setAssetLoading] = React.useState(true);
 
     React.useEffect(() => {
-        fetchFrom('sticker/api/v1/getLatestPurchasedToken').then(response => {
+        fetchFrom('api/v2/sticker/getLatestPurchasedToken').then(response => {
             response.json().then(jsonAsset => {
                 if(jsonAsset.data)
                     setAsset(jsonAsset.data);

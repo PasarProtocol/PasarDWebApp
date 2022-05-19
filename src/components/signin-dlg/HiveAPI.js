@@ -15,7 +15,7 @@ const AVATAR = "avatar"
 const AVATAR_REMOTE_PATH = "pasarAvatar"
 
 export const createProfileCollection = async() => {
-  await  createCollection(COLLECTION_NAME)
+  await createCollection(COLLECTION_NAME)
 }
 
 export function registerAllScript() {
