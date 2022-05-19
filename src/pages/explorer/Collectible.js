@@ -52,7 +52,7 @@ export default function Collectible() {
     setAbortController(newController);
 
     setLoadingCollectibles(true);
-    fetchFrom(`sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetchFrom(`api/v2/sticker/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonCollectibles => {
         setTotalCount(jsonCollectibles.data.total)
         setPages(Math.ceil(jsonCollectibles.data.total/showCount));

@@ -34,12 +34,12 @@ export default function Explorer() {
   React.useEffect(async () => {
     setLoadingCollectibles(true);
     setLoadingTransactions(true);
-    const resCollectibles = await fetchFrom('sticker/api/v1/listStickers?pageNum=1&pageSize=10');
+    const resCollectibles = await fetchFrom('api/v2/sticker/listStickers?pageNum=1&pageSize=10');
     const jsonCollectibles = await resCollectibles.json();
     setNewestCollectibles(jsonCollectibles.data.result);
     setLoadingCollectibles(false);
 
-    const resTransactions = await fetchFrom('sticker/api/v1/listTrans?pageNum=1&pageSize=10');
+    const resTransactions = await fetchFrom('api/v2/sticker/listTrans?pageNum=1&pageSize=10');
     const jsonTransactions = await resTransactions.json();
     setLatestTransactions(jsonTransactions.data.results);
     setLoadingTransactions(false);

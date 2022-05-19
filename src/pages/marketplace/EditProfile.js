@@ -258,7 +258,7 @@ export default function EditProfile() {
         }, {});
         const birthDateCredential = credentials.find(c => c.getType().indexOf("BirthDateCredential") >= 0);
         const genderCredential = credentials.find(c => c.getType().indexOf("GenderCredential") >= 0);
-        const countryCredential = credentials.find(c => c.getType().indexOf("CountryCredential") >= 0);
+        const countryCredential = credentials.find(c => c.getType().indexOf("NationalityCredential") >= 0);
         if (!birthDateCredential && !genderCredential && !countryCredential && checkedItem[7]){
           stopProvide("Nothing to provide KYC-me credentials")
           return

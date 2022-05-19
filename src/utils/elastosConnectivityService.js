@@ -132,7 +132,7 @@ export default class ElastosConnectivityService {
           .withNoMatchRecommendations([
             { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
           ]),
-        ConnDID.simpleTypeClaim("Your country", "CountryCredential", false)
+        ConnDID.simpleTypeClaim("Your country", "NationalityCredential", false)
           .withIssuers(this[sTrustedProvider])
           .withNoMatchRecommendations([
             { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
@@ -161,7 +161,7 @@ export default class ElastosConnectivityService {
             .withNoMatchRecommendations([
               { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
             ]),
-          ConnDID.simpleTypeClaim("Your country", "CountryCredential", false)
+          ConnDID.simpleTypeClaim("Your country", "NationalityCredential", false)
             .withIssuers(this[sTrustedProvider])
             .withNoMatchRecommendations([
               { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
