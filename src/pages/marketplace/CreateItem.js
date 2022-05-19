@@ -46,7 +46,7 @@ import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import {TOKEN_721_ABI} from '../../abi/token721ABI'
 import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
 import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL, auctionOrderType} from '../../config'
-import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree } from '../../utils/common';
+import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, isValidLimitPrice } from '../../utils/common';
 import {requestSigndataOnTokenID} from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
@@ -267,6 +267,7 @@ export default function CreateItem() {
     if(priceValue<0)
       return
     priceValue = removeLeadingZero(priceValue)
+    if (!isValidLimitPrice(priceValue)) return;
     setPrice(priceValue)
     setRcvPrice(math.round(priceValue*98/100, 3))
   };
@@ -276,6 +277,7 @@ export default function CreateItem() {
     if(priceValue<0)
       return
     priceValue = removeLeadingZero(priceValue)
+    if (!isValidLimitPrice(priceValue)) return;
     setReservePrice(priceValue)
   };
 
@@ -284,13 +286,17 @@ export default function CreateItem() {
     if(priceValue<0)
       return
     priceValue = removeLeadingZero(priceValue)
+    if (!isValidLimitPrice(priceValue)) return;
     setBuyoutPrice(priceValue)
   };
 
   const handleChangeRoyalties = (event) => {
-    if(event.target.value<0 || event.target.value>20)
+    let royaltyValue = event.target.value
+    if(royaltyValue<0 || royaltyValue>20)
       return
-    setRoyalties(removeLeadingZero(event.target.value))
+    royaltyValue = removeLeadingZero(royaltyValue)
+    if (!isValidLimitPrice(royaltyValue)) return;
+    setRoyalties(royaltyValue)
   };
 
   const handleProperties = (properties, key, index, e) => {
