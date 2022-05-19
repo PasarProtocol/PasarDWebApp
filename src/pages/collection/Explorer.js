@@ -49,7 +49,8 @@ export default function Explorer() {
     fetchFrom(`api/v2/sticker/getCollection?sort=${orderType}`, { signal })
       .then((response) => {
         response.json().then((jsonAssets) => {
-          setCollections(jsonAssets.data);
+          if(Array.isArray(jsonAssets.data))
+            setCollections(jsonAssets.data);
           setLoadingCollections(false);
         }).catch((e) => {
           setLoadingCollections(false);
@@ -127,6 +128,12 @@ export default function Explorer() {
                 <CollectionCard info={info}/>
               </Grid>
             )
+          }
+          {
+            !collections.length &&
+            <Grid item xs={12}>
+              <Typography variant="h4" align='center'>No collection found!</Typography>
+            </Grid>
           }
         </Grid>
       </Container>
