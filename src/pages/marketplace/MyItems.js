@@ -98,7 +98,9 @@ export default function MyItems() {
       setWalletAddress(params.address)
       getDidInfoFromAddress(params.address)
         .then((info) => {
-          fetchProfileData(info.did, {name: info.name || '', bio: info.description || ''})
+          setDidInfo({'name': info.name || '', 'description': info.description || ''})
+          if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+            fetchProfileData(info.did, {name: info.name || '', bio: info.description || ''})
         })
         .catch((e) => {
         })
