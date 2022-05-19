@@ -63,7 +63,8 @@ export default function BadgeProfile(props) {
         .then((info) => {
           if(isMounted){
             setDidInfo({'name': info.name || '', 'description': info.description || ''})
-            fetchProfileData(info.did, {name: info.name || '', bio: info.description || ''})
+            if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+              fetchProfileData(info.did, {name: info.name || '', bio: info.description || ''})
           }
         })
       

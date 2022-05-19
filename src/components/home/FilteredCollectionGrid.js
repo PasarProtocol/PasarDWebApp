@@ -67,7 +67,8 @@ export default function FilteredCollectionGrid(props){
     fetchFrom('api/v2/sticker/getCollection')
       .then((response) => {
         response.json().then((jsonAssets) => {
-          setCollections(jsonAssets.data);
+          if(Array.isArray(jsonAssets.data))
+            setCollections(jsonAssets.data);
           setLoadingCollections(false);
         }).catch((e) => {
           setLoadingCollections(false);
