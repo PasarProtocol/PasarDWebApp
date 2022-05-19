@@ -323,6 +323,10 @@ export function removeLeadingZero(value) {
   return value.replace(/-/g, '').replace(/^0+(?!\.|$)/, '');
 }
 
+export function isValidLimitPrice(value) {
+  return /^[0-9]{0,8}((\.[0-9]{0,3})|)$/.test(value)
+}
+
 export function isNumberString(value) {
   return /^\d+\.?\d*$/.test(value)
 }
