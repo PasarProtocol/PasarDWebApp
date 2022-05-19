@@ -458,17 +458,15 @@ export default function MyProfile() {
                     <Grid container spacing={2}>
                       {
                         sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
-                        <Grid item xs={12} sm={6} md={4}>
-                          <PaperRecord sx={{display: 'flex', justifyContent: 'center', width: '100%', height: '100%', borderStyle: 'dashed', minHeight: 250}}>
-                            <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
-                              <StyledButton variant="contained" onClick={handleNavlink} to='/collection/create' sx={{mb: 2}}>
-                                Create new collection
-                              </StyledButton>
-                              <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
-                                Import existing collection
-                              </StyledButton>
-                            </Stack>
-                          </PaperRecord>
+                        <Grid item xs={12} sx={{display: 'flex', justifyContent: 'end'}}>
+                          <Stack direction='row' spacing={2}>
+                            <StyledButton variant="contained" onClick={handleNavlink} to='/collection/create'>
+                              Create
+                            </StyledButton>
+                            <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
+                              Import
+                            </StyledButton>
+                          </Stack>
                         </Grid>
                       }
                       {
