@@ -30,7 +30,7 @@ export default function CollectionSortSelect({ onChange, orderType, sortOptions,
     >
       {
         sortOptions.map((option, _i)=>(
-          <MenuItem value={_i}>{option}</MenuItem>
+          <MenuItem key={_i} value={_i}>{option}</MenuItem>
         ))
       }
     </Select>

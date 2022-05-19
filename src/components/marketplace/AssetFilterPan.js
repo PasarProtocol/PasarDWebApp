@@ -45,6 +45,9 @@ export default function AssetFilterPan(props){
     fetchFrom('api/v2/sticker/getCollection')
       .then((response) => {
         response.json().then((jsonCollections) => {
+          if(!Array.isArray(jsonCollections.data))
+            return
+
           const resCollections = [...jsonCollections.data].map(item=>{
             const tempItem = {...item, avatar: ''}
             return tempItem
