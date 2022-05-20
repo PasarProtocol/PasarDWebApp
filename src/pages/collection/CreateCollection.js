@@ -519,6 +519,9 @@ export default function CreateCollection() {
                 value={name}
                 onChange={handleInputName}
                 aria-describedby="name-error-text"
+                inputProps={{
+                  maxLength: 30
+                }}
               />
               <FormHelperText id="name-error-text" hidden={!isOnValidation||(isOnValidation&&name.length>0)}>Name is required</FormHelperText>
             </FormControl>
@@ -536,6 +539,9 @@ export default function CreateCollection() {
                 value={symbol}
                 onChange={handleInputSymbol}
                 aria-describedby="name-error-text"
+                inputProps={{
+                  maxLength: 15
+                }}
               />
               <FormHelperText id="name-error-text" hidden={!isOnValidation||(isOnValidation&&symbol.length>0)}>Symbol is required</FormHelperText>
             </FormControl>
@@ -573,6 +579,9 @@ export default function CreateCollection() {
                 aria-describedby="description-error-text"
                 sx={{mt: '-5px !important'}}
                 multiline={Boolean(true)}
+                inputProps={{
+                  maxLength: 500
+                }}
               />
               <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
             </FormControl>

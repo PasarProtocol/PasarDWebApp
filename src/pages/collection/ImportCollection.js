@@ -485,6 +485,9 @@ export default function ImportCollection() {
                 aria-describedby="description-error-text"
                 sx={{mt: '-5px !important'}}
                 multiline={Boolean(true)}
+                inputProps={{
+                  maxLength: 500
+                }}
               />
               <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
             </FormControl>

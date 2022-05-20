@@ -51,6 +51,12 @@ const SearchbarStyle = styled('div')(({ theme }) => ({
   }
 }));
 
+const ListItemTextStyle = styled(ListItemText)(({ theme }) => ({
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+}));
+
 const defaultPlaceHolder = "Search name, description, address and token ID"
 // ----------------------------------------------------------------------
 export default function Searchbar({placeholder}) {
@@ -270,7 +276,15 @@ export default function Searchbar({placeholder}) {
                               <ListItemAvatar>
                                 <Avatar alt="Collection" src={instanceCollectionAvatar[_i]} sx={{width: 30, height: 30}} />
                               </ListItemAvatar>
-                              <ListItemText primary={item.name} secondary={`by ${reduceHexAddress(item.owner)}`} />
+                              <ListItemTextStyle
+                                primary={item.name}
+                                secondary={`by ${reduceHexAddress(item.owner)}`}
+                                primaryTypographyProps={{
+                                  style: {
+                                    display: 'inline'
+                                  }
+                                }}
+                              />
                             </ListItemButton>
                           ))
                         }
@@ -292,7 +306,15 @@ export default function Searchbar({placeholder}) {
                               <ListItemAvatar>
                                 <Avatar alt="NFT" src={item.avatar} sx={{width: 30, height: 30}} />
                               </ListItemAvatar>
-                              <ListItemText primary={item.name} secondary={item.status} />
+                              <ListItemTextStyle
+                                primary={item.name}
+                                secondary={item.status}
+                                primaryTypographyProps={{
+                                  style: {
+                                    display: 'inline'
+                                  }
+                                }}
+                              />
                             </ListItemButton>
                           ))
                         }
@@ -314,7 +336,14 @@ export default function Searchbar({placeholder}) {
                               <ListItemAvatar>
                                 <Jazzicon address={item.address} size={30} sx={{mr: 0}}/>
                               </ListItemAvatar>
-                              <ListItemText primary={reduceHexAddress(item.address)}/>
+                              <ListItemText
+                                primary={reduceHexAddress(item.address)}
+                                primaryTypographyProps={{
+                                  style: {
+                                    display: 'inline'
+                                  }
+                                }}
+                              />
                             </ListItemButton>
                           ))
                         }

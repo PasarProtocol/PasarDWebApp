@@ -157,7 +157,7 @@ export default function ChooseCollection(props) {
                             sx={{ width: 56, height: 56, borderRadius: '100%', backgroundColor: 'black' }}
                         />
                         <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                          <Typography variant="h5" noWrap>
+                          <Typography variant="h5" sx={{wordBreak: 'break-all'}}>
                             {el.name}
                           </Typography>
                           <Typography variant="subtitle2" color="text.secondary" sx={{lineHeight: 1.2, fontWeight: 'normal'}} noWrap>

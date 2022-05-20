@@ -374,6 +374,9 @@ export default function EditCollection() {
                 value={collectionName}
                 onChange={handleInputName}
                 aria-describedby="name-error-text"
+                inputProps={{
+                  maxLength: 30
+                }}
               />
               <FormHelperText id="name-error-text" hidden={!isOnValidation||(isOnValidation&&collectionName.length>0)}>Name is required</FormHelperText>
             </FormControl>
@@ -387,6 +390,9 @@ export default function EditCollection() {
                 value={symbol}
                 readOnly={Boolean(true)}
                 aria-describedby="symbol-error-text"
+                inputProps={{
+                  maxLength: 15
+                }}
               />
               <FormHelperText id="symbol-error-text" hidden={!isOnValidation||(isOnValidation&&symbol.length>0)}>Symbol is not exist</FormHelperText>
             </FormControl>
@@ -420,6 +426,9 @@ export default function EditCollection() {
                 aria-describedby="description-error-text"
                 sx={{mt: '-5px !important'}}
                 multiline={Boolean(true)}
+                inputProps={{
+                  maxLength: 500
+                }}
               />
               <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
             </FormControl>

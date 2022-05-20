@@ -137,7 +137,7 @@ const CollectionImgBox = (props) => {
           ({ TransitionProps }) => (
             <Fade {...TransitionProps}>
               <Stack sx={{minWidth: 300, maxWidth: 400, p: 2, alignItems: 'center', borderRadius: 1, boxShadow: (theme) => theme.customShadows.z12, background: (theme) => theme.palette.background.paper}}>
-                <Typography variant="h5" noWrap>{name}</Typography>
+                <Typography variant="h5" sx={{wordBreak: 'break-all'}} align='center'>{name}</Typography>
                 <TypographyStyle variant="subtitle2" color="text.secondary" noWrap>{totalCount} items</TypographyStyle>
                 <Grid container sx={{pt: 2}}>
                   <Grid item sm={4} textAlign="center">

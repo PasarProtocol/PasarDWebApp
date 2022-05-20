@@ -100,7 +100,7 @@ const MintingTypeButton = (props)=>{
                     // type==="Choose"&&selectedCollection.avatar.length?selectedCollection.symbol:type
                 }
             </Typography>
-            <Typography variant="body2" sx={{ height: 30, fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1, sm: ''} }}>
+            <Typography variant="body2" sx={{ height: 30, fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1, sm: ''} }} noWrap>
                 {
                     type==="Choose"&&selectedCollection.avatar.length?selectedCollection.name:description
                 }

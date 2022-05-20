@@ -437,7 +437,7 @@ export default function CollectionDetail() {
                   avatar={avatar}
                 />
               </Box>
-              <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
+              <Typography variant="h2" component="div" align="center" sx={{ maxWidth: 900, m: 'auto !important', lineHeight: 1.1, wordBreak: 'break-all' }}>
                 {collection.name}
               </Typography>
               {
@@ -465,7 +465,7 @@ export default function CollectionDetail() {
                 <Box>
                   <StatisticPanel address={collection.token}/>
                 </Box>
-                <Typography variant="body2" component="div" align="center" color='text.secondary' sx={{maxWidth: 900, m: 'auto !important', pt: 2}}>
+                <Typography variant="body2" component="div" align="center" color='text.secondary' sx={{ maxWidth: 900, m: 'auto !important', pt: 2, wordBreak: 'break-all' }}>
                   {description}
                 </Typography>
                 <IconLinkButtonGroup {...socials}/>
