@@ -155,12 +155,8 @@ export default function CollectibleHandleSection(props) {
           priceText = `${round(currentBid/1e18, 3)} ${coinName}`
         if(address === collectible.holder && collectible.SaleType !== "Not on sale")
           handleField = 
-            didSignin?
             <StyledButton variant="contained" fullWidth onClick={(e)=>{setCancelOpen(true)}}>
               Cancel sale
-            </StyledButton>:
-            <StyledButton variant="contained" actiontype='remove' fullWidth onClick={openSignin}>
-              Sign in to Cancel sale
             </StyledButton>
         else
           auctionTextField = 
@@ -204,13 +200,8 @@ export default function CollectibleHandleSection(props) {
         </StyledButton>
     } else if(address === collectible.holder && collectible.SaleType !== "Not on sale") {
       handleField = 
-        didSignin?
         <StyledButton variant="contained" fullWidth onClick={(e)=>{setCancelOpen(true)}}>
           Cancel sale
-        </StyledButton>:
-        
-        <StyledButton variant="contained" actiontype='remove' fullWidth onClick={openSignin}>
-          Sign in to Cancel sale
         </StyledButton>
     } else if(address!==collectible.holder && address!==collectible.royaltyOwner) {
       handleField = 

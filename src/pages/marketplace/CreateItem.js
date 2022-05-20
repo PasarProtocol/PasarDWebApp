@@ -1144,7 +1144,7 @@ export default function CreateItem() {
                   </>:
                   <>
                     <UploadMultiFile
-                      showPreview={1&&true}
+                      showPreview={Boolean(true)}
                       error={isOnValidation&&!files.length}
                       files={files}
                       onDrop={handleDropMultiFile}
