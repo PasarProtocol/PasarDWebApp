@@ -202,6 +202,16 @@ export default function CollectibleHandleSection(props) {
         <StyledButton variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}}>
           Go back to Marketplace
         </StyledButton>
+    } else if(address === collectible.holder && collectible.SaleType !== "Not on sale") {
+      handleField = 
+        didSignin?
+        <StyledButton variant="contained" fullWidth onClick={(e)=>{setCancelOpen(true)}}>
+          Cancel sale
+        </StyledButton>:
+        
+        <StyledButton variant="contained" actiontype='remove' fullWidth onClick={openSignin}>
+          Sign in to Cancel sale
+        </StyledButton>
     } else if(address!==collectible.holder && address!==collectible.royaltyOwner) {
       handleField = 
         didSignin?
