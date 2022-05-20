@@ -233,7 +233,7 @@ export default function AssetFilterPan(props){
                           <ListItemIcon>
                             <Box draggable = {false} component={el.avatar?"img":"div"} src={el.avatar} sx={{ width: 24, height: 24, borderRadius: 2, p: el.avatar.startsWith('/static')?.5:0, backgroundColor: 'black' }} />
                           </ListItemIcon>
-                          <ListItemText primary={el.name} />
+                          <ListItemText primary={el.name} sx={{wordBreak: 'break-all'}}/>
                           {
                             filterProps.selectedCollections.includes(el.token)&&<CheckIcon/>
                           }

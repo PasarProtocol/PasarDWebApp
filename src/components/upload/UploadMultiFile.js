@@ -137,7 +137,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
       {fileRejections.length > 0 && <ShowRejectionItems />}
 
       <List disablePadding sx={{ ...(hasFile && { my: 3 }) }}>
-        <AnimatePresence>
+        {/* <AnimatePresence> */}
           {files.map((file) => {
             const { name, size, preview } = file;
             const key = isString(file) ? file : name;
@@ -146,8 +146,8 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
               return (
                 <ListItem
                   key={key}
-                  component={motion.div}
-                  {...varFadeInRight}
+                  // component={motion.div}
+                  // {...varFadeInRight}
                   sx={{
                     p: 0,
                     m: 0.5,
@@ -216,7 +216,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
               </ListItem>
             );
           })}
-        </AnimatePresence>
+        {/* </AnimatePresence> */}
       </List>
 
       {hasFile && (
