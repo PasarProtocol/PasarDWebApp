@@ -1178,6 +1178,9 @@ export default function CreateItem() {
                         value={singleName}
                         onChange={(e)=>{setSingleName(e.target.value)}}
                         aria-describedby="name-error-text"
+                        inputProps={{
+                          maxLength: 50
+                        }}
                       />
                       <FormHelperText id="name-error-text" hidden={!isOnValidation||(isOnValidation&&singleName.length>0)}>Item name is required</FormHelperText>
                     </FormControl>
@@ -1205,6 +1208,9 @@ export default function CreateItem() {
                     aria-describedby="description-error-text"
                     sx={{mt: '-5px !important'}}
                     multiline={Boolean(true)}
+                    inputProps={{
+                      maxLength: 300
+                    }}
                   />
                   <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
                 </FormControl>
