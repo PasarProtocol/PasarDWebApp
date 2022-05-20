@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
+import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import { merge } from 'lodash';
 import * as math from 'mathjs';
@@ -140,10 +141,9 @@ export default function ChartArea({by, is4Address}) {
     const dates = dateRangeBeforeDays(days)
     const tempValueArray = Array(dates.length).fill(0)
     volumeList.forEach(item=>{
-      const splitDate = item.onlyDate.split(" ")
-      let seekDate = splitDate[0]
+      let seekDate = format(item.onlyDate*1000, 'yyyy-MM-dd')
       if(period==='d' || period===null)
-        seekDate = splitDate.length>1?`${splitDate[0]} ${splitDate[1]}:00`:`${splitDate[0]} 00:00`
+        seekDate = format(item.onlyDate*1000, 'yyyy-MM-dd HH:00')
       const indexOfDate = dates.indexOf(seekDate);
       const value = item.price!==undefined?item.price:item.value;
       if(indexOfDate>=0)
