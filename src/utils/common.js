@@ -34,7 +34,7 @@ export const fetchFrom = (uri, props = {}) => {
   const backendURL =
     process.env.REACT_APP_ENV === 'production'
       ? process.env.REACT_APP_BACKEND_URL_PRODUCTION
-      : process.env.REACT_APP_BACKEND_URL_TEMP;
+      : process.env.REACT_APP_BACKEND_URL_TEST;
   return fetch(`${backendURL}/${uri}`, props);
 };
 
