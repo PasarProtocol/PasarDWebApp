@@ -137,7 +137,7 @@ const CollectionImgBox = (props) => {
           ({ TransitionProps }) => (
             <Fade {...TransitionProps}>
               <Stack sx={{minWidth: 300, maxWidth: 400, p: 2, alignItems: 'center', borderRadius: 1, boxShadow: (theme) => theme.customShadows.z12, background: (theme) => theme.palette.background.paper}}>
-                <Typography variant="h5" sx={{wordBreak: 'break-all'}} align='center'>{name}</Typography>
+                <Typography variant="h5" align='center' sx={{width: '100%'}} noWrap>{name}</Typography>
                 <TypographyStyle variant="subtitle2" color="text.secondary" noWrap>{totalCount} items</TypographyStyle>
                 <Grid container sx={{pt: 2}}>
                   <Grid item sm={4} textAlign="center">
@@ -369,7 +369,7 @@ const CollectionCardPaper = (props) => {
         </Box>
         <Box sx={{p:2}}>
           <Stack direction="column" sx={{justifyContent: 'center', textAlign: 'center'}}>
-            <TypographyStyle variant="h5" noWrap>{name}</TypographyStyle>
+            <Typography variant="h5" noWrap sx={{fontWeight: 'normal'}}>{name}</Typography>
             <Typography variant="subtitle2" component='div' sx={{fontWeight: 'normal'}}>
               by{' '}
               {
