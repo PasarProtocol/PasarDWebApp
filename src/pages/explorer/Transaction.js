@@ -161,11 +161,14 @@ export default function Transaction() {
           ))}
         </Grid>
         {
-            transactions.length>0?
+            transactions.length>0 &&
             <StackStyle  sx={{ mt: 2, display: 'block' }}>
                 <Pagination page={page} pages={pages} onChange={setPage}/>
                 <ShowSelect count={showCount} onChange={changeShowCount}/>
-            </StackStyle>:
+            </StackStyle>
+        }
+        {
+            !isLoadingTransactions && !transactions.length &&
             <Typography variant="h4" align='center' sx={{mt: 2}}>No transaction found!</Typography>
         }
       </Container>

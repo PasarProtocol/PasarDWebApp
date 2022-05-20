@@ -105,11 +105,14 @@ export default function Collectible() {
             </Grid>
         </Scrollbar>
         {
-            collectibles.length>0?
+            collectibles.length>0 &&
             <StackStyle  sx={{ mt: 2, display: 'block' }}>
                 <Pagination page={page} pages={pages} onChange={setPage}/>
                 <ShowSelect count={showCount} onChange={changeShowCount}/>
-            </StackStyle>:
+            </StackStyle>
+        }
+        {
+            !isLoadingCollectibles && !collectibles.length &&
             <Typography variant="h4" align='center'>No collectible found!</Typography>
         }
       </Container>
