@@ -62,7 +62,7 @@ export default function LatestTransactions(props) {
         </Box>
       ))}
       {
-        !props.dataList.length &&
+        !props.isLoading && !props.dataList.length &&
         <Typography variant="h5" align='center' sx={{mt: 2}}>No transaction found!</Typography>
       }
     </CollectionView>

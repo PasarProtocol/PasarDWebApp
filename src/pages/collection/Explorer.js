@@ -130,7 +130,7 @@ export default function Explorer() {
             )
           }
           {
-            !collections.length &&
+            !isLoadingCollections && !collections.length &&
             <Grid item xs={12}>
               <Typography variant="h4" align='center'>No collection found!</Typography>
             </Grid>

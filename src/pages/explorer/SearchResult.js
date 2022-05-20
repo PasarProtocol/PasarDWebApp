@@ -67,7 +67,10 @@ export default function SearchResult() {
         </StackStyle>
         {isLoadingCollectibles && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
         <Grid container spacing={2}>
-        {!collectibles.length&&<Grid item xs={12} align="center"><h3>No matching collectible found!</h3></Grid>}
+        {
+          !isLoadingCollectibles && !collectibles.length &&
+          <Grid item xs={12} align="center"><h3>No matching collectible found!</h3></Grid>
+        }
         {collectibles.map((item, key) => (
           <Grid key={key} item xs={12}>
               <PaperRecord sx={{

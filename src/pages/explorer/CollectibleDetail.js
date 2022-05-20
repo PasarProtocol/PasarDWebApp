@@ -62,35 +62,45 @@ export default function CollectibleDetail() {
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const imageRef = React.useRef();
   React.useEffect(async () => {
-    const resCollectible = await fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${params.collection}`);
-    const jsonCollectible = await resCollectible.json();
-    const jsonData = jsonCollectible.data
-    if(jsonData.baseToken && jsonData.baseToken===STICKER_ADDRESS) {
-      const defaultCollection = getCollectionTypeFromImageUrl(jsonData)
-      jsonData.collection = collectionTypes[defaultCollection].name
-      jsonData.is721 = false
-    }
-    else if(jsonData.baseToken && jsonData.baseToken!==STICKER_ADDRESS) {
-      jsonData.collection = ''
-      jsonData.is721 = false
-      fetchFrom(`api/v2/sticker/getCollection/${jsonData.baseToken}`)
-        .then((response) => {
-          response.json().then((jsonAssets) => {
-            if(!jsonAssets.data)
-              return
-            setCollectible((prevState)=>{
-              const tempCollectible = {...prevState}
-              tempCollectible.collection = jsonAssets.data.name
-              tempCollectible.is721 = jsonAssets.data.is721
-              return tempCollectible
-            });
-          }).catch((e) => {
-          });
+    const resCollectible = await 
+    fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${params.collection}`)
+      .then((response) => {
+        response.json().then((jsonCollectible) => {
+          if(!jsonCollectible.data){
+            setLoadingCollectible(false);
+            return
+          }
+          const jsonData = jsonCollectible.data
+          if(jsonData.baseToken && jsonData.baseToken===STICKER_ADDRESS) {
+            const defaultCollection = getCollectionTypeFromImageUrl(jsonData)
+            jsonData.collection = collectionTypes[defaultCollection].name
+            jsonData.is721 = false
+          }
+          else if(jsonData.baseToken && jsonData.baseToken!==STICKER_ADDRESS) {
+            jsonData.collection = ''
+            jsonData.is721 = false
+            fetchFrom(`api/v2/sticker/getCollection/${jsonData.baseToken}`)
+              .then((response) => {
+                response.json().then((jsonAssets) => {
+                  if(!jsonAssets.data)
+                    return
+                  setCollectible((prevState)=>{
+                    const tempCollectible = {...prevState}
+                    tempCollectible.collection = jsonAssets.data.name
+                    tempCollectible.is721 = jsonAssets.data.is721
+                    return tempCollectible
+                  });
+                }).catch((e) => {
+                });
+              })
+          }
+          setCollectible(jsonData);
+          setLoadingCollectible(false);
         })
-    }
-    setCollectible(jsonData);
-    setLoadingCollectible(false);
-
+      })
+      .catch(error=>{
+        setLoadingCollectible(false);
+      })
     
     function handleResize() {
       const { innerWidth: width } = window;
