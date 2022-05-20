@@ -27,12 +27,17 @@ export default function ChooseCollection(props) {
         fetchFrom(`api/v2/sticker/getCollectionByOwner/${essentialAddress}`)
           .then((response) => {
             response.json().then((jsonCollections) => {
+              if(!jsonCollections.data)
+                return
               const tempCollections = jsonCollections.data.map((item, index)=>{
                 const tempItem = {...item, avatar: '', index}
                 return tempItem
               })
               setCollections(tempCollections)
             })
+          })
+          .catch(error=>{
+            
           })
     }
   }, [])

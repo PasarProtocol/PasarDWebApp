@@ -279,7 +279,7 @@ export default function SignInDialog() {
     // let presentation;
     try {
       const presentation = await didAccess.requestCredentials({
-        claims: [DID.simpleIdClaim('Your name', 'name', false), DID.simpleIdClaim('Your description', 'description', false)]
+        claims: [DID.simpleIdClaim('Your avatar', 'avatar', false), DID.simpleIdClaim('Your name', 'name', false), DID.simpleIdClaim('Your description', 'description', false)]
       });
       if (presentation) {
         const did = presentation.getHolder().getMethodSpecificId() || '';

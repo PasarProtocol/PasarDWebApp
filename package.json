@@ -97,6 +97,7 @@
     "firebase": "^8.10.0",
     "formik": "^2.2.9",
     "framer-motion": "^4.1.17",
+    "gif-me-duration": "^1.0.8",
     "highlight.js": "^11.2.0",
     "history": "^5.0.1",
     "i18next": "^20.6.1",

@@ -8003,7 +8003,7 @@ command-line-usage@6.1.1:
     table-layout "^1.0.1"
     typical "^5.2.0"
 
-commander@2, commander@^2.20.0:
+commander@2, commander@^2.20.0, commander@^2.9.0:
   version "2.20.3"
   resolved "https://registry.npmjs.org/commander/-/commander-2.20.3.tgz"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
@@ -11592,6 +11592,22 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
+gif-me-duration@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/gif-me-duration/-/gif-me-duration-1.0.8.tgz#f8eadedb6b28ef67c891e05187a3decad0b73d1e"
+  integrity sha512-3K/n+lkReDld7DC3+Ok2uBa4kUbTE9SpmNRk1BMfBMCE9ueOFJ+sxVZIVwEaDyzQahs2BkETQ5PbzjhLruNiZQ==
+  dependencies:
+    gify-parse "^1.0.6"
+    node-fetch "^2.6.0"
+
+gify-parse@^1.0.6:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/gify-parse/-/gify-parse-1.0.7.tgz#d562608c297834f03c5206b5a673c8d62956c163"
+  integrity sha512-gmrd8Tl/535xdlXnJVutY+7KyLsz+ZTvVRBy+Kqntdw5eZsE8WWtyGZWTRvOC4597Qv8//W8twokSI2IFoJZAA==
+  dependencies:
+    commander "^2.9.0"
+    jdataview "^2.5.0"
+
 git-config-path@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/git-config-path/-/git-config-path-1.0.1.tgz#6d33f7ed63db0d0e118131503bab3aca47d54664"
@@ -13780,6 +13796,11 @@ javascript-natural-sort@^0.7.1:
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/javascript-natural-sort/-/javascript-natural-sort-0.7.1.tgz#f9e2303d4507f6d74355a73664d1440fb5a0ef59"
   integrity sha1-+eIwPUUH9tdDVac2ZNFED7Wg71k=
+
+jdataview@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/jdataview/-/jdataview-2.5.0.tgz#3081b3fea651f9317ec6bd4feb2ddc98aa41d595"
+  integrity sha1-MIGz/qZR+TF+xr1P6y3cmKpB1ZU=
 
 jest-changed-files@^26.6.2:
   version "26.6.2"
