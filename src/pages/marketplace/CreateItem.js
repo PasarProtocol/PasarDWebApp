@@ -15,6 +15,7 @@ import { useSnackbar } from 'notistack';
 import { LoadingButton } from '@mui/lab';
 import { addDays } from 'date-fns';
 import jwtDecode from 'jwt-decode';
+import gifDurations from 'gif-me-duration';
 
 // components
 import { MHidden } from '../../components/@material-extend';
@@ -53,7 +54,6 @@ import useOffSetTop from '../../hooks/useOffSetTop';
 import useMintDlg from '../../hooks/useMintDlg';
 import useSingin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
-
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -164,6 +164,33 @@ export default function CreateItem() {
   }, [isOpenMint]);
 
   React.useEffect(() => {
+    if(itemtype==='Avatar'){
+      if(mintype==='Single' && file){
+        if(file.size>5*1024*1024) {
+          enqueueSnackbar('Allow up to 5 MB of avatar image', { variant: 'warning' });
+          setFile(null)
+          return
+        }
+        const reader = new FileReader();
+        reader.onload = function (f) {
+          const data = f.target.result;
+          const img = document.createElement('img');
+          img.src = data;
+          img.onload = function() {
+            if(img.width!==600 || img.height!==600) {
+              enqueueSnackbar('Avatar image must be 600x600 pixels', { variant: 'warning' });
+              setFile(null)
+            }
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+      if(mintype==="Batch")
+        setFiles([])
+    }
+  }, [itemtype]);
+
+  React.useEffect(() => {
     switch(coinType){
       case 0:
         getCoinUSD().then((res) => {
@@ -201,16 +228,49 @@ export default function CreateItem() {
       setMultiProperties([...Array(files.length)].map(el=>([{type: '', name: ''}])))
   }, [files]);
 
-  const handleDropSingleFile = React.useCallback((acceptedFiles) => {
+  const handleDropSingleFile = React.useCallback(async (acceptedFiles) => {
     const accepted = acceptedFiles[0];
     if (accepted) {
-      setFile(
-        Object.assign(accepted, {
-          preview: URL.createObjectURL(accepted)
-        })
-      )
+      if(itemtype==='Avatar'){
+        if(accepted.size>5*1024*1024) {
+          enqueueSnackbar('Allow up to 5 MB of avatar image', { variant: 'warning' });
+          return
+        }
+        
+        if(accepted.type.endsWith('gif')) {
+          const result = await gifDurations(URL.createObjectURL(accepted));
+          if(result[0].duration >= 10*1000){
+            enqueueSnackbar('Allow less than 10s of gif avatar image', { variant: 'warning' });
+            return
+          }
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (f) {
+          const data = f.target.result;
+          const img = document.createElement('img');
+          img.src = data;
+          img.onload = function() {
+            if(img.width===600 && img.height===600)
+              setFile(
+                Object.assign(accepted, {
+                  preview: URL.createObjectURL(accepted)
+                })
+              )
+            else
+              enqueueSnackbar('Avatar image must be 600x600 pixels', { variant: 'warning' });
+          };
+        };
+        reader.readAsDataURL(accepted);
+      } else {
+        setFile(
+          Object.assign(accepted, {
+            preview: URL.createObjectURL(accepted)
+          })
+        )
+      }
     }
-  }, []);
+  }, [itemtype]);
 
   const handleDropMultiFile = React.useCallback((acceptedFiles) => {
       acceptedFiles.splice(20)
@@ -218,15 +278,51 @@ export default function CreateItem() {
         enqueueSnackbar('Allow at least 2 items!', { variant: 'warning' });
         return
       }
-      setFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file)
-          })
-        )
-      );
+      if(itemtype==='Avatar'){
+        acceptedFiles.forEach(async (eachFile, _i)=>{
+          if(eachFile.size>5*1024*1024) {
+            enqueueSnackbar('Allow up to 5 MB of avatar image', { variant: 'warning' });
+            return
+          }
+          
+          if(eachFile.type.endsWith('gif')) {
+            const result = await gifDurations(URL.createObjectURL(eachFile));
+            if(result[0].duration >= 10*1000){
+              enqueueSnackbar('Allow less than 10s of gif avatar image', { variant: 'warning' });
+              return
+            }
+          }
+          
+          const reader = new FileReader();
+          reader.onload = function (f) {
+            const data = f.target.result;
+            const img = document.createElement('img');
+            img.src = data;
+            img.onload = function() {
+              if(img.width===600 && img.height===600)
+                setFiles((prevState)=>{
+                  const tempFiles = [...prevState]
+                  tempFiles.push(Object.assign(eachFile, {
+                    preview: URL.createObjectURL(eachFile)
+                  }))
+                });
+              else
+                enqueueSnackbar('Avatar image must be 600x600 pixels', { variant: 'warning' });
+            };
+          };
+          reader.readAsDataURL(eachFile);
+        })
+      } else {
+        setFiles(
+          acceptedFiles.map((file) =>
+            Object.assign(file, {
+              preview: URL.createObjectURL(file)
+            })
+          )
+        );
+      }
     },
-    [setFiles]
+    [setFiles, itemtype]
   );
 
   const handleSingleRemove = (file) => {
