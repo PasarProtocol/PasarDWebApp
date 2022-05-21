@@ -1,6 +1,6 @@
 // material
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
@@ -49,7 +49,8 @@ const PaperStyle = (props) => (
 // ----------------------------------------------------------------------
 const DefaultPageSize = 5;
 export default function CollectibleDetail() {
-  const params = useParams(); // params.collection
+  const location = useLocation();
+  const { tokenId, baseToken } = location.state || {}
   const [collectible, setCollectible] = React.useState({});
   const [transRecord, setTransRecord] = React.useState([]);
   const [detailPageSize, setDetailPageSize] = React.useState(DefaultPageSize);
@@ -63,7 +64,7 @@ export default function CollectibleDetail() {
   const imageRef = React.useRef();
   React.useEffect(async () => {
     const resCollectible = await 
-    fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${params.collection}`)
+    fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`)
       .then((response) => {
         response.json().then((jsonCollectible) => {
           if(!jsonCollectible.data){
@@ -124,7 +125,7 @@ export default function CollectibleDetail() {
     setAbortController(newController);
 
     setLoadingTransRecord(true);
-    fetchFrom(`api/v2/sticker/getTranDetailsByTokenId?tokenId=${params.collection}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetchFrom(`api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${baseToken}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
         setTotalCount(jsonTransactions.data.length)
         const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {

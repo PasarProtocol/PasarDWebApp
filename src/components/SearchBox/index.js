@@ -276,7 +276,13 @@ export default function SearchBox(props) {
                   <Divider />
                   {
                     instanceSearchResult.items.map((item, _i)=>(
-                      <ListItemButton key={_i} component={RouterLink} to={`/marketplace/detail/${item.tokenId}`} onClick={handleLinkClick}>
+                      <ListItemButton
+                        key={_i}
+                        component={RouterLink}
+                        to='/marketplace/detail'
+                        state={{tokenId: item.tokenId, baseToken: item.baseToken}}
+                        onClick={handleLinkClick}
+                      >
                         <ListItemAvatar>
                           <Avatar alt="NFT" src={item.avatar} sx={{width: 30, height: 30}} />
                         </ListItemAvatar>

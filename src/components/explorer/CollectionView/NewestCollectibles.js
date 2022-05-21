@@ -15,10 +15,10 @@ CollectibleItem.propTypes = {
 };
 
 function CollectibleItem({ news }) {
-  const { image, title, tokenId, tokenIdHex, postedAt, creator } = news;
+  const { image, title, tokenId, baseToken, tokenIdHex, postedAt, creator } = news;
   return (
       <Stack direction="row" alignItems="center" spacing={2}>
-          <Link to={`/explorer/collectible/detail/${tokenId}`} component={RouterLink} sx={{borderRadius: 1}} >
+          <Link to='/explorer/collectible/detail' state={{tokenId, baseToken}} component={RouterLink} sx={{borderRadius: 1}} >
             <Box
                 draggable = {false}
                 component="img"
@@ -29,7 +29,7 @@ function CollectibleItem({ news }) {
             />
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-              <Link to={`/explorer/collectible/detail/${tokenId}`} component={RouterLink} color="text.primary">
+              <Link to='/explorer/collectible/detail' state={{tokenId, baseToken}} component={RouterLink} color="text.primary">
                 <Typography variant="subtitle2" noWrap>
                   {title}
                 </Typography>
@@ -66,6 +66,7 @@ export default function NewestCollectibles(props) {
               creator: collectible.royaltyOwner,
               postedAt: collectible.createTime*1000,
               tokenId: collectible.tokenId,
+              baseToken: collectible.baseToken,
               tokenIdHex: collectible.tokenIdHex
             }}
           />

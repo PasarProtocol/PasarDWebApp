@@ -268,9 +268,9 @@ export default function MyItems() {
     sessionStorage.setItem('disp-mode', mode);
     setDispmode(mode);
   };
-  const link2Detail = (tokenId) => {
-    navigate(`/explorer/collectible/detail/${tokenId}`);
-  };
+  const link2Detail = (tokenId, baseToken)=>{
+    navigate('/explorer/collectible/detail', {state: {tokenId, baseToken}});
+  }
   const loadingSkeletons = Array(10).fill(null)
 
   return (
