@@ -367,7 +367,8 @@ export default function AssetCard(props) {
             isLink?(
               <Link
                 component={RouterLink}
-                to={isMoreLink?`/collection/detail/${baseToken}`:`/marketplace/detail/${tokenId}`}
+                to={isMoreLink?`/collection/detail/${baseToken}`:'/marketplace/detail'}
+                state={{tokenId, baseToken}}
                 alt=""
                 underline="none"
                 onClick={(e)=>{if(isDragging) e.preventDefault()}}

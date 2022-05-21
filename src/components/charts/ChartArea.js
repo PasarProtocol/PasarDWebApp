@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { merge } from 'lodash';
 import * as math from 'mathjs';
@@ -34,7 +34,9 @@ const getUTCdate = (date)=>{
   return [m, d, y].join("-");
 }
 export default function ChartArea({by, is4Address}) {
-  const params = useParams();
+  const params = useParams(); // params.address
+  const location = useLocation();
+  const { tokenId, baseToken } = location.state || {}
   const { themeMode } = useSettings();
   const [period, setPeriod] = useState('a');
   const [volumeType, setType] = useState(by==="address"?1:0);
@@ -95,7 +97,7 @@ export default function ChartArea({by, is4Address}) {
     setLoadingVolumeChart(true);
     let suburl = '';
     if(by==="collectible")
-      suburl = `getNftPriceByTokenId/${params.collection}`
+      suburl = `getNftPriceByTokenId/${tokenId}/${baseToken}`
     else if(by==="address")
       suburl = `getTotalRoyaltyandTotalSaleByWalletAddr/${params.address}?type=${volumeType}`
     fetchFrom(`api/v2/sticker/${suburl}`, { signal }).then(response => {

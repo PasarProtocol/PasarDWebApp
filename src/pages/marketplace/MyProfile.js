@@ -288,9 +288,10 @@ export default function MyProfile() {
     sessionStorage.setItem('disp-mode', mode);
     setDispmode(mode);
   };
-  const link2Detail = (tokenId) => {
-    navigate(`/explorer/collectible/detail/${tokenId}`);
-  };
+
+  const link2Detail = (tokenId, baseToken)=>{
+    navigate('/explorer/collectible/detail', {state: {tokenId, baseToken}});
+  }
 
   const handleNavlink = (e)=>{
     const path = e.target.getAttribute('to')

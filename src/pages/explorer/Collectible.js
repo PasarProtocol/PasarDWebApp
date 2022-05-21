@@ -71,8 +71,8 @@ export default function Collectible() {
   const handleDateOrder = (selected)=>{
     setTimeOrder(selected)
   }
-  const link2Detail = (tokenId)=>{
-    navigate(`/explorer/collectible/detail/${tokenId}`);
+  const link2Detail = (tokenId, baseToken)=>{
+    navigate('/explorer/collectible/detail', {state: {tokenId, baseToken}});
   }
   return (
     <RootStyle title="Collectible | PASAR">
@@ -94,7 +94,7 @@ export default function Collectible() {
                         textAlign: 'center',
                         cursor: 'pointer'
                       }}
-                      onClick={()=>link2Detail(item.tokenId)}
+                      onClick={()=>link2Detail(item.tokenId, item.baseToken)}
                     >
                         <CollectibleListItem
                             item={item}

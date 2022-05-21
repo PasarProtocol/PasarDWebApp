@@ -53,8 +53,8 @@ export default function SearchResult() {
     });
   }, [params.key]);
   
-  const link2Detail = (tokenId)=>{
-    navigate(`/explorer/collectible/detail/${tokenId}`);
+  const link2Detail = (tokenId, baseToken)=>{
+    navigate('/explorer/collectible/detail', {state: {tokenId, baseToken}});
   }
   return (
     <RootStyle title="Search | PASAR">
@@ -77,7 +77,7 @@ export default function SearchResult() {
                   textAlign: 'center',
                   cursor: 'pointer'
                 }}
-                onClick={()=>link2Detail(item.tokenId)}
+                onClick={()=>link2Detail(item.tokenId, item.baseToken)}
               >
                 <CollectibleListItem
                     item={item}

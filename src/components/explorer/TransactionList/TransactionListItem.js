@@ -35,7 +35,7 @@ export default function TransactionListItem({ item }) {
                     src={`/static/${methodItem.icon}.svg`}
                     sx={{ width: 48, height: 48, borderRadius: 1, mr: 2, background: methodItem.color, p: 2 }}
                 />:
-                <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink} sx={{borderRadius: 1}} >
+                <Link to='/explorer/collectible/detail' state={{tokenId: item.tokenId, baseToken: item.baseToken}} component={RouterLink} sx={{borderRadius: 1}} >
                     <Box
                         draggable = {false}
                         component="img"
@@ -51,7 +51,7 @@ export default function TransactionListItem({ item }) {
                     <Typography color="inherit" variant="subtitle2" noWrap>
                         Name
                     </Typography>
-                    <Link to={`/explorer/collectible/detail/${item.tokenId}`} component={RouterLink} color='text.secondary'>
+                    <Link to='/explorer/collectible/detail' state={{tokenId: item.tokenId, baseToken: item.baseToken}} component={RouterLink} color='text.secondary'>
                         <Typography variant="body2">
                             {item.name}
                         </Typography>

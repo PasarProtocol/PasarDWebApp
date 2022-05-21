@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
+import { useLocation, Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { round } from 'mathjs'
 import { format } from 'date-fns';
 import Lightbox from 'react-image-lightbox';
@@ -122,7 +122,8 @@ const BidStatus = ({isReserveMet}) => (
 // ----------------------------------------------------------------------
 export default function CollectibleDetail() {
   const navigate = useNavigate();
-  const params = useParams(); // params.collection
+  const location = useLocation();
+  const { tokenId, baseToken } = location.state || {}
   const [isFullScreen, setFullScreen] = React.useState(false);
   const [isOpenSharePopup, setOpenSharePopup] = React.useState(null);
   const [isOpenMorePopup, setOpenMorePopup] = React.useState(null);
@@ -164,7 +165,7 @@ export default function CollectibleDetail() {
       setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
     })
     determineDispCount()
-  }, [params.collection])
+  }, [tokenId])
 
   function determineDispCount() {
     const { innerWidth: width } = window;
@@ -220,7 +221,7 @@ export default function CollectibleDetail() {
   }, [account, pasarLinkAddress]);
   React.useEffect(async () => {
     window.scrollTo(0,0)
-    const resCollectible = await fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${params.collection}`);
+    const resCollectible = await fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`);
     const jsonCollectible = await resCollectible.json();
     if(jsonCollectible.data){
       try{
@@ -250,7 +251,7 @@ export default function CollectibleDetail() {
             });
           })
         getCollectiblesInCollection4Preview(jsonCollectible.data.baseToken, 5).then(res=>{
-          setCollectiblesInCollection(res.filter(item=>item.tokenId !== params.collection))
+          setCollectiblesInCollection(res.filter(item=>item.tokenId !== tokenId))
         })
         getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
           if(dia!=='0')
@@ -305,11 +306,11 @@ export default function CollectibleDetail() {
       }
     }
     setLoadingCollectible(false);
-  }, [updateCount, params.collection]);
+  }, [updateCount, tokenId]);
   
   React.useEffect(async () => {
     setLoadingTransRecord(true);
-    fetchFrom(`api/v2/sticker/getTranDetailsByTokenId?tokenId=${params.collection}&method=&timeOrder=-1`).then(response => {
+    fetchFrom(`api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${baseToken}&method=&timeOrder=-1`).then(response => {
       response.json().then(jsonTransactions => {
         setTransRecord(jsonTransactions.data.filter((trans)=>
           !((trans.event==="SafeTransferFrom"||trans.event==="SafeTransferFromWithMemo") && (trans.to===blankAddress||trans.to===marketContract))
@@ -320,7 +321,7 @@ export default function CollectibleDetail() {
       if(e.code !== e.ABORT_ERR)
         setLoadingTransRecord(false);
     });
-  }, [updateCount, params.collection]);
+  }, [updateCount, tokenId]);
 
   const onImgLoad = ({target:img}) => {
     if(img.alt)
@@ -615,7 +616,8 @@ export default function CollectibleDetail() {
               <Typography variant="h5" sx={{ my: 1 }}>Item Details</Typography>
               <AssetDetailInfo detail={collectible}/>
               <Button
-                to={`/explorer/collectible/detail/${collectible.tokenId}`}
+                to='/explorer/collectible/detail'
+                state={{tokenId: collectible.tokenId, baseToken: collectible.baseToken}}
                 size="small"
                 color="inherit"
                 component={RouterLink}
@@ -685,7 +687,8 @@ export default function CollectibleDetail() {
               <AccordionDetails sx={{pb: '50px', position: 'relative', px: '20px'}}>
                 <CollectibleHistory isLoading={isLoadingTransRecord} dataList={transRecord} creator={{address: collectible.royaltyOwner, name: didName.creator}}/>
                 <Button
-                  to={`/explorer/collectible/detail/${collectible.tokenId}`}
+                  to='/explorer/collectible/detail'
+                  state={{tokenId: collectible.tokenId, baseToken: collectible.baseToken}}
                   size="small"
                   color="inherit"
                   component={RouterLink}
@@ -792,7 +795,12 @@ export default function CollectibleDetail() {
             </Grid>
           }
           <Grid item xs={12}>
-            <Link to={`/explorer/collectible/detail/${collectible.tokenId}`} component={RouterLink} underline="none">
+            <Link
+              to='/explorer/collectible/detail'
+              state={{tokenId: collectible.tokenId, baseToken: collectible.baseToken}}
+              component={RouterLink}
+              underline="none"
+            >
               <PaperStyle sx={{position: 'relative'}}>
                 <Stack direction="row" sx={{alignItems: 'center'}}>
                   <Typography variant="h5" sx={{ my: 1, flex: 1 }}>

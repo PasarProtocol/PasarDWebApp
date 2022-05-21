@@ -383,8 +383,8 @@ export default function MarketExplorer() {
     setRange(emptyRange)
     setAdult(false)
   }
-  const link2Detail = (tokenId)=>{
-    navigate(`/explorer/collectible/detail/${tokenId}`);
+  const link2Detail = (tokenId, baseToken)=>{
+    navigate('/explorer/collectible/detail', {state: {tokenId, baseToken}});
   }
   const closeFilter = (e)=>{
     setFilterView(!isFilterView&&1)

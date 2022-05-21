@@ -74,6 +74,8 @@ export const getAssetImage = (metaObj, isThumbnail = false) => {
   const { asset, thumbnail, tokenJsonVersion, data } = metaObj;
   if (tokenJsonVersion === null) {
     const imgUrl = isThumbnail?thumbnail:asset
+    if(!imgUrl)
+      return ''
     if((imgUrl.match(/:/g) || []).length !== 2)
       return imgUrl
     return getIpfsUrl(imgUrl);

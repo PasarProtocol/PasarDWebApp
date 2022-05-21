@@ -54,7 +54,13 @@ const DetailItem = (props)=>{
                     title==="Status"&&(
                       value===0?
                       "Not on sale":(
-                        <Link to={`/marketplace/detail/${params.collection}`} component={RouterLink} color='text.secondary' sx={{display: 'flex', alignItems: 'center'}}>
+                        <Link
+                          to='/marketplace/detail'
+                          state={{tokenId: item.tokenId, baseToken: item.baseToken}}
+                          component={RouterLink}
+                          color='text.secondary'
+                          sx={{display: 'flex', alignItems: 'center'}}
+                        >
                           Listed on Pasar&nbsp;<Icon icon={externalLinkFill} width="17px"/>
                         </Link>
                       )
