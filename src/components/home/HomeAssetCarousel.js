@@ -1,8 +1,12 @@
 import React, { Component } from "react";
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Fade } from "react-slideshow-image";
 import "react-slideshow-image/dist/styles.css";
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+
+import { fetchFrom, getAssetImage } from '../../utils/common'
 
 const BoxStyle = styled(Box)(({ theme }) => ({
     width: '100%',
@@ -11,17 +15,91 @@ const BoxStyle = styled(Box)(({ theme }) => ({
     borderRadius: theme.spacing(2),
     overflow: 'hidden',
     position: 'relative',
+    '& .carousel img': {
+        display: 'block'
+    }
+}));
+
+const CardStyle = styled(Card)(({ theme }) => ({
+    width: '100%',
+    height: '100%',
+    maxWidth: 500,
+    overflow: 'hidden',
+    position: 'relative',
     '& .indicators': {
         position: 'absolute',
         width: '100%',
         bottom: 20,
         zIndex: 1,
         padding: '0 20px'
+    },
+    '& .carousel-box': {
+        marginTop: 0
     }
 }));
 
+function CarouselInCollection({collection}) {
+    const {name, collectibles} = collection
+    const getConfigurableProps = () => ({
+        showArrows: false,
+        showStatus: false,
+        showIndicators: false,
+        infiniteLoop: true,
+        showThumbs: false,
+        useKeyboardArrows: false,
+        autoPlay: true,
+        stopOnHover: false,
+        swipeable: false,
+        dynamicHeight: true,
+        emulateTouch: false,
+        autoFocus: false,
+        interval: 500,
+        transitionTime: 0,
+    });
+    return (
+        <BoxStyle className="carousel-box">
+            <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
+                {
+                    collectibles.slice(0,5).map((each, index) => {
+                        const imageSrc = getAssetImage(each)
+                        return <Box key={index} sx={{
+                            // position: 'relative',
+                            pb: '100%',
+                            height: 0,                        
+                        }}>
+                            <Typography variant="h5" sx={{position: 'absolute', top: 16, left: 16, color: 'white', zIndex: 1}}>{name}</Typography>
+                            <Box component='img' src={imageSrc} sx={{position: 'absolute', width: '100%', height: '100%'}}/>
+                        </Box>
+                    })
+                }
+            </Carousel>
+        </BoxStyle>
+    );
+}
+
 export default function HomeAssetCarousel() {
-    // const [current, setCurrentBox] = React.useState(0);
+    const [collections, setCollections] = React.useState([]);
+    const [isLoadingCollections, setLoadingCollections] = React.useState(false);
+    
+    React.useEffect(() => {
+        setLoadingCollections(true);
+        fetchFrom(`api/v2/sticker/getCollection?sort=0`, {})
+          .then((response) => {
+            response.json().then((jsonAssets) => {
+                if(Array.isArray(jsonAssets.data)){
+                    const tempCollectionData = jsonAssets.data.filter(collection=>collection.collectibles.length>1)
+                    setCollections(tempCollectionData.slice(0, 3));
+                }
+                setLoadingCollections(false);
+            }).catch((e) => {
+                setLoadingCollections(false);
+            });
+          })
+          .catch((e) => {
+                setLoadingCollections(false);
+          });
+    }, []);
+
     const properties = {
         duration: 2500,
         autoplay: true,
@@ -73,26 +151,21 @@ export default function HomeAssetCarousel() {
             //     {i + 1}
             // </Box>
     };
-    const slideImages = [
-      "https://images.unsplash.com/photo-1509721434272-b79147e0e708?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
-      "https://images.unsplash.com/photo-1506710507565-203b9f24669b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1536&q=80",
-      "https://images.unsplash.com/photo-1536987333706-fc9adfb10d91?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80",
-    ];
-    const slideCollections = ['Bunny Punks', 'Pasar', 'Elastos']
     return (
-        <BoxStyle className="carousel-box">
-            <Fade {...properties}>
-                {slideImages.map((each, index) => (
-                    <Box key={index} sx={{
-                        // position: 'relative',
-                        pb: '100%',
-                        height: 0,
-                    }}>
-                        <Typography variant="h5" sx={{position: 'absolute', top: 16, left: 16, color: 'white', zIndex: 1}}>{slideCollections[index]}</Typography>
-                        <Box component='img' src={each} sx={{position: 'absolute', width: '100%', height: '100%'}}/>
+        <CardStyle className="carousel-box" sx={{ display: !isLoadingCollections&&!collections.length?'none':'block'}}>
+            {
+                isLoadingCollections?
+                <Box sx={{ pb: '100%', height: 0, position: 'relative' }}>
+                    <Box sx={{ position: 'absolute', top: 0, height: '100%', display: 'flex', alignItems: 'center', left: '50%', transform: 'translate(-50%, 0)' }}>
+                        <Box component='img' src='/static/loading-homecard.jpg' sx={{width: '100%'}}/>
                     </Box>
-                ))}
-            </Fade>
-        </BoxStyle>
+                </Box>:
+                <Fade {...properties}>
+                    {collections.map((collection, index) => (
+                        <CarouselInCollection key={index} collection={collection}/>
+                    ))}
+                </Fade>
+            }
+        </CardStyle>
     );
 }
