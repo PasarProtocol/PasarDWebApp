@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { merge } from 'lodash';
@@ -50,7 +50,10 @@ export default function ChartArea({by, is4Address}) {
     merge(baseOptionChart, {
       xaxis: {
         type: 'datetime',
-        categories: dates
+        categories: dates,
+        labels: {
+          datetimeUTC: false
+        },
       },
       chart: {
         events: {
@@ -61,14 +64,14 @@ export default function ChartArea({by, is4Address}) {
           }
         }
       },
-      tooltip: { x: { format: 'dd/MM/yy HH:mm' }, theme: themeMode }
-    });
+      tooltip: { x: { format: (period!=='d'&&period!==null)?'dd/MM/yy':'dd/MM/yy HH:mm' }, theme: themeMode }
+    })
   const [optionDates, setOptionDates] = useState([]);
   const [chartOptions, setChartOptions] = useState(mergeChartOption([]));
   
   useEffect(() => {
     setChartOptions(mergeChartOption(optionDates))
-  }, [optionDates, themeMode]);
+  }, [optionDates, period, themeMode]);
 
   
   useEffect(async () => {
@@ -126,16 +129,20 @@ export default function ChartArea({by, is4Address}) {
         days = 7;
         break;
       case 'd':
-        days = 3;
+        days = 2;
         break;
       default:
-        days = 3;
+        days = 2;
         break;
     }
     const dates = dateRangeBeforeDays(days)
-    const tempValueArray = Array(days).fill(0)
+    const tempValueArray = Array(dates.length).fill(0)
     volumeList.forEach(item=>{
-      const indexOfDate = dates.indexOf(item.onlyDate.substring(0,10));
+      const splitDate = item.onlyDate.split(" ")
+      let seekDate = splitDate[0]
+      if(period==='d' || period===null)
+        seekDate = splitDate.length>1?`${splitDate[0]} ${splitDate[1]}:00`:`${splitDate[0]} 00:00`
+      const indexOfDate = dates.indexOf(seekDate);
       const value = item.price!==undefined?item.price:item.value;
       if(indexOfDate>=0)
         tempValueArray[indexOfDate] = math.round(tempValueArray[indexOfDate]+math.round(value/10**18, 4), 4);
