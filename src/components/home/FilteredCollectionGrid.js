@@ -1,68 +1,52 @@
 import React from 'react';
-import Slider from 'react-slick';
 import {isMobile} from 'react-device-detect';
-import Carousel from 'react-multi-carousel';
+import { Splide, SplideSlide } from '@splidejs/react-splide';
+import '@splidejs/react-splide/dist/css/splide.min.css';
 import { Box, Button } from '@mui/material';
 
 import CollectionCard from '../collection/CollectionCard';
 import CollectionCardSkeleton from '../collection/CollectionCardSkeleton';
-import { fetchFrom, getAssetImage, getCoinUSD, getCollectionTypeFromImageUrl, collectionTypes } from '../../utils/common';
+import { fetchFrom, collectionTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 export default function FilteredCollectionGrid(props){
   const [collections, setCollections] = React.useState(collectionTypes);
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
   const [isDragging, setDragging] = React.useState(false);
+  const ref = React.useRef()
 
-  const settings = {
-    beforeChange: () => {setDragging(true)},
-    afterChange: () => {setDragging(false)},
-    additionalTransfrom: 0,
-    arrows: false,
+  const settings = { 
+    rewind: true,
+    // type: 'loop',
+    // autoplay: true,
     pauseOnHover: false,
-    autoPlay: true,
-    autoPlaySpeed: 2500,
-    centerMode: false,
-    containerClass: "container-with-dots",
-    draggable: true,
-    focusOnSelect: false,
-    infinite: true,
-    keyBoardControl: true,
-    minimumTouchDrag: 80,
-    renderButtonGroupOutside: false,
-    renderDotsOutside: false,
-    responsive: {
-      desktop: {
-        breakpoint: {
-          max: 3000,
-          min: 1200
-        },
-        items: 3,
-        partialVisibilityGutter: 50
+    resetProgress: true,
+    updateOnMove: true,
+    live: true,
+    perPage: 4,
+    perMove: 1,
+    speed: 2500,
+    lazyLoad: 'nearby',
+    preloadPages: 4,
+    breakpoints: {
+      3000: {
+        perPage: 3,
       },
-      desktop_sm: {
-        breakpoint: {
-          max: 1200,
-          min: 750
-        },
-        items: 2,
-        partialVisibilityGutter: 40
+      1200: {
+        perPage: 2,
       },
-      mobile: {
-        breakpoint: {
-          max: 750,
-          min: 0
-        },
-        items: 1,
-        partialVisibilityGutter: 30
-      }
-    },
-    showDots: false,
-    slidesToSlide: 1,
-    swipeable: true
+      750: {
+        perPage: 1,
+      },
+    }
   }
   
   React.useEffect(async () => {
+    setInterval(() => {
+      if(ref.current)
+        ref.current.splide.go('>');
+    }, 2500);
+
     setLoadingCollections(true);
     fetchFrom('api/v2/sticker/getCollection')
       .then((response) => {
@@ -82,21 +66,25 @@ export default function FilteredCollectionGrid(props){
   
   return (
     <Box sx={{ mx: 0 }}>
-      <Carousel {...settings}>
+      <Splide ref={ref} options={settings}>
         {
           isLoadingCollections?
           loadingSkeletons.map((item, index)=>(
-            <Box key={index} sx={{p: 2}}>
-              <CollectionCardSkeleton/>
-            </Box>
+            <SplideSlide key={index}>
+              <Box sx={{p: 2}}>
+                <CollectionCardSkeleton/>
+              </Box>
+            </SplideSlide>
           )):
           collections.map((item, index)=>(
-            <Box key={index} sx={{ p: 2, height: '100%' }}>
-              <CollectionCard info={item} isOnSlider={Boolean(true)} isDragging={isDragging}/>
-            </Box>
+            <SplideSlide key={index}>
+              <Box sx={{ p: 2, height: '100%' }}>
+                <CollectionCard info={item} isOnSlider={Boolean(true)} isDragging={isDragging}/>
+              </Box>
+            </SplideSlide>
           ))
         }
-      </Carousel>
+      </Splide>
     </Box>
   )
 }

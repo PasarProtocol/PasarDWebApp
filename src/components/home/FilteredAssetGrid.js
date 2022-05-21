@@ -1,8 +1,8 @@
 import React from 'react';
 import {round} from 'mathjs'
 import {isMobile} from 'react-device-detect';
-import Carousel from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
+import { Splide, SplideSlide } from '@splidejs/react-splide';
+import '@splidejs/react-splide/dist/css/splide.min.css';
 // material
 import { Box, Button } from '@mui/material';
 import { MHidden } from '../@material-extend';
@@ -16,71 +16,46 @@ const AssetGroupSlider = (props)=>{
   const {isLoading, assets} = props
   const [coinPrice, setCoinPrice] = React.useState([0,0]);
   const [isDragging, setDragging] = React.useState(false);
-  const settings = {
-    beforeChange: () => {setDragging(true)},
-    afterChange: () => {setDragging(false)},
-    additionalTransfrom: 0,
-    arrows: false,
+  const ref = React.useRef()
+
+  const settings = { 
+    rewind: true,
+    // type: 'loop',
+    // autoplay: true,
     pauseOnHover: false,
-    autoPlay: true,
-    autoPlaySpeed: 2500,
-    centerMode: false,
-    containerClass: "container-with-dots",
-    draggable: true,
-    focusOnSelect: false,
-    infinite: true,
-    keyBoardControl: true,
-    minimumTouchDrag: 80,
-    renderButtonGroupOutside: false,
-    renderDotsOutside: false,
-    responsive: {
-      desktop: {
-        breakpoint: {
-          max: 3000,
-          min: 1300
-        },
-        items: 5,
-        partialVisibilityGutter: 50
+    resetProgress: true,
+    updateOnMove: true,
+    live: true,
+    perPage: 4,
+    perMove: 1,
+    speed: 2500,
+    lazyLoad: 'nearby',
+    preloadPages: 4,
+    breakpoints: {
+      3000: {
+        perPage: 5,
       },
-      desktop_sm: {
-        breakpoint: {
-          max: 1300,
-          min: 1000
-        },
-        items: 4,
-        partialVisibilityGutter: 40
+      1300: {
+        perPage: 4,
       },
-      tablet: {
-        breakpoint: {
-          max: 1000,
-          min: 800
-        },
-        items: 3,
-        partialVisibilityGutter: 40
+      1000: {
+        perPage: 3,
       },
-      tablet_sm: {
-        breakpoint: {
-          max: 800,
-          min: 600
-        },
-        items: 2,
-        partialVisibilityGutter: 30
+      800: {
+        perPage: 2,
       },
-      mobile: {
-        breakpoint: {
-          max: 600,
-          min: 0
-        },
-        items: 1,
-        partialVisibilityGutter: 30
-      }
-    },
-    showDots: false,
-    slidesToSlide: 1,
-    swipeable: true
+      600: {
+        perPage: 1,
+      },
+    }
   }
 
   React.useEffect(()=>{
+    setInterval(() => {
+      if(ref.current)
+        ref.current.splide.go('>');
+    }, 2500);
+
     getCoinUSD().then((res) => {
       setCoinPriceByType(0, res)
     });
@@ -98,40 +73,44 @@ const AssetGroupSlider = (props)=>{
   const loadingSkeletons = Array(10).fill(0)
   return (
     <Box sx={{ mx: 0 }}>
-      <Carousel {...settings}>
+      <Splide ref={ref} options={settings}>
         {
           isLoading?
           loadingSkeletons.map((item, index)=>(
-            <Box key={index} sx={{p: 2}}>
-              <AssetCardSkeleton key={index}/>
-            </Box>
+            <SplideSlide key={index}>
+              <Box sx={{p: 2}}>
+                <AssetCardSkeleton key={index}/>
+              </Box>
+            </SplideSlide>
           )):
           assets.map((item, index)=>{
             const coinType = getCoinTypeFromToken(item)
 
-            return <Box key={index} sx={{
-              p: 2,
-              '& h5 img': {
-                display: 'inline'
-              }
-            }}>
-              <AssetCard
-                {...item}
-                thumbnail={getAssetImage(item, true)}
-                name={item.name && item.name}
-                price={round(item.price/1e18, 3)}
-                saleType={item.SaleType || item.saleType}
-                type={0}
-                isLink={1&&true}
-                coinUSD={coinPrice[coinType]}
-                coinType={coinType}
-                isDragging={isDragging}
-                defaultCollectionType={getCollectionTypeFromImageUrl(item)}
-              />
-            </Box>
+            return <SplideSlide key={index}>
+                <Box sx={{
+                  p: 2,
+                  '& h5 img': {
+                    display: 'inline'
+                  }
+                }}>
+                  <AssetCard
+                    {...item}
+                    thumbnail={getAssetImage(item, true)}
+                    name={item.name && item.name}
+                    price={round(item.price/1e18, 3)}
+                    saleType={item.SaleType || item.saleType}
+                    type={0}
+                    isLink={1&&true}
+                    coinUSD={coinPrice[coinType]}
+                    coinType={coinType}
+                    isDragging={isDragging}
+                    defaultCollectionType={getCollectionTypeFromImageUrl(item)}
+                  />
+                </Box>
+              </SplideSlide>
           })
         }
-      </Carousel>
+      </Splide>
     </Box>
   )
 }
