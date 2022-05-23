@@ -6,6 +6,7 @@ import "react-slideshow-image/dist/styles.css";
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
+import LoadingScreen from '../LoadingScreen';
 import { fetchFrom, getAssetImage } from '../../utils/common'
 
 const BoxStyle = styled(Box)(({ theme }) => ({
@@ -157,7 +158,8 @@ export default function HomeAssetCarousel() {
                 isLoadingCollections?
                 <Box sx={{ pb: '100%', height: 0, position: 'relative' }}>
                     <Box sx={{ position: 'absolute', top: 0, height: '100%', display: 'flex', alignItems: 'center', left: '50%', transform: 'translate(-50%, 0)' }}>
-                        <Box component='img' src='/static/loading-homecard.jpg' sx={{width: '100%'}}/>
+                        {/* <Box component='img' src='/static/loading-homecard.jpg' sx={{width: '100%'}}/> */}
+                        <LoadingScreen />
                     </Box>
                 </Box>:
                 <Fade {...properties}>

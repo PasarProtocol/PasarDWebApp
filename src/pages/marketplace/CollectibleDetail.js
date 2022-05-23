@@ -8,7 +8,7 @@ import { Icon } from '@iconify/react';
 import { useWeb3React } from "@web3-react/core";
 import { styled } from '@mui/material/styles';
 import { Link, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Tooltip,
-  Typography, Box, Modal, Backdrop, Menu, MenuItem, Button, IconButton, Toolbar, SvgIcon } from '@mui/material';
+  Typography, Box, Modal, Backdrop, Menu, MenuItem, Button, IconButton, Toolbar, SvgIcon, Avatar } from '@mui/material';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
@@ -39,6 +39,7 @@ import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { blankAddress, marketContract } from '../../config'
+import { queryName, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCoinTypeFromToken, getCollectiblesInCollection4Preview,
   getCoinUSD, getDiaTokenPrice, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, getCollectionTypeFromImageUrl, getShortUrl, getIpfsUrl, collectionTypes } from '../../utils/common';
 
@@ -135,6 +136,7 @@ export default function CollectibleDetail() {
   const [badge, setBadge] = React.useState({creator: {dia: 0, kyc: false}, owner: {dia: 0, kyc: false}});
   const [collectionBadge, setCollectionBadge] = React.useState({dia: 0, kyc: false});
   const [didName, setDidName] = React.useState({creator: '', owner: ''});
+  const [avatarUrl, setAvatarUrl] = React.useState({creator: null, owner: null});
   const [transRecord, setTransRecord] = React.useState([]);
   const [collectiblesInCollection, setCollectiblesInCollection] = React.useState([]);
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
@@ -275,8 +277,11 @@ export default function CollectibleDetail() {
         if(jsonCollectible.data.royaltyOwner === jsonCollectible.data.holder){
           getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
             .then((info) => {
-              if(info.name)
+              if(info.name){
                 setDidName({creator: info.name, owner: info.name})
+                if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+                  fetchProfileData(info.did, info.name || '')
+              }
             })
             .catch((e) => {
             })
@@ -284,6 +289,8 @@ export default function CollectibleDetail() {
           getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
             .then((info) => {
               setDidNameOfUser('creator', info.name || '')
+              if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+                fetchProfileData(info.did, info.name || '', 'creator')
             })
             .catch((e) => {
             })
@@ -291,6 +298,8 @@ export default function CollectibleDetail() {
           getDidInfoFromAddress(jsonCollectible.data.holder)
             .then((info) => {
               setDidNameOfUser('owner', info.name || '')
+              if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+                fetchProfileData(info.did, info.name || '', 'owner')
             })
             .catch((e) => {
             })
@@ -323,6 +332,35 @@ export default function CollectibleDetail() {
         setLoadingTransRecord(false);
     });
   }, [updateCount, tokenId]);
+
+  const fetchProfileData = (targetDid, didInfo, type='all')=>{
+    queryName(targetDid)
+      .then((res)=>{
+        if(res.find_message && res.find_message.items.length) {
+          const displayName = res.find_message.items[0].display_name
+          if(type==='all')
+            setDidName({creator: displayName, owner: displayName})
+          else
+            setDidNameOfUser(type, displayName)
+        }
+
+        downloadAvatar(targetDid).then((res)=>{
+          if(res && res.length) {
+            const base64Content = res.reduce((content, code)=>{
+              content=`${content}${String.fromCharCode(code)}`;
+              return content
+            }, '')
+            const displayAvatar = `data:image/png;base64,${base64Content}`
+            if(type==='all')
+              setAvatarUrl({creator: displayAvatar, owner: displayAvatar})
+            else
+              setAvatarOfUser(type, displayAvatar)
+          }
+        })
+      })
+      .catch(e=>{
+      })
+  }
 
   const onImgLoad = ({target:img}) => {
     if(img.alt)
@@ -357,6 +395,13 @@ export default function CollectibleDetail() {
       const tempDidName = {...prevState};
       tempDidName[type] = value;
       return tempDidName;
+    });
+  };
+  const setAvatarOfUser = (type, value) => {
+    setAvatarUrl((prevState) => {
+      const tempAvatar = {...prevState};
+      tempAvatar[type] = value;
+      return tempAvatar;
     });
   };
 
@@ -543,7 +588,11 @@ export default function CollectibleDetail() {
                 <Stack direction='row'>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     <Link to={`/profile/others/${collectible.royaltyOwner}`} component={RouterLink} color='text.primary' sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
-                      <Jazzicon address={collectible.royaltyOwner}/>
+                      {
+                        avatarUrl.creator?
+                        <Avatar alt="user" src={avatarUrl.creator} sx={{width: 40, height: 40, mr: 1}} />:
+                        <Jazzicon address={collectible.royaltyOwner}/>
+                      }
                       {didName.creator?didName.creator:reduceHexAddress(collectible.royaltyOwner)}
                     </Link>
                     <Stack spacing={.6} direction="row">
@@ -568,7 +617,11 @@ export default function CollectibleDetail() {
                 <Stack direction='row'>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     <Link to={`/profile/others/${collectible.holder}`} component={RouterLink} color='text.primary' sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
-                      <Jazzicon address={collectible.holder}/>
+                      {
+                        avatarUrl.owner?
+                        <Avatar alt="user" src={avatarUrl.owner} sx={{width: 40, height: 40, mr: 1}} />:
+                        <Jazzicon address={collectible.holder}/>
+                      }
                       {didName.owner?didName.owner:reduceHexAddress(collectible.holder)}
                     </Link>
                     <Stack spacing={.6} direction="row">
