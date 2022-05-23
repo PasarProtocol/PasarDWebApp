@@ -273,7 +273,7 @@ export default function CreateItem() {
   }, [itemtype]);
 
   const handleDropMultiFile = React.useCallback((acceptedFiles) => {
-      acceptedFiles.splice(20)
+      acceptedFiles.splice(10)
       if(acceptedFiles.length<2){
         enqueueSnackbar('Allow at least 2 items!', { variant: 'warning' });
         return
@@ -614,14 +614,7 @@ export default function CreateItem() {
           walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
             console.log("Gas price:", gasPrice); 
     
-            const _gasLimit = 5000000;
             console.log("Sending transaction with account address:", accounts[0]);
-            const transactionParams = {
-              'from': accounts[0],
-              'gasPrice': gasPrice,
-              'gas': _gasLimit,
-              'value': 0
-            };
             setProgress(70)
             setReadySignForMint(true)
 
@@ -635,63 +628,79 @@ export default function CreateItem() {
             }
             else
               mintMethod = stickerContract.methods.mintBatch(_ids, _tokenSupplies, _uris, _royaltyFees)
-            const commonArgs = {
-              '_baseAddress': baseAddress,
-              '_amounts': _tokenSupplies,
-              'beforeSendFunc': ()=>{setReadySignForMint(true)},
-              'afterSendFunc': ()=>{setReadySignForMint(false)}
+            
+            const tempTx = {
+              from: accounts[0]
             }
-            mintMethod.send(transactionParams)
-              .on('receipt', (receipt) => {
-                  setReadySignForMint(false)
-                  console.log("receipt", receipt);
-                  if(isPutOnSale){
-                    setProgress(80)
-                    setCurrent(2)
-                    stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
-                      console.log("isApprovalForAll=", isApproval);
-                      if (!isApproval) {
-                          stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
-                            .on('receipt', (receipt) => {
-                                setOpenAccessDlg(false)
-                                setCurrent(3)
-                                console.log("setApprovalForAll-receipt", receipt);
-                                callContractMethod('createOrderForSaleBatch', coinType, {
-                                  ...paramObj,
-                                  ...commonArgs,
-                                  '_price': BigInt(price*1e18).toString()
-                                }).then((success) => {
-                                  resolve(success)
-                                }).catch(error=>{
+            mintMethod.estimateGas(tempTx).then(gasLimit=>{
+              const _gasLimit = Math.min(Math.ceil(gasLimit * 1.5), 8000000).toString()
+              // const _gasLimit = 8000000
+              // console.log({_gasLimit})
+              const transactionParams = {
+                'from': accounts[0],
+                'gasPrice': gasPrice,
+                'gas': _gasLimit,
+                'value': 0
+              };
+              const commonArgs = {
+                '_baseAddress': baseAddress,
+                '_amounts': _tokenSupplies,
+                'beforeSendFunc': ()=>{setReadySignForMint(true)},
+                'afterSendFunc': ()=>{setReadySignForMint(false)}
+              }
+              mintMethod.send(transactionParams)
+                .on('receipt', (receipt) => {
+                    setReadySignForMint(false)
+                    console.log("receipt", receipt);
+                    if(isPutOnSale){
+                      setProgress(80)
+                      setCurrent(2)
+                      stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
+                        console.log("isApprovalForAll=", isApproval);
+                        if (!isApproval) {
+                            stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
+                              .on('receipt', (receipt) => {
+                                  setOpenAccessDlg(false)
+                                  setCurrent(3)
+                                  console.log("setApprovalForAll-receipt", receipt);
+                                  callContractMethod('createOrderForSaleBatch', coinType, {
+                                    ...paramObj,
+                                    ...commonArgs,
+                                    '_price': BigInt(price*1e18).toString()
+                                  }).then((success) => {
+                                    resolve(success)
+                                  }).catch(error=>{
+                                    reject(error)
+                                  })
+                              })
+                              .on('error', (error, receipt) => {
+                                  console.error("setApprovalForAll-error", error);
+                                  setOpenAccessDlg(false)
                                   reject(error)
-                                })
-                            })
-                            .on('error', (error, receipt) => {
-                                console.error("setApprovalForAll-error", error);
-                                setOpenAccessDlg(false)
-                                reject(error)
-                            })
-                        // })
-                      }
-                      callContractMethod('createOrderForSaleBatch', coinType, {
-                        ...paramObj,
-                        ...commonArgs,
-                        '_price': BigInt(price*1e18).toString()
-                      }).then((success) => {
-                        resolve(success)
-                      }).catch(error=>{
-                        reject(error)
+                              })
+                          // })
+                        }
+                        callContractMethod('createOrderForSaleBatch', coinType, {
+                          ...paramObj,
+                          ...commonArgs,
+                          '_price': BigInt(price*1e18).toString()
+                        }).then((success) => {
+                          resolve(success)
+                        }).catch(error=>{
+                          reject(error)
+                        })
                       })
-                    })
-                  }
-                  else
-                    resolve(true)
-              })
-              .on('error', (error, receipt) => {
-                  console.error("error", error);
-                  reject(error)
-              });
-  
+                    }
+                    else
+                      resolve(true)
+                })
+                .on('error', (error, receipt) => {
+                    console.error("error", error);
+                    reject(error)
+                });
+            }).catch((error) => {
+              reject(error);
+            })
           }).catch((error) => {
             reject(error);
           })
@@ -766,36 +775,46 @@ export default function CreateItem() {
         creatorObj.KYCedProof = proof
       }
       const tokenId = `0x${hash(added.origin.path)}`
-      requestSigndataOnTokenID(tokenId).then(rsp=>{
-        // create the metadata object we'll be storing
-        const metaObj = {
-          "version": "2",
-          "type": itemtype==="General"?'image':itemtype.toLowerCase(),
-          "name": collectibleName,
-          "description": description,
-          "creator": creatorObj,
-          "data": {
-            "image": `pasar:image:${added.origin.path}`,
-            "kind": added.type.replace('image/', ''),
-            "size": added.origin.size,
-            "thumbnail": `pasar:image:${added.thumbnail.path}`,
-            "signature": rsp.signature
-          },
-          "adult": explicitRef.current.checked,
-          "properties": propertiesObj,
-        }
+      const metaObj = {
+        "version": "2",
+        "type": itemtype==="General"?'image':itemtype.toLowerCase(),
+        "name": collectibleName,
+        "description": description,
+        "creator": creatorObj,
+        "data": {
+          "image": `pasar:image:${added.origin.path}`,
+          "kind": added.type.replace('image/', ''),
+          "size": added.origin.size,
+          "thumbnail": `pasar:image:${added.thumbnail.path}`,
+        },
+        "adult": explicitRef.current.checked,
+        "properties": propertiesObj,
+      }
+
+      if(index===0)
+        requestSigndataOnTokenID(tokenId).then(rsp=>{
+          metaObj.data.signature = rsp.signature
+          console.log(metaObj)
+          try {
+            const jsonMetaObj = JSON.stringify(metaObj);
+            const metaRecv = Promise.resolve(client.add(jsonMetaObj))
+            resolve(metaRecv)
+          } catch (error) {
+            reject(error);
+          }
+        }).catch((error) => {
+          reject(error);
+        })
+      else {
         console.log(metaObj)
         try {
           const jsonMetaObj = JSON.stringify(metaObj);
-          // add the metadata itself as well
           const metaRecv = Promise.resolve(client.add(jsonMetaObj))
           resolve(metaRecv)
         } catch (error) {
           reject(error);
         }
-      }).catch((error) => {
-        reject(error);
-      })
+      }
     })
   )
   const sendIpfsDidJson = ()=>(

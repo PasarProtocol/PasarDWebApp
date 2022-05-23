@@ -109,7 +109,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
         <Box>
           <Typography variant="body2" align="center">
             File types supported:PNG, JPEG, JPG, GIF<br/>
-            Range: 2~20 items per batch
+            Range: 2~10 items per batch
             {isAvatar&&(
               <>
                 <br/>Canvas size must be 600x600 pixels<br/>Max. size:5 MB<br/>Recommended GIF animation length: Less than 10 seconds
