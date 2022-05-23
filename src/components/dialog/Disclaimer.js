@@ -49,7 +49,7 @@ export default function Disclaimer(props) {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{display: 'grid'}}>
         <Container sx={{
           mt: 2,
           maxHeight: 500,

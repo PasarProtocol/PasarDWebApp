@@ -371,15 +371,7 @@ export function callContractMethod(type, coinType, paramObj) {
           .getGasPrice()
           .then((gasPrice) => {
             console.log('Gas price:', gasPrice);
-
-            const _gasLimit = 5000000;
             console.log('Sending transaction with account address:', accounts[0]);
-            const transactionParams = {
-              'from': accounts[0],
-              'gasPrice': gasPrice,
-              'gas': _gasLimit,
-              'value': 0
-            };
             let method = null;
             if (type === 'createOrderForSale') {
               console.log('createOrderForSale');
@@ -420,17 +412,30 @@ export function callContractMethod(type, coinType, paramObj) {
             }
             const { beforeSendFunc, afterSendFunc } = paramObj;
             if (beforeSendFunc) beforeSendFunc();
-            method
-              .send(transactionParams)
-              .on('receipt', (receipt) => {
-                if (afterSendFunc) afterSendFunc();
-                console.log('receipt', receipt);
-                resolve(true);
-              })
-              .on('error', (error, receipt) => {
-                console.error('error', error);
-                reject(error);
-              });
+            method.estimateGas({ from: accounts[0] }).then(gasLimit=>{
+              const _gasLimit = Math.min(Math.ceil(gasLimit * 1.5), 8000000).toString()
+              // const _gasLimit = 8000000
+              console.log({_gasLimit})
+              const transactionParams = {
+                'from': accounts[0],
+                'gasPrice': gasPrice,
+                'gas': _gasLimit,
+                'value': 0
+              };
+              method
+                .send(transactionParams)
+                .on('receipt', (receipt) => {
+                  if (afterSendFunc) afterSendFunc();
+                  console.log('receipt', receipt);
+                  resolve(true);
+                })
+                .on('error', (error, receipt) => {
+                  console.error('error', error);
+                  reject(error);
+                });
+            }).catch((error) => {
+              reject(error);
+            })
           })
           .catch((error) => {
             reject(error);
