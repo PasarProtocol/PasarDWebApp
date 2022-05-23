@@ -30,7 +30,7 @@ export default function MintBatchName(props) {
   const [fromNumber, setFromNumber] = useState("");
   
   React.useEffect(async () => {
-    const fnum = fromNumber!==""?parseInt(fromNumber, 10):0
+    const fnum = fromNumber!==""?parseInt(fromNumber, 10):1
     const nameArr = [...Array(uploadedCount)].map((el, id)=>`${namePrefix}${(fnum+id).toString().padStart(padNum, "0")}`)
     handleNameGroup([...nameArr])
     if(nameArr.length>3){

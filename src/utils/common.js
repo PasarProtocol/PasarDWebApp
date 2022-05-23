@@ -587,7 +587,7 @@ export const MethodList = [
 ];
 export const collectionTypes = [
   {
-    shortName: 'PSRC',
+    symbol: 'PSRC',
     name: 'Pasar Collection',
     avatar: '/static/logo-icon.svg',
     shortDescription: 'Pasar default collection',
@@ -595,7 +595,7 @@ export const collectionTypes = [
     token: 2
   },
   {
-    shortName: 'FSTK',
+    symbol: 'FSTK',
     name: 'Feeds NFT Sticker',
     avatar: '/static/feeds-sticker.svg',
     shortDescription: 'Feeds default collection',
@@ -603,7 +603,7 @@ export const collectionTypes = [
     token: 1
   },
   // {
-  //   shortName: 'Bunny',
+  //   symbol: 'Bunny',
   //   name: 'Bunny Punk',
   //   avatar: 'https://ipfs-test.trinity-feeds.app/ipfs/QmVGaCENQCFKm1cJhRWBJ6Wj41LWh1Ev4gjkTBTZCyH7YC',
   //   background: 'https://lh3.googleusercontent.com/fItcL7Th5tjT-54xPOMDWOWWxlAUvROhpH6SiJigUihUa0BusEPFJKI8UkkLyvFEh9Oxl1OBRrv0mZHgPndNf7QocVnqwLxECKlr=h600',

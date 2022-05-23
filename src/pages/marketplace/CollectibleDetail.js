@@ -40,7 +40,7 @@ import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { blankAddress, marketContract } from '../../config'
 import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCoinTypeFromToken, getCollectiblesInCollection4Preview,
-  getCoinUSD, getDiaTokenPrice, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, getCollectionTypeFromImageUrl, getShortUrl, getIpfsUrl } from '../../utils/common';
+  getCoinUSD, getDiaTokenPrice, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, getCollectionTypeFromImageUrl, getShortUrl, getIpfsUrl, collectionTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -154,6 +154,7 @@ export default function CollectibleDetail() {
   const context = useWeb3React()
   const { account } = context;
 
+  const defaultCollection = collectionTypes[0]
   React.useEffect(() => {
     getShortUrl(window.location.href).then((shortUrl)=>{
       setShareUrl(shortUrl)
@@ -599,7 +600,14 @@ export default function CollectibleDetail() {
                       </Box>
                     </Stack>
                   </Link>:
-                  <AvatarStyle sx={{ p: 1 }} />
+                  <Stack direction='row'>
+                    <Box sx={{ width: 40, height: 40, borderRadius: '100%', p: 1, backgroundColor: 'black', display: 'flex', mr: 1 }}>
+                      <Box draggable = {false} component="img" src={defaultCollection.avatar}/>
+                    </Box>
+                    <Box sx={{ minWidth: 0, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                      <Typography variant="body2" sx={{alignItems: 'center', wordBreak: 'break-all'}}>{defaultCollection.name} ({defaultCollection.symbol})</Typography>
+                    </Box>
+                  </Stack>
                 }
               </Stack>
             </PaperStyle>

@@ -55,12 +55,8 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 export default function AssetCard(props) {
   const { name="???", description, quantity=1, price=0, coinType=0, isLink, isMoreLink, tokenId, type, orderId, orderType, status, endTime, currentBid, baseToken='',
    saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, defaultCollectionType, isDragging=false, reservePrice=0, buyoutPrice=0 } = props
-  const defaultCollection = {
-    ...collectionTypes[defaultCollectionType],
-    token: STICKER_ADDRESS,
-    description: collectionTypes[defaultCollectionType].shortDescription
-  }
-  const [collection, setCollection] = React.useState(defaultCollection);
+  
+  const [collection, setCollection] = React.useState(null);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [disclaimerOpen, setOpenDisclaimer] = React.useState(false);
   const [sellOpen, setOpenSell] = React.useState(false);
@@ -90,10 +86,7 @@ export default function AssetCard(props) {
 
   React.useEffect(() => {
     let isMounted = true;
-    if(baseToken && baseToken===STICKER_ADDRESS) {
-      setCollection(defaultCollection);
-    }
-    else if(baseToken && baseToken!==STICKER_ADDRESS) {
+    if(baseToken) {
       fetchFrom(`api/v2/sticker/getCollection/${baseToken}`)
         .then((response) => {
           response.json().then((jsonAssets) => {
@@ -235,7 +228,7 @@ export default function AssetCard(props) {
         >
           <Stack sx={{p:2, pb: 1}} direction="row">
             <Stack sx={{flexGrow:1}} direction="row" spacing={.5}>
-              <BadgeProfile type={1} collection={collection}/>
+              <BadgeProfile type={1} collection={collection} defaultCollectionType={defaultCollectionType}/>
               {
                 holder&&<BadgeProfile type={2} walletAddress={holder}/>
               }

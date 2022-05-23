@@ -48,13 +48,19 @@ const queryProfileSocials = {
   medium: queryMedium
 }
 export default function BadgeProfile(props) {
-  const {type, walletAddress, collection={}, reservePriceFlag=false, hasBuynow=false} = props
+  const {type, walletAddress, collection={}, reservePriceFlag=false, hasBuynow=false, defaultCollectionType=0} = props
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = React.useState(false);
   const [didInfo, setDidInfo] = useState({name: '', description: ''});
   const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [badge, setBadge] = React.useState({dia: 0, kyc: false});
   const [socials, setSocials] = React.useState({});
+
+  const defaultCollection = {
+    ...collectionTypes[defaultCollectionType],
+    token: STICKER_ADDRESS,
+    description: collectionTypes[defaultCollectionType].shortDescription
+  }
 
   useEffect(()=>{
     let isMounted = true;
@@ -87,8 +93,8 @@ export default function BadgeProfile(props) {
     setOpen(false);
   };
 
-  const {avatar, token} = collection
-  let {name, description} = collection
+  const {avatar, token} = collection || defaultCollection
+  let {name, description} = collection || defaultCollection
   let dispAddress = reduceHexAddress(token)
   if(type===2){
     name = didInfo.name || reduceHexAddress(walletAddress)
@@ -227,11 +233,19 @@ export default function BadgeProfile(props) {
                 <Box sx={{...AvatarBoxStyle}}>
                   {
                     type===1&&
-                    <Link to={`/collection/detail/${token}`} component={RouterLink} color='text.primary'>
-                      <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
-                        <Box draggable = {false} component="img" src={avatar} sx={{ width: avatar&&avatar.startsWith('/static')?35:60 }} />
-                      </Box>
-                    </Link>
+                    <>
+                      {
+                        collection?
+                        <Link to={`/collection/detail/${token}`} component={RouterLink} color='text.primary'>
+                          <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+                            <Box draggable = {false} component="img" src={avatar} sx={{ width: avatar&&avatar.startsWith('/static')?35:60 }} />
+                          </Box>
+                        </Link>:
+                        <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+                          <Box draggable = {false} component="img" src={avatar} sx={{ width: avatar&&avatar.startsWith('/static')?35:60 }} />
+                        </Box>
+                      }
+                    </>
                   }
                   {
                     type===2&&
@@ -247,9 +261,15 @@ export default function BadgeProfile(props) {
                 </Box>
                 {
                   type===1?
-                  <Link to={`/collection/detail/${token}`} component={RouterLink} color='text.primary'>
-                    <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
-                  </Link>:
+                  <>
+                    {
+                      collection?
+                      <Link to={`/collection/detail/${token}`} component={RouterLink} color='text.primary'>
+                        <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
+                      </Link>:
+                      <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
+                    }
+                  </>:
 
                   <Link to={`/profile/others/${walletAddress}`} component={RouterLink} color='text.primary'>
                     <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
