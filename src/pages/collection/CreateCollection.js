@@ -464,7 +464,7 @@ export default function CreateCollection() {
       scrollToRef(descriptionRef)
     else if(duproperties.length || recipientRoyaltiesGroup.filter(el=>el.address.length>0&&!el.royalties.length).length)
       enqueueSnackbar('Fee recipient properties are invalid.', { variant: 'warning' });
-    else if(recipientRoyaltiesGroup.filter(el=>el.address.length%42).length)
+    else if(recipientRoyaltiesGroup.filter(el=>(el.address.length%42 || (el.address.length===42 && !Web3.utils.isAddress(el.address)))).length)
       enqueueSnackbar('Fee recipient address is invalid.', { variant: 'warning' });
     else if(recipientRoyaltiesGroup.reduce((sum, el)=>sum+=el.royalties*1, 0)>30)
       enqueueSnackbar('Total royalties must not be more than 30%', { variant: 'warning' });
@@ -603,9 +603,11 @@ export default function CreateCollection() {
             </Grid>
             {
               recipientRoyaltiesGroup.map((item, index)=>{
-                const addressErrFlag = isOnValidation && (duproperties.includes(item.address) || item.address.length%42>0)
+                const addressErrFlag = isOnValidation && (duproperties.includes(item.address) || item.address.length%42>0 || (item.address.length === 42 && !Web3.utils.isAddress(item.address)))
                 let addressErrText = ''
                 if(isOnValidation && item.address.length%42)
+                  addressErrText = 'Not a valid address'
+                else if(isOnValidation && (item.address.length === 42 && !Web3.utils.isAddress(item.address)))
                   addressErrText = 'Not a valid address'
                 else if(isOnValidation && duproperties.includes(item.address))
                   addressErrText = 'Duplicated address'

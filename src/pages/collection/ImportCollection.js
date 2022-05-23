@@ -384,11 +384,19 @@ export default function ImportCollection() {
       scrollToRef(descriptionRef)
     else if(duproperties.length || recipientRoyaltiesGroup.filter(el=>el.address.length>0&&!el.royalties.length).length)
       enqueueSnackbar('Fee recipient properties are invalid.', { variant: 'warning' });
+    else if(recipientRoyaltiesGroup.filter(el=>(el.address.length%42 || (el.address.length===42 && !Web3.utils.isAddress(el.address)))).length)
+      enqueueSnackbar('Fee recipient address is invalid.', { variant: 'warning' });
     else if(recipientRoyaltiesGroup.reduce((sum, el)=>sum+=el.royalties*1, 0)>30)
       enqueueSnackbar('Total royalties must not be more than 30%', { variant: 'warning' });
     else
       importCollection()
   }
+
+  let AddressHelperText = "Address is required"
+  if(isFilledAddress&&!autoLoaded)
+    AddressHelperText = "Address not found"
+  else if(contractAddress.length&&!autoLoaded)
+    AddressHelperText = "Address is not valid"
   return (
     <RootStyle title="ImportCollection | PASAR">
       <Container maxWidth="lg">
@@ -421,9 +429,7 @@ export default function ImportCollection() {
                   !(isOnValidation&&(!contractAddress.length||!autoLoaded))&&!(isFilledAddress&&!autoLoaded)
                 }
               >
-                {
-                  isFilledAddress&&!autoLoaded?"Address not found":"Address is required"
-                }
+                {AddressHelperText}
               </FormHelperText>
             </FormControl>
             <Divider/>
@@ -508,33 +514,45 @@ export default function ImportCollection() {
               </Grid>
             </Grid>
             {
-              recipientRoyaltiesGroup.map((item, index)=>(
-                <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
-                  <Grid item xs={8}>
-                    <TextFieldStyle
-                      label="Example: 0x012...ABC"
-                      size="small"
-                      fullWidth
-                      value={item.address}
-                      onChange={(e)=>{handleRecipientRoyaltiesGroup('address', index, e)}}
-                      error={isOnValidation&&duproperties.includes(item.address)}
-                      helperText={isOnValidation&&duproperties.includes(item.address)?'Duplicated address':''}
-                    />
+              recipientRoyaltiesGroup.map((item, index)=>{
+                const addressErrFlag = isOnValidation && (duproperties.includes(item.address) || item.address.length%42>0 || (item.address.length === 42 && !Web3.utils.isAddress(item.address)))
+                let addressErrText = ''
+                if(isOnValidation && item.address.length%42)
+                  addressErrText = 'Not a valid address'
+                else if(isOnValidation && (item.address.length === 42 && !Web3.utils.isAddress(item.address)))
+                  addressErrText = 'Not a valid address'
+                else if(isOnValidation && duproperties.includes(item.address))
+                  addressErrText = 'Duplicated address'
+
+                return (
+                  <Grid container spacing={1} key={index} sx={index?{mt: 1}:{}}>
+                    <Grid item xs={8}>
+                      <TextFieldStyle
+                        label="Example: 0x012...ABC"
+                        size="small"
+                        fullWidth
+                        inputProps={{ maxLength: 42 }}
+                        value={item.address}
+                        onChange={(e)=>{handleRecipientRoyaltiesGroup('address', index, e)}}
+                        error={addressErrFlag}
+                        helperText={addressErrText}
+                      />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <TextFieldStyle
+                        type="number"
+                        label="Example: 10"
+                        size="small"
+                        fullWidth
+                        value={item.royalties}
+                        onChange={(e)=>{handleRecipientRoyaltiesGroup('royalties', index, e)}}
+                        error={isOnValidation&&item.address.length>0&&!item.royalties.length}
+                        helperText={isOnValidation&&item.address.length>0&&!item.royalties.length?'Can not be empty.':''}
+                      />
+                    </Grid>
                   </Grid>
-                  <Grid item xs={4}>
-                    <TextFieldStyle
-                      type="number"
-                      label="Example: 10"
-                      size="small"
-                      fullWidth
-                      value={item.royalties}
-                      onChange={(e)=>{handleRecipientRoyaltiesGroup('royalties', index, e)}}
-                      error={isOnValidation&&item.address.length>0&&!item.royalties.length}
-                      helperText={isOnValidation&&item.address.length>0&&!item.royalties.length?'Can not be empty.':''}
-                    />
-                  </Grid>
-                </Grid>
-              ))
+                )
+              })
             }
             <Grid item xs={12}>
               <Accordion sx={{bgcolor: 'unset'}}>
