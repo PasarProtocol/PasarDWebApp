@@ -29,7 +29,7 @@ const RootStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 const DetailItem = (props)=>{
   const params = useParams(); // params.collection
-  const { item, isLast, value } = props
+  const { item, isLast, value, detail } = props
   const { icon, title, copyable } = item;
   let displayValue = value
   if(item.key==='tokenIdHex')
@@ -56,7 +56,7 @@ const DetailItem = (props)=>{
                       "Not on sale":(
                         <Link
                           to='/marketplace/detail'
-                          state={{tokenId: item.tokenId, baseToken: item.baseToken}}
+                          state={{tokenId: detail.tokenId, baseToken: detail.baseToken}}
                           component={RouterLink}
                           color='text.secondary'
                           sx={{display: 'flex', alignItems: 'center'}}
@@ -98,6 +98,7 @@ function CarouselItem({ page, detail }) {
           key={index}
           item={item}
           value={value}
+          detail={detail}
           isLast={index===page.length-1}
         />
       })}

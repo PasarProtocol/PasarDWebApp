@@ -39,7 +39,8 @@ import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { blankAddress, marketContract } from '../../config'
-import { queryName, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
+import { queryAvatarUrl, queryName, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
+import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCoinTypeFromToken, getCollectiblesInCollection4Preview,
   getCoinUSD, getDiaTokenPrice, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, getCollectionTypeFromImageUrl, getShortUrl, getIpfsUrl, collectionTypes } from '../../utils/common';
 
@@ -344,6 +345,20 @@ export default function CollectibleDetail() {
             setDidNameOfUser(type, displayName)
         }
 
+        queryAvatarUrl(targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length) {
+            const avatarUrl = res.find_message.items[0].display_name
+            downloadFromUrl(avatarUrl).then(avatarData=>{
+              if(avatarData && avatarData.length) {
+                const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
+                if(type==='all')
+                  setAvatarUrl({creator: base64Content, owner: base64Content})
+                else
+                  setAvatarOfUser(type, base64Content)
+              }
+            })
+          }
+        })
         downloadAvatar(targetDid).then((res)=>{
           if(res && res.length) {
             const base64Content = res.reduce((content, code)=>{
@@ -352,9 +367,18 @@ export default function CollectibleDetail() {
             }, '')
             const displayAvatar = `data:image/png;base64,${base64Content}`
             if(type==='all')
-              setAvatarUrl({creator: displayAvatar, owner: displayAvatar})
+              setAvatarUrl((prevState)=>{
+                if(!prevState.creator)
+                  return {creator: displayAvatar, owner: displayAvatar}
+                return prevState
+              })
             else
-              setAvatarOfUser(type, displayAvatar)
+              setAvatarUrl((prevState) => {
+                const tempAvatar = {...prevState};
+                if(!tempAvatar[type])
+                  tempAvatar[type] = displayAvatar;
+                return tempAvatar;
+              });
           }
         })
       })

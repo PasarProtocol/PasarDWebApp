@@ -146,6 +146,7 @@ export default function EditProfile() {
               setAvatarUrl((prevState)=>{
                 if(!checkedItem[0])
                   return `data:image/png;base64,${base64Content}`
+                return prevState
               })
             }
           })
