@@ -3,6 +3,7 @@ import { deleateOneDBData, deleteCollection, queryDBData, downloadScripting, upl
 import { ApplicationDID } from '../../config'
 
 const COLLECTION_NAME = "Profile"
+const AVATAR_URL = "avatar_url"
 const NAME = "name"
 const DESCRIPTION = "description"
 const WEBSITE = "website"
@@ -29,6 +30,7 @@ export function registerAllScript() {
     // const kycMe = registerScripting(KYC_ME)
     // const avatar = registerAvatarDownloadScripting()
     const array = [
+      registerScripting(AVATAR_URL), 
       registerScripting(DESCRIPTION), 
       registerScripting(WEBSITE), 
       registerScripting(TWITTER), 
@@ -119,6 +121,11 @@ const registerFileDownloadScripting = (scriptName) => (
   })
 )
 
+export const queryAvatarUrl = async(targetDid, appid = ApplicationDID) => {
+  const result = await callQueryScript(AVATAR_URL, targetDid, appid)
+  return result
+}
+
 export const queryName = async(targetDid, appid = ApplicationDID) => {
   const result = await callQueryScript(NAME, targetDid, appid)
   return result
@@ -187,6 +194,11 @@ const callQueryScript = (propertyIdentity, targetDid, appid = ApplicationDID) =>
   })
 )
 
+export const insertAvatarUrl = async(displayName, type = "public") =>{
+  const result = await insertProperty(AVATAR_URL, displayName, type)
+  return result
+}
+
 export const insertName = async(displayName, type = "public") =>{
   const result = await insertProperty(NAME, displayName, type)
   return result
@@ -246,6 +258,11 @@ const insertDataToProfileDB = async(propertyIdentity, displayName, type) =>{
     console.log(`Insert ${propertyIdentity} to Profile db error : ${error}`)
     return error
   }
+}
+
+export const updateAvatarUrl = async(displayName, type) =>{
+  const result = await updateProperty(AVATAR_URL, displayName, type)
+  return result
 }
 
 export const updateName = async(displayName, type) =>{
@@ -323,6 +340,10 @@ export const queryProfileFromDB = async () => {
      console.log("Query profile from DB error : ", error)
      return error
   }
+}
+export const deleteAvatarUrl = async() => {
+  const result = await deleteData(AVATAR_URL)
+  return result
 }
 
 export const deleteName = async() => {
@@ -412,4 +433,3 @@ const downloadScriptingTransactionID = async(targetDid, scriptName, remotePath) 
 
   return transactionId
 }
-

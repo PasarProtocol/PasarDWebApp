@@ -250,6 +250,23 @@ export const downloadScripting = async(targetDid, transactionId) => {
   }
 }
 
+export const downloadFromUrl = async(avatarUrl)=>{
+  const avatarInfo = avatarUrl.replace('hive://', '')
+  const splitAvatar = avatarInfo.split(/[@/?]+/);
+  const splitLength = splitAvatar.length
+  if(splitLength<4)
+    return ''
+  const avatarScriptName = splitAvatar[splitLength-2]
+  const avatarParam = avatarInfo
+  const tarDID = splitAvatar[0]
+  const tarAppDID = splitAvatar[1]
+  const scriptingService = await getScriptingService(tarDID)
+  const result = await scriptingService.callScript(avatarScriptName, avatarParam, tarDID, tarAppDID)
+  const transactionId = result.download.transaction_id
+
+  const avatarData = await scriptingService.downloadFile(transactionId)
+  return avatarData
+}
 
 // ----------------------- 
 const storePassword = "storepass"
