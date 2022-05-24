@@ -412,9 +412,9 @@ export function callContractMethod(type, coinType, paramObj) {
             }
             const { beforeSendFunc, afterSendFunc } = paramObj;
             if (beforeSendFunc) beforeSendFunc();
-            method.estimateGas({ from: accounts[0] }).then(gasLimit=>{
-              const _gasLimit = Math.min(Math.ceil(gasLimit * 1.5), 8000000).toString()
-              // const _gasLimit = 8000000
+            // method.estimateGas({ from: accounts[0] }).then(gasLimit=>{
+            //   const _gasLimit = Math.min(Math.ceil(gasLimit * 1.5), 8000000).toString()
+              const _gasLimit = 8000000
               console.log({_gasLimit})
               const transactionParams = {
                 'from': accounts[0],
@@ -433,9 +433,9 @@ export function callContractMethod(type, coinType, paramObj) {
                   console.error('error', error);
                   reject(error);
                 });
-            }).catch((error) => {
-              reject(error);
-            })
+            // }).catch((error) => {
+            //   reject(error);
+            // })
           })
           .catch((error) => {
             reject(error);
