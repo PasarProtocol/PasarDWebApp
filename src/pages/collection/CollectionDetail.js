@@ -32,7 +32,7 @@ import StatisticPanel from '../../components/collection/StatisticPanel'
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import Badge from '../../components/Badge';
 import DIABadge from '../../components/DIABadge';
-import { fetchFrom, getIpfsUrl, reduceHexAddress, getDidInfoFromAddress } from '../../utils/common';
+import { fetchFrom, getIpfsUrl, reduceHexAddress, getDidInfoFromAddress, getInfoFromDID } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -134,12 +134,17 @@ export default function CollectionDetail() {
       .then((response) => {
         response.json().then((jsonAssets) => {
           setCollection(jsonAssets.data);
-          getDidInfoFromAddress(jsonAssets.data.owner)
-            .then((info) => {
-              if(info.name)
-                setDidName(info.name)
-            })
-            .catch((e) => {})
+          console.log(jsonAssets.data)
+          const {creatorDid='', creatorName=''} = jsonAssets.data
+          if(creatorName)
+            setDidName(creatorName)
+          else
+            getInfoFromDID(creatorDid)
+              .then((info) => {
+                if(info.name)
+                  setDidName(info.name)
+              })
+              .catch((e) => {})
           
           const metaUri = getIpfsUrl(jsonAssets.data.uri)
           if(metaUri) {

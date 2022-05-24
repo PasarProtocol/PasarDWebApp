@@ -17,7 +17,7 @@ import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
 import Badge from '../Badge';
 import DIABadge from '../DIABadge';
 import useSingin from '../../hooks/useSignin';
-import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, coinTypes, getAssetImage, checkWhetherGeneralCollection } from '../../utils/common';
+import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, coinTypes, getInfoFromDID, getAssetImage, checkWhetherGeneralCollection } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const avatarStyle = {
@@ -200,11 +200,11 @@ const CollectionImgBox = (props) => {
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider, isOwned=false, openRoyaltiesDlg } = props
-  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, collectibles=[], tokenJson={} } = info
+  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, collectibles=[], tokenJson={}, creatorName='', creatorDid='' } = info
   let { description='', avatar='', background='' } = info
   const realData = [totalPrice, floorPrice, totalOwner]
 
-  const [didName, setDidName] = React.useState(tokenJson&&tokenJson.creator&&tokenJson.creator.name?tokenJson.creator.name:'');
+  const [didName, setDidName] = React.useState(creatorName);
   const [metaObj, setMetaObj] = React.useState({});
   // const [realData, setRealData] = React.useState([0, 0, 0]);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
@@ -268,7 +268,7 @@ const CollectionCardPaper = (props) => {
     }      
     else if(owner) {
       if(!didName)
-        getDidInfoFromAddress(owner)
+        getInfoFromDID(creatorDid)
           .then((info) => {
             if(info.name)
               setDidName(info.name)
@@ -312,7 +312,7 @@ const CollectionCardPaper = (props) => {
           setOpenDownloadEssentialDlg(true)
           return
         }
-        navigate(`/collection/edit`, {state: {token}});
+        navigate(`/collections/edit`, {state: {token}});
         break;
       case 'royalties':
         if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
@@ -433,7 +433,7 @@ export default function CollectionCard(props) {
 
   const route2Detail = () => {
     if(!isDragging)
-      navigate(`/collection/detail/${info.token}`);
+      navigate(`/collections/detail/${info.token}`);
   }
 
   return (
