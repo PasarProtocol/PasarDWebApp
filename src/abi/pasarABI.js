@@ -3241,7 +3241,19 @@ module.exports.PASAR_CONTRACT_ABI = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
     "inputs": [
+      {
+        "internalType": "address",
+        "name": "_library",
+        "type": "address"
+      },
       {
         "internalType": "address",
         "name": "_registry",
@@ -3256,13 +3268,6 @@ module.exports.PASAR_CONTRACT_ABI = [
     "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "initialize",
-    "outputs": [],
-    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -3463,6 +3468,19 @@ module.exports.PASAR_CONTRACT_ABI = [
       }
     ],
     "name": "setPlatformFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_dexSwapper",
+        "type": "address"
+      }
+    ],
+    "name": "setSwapper",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
