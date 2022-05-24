@@ -23,9 +23,10 @@ import TransLoadingButton from '../../components/TransLoadingButton';
 import Badge from '../../components/Badge';
 import DIABadge from '../../components/DIABadge';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
-import { queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, 
-  deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe, 
-  updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe, uploadAvatar, downloadAvatar } from '../../components/signin-dlg/HiveAPI';
+import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, 
+  deleteAvatarUrl, deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe, 
+  updateAvatarUrl, updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe, uploadAvatar, downloadAvatar } from '../../components/signin-dlg/HiveAPI';
+import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { isInAppBrowser, getCredentialInfo, getDiaTokenInfo, reduceHexAddress } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 // ----------------------------------------------------------------------
@@ -43,6 +44,7 @@ const RootStyle = styled(Page)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 const credentialItems = [
+  {title: 'Avatar', description: 'avatar', id: 'avatar'},
   {title: 'Name', description: 'name', id: 'name'},
   {title: 'Description', description: 'description', id: 'description'},
   {title: 'Website', description: 'website', id: 'website'},
@@ -63,7 +65,7 @@ const DescriptionStyle = {
   wordWrap: 'break-word'
 }
 export default function EditProfile() {
-  const [checkedItem, setCheckedItem] = React.useState(Array(7).fill(false));
+  const [checkedItem, setCheckedItem] = React.useState(Array(8).fill(false));
   const [walletAddress, setWalletAddress] = React.useState(null);
   const [onProgress, setOnProgress] = React.useState(false);
   const [avatarUrl, setAvatarUrl] = React.useState(null);
@@ -76,8 +78,8 @@ export default function EditProfile() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  const updateProfileData = [updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium]
-  const deleteProfileData = [deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe]
+  const updateProfileData = [updateAvatarUrl, updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium]
+  const deleteProfileData = [deleteAvatarUrl, deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe]
   const queryProfileSocials = {
     website: queryWebsite,
     twitter: queryTwitter,
@@ -87,6 +89,9 @@ export default function EditProfile() {
   }
     
   React.useEffect(async () => {
+    // updateAvatarUrl('hive://did:elastos:inSeTvmVDj6to7dHSZgkRZuUJYc9yHJChN@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1636346252993?params={"empty":0}').then(res=>{
+    //   console.log(res, 'success avatar')
+    // })
     const connectivityService = new ElastosConnectivityService()
     setElastosConnectivityService(connectivityService)
 
@@ -107,7 +112,7 @@ export default function EditProfile() {
         .then((res)=>{
           if(res.find_message && res.find_message.items.length) {
             setDidInfoValue('name', res.find_message.items[0].display_name)
-            handleSetChecked(0)
+            handleSetChecked(1)
           } else {
             setDidInfoValue('name', '')
           }
@@ -115,9 +120,21 @@ export default function EditProfile() {
           queryDescription(targetDid).then((res)=>{
             if(res.find_message && res.find_message.items.length) {
               setDidInfoValue('description', res.find_message.items[0].display_name)
-              handleSetChecked(1)
+              handleSetChecked(2)
             } else {
               setDidInfoValue('description', '')
+            }
+          })
+          queryAvatarUrl(targetDid).then((res)=>{
+            if(res.find_message && res.find_message.items.length) {
+              const avatarUrl = res.find_message.items[0].display_name
+              handleSetChecked(0)
+              downloadFromUrl(avatarUrl).then(avatarData=>{
+                if(avatarData && avatarData.length) {
+                  const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
+                  setAvatarUrl(base64Content)
+                }
+              })
             }
           })
           downloadAvatar(targetDid).then((res)=>{
@@ -126,13 +143,16 @@ export default function EditProfile() {
                 content=`${content}${String.fromCharCode(code)}`;
                 return content
               }, '')
-              setAvatarUrl(`data:image/png;base64,${base64Content}`)
+              setAvatarUrl((prevState)=>{
+                if(!checkedItem[0])
+                  return `data:image/png;base64,${base64Content}`
+              })
             }
           })
           queryKycMe(targetDid).then((res)=>{
             if(res.find_message && res.find_message.items.length) {
               setBadgeFlag('kyc', true)
-              handleSetChecked(7)
+              handleSetChecked(8)
             }
             else
               setBadgeFlag('kyc', false)
@@ -145,7 +165,7 @@ export default function EditProfile() {
                   tempState[field] = res.find_message.items[0].display_name
                   return tempState
                 })
-                handleSetChecked(_i+2)
+                handleSetChecked(_i+3)
               } else {
                 setSocials((prevState) => {
                   const tempState = {...prevState}
@@ -254,12 +274,14 @@ export default function EditProfile() {
   
         const profileData = credentials.reduce((props, c) => {
           props[c.id.fragment] = c.subject.properties[c.id.fragment];
+          if(c.id.fragment === 'avatar')
+            props[c.id.fragment] = props[c.id.fragment].data
           return props;
         }, {});
         const birthDateCredential = credentials.find(c => c.getType().indexOf("BirthDateCredential") >= 0);
         const genderCredential = credentials.find(c => c.getType().indexOf("GenderCredential") >= 0);
         const countryCredential = credentials.find(c => c.getType().indexOf("NationalityCredential") >= 0);
-        if (!birthDateCredential && !genderCredential && !countryCredential && checkedItem[7]){
+        if (!birthDateCredential && !genderCredential && !countryCredential && checkedItem[8]){
           stopProvide("Nothing to provide KYC-me credentials")
           return
         }
@@ -271,7 +293,7 @@ export default function EditProfile() {
         })
         // console.log(profileData)
         // updateName(profileData.name)
-        if(checkedItem[7] && profileData){
+        if(checkedItem[8] && profileData){
           const {BirthDateCredential, GenderCredential, CountryCredential} = profileData
           const tempKYCdata = { birthdate: BirthDateCredential, gender: GenderCredential, country: CountryCredential }
           updateKycMe(JSON.stringify(tempKYCdata))

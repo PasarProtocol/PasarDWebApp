@@ -38,7 +38,8 @@ import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import useSingin from '../../hooks/useSignin';
-import { queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
+import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
+import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -155,13 +156,28 @@ export default function MyProfile() {
             else
               setDidInfoValue('description', bio)
           })
+          queryAvatarUrl(targetDid).then((res)=>{
+            if(res.find_message && res.find_message.items.length) {
+              const avatarUrl = res.find_message.items[0].display_name
+              downloadFromUrl(avatarUrl).then(avatarData=>{
+                if(avatarData && avatarData.length) {
+                  const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
+                  setAvatarUrl(base64Content)
+                }
+              })
+            }
+          })
           downloadAvatar(targetDid).then((res)=>{
             if(res && res.length) {
               const base64Content = res.reduce((content, code)=>{
                 content=`${content}${String.fromCharCode(code)}`;
                 return content
               }, '')
-              setAvatarUrl(`data:image/png;base64,${base64Content}`)
+              setAvatarUrl((prevState)=>{
+                if(!prevState)
+                  return `data:image/png;base64,${base64Content}`
+                return prevState
+              })
             }
           })
           queryKycMe(targetDid).then((res)=>{
