@@ -141,7 +141,7 @@ export default function CreateItem() {
     setOpenDisclaimer(true)
   }, []);
 
-  React.useEffect(async () => {
+  React.useEffect(() => {
     if(selectedCollection.token)
       setCollection("Choose")
   }, [selectedCollection.token]);
@@ -422,6 +422,14 @@ export default function CreateItem() {
     const tempMultiProperties = [...multiProperties]
     tempMultiProperties[multindex] = handleProperties(multiProperties[multindex], key, index, e)
     setMultiProperties(tempMultiProperties)
+  }
+  const handleClickCollection = (type)=>{
+    if(type==='PSRC'){
+      setCollection("PSRC")
+      handleChooseCollection({token: "", name: "", symbol: "", avatar: ""})
+    }
+    else
+      setChooseCollectionOpen(true)
   }
   const progressStep = (pos, index)=>{
     if(mintype!=="Batch")
@@ -1108,8 +1116,8 @@ export default function CreateItem() {
           </Grid>
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
-              <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{setCollection("PSRC")}} current={collection}/>
-              <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{setChooseCollectionOpen(true)}} current={collection} selectedCollection={selectedCollection}/>
+              <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{handleClickCollection("PSRC")}} current={collection}/>
+              <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{handleClickCollection("Choose")}} current={collection} selectedCollection={selectedCollection}/>
               {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
                   <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
