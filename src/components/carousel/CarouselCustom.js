@@ -55,8 +55,8 @@ const DetailItem = (props)=>{
                       value===0?
                       "Not on sale":(
                         <Link
-                          to='/marketplace/detail'
-                          state={{tokenId: detail.tokenId, baseToken: detail.baseToken}}
+                          to={`/marketplace/detail/${[detail.tokenId, detail.baseToken].join('&')}`}
+                          // state={{tokenId: detail.tokenId, baseToken: detail.baseToken}}
                           component={RouterLink}
                           color='text.secondary'
                           sx={{display: 'flex', alignItems: 'center'}}

@@ -23,7 +23,7 @@ export const PATH_PAGE = {
   explorer: '/explorer',
   marketplace: '/marketplace',
   create: '/create',
-  collection: '/collection',
+  collection: '/collections',
   features: '/features',
   rewards: '/rewards'
 };

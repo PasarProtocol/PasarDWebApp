@@ -190,7 +190,7 @@ export default function ChooseCollection(props) {
           <>
             <Typography variant="h5" sx={{ color: 'text.secondary', py: 2 }} align='center'>We could not find any of your collections</Typography>
             <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
-              <StyledButton variant='contained' component={RouterLink} to="/collection/create">
+              <StyledButton variant='contained' component={RouterLink} to="/collections/create">
                 Create New Collection
               </StyledButton>
             </Box>

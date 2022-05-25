@@ -54,7 +54,7 @@ export default function SearchResult() {
   }, [params.key]);
   
   const link2Detail = (tokenId, baseToken)=>{
-    navigate('/explorer/collectible/detail', {state: {tokenId, baseToken}});
+    navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   }
   return (
     <RootStyle title="Search | PASAR">

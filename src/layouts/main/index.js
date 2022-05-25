@@ -62,7 +62,7 @@ export default function MainLayout() {
   const isHome = pathname === '/';
   const isContainerXl = isHome || pathname === '/collection';
   const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create'
-   || pathname === '/create/' || pathname.startsWith('/marketplace/search') || pathname.startsWith('/collection/detail');
+   || pathname === '/create/' || pathname.startsWith('/marketplace/search') || pathname.startsWith('/collections/detail');
   return (
     <>
       <MainNavbar />

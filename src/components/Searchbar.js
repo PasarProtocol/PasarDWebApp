@@ -272,7 +272,7 @@ export default function Searchbar({placeholder}) {
                         <Divider />
                         {
                           instanceSearchResult.collections.map((item, _i)=>(
-                            <ListItemButton key={_i} component={RouterLink} to={`/collection/detail/${item.token}`} onClick={handleLinkClick}>
+                            <ListItemButton key={_i} component={RouterLink} to={`/collections/detail/${item.token}`} onClick={handleLinkClick}>
                               <ListItemAvatar>
                                 <Avatar alt="Collection" src={instanceCollectionAvatar[_i]} sx={{width: 30, height: 30}} />
                               </ListItemAvatar>
@@ -305,8 +305,8 @@ export default function Searchbar({placeholder}) {
                             <ListItemButton
                               key={_i}
                               component={RouterLink}
-                              to='/marketplace/detail'
-                              state={{tokenId: item.tokenId, baseToken: item.baseToken}}
+                              to={`/marketplace/detail/${[item.tokenId, item.baseToken].join('&')}`}
+                              // state={{tokenId: item.tokenId, baseToken: item.baseToken}}
                               onClick={handleLinkClick}
                             >
                               <ListItemAvatar>
