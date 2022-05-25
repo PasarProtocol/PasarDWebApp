@@ -312,7 +312,7 @@ const CollectionCardPaper = (props) => {
           setOpenDownloadEssentialDlg(true)
           return
         }
-        navigate(`/collections/edit`, {state: {token}});
+        navigate(`/collection/edit`, {state: {token}});
         break;
       case 'royalties':
         if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
@@ -433,7 +433,7 @@ export default function CollectionCard(props) {
 
   const route2Detail = () => {
     if(!isDragging)
-      navigate(`/collections/detail/${info.token}`);
+      navigate(`/collection/detail/${info.token}`);
   }
 
   return (
