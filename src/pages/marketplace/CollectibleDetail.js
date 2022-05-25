@@ -124,8 +124,10 @@ const BidStatus = ({isReserveMet}) => (
 // ----------------------------------------------------------------------
 export default function CollectibleDetail() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { tokenId, baseToken } = location.state || {}
+  // const location = useLocation();
+  // const { tokenId, baseToken } = location.state || {}
+  const params = useParams()
+  const [ tokenId, baseToken ] = params.args.split('&')
   const [isFullScreen, setFullScreen] = React.useState(false);
   const [isOpenSharePopup, setOpenSharePopup] = React.useState(null);
   const [isOpenMorePopup, setOpenMorePopup] = React.useState(null);
@@ -665,7 +667,7 @@ export default function CollectibleDetail() {
                 <Typography variant="subtitle2">Collection</Typography>
                 {
                   collection?
-                  <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ color: 'inherit' }}>
+                  <Link to={`/collections/detail/${collection.token}`} component={RouterLink} sx={{ color: 'inherit' }}>
                     <Stack direction='row'>
                       {
                         collection.avatar?
@@ -701,8 +703,7 @@ export default function CollectibleDetail() {
               <Typography variant="h5" sx={{ my: 1 }}>Item Details</Typography>
               <AssetDetailInfo detail={collectible}/>
               <Button
-                to='/explorer/collectible/detail'
-                state={{tokenId: collectible.tokenId, baseToken: collectible.baseToken}}
+                to={`/explorer/collectible/detail/${[collectible.tokenId, collectible.baseToken].join('&')}`}
                 size="small"
                 color="inherit"
                 component={RouterLink}
@@ -772,8 +773,7 @@ export default function CollectibleDetail() {
               <AccordionDetails sx={{pb: '50px', position: 'relative', px: '20px'}}>
                 <CollectibleHistory isLoading={isLoadingTransRecord} dataList={transRecord} creator={{address: collectible.royaltyOwner, name: didName.creator}}/>
                 <Button
-                  to='/explorer/collectible/detail'
-                  state={{tokenId: collectible.tokenId, baseToken: collectible.baseToken}}
+                  to={`/explorer/collectible/detail/${[collectible.tokenId, collectible.baseToken].join('&')}`}
                   size="small"
                   color="inherit"
                   component={RouterLink}
@@ -798,7 +798,7 @@ export default function CollectibleDetail() {
                 <AccordionDetails sx={{pb: '50px', position: 'relative', px: '20px'}}>
                   <Stack direction="row" spacing={2}>
                     <MHidden width="smDown">
-                      <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
+                      <Link to={`/collections/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
                           {
                             collection.avatar?
                             <AvatarStyle draggable = {false} component="img" src={collection.avatar} sx={{ minWidth: 40 }} />:
@@ -809,7 +809,7 @@ export default function CollectibleDetail() {
                     <Stack spacing={1} sx={{ minWidth: 0, flexGrow: 1 }}>
                         <Stack direction="row">
                           <MHidden width="smUp">
-                            <Link to={`/collection/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
+                            <Link to={`/collections/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
                                 {
                                   collection.avatar?
                                   <AvatarStyle draggable = {false} component="img" src={collection.avatar} sx={{ minWidth: 40 }} />:
@@ -881,8 +881,7 @@ export default function CollectibleDetail() {
           }
           <Grid item xs={12}>
             <Link
-              to='/explorer/collectible/detail'
-              state={{tokenId: collectible.tokenId, baseToken: collectible.baseToken}}
+              to={`/explorer/collectible/detail/${[collectible.tokenId, collectible.baseToken].join('&')}`}
               component={RouterLink}
               underline="none"
             >

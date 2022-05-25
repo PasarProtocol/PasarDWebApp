@@ -98,10 +98,10 @@ export default function Explorer() {
               {collections.length} collections
             </Typography>
             <Stack direction='row' spacing={1}>
-              <StyledButton variant="contained" onClick={handleNavlink} to='/collection/create'>
+              <StyledButton variant="contained" onClick={handleNavlink} to='/collections/create'>
                 Create
               </StyledButton>
-              <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
+              <StyledButton variant="contained" onClick={handleNavlink} to='/collections/import'>
                 Import
               </StyledButton>
               {

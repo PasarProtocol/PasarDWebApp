@@ -285,7 +285,7 @@ export default function MyItems() {
     setDispmode(mode);
   };
   const link2Detail = (tokenId, baseToken)=>{
-    navigate('/explorer/collectible/detail', {state: {tokenId, baseToken}});
+    navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   }
   const loadingSkeletons = Array(10).fill(null)
 

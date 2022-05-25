@@ -72,7 +72,7 @@ export default function Collectible() {
     setTimeOrder(selected)
   }
   const link2Detail = (tokenId, baseToken)=>{
-    navigate('/explorer/collectible/detail', {state: {tokenId, baseToken}});
+    navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   }
   return (
     <RootStyle title="Collectible | PASAR">

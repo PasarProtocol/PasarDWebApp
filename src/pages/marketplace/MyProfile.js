@@ -306,7 +306,7 @@ export default function MyProfile() {
   };
 
   const link2Detail = (tokenId, baseToken)=>{
-    navigate('/explorer/collectible/detail', {state: {tokenId, baseToken}});
+    navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   }
 
   const handleNavlink = (e)=>{
@@ -477,10 +477,10 @@ export default function MyProfile() {
                         sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
                         <Grid item xs={12} sx={{display: 'flex', justifyContent: 'end'}}>
                           <Stack direction='row' spacing={2}>
-                            <StyledButton variant="contained" onClick={handleNavlink} to='/collection/create'>
+                            <StyledButton variant="contained" onClick={handleNavlink} to='/collections/create'>
                               Create
                             </StyledButton>
-                            <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
+                            <StyledButton variant="contained" onClick={handleNavlink} to='/collections/import'>
                               Import
                             </StyledButton>
                           </Stack>
@@ -500,10 +500,10 @@ export default function MyProfile() {
                       {
                         sessionStorage.getItem("PASAR_LINK_ADDRESS")==='2' &&
                         <>
-                          <StyledButton variant="contained" onClick={handleNavlink} to='/collection/create' sx={{mb: 2}}>
+                          <StyledButton variant="contained" onClick={handleNavlink} to='/collections/create' sx={{mb: 2}}>
                             Create new collection
                           </StyledButton>
-                          <StyledButton variant="contained" onClick={handleNavlink} to='/collection/import'>
+                          <StyledButton variant="contained" onClick={handleNavlink} to='/collections/import'>
                             Import existing collection
                           </StyledButton>
                         </>

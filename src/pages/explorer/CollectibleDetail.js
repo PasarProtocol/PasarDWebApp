@@ -49,8 +49,10 @@ const PaperStyle = (props) => (
 // ----------------------------------------------------------------------
 const DefaultPageSize = 5;
 export default function CollectibleDetail() {
-  const location = useLocation();
-  const { tokenId, baseToken } = location.state || {}
+  // const location = useLocation();
+  // const { tokenId, baseToken } = location.state || {}
+  const params = useParams()
+  const [ tokenId, baseToken ] = params.args.split('&')
   const [collectible, setCollectible] = React.useState({});
   const [transRecord, setTransRecord] = React.useState([]);
   const [detailPageSize, setDetailPageSize] = React.useState(DefaultPageSize);

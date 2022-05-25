@@ -423,7 +423,7 @@ export default function CollectionDetail() {
     setAdult(false)
   }
   const link2Detail = (tokenId, baseToken)=>{
-    navigate('/explorer/collectible/detail', {state: {tokenId, baseToken}});
+    navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   }
   const closeFilter = (e)=>{
     setFilterView(!isFilterView&&1)

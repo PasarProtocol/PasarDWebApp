@@ -252,7 +252,7 @@ export default function BadgeProfile(props) {
                     <>
                       {
                         collection?
-                        <Link to={`/collection/detail/${token}`} component={RouterLink} color='text.primary'>
+                        <Link to={`/collections/detail/${token}`} component={RouterLink} color='text.primary'>
                           <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
                             <Box draggable = {false} component="img" src={avatar} sx={{ width: avatar&&avatar.startsWith('/static')?35:60 }} />
                           </Box>
@@ -280,7 +280,7 @@ export default function BadgeProfile(props) {
                   <>
                     {
                       collection?
-                      <Link to={`/collection/detail/${token}`} component={RouterLink} color='text.primary'>
+                      <Link to={`/collections/detail/${token}`} component={RouterLink} color='text.primary'>
                         <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
                       </Link>:
                       <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
