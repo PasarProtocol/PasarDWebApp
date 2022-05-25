@@ -605,10 +605,10 @@ export default function CollectibleDetail() {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <PaperStyle>
-              <Typography variant="h4">
+              <Typography variant="h4" sx={{wordBreak: 'break-all'}}>
                   {collectible.name}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', wordBreak: 'break-word' }}>{collectible.description}</Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>{collectible.description}</Typography>
               <Stack sx={{mt: 2}} spacing={1}>
                 <Typography variant="subtitle2">Creator</Typography>
                 <Stack direction='row'>
@@ -819,7 +819,7 @@ export default function CollectibleDetail() {
                           </MHidden>
                           <Typography variant="subtitle2" sx={{display: 'flex', alignItems: 'center'}}>{collection.name}</Typography>
                         </Stack>
-                        <Typography variant="body2" color='text.secondary'>{collection.description}</Typography>
+                        <Typography variant="body2" color='text.secondary' sx={{wordBreak: 'break-all'}}>{collection.description}</Typography>
                         {
                           !!collection.owner && !!collection.token &&
                           <Box>
