@@ -41,7 +41,7 @@
     "@elastosfoundation/elastos-connectivity-sdk-js": "^1.0.15",
     "@elastosfoundation/elastos-cordova-plugin-did": "^1.0.41",
     "@elastosfoundation/essentials-connector-client-browser": "^1.0.32",
-    "@elastosfoundation/hive-js-sdk": "^2.5.1",
+    "@elastosfoundation/hive-js-sdk": "^2.7.1",
     "@emotion/cache": "^11.4.0",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
