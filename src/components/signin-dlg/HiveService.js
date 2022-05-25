@@ -1,9 +1,10 @@
-import {InsertOptions, File as HiveFile, VaultServices, AppContext, Logger as HiveLogger } from "@elastosfoundation/hive-js-sdk";
+import {InsertOptions, File as HiveFile, ScriptRunner, Vault, AppContext, Logger as HiveLogger } from "@elastosfoundation/hive-js-sdk";
 import {JWTParserBuilder, JWTHeader, DID as DID2, DIDBackend, DefaultDIDAdapter, JSONObject, VerifiablePresentation  } from '@elastosfoundation/did-js-sdk';
 import {connectivity, DID as ConDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { ApplicationDID } from '../../config'
 
-let vaults 
+let hiveVault 
+let scriptRunners
 
 const creatAppContext = async (appInstanceDidDocument, userDidString) => {
   try {
@@ -36,68 +37,74 @@ const creatAppContext = async (appInstanceDidDocument, userDidString) => {
   return context
   } catch (error) {
     console.log("creatAppContext error: ",error)
+    throw error
   }
 }
 
-const createVault = async (targetDid) => {
+const createVault = async () => {
   try {
+    const pasarDid = sessionStorage.getItem('PASAR_DID')
+    const userDid = `did:elastos:${pasarDid}`
     const appinstanceDocument = await getAppInstanceDIDDoc()
-    const context = await creatAppContext(appinstanceDocument, targetDid)
-    const vault = new VaultServices(context)
-    if (vaults === undefined) {
-      vaults = {}
+    const context = await creatAppContext(appinstanceDocument, userDid)
+    const hiveVault = new Vault(context)
+
+    const scriptRunner = await creatScriptRunner(userDid)
+    if (scriptRunners === undefined) {
+      scriptRunners = {}
     }
-    vaults[targetDid] = vault
-    return vault
+
+    scriptRunners[userDid] = scriptRunner
+
+    return hiveVault
   }
   catch (error) {
     console.log("creat vault error: ", error)
+    throw error
   }
 }
 
-const getVault = async (targetDid) => {
-  if (vaults === undefined) {
-    await createVault(targetDid)
+const creatScriptRunner = async (targetDid) => {
+  const appinstanceDocument = await getAppInstanceDIDDoc()
+  const context = await creatAppContext(appinstanceDocument, targetDid)
+  const scriptRunner = new ScriptRunner(context)
+  if (scriptRunners === undefined) {
+    scriptRunners = {}
   }
-  let vault = vaults[targetDid]
-  if (vault === null || vault === undefined) {
-    vault = await createVault(targetDid)
-    return vault
-  }
-  return vault
+  scriptRunners[targetDid] = scriptRunner
+
+  return scriptRunner
 }
 
-const getMyVault = async () => {
-  const pasarDid = sessionStorage.getItem('PASAR_DID')
-  const userDid = `did:elastos:${pasarDid}`
-  if (vaults === undefined) {
-    await createVault(userDid)
+const getScriptRunner = async (targetDid) => {
+  let scriptRunner = scriptRunners[targetDid]
+  if (scriptRunner === undefined || scriptRunner === null) {
+    scriptRunner = await creatScriptRunner(targetDid)
   }
-  const vault = vaults[userDid]
-  return vault
+  return scriptRunner
 }
 
-const getScriptingService = async (targetDid) => {
-  const vault = await getVault(targetDid)
-  const scriptingService = vault.getScriptingService()
-
-  return scriptingService
+const getVault = async () => {
+  if (hiveVault === undefined || hiveVault === null) {
+    hiveVault = await createVault()
+  }
+  return hiveVault
 }
 
-const getMyScriptingService = async () => {
-  const vault = await getMyVault()
-  const scriptingService = vault.getScriptingService()
+const getScriptingService = async () => {
+  const hiveVault = await getVault()
+  const scriptingService = hiveVault.getScriptingService()
 
   return scriptingService
 }
 
 const getDatabaseService = async () => {
-  const databaseService = (await getMyVault()).getDatabaseService()
+  const databaseService = (await getVault()).getDatabaseService()
   return databaseService
 }
 
 const getFilesService = async () =>  {
-  const fileService = (await getMyVault()).getFilesService()
+  const fileService = (await getVault()).getFilesService()
   return fileService
 }
 
@@ -159,9 +166,9 @@ export const registerScript = (scriptName, executable, condition, allowAnonymous
 
 export const callScript = (scriptName, document, targetDid, appid = ApplicationDID) => (
   new Promise((resolve, reject) => {
-    getScriptingService(targetDid)
-      .then(scriptingService=>(
-        scriptingService.callScript(scriptName, document, targetDid, appid)
+    getScriptRunner(targetDid)
+      .then(scriptRunner=>(
+        scriptRunner.callScript(scriptName, document, targetDid, appid)
       ))
       .then(res=>{
         resolve(res)
@@ -242,8 +249,8 @@ export const uploadFileWithString= async(remotePath, img) => {
 
 export const downloadScripting = async(targetDid, transactionId) => {
   try {
-    const scriptingService = await getScriptingService(targetDid)
-    return await scriptingService.downloadFile(transactionId)
+    const scriptRunner = await getScriptRunner(targetDid)
+    return await scriptRunner.downloadFile(transactionId)
   } catch (error) {
     console.log("downloadScripting error: ", error)
     return error
