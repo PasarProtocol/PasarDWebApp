@@ -175,7 +175,7 @@ export default function AssetCard(props) {
           return
         }
         if(currentBid.length && !auctionEnded){
-          enqueueSnackbar('Already have been bid', { variant: 'warning' });
+          enqueueSnackbar('Already has been bid', { variant: 'warning' });
           return
         }
         setOpenUpdate(true)
@@ -186,10 +186,13 @@ export default function AssetCard(props) {
           return
         }
         if(currentBid.length && !auctionEnded){
-          enqueueSnackbar('Already have been bid', { variant: 'warning' });
+          enqueueSnackbar('Already has been bid', { variant: 'warning' });
           return
         }
         setOpenCancel(true)
+        break;
+      case 'claim':
+        setSettleOrderOpen(true)
         break;
       case 'delete':
         setOpenDelete(true)
@@ -248,7 +251,7 @@ export default function AssetCard(props) {
                   disabled={
                     !(
                       sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && (
-                        (type===1 && myaddress===holder) || 
+                        (type===1 && myaddress===holder && (auctionEnded || (!auctionEnded && !currentBidPrice))) || 
                         (type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))
                       )
                     )
@@ -281,18 +284,39 @@ export default function AssetCard(props) {
                   </div>
                 }
                 {
-                  type===1&&myaddress===holder&&
+                  type===1&&myaddress===holder&&sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
                   <div>
                     {
-                      sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&
-                      <div>
-                        <MenuItem value='update' onClick={handleClosePopup}>
-                          <LocalOfferOutlinedIcon/>&nbsp;Update Price
-                        </MenuItem>
-                        <MenuItem value='cancel' onClick={handleClosePopup}>
-                          <CancelOutlinedIcon/>&nbsp;Cancel Sale
-                        </MenuItem>
-                      </div>
+                      !auctionEnded?
+                      <>
+                        {
+                          !currentBidPrice&&
+                          <div>
+                            <MenuItem value='update' onClick={handleClosePopup}>
+                              <LocalOfferOutlinedIcon/>&nbsp;Update Price
+                            </MenuItem>
+                            <MenuItem value='cancel' onClick={handleClosePopup}>
+                              <CancelOutlinedIcon/>&nbsp;Cancel Sale
+                            </MenuItem>
+                          </div>    
+                        }
+                      </>:
+
+                      <>
+                      {
+                        (!currentBidPrice || currentBidPrice<reservePrice)?
+                        <div>
+                          <MenuItem value='cancel' onClick={handleClosePopup}>
+                            <CancelOutlinedIcon/>&nbsp;Cancel Sale
+                          </MenuItem>
+                        </div>:
+                        <div>
+                          <MenuItem value='claim' onClick={handleClosePopup}>
+                            <CancelOutlinedIcon/>&nbsp;Claim Item
+                          </MenuItem>
+                        </div>
+                      }
+                    </>
                     }
                     {/* <MenuItem onClick={handleClosePopup}>
                       <ShareOutlinedIcon/>&nbsp;Share
@@ -464,7 +488,7 @@ export default function AssetCard(props) {
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps}/>
         <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance}/>
         <AuctionDlg isOpen={auctionOpen} setOpen={setOpenAuction} {...dlgProps}/>
-        <SettleOrderDlg isOpen={settleOpen} setOpen={setSettleOrderOpen} info={props} address={myaddress}/>
+        <SettleOrderDlg isOpen={settleOpen} setOpen={setSettleOrderOpen} info={{...props, listBid: currentBid}} address={myaddress}/>
       </Box>
   );
 };
