@@ -98,10 +98,12 @@ export default function CollectibleHandleSection(props) {
 
   const checkHasEnded  = () => {
     const tempEndTime = collectible.endTime*1000
-    if(!auctionEnded&&(!tempEndTime || tempEndTime<=Date.now()))
+    if(!tempEndTime || tempEndTime<=Date.now())
       setAuctionEnded(true)
-    else
+    else {
+      setAuctionEnded(false)
       setTimeout(()=>checkHasEnded(), 1000)
+    }
   }
   const coinType = getCoinTypeFromToken(collectible)
   const coinName = coinTypes[coinType].name
