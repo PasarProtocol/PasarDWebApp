@@ -111,6 +111,12 @@ export default function CreateCollection() {
   }, []);
 
   React.useEffect(() => {
+    if(!address)
+      return
+    setRecipientRoyaltiesGroup(prevState=>{
+      const tempState = [{address, royalties: '10'}, ...prevState]
+      return tempState
+    })
     fetchFrom(`api/v2/sticker/getCollectionByOwner/${address}`)
       .then((response) => {
         response.json().then((jsonAssets) => {

@@ -126,7 +126,9 @@ export default function UpdateRoyalties(props) {
 
   const saveRoyalties = async () => {
     setOnValidation(true)
-    if(duproperties.length || recipientRoyaltiesGroup.filter(el=>el.address.length>0&&!el.royalties.length).length)
+    if(!recipientRoyaltiesGroup.filter(el=>el.address.length&&el.royalties.length).length)
+      enqueueSnackbar('Fee recipient properties are required.', { variant: 'warning' });
+    else if(duproperties.length || recipientRoyaltiesGroup.filter(el=>el.address.length>0&&!el.royalties.length).length)
       enqueueSnackbar('Fee recipient properties are invalid.', { variant: 'warning' });
     else if(recipientRoyaltiesGroup.filter(el=>(el.address.length%42 || (el.address.length===42 && !Web3.utils.isAddress(el.address)))).length)
       enqueueSnackbar('Fee recipient address is invalid.', { variant: 'warning' });
