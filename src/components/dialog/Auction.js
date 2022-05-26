@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
 import { addDays } from 'date-fns';
 import * as math from 'mathjs';
 import { useWeb3React } from '@web3-react/core';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, 
-  Divider, FormControl, Input, InputLabel, Tooltip, FormControlLabel,  } from '@mui/material';
+  Divider, FormControl, Input, InputLabel, Tooltip, FormControlLabel, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { Icon } from '@iconify/react';
@@ -22,9 +22,11 @@ import CoinSelect from '../marketplace/CoinSelect';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import CustomSwitch from '../custom-switch';
 import CoinTypeLabel from '../CoinTypeLabel';
+import DIABadge from '../DIABadge';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString, isValidLimitPrice } from '../../utils/common';
+import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString, isValidLimitPrice, getDiaBalanceDegree } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
+import { PATH_PAGE } from '../../routes/paths';
 
 export default function Auction(props) {
   const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate } = props;
@@ -44,7 +46,7 @@ export default function Auction(props) {
   const { enqueueSnackbar } = useSnackbar();
 
   const context = useWeb3React();
-  const { pasarLinkAddress } = useSingin()
+  const { pasarLinkAddress, diaBalance } = useSingin()
   const { library, chainId, account } = context;
 
   React.useEffect(async () => {
@@ -215,6 +217,7 @@ export default function Auction(props) {
       });
     }
   }
+  const DiaDegree = getDiaBalanceDegree(diaBalance)
 
   const TypographyStyle = {display: 'inline', lineHeight: 1.1}
   return (
@@ -282,7 +285,17 @@ export default function Auction(props) {
         </Typography>
 
         <Grid item xs={12}>
-          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Reserve Price</Typography>
+          <Typography variant="h4" sx={{fontWeight: 'normal'}}>
+            Include Reserve Price
+            {
+              DiaDegree===0 &&
+              <Stack direction="row" spacing={1} sx={{display: 'inline-flex', pl: 2}}>
+                <DIABadge degree={1} isRequire={Boolean(true)}/>
+                <DIABadge degree={2} isRequire={Boolean(true)}/>
+                <DIABadge degree={3} isRequire={Boolean(true)}/>
+              </Stack>
+            }
+          </Typography>
         </Grid>
         <Grid item xs={12}>
           <Stack direction="row">
@@ -290,11 +303,23 @@ export default function Auction(props) {
               Set a minimum price before auction can complete
             </InputLabelStyle>
             <FormControlLabel
-              control={<CustomSwitch onChange={handleReserveForAuction}/>}
+              control={<CustomSwitch onChange={handleReserveForAuction} disabled={DiaDegree===0}/>}
               sx={{mt:-2, mr: 0}}
               label=""
             />
           </Stack>
+          {
+            DiaDegree===0 &&
+            <>
+              <Divider/>
+              <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
+                Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info{' '}
+                <Link underline="always" component={RouterLink} to={PATH_PAGE.features} color='origin.main'>
+                  here
+                </Link>
+              </Typography>
+            </>
+          }
         </Grid>
         {
           isReserveForAuction&&
@@ -323,7 +348,17 @@ export default function Auction(props) {
           </>
         }
         <Grid item xs={12}>
-          <Typography variant="h4" sx={{fontWeight: 'normal'}}>Include Buy Now Price</Typography>
+          <Typography variant="h4" sx={{fontWeight: 'normal'}}>
+            Include Buy Now Price
+            {
+              DiaDegree===0 &&
+              <Stack direction="row" spacing={1} sx={{display: 'inline-flex', pl: 2}}>
+                <DIABadge degree={1} isRequire={Boolean(true)}/>
+                <DIABadge degree={2} isRequire={Boolean(true)}/>
+                <DIABadge degree={3} isRequire={Boolean(true)}/>
+              </Stack>
+            }
+          </Typography>
         </Grid>
         <Grid item xs={12}>
           <Stack direction="row">
@@ -331,11 +366,23 @@ export default function Auction(props) {
               Set instant purchase price (auction ends immediately after a sale)
             </InputLabelStyle>
             <FormControlLabel
-              control={<CustomSwitch onChange={handleBuynowForAuction}/>}
+              control={<CustomSwitch onChange={handleBuynowForAuction} disabled={DiaDegree===0}/>}
               sx={{mt:-2, mr: 0}}
               label=""
             />
           </Stack>
+          {
+            DiaDegree===0 &&
+            <>
+              <Divider/>
+              <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
+                Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info{' '}
+                <Link underline="always" component={RouterLink} to={PATH_PAGE.features} color='origin.main'>
+                  here
+                </Link>
+              </Typography>
+            </>
+          }
         </Grid>
         {
           isBuynowForAuction&&
