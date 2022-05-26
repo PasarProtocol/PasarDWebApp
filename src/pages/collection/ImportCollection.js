@@ -97,6 +97,14 @@ export default function ImportCollection() {
     }
   }, [isOpenRegCollection]);
 
+  React.useEffect(() => {
+    if(address)
+      setRecipientRoyaltiesGroup(prevState=>{
+        const tempState = [{address, royalties: '10'}, ...prevState]
+        return tempState
+      })
+  }, [address]);
+
   const handleInputAddress = (e)=>{
     const inputAddress = e.target.value
     if(inputAddress.length>=42){
