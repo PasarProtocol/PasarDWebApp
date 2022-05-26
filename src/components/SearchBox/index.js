@@ -180,6 +180,7 @@ export default function SearchBox(props) {
   }
   const handleLinkClick = (e)=>{
     setLinkToState(!linkToState)
+    setLeaveSearchField(true)
   }
   return (
     needAutocomplete?

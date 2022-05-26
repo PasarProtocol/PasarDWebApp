@@ -252,7 +252,7 @@ export default function AssetCard(props) {
                     !(
                       sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && (
                         (type===1 && myaddress===holder && (auctionEnded || (!auctionEnded && !currentBidPrice))) || 
-                        (type===2 && (isListedOwnedByMe || isUnlistedOwnedByMe))
+                        (type===2 && ((isListedOwnedByMe && (auctionEnded || (!auctionEnded && !currentBidPrice))) || isUnlistedOwnedByMe))
                       )
                     )
                   }
@@ -328,12 +328,38 @@ export default function AssetCard(props) {
                     (
                       isListedOwnedByMe&&
                       <div>
-                        <MenuItem value='update' onClick={handleClosePopup}>
-                          <LocalOfferOutlinedIcon/>&nbsp;Update Price
-                        </MenuItem>
-                        <MenuItem value='cancel' onClick={handleClosePopup}>
-                          <CancelOutlinedIcon/>&nbsp;Cancel Sale
-                        </MenuItem>
+                      {
+                        !auctionEnded?
+                        <>
+                          {
+                            !currentBidPrice&&
+                            <div>
+                              <MenuItem value='update' onClick={handleClosePopup}>
+                                <LocalOfferOutlinedIcon/>&nbsp;Update Price
+                              </MenuItem>
+                              <MenuItem value='cancel' onClick={handleClosePopup}>
+                                <CancelOutlinedIcon/>&nbsp;Cancel Sale
+                              </MenuItem>
+                            </div>    
+                          }
+                        </>:
+
+                        <>
+                        {
+                          (!currentBidPrice || currentBidPrice<reservePrice)?
+                          <div>
+                            <MenuItem value='cancel' onClick={handleClosePopup}>
+                              <CancelOutlinedIcon/>&nbsp;Cancel Sale
+                            </MenuItem>
+                          </div>:
+                          <div>
+                            <MenuItem value='claim' onClick={handleClosePopup}>
+                              <CancelOutlinedIcon/>&nbsp;Claim Item
+                            </MenuItem>
+                          </div>
+                        }
+                        </>
+                      }
                       </div>
                     ) || (
                       isUnlistedOwnedByMe&&
