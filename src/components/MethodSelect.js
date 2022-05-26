@@ -7,6 +7,8 @@ const options = [
     "CancelOrder",
     "ChangeOrderPrice",
     "CreateOrderForSale",
+    "CreateOrderForAuction",
+    "BidForOrder",
     "Mint",
     "SafeTransferFrom",
     "SafeTransferFromWithMemo",
