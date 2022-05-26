@@ -137,9 +137,9 @@ export default function Transfer(props) {
                       value={address}
                       onChange={(e)=>setAddress(e.target.value)}
                       startAdornment={' '}
-                      endAdornment={
-                        <QrCodeScannerIcon/>
-                      }
+                      // endAdornment={
+                      //   <QrCodeScannerIcon/>
+                      // }
                     />
                     <FormHelperText hidden={!isOnValidation||(isOnValidation&&address.length>0)}>Wallet address is required</FormHelperText>
                   </FormControl>
