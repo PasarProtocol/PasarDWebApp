@@ -21,11 +21,12 @@ import Page from '../../components/Page';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import LoadingScreen from '../../components/LoadingScreen';
 import AssetSortSelect from '../../components/AssetSortSelect';
-import useOffSetTop from '../../hooks/useOffSetTop';
 import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
+import useOffSetTop from '../../hooks/useOffSetTop';
+import useSignin from '../../hooks/useSignin';
 import { fetchFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -41,8 +42,6 @@ const RootStyle = styled(Page)(({ theme }) => ({
   }
 }));
 
-const APP_BAR_MOBILE = 72;
-const APP_BAR_DESKTOP = 88;
 const AppBarStyle = styled(AppBar)(({ theme }) => ({
   color: 'inherit',
   transition: theme.transitions.create(['top'], {
@@ -106,6 +105,9 @@ export default function MarketExplorer() {
     status: ["Buy Now", "On Auction", "Not Met", "Has Bids", "Has Ended"],
     type: ["General", "Avatar"],
   }
+  const { openTopAlert } = useSignin()
+  const APP_BAR_MOBILE = 72+(openTopAlert?50:0);
+  const APP_BAR_DESKTOP = 88+(openTopAlert?50:0);
   const rangeBtnId = 10
   const adultBtnId = 11
   const emptyRange = {min: '', max: ''}

@@ -65,7 +65,7 @@ const getLibrary = (provider) => {
 
 ReactDOM.render(
   <HelmetProvider>
-    <ReduxProvider store={store}>
+    {/* <ReduxProvider store={store}> */}
       <SettingsProvider>
         <SigninProvider>
           <BrowserRouter>
@@ -75,7 +75,7 @@ ReactDOM.render(
           </BrowserRouter>
         </SigninProvider>
       </SettingsProvider>
-    </ReduxProvider>
+    {/* </ReduxProvider> */}
   </HelmetProvider>,
   document.getElementById('root')
 );
