@@ -9,9 +9,10 @@ import { useLocation, Outlet } from 'react-router-dom';
 // material
 import { Box } from '@mui/material';
 // components
-import useSettings from '../../hooks/useSettings';
 import MainNavbar from './MainNavbar';
 import MainFooter from './MainFooter';
+import useSettings from '../../hooks/useSettings';
+import useSingin from '../../hooks/useSignin';
 
 // ----------------------------------------------------------------------
 
@@ -59,6 +60,7 @@ const BodyStyle = styled('div')(({ theme, footerhidden }) => (
 export default function MainLayout() {
   const { themeMode } = useSettings();
   const { pathname } = useLocation();
+  const { openTopAlert } = useSingin()
   const isHome = pathname === '/';
   const isContainerXl = isHome || pathname === '/collection';
   const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create'
@@ -66,7 +68,7 @@ export default function MainLayout() {
   return (
     <>
       <MainNavbar />
-      <BodyStyle footerhidden={isFooterHiddenPage?1:0}>
+      <BodyStyle footerhidden={isFooterHiddenPage?1:0} style={{paddingTop: openTopAlert?50:0, transition: 'padding-top 0.3s'}}>
         <Outlet />
       </BodyStyle>
       <MainFooter hidden={isFooterHiddenPage} isContainerXl={isContainerXl}/>

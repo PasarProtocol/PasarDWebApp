@@ -38,10 +38,12 @@ import { createProfileCollection, prepareConnectToHive, registerAllScript } from
 
 export default function SignInDialog() {
   const {
+    openTopAlert,
     openSigninEssential,
     openDownloadEssential,
     afterSigninPath,
     diaBalance,
+    setOpenTopAlert,
     setOpenSigninEssentialDlg,
     setOpenDownloadEssentialDlg,
     setOpenCredentials,
@@ -86,6 +88,19 @@ export default function SignInDialog() {
       }
     }
   }, [sessionLinkFlag, activatingConnector, account, chainId]);
+
+  React.useEffect(() => {
+    if(walletAddress)
+      fetchFrom(`api/v2/sticker/checkV1NFTByWallet/${walletAddress}`, {})
+        .then(response => {
+          response.json().then(jsonResult => {
+            if(jsonResult.data){
+              setOpenTopAlert(true)
+            }
+          })
+        }).catch(e => {
+        });
+  }, [walletAddress])
 
   React.useEffect(async () => {
     initializeWalletConnection();

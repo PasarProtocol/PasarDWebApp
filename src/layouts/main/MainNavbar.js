@@ -2,12 +2,14 @@ import React from 'react'
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
-import { Box, Button, AppBar, Toolbar, Container, Tooltip } from '@mui/material';
+import { Box, Button, AppBar, Toolbar, Container, Tooltip, Alert, IconButton, Collapse, Link } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import CloseIcon from '@mui/icons-material/Close';
 // hooks
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSettings from '../../hooks/useSettings';
+import useSignin from '../../hooks/useSignin';
 // components
 import { MHidden } from '../../components/@material-extend';
 import SearchBox from '../../components/SearchBox';
@@ -50,6 +52,7 @@ const ToolbarShadowStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function MainNavbar() {
+  const {openTopAlert, setOpenTopAlert} = useSignin()
   const isOffset = useOffSetTop(40);
   const { pathname } = useLocation();
   const { themeMode, changeMode } = useSettings();
@@ -59,6 +62,34 @@ export default function MainNavbar() {
 
   return (
     <AppBar sx={{ boxShadow: 0, bgcolor: 'transparent' }}>
+      <Collapse in={openTopAlert}>
+        <Alert
+          severity="info"
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setOpenTopAlert(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+          sx={{borderRadius: 0}}
+        >
+          If you have any existing NFTs listed on the old marketplace contract (Pasar V1), we encourage you to cancel the listing{' '}
+          <Link
+            underline="always"
+            href='https://v1.pasarprotocol.io'
+            target="_blank"
+            // color="text.secondary"
+          >
+            here
+          </Link>{' '}and re-list them on the new marketplace contract (Pasar V2).
+        </Alert>
+      </Collapse>
       <ToolbarStyle
         disableGutters
         sx={{

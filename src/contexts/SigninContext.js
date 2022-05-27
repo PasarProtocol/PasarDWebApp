@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 // ----------------------------------------------------------------------
 
 const initialState = {
+  openTopAlert: false,
   openSigninEssential: false,
   openDownloadEssential: false,
   afterSigninPath: null,
@@ -11,6 +12,7 @@ const initialState = {
   signinEssentialSuccess: false,
   elaConnectivityService: null,
   pasarLinkAddress: 0,
+  setOpenTopAlert: () => {},
   setOpenSigninEssentialDlg: () => {},
   setOpenDownloadEssentialDlg: () => {},
   setAfterSigninPath: () => {},
@@ -27,6 +29,7 @@ SigninProvider.propTypes = {
 };
 
 function SigninProvider({ children }) {
+  const [openTopAlert, setOpenTopAlert] = useState(false);
   const [openSigninEssential, setOpenSigninEssentialDlg] = useState(false);
   const [openDownloadEssential, setOpenDownloadEssentialDlg] = useState(false);
   const [openCredentials, setOpenCredentials] = useState(false);
@@ -39,6 +42,7 @@ function SigninProvider({ children }) {
   return (
     <SigninContext.Provider
       value={{
+        openTopAlert,
         openSigninEssential,
         openDownloadEssential,
         openCredentials,
@@ -47,6 +51,7 @@ function SigninProvider({ children }) {
         elaConnectivityService,
         diaBalance,
         pasarLinkAddress,
+        setOpenTopAlert,
         setOpenSigninEssentialDlg,
         setOpenDownloadEssentialDlg,
         setOpenCredentials,
