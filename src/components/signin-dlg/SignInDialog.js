@@ -594,6 +594,15 @@ export default function SignInDialog() {
               <AccountCircleOutlinedIcon />
               &nbsp;Profile
             </MenuItem>
+            <MenuItem href="https://v1.pasarprotocol.io/marketplace" component={Link} target="_blank" onClick={closeAccountMenu}>
+              <Box
+                component="img"
+                alt=''
+                src='/static/marketplace.svg'
+                sx={{ width: 24, height: 24, p: '1px', filter: (theme)=>theme.palette.mode==='light'?'invert(1)':'none' }}
+              />
+              &nbsp;V1 Marketplace
+            </MenuItem>
             {/* <MenuItem onClick={closeAccountMenu}>
               <SettingsOutlinedIcon />
               &nbsp;Settings
