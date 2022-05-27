@@ -514,7 +514,7 @@ export default function AssetCard(props) {
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps}/>
         <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance}/>
         <AuctionDlg isOpen={auctionOpen} setOpen={setOpenAuction} {...dlgProps}/>
-        <SettleOrderDlg isOpen={settleOpen} setOpen={setSettleOrderOpen} info={{...props, listBid: currentBid}} address={myaddress}/>
+        <SettleOrderDlg isOpen={settleOpen} setOpen={setSettleOrderOpen} info={{...props, listBid: currentBid}} address={myaddress} {...{updateCount, handleUpdate}}/>
       </Box>
   );
 };

@@ -28,7 +28,7 @@ export default function SettleOrder(props) {
   const { updateCount, setUpdateCount } = useAuctionDlg()
   const { library, chainId, account } = context;
 
-  const { isOpen, setOpen, info, address } = props;
+  const { isOpen, setOpen, info, address, updateCount: updateCountProfile, handleUpdate } = props;
 
   // let priceInfo = info.Price;
   // if(info.orderType===auctionOrderType && info.buyoutPrice)
@@ -72,6 +72,9 @@ export default function SettleOrder(props) {
                 setTimeout(()=>{
                   setUpdateCount(updateCount+1)
                 }, 1000)
+
+                if(handleUpdate)
+                  setTimeout(()=>{handleUpdate(updateCountProfile+1)}, 3000)
               }).catch((error) => {
                 console.log(error)
                 enqueueSnackbar('Settle auction order error!', { variant: 'error' });
@@ -115,6 +118,9 @@ export default function SettleOrder(props) {
       setTimeout(()=>{
         setUpdateCount(updateCount+1)
       }, 1000)
+      
+      if(handleUpdate)
+        setTimeout(()=>{handleUpdate(updateCountProfile+1)}, 3000)
     }).catch(error=>{
       enqueueSnackbar('Settle auction order error!', { variant: 'error' })
       setOnProgress(false)
