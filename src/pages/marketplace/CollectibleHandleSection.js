@@ -144,7 +144,7 @@ export default function CollectibleHandleSection(props) {
           <StyledButton variant="contained" actiontype='bid' fullWidth onClick={openSignin}>
             Sign in to Place bid
           </StyledButton>
-      else if(address === collectible.holder && (!currentBid || currentBid<collectible.reservePrice) && collectible.SaleType !== "Not on sale")
+      else if(address === collectible.holder && !currentBid && collectible.SaleType !== "Not on sale")
         handleField = 
           <StyledButton variant="contained" fullWidth onClick={(e)=>{setCancelOpen(true)}}>
             Cancel sale
