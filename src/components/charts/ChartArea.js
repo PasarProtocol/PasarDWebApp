@@ -37,7 +37,8 @@ const getUTCdate = (date)=>{
 export default function ChartArea({by, is4Address}) {
   const params = useParams(); // params.address
   const location = useLocation();
-  const { tokenId, baseToken } = location.state || {}
+  // const { tokenId, baseToken } = location.state || {}
+  const [ tokenId, baseToken ] = params.args?params.args.split('&'):['', '']
   const { themeMode } = useSettings();
   const [period, setPeriod] = useState('a');
   const [volumeType, setType] = useState(by==="address"?1:0);

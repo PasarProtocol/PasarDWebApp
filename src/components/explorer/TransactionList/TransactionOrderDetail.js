@@ -74,6 +74,14 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
     const eventBorderStyle = event==='Burn'?{borderColor: '#e45f14'}:{borderColor: 'text.secondary'}
     if(!methodItem)
         methodItem = {color: 'grey', icon: 'tag', detail: []}
+
+    let totalSum = `${gasFee} ELA`
+    if(method==="BuyOrder") {
+        if(coinType===0)
+            totalSum = `${price + gasFee} ELA`
+        else
+            totalSum = `${price} ${coinName} + ${gasFee} ELA`
+    }
     return (
         <RootStyle>
             <Box
@@ -175,7 +183,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                                 </td>
                                                 <td align="right">
                                                     <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                        {parseFloat((price - platformFee - royaltyFee).toFixed(7))} ELA
+                                                        {parseFloat((price - platformFee - royaltyFee).toFixed(7))} {coinName}
                                                     </Typography>
                                                 </td>
                                             </tr>
@@ -187,7 +195,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                                 </td>
                                                 <td align="right">
                                                     <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                        {platformFee} ELA
+                                                        {platformFee} {coinName}
                                                     </Typography>
                                                 </td>
                                             </tr>
@@ -199,7 +207,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                                 </td>
                                                 <td align="right">
                                                     <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                        {royaltyFee} ELA
+                                                        {royaltyFee} {coinName}
                                                     </Typography>
                                                 </td>
                                             </tr>
@@ -235,7 +243,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                 <tr>
                                     <td colSpan={2} align="right">
                                         <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", borderBottom: "1px solid", ...eventBorderStyle}}>
-                                            {method==="BuyOrder"?(price + gasFee):gasFee} ELA
+                                            {totalSum}
                                         </Typography>
                                         <Typography color="inherit" variant="subtitle2" noWrap sx={{borderTop: "1px solid", marginTop: '1px', ...eventBorderStyle}}/>
                                     </td>
