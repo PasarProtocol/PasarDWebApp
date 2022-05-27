@@ -124,9 +124,9 @@ export default function SettleOrder(props) {
   const settleOrder = async () => {
     setOnProgress(true);
     if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3')
-      callEthSettleOrder(info.OrderId);
+      callEthSettleOrder(info.orderId);
     else if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2')
-      callSettleOrder(info.OrderId);
+      callSettleOrder(info.orderId);
   };
 
   React.useEffect(async () => {
