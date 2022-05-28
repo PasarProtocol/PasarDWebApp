@@ -203,57 +203,28 @@ export function hash(string) {
 }
 
 export async function getCoinUSD() {
-  try {
-    const resCoinPrice = await fetch('https://esc.elastos.io/api?module=stats&action=coinprice');
-    const jsonData = await resCoinPrice.json();
-    if (jsonData && jsonData.result.coin_usd) return jsonData.result.coin_usd;
-    return 0;
-  } catch (error) {
-    return 0;
-  }
+  return new Promise((resolve, reject)=>{
+    getERC20TokenPrice(blankAddress).then(result=>{
+      if(result.bundle.elaPrice)
+        resolve(result.bundle.elaPrice)
+      else
+        resolve(0)
+    }).catch(err=>{
+      resolve(0)
+    })
+  })
+  // try {
+  //   const resCoinPrice = await fetch('https://esc.elastos.io/api?module=stats&action=coinprice');
+  //   const jsonData = await resCoinPrice.json();
+  //   if (jsonData && jsonData.result.coin_usd) return jsonData.result.coin_usd;
+  //   return 0;
+  // } catch (error) {
+  //   return 0;
+  // }
 }
 
 export function getDiaTokenPrice(connectProvider = null) {
   return getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS, connectProvider)
-  // return new Promise((resolve, reject) => {
-  //   let walletConnectWeb3
-  //   if(connectProvider)
-  //     walletConnectWeb3 = new Web3(connectProvider)
-  //   else if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
-  //     walletConnectWeb3 = new Web3(Web3.givenProvider || Web3.currentProvider || window.ethereum)
-  //   else
-  //     walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
-
-  //   walletConnectWeb3.eth
-  //     .getBlockNumber()
-  //     .then((blocknum) => {
-  //       const graphQLParams = {
-  //         query: `query tokenPriceData { token(id: "0x2c8010ae4121212f836032973919e8aec9aeaee5", block: {number: ${blocknum}}) { derivedELA } bundle(id: "1", block: {number: ${blocknum}}) { elaPrice } }`,
-  //         variables: null,
-  //         operationName: 'tokenPriceData'
-  //       };
-  //       axios({
-  //         method: 'POST',
-  //         url: 'https://api.glidefinance.io/subgraphs/name/glide/exchange',
-  //         headers: {
-  //           'content-type': 'application/json',
-  //           // "x-rapidapi-host": "reddit-graphql-proxy.p.rapidapi.com",
-  //           // "x-rapidapi-key": process.env.RAPIDAPI_KEY,
-  //           accept: 'application/json'
-  //         },
-  //         data: graphQLParams
-  //       }).then((response) => {
-  //         try {
-  //           resolve(response.data.data);
-  //         } catch (error) {
-  //           reject(error);
-  //         }
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       reject(error);
-  //     });
-  // });
 }
 
 export function getERC20TokenPrice(tokenAddress, connectProvider = null) {
