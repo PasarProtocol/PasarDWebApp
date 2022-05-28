@@ -47,7 +47,7 @@ import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import {TOKEN_721_ABI} from '../../abi/token721ABI'
 import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
 import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL, auctionOrderType} from '../../config'
-import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, isValidLimitPrice } from '../../utils/common';
+import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, isValidLimitPrice, checkWhetherGeneralCollection } from '../../utils/common';
 import {requestSigndataOnTokenID} from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
@@ -116,6 +116,7 @@ export default function CreateItem() {
   const [disclaimerOpen, setOpenDisclaimer] = React.useState(false);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [moreDIAOpen, setOpenMoreDIA] = React.useState(false);
+  const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps } = useMintDlg()
   const { diaBalance } = useSingin()
   const { enqueueSnackbar } = useSnackbar();
@@ -142,8 +143,11 @@ export default function CreateItem() {
   }, []);
 
   React.useEffect(() => {
-    if(selectedCollection.token)
+    if(selectedCollection.token){
+      checkWhetherGeneralCollection(selectedCollection.token)
+        .then(setIsGeneralCollection)
       setCollection("Choose")
+    }
   }, [selectedCollection.token]);
 
   React.useEffect(async () => {
@@ -1501,7 +1505,7 @@ export default function CreateItem() {
                 )
               }
               {
-                collection !== 'Choose' &&
+                (collection !== 'Choose' || (collection === 'Choose' && isGeneralCollection)) &&
                 <>
                   <Grid item xs={12}>
                     <Typography variant="h4" sx={{fontWeight: 'normal'}}>Royalties&nbsp;
