@@ -33,6 +33,7 @@ const addressForProduction = {
   marketContract: "0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0",
   registerContract: "0x0B3d9c78E0e22b1c005AA74734aE0a973f1c60FE",
   diaContract: "0x2C8010Ae4121212F836032973919E8AeC9AEaEE5",
+  welaContract: "0x517E9e5d46C1EA8aB6f78677d6114Ef47F71f6c4",
   glideContract: "0xd39eC832FF1CaaFAb2729c76dDeac967ABcA8F27",
   elkContract: "0xE1C110E1B1b4A1deD0cAf3E42BfBdbB7b5d7cE1C",
   ethUsdcContract: "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
@@ -47,6 +48,7 @@ const addressForTest = {
   marketContract: "0x19088c509C390F996802B90bdc4bFe6dc3F5AAA7", // 0x86F5FDeC1b49E67393Ab8186EedBe5e49133E98f
   registerContract: "0x2b304ffC302b402785294629674A8C2b64cEF897", // 0x5d9Cf411cdebF75db34b45c014D4f44F558012C0
   diaContract: "0x85946E4b6AB7C5c5C60A7b31415A52C0647E3272",
+  welaContract: "0x517E9e5d46C1EA8aB6f78677d6114Ef47F71f6c4",
   glideContract: "0xd39eC832FF1CaaFAb2729c76dDeac967ABcA8F27",
   elkContract: "0xE1C110E1B1b4A1deD0cAf3E42BfBdbB7b5d7cE1C",
   ethUsdcContract: "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
@@ -64,7 +66,7 @@ const escServerForTest = "https://esc-testnet.elastos.io"
 const ApplicationDIDForMain = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 // const ApplicationDIDForTest = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB"
 
-export const {stickerContract, marketContract, registerContract, diaContract, glideContract, 
+export const {stickerContract, marketContract, registerContract, diaContract, welaContract, glideContract, 
   elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
 export const mainDiaContract = addressForProduction.diaContract
 

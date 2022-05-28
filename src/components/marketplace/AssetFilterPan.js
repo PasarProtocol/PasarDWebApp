@@ -301,7 +301,14 @@ export default function AssetFilterPan(props){
                               }} 
                             />
                           </ListItemIcon>
-                          <ListItemText primary={el.name} />
+                          <ListItemText 
+                            primary={el.name} 
+                            primaryTypographyProps={
+                              i<2?{
+                                sx: {fontWeight: 'bold'}
+                              }:{}
+                            }
+                          />
                           {
                             filterProps.selectedTokens.includes(el.address)&&<CheckIcon/>
                           }
