@@ -23,7 +23,7 @@ import {
   registerContract as REG_CONTRACT_ADDRESS,
   blankAddress, ipfsURL, rpcURL, bunnyContract } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
-import { DIAMOND_CONTRACT_ABI } from '../abi/diamondABI';
+import { ERC20_CONTRACT_ABI } from '../abi/diamondABI';
 import { REGISTER_CONTRACT_ABI } from '../abi/registerABI';
 import { COMMON_CONTRACT_ABI } from '../abi/commonABI';
 
@@ -149,22 +149,24 @@ export const getBalanceByAllCoinTypes = (connectProvider, balanceHandler) =>
       return
     }
     
-    let count = 0
     // const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(connectProvider);
     walletConnectWeb3.eth.getAccounts().then(accounts=>{
-      walletConnectWeb3.eth.getBalance(accounts[0]).then(balance=>{
-        balanceHandler(0, math.round(balance / 1e18, 4))
-        count+=1
-        if(count === 2)
-          resolve(true)
-      }).catch(err=>{})
-      getDiaTokenInfo(accounts[0], connectProvider).then(balance=>{
-        balanceHandler(1, balance*1)
-        count+=1
-        if(count === 2)
-          resolve(true)
-      }).catch(err=>{})
+      const getBalanceFuncs = coinTypes.map((coin, _i)=>{
+        if(coin.address === blankAddress) 
+          return walletConnectWeb3.eth.getBalance(accounts[0]).then(balance=>{
+            balanceHandler(_i, math.round(balance / 1e18, 4))
+          }).catch(err=>{})
+
+        return getERC20TokenBalance(coin.address, accounts[0], connectProvider).then(balance=>{
+          balanceHandler(_i, balance*1)
+        }).catch(err=>{})
+      })
+      Promise.all(getBalanceFuncs).then(res=>{
+        resolve(true)
+      }).catch(err=>{
+        reject(err)
+      })
     }).catch(err=>{
       reject(err)
     })
@@ -297,6 +299,10 @@ export function getERC20TokenPrice(tokenAddress, connectProvider = null) {
 }
 
 export function getDiaTokenInfo(strAddress, connectProvider = null) {
+  return getERC20TokenBalance(DIA_CONTRACT_ADDRESS, strAddress, connectProvider)
+}
+
+function getERC20TokenBalance(erc20ContractAddress, strAddress, connectProvider = null) {
   return new Promise((resolve, reject) => {
     try{
       let walletConnectWeb3
@@ -308,10 +314,10 @@ export function getDiaTokenInfo(strAddress, connectProvider = null) {
         walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
       
       // const web3 = new Web3(Web3.givenProvider);
-      // const MyContract = new web3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS);
+      // const MyContract = new web3.eth.Contract(ERC20_CONTRACT_ABI, DIA_CONTRACT_ADDRESS);
       // MyContract.methods.balanceOf(strAddress).call().then(console.log);
 
-      const diamondContract = new walletConnectWeb3.eth.Contract(DIAMOND_CONTRACT_ABI, DIA_CONTRACT_ADDRESS)
+      const diamondContract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, erc20ContractAddress)
       diamondContract.methods.balanceOf(strAddress).call()
         .then(result=>{
           // console.log(result)
