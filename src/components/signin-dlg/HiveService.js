@@ -4,7 +4,7 @@ import {connectivity, DID as ConDID} from "@elastosfoundation/elastos-connectivi
 import { ApplicationDID } from '../../config'
 
 let hiveVault 
-let scriptRunners
+let scriptRunners = {}
 
 const creatAppContext = async (appInstanceDidDocument, userDidString) => {
   try {
