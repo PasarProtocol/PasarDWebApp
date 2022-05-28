@@ -13,14 +13,20 @@ import {
   stickerContract as STICKER_ADDRESS, 
   marketContract as CONTRACT_ADDRESS, 
   diaContract as DIA_CONTRACT_ADDRESS, 
+  mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS,
+  glideContract as GLIDE_CONTRACT_ADDRESS, 
+  elkContract as ELK_CONTRACT_ADDRESS, 
+  ethUsdcContract as EUSDC_CONTRACT_ADDRESS, 
+  bunnyContract as BUNNY_CONTRACT_ADDRESS, 
+  bnbBusdContract as BUSD_CONTRACT_ADDRESS, 
   registerContract as REG_CONTRACT_ADDRESS,
-  blankAddress, ipfsURL, rpcURL } from '../config';
+  blankAddress, ipfsURL, rpcURL, bunnyContract } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { DIAMOND_CONTRACT_ABI } from '../abi/diamondABI';
 import { REGISTER_CONTRACT_ABI } from '../abi/registerABI';
 import { COMMON_CONTRACT_ABI } from '../abi/commonABI';
 
-const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS]
+const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS, GLIDE_CONTRACT_ADDRESS, ELK_CONTRACT_ADDRESS, EUSDC_CONTRACT_ADDRESS, BUNNY_CONTRACT_ADDRESS, BUSD_CONTRACT_ADDRESS]
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = (strAddress) => {
   if(!strAddress)
@@ -205,6 +211,49 @@ export async function getCoinUSD() {
 }
 
 export function getDiaTokenPrice(connectProvider = null) {
+  return getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS, connectProvider)
+  // return new Promise((resolve, reject) => {
+  //   let walletConnectWeb3
+  //   if(connectProvider)
+  //     walletConnectWeb3 = new Web3(connectProvider)
+  //   else if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+  //     walletConnectWeb3 = new Web3(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+  //   else
+  //     walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
+
+  //   walletConnectWeb3.eth
+  //     .getBlockNumber()
+  //     .then((blocknum) => {
+  //       const graphQLParams = {
+  //         query: `query tokenPriceData { token(id: "0x2c8010ae4121212f836032973919e8aec9aeaee5", block: {number: ${blocknum}}) { derivedELA } bundle(id: "1", block: {number: ${blocknum}}) { elaPrice } }`,
+  //         variables: null,
+  //         operationName: 'tokenPriceData'
+  //       };
+  //       axios({
+  //         method: 'POST',
+  //         url: 'https://api.glidefinance.io/subgraphs/name/glide/exchange',
+  //         headers: {
+  //           'content-type': 'application/json',
+  //           // "x-rapidapi-host": "reddit-graphql-proxy.p.rapidapi.com",
+  //           // "x-rapidapi-key": process.env.RAPIDAPI_KEY,
+  //           accept: 'application/json'
+  //         },
+  //         data: graphQLParams
+  //       }).then((response) => {
+  //         try {
+  //           resolve(response.data.data);
+  //         } catch (error) {
+  //           reject(error);
+  //         }
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       reject(error);
+  //     });
+  // });
+}
+
+export function getERC20TokenPrice(tokenAddress, connectProvider = null) {
   return new Promise((resolve, reject) => {
     let walletConnectWeb3
     if(connectProvider)
@@ -218,7 +267,7 @@ export function getDiaTokenPrice(connectProvider = null) {
       .getBlockNumber()
       .then((blocknum) => {
         const graphQLParams = {
-          query: `query tokenPriceData { token(id: "0x2c8010ae4121212f836032973919e8aec9aeaee5", block: {number: ${blocknum}}) { derivedELA } bundle(id: "1", block: {number: ${blocknum}}) { elaPrice } }`,
+          query: `query tokenPriceData { token(id: "${tokenAddress.toLowerCase()}", block: {number: ${blocknum}}) { derivedELA } bundle(id: "1", block: {number: ${blocknum}}) { elaPrice } }`,
           variables: null,
           operationName: 'tokenPriceData'
         };
@@ -626,6 +675,31 @@ export const coinTypes = [
     icon: 'badges/diamond.svg',
     name: 'DIA',
     address: DIA_CONTRACT_ADDRESS
+  },
+  {
+    icon: 'erc20/Glide.png',
+    name: 'GLIDE',
+    address: GLIDE_CONTRACT_ADDRESS
+  },
+  {
+    icon: 'erc20/Elk.png',
+    name: 'ELK',
+    address: ELK_CONTRACT_ADDRESS
+  },
+  {
+    icon: 'erc20/EUSDC.png',
+    name: 'ethUSDC',
+    address: EUSDC_CONTRACT_ADDRESS
+  },
+  {
+    icon: 'erc20/Bunny.png',
+    name: 'BUNNY',
+    address: BUNNY_CONTRACT_ADDRESS
+  },
+  {
+    icon: 'erc20/BUSD.png',
+    name: 'bnbBUSD',
+    address: BUSD_CONTRACT_ADDRESS
   }
 ]
 export const socialTypes = ['Website', 'Profile', 'Feeds', 'Twitter', 'Discord', 'Telegram', 'Medium']

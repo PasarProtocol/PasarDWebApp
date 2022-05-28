@@ -42,7 +42,8 @@ import { blankAddress, marketContract } from '../../config'
 import { queryAvatarUrl, queryName, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCoinTypeFromToken, getCollectiblesInCollection4Preview,
-  getCoinUSD, getDiaTokenPrice, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, getCollectionTypeFromImageUrl, getShortUrl, getIpfsUrl, collectionTypes } from '../../utils/common';
+  getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, getCollectionTypeFromImageUrl, 
+  getShortUrl, getIpfsUrl, collectionTypes, coinTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -146,7 +147,7 @@ export default function CollectibleDetail() {
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
-  const [coinPrice, setCoinPrice] = React.useState([0,0]);
+  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length).fill(0));
   const [dispCountInCollection, setDispCountInCollection] = React.useState(3);
   const [totalCountInCollection, setTotalCountInCollection] = React.useState(0);
   const [collectionAttributes, setCollectionAttributes] = React.useState({});
@@ -169,6 +170,13 @@ export default function CollectibleDetail() {
     });
     getDiaTokenPrice().then((res) => {
       setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
+    })
+    coinTypes.forEach((token, _i)=>{
+      if(_i<2)
+        return
+      getERC20TokenPrice(token.address).then((res) => {
+        setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice)
+      })
     })
     determineDispCount()
   }, [tokenId])
