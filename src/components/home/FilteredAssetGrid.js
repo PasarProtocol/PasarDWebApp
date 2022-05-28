@@ -8,13 +8,13 @@ import { Box, Button } from '@mui/material';
 import { MHidden } from '../@material-extend';
 import AssetCard from '../marketplace/AssetCard';
 import AssetCardSkeleton from '../marketplace/AssetCardSkeleton';
-import { fetchFrom, getAssetImage, getCoinUSD, getDiaTokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken } from '../../utils/common';
+import { fetchFrom, getAssetImage, getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, coinTypes } from '../../utils/common';
 import { blankAddress } from '../../config'
 // ----------------------------------------------------------------------
 
 const AssetGroupSlider = (props)=>{
   const {isLoading, assets} = props
-  const [coinPrice, setCoinPrice] = React.useState([0,0]);
+  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length).fill(0));
   const [isDragging, setDragging] = React.useState(false);
   const ref = React.useRef()
 
@@ -61,6 +61,13 @@ const AssetGroupSlider = (props)=>{
     });
     getDiaTokenPrice().then((res) => {
       setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
+    })
+    coinTypes.forEach((token, _i)=>{
+      if(_i<2)
+        return
+      getERC20TokenPrice(token.address).then((res) => {
+        setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice)
+      })
     })
   }, [])
   const setCoinPriceByType = (type, value) => {
