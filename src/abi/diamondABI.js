@@ -1,4 +1,4 @@
-module.exports.DIAMOND_CONTRACT_ABI = [
+module.exports.ERC20_CONTRACT_ABI = [
   {
     "inputs": [{
       "internalType": "address",

@@ -20,7 +20,7 @@ import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMet
 
 export default function Purchase(props) {
   const navigate = useNavigate();
-  const [balanceArray, setBalanceArray] = useState([0, 0]);
+  const [balanceArray, setBalanceArray] = useState(Array(coinTypes.length).fill(0));
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const context = useWeb3React();
