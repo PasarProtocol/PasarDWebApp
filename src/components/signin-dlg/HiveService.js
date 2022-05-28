@@ -321,9 +321,16 @@ const createChallengeResponse = async(vp, hiveDid, storepass) => {
 
 async function getAppInstanceDIDDoc() {
   const didAccess = new ConDID.DIDAccess()
-  const info = await didAccess.getOrCreateAppInstanceDID()
-  const instanceDIDDocument = await info.didStore.loadDid(info.did.toString())
-  return instanceDIDDocument
+  try {
+    const info = await didAccess.createNewAppInstanceDID()
+    const instanceDIDDocument = await info.didStore.loadDid(info.did.toString())
+    return instanceDIDDocument  
+  } catch (error) {
+    const info = await didAccess.getOrCreateAppInstanceDID()
+    const instanceDIDDocument = await info.didStore.loadDid(info.did.toString())
+    return instanceDIDDocument  
+  }
+  
 }
 
 async function issueDiplomaFor() {
