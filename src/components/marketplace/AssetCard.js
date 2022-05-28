@@ -464,11 +464,13 @@ export default function AssetCard(props) {
                 type===2&&isListedByOthers||
                 type===3&&!auctionEnded
               ) &&
-              <Typography variant="h5" sx={{color: "origin.main"}} noWrap>
-                <Box component="img" src={`/static/${coinTypes[coinType].icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType===0?'invert(1)':'none' }} />
-                &nbsp;{price} {coinTypes[coinType].name}&nbsp;
-                <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline-flex', alignItems: 'end'}}>≈ USD {math.round(coinUSD * price, 2)}</Typography>
-              </Typography>
+              <Stack direction='row'>
+                <Box component="img" src={`/static/${coinTypes[coinType].icon}`} sx={{ width: 20, m: 'auto', display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType===0?'invert(1)':'none' }} />
+                <Typography variant="h5" sx={{color: "origin.main", flexGrow: 1}} noWrap>
+                  &nbsp;{price} {coinTypes[coinType].name}&nbsp;
+                  <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline-flex', alignItems: 'end'}}>≈ USD {math.round(coinUSD * price, 2)}</Typography>
+                </Typography>
+              </Stack>
             }
             {
               (
