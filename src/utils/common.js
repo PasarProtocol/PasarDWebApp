@@ -14,6 +14,7 @@ import {
   marketContract as CONTRACT_ADDRESS, 
   diaContract as DIA_CONTRACT_ADDRESS, 
   mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS,
+  welaContract as WELA_CONTRACT_ADDRESS, 
   glideContract as GLIDE_CONTRACT_ADDRESS, 
   elkContract as ELK_CONTRACT_ADDRESS, 
   ethUsdcContract as EUSDC_CONTRACT_ADDRESS, 
@@ -26,7 +27,7 @@ import { DIAMOND_CONTRACT_ABI } from '../abi/diamondABI';
 import { REGISTER_CONTRACT_ABI } from '../abi/registerABI';
 import { COMMON_CONTRACT_ABI } from '../abi/commonABI';
 
-const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS, GLIDE_CONTRACT_ADDRESS, ELK_CONTRACT_ADDRESS, EUSDC_CONTRACT_ADDRESS, BUNNY_CONTRACT_ADDRESS, BUSD_CONTRACT_ADDRESS]
+const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS, WELA_CONTRACT_ADDRESS, GLIDE_CONTRACT_ADDRESS, ELK_CONTRACT_ADDRESS, EUSDC_CONTRACT_ADDRESS, BUNNY_CONTRACT_ADDRESS, BUSD_CONTRACT_ADDRESS]
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = (strAddress) => {
   if(!strAddress)
@@ -675,6 +676,11 @@ export const coinTypes = [
     icon: 'badges/diamond.svg',
     name: 'DIA',
     address: DIA_CONTRACT_ADDRESS
+  },
+  {
+    icon: 'erc20/WELA.png',
+    name: 'WELA',
+    address: WELA_CONTRACT_ADDRESS
   },
   {
     icon: 'erc20/Glide.png',
