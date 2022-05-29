@@ -5,7 +5,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { isMobile } from 'react-device-detect';
 
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Typography, Tab, Tabs, Link, Button, Box, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material';
+import { Container, Stack, Typography, Tab, Tabs, Link, Button, Grid, Box, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material';
 // import { TabContext, TabList, TabPanel } from '@mui/lab';
 import SquareIcon from '@mui/icons-material/Square';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -28,6 +28,8 @@ import Badge from '../../components/Badge';
 import DIABadge from '../../components/DIABadge';
 import AddressCopyButton from '../../components/AddressCopyButton';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
+import CollectionCard from '../../components/collection/CollectionCard';
+import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
@@ -71,6 +73,8 @@ export default function MyItems() {
   const params = useParams(); // params.address
   const navigate = useNavigate();
   const [assets, setAssets] = React.useState([[], [], []]);
+  const [collections, setCollections] = React.useState([]);
+  const [isLoadingCollection, setLoadingCollection] = React.useState(false);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
   const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):defaultDispMode);
   const [orderType, setOrderType] = React.useState(0);
@@ -278,6 +282,24 @@ export default function MyItems() {
       });
   }, [walletAddress, orderType, updateCount]);
 
+  React.useEffect(async () => {
+    if(walletAddress) {
+      setLoadingCollection(true);
+      fetchFrom(`api/v2/sticker/getCollectionByOwner/${walletAddress}`)
+        .then((response) => {
+          response.json().then((jsonAssets) => {
+            setCollections(jsonAssets.data);
+            setLoadingCollection(false);
+          }).catch((e) => {
+            setLoadingCollection(false);
+          });
+        })
+        .catch((e) => {
+          if (e.code !== e.ABORT_ERR) setLoadingCollection(false);
+        });
+    }
+  }, [walletAddress]);
+
   const handleDispmode = (event, mode) => {
     if (mode === null)
       return
@@ -352,6 +374,7 @@ export default function MyItems() {
             <Tab label={`Listed (${assets[0].length})`} value={0} />
             <Tab label={`Owned (${assets[1].length})`} value={1} />
             <Tab label={`Created (${assets[2].length})`} value={2} />
+            <Tab label={`Collections (${collections.length})`} value={3} />
           </Tabs>
           {/* <MHidden width="smDown">
             <ToolGroupStyle>
@@ -399,6 +422,39 @@ export default function MyItems() {
                 }
               </Box>
             ))}
+            <Box sx={{ minHeight: 200, p: '10px' }}>
+              {
+                !isLoadingCollection?
+                <Box component="main">
+                  {
+                    collections.length > 0 ?
+                    <Grid container spacing={2}>
+                      {
+                        collections.map((info, index)=>
+                          <Grid item key={index} xs={12} sm={6} md={4}>
+                            <CollectionCard info={info} isOwned={Boolean(true)}/>
+                          </Grid>
+                        )
+                      }
+                    </Grid>:
+
+                    <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
+                      <Typography variant="h3" align="center"> No Collections Found </Typography>
+                      <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>We could not find any of your collections</Typography>
+                    </Stack>
+                  }
+                </Box>:
+                <Grid container spacing={2}>
+                  {
+                    Array(3).fill(0).map((item, index)=>(
+                      <Grid item key={index} xs={12} sm={6} md={4}>
+                        <CollectionCardSkeleton key={index}/>
+                      </Grid>
+                    ))
+                  }
+                </Grid>
+              }
+            </Box>
           </SwipeableViews>
         </Box>
       </Container>
