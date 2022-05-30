@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import menu2Fill from '@iconify/icons-eva/menu-2-fill';
-import twitterIcon from '@iconify/icons-ant-design/twitter';
 // import telegramIcon from '@iconify/icons-ic/outline-telegram';
-import TelegramIcon from '@mui/icons-material/Telegram';
+import twitterIcon from '@iconify/icons-ant-design/twitter';
+import mediumIcon from '@iconify/icons-ant-design/medium';
 import githubIcon from '@iconify/icons-ant-design/github'
 import discordIcon from '@iconify/icons-ic/baseline-discord';
 import { NavLink as RouterLink, useLocation, useNavigate } from 'react-router-dom';
@@ -41,6 +41,13 @@ const ListItemStyle = styled(ListItemButton)(({ theme }) => ({
   color: theme.palette.text.secondary
 }));
 
+const SOCIALS = [
+  // { name: 'TelegramIcon', icon: telegramIcon },
+  { name: 'Medium', icon: mediumIcon, url: 'https://medium.com/@protocolpasar' },
+  { name: 'Twitter', icon: twitterIcon, url: 'https://twitter.com/PasarProtocol' },
+  { name: 'Discord', icon: discordIcon, url: 'https://discord.gg/RPbcBv8ckh' },
+  { name: 'Github', icon: githubIcon, url: 'https://github.com/PasarProtocol' }
+];
 // ----------------------------------------------------------------------
 
 // MenuMobileItem.propTypes = {
@@ -244,26 +251,15 @@ export default function MenuMobile(props) {
         <Box sx={{ flexGrow: 1 }} />
         <Container>
           <Grid container dir="ltr" sx={{pb: 1}}>
-            {/* <Grid item xs={4} align="center">
-              <MFab color="info" size="medium">
-                <TelegramIcon sx={{ fontSize: 30 }} />
-              </MFab>
-            </Grid> */}
-            <Grid item xs={6} align="center">
-              <MFab size="medium" color={fabColorType} href="https://discord.gg/RPbcBv8ckh" component={Link} target="_blank">
-                <Icon icon={discordIcon} width={30} height={30} />
-              </MFab>
-            </Grid>
-            <Grid item xs={6} align="center">
-              <MFab size="medium" color={fabColorType} href="https://github.com/PasarProtocol" component={Link} target="_blank">
-                <Icon icon={githubIcon} width={30} height={30} />
-              </MFab>
-            </Grid>
-            {/* <Grid item xs={4} align="center">
-              <MFab color="info" size="medium">
-                <Icon icon={twitterIcon} width={30} height={30} />
-              </MFab>
-            </Grid> */}
+            {
+              SOCIALS.map((social) => (
+                <Grid item xs={3} align="center">
+                  <MFab size="small" color={fabColorType} href={social.url} component={Link} target="_blank">
+                    <Icon icon={social.icon} width={20} height={22} />
+                  </MFab>
+                </Grid>
+              ))
+            }
           </Grid>
           <Box
             sx={{

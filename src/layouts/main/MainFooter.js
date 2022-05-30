@@ -2,6 +2,7 @@ import React from 'react';
 import { Icon } from '@iconify/react';
 import twitterFill from '@iconify/icons-ant-design/twitter-circle';
 import telegramIcon from '@iconify/icons-ic/round-telegram';
+import mediumIcon from '@iconify/icons-ant-design/medium-circle-filled';
 
 // material
 import { styled } from '@mui/material/styles';
@@ -15,8 +16,9 @@ import { PATH_DOCS } from '../../routes/paths';
 // ----------------------------------------------------------------------
 
 const SOCIALS = [
-  { name: 'TelegramIcon', icon: telegramIcon },
-  { name: 'Twitter', icon: twitterFill }
+  // { name: 'TelegramIcon', icon: telegramIcon },
+  { name: 'Medium', icon: mediumIcon, url: 'https://medium.com/@protocolpasar' },
+  { name: 'Twitter', icon: twitterFill, url: 'https://twitter.com/PasarProtocol' }
 ];
 
 const RootStyle = styled(Box)(({ theme, sx }) => ({
@@ -88,11 +90,11 @@ export default function MainFooter({ hidden, isContainerXl }) {
               justifyContent={{ xs: 'center', md: 'flex-end' }}
               sx={{ mb: { xs: 5, md: 0 } }}
             >
-              {/* {SOCIALS.map((social) => (
-                <IconButton key={social.name} color="inherit" sx={{ p: 0 }}>
+              {SOCIALS.map((social) => (
+                <IconButton key={social.name} color="inherit" sx={{ p: 0 }} component={Link} href={social.url} target="_blank">
                   <Icon icon={social.icon} width={40} height={40} />
                 </IconButton>
-              ))} */}
+              ))}
               <IconButton
                 color="inherit"
                 sx={{ p: '2px' }}
