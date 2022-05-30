@@ -123,7 +123,7 @@ export const createCollection = async(channelName) => {
       return null
     }
     // TODO: throw error
-    throw error
+    return error
   }
 }
 
@@ -187,7 +187,7 @@ export const insertDBData = async(collectName, doc) => {
   } catch (error) {
     console.log("insertDBData error: ", error)
     // TODO throw error
-    throw error
+    return error
   }
 }
 
@@ -199,7 +199,7 @@ export const updateOneDBData = async(collectName, filter, update, option) => {
   } catch (error) {
     console.log("updateOneDBData error: ", error)
     // TODO throw error
-    throw error
+    return error
   }
 }
 
@@ -210,7 +210,7 @@ export const queryDBData = async(collectionName, filter) => {
     return result
   } catch (error) {
     console.log("queryDBData error: ", error)
-    throw error
+    return error
   }
 }
 
@@ -221,7 +221,7 @@ export const deleateOneDBData = async(collectName, fillter) => {
     return "SUCCESS"
   } catch (error) {
     console.log("deleate one DB data error: ", error)
-    throw error
+    return error
   }
 }
 
@@ -232,7 +232,7 @@ export const deleteCollection = async(collectionName) => {
       return result
     } catch (error) {
       console.log("delete collection error: ", error)
-      throw error
+      return error
     }
 }
 
@@ -243,7 +243,7 @@ export const uploadFileWithString= async(remotePath, img) => {
   }
   catch (error) {
     console.log(`upload file with string error: ${error}`)
-    throw error
+    return error
   }
 }
 
@@ -253,7 +253,7 @@ export const downloadScripting = async(targetDid, transactionId) => {
     return await scriptRunner.downloadFile(transactionId)
   } catch (error) {
     console.log("downloadScripting error: ", error)
-    throw error
+    return error
   }
 }
 
@@ -319,18 +319,24 @@ const createChallengeResponse = async(vp, hiveDid, storepass) => {
 	return token
 }
 
+// async function getAppInstanceDIDDoc() {
+//   const didAccess = new ConDID.DIDAccess()
+//   try {
+//     const info = await didAccess.createNewAppInstanceDID()
+//     const instanceDIDDocument = await info.didStore.loadDid(info.did.toString())
+//     return instanceDIDDocument  
+//   } catch (error) {
+//     const info = await didAccess.getOrCreateAppInstanceDID()
+//     const instanceDIDDocument = await info.didStore.loadDid(info.did.toString())
+//     return instanceDIDDocument  
+//   }
+// }
+
 async function getAppInstanceDIDDoc() {
   const didAccess = new ConDID.DIDAccess()
-  try {
-    const info = await didAccess.createNewAppInstanceDID()
-    const instanceDIDDocument = await info.didStore.loadDid(info.did.toString())
-    return instanceDIDDocument  
-  } catch (error) {
-    const info = await didAccess.getOrCreateAppInstanceDID()
-    const instanceDIDDocument = await info.didStore.loadDid(info.did.toString())
-    return instanceDIDDocument  
-  }
-  
+  const info = await didAccess.getOrCreateAppInstanceDID()
+  const instanceDIDDocument = await info.didStore.loadDid(info.did.toString())
+  return instanceDIDDocument
 }
 
 async function issueDiplomaFor() {
