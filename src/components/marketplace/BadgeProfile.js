@@ -192,9 +192,9 @@ export default function BadgeProfile(props) {
           type===1&&
           <>
             {
-              avatar&&avatar.startsWith('/static')?
-              <Box sx={{ width: 26, height: 26, borderRadius: 2, p: .5, backgroundColor: 'black', display: 'flex' }}>
-                <Box draggable = {false} component="img" src={avatar} sx={{ width: 24 }} />
+              !collection?
+              <Box sx={{ width: 26, height: 26, borderRadius: 2, p: '6px', backgroundColor: 'black', display: 'flex' }}>
+                <Box draggable = {false} component="img" src={avatar} sx={{ width: 24, borderRadius: '100%', p: '2px', background: (theme)=>theme.palette.origin.main }} />
               </Box>:
 
               <Box sx={{ width: 26, height: 26, borderRadius: 2, backgroundColor: 'black', display: 'flex', overflow: 'hidden' }}>
@@ -257,8 +257,19 @@ export default function BadgeProfile(props) {
                             <Box draggable = {false} component="img" src={avatar} sx={{ width: avatar&&avatar.startsWith('/static')?35:60 }} />
                           </Box>
                         </Link>:
-                        <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
-                          <Box draggable = {false} component="img" src={avatar} sx={{ width: avatar&&avatar.startsWith('/static')?35:60 }} />
+
+                        <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, p: 2 }}>
+                          <Box 
+                            draggable = {false}
+                            component="img"
+                            src={avatar} 
+                            sx={{ 
+                              width: '100%',
+                              height: '100%',
+                              background: (theme)=>theme.palette.origin.main, 
+                              borderRadius: '100%', 
+                              p: .5 
+                            }} />
                         </Box>
                       }
                     </>

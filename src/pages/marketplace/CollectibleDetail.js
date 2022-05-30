@@ -872,7 +872,7 @@ export default function CollectibleDetail() {
                                       isLink={Boolean(true)}
                                       coinUSD={coinPrice[coinType]}
                                       coinType={coinType}
-                                      defaultCollectionType={getCollectionTypeFromImageUrl(item)}
+                                      // defaultCollectionType={getCollectionTypeFromImageUrl(item)}
                                       isMoreLink={collectiblesInCollection.slice(0, dispCountInCollection).length===_i+1}
                                     />
                                 })

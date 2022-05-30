@@ -621,7 +621,7 @@ export const collectionTypes = [
   {
     symbol: 'PSRC',
     name: 'Pasar Collection',
-    avatar: '/static/logo-icon.svg',
+    avatar: '/static/logo-icon-white.svg',
     shortDescription: 'Pasar default collection',
     description: 'A collection of all items minted using the Pasar Collection Contract',
     token: 2
