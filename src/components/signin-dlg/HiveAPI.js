@@ -13,10 +13,28 @@ const TELEGRAM = "telegram"
 const MEDIUM = "medium"
 const KYC_ME = "kyc_me"
 const AVATAR = "avatar"
+
 const AVATAR_REMOTE_PATH = "pasarAvatar"
 
-export const createProfileCollection = async() => {
-  await createCollection(COLLECTION_NAME)
+const TABLE_PASAR_INFO = "pasar_scripting"
+const PASAR_SCRIPT_VERSION = "1.0.0"
+const PASAR_LOCAL_SCRIPT_VERSION_KEY = "PASARLOCALSCRIPTVERSIONKEY"
+
+export function createAllCollection() {
+  return new Promise((resolve, reject) => {
+    const array = [
+      createCollection(COLLECTION_NAME), 
+      createCollection(TABLE_PASAR_INFO) 
+    ]
+    Promise.all(array).then(values => {
+      console.log("Create collection all Success, vaules = ", values)
+      resolve('FINISH')
+    }, reason => {
+      console.log("Create collection error, reason: ", reason)
+      reject(reason)
+    })
+  })
+
 }
 
 export function registerAllScript() {
@@ -432,4 +450,87 @@ const downloadScriptingTransactionID = async(targetDid, scriptName, remotePath) 
   const transactionId = result[scriptName].transaction_id
 
   return transactionId
+}
+
+const updatePasarScripting = async(lasterVersion, preVersion) => {
+  try {
+    const doc =
+    {
+      "laster_version": lasterVersion,
+      "pre_version": preVersion,
+    }
+    const option = new UpdateOptions(false, true)
+    const filter = {}
+    const update = { "$set": doc }
+    const result = await updateOneDBData(TABLE_PASAR_INFO, filter, update, option)
+    return result
+  } catch (error) {
+    console.log(`update pasar scripting error: ${error}`)
+    throw error
+  }
+}
+
+const queryPasarScriptingFromDB = async() => {
+  try {
+    const filter = {};
+    const result = await queryDBData(TABLE_PASAR_INFO, filter)
+    return result
+  } catch (error) {
+    console.log(`query pasar scripting error: ${error}`)
+    throw error
+  }
+}
+
+export const creatAndRegister = async(isForce) => {
+  let lasterVersion = ''
+  let preVersion = ''
+  const pasarDid = sessionStorage.getItem('PASAR_DID')
+  const userDid = `did:elastos:${pasarDid}`
+  if (userDid === 'did:elastos:') {
+    return
+  }
+  let localVersion = localStorage.getItem(userDid + PASAR_LOCAL_SCRIPT_VERSION_KEY) || ''
+  if (localVersion === "" && isForce === false) {
+    return
+  }
+  if (localVersion !== PASAR_SCRIPT_VERSION) {
+    try {
+      if (localVersion === '') {
+        const result = await queryPasarScriptingFromDB()
+        lasterVersion = result[0].laster_version
+        preVersion = result[0].pre_version
+      }
+    }
+    catch (error) {
+      if (error.code === 404) {
+        // ignore 404
+        console.log("ignore query pasar info 404 error")
+      }
+      else {
+        console.log("query pasar info error: ", error)
+      }
+    }
+  }
+  else {
+    // no need register, return
+    return
+  }
+  if (PASAR_SCRIPT_VERSION !== lasterVersion) {
+    try {
+      await createAllCollection()
+      await registerAllScript()
+      preVersion = lasterVersion === '' ? localVersion : lasterVersion
+      lasterVersion = PASAR_SCRIPT_VERSION
+      localVersion = lasterVersion
+
+      // update
+      await updatePasarScripting(lasterVersion, preVersion)
+      localStorage.setItem(userDid + PASAR_LOCAL_SCRIPT_VERSION_KEY, localVersion)
+    } catch (error) {
+      console.log("update pasar info error: ", error)
+    }
+  } else if (localVersion === '' && PASAR_SCRIPT_VERSION === lasterVersion) {
+    localVersion = PASAR_SCRIPT_VERSION
+    localStorage.setItem(userDid + PASAR_LOCAL_SCRIPT_VERSION_KEY, localVersion)
+  }
 }
