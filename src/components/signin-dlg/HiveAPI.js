@@ -274,7 +274,7 @@ const insertDataToProfileDB = async(propertyIdentity, displayName, type) =>{
     return insertResult
   } catch (error) {
     console.log(`Insert ${propertyIdentity} to Profile db error : ${error}`)
-    return error
+    throw error
   }
 }
 
@@ -344,7 +344,7 @@ const updateDataToProfileDB = async(propertyIdentity, displayName, type = "publi
     return insertResult
   } catch (error) {
     console.log("update Profile db error : ", error)
-    return error
+    throw error
   }
 }
 
@@ -356,7 +356,7 @@ export const queryProfileFromDB = async () => {
     return result
   } catch (error) {
      console.log("Query profile from DB error : ", error)
-     return error
+     throw error
   }
 }
 export const deleteAvatarUrl = async() => {
@@ -414,7 +414,7 @@ const deleteData = async(propertyIdentity) => {
     return result
   } catch (error) {
     console.log(`Delete ${propertyIdentity} profile from DB error : ${error}`)
-    return error
+    throw error
   }
 }
 
@@ -435,7 +435,7 @@ export const downloadAvatar = async(targetDid) => {
   return data
   } catch (error) {
     console.log(`download avatar error: ${error}`)
-    return error
+    throw error
   }
 }
 
@@ -508,6 +508,7 @@ export const creatAndRegister = async(isForce) => {
       }
       else {
         console.log("query pasar info error: ", error)
+        throw error
       }
     }
   }

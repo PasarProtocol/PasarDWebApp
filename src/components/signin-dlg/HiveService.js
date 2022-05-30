@@ -123,7 +123,7 @@ export const createCollection = async(channelName) => {
       return null
     }
     // TODO: throw error
-    return error
+    throw error
   }
 }
 
@@ -187,7 +187,7 @@ export const insertDBData = async(collectName, doc) => {
   } catch (error) {
     console.log("insertDBData error: ", error)
     // TODO throw error
-    return error
+    throw error
   }
 }
 
@@ -221,7 +221,7 @@ export const deleateOneDBData = async(collectName, fillter) => {
     return "SUCCESS"
   } catch (error) {
     console.log("deleate one DB data error: ", error)
-    return error
+    throw error
   }
 }
 
@@ -232,7 +232,7 @@ export const deleteCollection = async(collectionName) => {
       return result
     } catch (error) {
       console.log("delete collection error: ", error)
-      return error
+      throw error
     }
 }
 
@@ -243,7 +243,7 @@ export const uploadFileWithString= async(remotePath, img) => {
   }
   catch (error) {
     console.log(`upload file with string error: ${error}`)
-    return error
+    throw error
   }
 }
 
@@ -253,7 +253,7 @@ export const downloadScripting = async(targetDid, transactionId) => {
     return await scriptRunner.downloadFile(transactionId)
   } catch (error) {
     console.log("downloadScripting error: ", error)
-    return error
+    throw error
   }
 }
 
