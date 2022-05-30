@@ -20,10 +20,21 @@ export default function CoinSelect({ selected, onChange }) {
   }
   return (
     <>
-      <Button color="inherit" size="small" sx={{px: 1, py: .5}} onClick={openPopupMenu}>
+      <Button 
+        color="inherit" 
+        size="small" 
+        sx={{
+          px: 1, 
+          py: .5,
+          textTransform: 'none',
+          fontWeight: 'normal',
+          fontSize: '1rem'
+        }} 
+        onClick={openPopupMenu}
+        endIcon={<Icon icon={arrowIosDownwardFill}/>}
+      >
         <Box component="img" src={`/static/${coinTypes[selected].icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&selected===0?'invert(1)':'none' }} />
         &nbsp;{coinTypes[selected].name}&nbsp;
-        <Icon icon={arrowIosDownwardFill} width={20} height={20}/>
       </Button>
       <Menu 
         keepMounted
