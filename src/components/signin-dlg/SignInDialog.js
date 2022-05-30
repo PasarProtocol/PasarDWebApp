@@ -34,7 +34,7 @@ import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
 import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
-import { createProfileCollection, prepareConnectToHive, registerAllScript } from './HiveAPI';
+import { creatAndRegister, prepareConnectToHive } from './HiveAPI';
 
 export default function SignInDialog() {
   const {
@@ -344,11 +344,11 @@ export default function SignInDialog() {
         // TODO: IMPROVE HIVE LOGIN
         prepareConnectToHive()
           .then(res=>(
-            registerAllScript()
+            creatAndRegister(true)
           ))
-          .then(result=>{
-            createProfileCollection()
-          })
+          // .then(result=>{
+          //   // createProfileCollection()
+          // })
           .catch(error=>{
             console.log("Register scripting error: ", error)
           })
