@@ -199,7 +199,7 @@ export const updateOneDBData = async(collectName, filter, update, option) => {
   } catch (error) {
     console.log("updateOneDBData error: ", error)
     // TODO throw error
-    return error
+    throw error
   }
 }
 
@@ -210,7 +210,7 @@ export const queryDBData = async(collectionName, filter) => {
     return result
   } catch (error) {
     console.log("queryDBData error: ", error)
-    return error
+    throw error
   }
 }
 
