@@ -115,6 +115,7 @@
     "notistack": "^2.0.3",
     "nprogress": "^0.2.0",
     "numeral": "^2.0.6",
+    "prepend-http": "^4.0.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
     "react-animated-number": "^0.4.4",
