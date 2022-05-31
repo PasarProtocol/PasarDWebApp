@@ -1,4 +1,5 @@
 import React from 'react';
+import prependHttp from 'prepend-http';
 // material
 import { styled } from '@mui/material/styles';
 import { Typography, Box, IconButton, Stack, Link } from '@mui/material';
@@ -25,43 +26,43 @@ export default function IconLinkButtonGroup(props) {
     >
       {
         !!website&&
-        <MFab size="small" color= {colorType} href={website} target='_blank'>
+        <MFab size="small" color= {colorType} href={prependHttp(website)} target='_blank' component='a'>
           <Icon icon={languageIcon} width={24} height={24} />
         </MFab>
       }
       {
         !!profile&&
-        <MFab size="small" color= {colorType} href={profile} target='_blank'>
+        <MFab size="small" color= {colorType} href={prependHttp(profile)} target='_blank'>
           <Box component="img" src='/static/profile-icon.svg' width={20} height={20} sx={{filter: themeMode==='light'?'unset':'invert(1)'}}/>
         </MFab>
       }
       {
         !!feeds&&
-        <MFab size="small" color= {colorType} href={feeds} target='_blank'>
+        <MFab size="small" color= {colorType} href={prependHttp(feeds)} target='_blank'>
           <Box component="img" src='/static/empty-feeds-icon.svg' width={22} height={22} sx={{filter: themeMode==='light'?'unset':'invert(1)'}}/>
         </MFab>
       }
       {
         !!twitter&&
-        <MFab size="small" color= {colorType} href={twitter} target='_blank'>
+        <MFab size="small" color= {colorType} href={prependHttp(twitter)} target='_blank'>
           <Icon icon={twitterIcon} width={24} height={24} />
         </MFab>
       }
       {
         !!discord&&
-        <MFab size="small" color= {colorType} href={discord} target='_blank'>
+        <MFab size="small" color= {colorType} href={prependHttp(discord)} target='_blank'>
           <Icon icon={discordIcon} width={24} height={24} />
         </MFab>
       }
       {
         !!telegram&&
-        <MFab size="small" color= {colorType} href={telegram} target='_blank'>
+        <MFab size="small" color= {colorType} href={prependHttp(telegram)} target='_blank'>
           <TelegramIcon />
         </MFab>
       }
       {
         !!medium&&
-        <MFab size="small" color= {colorType} href={medium} target='_blank'>
+        <MFab size="small" color= {colorType} href={prependHttp(medium)} target='_blank'>
           <Icon icon={mediumIcon} width={24} height={24} />
         </MFab>
       }
