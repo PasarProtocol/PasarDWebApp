@@ -312,7 +312,7 @@ export default function AssetCard(props) {
                         </div>:
                         <div>
                           <MenuItem value='claim' onClick={handleClosePopup}>
-                            <CancelOutlinedIcon/>&nbsp;Claim Item
+                            <GavelIcon/>&nbsp;Claim Item
                           </MenuItem>
                         </div>
                       }
@@ -354,7 +354,7 @@ export default function AssetCard(props) {
                           </div>:
                           <div>
                             <MenuItem value='claim' onClick={handleClosePopup}>
-                              <CancelOutlinedIcon/>&nbsp;Claim Item
+                              <GavelIcon/>&nbsp;Claim Item
                             </MenuItem>
                           </div>
                         }
