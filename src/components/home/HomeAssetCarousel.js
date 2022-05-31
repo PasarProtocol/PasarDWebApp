@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Box, Typography, Card } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { Box, Typography, Card, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Fade } from "react-slideshow-image";
 import "react-slideshow-image/dist/styles.css";
@@ -40,7 +41,7 @@ const CardStyle = styled(Card)(({ theme }) => ({
 }));
 
 function CarouselInCollection({collection}) {
-    const {name, collectibles} = collection
+    const {name, collectibles, token} = collection
     const getConfigurableProps = () => ({
         showArrows: false,
         showStatus: false,
@@ -58,23 +59,25 @@ function CarouselInCollection({collection}) {
         transitionTime: 0,
     });
     return (
-        <BoxStyle className="carousel-box">
-            <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
-                {
-                    collectibles.slice(0,5).map((each, index) => {
-                        const imageSrc = getAssetImage(each)
-                        return <Box key={index} sx={{
-                            // position: 'relative',
-                            pb: '100%',
-                            height: 0,                        
-                        }}>
-                            <Typography variant="h5" sx={{position: 'absolute', top: 16, left: 16, color: 'white', zIndex: 1}}>{name}</Typography>
-                            <Box component='img' src={imageSrc} sx={{position: 'absolute', width: '100%', height: '100%'}}/>
-                        </Box>
-                    })
-                }
-            </Carousel>
-        </BoxStyle>
+        <Link to={`/collections/detail/${token}`} component={RouterLink}>
+            <BoxStyle className="carousel-box">
+                <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
+                    {
+                        collectibles.slice(0,5).map((each, index) => {
+                            const imageSrc = getAssetImage(each)
+                            return <Box key={index} sx={{
+                                // position: 'relative',
+                                pb: '100%',
+                                height: 0,                        
+                            }}>
+                                <Typography variant="h5" sx={{position: 'absolute', top: 16, left: 16, color: 'white', zIndex: 1}}>{name}</Typography>
+                                <Box component='img' src={imageSrc} sx={{position: 'absolute', width: '100%', height: '100%'}}/>
+                            </Box>
+                        })
+                    }
+                </Carousel>
+            </BoxStyle>
+        </Link>
     );
 }
 
