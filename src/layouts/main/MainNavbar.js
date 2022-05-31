@@ -84,6 +84,7 @@ export default function MainNavbar() {
             underline="always"
             href='https://v1.pasarprotocol.io'
             target="_blank"
+            color='inherit'
             // color="text.secondary"
           >
             here
