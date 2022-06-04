@@ -134,7 +134,8 @@ export default function CollectibleHandleSection(props) {
         usdPriceText = `≈ USD ${round(coinUSD*currentBid/1e18, 3)}`
       }
 
-      if(address!==collectible.holder && address!==collectible.royaltyOwner)
+      // if(address!==collectible.holder && address!==collectible.royaltyOwner)
+      if(address!==collectible.holder)
         handleField = 
           didSignin?
           <Stack direction="row" spacing={1}>
@@ -217,7 +218,8 @@ export default function CollectibleHandleSection(props) {
         <StyledButton variant="contained" fullWidth onClick={(e)=>{setCancelOpen(true)}}>
           Cancel sale
         </StyledButton>
-    } else if(address!==collectible.holder && address!==collectible.royaltyOwner) {
+    // } else if(address!==collectible.holder && address!==collectible.royaltyOwner) {
+    } else if(address!==collectible.holder) {
       handleField = 
         didSignin?
         <StyledButton variant="contained" fullWidth onClick={handlePurchase}>

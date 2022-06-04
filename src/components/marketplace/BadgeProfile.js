@@ -38,7 +38,8 @@ const DescriptionStyle = {
   display: '-webkit-box !important',
   fontWeight: 'normal',
   whiteSpace: 'pre-wrap',
-  wordWrap: 'break-word'
+  wordWrap: 'break-word',
+  lineHeight: 1.2
 }
 
 const queryProfileSocials = {
@@ -208,7 +209,7 @@ export default function BadgeProfile(props) {
           <>
             {
               avatarUrl?
-              <Avatar alt="user" src={avatarUrl} sx={{width: 26, height: 26}} />:
+              <Avatar alt="user" src={avatarUrl} sx={{width: 26, height: 26, display: 'inline-flex'}} />:
               <Jazzicon address={walletAddress} size={26} sx={{mr: 0}}/>
             }
           </>
