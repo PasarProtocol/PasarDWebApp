@@ -28,6 +28,8 @@ import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/Cu
 import CreateItemDlg from '../../components/dialog/CreateItem';
 import RegisterCollectionDlg from '../../components/dialog/RegisterCollection';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import LoadingScreen from '../../components/LoadingScreen';
+import LoadingWrapper from '../../components/LoadingWrapper';
 
 import {REGISTER_CONTRACT_ABI} from '../../abi/registerABI'
 import {TOKEN_721_ABI} from '../../abi/token721ABI'
@@ -64,6 +66,7 @@ const _gasLimit = 5000000;
 export default function EditCollection() {
   const location = useLocation();
   const { token: baseToken } = location.state || {}
+  const [isLoadingCollection, setLoadingCollection] = React.useState(false);
   const [address, setAddress] = React.useState('')
   const [standard, setStandard] = React.useState("ERC-721");
   const [collectionName, setCollectionName] = React.useState('');
@@ -96,9 +99,11 @@ export default function EditCollection() {
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
       navigate('/marketplace')
 
+    setLoadingCollection(true)
     fetchFrom(`api/v2/sticker/getCollection/${baseToken}`)
       .then((response) => {
         response.json().then((jsonAssets) => {
+          setLoadingCollection(false)
           setCollectionName(jsonAssets.data.name)
           setSymbol(jsonAssets.data.symbol)
           const metaUri = getIpfsUrl(jsonAssets.data.uri)
@@ -117,9 +122,11 @@ export default function EditCollection() {
               });
           }
         }).catch((e) => {
+          setLoadingCollection(false)
         });
       })
       .catch((e) => {
+        setLoadingCollection(false)
       });
 
     if(isInAppBrowser())
@@ -364,135 +371,142 @@ export default function EditCollection() {
         <Typography variant="h2" component="h2" align="center" sx={{mb: 3}}>
           Edit Collection
         </Typography>
-        <Grid container direction="row" spacing={2}>
-          <Grid item xs={12} sm={8} ref={nameRef}>
-            <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Collection Name</Typography>
-            <FormControl error={isOnValidation&&!collectionName.length} variant="standard" sx={{width: '100%'}}>
-              <InputStyle
-                id="input-with-name"
-                startAdornment={' '}
-                value={collectionName}
-                onChange={handleInputName}
-                aria-describedby="name-error-text"
-                inputProps={{
-                  maxLength: 30
-                }}
-              />
-              <FormHelperText id="name-error-text" hidden={!isOnValidation||(isOnValidation&&collectionName.length>0)}>Name is required</FormHelperText>
-            </FormControl>
-            <Divider/>
-          </Grid>
-          <Grid item xs={12} sm={8} ref={symbolRef}>
-            <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Symbol</Typography>
-            <FormControl error={isOnValidation&&!symbol.length} variant="standard" sx={{width: '100%'}}>
-              <InputStyle
-                startAdornment={' '}
-                value={symbol}
-                readOnly={Boolean(true)}
-                aria-describedby="symbol-error-text"
-                inputProps={{
-                  maxLength: 15
-                }}
-              />
-              <FormHelperText id="symbol-error-text" hidden={!isOnValidation||(isOnValidation&&symbol.length>0)}>Symbol is not exist</FormHelperText>
-            </FormControl>
-            <Divider/>
-          </Grid>
-          <Grid item xs={12} sm={8}>
-            <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}} ref={uploadAvatarRef}>Avatar</Typography>
-            <UploadSingleFile
-              file={avatarFile}
-              onDrop={handleDropAvatarFile}
-              onRemove={handleRemoveAvatar}
-              accept=".jpg, .png, .jpeg, .gif"/>
-
-            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}} ref={uploadBackgroundRef}>Background Image</Typography>
-            <UploadSingleFile
-              file={backgroundFile}
-              onDrop={handleDropBackgroundFile}
-              onRemove={handleRemoveBackground}
-              accept=".jpg, .png, .jpeg, .gif"/>
-            
-            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}} ref={descriptionRef}>Description</Typography>
-            <FormControl error={isOnValidation&&!description.length} variant="standard" sx={{width: '100%'}}>
-              <InputLabelStyle htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
-                Add collection description
-              </InputLabelStyle>
-              <InputStyle
-                id="input-with-description"
-                startAdornment={' '}
-                value={description}
-                onChange={(e)=>setDescription(e.target.value)}
-                aria-describedby="description-error-text"
-                sx={{mt: '-5px !important'}}
-                multiline={Boolean(true)}
-                inputProps={{
-                  maxLength: 500
-                }}
-              />
-              <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
-            </FormControl>
-            <Divider/>
-
-            <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}}>Category</Typography>
-            <CategorySelect selected={category} onChange={setCategory} />
-
-            <Grid item xs={12}>
-              <Accordion sx={{bgcolor: 'unset'}}>
-                <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{pl: 0}}>
-                  <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
-                    Socials&nbsp;<Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  {
-                    socialTypes.map((type, index)=>
-                      <Box key={index}>
-                        <Typography variant="h4" sx={{fontWeight: 'normal', color: 'origin.main'}}>{type}</Typography>
-                        <FormControl variant="standard" sx={{width: '100%'}}>
-                          <InputLabelStyle htmlFor={`input-with-${type}`} sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
-                            Add {type} URL
-                          </InputLabelStyle>
-                          <InputStyle
-                            id={`input-with-${type}`}
-                            startAdornment={' '}
-                            value={socialUrl[type.toLowerCase()]}
-                            onChange={(e)=>handleInputSocials(e.target.value, type.toLowerCase())}
-                            sx={{mt: '-5px !important'}}
-                          />
-                        </FormControl>
-                        <Divider/>
-                      </Box>
-                    )
-                  }
-                </AccordionDetails>
-              </Accordion>
+        {
+          isLoadingCollection?
+          <LoadingWrapper>
+            <LoadingScreen />
+          </LoadingWrapper>:
+          
+          <Grid container direction="row" spacing={2}>
+            <Grid item xs={12} sm={8} ref={nameRef}>
+              <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Collection Name</Typography>
+              <FormControl error={isOnValidation&&!collectionName.length} variant="standard" sx={{width: '100%'}}>
+                <InputStyle
+                  id="input-with-name"
+                  startAdornment={' '}
+                  value={collectionName}
+                  onChange={handleInputName}
+                  aria-describedby="name-error-text"
+                  inputProps={{
+                    maxLength: 30
+                  }}
+                />
+                <FormHelperText id="name-error-text" hidden={!isOnValidation||(isOnValidation&&collectionName.length>0)}>Name is required</FormHelperText>
+              </FormControl>
+              <Divider/>
             </Grid>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Grid container direction="column" spacing={1} sx={{position: 'sticky', top: isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP}}>
+            <Grid item xs={12} sm={8} ref={symbolRef}>
+              <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Symbol</Typography>
+              <FormControl error={isOnValidation&&!symbol.length} variant="standard" sx={{width: '100%'}}>
+                <InputStyle
+                  startAdornment={' '}
+                  value={symbol}
+                  readOnly={Boolean(true)}
+                  aria-describedby="symbol-error-text"
+                  inputProps={{
+                    maxLength: 15
+                  }}
+                />
+                <FormHelperText id="symbol-error-text" hidden={!isOnValidation||(isOnValidation&&symbol.length>0)}>Symbol is not exist</FormHelperText>
+              </FormControl>
+              <Divider/>
+            </Grid>
+            <Grid item xs={12} sm={8}>
+              <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}} ref={uploadAvatarRef}>Avatar</Typography>
+              <UploadSingleFile
+                file={avatarFile}
+                onDrop={handleDropAvatarFile}
+                onRemove={handleRemoveAvatar}
+                accept=".jpg, .png, .jpeg, .gif"/>
+
+              <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}} ref={uploadBackgroundRef}>Background Image</Typography>
+              <UploadSingleFile
+                file={backgroundFile}
+                onDrop={handleDropBackgroundFile}
+                onRemove={handleRemoveBackground}
+                accept=".jpg, .png, .jpeg, .gif"/>
+              
+              <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}} ref={descriptionRef}>Description</Typography>
+              <FormControl error={isOnValidation&&!description.length} variant="standard" sx={{width: '100%'}}>
+                <InputLabelStyle htmlFor="input-with-description" sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
+                  Add collection description
+                </InputLabelStyle>
+                <InputStyle
+                  id="input-with-description"
+                  startAdornment={' '}
+                  value={description}
+                  onChange={(e)=>setDescription(e.target.value)}
+                  aria-describedby="description-error-text"
+                  sx={{mt: '-5px !important'}}
+                  multiline={Boolean(true)}
+                  inputProps={{
+                    maxLength: 500
+                  }}
+                />
+                <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
+              </FormControl>
+              <Divider/>
+
+              <Typography variant="h4" sx={{fontWeight: 'normal', py: 1}}>Category</Typography>
+              <CategorySelect selected={category} onChange={setCategory} />
+
               <Grid item xs={12}>
-                <Typography variant="h4" sx={{fontWeight: 'normal'}}>Preview</Typography>
-              </Grid>
-              <Grid item xs={12} sx={{width: '100%'}}>
-                <CollectionCard 
-                  isPreview={Boolean(true)}
-                  info={{
-                    collectionName,
-                    description,
-                    owner: address,
-                    avatar: avatarFile?getUrlfromFile(avatarFile):getIpfsUrl(metaObj.avatar),
-                    background: backgroundFile?getUrlfromFile(backgroundFile):getIpfsUrl(metaObj.background)
-                  }}/>
+                <Accordion sx={{bgcolor: 'unset'}}>
+                  <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{pl: 0}}>
+                    <Typography variant="h4" component="div" sx={{fontWeight: 'normal'}}>
+                      Socials&nbsp;<Typography variant="caption" sx={{color: 'origin.main'}}>Optional</Typography>
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {
+                      socialTypes.map((type, index)=>
+                        <Box key={index}>
+                          <Typography variant="h4" sx={{fontWeight: 'normal', color: 'origin.main'}}>{type}</Typography>
+                          <FormControl variant="standard" sx={{width: '100%'}}>
+                            <InputLabelStyle htmlFor={`input-with-${type}`} sx={{ whiteSpace: 'break-spaces', width: 'calc(100% / 0.75)', position: 'relative', transformOrigin: 'left' }}>
+                              Add {type} URL
+                            </InputLabelStyle>
+                            <InputStyle
+                              id={`input-with-${type}`}
+                              startAdornment={' '}
+                              value={socialUrl[type.toLowerCase()]}
+                              onChange={(e)=>handleInputSocials(e.target.value, type.toLowerCase())}
+                              sx={{mt: '-5px !important'}}
+                            />
+                          </FormControl>
+                          <Divider/>
+                        </Box>
+                      )
+                    }
+                  </AccordionDetails>
+                </Accordion>
               </Grid>
             </Grid>
+            <Grid item xs={12} sm={4}>
+              <Grid container direction="column" spacing={1} sx={{position: 'sticky', top: isOffset?APP_BAR_DESKTOP-16:APP_BAR_DESKTOP}}>
+                <Grid item xs={12}>
+                  <Typography variant="h4" sx={{fontWeight: 'normal'}}>Preview</Typography>
+                </Grid>
+                <Grid item xs={12} sx={{width: '100%'}}>
+                  <CollectionCard 
+                    isPreview={Boolean(true)}
+                    info={{
+                      collectionName,
+                      description,
+                      owner: address,
+                      avatar: avatarFile?getUrlfromFile(avatarFile):getIpfsUrl(metaObj.avatar),
+                      background: backgroundFile?getUrlfromFile(backgroundFile):getIpfsUrl(metaObj.background)
+                    }}/>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={12} sm={8}>
+              <TransLoadingButton loading={onProgress} loadingText="Please wait while update collection" onClick={handleUpdateAction} fullWidth>
+                Save
+              </TransLoadingButton>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={8}>
-            <TransLoadingButton loading={onProgress} loadingText="Please wait while update collection" onClick={handleUpdateAction} fullWidth>
-              Save
-            </TransLoadingButton>
-          </Grid>
-        </Grid>
+        }
       </Container>
       <RegisterCollectionDlg
         type={2}
