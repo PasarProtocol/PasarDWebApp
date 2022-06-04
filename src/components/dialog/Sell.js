@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
 import * as math from 'mathjs';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, Grid, Tooltip, Icon, Button, Box, FormHelperText } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, Grid, Tooltip, Button, Box, FormHelperText } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
+import { Icon } from '@iconify/react';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import {
   stickerContract as CONTRACT_ADDRESS,
@@ -19,7 +20,7 @@ import useSingin from '../../hooks/useSignin';
 import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes, isValidLimitPrice } from '../../utils/common';
 
 export default function Sell(props) {
-  const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate, saleType, royalties } = props;
   const [price, setPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [coinType, setCoinType] = React.useState(0);
@@ -42,7 +43,8 @@ export default function Sell(props) {
     priceValue = removeLeadingZero(priceValue);
     if (!isValidLimitPrice(priceValue)) return;
     setPrice(priceValue);
-    setRcvPrice(math.round((priceValue * 98) / 100, 3));
+    const royaltyFee = saleType === 'Primary Sale' ? 0 : math.round((priceValue * royalties) / 10 ** 6, 4);
+    setRcvPrice(math.round((priceValue * 98) / 100 - royaltyFee, 3));
   };
 
   const callSetApprovalForAllAndSell = (_operator, _approved, _price, _didUri) => (
@@ -189,6 +191,10 @@ export default function Sell(props) {
               >
                 <Icon icon="eva:info-outline" style={{ marginBottom: -4, fontSize: 18 }} />
               </Tooltip>
+              {
+                (royalties*1)>0 &&
+                <>,&nbsp;Royalty fee {math.round(royalties/1e4, 2)}%</>
+              }
             </Typography>
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive

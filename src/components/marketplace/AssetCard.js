@@ -54,7 +54,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 
 export default function AssetCard(props) {
   const { name="???", description, quantity=1, price=0, coinType=0, isLink, isMoreLink, tokenId, type, orderId, orderType, status, endTime, currentBid, baseToken='',
-   saleType, myaddress, royaltyOwner, holder, updateCount, handleUpdate, coinUSD, defaultCollectionType=0, isDragging=false, reservePrice=0, buyoutPrice=0 } = props
+   saleType, myaddress, royaltyOwner, royalties, holder, updateCount, handleUpdate, coinUSD, defaultCollectionType=0, isDragging=false, reservePrice=0, buyoutPrice=0 } = props
   
   const [collection, setCollection] = React.useState(null);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
@@ -509,7 +509,7 @@ export default function AssetCard(props) {
           </Box>
         </PaperRecord>
         <DisclaimerDlg isOpen={disclaimerOpen} setOpen={setOpenDisclaimer}/>
-        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} {...dlgProps}/>
+        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} {...dlgProps} saleType={saleType} royalties={royalties}/>
         <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} {...dlgProps} orderType={orderType}/>
         <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} {...dlgProps}/>
         <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} {...dlgProps}/>
