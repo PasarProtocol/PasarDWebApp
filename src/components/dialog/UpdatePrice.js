@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import Web3 from 'web3';
 import * as math from 'mathjs';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, 
-  Grid, Tooltip, Icon, Button, Box, FormHelperText } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Stack, Input, FormControl, InputLabel, Divider, 
+  Grid, Tooltip, Icon, Button, Box, FormHelperText, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
@@ -13,9 +14,11 @@ import CoinSelect from '../marketplace/CoinSelect';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
-import { removeLeadingZero, isInAppBrowser, coinTypes, callContractMethod, isValidLimitPrice } from '../../utils/common';
+import DIABadge from '../DIABadge';
+import { removeLeadingZero, isInAppBrowser, coinTypes, callContractMethod, isValidLimitPrice, getDiaBalanceDegree } from '../../utils/common';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
-
+import useSignin from '../../hooks/useSignin';
+import { PATH_PAGE } from '../../routes/paths';
 
 export default function UpdatePrice(props) {
   const { isOpen, setOpen, name, orderId, orderType, updateCount, handleUpdate } = props;
@@ -28,6 +31,8 @@ export default function UpdatePrice(props) {
   const [coinType, setCoinType] = React.useState(0);
   const [isOnValidation, setOnValidation] = React.useState(false);
   
+  const { diaBalance } = useSignin()
+
   const handleClose = () => {
     setOpen(false);
     setOnProgress(false)
@@ -90,6 +95,8 @@ export default function UpdatePrice(props) {
     console.log(_updatedPrice);
     callChangeOrderPrice(orderId, _updatedPrice, _reservePrice, _buyoutPrice);
   };
+
+  const DiaDegree = getDiaBalanceDegree(diaBalance)
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -164,41 +171,83 @@ export default function UpdatePrice(props) {
             <Grid item xs={12}>
               <Typography variant="h4" sx={{ fontWeight: 'normal' }}>
                 Reserve Price
+                {
+                  DiaDegree===0 &&
+                  <Stack direction="row" spacing={1} sx={{display: 'inline-flex', pl: 2}}>
+                    <DIABadge degree={1} isRequire={Boolean(true)}/>
+                    <DIABadge degree={2} isRequire={Boolean(true)}/>
+                    <DIABadge degree={3} isRequire={Boolean(true)}/>
+                  </Stack>
+                }
               </Typography>
             </Grid>
-            <Grid item xs={12}>
-              <FormControl variant="standard" sx={{ width: '100%' }}>
-                <InputLabelStyle htmlFor="input-with-price">Enter a reserve price</InputLabelStyle>
-                <InputStyle
-                  type="number"
-                  id="input-reserve-price"
-                  value={reservePrice}
-                  onChange={handleChangeReservePrice}
-                  startAdornment={' '}
-                  endAdornment={<CoinTypeLabel type={coinType}/>}
-                />
-              </FormControl>
-              <Divider />
-            </Grid>
+            {
+              DiaDegree===0?
+              <Grid item xs={12} sx={{mb: 1}}>
+                <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
+                  Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info{' '}
+                  <Link underline="always" component={RouterLink} to={PATH_PAGE.features} color='origin.main'>
+                    here
+                  </Link>
+                </Typography>
+                <Divider />
+              </Grid>: 
+
+              <Grid item xs={12}>
+                <FormControl variant="standard" sx={{ width: '100%' }}>
+                  <InputLabelStyle htmlFor="input-with-price">Enter a reserve price</InputLabelStyle>
+                  <InputStyle
+                    type="number"
+                    id="input-reserve-price"
+                    value={reservePrice}
+                    onChange={handleChangeReservePrice}
+                    startAdornment={' '}
+                    endAdornment={<CoinTypeLabel type={coinType}/>}
+                  />
+                </FormControl>
+                <Divider />
+              </Grid>
+            }
             <Grid item xs={12}>
               <Typography variant="h4" sx={{ fontWeight: 'normal' }}>
                 Buy Now Price
+                {
+                  DiaDegree===0 &&
+                  <Stack direction="row" spacing={1} sx={{display: 'inline-flex', pl: 2}}>
+                    <DIABadge degree={1} isRequire={Boolean(true)}/>
+                    <DIABadge degree={2} isRequire={Boolean(true)}/>
+                    <DIABadge degree={3} isRequire={Boolean(true)}/>
+                  </Stack>
+                }
               </Typography>
             </Grid>
-            <Grid item xs={12}>
-              <FormControl variant="standard" sx={{ width: '100%' }}>
-                <InputLabelStyle htmlFor="input-with-price">Enter a buy now price</InputLabelStyle>
-                <InputStyle
-                  type="number"
-                  id="input-buyout-price"
-                  value={buyoutPrice}
-                  onChange={handleChangeBuyoutPrice}
-                  startAdornment={' '}
-                  endAdornment={<CoinTypeLabel type={coinType}/>}
-                />
-              </FormControl>
-              <Divider />
-            </Grid>
+            {
+              DiaDegree===0?
+              <Grid item xs={12}>
+                <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
+                  Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info{' '}
+                  <Link underline="always" component={RouterLink} to={PATH_PAGE.features} color='origin.main'>
+                    here
+                  </Link>
+                </Typography>
+                <Divider />
+              </Grid>: 
+
+              <Grid item xs={12}>
+                <FormControl variant="standard" sx={{ width: '100%' }}>
+                  <InputLabelStyle htmlFor="input-with-price">Enter a buy now price</InputLabelStyle>
+                  <InputStyle
+                    type="number"
+                    id="input-buyout-price"
+                    value={buyoutPrice}
+                    onChange={handleChangeBuyoutPrice}
+                    startAdornment={' '}
+                    endAdornment={<CoinTypeLabel type={coinType}/>}
+                  />
+                </FormControl>
+                <Divider />
+              </Grid>
+            }
           </Grid>
         }
         <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>

@@ -25,7 +25,7 @@ import CoinTypeLabel from '../CoinTypeLabel';
 import DIABadge from '../DIABadge';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString, isValidLimitPrice, getDiaBalanceDegree } from '../../utils/common';
-import useSingin from '../../hooks/useSignin';
+import useSignin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
 
 export default function Auction(props) {
@@ -46,7 +46,7 @@ export default function Auction(props) {
   const { enqueueSnackbar } = useSnackbar();
 
   const context = useWeb3React();
-  const { pasarLinkAddress, diaBalance } = useSingin()
+  const { pasarLinkAddress, diaBalance } = useSignin()
   const { library, chainId, account } = context;
 
   React.useEffect(async () => {
