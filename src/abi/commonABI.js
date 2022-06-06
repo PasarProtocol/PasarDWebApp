@@ -19,5 +19,12 @@ module.exports.COMMON_CONTRACT_ABI = [
     inputs: [{ type: 'bytes4', name: '_interfaceId', internalType: 'bytes4' }],
     name: 'supportsInterface',
     outputs: [{ type: 'bool', name: '', internalType: 'bool' }]
+  },
+  {
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ type: 'address', name: '', internalType: 'address' }]
   }
 ];

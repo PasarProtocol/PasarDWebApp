@@ -54,7 +54,7 @@ const CheckIcon = ({loaded})=>{
 export default function ImportCollection() {
   const [address, setAddress] = React.useState('')
   const [contractAddress, setContractAddress] = React.useState('')
-  const [collectionInfo, setCollectionInfo] = React.useState({name: '', symbol: ''})
+  const [collectionInfo, setCollectionInfo] = React.useState({name: '', symbol: '', owner: ''})
   const [description, setDescription] = React.useState('');
   const [category, setCategory] = React.useState('General');
   const [avatarFile, setAvatarFile] = React.useState(null);
@@ -382,7 +382,7 @@ export default function ImportCollection() {
   }
   const handleImportAction = () => {
     setOnValidation(true)
-    if(!contractAddress.length || !autoLoaded)
+    if(!contractAddress.length || !autoLoaded || ((collectionInfo.owner!==address) && autoLoaded))
       scrollToRef(contractRef)
     else if(!avatarFile)
       scrollToRef(uploadAvatarRef)
@@ -405,6 +405,11 @@ export default function ImportCollection() {
     AddressHelperText = "Address not found"
   else if(contractAddress.length&&!autoLoaded)
     AddressHelperText = "Address is not valid"
+  else if((collectionInfo.owner!==address)&&autoLoaded)
+    AddressHelperText = "Your wallet address is different than the deployed collection owner address"
+
+  const isCollectionAddressInvalid = (isOnValidation&&(!contractAddress.length||!autoLoaded)) || (isFilledAddress&&!autoLoaded) || ((collectionInfo.owner!==address)&&autoLoaded)
+  const autoLoadingSuccess = (collectionInfo.owner===address) && autoLoaded
   return (
     <RootStyle title="ImportCollection | PASAR">
       <Container maxWidth="lg">
@@ -419,23 +424,21 @@ export default function ImportCollection() {
           </Grid>
           <Grid item xs={12} sm={8} ref={contractRef}>
             <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Contract/Collection Address</Typography>
-            <FormControl error={(isOnValidation&&(!contractAddress.length||!autoLoaded))||(isFilledAddress&&!autoLoaded)} variant="standard" sx={{width: '100%'}}>
+            <FormControl error={isCollectionAddressInvalid} variant="standard" sx={{width: '100%'}}>
               <InputLabelStyle htmlFor="input-with-address">
                 Enter your ERC-721 or ERC-1155 contract/collection address
               </InputLabelStyle>
               <InputStyle
                 id="input-with-address"
                 startAdornment={' '}
-                endAdornment={<CheckIcon loaded={autoLoaded}/>}
+                endAdornment={<CheckIcon loaded={autoLoadingSuccess}/>}
                 value={contractAddress}
                 onChange={handleInputAddress}
                 aria-describedby="address-error-text"
               />
               <FormHelperText
                 id="address-error-text"
-                hidden={
-                  !(isOnValidation&&(!contractAddress.length||!autoLoaded))&&!(isFilledAddress&&!autoLoaded)
-                }
+                hidden={!isCollectionAddressInvalid}
               >
                 {AddressHelperText}
               </FormHelperText>
@@ -443,12 +446,12 @@ export default function ImportCollection() {
             <Divider/>
           </Grid>
           {
-            autoLoaded&&
+            autoLoadingSuccess&&
             <>
               <Grid item xs={12} sm={8}>
                 <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Collection Name</Typography>
                 <InputStyle
-                  endAdornment={<CheckIcon loaded={autoLoaded}/>}
+                  endAdornment={<CheckIcon loaded={autoLoadingSuccess}/>}
                   value={collectionInfo.name}
                   readOnly={Boolean(true)}
                   sx={{width: '100%'}}
@@ -458,7 +461,7 @@ export default function ImportCollection() {
               <Grid item xs={12} sm={8}>
                 <Typography variant="h4" sx={{fontWeight: 'normal', pb: 1}}>Symbol</Typography>
                 <InputStyle
-                  endAdornment={<CheckIcon loaded={autoLoaded}/>}
+                  endAdornment={<CheckIcon loaded={autoLoadingSuccess}/>}
                   value={collectionInfo.symbol}
                   readOnly={Boolean(true)}
                   sx={{width: '100%'}}
