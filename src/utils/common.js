@@ -488,7 +488,12 @@ export function getContractInfo(strAddress) {
         .then(resultName=>{
           tokenContract.methods.symbol().call()
             .then(resultSymbol=>{
-              resolve({name: resultName, symbol: resultSymbol})
+              tokenContract.methods.owner().call()
+                .then(resultOwner=>{
+                  resolve({name: resultName, symbol: resultSymbol, owner: resultOwner})
+                }).catch((error) => {
+                  reject(error)
+                })
             }).catch((error) => {
               reject(error)
             })
