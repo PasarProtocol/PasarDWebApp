@@ -37,9 +37,9 @@ export default function CollectibleListItem({ item }) {
                         </Typography>
                         <CopyButton text={royaltyOwner}/>
                     </Stack>
-                    <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} align="left" noWrap>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }} align="left" noWrap>
                         Token ID : {tokenIdHex}
-                    </TypographyStyle>
+                    </Typography>
                 </Grid>
                 <Grid item xs={4}>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} align="right" noWrap>
