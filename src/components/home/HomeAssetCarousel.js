@@ -87,7 +87,7 @@ export default function HomeAssetCarousel() {
     
     React.useEffect(() => {
         setLoadingCollections(true);
-        fetchFrom(`api/v2/sticker/getCollection?sort=0`, {})
+        fetchFrom(`api/v2/sticker/getCollection?sort=0&onMarket=${true}`, {})
           .then((response) => {
             response.json().then((jsonAssets) => {
                 if(Array.isArray(jsonAssets.data)){
