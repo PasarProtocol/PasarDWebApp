@@ -390,7 +390,7 @@ export default function SignInDialog() {
       setSigninEssentialSuccess(false);
       setActivatingConnector(null);
       setWalletAddress(null);
-      if (isUsingEssentialsConnector() || essentialsConnector.hasWalletConnectSession())
+      if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession())
         await essentialsConnector.disconnectWalletConnect();
       if (isInAppBrowser() && (await window.elastos.getWeb3Provider().isConnected()))
         await window.elastos.getWeb3Provider().disconnect();
@@ -402,7 +402,7 @@ export default function SignInDialog() {
 
   const handleClickOpenSinginDlg = async() => {
     if(isInAppBrowser()){
-      if (isUsingEssentialsConnector() || essentialsConnector.hasWalletConnectSession()) {
+      if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
         await signOutWithEssentials();
         await signInWithEssentials();
       } else {
@@ -677,7 +677,7 @@ export default function SignInDialog() {
                       onClick={async () => {
                         // check if is already connected
                         // await signInWithEssentials();
-                        if (isUsingEssentialsConnector() || essentialsConnector.hasWalletConnectSession()) {
+                        if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
                           await signOutWithEssentials();
                           await signInWithEssentials();
                         } else {
@@ -866,7 +866,7 @@ export default function SignInDialog() {
                   onClick={async () => {
                     // check if is already connected
                     // await signInWithEssentials();
-                    if (isUsingEssentialsConnector() || essentialsConnector.hasWalletConnectSession()) {
+                    if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
                       await signOutWithEssentials();
                       await signInWithEssentials();
                     } else {
