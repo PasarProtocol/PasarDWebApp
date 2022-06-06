@@ -114,6 +114,11 @@ export default function SearchBox(props) {
   }
   
   React.useEffect(()=>{
+    if(!params.key)
+      ref.current.value = ''
+  }, [params.key])
+
+  React.useEffect(()=>{
     setShowAutocomplete(false)
   }, [linkToState])
 
