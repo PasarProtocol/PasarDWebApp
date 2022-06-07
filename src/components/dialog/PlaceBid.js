@@ -18,7 +18,8 @@ import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
-import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, coinTypes, isValidLimitPrice } from '../../utils/common';
+import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, 
+  removeLeadingZero, coinTypes, isValidLimitPrice, getFilteredGasPrice } from '../../utils/common';
 
 export default function PlaceBid(props) {
   const navigate = useNavigate();
@@ -71,7 +72,8 @@ export default function PlaceBid(props) {
             const erc20Contract = new ethers.Contract(coinTypes[coinType].address, ERC20_CONTRACT_ABI, signer);
             const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MARKET_CONTRACT_ADDRESS))
             console.log(erc20BidderApproved)
-            const gasPrice = await provider.getGasPrice();
+            const _gasPrice = await provider.getGasPrice();
+            const gasPrice = getFilteredGasPrice(_gasPrice)
             if(erc20BidderApproved < _price*1){
               console.log('Pasar marketplace not enough ERC20 allowance from bidder');
               const txParams = {
@@ -88,7 +90,8 @@ export default function PlaceBid(props) {
             }
           }
           
-          provider.getGasPrice().then(gasPrice=>{
+          provider.getGasPrice().then(_gasPrice=>{
+            const gasPrice = getFilteredGasPrice(_gasPrice)
             const transactionParams = {
               'from': userAddress,
               'gasPrice': gasPrice.toBigInt(),
@@ -153,7 +156,8 @@ export default function PlaceBid(props) {
     if(coinType) {
       const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinTypes[coinType].address);
       const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MARKET_CONTRACT_ADDRESS).call())
-      const gasPrice = await walletConnectWeb3.eth.getGasPrice();
+      const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
+      const gasPrice = getFilteredGasPrice(_gasPrice)
       if(erc20BidderApproved < _price*1){
         console.log('Pasar marketplace not enough ERC20 allowance from bidder');
         const txParams = {
@@ -168,7 +172,8 @@ export default function PlaceBid(props) {
         }
       }
     }
-    const gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const gasPrice = getFilteredGasPrice(_gasPrice)
     
     console.log('Sending transaction with account address:', accounts[0]);
     const transactionParams = {

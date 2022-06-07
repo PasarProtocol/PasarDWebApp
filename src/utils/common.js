@@ -816,6 +816,8 @@ export const getCollectiblesInCollection4Preview = (address, count) =>
       });
   });
 
+export const getFilteredGasPrice = (_gasPrice) => _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice;
+
 export const getFullUrl = (url) => `${window.location.protocol}//${window.location.host}/${url}`;
 
 export const checkIsMobile = () =>

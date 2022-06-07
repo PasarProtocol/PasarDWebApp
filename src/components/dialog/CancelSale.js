@@ -8,7 +8,7 @@ import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
-import { isInAppBrowser } from '../../utils/common';
+import { isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 
 export default function CancelSale(props) {
@@ -29,7 +29,8 @@ export default function CancelSale(props) {
     const contractAddress = MARKET_CONTRACT_ADDRESS;
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
-    const gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const gasPrice = getFilteredGasPrice(_gasPrice)
 
     console.log('Sending transaction with account address:', accounts[0]);
     const transactionParams = {

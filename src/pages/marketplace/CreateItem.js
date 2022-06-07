@@ -47,7 +47,8 @@ import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
 import {TOKEN_721_ABI} from '../../abi/token721ABI'
 import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
 import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL, auctionOrderType} from '../../config'
-import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, isValidLimitPrice, checkWhetherGeneralCollection } from '../../utils/common';
+import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, 
+  isValidLimitPrice, checkWhetherGeneralCollection, getFilteredGasPrice } from '../../utils/common';
 import {requestSigndataOnTokenID} from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
@@ -482,7 +483,8 @@ export default function CreateItem() {
           }
 
           setProgress(50)
-          walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+          walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
+            const gasPrice = getFilteredGasPrice(_gasPrice)
             console.log("Gas price:", gasPrice); 
     
             const _gasLimit = 5000000;
@@ -623,7 +625,8 @@ export default function CreateItem() {
             baseAddress = selectedCollection.token
           }
 
-          walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+          walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
+            const gasPrice = getFilteredGasPrice(_gasPrice)
             console.log("Gas price:", gasPrice); 
     
             console.log("Sending transaction with account address:", accounts[0]);

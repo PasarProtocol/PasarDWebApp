@@ -11,7 +11,7 @@ import {
   marketContract as MARKET_CONTRACT_ADDRESS,
   blankAddress
 } from '../../config';
-import { reduceHexAddress, isInAppBrowser } from '../../utils/common';
+import { reduceHexAddress, isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 
@@ -32,7 +32,8 @@ export default function DeleteItem(props) {
     const contractAddress = CONTRACT_ADDRESS;
     const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
-    const gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const gasPrice = getFilteredGasPrice(_gasPrice)
 
     console.log('Sending transaction with account address:', accounts[0]);
     const transactionParams = {

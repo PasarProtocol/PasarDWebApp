@@ -24,7 +24,8 @@ import CustomSwitch from '../custom-switch';
 import CoinTypeLabel from '../CoinTypeLabel';
 import DIABadge from '../DIABadge';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString, isValidLimitPrice, getDiaBalanceDegree } from '../../utils/common';
+import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString, 
+  isValidLimitPrice, getDiaBalanceDegree, getFilteredGasPrice } from '../../utils/common';
 import useSignin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
 
@@ -124,7 +125,8 @@ export default function Auction(props) {
 
         const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, baseToken);
         
-        walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+        walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
+          const gasPrice = getFilteredGasPrice(_gasPrice)
           console.log("Gas price:", gasPrice);
           // console.log("Sending transaction with account address:", accounts[0]);
           const transactionParams = {
