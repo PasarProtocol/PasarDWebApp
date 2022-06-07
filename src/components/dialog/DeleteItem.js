@@ -7,7 +7,8 @@ import { useSnackbar } from 'notistack';
 
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import {
-  stickerContract as CONTRACT_ADDRESS,
+  stickerContract as PASAR_CONTRACT_ADDRESS,
+  feedsContract as FEEDS_CONTRACT_ADDRESS,
   marketContract as MARKET_CONTRACT_ADDRESS,
   blankAddress
 } from '../../config';
@@ -16,7 +17,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 
 export default function DeleteItem(props) {
-  const { isOpen, setOpen, name, tokenId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, tokenId, updateCount, handleUpdate, v1State=false } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const handleClose = () => {
@@ -29,7 +30,7 @@ export default function DeleteItem(props) {
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
     const contractAbi = STICKER_CONTRACT_ABI;
-    const contractAddress = CONTRACT_ADDRESS;
+    const contractAddress = !v1State ? PASAR_CONTRACT_ADDRESS: FEEDS_CONTRACT_ADDRESS;
     const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
     const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
