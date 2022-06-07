@@ -65,6 +65,7 @@ export default function SignInDialog() {
   const [balance, setBalance] = useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [diaUSD, setDiaUSD] = React.useState(0);
+  const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
   const navigate = useNavigate();
 
   const initializeWalletConnection = React.useCallback(async () => {
@@ -96,11 +97,58 @@ export default function SignInDialog() {
           response.json().then(jsonResult => {
             if(jsonResult.data){
               setOpenTopAlert(true)
+            } else {
+              setOpenTopAlert(false)
             }
           })
         }).catch(e => {
         });
   }, [walletAddress])
+
+  // React.useEffect(() => {
+      // EE
+      const handleEEAccountsChanged = (accounts) => {
+        // console.log(accounts)
+        if(accounts.length) {
+          setWalletAddress(accounts[0])
+          getDiaTokenInfo(accounts[0], walletConnectProvider)
+            .then((dia) => {
+              setDiaBalance(dia);
+            })
+            .catch((error) => {
+              setDiaBalance(0);
+            });
+          getBalance(walletConnectProvider).then((res) => {
+            setBalance(math.round(res / 1e18, 4));
+          });
+        }
+      };
+      const handleEEChainChanged = (chainId) => {
+        console.log(chainId)
+        // if (
+        //     chainId &&
+        //     ((process.env.REACT_APP_PUBLIC_ENV !== 'development' && chainId !== 20) ||
+        //         (process.env.REACT_APP_PUBLIC_ENV === 'development' && chainId !== 21))
+        // )
+        //     showChainErrorSnackBar();
+      };
+      const handleEEDisconnect = (code, reason) => {
+        console.log('Disconnect code: ', code, ', reason: ', reason);
+        signOutWithEssentials();
+      };
+      const handleEEError = (code, reason) => {
+        console.error(code, reason);
+      };
+
+      // Subscribe to accounts change
+      walletConnectProvider.on('accountsChanged', handleEEAccountsChanged);
+      // Subscribe to chainId change
+      walletConnectProvider.on('chainChanged', handleEEChainChanged);
+      // Subscribe to session disconnection
+      walletConnectProvider.on('disconnect', handleEEDisconnect);
+      // Subscribe to session disconnection
+      walletConnectProvider.on('error', handleEEError);
+  // }, [])
 
   React.useEffect(async () => {
     initializeWalletConnection();
