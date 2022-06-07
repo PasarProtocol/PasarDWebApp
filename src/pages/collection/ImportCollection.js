@@ -30,7 +30,7 @@ import {REGISTER_CONTRACT_ABI} from '../../abi/registerABI'
 import {registerContract as CONTRACT_ADDRESS, ipfsURL} from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, getContractInfo, socialTypes } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, getContractInfo, getFilteredGasPrice, socialTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -313,7 +313,8 @@ export default function ImportCollection() {
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, CONTRACT_ADDRESS)
-          walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+          walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
+            const gasPrice = getFilteredGasPrice(_gasPrice)
             console.log("Gas price:", gasPrice); 
     
             const _gasLimit = 5000000;

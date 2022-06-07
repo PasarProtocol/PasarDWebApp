@@ -37,7 +37,7 @@ import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
 import {registerContract as CONTRACT_ADDRESS, diaContract as DIA_TOKEN_ADDRESS, ipfsURL, tokenConf} from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, fetchFrom, getIpfsUrl, isNumberString, getContractInfo, socialTypes } from '../../utils/common';
+import { isInAppBrowser, fetchFrom, getIpfsUrl, isNumberString, getContractInfo, getFilteredGasPrice, socialTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -287,7 +287,8 @@ export default function EditCollection() {
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, CONTRACT_ADDRESS)
-          walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+          walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
+            const gasPrice = getFilteredGasPrice(_gasPrice)
             console.log("Gas price:", gasPrice); 
     
             console.log("Sending transaction with account address:", accounts[0]);
