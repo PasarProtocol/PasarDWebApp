@@ -11,7 +11,8 @@ import jwtDecode from 'jwt-decode';
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
 import { 
   stickerContract as STICKER_ADDRESS, 
-  marketContract as CONTRACT_ADDRESS, 
+  marketContract as MARKET_CONTRACT_ADDRESS, 
+  v1marketContract as V1_MARKET_CONTRACT_ADDRESS,
   diaContract as DIA_CONTRACT_ADDRESS, 
   mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS,
   welaContract as WELA_CONTRACT_ADDRESS, 
@@ -23,6 +24,7 @@ import {
   registerContract as REG_CONTRACT_ADDRESS,
   blankAddress, ipfsURL, rpcURL, bunnyContract } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
+import { V1_PASAR_CONTRACT_ABI } from '../abi/pasarV1ABI';
 import { ERC20_CONTRACT_ABI } from '../abi/diamondABI';
 import { REGISTER_CONTRACT_ABI } from '../abi/registerABI';
 import { COMMON_CONTRACT_ABI } from '../abi/commonABI';
@@ -393,7 +395,7 @@ export function callContractMethod(type, coinType, paramObj) {
       .getAccounts()
       .then((accounts) => {
         // console.log(accounts)
-        const marketContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, CONTRACT_ADDRESS);
+        const marketContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, MARKET_CONTRACT_ADDRESS);
         walletConnectWeb3.eth
           .getGasPrice()
           .then((gasPrice) => {
@@ -431,8 +433,13 @@ export function callContractMethod(type, coinType, paramObj) {
               method = marketContract.methods.changeAuctionOrderPrice(_orderId, _price, _reservePrice, _buyoutPrice, pricingContract[coinType]);
             } else if (type === 'changeSaleOrderPrice') {
               console.log('changeSaleOrderPrice');
-              const { _orderId, _price } = paramObj;
-              method = marketContract.methods.changeSaleOrderPrice(_orderId, _price, pricingContract[coinType]);
+              const { _orderId, _price, v1State=false } = paramObj;
+              if(!v1State)
+                method = marketContract.methods.changeSaleOrderPrice(_orderId, _price, pricingContract[coinType]);
+              else {
+                const v1MarketContract = new walletConnectWeb3.eth.Contract(V1_PASAR_CONTRACT_ABI, V1_MARKET_CONTRACT_ADDRESS);
+                method = v1MarketContract.methods.changeOrderPrice(_orderId, _price);
+              }
             } else {
               reject(new Error());
               return;

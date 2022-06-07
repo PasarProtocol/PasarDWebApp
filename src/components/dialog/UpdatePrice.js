@@ -21,7 +21,7 @@ import useSignin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
 
 export default function UpdatePrice(props) {
-  const { isOpen, setOpen, name, orderId, orderType, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, orderId, orderType, updateCount, handleUpdate, v1State=false } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [price, setPrice] = React.useState('');
@@ -70,7 +70,7 @@ export default function UpdatePrice(props) {
   };
 
   const callChangeOrderPrice = async (_orderId, _price, _reservePrice, _buyoutPrice) => {
-    callContractMethod(orderType===auctionOrderType?'changeAuctionOrderPrice':'changeSaleOrderPrice', coinType, {_orderId, _price, _reservePrice, _buyoutPrice})
+    callContractMethod(orderType===auctionOrderType?'changeAuctionOrderPrice':'changeSaleOrderPrice', coinType, {_orderId, _price, _reservePrice, _buyoutPrice, v1State})
       .then((success) => {
         setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
         enqueueSnackbar('Update price success!', { variant: 'success' });
