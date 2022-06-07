@@ -29,6 +29,7 @@ export const blankAddress = "0x0000000000000000000000000000000000000000";
 
 const addressForProduction = {
   stickerContract: "0xF63f820F4a0bC6E966D61A4b20d24916713Ebb95",
+  feedsContract: "0x020c7303664bc88ae92cE3D380BF361E03B78B81",
   // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
   marketContract: "0xaeA699E4dA22986eB6fa2d714F5AC737Fe93a998",
   v1marketContract: "0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0",
@@ -45,6 +46,7 @@ const addressForProduction = {
 
 const addressForTest = {
   stickerContract: "0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0",
+  feedsContract: "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961",
   // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
   marketContract: "0x19088c509C390F996802B90bdc4bFe6dc3F5AAA7",
   v1marketContract: "0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087",
@@ -68,7 +70,7 @@ const escServerForTest = "https://esc-testnet.elastos.io"
 const ApplicationDIDForMain = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 // const ApplicationDIDForTest = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB"
 
-export const {stickerContract, marketContract, v1marketContract, registerContract, diaContract, welaContract, glideContract, 
+export const {stickerContract, feedsContract, marketContract, v1marketContract, registerContract, diaContract, welaContract, glideContract, 
   elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
 export const mainDiaContract = addressForProduction.diaContract
 
