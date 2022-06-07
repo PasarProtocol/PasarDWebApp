@@ -1,4 +1,4 @@
-module.exports.PASAR_CONTRACT_ABI = [
+module.exports.V1_PASAR_CONTRACT_ABI = [
   {
     "anonymous": false,
     "inputs": [
