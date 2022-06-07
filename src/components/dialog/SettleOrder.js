@@ -16,7 +16,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import StyledButton from '../signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
-import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser } from '../../utils/common';
+import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
 
 export default function SettleOrder(props) {
   const navigate = useNavigate();
@@ -56,7 +56,8 @@ export default function SettleOrder(props) {
         const signer = provider.getSigner();
         const pasarContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, PASAR_CONTRACT_ABI, signer);
         signer.getAddress().then(userAddress=>{
-          provider.getGasPrice().then(gasPrice=>{
+          provider.getGasPrice().then(_gasPrice=>{
+            const gasPrice = getFilteredGasPrice(_gasPrice)
             const transactionParams = {
               'from': userAddress,
               'gasPrice': gasPrice.toBigInt(),

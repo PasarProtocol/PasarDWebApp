@@ -17,7 +17,7 @@ import {
   stickerContract as CONTRACT_ADDRESS,
   marketContract as MARKET_CONTRACT_ADDRESS
 } from '../../config';
-import { reduceHexAddress, removeLeadingZero, isInAppBrowser } from '../../utils/common';
+import { reduceHexAddress, removeLeadingZero, isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
 
@@ -49,7 +49,8 @@ export default function Transfer(props) {
         const contractAddress = CONTRACT_ADDRESS;
         const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
     
-        walletConnectWeb3.eth.getGasPrice().then(gasPrice=>{
+        walletConnectWeb3.eth.getGasPrice().then(_gasPrice=>{
+          const gasPrice = getFilteredGasPrice(_gasPrice)
           console.log('Sending transaction with account address:', accounts[0]);
           const transactionParams = {
             'from': accounts[0],

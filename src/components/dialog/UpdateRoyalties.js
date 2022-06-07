@@ -14,7 +14,7 @@ import {
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { TextFieldStyle } from '../CustomInput';
-import { removeLeadingZero, isNumberString, reduceHexAddress, isInAppBrowser } from '../../utils/common';
+import { removeLeadingZero, isNumberString, reduceHexAddress, isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
 
 export default function UpdateRoyalties(props) {
   const { isOpen, setOpen, name, token, owners=[], feeRates=[] } = props;
@@ -49,7 +49,8 @@ export default function UpdateRoyalties(props) {
     const accounts = await walletConnectWeb3.eth.getAccounts();
     
     const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, CONTRACT_ADDRESS)
-    const gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const gasPrice = getFilteredGasPrice(_gasPrice)
 
     console.log('Sending transaction with account address:', accounts[0]);
     const transactionParams = {

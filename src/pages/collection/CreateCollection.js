@@ -38,7 +38,7 @@ import useOffSetTop from '../../hooks/useOffSetTop';
 import useSingin from '../../hooks/useSignin';
 
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, socialTypes, getDiaBalanceDegree, fetchFrom } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, socialTypes, getDiaBalanceDegree, fetchFrom, getFilteredGasPrice } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -328,7 +328,8 @@ export default function CreateCollection() {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           const {abi: tokenABI, code: tokenCode} = tokenStandard[standard]
           let registerContract = new walletConnectWeb3.eth.Contract(tokenABI)
-          walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+          walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
+            const gasPrice = getFilteredGasPrice(_gasPrice)
             registerContract = registerContract.deploy({
               data: '0x'.concat(raw(`../../bytecode/${tokenCode}`)),
               arguments: [name, symbol, paramObj._uri, DIA_TOKEN_ADDRESS, diaTokenValue],
@@ -380,7 +381,8 @@ export default function CreateCollection() {
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, CONTRACT_ADDRESS)
-          walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+          walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
+            const gasPrice = getFilteredGasPrice(_gasPrice)
             console.log("Gas price:", gasPrice); 
     
             console.log("Sending transaction with account address:", accounts[0]);

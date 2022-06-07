@@ -17,7 +17,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
-import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes, isValidLimitPrice } from '../../utils/common';
+import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes, isValidLimitPrice, getFilteredGasPrice } from '../../utils/common';
 
 export default function Sell(props) {
   const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate, saleType, royalties } = props;
@@ -55,7 +55,8 @@ export default function Sell(props) {
 
         const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, baseToken);
         
-        walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+        walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
+          const gasPrice = getFilteredGasPrice(_gasPrice)
           console.log("Gas price:", gasPrice);
           // console.log("Sending transaction with account address:", accounts[0]);
           const transactionParams = {
