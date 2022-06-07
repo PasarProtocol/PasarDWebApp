@@ -10,7 +10,7 @@ import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { ERC20_CONTRACT_ABI } from '../../abi/erc20ABI';
-import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
+import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, v1marketContract as V1_MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
@@ -27,7 +27,8 @@ export default function Purchase(props) {
   const { pasarLinkAddress } = useSingin()
   const { library, chainId, account } = context;
   const { isOpen, setOpen, info, coinType=0 } = props;
-
+  const { v1State=false } = info
+  
   const coinBalance = balanceArray[coinType]
   const coinName = coinTypes[coinType].name
   let priceInfo = info.Price;
@@ -42,9 +43,10 @@ export default function Purchase(props) {
       const { ethereum } = window;
 
       if (ethereum) {
+        const contractAddress = !v1State ? MARKET_CONTRACT_ADDRESS: V1_MARKET_CONTRACT_ADDRESS;
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
-        const pasarContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, PASAR_CONTRACT_ABI, signer);
+        const pasarContract = new ethers.Contract(contractAddress, PASAR_CONTRACT_ABI, signer);
         signer.getAddress().then(async userAddress=>{
           if(coinType) {
             const erc20Contract = new ethers.Contract(coinTypes[coinType].address, ERC20_CONTRACT_ABI, signer);
@@ -129,7 +131,8 @@ export default function Purchase(props) {
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
     const contractAbi = PASAR_CONTRACT_ABI;
-    const contractAddress = MARKET_CONTRACT_ADDRESS;
+    const contractAddress = !v1State ? MARKET_CONTRACT_ADDRESS: V1_MARKET_CONTRACT_ADDRESS;
+
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
     if(coinType) {
       const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinTypes[coinType].address);
