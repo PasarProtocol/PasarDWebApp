@@ -5,14 +5,14 @@ import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
-import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
+import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, v1marketContract as V1_MARKET_CONTRACT_ADDRESS } from '../../config';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 
 export default function CancelSale(props) {
-  const { isOpen, setOpen, name, orderId, OrderId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, orderId, OrderId, updateCount, handleUpdate, v1State=false } = props;
   const { updateCount: updateCount2, setUpdateCount } = useAuctionDlg()
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
@@ -26,7 +26,7 @@ export default function CancelSale(props) {
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
     const contractAbi = PASAR_CONTRACT_ABI;
-    const contractAddress = MARKET_CONTRACT_ADDRESS;
+    const contractAddress = !v1State ? MARKET_CONTRACT_ADDRESS: V1_MARKET_CONTRACT_ADDRESS;
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
     const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
