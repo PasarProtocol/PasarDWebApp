@@ -165,7 +165,7 @@ const CollectionImgBox = (props) => {
                   <Grid container sx={{py: 2, mx: -2, width: 'calc(100% + 32px)'}}>
                     {
                       collectibles.map((item, _i)=>{
-                        const thumbnail = getAssetImage(item)
+                        const thumbnail = getAssetImage(item, false)
                         return <Grid item sm={4} key={_i} sx={{height: 80}}>
                           {
                             _i===5?

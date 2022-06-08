@@ -419,23 +419,14 @@ export default function AssetCard(props) {
                 {
                   isMoreLink?
                   <Box sx={{position: 'relative', background: '#161c24'}}>
-                    <CardImgBox
-                      src={props.thumbnail}
-                      {...props}
-                    />
+                    <CardImgBox {...props}/>
                     <Typography variant="h5" align='center' sx={{width: '100%', top: '50%', color: 'white', position: 'absolute', transform: 'translateY(-50%)'}}>+ more</Typography>
                   </Box>:
-                  <CardImgBox
-                    src={props.thumbnail}
-                    {...props}
-                  />
+                  <CardImgBox {...props}/>
                 }
               </Link>
             ):(
-              <CardImgBox
-                src={props.thumbnail}
-                {...props}
-              />
+              <CardImgBox {...props}/>
             )
           }
           </Box>

@@ -41,7 +41,7 @@ export default function HomeAssetCard() {
                 asset!=null&&
                 <>
                     <Link to={`/profile/others/${asset.royaltyOwner}`} component={RouterLink}>
-                        <CardImgBox src={getAssetImage(asset)}/>
+                        <CardImgBox src={getAssetImage(asset, false)}/>
                     </Link>
                     <Stack direction="row" sx={{py: 2}}>
                         <Box sx={{flexGrow: 1, minWidth: 0}}>

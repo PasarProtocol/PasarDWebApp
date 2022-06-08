@@ -173,7 +173,7 @@ export default function CollectibleDetail() {
                   draggable = {false}
                   component="img"
                   alt={collectible.name}
-                  src={getAssetImage(collectible)}
+                  src={getAssetImage(collectible, false)}
                   onLoad={onImgLoad}
                   onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
                   sx={{ width: '100%', borderRadius: 1, mr: 2 }}
