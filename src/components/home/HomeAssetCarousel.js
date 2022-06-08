@@ -64,7 +64,7 @@ function CarouselInCollection({collection}) {
                 <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
                     {
                         collectibles.slice(0,5).map((each, index) => {
-                            const imageSrc = getAssetImage(each)
+                            const imageSrc = getAssetImage(each, false)
                             return <Box key={index} sx={{
                                 // position: 'relative',
                                 pb: '100%',

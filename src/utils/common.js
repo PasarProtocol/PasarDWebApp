@@ -22,7 +22,7 @@ import {
   bunnyContract as BUNNY_CONTRACT_ADDRESS, 
   bnbBusdContract as BUSD_CONTRACT_ADDRESS, 
   registerContract as REG_CONTRACT_ADDRESS,
-  blankAddress, ipfsURL, rpcURL, bunnyContract } from '../config';
+  blankAddress, ipfsURL as PasarIpfs, rpcURL, bunnyContract } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { V1_PASAR_CONTRACT_ABI } from '../abi/pasarV1ABI';
 import { ERC20_CONTRACT_ABI } from '../abi/diamondABI';
@@ -30,6 +30,8 @@ import { REGISTER_CONTRACT_ABI } from '../abi/registerABI';
 import { COMMON_CONTRACT_ABI } from '../abi/commonABI';
 
 const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS, WELA_CONTRACT_ADDRESS, GLIDE_CONTRACT_ADDRESS, ELK_CONTRACT_ADDRESS, EUSDC_CONTRACT_ADDRESS, BUNNY_CONTRACT_ADDRESS, BUSD_CONTRACT_ADDRESS]
+const ipfsUrls = [PasarIpfs, 'https://ipfs.ela.city', 'https://gateway.pinata.cloud']
+
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = (strAddress) => {
   if(!strAddress)
@@ -71,15 +73,16 @@ export const getTimeZone = () => {
   return e.includes("-") ? e : "+".concat(e)
 }
 
-export const getIpfsUrl = (id) => {
+export const getIpfsUrl = (id, ipfsType = 0) => {
   if (!id) return '';
+  const ipfsUrl = ipfsUrls[ipfsType]
   const prefixLen = id.split(':', 2).join(':').length;
   if (prefixLen >= id.length) return '';
   const uri = id.substring(prefixLen + 1);
-  return `${ipfsURL}/ipfs/${uri}`;
+  return `${ipfsUrl}/ipfs/${uri}`;
 };
 
-export const getAssetImage = (metaObj, isThumbnail = false) => {
+export const getAssetImage = (metaObj, isThumbnail, ipfsType = 0) => {
   const { asset, thumbnail, tokenJsonVersion, data } = metaObj;
   if (tokenJsonVersion === null) {
     const imgUrl = isThumbnail?thumbnail:asset
@@ -87,7 +90,7 @@ export const getAssetImage = (metaObj, isThumbnail = false) => {
       return ''
     if((imgUrl.match(/:/g) || []).length !== 2)
       return imgUrl
-    return getIpfsUrl(imgUrl);
+    return getIpfsUrl(imgUrl, ipfsType);
   }
   
   let cid = asset;
@@ -96,7 +99,7 @@ export const getAssetImage = (metaObj, isThumbnail = false) => {
     else if (isThumbnail) cid = data.thumbnail;
     else cid = data.image;
   } else if (isThumbnail) cid = thumbnail;
-  return getIpfsUrl(cid);
+  return getIpfsUrl(cid, ipfsType);
 };
 
 export const getCollectionTypeFromImageUrl = (metaObj) => {
@@ -708,7 +711,7 @@ export const getCoinTypeFromToken = (item) => {
   return coinType
 }
 export const sendIpfsDidJson = async () => {
-  const client = create(`${ipfsURL}/`);
+  const client = create(`${PasarIpfs}/`);
   // create the metadata object we'll be storing
   const did = sessionStorage.getItem('PASAR_DID') || ''
   const token = sessionStorage.getItem("PASAR_TOKEN");

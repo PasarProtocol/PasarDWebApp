@@ -56,7 +56,6 @@ const GridItems = (props) => {
             item?
             <AssetCard
               {...item}
-              thumbnail={getAssetImage(item, true)}
               price={round(item.price/1e18, 3)}
               saleType={item.SaleType?item.SaleType:item.saleType}
               isLink={Boolean(true)}

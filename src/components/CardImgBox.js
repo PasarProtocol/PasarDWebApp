@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { getAssetImage } from '../utils/common'
 
 const BoxStyle = styled(Box)(({ theme }) => ({
     position: 'relative',
@@ -34,7 +35,8 @@ const BoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 const CardImgBox = (props) => {
-    const { src, isMoreLink=false } = props;
+    const { isMoreLink=false } = props;
+    const src = getAssetImage(props, true)
     const imageRef = React.useRef();
 
     const handleResize = ()=>{
@@ -47,6 +49,16 @@ const CardImgBox = (props) => {
         imageRef.current.style.height = '100%'
     }
 
+    const handleErrorImage = (e) => {
+      if(e.target.src.indexOf("pasarprotocol.io") >= 0) {
+        e.target.src = getAssetImage(props, true, 1)
+      } else if(e.target.src.indexOf("ipfs.ela") >= 0) {
+        e.target.src = getAssetImage(props, true, 2)
+      } else {
+        e.target.src = '/static/broken-image.svg'
+      }
+    }
+
     const imageStyle = {
       // borderRadius: 1,
       // boxShadow: (theme)=>theme.customShadows.z16,
@@ -57,7 +69,7 @@ const CardImgBox = (props) => {
     return (
       <BoxStyle className='card-img' sx={{opacity: isMoreLink?.5:1}}>
         <Box className='img-box'>
-          <Box draggable = {false} component="img" src={src} sx={imageStyle} ref={imageRef} onLoad={handleResize} onError={(e) => e.target.src = '/static/broken-image.svg'}/>
+          <Box draggable = {false} component="img" src={src} sx={imageStyle} ref={imageRef} onLoad={handleResize} onError={handleErrorImage}/>
         </Box>
       </BoxStyle>
     );
