@@ -10,7 +10,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import MethodLabel from '../../MethodLabel';
 import CopyButton from '../../CopyButton';
 import { MethodList, reduceHexAddress, getTime, getCoinTypeFromToken, coinTypes } from '../../../utils/common';
-import {escURL, marketContract} from '../../../config'
+import {escURL, marketContract, v1marketContract} from '../../../config'
 
 TransactionOrderDetail.propTypes = {
     item: PropTypes.object.isRequired
@@ -59,7 +59,7 @@ const StackColStyle = styled(Stack)(({ theme }) => ({
     }
 }));
 export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
-    const { event, tHash } = item
+    const { event, tHash, v1Event=false } = item
     const method = event!==undefined?event:item.method
     const timestamp = getTime(item.timestamp)
     const price = parseFloat((item.price/ 10 ** 18).toFixed(3))
@@ -102,7 +102,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                 if(el.field&&!el.copyable)
                                     value = parseFloat((value / 10 ** 18).toFixed(7))
                                 if(el.field==="marketplace")
-                                    value = marketContract
+                                    value = !v1Event ? marketContract: v1marketContract
                                 const displayValue = el.ellipsis?reduceHexAddress(value):value
                                 return (
                                     <StackRowStyle key={index}>
