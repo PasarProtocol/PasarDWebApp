@@ -19,6 +19,9 @@ import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import jwtDecode from 'jwt-decode';
 import { isUndefined, update } from 'lodash';
+import firebase from "firebase/app"
+import { registerAnalytics } from "@firebase/analytics";
+
 import { DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
 import jwt from 'jsonwebtoken';
@@ -35,6 +38,23 @@ import PaperRecord from '../PaperRecord';
 import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser, getCredentialInfo } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 import { creatAndRegister, prepareConnectToHive } from './HiveAPI';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC1hdxto7LGxQiYYOGOgXz9Xq9nHX1C4z0",
+  authDomain: "pasarprotocol-f56d7.firebaseapp.com",
+  projectId: "pasarprotocol-f56d7",
+  storageBucket: "pasarprotocol-f56d7.appspot.com",
+  messagingSenderId: "243868041871",
+  appId: "1:243868041871:web:09cadc30be69fbce3be6fa",
+  measurementId: "G-09769VV3M3"
+};
+  
+  // Initialize Firebase
+  // const app = initializeApp(firebaseConfig);
+  // const analytics = getAnalytics(app); 
+  const app = firebase.initializeApp(firebaseConfig)
+  const analytiscs = firebase.analytics(app)
+  // analytiscs.logEvent('login');// 
 
 export default function SignInDialog() {
   const {
