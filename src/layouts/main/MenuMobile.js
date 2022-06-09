@@ -252,8 +252,8 @@ export default function MenuMobile(props) {
         <Container>
           <Grid container dir="ltr" sx={{pb: 1}}>
             {
-              SOCIALS.map((social) => (
-                <Grid item xs={3} align="center">
+              SOCIALS.map((social, _i) => (
+                <Grid key={_i} item xs={3} align="center">
                   <MFab size="small" color={fabColorType} href={social.url} component={Link} target="_blank">
                     <Icon icon={social.icon} width={20} height={22} />
                   </MFab>
