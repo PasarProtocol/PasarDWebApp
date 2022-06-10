@@ -78,7 +78,7 @@ export default function EditProfile() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  const updateProfileData = [updateAvatarUrl, updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium]
+  const updateProfileData = [updateAvatarUrl, updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe]
   const deleteProfileData = [deleteAvatarUrl, deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe]
   const queryProfileSocials = {
     website: queryWebsite,
@@ -286,26 +286,36 @@ export default function EditProfile() {
           stopProvide("Nothing to provide KYC-me credentials")
           return
         }
-        credentialItems.slice(0, credentialItems.length-1).forEach((item, _i)=>{
+        // credentialItems.slice(0, credentialItems.length-1).forEach((item, _i)=>{
+        //   const updateFunc = updateProfileData[_i]
+        //   if(profileData[item.id] && checkedItem[_i])
+        //     await updateFunc(profileData[item.id])
+        //   else
+        //     await updateFunc('', "private")
+        //     // deleteProfileData[_i]()
+        // })
+        await Promise.all(credentialItems.slice(0, credentialItems.length-1).map((item, _i)=>{
+          const updateFunc = updateProfileData[_i]
           if(profileData[item.id] && checkedItem[_i])
-            updateProfileData[_i](profileData[item.id])
-          else
-            deleteProfileData[_i]()
-        })
+            return updateFunc(profileData[item.id])
+          return updateFunc('', "private")
+        }))
         // console.log(profileData)
         // updateName(profileData.name)
         if(checkedItem[8] && profileData){
           const {BirthDateCredential, GenderCredential, CountryCredential} = profileData
           const tempKYCdata = { birthdate: BirthDateCredential, gender: GenderCredential, country: CountryCredential }
-          updateKycMe(JSON.stringify(tempKYCdata))
+          await updateKycMe(JSON.stringify(tempKYCdata))
           // const vpBuffer = Buffer.from(kycVerifiablePresentation.serialize())
           // const encodedPresentation = bs58.encode(vpBuffer)
           // sessionStorage.setItem('KYCedProof', encodedPresentation)
         } else {
-          deleteKycMe()
+          await updateKycMe('', 'private')
+          // deleteKycMe()
         }
       } else {
-        const deleteProfileFuncArr = deleteProfileData.map(func=>func())
+        const deleteProfileFuncArr = updateProfileData.map(func=>func('', 'private'))
+        // const deleteProfileFuncArr = deleteProfileData.map(func=>func())
         await Promise.all(deleteProfileFuncArr)
       }
       if(avatarUrl && !isString(avatarUrl)) {

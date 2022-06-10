@@ -129,7 +129,7 @@ export default function SignInDialog() {
       // EE
       const handleEEAccountsChanged = (accounts) => {
         // console.log(accounts)
-        if(accounts.length) {
+        if(accounts.length && walletAddress) {
           setWalletAddress(accounts[0])
           getDiaTokenInfo(accounts[0], walletConnectProvider)
             .then((dia) => {
@@ -747,10 +747,10 @@ export default function SignInDialog() {
                         // await signInWithEssentials();
                         if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
                           await signOutWithEssentials();
-                          await signInWithEssentials();
-                        } else {
-                          await signInWithEssentials();
+                        } else if(essentialsConnector.hasWalletConnectSession()) {
+                          await essentialsConnector.disconnectWalletConnect();
                         }
+                        await signInWithEssentials();
                       }}
                     >
                       Elastos Essentials
