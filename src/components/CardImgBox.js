@@ -35,8 +35,8 @@ const BoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 const CardImgBox = (props) => {
-    const { isMoreLink=false } = props;
-    const src = getAssetImage(props, true)
+    const { isMoreLink=false, isLink, thumbnail } = props;
+    const src = isLink? getAssetImage(props, true): props.thumbnail
     const imageRef = React.useRef();
 
     const handleResize = ()=>{

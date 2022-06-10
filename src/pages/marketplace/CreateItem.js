@@ -43,13 +43,20 @@ import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/Cu
 import CoinTypeLabel from '../../components/CoinTypeLabel';
 import DIABadge from '../../components/DIABadge';
 
-import {STICKER_CONTRACT_ABI} from '../../abi/stickerABI'
-import {TOKEN_721_ABI} from '../../abi/token721ABI'
-import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
-import {stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, ipfsURL, auctionOrderType} from '../../config'
-import {hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, 
+import { STICKER_CONTRACT_ABI as PASAR_CONTRACT_ABI } from '../../abi/stickerABI'
+import { FEEDS_STICKER_CONTRACT_ABI as FEEDS_CONTRACT_ABI } from '../../abi/feedsStickerABI'
+import { TOKEN_721_ABI } from '../../abi/token721ABI'
+import { TOKEN_1155_ABI } from '../../abi/token1155ABI'
+import { 
+  stickerContract as PASAR_CONTRACT_ADDRESS, 
+  feedsContract as FEEDS_CONTRACT_ADDRESS, 
+  marketContract as MARKET_CONTRACT_ADDRESS, 
+  ipfsURL, 
+  auctionOrderType 
+} from '../../config'
+import { hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, 
   isValidLimitPrice, checkWhetherGeneralCollection, getFilteredGasPrice } from '../../utils/common';
-import {requestSigndataOnTokenID} from '../../utils/elastosConnectivityService';
+import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useMintDlg from '../../hooks/useMintDlg';
@@ -429,10 +436,12 @@ export default function CreateItem() {
     setMultiProperties(tempMultiProperties)
   }
   const handleClickCollection = (type)=>{
-    if(type==='PSRC'){
-      setCollection("PSRC")
+    if(type==='PSRC' || type==='FSTK'){
+      if(type==='FSTK' && mintype==='Batch')
+        setMintType('Single')
+      setCollection(type)
       handleChooseCollection({token: "", name: "", symbol: "", avatar: ""})
-    }
+    } 
     else
       setChooseCollectionOpen(true)
   }
@@ -475,11 +484,14 @@ export default function CreateItem() {
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           // console.log(accounts)
-          let baseAddress = CONTRACT_ADDRESS
-          let stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
-          if(collection === 'Choose') {
-            stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection.token)
+          let baseAddress = PASAR_CONTRACT_ADDRESS
+          let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, PASAR_CONTRACT_ADDRESS)
+          if(collection === 'FSTK') {
+            baseAddress = FEEDS_CONTRACT_ADDRESS
+            stickerContract = new walletConnectWeb3.eth.Contract(FEEDS_CONTRACT_ABI, FEEDS_CONTRACT_ADDRESS)
+          } else if(collection === 'Choose') {
             baseAddress = selectedCollection.token
+            stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection.token)
           }
 
           setProgress(50)
@@ -505,6 +517,8 @@ export default function CreateItem() {
               else // ERC1155
                 mintMethod = stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri)
             }
+            else if(collection === 'FSTK')
+              mintMethod = stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee, paramObj._didUri)
             else
               mintMethod = stickerContract.methods.mint(paramObj._id, _tokenSupply, paramObj._uri, _royaltyFee)
             const commonArgs = {
@@ -618,11 +632,14 @@ export default function CreateItem() {
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           // console.log(accounts)
-          let baseAddress = CONTRACT_ADDRESS
-          let stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
-          if(collection === 'Choose') {
-            stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection.token)
+          let baseAddress = PASAR_CONTRACT_ADDRESS
+          let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, PASAR_CONTRACT_ADDRESS)
+          if(collection === 'FSTK') {
+            baseAddress = FEEDS_CONTRACT_ADDRESS
+            stickerContract = new walletConnectWeb3.eth.Contract(FEEDS_CONTRACT_ABI, FEEDS_CONTRACT_ADDRESS)
+          } else if(collection === 'Choose') {
             baseAddress = selectedCollection.token
+            stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection.token)
           }
 
           walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
@@ -894,6 +911,8 @@ export default function CreateItem() {
       }).then((didRecv) => {
         setProgress(45)
         _didUri = `pasar:json:${didRecv.path}`
+        if(collection==='FSTK')
+          _didUri = `Feeds:json:${didRecv.path}`
         resolve({ _id, _uri, _didUri })
       }).catch((error) => {
         reject(error);
@@ -1055,8 +1074,10 @@ export default function CreateItem() {
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       walletConnectWeb3.eth.getAccounts().then((accounts)=>{
         // console.log(accounts)
-        let stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, CONTRACT_ADDRESS)
-        if(collection === 'Choose') {
+        let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, PASAR_CONTRACT_ADDRESS)
+        if(collection === 'FSTK') {
+          stickerContract = new walletConnectWeb3.eth.Contract(FEEDS_CONTRACT_ABI, FEEDS_CONTRACT_ADDRESS)
+        } else if(collection === 'Choose') {
           stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection.token)
         }
         stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
@@ -1110,6 +1131,8 @@ export default function CreateItem() {
         mintBatch()
   }
   const DiaDegree = getDiaBalanceDegree(diaBalance)
+  const baseTokenGroup = { 'PSRC': PASAR_CONTRACT_ADDRESS, 'FSTK': FEEDS_CONTRACT_ADDRESS, 'Choose': selectedCollection.token }
+
   return (
     <RootStyle title="CreateItem | PASAR">
       <ProgressBar isFinished={(progress===0||progress===100||!onProgress)} progress={progress} />
@@ -1124,6 +1147,7 @@ export default function CreateItem() {
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
               <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{handleClickCollection("PSRC")}} current={collection}/>
+              <MintingTypeButton type="FSTK" description="Feeds Collection" onClick={()=>{handleClickCollection("FSTK")}} current={collection}/>
               <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{handleClickCollection("Choose")}} current={collection} selectedCollection={selectedCollection}/>
               {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
@@ -1146,7 +1170,10 @@ export default function CreateItem() {
                   </div>
                 </Tooltip>
               }
-              <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
+              {
+                collection!=='FSTK' &&
+                <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
+              }
             </Stack>
           </Grid>
           <Grid item xs={12}>
@@ -1679,7 +1706,7 @@ export default function CreateItem() {
                         name={singleName}
                         type={0}
                         defaultCollectionType={0}
-                        baseToken={collection==="Choose"?selectedCollection.token:CONTRACT_ADDRESS}
+                        baseToken={baseTokenGroup[collection]}
                         orderType={saletype==='Auction'?auctionOrderType:1}
                         {...{description, price, coinType, quantity, coinUSD, reservePrice, buyoutPrice}}
                       />
@@ -1703,7 +1730,7 @@ export default function CreateItem() {
                     ):(
                       <MultiMintGrid
                         assets={previewFiles}
-                        baseToken={collection==="Choose"?selectedCollection.token:CONTRACT_ADDRESS}
+                        baseToken={baseTokenGroup[collection]}
                         orderType={saletype==='Auction'?auctionOrderType:1}
                         {...{multiNames, description, quantity, price, coinType, coinUSD, reservePrice, buyoutPrice}}
                       />

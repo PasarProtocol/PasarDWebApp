@@ -71,7 +71,7 @@ const MintingTypeButton = (props)=>{
             {
                 type==="FSTK"&&
                 <Box sx={commonSx}>
-                    <Box draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26} }} />
+                    <Box draggable = {false} component="img" src="/static/feeds-collection.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26}, filter: current===type?'none':'brightness(5)' }} />
                 </Box>
             }
             {
