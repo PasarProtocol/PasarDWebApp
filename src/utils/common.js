@@ -84,22 +84,21 @@ export const getIpfsUrl = (id, ipfsType = 0) => {
 
 export const getAssetImage = (metaObj, isThumbnail, ipfsType = 0) => {
   const { asset, thumbnail, tokenJsonVersion, data } = metaObj;
-  if (tokenJsonVersion === null) {
+
+  if(!asset && !thumbnail && !data)
+    return ''
+
+  let imgUrl = asset
+  if(data)
+    imgUrl = isThumbnail ? data.thumbnail : data.image
+  else if(asset || thumbnail) {
     const imgUrl = isThumbnail?thumbnail:asset
     if(!imgUrl)
       return ''
-    if((imgUrl.match(/:/g) || []).length !== 2)
-      return imgUrl
-    return getIpfsUrl(imgUrl, ipfsType);
   }
-  
-  let cid = asset;
-  if (tokenJsonVersion === '2' && !asset) {
-    if (!data) cid = '';
-    else if (isThumbnail) cid = data.thumbnail;
-    else cid = data.image;
-  } else if (isThumbnail) cid = thumbnail;
-  return getIpfsUrl(cid, ipfsType);
+  if((imgUrl.match(/:/g) || []).length !== 2)
+    return imgUrl
+  return getIpfsUrl(imgUrl, ipfsType);
 };
 
 export const getCollectionTypeFromImageUrl = (metaObj) => {
