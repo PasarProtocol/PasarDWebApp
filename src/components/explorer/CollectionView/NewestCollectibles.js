@@ -11,27 +11,39 @@ import CopyButton from '../../CopyButton';
 
 
 CollectibleItem.propTypes = {
-  news: PropTypes.object.isRequired
+  collectible: PropTypes.object.isRequired
 };
 
-function CollectibleItem({ news }) {
-  const { image, title, tokenId, baseToken, tokenIdHex, postedAt, creator } = news;
+function CollectibleItem({ collectible }) {
+  const { image, name, tokenId, baseToken, tokenIdHex, createTime, royaltyOwner: creator } = collectible;
+  const imageUrl = getAssetImage(collectible, true)
+
+  const handleErrorImage = (e) => {
+    if(e.target.src.indexOf("pasarprotocol.io") >= 0) {
+      e.target.src = getAssetImage(collectible, true, 1)
+    } else if(e.target.src.indexOf("ipfs.ela") >= 0) {
+      e.target.src = getAssetImage(collectible, true, 2)
+    } else {
+      e.target.src = '/static/broken-image.svg'
+    }
+  }
+
   return (
       <Stack direction="row" alignItems="center" spacing={2}>
           <Link to={`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`} component={RouterLink} sx={{borderRadius: 1}} >
             <Box
                 draggable = {false}
                 component="img"
-                alt={title}
-                src={image}
-                onError={(e) => e.target.src = '/static/broken-image.svg'}
+                alt={name}
+                src={imageUrl}
+                onError={handleErrorImage}
                 sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer' }}
             />
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Link to={`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`} component={RouterLink} color="text.primary">
                 <Typography variant="subtitle2" noWrap>
-                  {title}
+                  {name}
                 </Typography>
               </Link>
               <Typography variant="body2" noWrap>
@@ -43,7 +55,7 @@ function CollectibleItem({ news }) {
           </Box>
           <Box>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
-                  {formatDistance(postedAt, new Date(), { addSuffix: true }).replace("about","").trim()}
+                  {formatDistance(createTime*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary', pb: '5px' }} align="right" noWrap>
                   Token ID : {reduceHexAddress(tokenIdHex)}
@@ -59,17 +71,7 @@ export default function NewestCollectibles(props) {
       {props.isLoading && <LoadingScreen />}
       {props.dataList.map((collectible, index) => (
         <Box key={index}>
-          <CollectibleItem 
-            news={{
-              image: getAssetImage(collectible, true),
-              title: collectible.name,
-              creator: collectible.royaltyOwner,
-              postedAt: collectible.createTime*1000,
-              tokenId: collectible.tokenId,
-              baseToken: collectible.baseToken,
-              tokenIdHex: collectible.tokenIdHex
-            }}
-          />
+          <CollectibleItem collectible={collectible}/>
           {
             index<props.dataList.length-1&&
             <Divider sx={{pb: 2}}/>

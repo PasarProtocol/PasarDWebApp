@@ -24,6 +24,16 @@ const TypographyStyle = styled(Typography)(({ theme, alignsm }) => ({
     }
 }));
 export default function TransactionListItem({ item }) {
+    const handleErrorImage = (e) => {
+        if(e.target.src.indexOf("pasarprotocol.io") >= 0) {
+          e.target.src = getAssetImage(item, true, 1)
+        } else if(e.target.src.indexOf("ipfs.ela") >= 0) {
+          e.target.src = getAssetImage(item, true, 2)
+        } else {
+          e.target.src = '/static/broken-image.svg'
+        }
+    }
+
     const methodItem = MethodList.find((el)=>el.method===item.event)
     return (
         <RootStyle>
@@ -41,7 +51,7 @@ export default function TransactionListItem({ item }) {
                         component="img"
                         alt={item.name}
                         src={getAssetImage(item, true)}
-                        onError={(e) => e.target.src = '/static/broken-image.svg'}
+                        onError={handleErrorImage}
                         sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
                     />
                 </Link>
