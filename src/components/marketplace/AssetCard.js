@@ -174,7 +174,7 @@ export default function AssetCard(props) {
           setOpenDownloadEssentialDlg(true)
           return
         }
-        if(currentBid.length && !auctionEnded){
+        if(currentBid.length && status==='MarketBid' && !auctionEnded){
           enqueueSnackbar('Already has been bid', { variant: 'warning' });
           return
         }
@@ -185,7 +185,7 @@ export default function AssetCard(props) {
           setOpenDownloadEssentialDlg(true)
           return
         }
-        if(currentBid.length && !auctionEnded){
+        if(currentBid.length && status==='MarketBid' && !auctionEnded){
           enqueueSnackbar('Already has been bid', { variant: 'warning' });
           return
         }
@@ -209,7 +209,7 @@ export default function AssetCard(props) {
     setOpenPopup(null);
   };
   const dlgProps = {name, tokenId, orderId, updateCount, handleUpdate, baseToken, v1State}
-  const currentBidPrice = currentBid&&currentBid.length>0?currentBid[0].price:0
+  const currentBidPrice = currentBid && currentBid.length>0 && status==='MarketBid' ? currentBid[0].price : 0
   return (
       <Box>
         <PaperRecord
