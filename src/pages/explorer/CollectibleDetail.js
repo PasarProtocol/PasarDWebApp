@@ -159,6 +159,17 @@ export default function CollectibleDetail() {
     else
       setDetailPageSize(pgsize)
   }
+
+  const handleErrorImage = (e) => {
+    if(e.target.src.indexOf("pasarprotocol.io") >= 0) {
+      e.target.src = getAssetImage(collectible, false, 1)
+    } else if(e.target.src.indexOf("ipfs.ela") >= 0) {
+      e.target.src = getAssetImage(collectible, false, 2)
+    } else {
+      e.target.src = '/static/circle-loading.svg'
+    }
+  }
+
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">
@@ -175,7 +186,7 @@ export default function CollectibleDetail() {
                   alt={collectible.name}
                   src={getAssetImage(collectible, false)}
                   onLoad={onImgLoad}
-                  onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
+                  onError={handleErrorImage}
                   sx={{ width: '100%', borderRadius: 1, mr: 2 }}
                   ref={imageRef}
               />
