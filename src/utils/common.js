@@ -96,6 +96,8 @@ export const getAssetImage = (metaObj, isThumbnail, ipfsType = 0) => {
     if(!imgUrl)
       return ''
   }
+  if(!imgUrl)
+    return ''
   if((imgUrl.match(/:/g) || []).length !== 2)
     return imgUrl
   return getIpfsUrl(imgUrl, ipfsType);
