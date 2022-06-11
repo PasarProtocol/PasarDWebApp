@@ -145,6 +145,7 @@ export default function CollectibleDetail() {
   const [collectiblesInCollection, setCollectiblesInCollection] = React.useState([]);
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
+  const [imageUrl, setImageUrl] = React.useState('');
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length).fill(0));
@@ -201,6 +202,9 @@ export default function CollectibleDetail() {
   
   React.useEffect(() => {
     if(collectible.baseToken) {
+      const assetImageUrl = getAssetImage(collectible, false)
+      setImageUrl(assetImageUrl)
+      
       fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${collectible.baseToken}`)
         .then((response) => {
           response.json().then((jsonData) => {
@@ -397,7 +401,7 @@ export default function CollectibleDetail() {
   }
 
   const onImgLoad = ({target:img}) => {
-    if(img.alt)
+    if(img.alt && img.src)
       setLoadedImage(true)
     handleResize()
   }
@@ -456,8 +460,18 @@ export default function CollectibleDetail() {
       }
     }
   }
-  
   window.addEventListener('resize', handleResize);
+  
+  const handleErrorImage = (e) => {
+    if(e.target.src.indexOf("pasarprotocol.io") >= 0) {
+      e.target.src = getAssetImage(collectible, true, 1)
+    } else if(e.target.src.indexOf("ipfs.ela") >= 0) {
+      e.target.src = getAssetImage(collectible, true, 2)
+    } else {
+      e.target.src = '/static/broken-image.svg'
+    }
+    setImageUrl(e.target.src)
+  }
   let properties = {}
   if(collectible && (collectible.properties || collectible.attribute))
     properties = collectible.properties || collectible.attribute
@@ -473,18 +487,28 @@ export default function CollectibleDetail() {
       >
         <Container maxWidth="lg" align="center" sx={{position: 'relative', px: {sm: 3, md: 12}}}>
           <Box sx={{position: 'relative', display: 'inline-block'}}>
+            {
+              !isLoadedImage && 
+              <Box
+                  draggable = {false}
+                  component="img"
+                  alt={collectible.name}
+                  src='/static/circle-loading.svg'
+                  sx={{ maxHeight: 400, borderRadius: 1 }}
+              />
+            }
             <Box
                 draggable = {false}
                 component="img"
                 alt={collectible.name}
-                src={getAssetImage(collectible, false)}
+                src={imageUrl}
                 onLoad={onImgLoad}
-                onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
-                sx={{ maxHeight: 400, borderRadius: 1 }}
+                onError={handleErrorImage}
+                sx={{ maxHeight: 400, borderRadius: 1, display: isLoadedImage?'block':'none' }}
                 ref={imageRef}
             />
             {
-              address!==collectible.holder&&isLoadedImage&&
+              address!==collectible.holder && isLoadedImage && !imageUrl.endsWith('broken-image.svg') &&
               <Box
                   draggable = {false}
                   component="img"
@@ -494,7 +518,7 @@ export default function CollectibleDetail() {
             }
           </Box>
           <ToolGroupStyle>
-            <MFab size="small" onClick={()=>{setFullScreen(!isFullScreen)}}>
+            <MFab size="small" onClick={()=>{setFullScreen(!isFullScreen)}} disabled={!isLoadedImage || imageUrl.endsWith('broken-image.svg')}>
               <FullscreenIcon />
             </MFab>
             <MFab size="small" sx={{ml: 1}} onClick={openSharePopupMenu}>
@@ -578,20 +602,22 @@ export default function CollectibleDetail() {
                   <CloseIcon />
                 </IconButton>
               </Toolbar>
-              <Box sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)'
-              }}
-                ref={imageBoxRef}>
+              <Box 
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                }}
+                ref={imageBoxRef}
+              >
                 <Box
                     draggable = {false}
                     component="img"
                     alt={collectible.name}
-                    src={getAssetImage(collectible, false)}
-                    onLoad={onImgLoad}
-                    onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
+                    src={imageUrl}
+                    // onLoad={onImgLoad}
+                    onError={(e) => {e.target.src = '/static/broken-image.svg'}}
                     sx={{ width: '100%', height: '100%' }}
                 />
                 {
