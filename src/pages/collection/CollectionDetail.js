@@ -543,13 +543,19 @@ export default function CollectionDetail() {
                 {/* {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>} */}
                 <Box sx={{ display: 'flex' }}>
                   <Box
-                    sx={{ width: drawerWidth*isFilterView, flexShrink: 0, display: {xs: 'none', sm: 'none', md: 'block'}, transition: 'width ease .5s', position: 'relative' }}
-                    aria-label="mailbox folders"
+                    sx={{ 
+                      width: drawerWidth*isFilterView, 
+                      flexShrink: 0, 
+                      display: {xs: 'none', sm: 'none', md: 'block'}, 
+                      transition: 'width ease .5s', 
+                      position: 'relative'
+                    }}
                   >
                     <CollectionFilterPan 
                       sx={{
                         position: 'absolute',
                         width: drawerWidth,
+                        height: '1400px',
                         left: drawerWidth*(isFilterView-1)-24,
                         transition: 'all ease .5s',
                         p: 1
@@ -670,17 +676,14 @@ export default function CollectionDetail() {
                     <Divider />
                   </>
                 }
-                <Box style={{display: 'contents'}}>
-                  <Scrollbar>
-                    <CollectionFilterPan 
-                      sx={{
-                      }}
-                      filterProps = {filterForm}
-                      handleFilter = {handleFilterMobile}
-                      {...{btnGroup, address: params.collection}}
-                    />
-                  </Scrollbar>
-                </Box>
+                <CollectionFilterPan 
+                  sx={{
+                    display: 'contents'
+                  }}
+                  filterProps = {filterForm}
+                  handleFilter = {handleFilterMobile}
+                  {...{btnGroup, address: params.collection}}
+                />
                 <Divider />
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>
                   <Typography variant="subtitle1">Filters</Typography>
