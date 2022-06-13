@@ -53,7 +53,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 export default function AssetCard(props) {
-  const { name="???", description, quantity=1, price=0, coinType=0, isLink, isMoreLink, tokenId, type, orderId, orderType, status, endTime, currentBid, baseToken='', saleType,
+  const { name="???", description, quantity=1, price=0, coinType=0, isLink, isMoreLink, tokenId, type, orderId, orderType, status, endTime, currentBid, baseToken='', saleType, showPrice=false, 
    myaddress, royaltyOwner, royalties, holder, updateCount, handleUpdate, coinUSD, defaultCollectionType=0, isDragging=false, reservePrice=0, buyoutPrice=0, v1State=false } = props
   
   const [collection, setCollection] = React.useState(null);
@@ -450,6 +450,7 @@ export default function AssetCard(props) {
             {
               (
                 (type===0&&saleType!=="Not on sale")||
+                (type===0&&saleType==="Not on sale"&&showPrice)||
                 type===1||
                 type===2&&(isListedOwnedByMe)||
                 type===2&&isListedByOthers||
@@ -465,7 +466,7 @@ export default function AssetCard(props) {
             }
             {
               (
-                (type===0&&saleType==="Not on sale")||
+                (type===0&&saleType==="Not on sale"&&!showPrice)||
                 (type===2&&isUnlistedByOthers)
               ) &&
               <Typography variant="h5" sx={{color: "origin.main"}} align='center'>

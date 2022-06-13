@@ -13,7 +13,7 @@ import { blankAddress } from '../../config'
 // ----------------------------------------------------------------------
 
 const AssetGroupSlider = (props)=>{
-  const {isLoading, assets} = props
+  const {isLoading, assets, type} = props
   const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length).fill(0));
   const [isDragging, setDragging] = React.useState(false);
   const ref = React.useRef()
@@ -111,6 +111,7 @@ const AssetGroupSlider = (props)=>{
                     coinUSD={coinPrice[coinType]}
                     coinType={coinType}
                     isDragging={isDragging}
+                    showPrice={type==='recent_sold'}
                     // defaultCollectionType={getCollectionTypeFromImageUrl(item)}
                   />
                 </Box>
@@ -162,6 +163,6 @@ export default function FilteredAssetGrid(props){
         }
       </>
     ):
-    <AssetGroupSlider isLoading={isLoadingCollectibles} assets={filteredCollectibles.slice(0, 10)}/>
+    <AssetGroupSlider isLoading={isLoadingCollectibles} assets={filteredCollectibles.slice(0, 10)} type={type}/>
   )
 }
