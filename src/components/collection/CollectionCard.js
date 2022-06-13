@@ -200,11 +200,11 @@ const CollectionImgBox = (props) => {
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider, isOwned=false, openRoyaltiesDlg } = props
-  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, collectibles=[], tokenJson={}, creatorName='', creatorDid='' } = info
+  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, collectibles=[], tokenJson={}, creatorDid='' } = info
   let { description='', avatar='', background='' } = info
   const realData = [totalPrice, floorPrice, totalOwner]
 
-  const [didName, setDidName] = React.useState(creatorName);
+  const [didName, setDidName] = React.useState('');
   const [metaObj, setMetaObj] = React.useState({});
   // const [realData, setRealData] = React.useState([0, 0, 0]);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
@@ -247,6 +247,16 @@ const CollectionCardPaper = (props) => {
         .then(response => response.json())
         .then(data => {
           setMetaObj(data)
+          if(data.creator && data.creator.name)
+            setDidName(data.creator.name)
+          else {
+            getInfoFromDID(creatorDid)
+              .then((info) => {
+                if(info.name)
+                  setDidName(info.name)
+              })
+              .catch((e) => {})
+          }
         });
     }
   }, [uri]);
@@ -267,13 +277,13 @@ const CollectionCardPaper = (props) => {
       }
     }      
     else if(owner) {
-      if(!didName)
-        getInfoFromDID(creatorDid)
-          .then((info) => {
-            if(info.name)
-              setDidName(info.name)
-          })
-          .catch((e) => {})
+      // if(!didName)
+      //   getInfoFromDID(creatorDid)
+      //     .then((info) => {
+      //       if(info.name)
+      //         setDidName(info.name)
+      //     })
+      //     .catch((e) => {})
       
       getDiaTokenInfo(owner).then(dia=>{
         if(dia!=='0')

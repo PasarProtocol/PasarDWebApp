@@ -73,23 +73,30 @@ export const getTimeZone = () => {
   return e.includes("-") ? e : "+".concat(e)
 }
 
-export const getIpfsUrl = (id, ipfsType = 0) => {
-  if (!id) return '';
+export const getIpfsUrl = (uri, ipfsType = 0) => {
+  if (!uri) return '';
   const ipfsUrl = ipfsUrls[ipfsType]
-  const prefixLen = id.split(':', 2).join(':').length;
-  if (prefixLen >= id.length) return '';
-  const uri = id.substring(prefixLen + 1);
-  return `${ipfsUrl}/ipfs/${uri}`;
+  if((uri.match(/:/g) || []).length !== 2){
+    const ipfsStrPos = uri.search('/ipfs/')
+    if(ipfsStrPos<0)
+      return uri
+    return `${ipfsUrl}${uri.substr(ipfsStrPos)}`;
+  }
+
+  const prefixLen = uri.split(':', 2).join(':').length;
+  if (prefixLen >= uri.length) return '';
+  const tempUri = uri.substring(prefixLen + 1);
+  return `${ipfsUrl}/ipfs/${tempUri}`;
 };
 
 export const getAssetImage = (metaObj, isThumbnail, ipfsType = 0) => {
-  const { asset, thumbnail, tokenJsonVersion, data } = metaObj;
+  const { asset, thumbnail, data } = metaObj;
 
   if(!asset && !thumbnail && !data)
     return ''
 
   let imgUrl = asset
-  if(data)
+  if(data && data.thumbnail && data.image)
     imgUrl = isThumbnail ? data.thumbnail : data.image
   else if(asset || thumbnail) {
     const imgUrl = isThumbnail?thumbnail:asset
@@ -98,8 +105,6 @@ export const getAssetImage = (metaObj, isThumbnail, ipfsType = 0) => {
   }
   if(!imgUrl)
     return ''
-  if((imgUrl.match(/:/g) || []).length !== 2)
-    return imgUrl
   return getIpfsUrl(imgUrl, ipfsType);
 };
 
