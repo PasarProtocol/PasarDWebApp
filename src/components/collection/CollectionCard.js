@@ -200,7 +200,7 @@ const CollectionImgBox = (props) => {
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider, isOwned=false, openRoyaltiesDlg } = props
-  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, collectibles=[], tokenJson={}, creatorDid='' } = info
+  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, collectibles=[], tokenJson={} } = info
   let { description='', avatar='', background='' } = info
   const realData = [totalPrice, floorPrice, totalOwner]
 
@@ -247,15 +247,17 @@ const CollectionCardPaper = (props) => {
         .then(response => response.json())
         .then(data => {
           setMetaObj(data)
-          if(data.creator && data.creator.name)
-            setDidName(data.creator.name)
-          else {
-            getInfoFromDID(creatorDid)
-              .then((info) => {
-                if(info.name)
-                  setDidName(info.name)
-              })
-              .catch((e) => {})
+          if(data.creator) {
+            if(data.creator.name)
+              setDidName(data.creator.name)
+            else if(data.creator.did) {
+              getInfoFromDID(data.creator.did)
+                .then((info) => {
+                  if(info.name)
+                    setDidName(info.name)
+                })
+                .catch((e) => {})
+            }
           }
         });
     }

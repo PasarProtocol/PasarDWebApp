@@ -134,7 +134,6 @@ export default function CollectionDetail() {
       .then((response) => {
         response.json().then((jsonAssets) => {
           setCollection(jsonAssets.data);
-          console.log(jsonAssets.data)
           const {creatorDid='', creatorName=''} = jsonAssets.data
           if(creatorName)
             setDidName(creatorName)
