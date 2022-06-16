@@ -23,6 +23,7 @@ import { auctionOrderType } from '../../config';
 const StickyPaperStyle = styled(Paper)(({ theme }) => ({
   position: 'sticky',
   bottom: 0,
+  zIndex: 1,
   boxShadow: `${theme.palette.mode==='dark'?'rgb(6 12 20)':'rgb(230 230 230)'} 0px -5px 12px`,
   marginTop: theme.spacing(2),
   padding: theme.spacing(2),
