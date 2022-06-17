@@ -1,7 +1,13 @@
 import React from 'react'
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
+import PaperRecord from './PaperRecord';
 import { getAssetImage } from '../utils/common'
+import useSettings from '../hooks/useSettings';
 
 const BoxStyle = styled(Box)(({ theme }) => ({
     position: 'relative',
@@ -38,15 +44,18 @@ const CardImgBox = (props) => {
     const { isMoreLink=false, isLink, thumbnail } = props;
     const src = isLink? getAssetImage(props, true): props.thumbnail
     const imageRef = React.useRef();
+    const [isAfterLoad, setIsAfterLoad] = React.useState(false)
 
     const handleResize = ()=>{
+      setIsAfterLoad(true)
       if(!imageRef.current)
         return
-      const { clientWidth: imgWidth, clientHeight: imgHeight } = imageRef.current;
+      const currentImg = imageRef.current.getElementsByTagName('img')[0]
+      const { clientWidth: imgWidth, clientHeight: imgHeight } = currentImg;
       if(imgWidth > imgHeight)
-        imageRef.current.style.width = '100%'
+        currentImg.style.width = '100%'
       else
-        imageRef.current.style.height = '100%'
+        currentImg.style.height = '100%'
     }
 
     const handleErrorImage = (e) => {
@@ -64,12 +73,35 @@ const CardImgBox = (props) => {
       // boxShadow: (theme)=>theme.customShadows.z16,
       display: 'inline-flex',
       maxHeight: '100%',
-      p: '1px'
+      padding: '1px'
+    }
+    const { themeMode } = useSettings();
+    const themeProp = {}
+    if(themeMode==="dark"){
+      themeProp.baseColor = '#333d48'
+      themeProp.highlightColor = '#434d58'
     }
     return (
       <BoxStyle className='card-img' sx={{opacity: isMoreLink?.5:1}}>
-        <Box className='img-box'>
-          <Box draggable = {false} component="img" src={src} sx={imageStyle} ref={imageRef} onLoad={handleResize} onError={handleErrorImage}/>
+        {
+          !isAfterLoad &&
+          <SkeletonTheme {...themeProp}>
+            <Skeleton style={{ justifyContent: 'center', aspectRatio: '1/1', padding: 2, zIndex: 1}} />
+          </SkeletonTheme>
+        }
+        <Box className='img-box' ref={imageRef}>
+          <LazyLoadImage 
+            src={src}
+            effect="blur" 
+            wrapperProps={{
+              style:{
+                width: isAfterLoad?'auto':0
+              }
+            }} 
+            style={{...imageStyle}} 
+            afterLoad={handleResize} 
+            onError={handleErrorImage}
+          />
         </Box>
       </BoxStyle>
     );

@@ -25,12 +25,16 @@ const GridItems = (props) => {
       setCoinPriceByType(0, res)
     });
     getDiaTokenPrice().then((res) => {
+      if(!res)
+        return
       setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
     })
     coinTypes.forEach((token, _i)=>{
       if(_i<2)
         return
       getERC20TokenPrice(token.address).then((res) => {
+        if(!res)
+          return
         setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice)
       })
     })

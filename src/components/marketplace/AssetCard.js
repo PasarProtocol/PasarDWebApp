@@ -43,7 +43,7 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
   position: 'absolute',
   top: 50,
   right: 8,
-  zIndex: 1,
+  zIndex: 2,
   borderRadius: theme.spacing(2),
   padding: '2px 8px',
   backdropFilter: 'blur(6px)',
