@@ -47,7 +47,7 @@ const GridItems = (props) => {
     });
   }
   return <AnimatePresence>
-      {props.items.map((item, index) => {
+      {props.assets.map((item, index) => {
         const coinType = getCoinTypeFromToken(item)
 
         return <motion.div
@@ -75,19 +75,15 @@ const GridItems = (props) => {
     </AnimatePresence>
 }
 export default function AssetGrid(props){
+  const { dispmode, assets, type=0, myaddress, updateCount, handleUpdate } = props
   let itemWidth = 200
-  if(props.dispmode===0)
+  if(dispmode===0)
     itemWidth = isMobile?230:270
   else itemWidth = isMobile?150:200
+
   return(
     <StackedGrid itemWidth={itemWidth}>
-      <GridItems 
-        items={props.assets}
-        type={props.type?props.type:0}
-        myaddress={props.myaddress}
-        updateCount={props.updateCount}
-        handleUpdate={props.handleUpdate}
-      />
+      <GridItems {...{assets, type, myaddress, updateCount, handleUpdate}}/>
     </StackedGrid>
   )
 }
