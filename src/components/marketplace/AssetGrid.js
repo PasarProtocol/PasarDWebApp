@@ -46,18 +46,11 @@ const GridItems = (props) => {
       return tempPrice;
     });
   }
-  return <AnimatePresence>
+  return <>
       {props.assets.map((item, index) => {
         const coinType = getCoinTypeFromToken(item)
 
-        return <motion.div
-          key={index}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {
-            item?
+        return item?
             <AssetCard
               {...item}
               price={round(item.price/1e18, 3)}
@@ -69,10 +62,8 @@ const GridItems = (props) => {
               {...props}
             />:
             <AssetCardSkeleton/>
-          }
-        </motion.div>
       })}
-    </AnimatePresence>
+    </>
 }
 export default function AssetGrid(props){
   const { dispmode, assets, type=0, myaddress, updateCount, handleUpdate } = props
