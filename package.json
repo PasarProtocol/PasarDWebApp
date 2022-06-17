@@ -135,6 +135,7 @@
     "react-imgix": "9.0.2",
     "react-infinite-scroll-component": "^6.1.0",
     "react-intersection-observer": "^8.32.1",
+    "react-lazy-load-image-component": "^1.5.4",
     "react-loading-skeleton": "^3.0.3",
     "react-map-gl": "^6.1.17",
     "react-markdown": "^7.0.1",
