@@ -174,6 +174,9 @@ export default function MarketExplorer() {
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
     setLoadingAssets(true);
+    
+    if(!loadNext)
+      setAssets([])
     fetchFrom(`api/v2/sticker/getDetailedCollectibles?`+
       `collectionType=${selectedCollections.join(',')}&`+
       `tokenType=${selectedTokens.join(',')}&`+
@@ -514,11 +517,7 @@ export default function MarketExplorer() {
                     }
                     style={{padding: '10px'}}
                   >
-                    {
-                      !isLoadingAssets?
-                      <AssetGrid assets={assets} dispmode={dispmode}/>:
-                      <AssetGrid assets={loadNext?[...assets, ...loadingSkeletons]:loadingSkeletons} dispmode={dispmode}/>
-                    }
+                    <AssetGrid {...{assets: isLoadingAssets ? [...assets, ...loadingSkeletons] : assets, dispmode}}/>
                   </InfiniteScroll>
                 </Box>
               </Box>
