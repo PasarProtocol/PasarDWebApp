@@ -195,6 +195,8 @@ export default function CollectionDetail() {
       pageSize: showCount,
       tokenType: selectedTokens.join(',')
     }
+    if(!loadNext)
+      setAssets([])
     fetchFrom('api/v2/sticker/getDetailedCollectiblesInCollection', {
       method: 'POST',
       cache: 'no-cache',
@@ -590,11 +592,7 @@ export default function CollectionDetail() {
                       }
                       style={{padding: '10px'}}
                     >
-                      {
-                        !isLoadingAssets?
-                        <AssetGrid assets={assets} dispmode={dispmode}/>:
-                        <AssetGrid assets={loadNext?[...assets, ...loadingSkeletons]:loadingSkeletons} dispmode={dispmode}/>
-                      }
+                      <AssetGrid {...{assets: isLoadingAssets ? [...assets, ...loadingSkeletons] : assets, dispmode}}/>
                     </InfiniteScroll>
                   </Box>
                 </Box>
