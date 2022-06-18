@@ -133,7 +133,7 @@ export default function FilteredAssetGrid(props){
     filterApi = "api/v2/sticker/getRecentlySold"
   else if(type === 'live_auction')
     filterApi = `api/v2/sticker/getDetailedCollectibles?collectionType=&tokenType=&status=On Auction,Has Ended&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=${count}`
-  React.useEffect(async () => {
+  React.useEffect(() => {
     setLoadingCollectibles(true);
     fetchFrom(filterApi)
       .then((response) => {
