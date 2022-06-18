@@ -52,6 +52,7 @@ const GridItems = (props) => {
 
         return item?
             <AssetCard
+              key={index}
               {...item}
               price={round(item.price/1e18, 3)}
               saleType={item.SaleType?item.SaleType:item.saleType}
@@ -61,7 +62,7 @@ const GridItems = (props) => {
               // defaultCollectionType={getCollectionTypeFromImageUrl(item)}
               {...props}
             />:
-            <AssetCardSkeleton/>
+            <AssetCardSkeleton key={index}/>
       })}
     </>
 }

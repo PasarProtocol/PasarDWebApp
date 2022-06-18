@@ -339,7 +339,6 @@ export default function MarketHome() {
                 </Button>
               </Stack>
             </CardStyle>
-          {/* </MotionInView> */}
         </Stack>
       </Container>
     </RootStyle>
