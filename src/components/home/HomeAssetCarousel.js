@@ -3,6 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Box, Typography, Card, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Fade } from "react-slideshow-image";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-slideshow-image/dist/styles.css";
 import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -71,7 +72,22 @@ function CarouselInCollection({collection}) {
                                 height: 0,                        
                             }}>
                                 <Typography variant="h5" sx={{position: 'absolute', top: 16, left: 16, color: 'white', zIndex: 1}}>{name}</Typography>
-                                <Box component='img' src={imageSrc} sx={{position: 'absolute', width: '100%', height: '100%'}}/>
+                                {/* <Box component='img' src={imageSrc} sx={{position: 'absolute', width: '100%', height: '100%'}}/> */}
+                                <LazyLoadImage 
+                                    src={imageSrc}
+                                    effect="blur" 
+                                    wrapperProps={{
+                                        style:{
+                                            position: 'absolute', 
+                                            width: '100%', 
+                                            height: '100%',
+                                            left: 0
+                                        }
+                                    }} 
+                                    style={{
+                                        width: '100%', height: '100%'
+                                    }} 
+                                />
                             </Box>
                         })
                     }
