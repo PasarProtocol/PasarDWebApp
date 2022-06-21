@@ -19,7 +19,7 @@ export function TransItem({ trans }) {
         methodItem = {color: 'grey', icon: 'tag', detail: []}
   return (
       <Stack direction="row" spacing={2}>
-          <Link href={`/explorer/transaction/${trans.tHash}`} underline="none" sx={{borderRadius: 1}} >
+          <Link href={`/explorer/collectible/detail/${[trans.tokenId, trans.baseToken].join('&')}`} underline="none" sx={{borderRadius: 1}} >
             <Box
                 component="img"
                 alt=""
