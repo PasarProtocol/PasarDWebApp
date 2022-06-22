@@ -432,15 +432,15 @@ export default function AssetCard(props) {
           </Box>
           <Box sx={{p:2}}>
             <Stack direction="row">
-              <Typography variant="h5" noWrap sx={{flexGrow: 1}}>{name}</Typography>
+              <Typography variant="h6" noWrap sx={{flexGrow: 1, fontSize: {xs: '1rem'}}}>{name}</Typography>
               {
                 orderType===auctionOrderType?
                 <Tooltip title={currentBidPrice?"Top Bid":"Starting Price"} arrow enterTouchDelay={0}>
-                  <Typography variant="subtitle2" sx={{pt: '3px', display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
+                  <Typography variant="subtitle2" sx={{display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
                     {math.round((currentBidPrice)/1e18, 3) || price} {coinTypes[coinType].name}
                   </Typography>
                 </Tooltip>:
-                <Typography variant="subtitle2" sx={{pt: '3px', display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
+                <Typography variant="subtitle2" sx={{display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
                   1/{quantity}
                 </Typography>
               }
@@ -457,8 +457,8 @@ export default function AssetCard(props) {
                 type===3&&!auctionEnded
               ) &&
               <Stack direction='row'>
-                <Box component="img" src={`/static/${coinTypes[coinType].icon}`} sx={{ width: 20, m: 'auto', display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType===0?'invert(1)':'none' }} />
-                <Typography variant="h5" sx={{color: "origin.main", flexGrow: 1}} noWrap>
+                <Box component="img" src={`/static/${coinTypes[coinType].icon}`} sx={{ width: 16, m: 'auto', display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType===0?'invert(1)':'none' }} />
+                <Typography variant="h6" sx={{color: "origin.main", flexGrow: 1, fontSize: {xs: '1rem'}}} noWrap>
                   &nbsp;{price} {coinTypes[coinType].name}&nbsp;
                   <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline-flex', alignItems: 'end'}}>≈ USD {math.round(coinUSD * price, 2)}</Typography>
                 </Typography>
