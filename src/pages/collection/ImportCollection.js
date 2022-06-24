@@ -24,13 +24,15 @@ import CollectionCard from '../../components/collection/CollectionCard';
 import CategorySelect from '../../components/collection/CategorySelect';
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import RegisterCollectionDlg from '../../components/dialog/RegisterCollection';
+import NeedMoreDIADlg from '../../components/dialog/NeedMoreDIA';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 
 import {REGISTER_CONTRACT_ABI} from '../../abi/registerABI'
 import {registerContract as CONTRACT_ADDRESS, ipfsURL} from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
+import useSingin from '../../hooks/useSignin';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, getContractInfo, getFilteredGasPrice, socialTypes } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, getContractInfo, getFilteredGasPrice, socialTypes, getDiaBalanceDegree, fetchFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -68,12 +70,15 @@ export default function ImportCollection() {
   const [currentPromise, setCurrentPromise] = React.useState(null);
   const [isOpenRegCollection, setOpenRegCollectionDlg] = React.useState(false);
   const [isReadySignForRegister, setReadySignForRegister] = React.useState(false);
+  const [moreDIAOpen, setOpenMoreDIA] = React.useState(false);
+  const [collectionCount, setCollectionCount] = React.useState(0);
   
   const contractRef = React.useRef();
   const uploadAvatarRef = React.useRef();
   const uploadBackgroundRef = React.useRef();
   const descriptionRef = React.useRef();
 
+  const { diaBalance } = useSingin()
   const { enqueueSnackbar } = useSnackbar();
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
@@ -98,11 +103,19 @@ export default function ImportCollection() {
   }, [isOpenRegCollection]);
 
   React.useEffect(() => {
-    if(address)
-      setRecipientRoyaltiesGroup(prevState=>{
-        const tempState = [{address, royalties: '10'}, ...prevState]
-        return tempState
+    if(!address)
+      return
+    setRecipientRoyaltiesGroup(prevState=>{
+      const tempState = [{address, royalties: '10'}, ...prevState]
+      return tempState
+    })
+    fetchFrom(`api/v2/sticker/getCollectionByOwner/${address}`)
+      .then((response) => {
+        response.json().then((jsonAssets) => {
+          setCollectionCount(jsonAssets.data.length)
+        }).catch((e) => {})
       })
+      .catch((e) => {});
   }, [address]);
 
   const handleInputAddress = (e)=>{
@@ -382,6 +395,7 @@ export default function ImportCollection() {
     window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
   }
   const handleImportAction = () => {
+    const degree = getDiaBalanceDegree(diaBalance)
     setOnValidation(true)
     if(!contractAddress.length || !autoLoaded || ((collectionInfo.owner!==address) && autoLoaded))
       scrollToRef(contractRef)
@@ -397,6 +411,8 @@ export default function ImportCollection() {
       enqueueSnackbar('Fee recipient address is invalid.', { variant: 'warning' });
     else if(recipientRoyaltiesGroup.reduce((sum, el)=>sum+=el.royalties*1, 0)>30)
       enqueueSnackbar('Total royalties must not be more than 30%', { variant: 'warning' });
+    else if((degree===0&&collectionCount>=1) || (degree===1&&collectionCount>=2) || (degree===2&&collectionCount>=5) || (degree===3&&collectionCount>=10))
+      setOpenMoreDIA(true)
     else
       importCollection()
   }
@@ -624,6 +640,7 @@ export default function ImportCollection() {
         </Grid>
       </Container>
       <RegisterCollectionDlg isOpenDlg={isOpenRegCollection} setOpenDlg={setOpenRegCollectionDlg} isReadySign={isReadySignForRegister}/>
+      <NeedMoreDIADlg isOpen={moreDIAOpen} setOpen={setOpenMoreDIA} balance={diaBalance} actionText="import more collections"/>
     </RootStyle>
   );
 }
