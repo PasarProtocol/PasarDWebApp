@@ -127,7 +127,7 @@ export default function Features() {
   const featureArray = [
     {title: 'Create item from Feeds default collection (FSTK)', allow: [true, true, true, true]},
     {title: 'Create item from Pasar default collection (PSRC)', allow: [true, true, true, true]},
-    {title: 'Allowable number of collections to create', allow: [false, '1', 'Up to 5', 'Up to 10']},
+    {title: 'Allowable number of collections to create', allow: ['1', 'Up to 2', 'Up to 5', 'Up to 10']},
     {title: 'Create item from own custom collection', allow: [true, true, true, true]},
     {title: 'Create items in batches (batch minting)', allow: [false, 'Up to 5', 'Up to 10', 'Up to 10']},
     {title: 'Sell items in batches (batch selling)', allow: [false, 'Up to 5', 'Up to 10', 'Up to 10']},
