@@ -79,16 +79,7 @@ export default function MainNavbar() {
           }
           sx={{borderRadius: 0}}
         >
-          If you have any existing NFTs listed on the old marketplace contract (Pasar V1), we encourage you to cancel the listing{' '}
-          <Link
-            underline="always"
-            href='https://v1.pasarprotocol.io'
-            target="_blank"
-            color='inherit'
-            // color="text.secondary"
-          >
-            here
-          </Link>{' '}and re-list them on the new marketplace contract (Pasar V2).
+          If you have any existing NFTs listed on the old marketplace contract (Pasar V1), we encourage you to relist them on the new marketplace contract (Pasar V2).
         </Alert>
       </Collapse>
       <ToolbarStyle
