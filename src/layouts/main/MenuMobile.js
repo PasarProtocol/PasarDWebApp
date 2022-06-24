@@ -288,7 +288,7 @@ export default function MenuMobile(props) {
             {' '}| Privacy Policy | Disclaimer️
           </CopyRight>
           <CopyRight>
-            v1 - {generatedGitInfo.gitCommitHash}
+            v2 - {generatedGitInfo.gitCommitHash}
           </CopyRight>
         </Container>
         <DonateDlg isOpen={donateOpen} setOpen={setDonateOpen}/>
