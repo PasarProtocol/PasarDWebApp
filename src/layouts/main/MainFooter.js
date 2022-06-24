@@ -164,7 +164,7 @@ export default function MainFooter({ hidden, isContainerXl }) {
                 Donate <span role="img" aria-label="">❤️</span>
               </Link>
               {' '}
-              v1 - {generatedGitInfo.gitCommitHash}
+              v2 - {generatedGitInfo.gitCommitHash}
             </CopyRight>
           </Grid>
           <Grid item xs={12} md={6}>
