@@ -469,7 +469,7 @@ export default function AssetCard(props) {
                 (type===0&&saleType==="Not on sale"&&!showPrice)||
                 (type===2&&isUnlistedByOthers)
               ) &&
-              <Typography variant="h5" sx={{color: "origin.main"}} align='center'>
+              <Typography variant="h6" sx={{color: "origin.main", fontSize: {xs: '1rem'}}} align='center'>
                 Not on Sale
               </Typography>
             }
