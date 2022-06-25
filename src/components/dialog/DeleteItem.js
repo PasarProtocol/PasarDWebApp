@@ -17,7 +17,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 
 export default function DeleteItem(props) {
-  const { isOpen, setOpen, name, tokenId, updateCount, handleUpdate, v1State=false } = props;
+  const { isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate, v1State=false } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const handleClose = () => {
@@ -30,7 +30,7 @@ export default function DeleteItem(props) {
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
     const contractAbi = STICKER_CONTRACT_ABI;
-    const contractAddress = !v1State ? PASAR_CONTRACT_ADDRESS: FEEDS_CONTRACT_ADDRESS;
+    const contractAddress = baseToken || PASAR_CONTRACT_ADDRESS;
     const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
     const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
