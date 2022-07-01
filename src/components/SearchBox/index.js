@@ -137,7 +137,8 @@ export default function SearchBox(props) {
               tempState[_i] = getIpfsUrl(res.data.avatar)
               return tempState
             })
-          });
+          })
+          .catch(console.log);
       }
     })
   }, [instanceSearchResult])

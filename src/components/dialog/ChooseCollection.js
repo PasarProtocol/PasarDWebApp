@@ -63,7 +63,8 @@ export default function ChooseCollection(props) {
               .then(response => response.json())
               .then(data => {
                 handleChoose({...tempCollection, avatar: getIpfsUrl(data.data.avatar)})
-              });
+              })
+              .catch(console.log);
           }
         }
       }
@@ -94,7 +95,8 @@ export default function ChooseCollection(props) {
                 tempCollections[_i].avatar = getIpfsUrl(data.data.avatar)
                 return tempCollections
               })
-            });
+            })
+            .catch(console.log);
         }
       })
     }

@@ -104,7 +104,8 @@ export default function AssetCard(props) {
                     tempState.description = data.data.description
                     return tempState
                   });
-                });
+                })
+                .catch(console.log);
             }
           }).catch((e) => {
           });

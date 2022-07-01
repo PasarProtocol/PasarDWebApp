@@ -119,7 +119,8 @@ export default function EditCollection() {
                   setCategory(`${resObj.category.charAt(0).toUpperCase()}${resObj.category.slice(1)}`)
                 if(resObj.socials)
                   setSocialUrl(resObj.socials)
-              });
+              })
+              .catch(console.log);
           }
         }).catch((e) => {
           setLoadingCollection(false)

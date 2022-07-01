@@ -79,7 +79,8 @@ export default function AssetFilterPan(props){
               tempCollections[_id].avatar = getIpfsUrl(data.data.avatar)
               return tempCollections
             })
-          });
+          })
+          .catch(console.log);
       }
     })
     

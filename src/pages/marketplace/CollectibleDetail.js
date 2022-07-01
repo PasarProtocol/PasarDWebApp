@@ -263,7 +263,8 @@ export default function CollectibleDetail() {
                       tempState.socials = data.data.socials
                       return tempState
                     });
-                  });
+                  })
+                  .catch(console.log);
               }
             }).catch((e) => {
             });

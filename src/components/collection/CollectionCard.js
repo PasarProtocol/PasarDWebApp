@@ -259,7 +259,8 @@ const CollectionCardPaper = (props) => {
                 .catch((e) => {})
             }
           }
-        });
+        })
+        .catch(console.log);
     }
   }, [uri]);
 
