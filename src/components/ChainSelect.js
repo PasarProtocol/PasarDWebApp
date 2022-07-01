@@ -14,9 +14,9 @@ const MenuProps = {
   },
   variant: "menu"
 }
-const menuItems = ['All blockchains', 'Elastos', 'Ethereum']
+const menuItems = ['All blockchains', 'Elastos Smart Chain', 'Ethereum']
 
-export default function NetworkSelect({ selected, onChange, sx={} }) {
+export default function ChainSelect({ selected, onChange, sx={} }) {
   const handleChange = (event) => {
     onChange(event.target.value);
   }
@@ -37,6 +37,6 @@ export default function NetworkSelect({ selected, onChange, sx={} }) {
   )
 }
 
-NetworkSelect.propTypes = {
+ChainSelect.propTypes = {
   onChange: PropTypes.func,
 }

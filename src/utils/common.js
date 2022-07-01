@@ -707,10 +707,10 @@ export const coinTypes = [
   }
 ]
 export const socialTypes = ['Website', 'Profile', 'Feeds', 'Twitter', 'Discord', 'Telegram', 'Medium']
-export const networkTypes = [
+export const chainTypes = [
   {
     icon: 'badges/ELA-network.svg',
-    name: 'Elastos'
+    name: 'Elastos Smart Chain (ESC)'
   },
   {
     icon: 'badges/ETH-network.svg',
