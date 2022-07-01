@@ -710,11 +710,13 @@ export const socialTypes = ['Website', 'Profile', 'Feeds', 'Twitter', 'Discord',
 export const chainTypes = [
   {
     icon: 'badges/ELA-network.svg',
-    name: 'Elastos Smart Chain (ESC)'
+    name: 'Elastos Smart Chain (ESC)',
+    color: (theme)=>theme.palette.origin.main
   },
   {
     icon: 'badges/ETH-network.svg',
-    name: 'Ethereum'
+    name: 'Ethereum',
+    color: '#6A70FA'
   }
 ]
 export const getCoinTypeFromToken = (item) => {
