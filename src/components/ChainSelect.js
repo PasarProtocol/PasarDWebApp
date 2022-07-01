@@ -14,7 +14,7 @@ const MenuProps = {
   },
   variant: "menu"
 }
-const menuItems = ['All blockchains', 'Elastos Smart Chain', 'Ethereum']
+const menuItems = ['All Blockchains', 'Elastos Smart Chain', 'Ethereum']
 
 export default function ChainSelect({ selected, onChange, sx={} }) {
   const handleChange = (event) => {

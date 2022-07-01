@@ -735,7 +735,7 @@ export default function CollectibleDetail() {
                     chainType<0?
                     <AvatarStyle draggable = {false} sx={{background: (theme)=>theme.palette.origin.main}}/>:
                     <>
-                      <AvatarStyle draggable = {false} component="img" src={`/static/${chainTypes[chainType].icon}`} sx={{background: (theme)=>theme.palette.origin.main, p: '9px'}}/>
+                      <AvatarStyle draggable = {false} component="img" src={`/static/${chainTypes[chainType].icon}`} sx={{background: chainTypes[chainType].color, p: '9px'}}/>
                       <Box sx={{ minWidth: 0, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
                         <Typography variant="body2" sx={{alignItems: 'center', wordBreak: 'break-all'}}>{chainTypes[chainType].name}</Typography>
                       </Box>

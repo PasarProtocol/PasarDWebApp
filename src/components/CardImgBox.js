@@ -48,14 +48,15 @@ const CardImgBox = (props) => {
 
     const handleResize = ()=>{
       setIsAfterLoad(true)
-      if(!imageRef.current)
-        return
-      const currentImg = imageRef.current.getElementsByTagName('img')[0]
-      const { clientWidth: imgWidth, clientHeight: imgHeight } = currentImg;
-      if(imgWidth > imgHeight)
-        currentImg.style.width = '100%'
-      else
-        currentImg.style.height = '100%'
+      // if(!imageRef.current)
+      //   return
+      // const currentImg = imageRef.current.getElementsByTagName('img')[0]
+      // const { clientWidth: imgWidth, clientHeight: imgHeight } = currentImg;
+      // if(imgWidth > imgHeight)
+      //   currentImg.style.width = '100%'
+      // else{
+      //   currentImg.style.height = '100%'
+      // }
     }
 
     const handleErrorImage = (e) => {
@@ -71,7 +72,7 @@ const CardImgBox = (props) => {
     const imageStyle = {
       // borderRadius: 1,
       // boxShadow: (theme)=>theme.customShadows.z16,
-      display: 'inline-flex',
+      // display: 'inline-flex',
       maxHeight: '100%',
       padding: '1px'
     }
@@ -95,7 +96,9 @@ const CardImgBox = (props) => {
             effect="blur" 
             wrapperProps={{
               style:{
-                width: isAfterLoad?'auto':0
+                display: 'contents'
+                // width: isAfterLoad?'auto':0,
+                // display: 'inline-flex'
               }
             }} 
             style={{...imageStyle}} 

@@ -77,11 +77,15 @@ export default function AssetFilterPan(props){
           .then(data => {
             setCollections((prevStatus)=>{
               const tempCollections = [...prevStatus]
+              if(!tempCollections[_id])
+                return
               tempCollections[_id].avatar = getIpfsUrl(data.data.avatar)
               return tempCollections
             })
             setFilterCollections((prevStatus)=>{
               const tempCollections = [...prevStatus]
+              if(!tempCollections[_id])
+                return
               tempCollections[_id].avatar = getIpfsUrl(data.data.avatar)
               return tempCollections
             })
