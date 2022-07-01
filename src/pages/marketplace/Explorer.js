@@ -212,7 +212,7 @@ export default function MarketExplorer() {
         setLoadingAssets(false);
     });
     sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, selectedCollections, selectedTokens, adult, order, chainType}))
-    setFilterForm({selectedBtns, range, selectedCollections, selectedTokens, adult, order})
+    setFilterForm({selectedBtns, range, selectedCollections, selectedTokens, adult, order, chainType})
   }, [page, showCount, selectedBtns, selectedCollections, selectedTokens, adult, range, order, chainType, params.key]);
   
   const handleDispmode = (event, mode) => {
@@ -391,6 +391,11 @@ export default function MarketExplorer() {
     setRange(emptyRange)
     setAdult(false)
   }
+  const handleChangeChainType = (type)=>{
+    setChainType(type)
+    setSelectedCollections([])
+    setSelectedTokens([])
+  }
   const link2Detail = (tokenId, baseToken)=>{
     navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   }
@@ -458,7 +463,7 @@ export default function MarketExplorer() {
                     </Box>
                     <Box sx={{display: 'flex'}}>
                       <AssetSortSelect selected={order} onChange={setOrder}/>
-                      <ChainSelect selected={chainType} onChange={setChainType}/>
+                      <ChainSelect selected={chainType} onChange={handleChangeChainType}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
                           <GridViewSharpIcon />
@@ -490,7 +495,7 @@ export default function MarketExplorer() {
                       },
                     }}
                     scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
-                    filterProps = {{selectedBtns, selectedCollections, selectedTokens, range, adult, order}}
+                    filterProps = {{selectedBtns, selectedCollections, selectedTokens, range, adult, order, chainType}}
                     {...{btnGroup, handleFilter}}
                   />
                 </Box>
@@ -502,7 +507,7 @@ export default function MarketExplorer() {
                     <Box sx={{display: 'flex', p: '10px', pb: 1}}>
                       <AssetSortSelect selected={order} onChange={setOrder} sx={{flex: 1}}/>
                       <MHidden width="smDown">
-                        <ChainSelect selected={chainType} onChange={setChainType}/>
+                        <ChainSelect selected={chainType} onChange={handleChangeChainType}/>
                       </MHidden>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
@@ -515,7 +520,7 @@ export default function MarketExplorer() {
                     </Box>
                     <MHidden width="smUp">
                       <Box sx={{px: '10px'}}>
-                        <ChainSelect selected={chainType} onChange={setChainType} sx={{width: '100%'}}/>
+                        <ChainSelect selected={chainType} onChange={handleChangeChainType} sx={{width: '100%'}}/>
                       </Box>
                     </MHidden>
                   </MHidden>
