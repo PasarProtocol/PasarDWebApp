@@ -128,7 +128,8 @@ export default function Searchbar({placeholder}) {
               tempState[_i] = getIpfsUrl(res.data.avatar)
               return tempState
             })
-          });
+          })
+          .catch(console.log);
       }
     })
   }, [instanceSearchResult])

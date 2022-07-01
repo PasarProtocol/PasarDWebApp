@@ -151,7 +151,8 @@ export default function CollectionDetail() {
               .then(response => response.json())
               .then(data => {
                 setMetaObj(data)
-              });
+              })
+              .catch(console.log);
           }
           setLoadingCollection(false);
         }).catch((e) => {
