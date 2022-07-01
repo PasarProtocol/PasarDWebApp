@@ -20,6 +20,7 @@ import { MHidden, MIconButton } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import LoadingScreen from '../../components/LoadingScreen';
+import NetworkSelect from '../../components/NetworkSelect';
 import AssetSortSelect from '../../components/AssetSortSelect';
 import AssetFilterPan from '../../components/marketplace/AssetFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
@@ -132,6 +133,7 @@ export default function MarketExplorer() {
   });
   const [totalCount, setTotalCount] = React.useState(0);
   const [order, setOrder] = React.useState(sessionFilterProps.order || 0);
+  const [network, setNetwork] = React.useState(sessionFilterProps.network || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
 
@@ -186,6 +188,7 @@ export default function MarketExplorer() {
       `minPrice=${range.min!==''?range.min*1e18:''}&`+
       `maxPrice=${range.max!==''?range.max*1e18:''}&`+
       `order=${order}&`+
+      `marketPlace=${network}&`+
       `keyword=${params.key?params.key:''}&`+
       `pageNum=${page}&`+
       `pageSize=${showCount}`, { signal }).then(response => {
@@ -208,9 +211,9 @@ export default function MarketExplorer() {
       if(e.code !== e.ABORT_ERR)
         setLoadingAssets(false);
     });
-    sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, selectedCollections, selectedTokens, adult, order}))
+    sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, selectedCollections, selectedTokens, adult, order, network}))
     setFilterForm({selectedBtns, range, selectedCollections, selectedTokens, adult, order})
-  }, [page, showCount, selectedBtns, selectedCollections, selectedTokens, adult, range, order, params.key]);
+  }, [page, showCount, selectedBtns, selectedCollections, selectedTokens, adult, range, order, network, params.key]);
   
   const handleDispmode = (event, mode) => {
     if(mode===null)
@@ -455,6 +458,7 @@ export default function MarketExplorer() {
                     </Box>
                     <Box sx={{display: 'flex'}}>
                       <AssetSortSelect selected={order} onChange={setOrder}/>
+                      <NetworkSelect selected={network} onChange={setNetwork}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
                           <GridViewSharpIcon />
@@ -497,6 +501,7 @@ export default function MarketExplorer() {
                   <MHidden width="mdUp">
                     <Box sx={{display: 'flex', p: '10px', pb: 1}}>
                       <AssetSortSelect selected={order} onChange={setOrder} sx={{flex: 1}}/>
+                      <NetworkSelect selected={network} onChange={setNetwork}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
                           <SquareIcon />
