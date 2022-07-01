@@ -34,15 +34,21 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
 }))
 export default function AssetFilterPan(props){
   const {sx, scrollMaxHeight, btnGroup, filterProps, handleFilter} = props
+  const {chainType} = filterProps
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
   const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
   const [collections, setCollections] = React.useState([]);
   const [filterCollections, setFilterCollections] = React.useState([]);
   const [filterTokens, setFilterTokens] = React.useState(coinTypes);
+  const [controller, setAbortController] = React.useState(new AbortController());
 
   React.useEffect(()=>{
-    fetchFrom('api/v2/sticker/getCollection')
+    controller.abort(); // cancel the previous request
+    const newController = new AbortController();
+    const { signal } = newController;
+    setAbortController(newController);
+    fetchFrom(`api/v2/sticker/getCollection?marketPlace=${chainType}`, { signal })
       .then((response) => {
         response.json().then((jsonCollections) => {
           if(!Array.isArray(jsonCollections.data))
@@ -58,7 +64,7 @@ export default function AssetFilterPan(props){
           setFilterCollections(allCollections)
         })
       })
-  }, [])
+  }, [chainType])
 
   React.useEffect(() => {
     collections.forEach((item, _id)=>{
