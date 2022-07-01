@@ -21,6 +21,7 @@ import Page from '../../components/Page';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import LoadingScreen from '../../components/LoadingScreen';
 import AssetSortSelect from '../../components/AssetSortSelect';
+import NetworkSelect from '../../components/NetworkSelect';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import CollectionFilterPan from '../../components/collection/CollectionFilterPan';
 import AssetGrid from '../../components/marketplace/AssetGrid';
@@ -112,6 +113,7 @@ export default function CollectionDetail() {
   });
   const [totalCount, setTotalCount] = React.useState(0);
   const [order, setOrder] = React.useState(sessionFilterProps.order || 0);
+  const [network, setNetwork] = React.useState(sessionFilterProps.network || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
 
@@ -191,6 +193,7 @@ export default function CollectionDetail() {
       minPrice: range.min!==''?range.min*1e18:'',
       maxPrice: range.max!==''?range.max*1e18:'',
       order,
+      marketPlace: network,
       keyword: params.key?params.key:'',
       pageNum: page,
       pageSize: showCount,
@@ -228,9 +231,9 @@ export default function CollectionDetail() {
         if(e.code !== e.ABORT_ERR)
           setLoadingAssets(false);
       });
-    sessionStorage.setItem("filter-props-other", JSON.stringify({selectedBtns, selectedAttributes, range, selectedTokens, adult, order}))
+    sessionStorage.setItem("filter-props-other", JSON.stringify({selectedBtns, selectedAttributes, range, selectedTokens, adult, order, network}))
     setFilterForm({selectedBtns, selectedAttributes, range, selectedTokens, adult, order})
-  }, [page, showCount, selectedBtns, selectedAttributes, selectedTokens, adult, range, order, params.key, params.collection]);
+  }, [page, showCount, selectedBtns, selectedAttributes, selectedTokens, adult, range, order, network, params.key, params.collection]);
   
   const handleDispmode = (event, mode) => {
     if(mode===null)
@@ -531,6 +534,7 @@ export default function CollectionDetail() {
                     </Box>
                     <Box sx={{display: 'flex'}}>
                       <AssetSortSelect selected={order} onChange={setOrder}/>
+                      <NetworkSelect selected={network} onChange={setNetwork}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
                           <GridViewSharpIcon />
@@ -573,6 +577,7 @@ export default function CollectionDetail() {
                     <MHidden width="smUp">
                       <Box sx={{display: 'flex', p: '10px', pb: 1}}>
                         <AssetSortSelect selected={order} onChange={setOrder} sx={{flex: 1}}/>
+                        <NetworkSelect selected={network} onChange={setNetwork}/>
                         <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                           <ToggleButton value={0}>
                             <SquareIcon />
