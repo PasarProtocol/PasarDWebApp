@@ -7,6 +7,7 @@ import { Grid, Container, Stack, Typography, Link, Button, Box, ToggleButtonGrou
 // components
 import Page from '../../components/Page';
 import CollectionSortSelect from '../../components/CollectionSortSelect';
+import NetworkSelect from '../../components/NetworkSelect';
 import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
@@ -34,6 +35,7 @@ export default function Explorer() {
   const [collections, setCollections] = React.useState([]);
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
   const [orderType, setOrderType] = React.useState(0);
+  const [network, setNetwork] = React.useState(0);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [needOptionToBelow, setOptionToBelow] = React.useState(false);
   const [controller, setAbortController] = React.useState(new AbortController());
@@ -46,7 +48,7 @@ export default function Explorer() {
     const { signal } = newController;
     setAbortController(newController);
     setLoadingCollections(true);
-    fetchFrom(`api/v2/sticker/getCollection?sort=${orderType}`, { signal })
+    fetchFrom(`api/v2/sticker/getCollection?sort=${orderType}&marketPlace=${network}`, { signal })
       .then((response) => {
         response.json().then((jsonAssets) => {
           if(Array.isArray(jsonAssets.data))
@@ -59,9 +61,9 @@ export default function Explorer() {
       .catch((e) => {
         if (e.code !== e.ABORT_ERR) setLoadingCollections(false);
       });
-  }, [orderType]);
+  }, [orderType, network]);
   function handleResize() {
-    if(sortOptions[orderType].length>15 && window.innerWidth<600)
+    if(sortOptions[orderType].length>15 && window.innerWidth<750)
       setOptionToBelow(true)
     else
       setOptionToBelow(false)
@@ -104,6 +106,7 @@ export default function Explorer() {
               <StyledButton variant="contained" onClick={handleNavlink} to='/collections/import'>
                 Import
               </StyledButton>
+              <NetworkSelect selected={network} onChange={setNetwork} />
               {
                 !needOptionToBelow&&
                 <CollectionSortSelect onChange={setOrderType} orderType={orderType} sortOptions={sortOptions} />
