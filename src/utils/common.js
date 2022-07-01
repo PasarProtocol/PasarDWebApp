@@ -707,6 +707,16 @@ export const coinTypes = [
   }
 ]
 export const socialTypes = ['Website', 'Profile', 'Feeds', 'Twitter', 'Discord', 'Telegram', 'Medium']
+export const networkTypes = [
+  {
+    icon: 'badges/ELA-network.svg',
+    name: 'Elastos'
+  },
+  {
+    icon: 'badges/ETH-network.svg',
+    name: 'Ethereum'
+  }
+]
 export const getCoinTypeFromToken = (item) => {
   let coinType = 0
   if(item) {

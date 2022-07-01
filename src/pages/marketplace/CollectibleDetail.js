@@ -43,7 +43,7 @@ import { queryAvatarUrl, queryName, downloadAvatar } from '../../components/sign
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCoinTypeFromToken, getCollectiblesInCollection4Preview,
   getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, getCollectionTypeFromImageUrl, 
-  getShortUrl, getIpfsUrl, collectionTypes, coinTypes } from '../../utils/common';
+  getShortUrl, getIpfsUrl, collectionTypes, coinTypes, networkTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -476,6 +476,12 @@ export default function CollectibleDetail() {
   let properties = {}
   if(collectible && (collectible.properties || collectible.attribute))
     properties = collectible.properties || collectible.attribute
+
+  let networkType = 0
+  if(collectible.marketPlace>=1 && collectible.marketPlace<=2)
+    networkType = collectible.marketPlace - 1
+  else if(!collectible || Object.keys(collectible).length===0)
+    networkType = -1
   return (
     <RootStyle title="Collectible | PASAR">
       <ScrollManager scrollKey="asset-detail-key"/>
@@ -723,6 +729,19 @@ export default function CollectibleDetail() {
                     </Box>
                   </Stack>
                 }
+                <Typography variant="subtitle2">Blockchain</Typography>
+                <Stack direction='row'>
+                  {
+                    networkType<0?
+                    <AvatarStyle draggable = {false} sx={{background: (theme)=>theme.palette.origin.main}}/>:
+                    <>
+                      <AvatarStyle draggable = {false} component="img" src={`/static/${networkTypes[networkType].icon}`} sx={{background: (theme)=>theme.palette.origin.main, p: '9px'}}/>
+                      <Box sx={{ minWidth: 0, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{alignItems: 'center', wordBreak: 'break-all'}}>{networkTypes[networkType].name}</Typography>
+                      </Box>
+                    </>
+                  }
+                </Stack>
               </Stack>
             </PaperStyle>
             <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
