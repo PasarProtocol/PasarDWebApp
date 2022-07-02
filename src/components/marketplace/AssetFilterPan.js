@@ -11,7 +11,7 @@ import CustomSwitch from '../custom-switch';
 import SearchBox from '../SearchBox';
 import Scrollbar from '../Scrollbar';
 import StyledButton from '../signin-dlg/StyledButton';
-import { coinTypes, collectionTypes, fetchFrom, getIpfsUrl } from '../../utils/common'
+import { coinTypes, coinTypesForEthereum, collectionTypes, fetchFrom, getIpfsUrl } from '../../utils/common'
 // ----------------------------------------------------------------------
 const DrawerStyle = styled(Drawer)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -33,6 +33,7 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
   backgroundColor: 'unset'
 }))
 export default function AssetFilterPan(props){
+  const coinTypeClass = [[...coinTypes, ...coinTypesForEthereum], coinTypes, coinTypesForEthereum]
   const {sx, scrollMaxHeight, btnGroup, filterProps, handleFilter} = props
   const {chainType} = filterProps
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
@@ -40,7 +41,7 @@ export default function AssetFilterPan(props){
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
   const [collections, setCollections] = React.useState([]);
   const [filterCollections, setFilterCollections] = React.useState([]);
-  const [filterTokens, setFilterTokens] = React.useState(coinTypes);
+  const [filterTokens, setFilterTokens] = React.useState(coinTypeClass[chainType]);
   const [controller, setAbortController] = React.useState(new AbortController());
 
   React.useEffect(()=>{
@@ -64,6 +65,7 @@ export default function AssetFilterPan(props){
           setFilterCollections(allCollections)
         })
       })
+    setFilterTokens(coinTypeClass[chainType])
   }, [chainType])
 
   React.useEffect(() => {
@@ -110,10 +112,11 @@ export default function AssetFilterPan(props){
   }
 
   const searchTokens = (inputStr)=>{
+    const tempCoinTypes = coinTypeClass[chainType]
     if(inputStr.length){
-      setFilterTokens(coinTypes.filter(el=>el.name.toLowerCase().includes(inputStr.toLowerCase())))
+      setFilterTokens(tempCoinTypes.filter(el=>el.name.toLowerCase().includes(inputStr.toLowerCase())))
     } else {
-      setFilterTokens(coinTypes)
+      setFilterTokens(tempCoinTypes)
     }
   }
 
@@ -315,7 +318,7 @@ export default function AssetFilterPan(props){
                           <ListItemText 
                             primary={el.name} 
                             primaryTypographyProps={
-                              i<2?{
+                              (chainType<2 && i<2)?{
                                 sx: {fontWeight: 'bold'}
                               }:{}
                             }
