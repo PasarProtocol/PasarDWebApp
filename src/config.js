@@ -41,6 +41,7 @@ const addressForProduction = {
   ethUsdcContract: "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
   bunnyContract: "0x75740FC7058DA148752ef8a9AdFb73966DEb42a8",
   bnbBusdContract: "0x9f1d0Ed4E041C503BD487E5dc9FC935Ab57F9a57",
+  elaOnEthContract: "0xe6fd75ff38Adca4B97FBCD938c86b98772431867",
   blockchain: 'Elastos Smart Chain (ESC)'
 }
 
@@ -58,6 +59,7 @@ const addressForTest = {
   ethUsdcContract: "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
   bunnyContract: "0x75740FC7058DA148752ef8a9AdFb73966DEb42a8",
   bnbBusdContract: "0x9f1d0Ed4E041C503BD487E5dc9FC935Ab57F9a57",
+  elaOnEthContract: "0x8c947E0fA67e91370587076A4108Df17840e9982",
   blockchain: 'Testnet (ESC)'
 }
 
@@ -71,7 +73,7 @@ const ApplicationDIDForMain = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 // const ApplicationDIDForTest = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB"
 
 export const {stickerContract, feedsContract, marketContract, v1marketContract, registerContract, diaContract, welaContract, glideContract, 
-  elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
+  elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, elaOnEthContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
 export const mainDiaContract = addressForProduction.diaContract
 
 export const ipfsURL = process.env.REACT_APP_ENV==="production"?process.env.REACT_APP_IPFS_URL_PRODUCTION:process.env.REACT_APP_IPFS_URL_TEST

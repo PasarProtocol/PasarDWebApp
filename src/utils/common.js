@@ -21,6 +21,7 @@ import {
   ethUsdcContract as EUSDC_CONTRACT_ADDRESS, 
   bunnyContract as BUNNY_CONTRACT_ADDRESS, 
   bnbBusdContract as BUSD_CONTRACT_ADDRESS, 
+  elaOnEthContract as ELA_ON_ETH_CONTRACT_ADDRESS, 
   registerContract as REG_CONTRACT_ADDRESS,
   blankAddress, ipfsURL as PasarIpfs, rpcURL, bunnyContract } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
@@ -704,6 +705,18 @@ export const coinTypes = [
     icon: 'erc20/BUSD.png',
     name: 'bnbBUSD',
     address: BUSD_CONTRACT_ADDRESS
+  }
+]
+export const coinTypesForEthereum = [
+  {
+    icon: 'erc20/ETH.svg',
+    name: 'ETH',
+    address: blankAddress
+  },
+  {
+    icon: 'erc20/ELAonETH.svg',
+    name: 'ELA on ETH',
+    address: ELA_ON_ETH_CONTRACT_ADDRESS
   }
 ]
 export const socialTypes = ['Website', 'Profile', 'Feeds', 'Twitter', 'Discord', 'Telegram', 'Medium']
