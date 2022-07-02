@@ -35,7 +35,7 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
 export default function AssetFilterPan(props){
   const coinTypeClass = [[...coinTypes, ...coinTypesForEthereum], coinTypes, coinTypesForEthereum]
   const {sx, scrollMaxHeight, btnGroup, filterProps, handleFilter} = props
-  const {chainType} = filterProps
+  const {chainType=0} = filterProps
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
   const [maxVal, setMaxVal] = React.useState(filterProps.range?filterProps.range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
