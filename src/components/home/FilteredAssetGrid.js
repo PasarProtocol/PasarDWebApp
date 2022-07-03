@@ -108,7 +108,7 @@ const AssetGroupSlider = (props)=>{
                     saleType={item.SaleType || item.saleType}
                     type={0}
                     isLink={1&&true}
-                    coinUSD={coinPrice[coinType]}
+                    coinUSD={coinPrice[coinType.index]}
                     coinType={coinType}
                     isDragging={isDragging}
                     showPrice={type==='recent_sold'}

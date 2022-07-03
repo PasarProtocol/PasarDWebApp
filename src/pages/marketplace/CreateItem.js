@@ -1708,7 +1708,8 @@ export default function CreateItem() {
                         defaultCollectionType={0}
                         baseToken={baseTokenGroup[collection]}
                         orderType={saletype==='Auction'?auctionOrderType:1}
-                        {...{description, price, coinType, quantity, coinUSD, reservePrice, buyoutPrice}}
+                        coinType={{index: coinType, ...coinTypes[coinType]}}
+                        {...{description, price, quantity, coinUSD, reservePrice, buyoutPrice}}
                       />
                     )
                   )
@@ -1732,7 +1733,8 @@ export default function CreateItem() {
                         assets={previewFiles}
                         baseToken={baseTokenGroup[collection]}
                         orderType={saletype==='Auction'?auctionOrderType:1}
-                        {...{multiNames, description, quantity, price, coinType, coinUSD, reservePrice, buyoutPrice}}
+                        coinType={{index: coinType, ...coinTypes[coinType]}}
+                        {...{multiNames, description, quantity, price, coinUSD, reservePrice, buyoutPrice}}
                       />
                     )
                   )

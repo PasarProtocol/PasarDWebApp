@@ -114,8 +114,8 @@ export default function CollectibleHandleSection(props) {
     }
   }
   const coinType = getCoinTypeFromToken(collectible)
-  const coinName = coinTypes[coinType].name
-  const coinUSD = coinPrice[coinType]
+  const coinName = coinType.name
+  const coinUSD = coinPrice[coinType.index]
   let statusText = 'On sale for a fixed price of'
   let priceText = `${round(collectible.Price/1e18, 3)} ${coinName}`
   let usdPriceText = `≈ USD ${round(coinUSD*collectible.Price/1e18, 3)}`

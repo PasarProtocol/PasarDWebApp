@@ -22,7 +22,7 @@ function TransItem(props) {
       methodItem = {color: 'grey', icon: 'tag', detail: []}
   const subject = trans[methodItem.verb.subject]
   const coinType = getCoinTypeFromToken(trans)
-  const coinName = coinTypes[coinType].name
+  const coinName = coinType.name
   
   React.useEffect(() => {
     if(subject) {

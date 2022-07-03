@@ -53,8 +53,8 @@ const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 export default function AssetCard(props) {
-  const { name="???", description, quantity=1, price=0, coinType=0, isLink, isMoreLink, tokenId, type, orderId, orderType, status, endTime, currentBid, baseToken='', saleType, showPrice=false, 
-   myaddress, royaltyOwner, royalties, holder, updateCount, handleUpdate, coinUSD, defaultCollectionType=0, isDragging=false, reservePrice=0, buyoutPrice=0, v1State=false } = props
+  const { name="???", description, quantity=1, price=0, coinType={}, isLink, isMoreLink, tokenId, type, orderId, orderType, status, endTime, currentBid, baseToken='', saleType, showPrice=false, 
+   myaddress, royaltyOwner, royalties, holder, updateCount, handleUpdate, coinUSD, defaultCollectionType=0, isDragging=false, reservePrice=0, buyoutPrice=0, v1State=false, marketPlace=1 } = props
   
   const [collection, setCollection] = React.useState(null);
   const [isOpenPopup, setOpenPopup] = React.useState(null);
@@ -438,7 +438,7 @@ export default function AssetCard(props) {
                 orderType===auctionOrderType?
                 <Tooltip title={currentBidPrice?"Top Bid":"Starting Price"} arrow enterTouchDelay={0}>
                   <Typography variant="subtitle2" sx={{display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
-                    {math.round((currentBidPrice)/1e18, 3) || price} {coinTypes[coinType].name}
+                    {math.round((currentBidPrice)/1e18, 3) || price} {coinType.name}
                   </Typography>
                 </Tooltip>:
                 <Typography variant="subtitle2" sx={{display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
@@ -458,11 +458,11 @@ export default function AssetCard(props) {
                 type===3&&!auctionEnded
               ) &&
               <Stack direction='row'>
-                <Box component="img" src={`/static/${coinTypes[coinType].icon}`} sx={{ width: 20, m: 'auto', display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType===0?'invert(1)':'none' }} />
-                <Box sx={{color: "origin.main", flexGrow: 1}}>
-                  &nbsp;<Typography variant="subtitle1" sx={{display: 'inline-flex'}}>{price} {coinTypes[coinType].name}</Typography>&nbsp;
+                <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 20, m: 'auto', display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
+                <Typography component='div' sx={{color: "origin.main", flexGrow: 1}} noWrap>
+                  &nbsp;<Typography variant="subtitle1" sx={{display: 'inline-flex'}}>{price} {coinType.name}</Typography>&nbsp;
                   <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline-flex', alignItems: 'end'}}>≈ USD {math.round(coinUSD * price, 2)}</Typography>
-                </Box>
+                </Typography>
               </Stack>
             }
             {

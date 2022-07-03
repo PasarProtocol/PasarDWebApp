@@ -176,41 +176,52 @@ export default function MarketExplorer() {
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
     setLoadingAssets(true);
-    
+    let tokenTypeStr = ''
+    let chainTypeForToken = 0
+    selectedTokens.forEach((tokenAddr, _i)=>{
+      tokenTypeStr = tokenTypeStr.concat(tokenTypeStr.length?',':'', tokenAddr.substr(2))
+      if(chainTypeForToken !== tokenAddr.charAt(0)*1 && chainTypeForToken < 3)
+        chainTypeForToken += tokenAddr.charAt(0)*1
+    })
+    chainTypeForToken %= 3
+    console.log(chainTypeForToken, tokenTypeStr)
+    // const tokenTypeStr = selectedTokens.map(tokenAddr=>tokenAddr.substr(2)).join(',')
+    // const chainTypeForToken = selectedTokens.map(tokenAddr=>tokenAddr.charAt(0)*1).join(',')
     if(!loadNext)
       setAssets([])
     fetchFrom(`api/v2/sticker/getDetailedCollectibles?`+
       `collectionType=${selectedCollections.join(',')}&`+
-      `tokenType=${selectedTokens.join(',')}&`+
+      `tokenType=${tokenTypeStr}&`+
       `status=${statusFilter}&`+
       `itemType=${itemTypeFilter}&`+
       `adult=${adult}&`+
       `minPrice=${range.min!==''?range.min*1e18:''}&`+
       `maxPrice=${range.max!==''?range.max*1e18:''}&`+
       `order=${order}&`+
-      `marketPlace=${chainType}&`+
+      `marketPlace=${chainTypeForToken || chainType}&`+
       `keyword=${params.key?params.key:''}&`+
       `pageNum=${page}&`+
-      `pageSize=${showCount}`, { signal }).then(response => {
-      response.json().then(jsonAssets => {
-        if(jsonAssets.data){
-          setTotalCount(jsonAssets.data.total)
-          setPages(Math.ceil(jsonAssets.data.total/showCount));
-          if(loadNext)
-            setAssets([...assets, ...jsonAssets.data.result]);
-          else {
-            setAssets(jsonAssets.data.result);
-            // window.scrollTo(0,0)
+      `pageSize=${showCount}`, { signal })
+      .then(response => {
+        response.json().then(jsonAssets => {
+          if(jsonAssets.data){
+            setTotalCount(jsonAssets.data.total)
+            setPages(Math.ceil(jsonAssets.data.total/showCount));
+            if(loadNext)
+              setAssets([...assets, ...jsonAssets.data.result]);
+            else {
+              setAssets(jsonAssets.data.result);
+              // window.scrollTo(0,0)
+            }
           }
-        }
-        setAlreadyMounted(false)
-        setLoadNext(false)
-        setLoadingAssets(false)
-      })
-    }).catch(e => {
-      if(e.code !== e.ABORT_ERR)
-        setLoadingAssets(false);
-    });
+          setAlreadyMounted(false)
+          setLoadNext(false)
+          setLoadingAssets(false)
+        })
+      }).catch(e => {
+        if(e.code !== e.ABORT_ERR)
+          setLoadingAssets(false);
+      });
     sessionStorage.setItem("filter-props", JSON.stringify({selectedBtns, range, selectedCollections, selectedTokens, adult, order, chainType}))
     setFilterForm({selectedBtns, range, selectedCollections, selectedTokens, adult, order, chainType})
   }, [page, showCount, selectedBtns, selectedCollections, selectedTokens, adult, range, order, chainType, params.key]);

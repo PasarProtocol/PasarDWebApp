@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
 import AssetCardSkeleton from './AssetCardSkeleton';
-import { getAssetImage, getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, coinTypes } from '../../utils/common';
+import { getAssetImage, getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, coinTypes, coinTypesForEthereum } from '../../utils/common';
 import { blankAddress } from '../../config';
 // ----------------------------------------------------------------------
 const StackedGrid = ({
@@ -19,7 +19,7 @@ const StackedGrid = ({
   </Box>
 );
 const GridItems = (props) => {
-  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length).fill(0));
+  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
   React.useEffect(()=>{
     getCoinUSD().then((res) => {
       setCoinPriceByType(0, res)
@@ -57,7 +57,7 @@ const GridItems = (props) => {
               price={round(item.price/1e18, 3)}
               saleType={item.SaleType?item.SaleType:item.saleType}
               isLink={Boolean(true)}
-              coinUSD={coinPrice[coinType]}
+              coinUSD={coinPrice[coinType.index]}
               coinType={coinType}
               // defaultCollectionType={getCollectionTypeFromImageUrl(item)}
               {...props}
