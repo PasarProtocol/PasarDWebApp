@@ -33,7 +33,9 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
   backgroundColor: 'unset'
 }))
 export default function AssetFilterPan(props){
-  const coinTypeClass = [[...coinTypes, ...coinTypesForEthereum], coinTypes, coinTypesForEthereum]
+  const tempCoinTypesForESC = coinTypes.map((coinType)=>({...coinType, address: `1-${coinType.address}`}))
+  const tempCoinTypesForEthereum = coinTypesForEthereum.map((coinType)=>({...coinType, address: `2-${coinType.address}`}))
+  const coinTypeClass = [[...tempCoinTypesForESC, ...tempCoinTypesForEthereum], tempCoinTypesForESC, tempCoinTypesForEthereum]
   const {sx, scrollMaxHeight, btnGroup, filterProps, handleFilter} = props
   const {chainType=0} = filterProps
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');

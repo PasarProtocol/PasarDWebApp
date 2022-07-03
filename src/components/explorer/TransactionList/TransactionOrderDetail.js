@@ -68,7 +68,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
     const royalties = item.royalties!==undefined?parseFloat((item.royalties/ 10 ** 18).toFixed(7)):0
     const royaltyFee = item.royaltyFee?parseFloat((item.royaltyFee/ 10 ** 18).toFixed(7)):0
     const coinType = getCoinTypeFromToken(item)
-    const coinName = coinTypes[coinType].name
+    const coinName = coinType.name
     let methodItem = MethodList.find((item)=>item.method===method)
     const eventStyle = event==='Burn'?{color: '#e45f14'}:{color: 'inherit'}
     const eventBorderStyle = event==='Burn'?{borderColor: '#e45f14'}:{borderColor: 'text.secondary'}
@@ -77,7 +77,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
 
     let totalSum = `${gasFee} ELA`
     if(method==="BuyOrder") {
-        if(coinType===0)
+        if(coinType.index===0)
             totalSum = `${price + gasFee} ELA`
         else
             totalSum = `${price} ${coinName} + ${gasFee} ELA`

@@ -173,7 +173,7 @@ export default function ChartArea({by, is4Address}) {
       const indexOfDate = dates.indexOf(seekDate);
       const value = item.price!==undefined?item.price:item.value;
       if(indexOfDate>=0)
-        tempValueArray[indexOfDate] = math.round(tempValueArray[indexOfDate]+math.round(value/10**18, 4)*coinPrice[coinType], 4);
+        tempValueArray[indexOfDate] = math.round(tempValueArray[indexOfDate]+math.round(value/10**18, 4)*coinPrice[coinType.index], 4);
     })
     setOptionDates(dates)
     // setChartOptions(mergeChartOption(dates))

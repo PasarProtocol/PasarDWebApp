@@ -26,7 +26,7 @@ function TransItem({ trans, coinType }) {
           })
     }
   }, [trans]);
-  const coinName = coinTypes[coinType].name
+  const coinName = coinType.name
 
   return (
       <Stack direction="row" spacing={2}>

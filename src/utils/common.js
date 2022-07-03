@@ -733,13 +733,19 @@ export const chainTypes = [
   }
 ]
 export const getCoinTypeFromToken = (item) => {
-  let coinType = 0
+  let coinTypeIndex = 0
   if(item) {
-    const { quoteToken=blankAddress } = item
-    coinType = coinTypes.findIndex(el=>el.address===quoteToken)
-    coinType = coinType<0?0:coinType
+    const { quoteToken=blankAddress, marketPlace=1 } = item
+    if(marketPlace!==2) {
+      coinTypeIndex = coinTypes.findIndex(el=>el.address===quoteToken)
+      coinTypeIndex = coinTypeIndex<0?0:coinTypeIndex
+      return {index: coinTypeIndex, ...coinTypes[coinTypeIndex]}
+    }
+    coinTypeIndex = coinTypesForEthereum.findIndex(el=>el.address===quoteToken)
+    coinTypeIndex = coinTypeIndex<0?0:coinTypeIndex
+    return {index: coinTypeIndex+coinTypes.length, ...coinTypesForEthereum[coinTypeIndex]}
   }
-  return coinType
+  return {index: coinTypeIndex, ...coinTypes[coinTypeIndex]}
 }
 export const sendIpfsDidJson = async () => {
   const client = create(`${PasarIpfs}/`);
