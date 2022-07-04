@@ -226,6 +226,9 @@ export default function AssetCard(props) {
                 transform: 'rotate(25deg)',
                 top: '-30%',
                 opacity: 0.18
+              },
+              '& .card-img>.chain-type': {
+                opacity: 1
               }
             }
           }}
