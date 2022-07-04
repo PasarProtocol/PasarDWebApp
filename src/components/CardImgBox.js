@@ -1,12 +1,12 @@
 import React from 'react'
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import PaperRecord from './PaperRecord';
-import { getAssetImage } from '../utils/common'
+import { getAssetImage, chainTypes } from '../utils/common'
 import useSettings from '../hooks/useSettings';
 
 const BoxStyle = styled(Box)(({ theme }) => ({
@@ -41,7 +41,7 @@ const BoxStyle = styled(Box)(({ theme }) => ({
 }));
 
 const CardImgBox = (props) => {
-    const { isMoreLink=false, isLink, thumbnail } = props;
+    const { isMoreLink=false, isLink, thumbnail, marketPlace=1 } = props;
     const src = isLink? getAssetImage(props, true): props.thumbnail
     const imageRef = React.useRef();
     const [isAfterLoad, setIsAfterLoad] = React.useState(false)
@@ -82,6 +82,8 @@ const CardImgBox = (props) => {
       themeProp.baseColor = '#333d48'
       themeProp.highlightColor = '#434d58'
     }
+    const tempChainTypes = [...chainTypes]
+    tempChainTypes[0].name = 'Elastos Smart Chain'
     return (
       <BoxStyle className='card-img' sx={{opacity: isMoreLink?.5:1}}>
         {
@@ -105,6 +107,11 @@ const CardImgBox = (props) => {
             afterLoad={handleResize} 
             onError={handleErrorImage}
           />
+        </Box>
+        <Box className='chain-type' sx={{position: 'absolute', bottom: 10, width: '100%', textAlign: 'center', opacity: 0, transition: 'opacity .2s'}}>
+          <Box sx={{bgcolor: tempChainTypes[marketPlace-1].color, borderRadius: 2, display: 'inline-flex', px: '10px', py: 1}}>
+            <Typography variant='subtitle2' color='white'>{tempChainTypes[marketPlace-1].name}</Typography>
+          </Box>
         </Box>
       </BoxStyle>
     );
