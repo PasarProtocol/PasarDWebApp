@@ -16,7 +16,7 @@ import SettleOrderDlg from '../../components/dialog/SettleOrder'
 import CancelDlg from '../../components/dialog/CancelSale';
 import Countdown from '../../components/Countdown';
 import useSingin from '../../hooks/useSignin';
-import { getTime, getCoinTypeFromToken, getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, coinTypes } from '../../utils/common';
+import { getTime, getCoinTypeFromToken, getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, coinTypes, coinTypesForEthereum } from '../../utils/common';
 import { auctionOrderType } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ export default function CollectibleHandleSection(props) {
   const [isOpenSettleOrder, setSettleOrderOpen] = useState(false);
   const [isOpenCancel, setCancelOpen] = useState(false);
   const [continuePurchase, setContinuePurchase] = useState(false);
-  const [coinPrice, setCoinPrice] = useState(Array(coinTypes.length).fill(0));
+  const [coinPrice, setCoinPrice] = useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
   const { pasarLinkAddress } = useSingin()
 
   useEffect(async() => {
