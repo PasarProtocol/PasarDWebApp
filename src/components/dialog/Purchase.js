@@ -30,7 +30,7 @@ export default function Purchase(props) {
   const { v1State=false } = info
   
   const coinBalance = balanceArray[coinType]
-  const coinName = coinTypes[coinType].name
+  const coinName = coinType.name
   let priceInfo = info.Price;
   if(info.orderType===auctionOrderType && info.buyoutPrice)
     priceInfo = info.buyoutPrice
@@ -49,7 +49,7 @@ export default function Purchase(props) {
         const pasarContract = new ethers.Contract(contractAddress, PASAR_CONTRACT_ABI, signer);
         signer.getAddress().then(async userAddress=>{
           if(coinType) {
-            const erc20Contract = new ethers.Contract(coinTypes[coinType].address, ERC20_CONTRACT_ABI, signer);
+            const erc20Contract = new ethers.Contract(coinType.address, ERC20_CONTRACT_ABI, signer);
             const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MARKET_CONTRACT_ADDRESS))
             const _gasPrice = await provider.getGasPrice();
             const gasPrice = getFilteredGasPrice(_gasPrice)
@@ -135,7 +135,7 @@ export default function Purchase(props) {
 
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
     if(coinType) {
-      const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinTypes[coinType].address);
+      const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinType.address);
       const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MARKET_CONTRACT_ADDRESS).call())
       const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
       const gasPrice = getFilteredGasPrice(_gasPrice)

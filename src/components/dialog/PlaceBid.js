@@ -37,7 +37,7 @@ export default function PlaceBid(props) {
   const { isOpen, setOpen, info, coinType=0 } = props;
 
   const coinBalance = balanceArray[coinType]
-  const coinName = coinTypes[coinType].name
+  const coinName = coinType.name
   const targetPrice = isBuynow?math.round(info.buyoutPrice / 1e18, 3):bidPrice
   const actionText = isBuynow?"Buy NFT":"Bid NFT"
 
@@ -69,7 +69,7 @@ export default function PlaceBid(props) {
         const pasarContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, PASAR_CONTRACT_ABI, signer);
         signer.getAddress().then(async userAddress=>{
           if(coinType) {
-            const erc20Contract = new ethers.Contract(coinTypes[coinType].address, ERC20_CONTRACT_ABI, signer);
+            const erc20Contract = new ethers.Contract(coinType.address, ERC20_CONTRACT_ABI, signer);
             const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MARKET_CONTRACT_ADDRESS))
             console.log(erc20BidderApproved)
             const _gasPrice = await provider.getGasPrice();
@@ -154,7 +154,7 @@ export default function PlaceBid(props) {
 
     const pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, MARKET_CONTRACT_ADDRESS);
     if(coinType) {
-      const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinTypes[coinType].address);
+      const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinType.address);
       const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MARKET_CONTRACT_ADDRESS).call())
       const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
       const gasPrice = getFilteredGasPrice(_gasPrice)
