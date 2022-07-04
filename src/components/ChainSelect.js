@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import Select from '@mui/material/Select';
+import { Select, Box } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import PropTypes from 'prop-types';
+import { chainTypes } from '../utils/common'
 
 const MenuProps = {
   anchorOrigin: {
@@ -14,7 +15,11 @@ const MenuProps = {
   },
   variant: "menu"
 }
-const menuItems = ['All Blockchains', 'Elastos Smart Chain', 'Ethereum']
+const menuItems = [
+  {name: 'All Blockchains', icon: 'blockchain.svg', color: 'black'}, 
+  {...chainTypes[0], name: 'Elastos Smart Chain'}, 
+  {...chainTypes[1]}
+]
 
 export default function ChainSelect({ selected, onChange, sx={} }) {
   const handleChange = (event) => {
@@ -25,13 +30,36 @@ export default function ChainSelect({ selected, onChange, sx={} }) {
       // defaultValue={0}
       value={selected}
       onChange={handleChange}
-      inputProps={{ 'aria-label': 'Without label' }}
       size="small"
-      sx={{mr: 1, ...sx}}
+      inputProps={{
+        'aria-label': 'Without label',
+        sx: {
+          display: 'flex',
+          alignItems: 'center'
+        }
+      }}
+      sx={{ mr: 1, ...sx }}
       MenuProps={MenuProps}
     >
       {
-        menuItems.map((type, i)=><MenuItem key={i} value={i} autoFocus={selected===i}>{type}</MenuItem>)
+        menuItems.map((type, i)=>(
+          <MenuItem key={i} value={i} autoFocus={selected===i}>
+            <Box sx={{borderRadius: '100%', overflow: 'hidden', mr: 1}}>
+              <Box
+                component="img" 
+                src={`/static/${type.icon}`} 
+                draggable = {false}
+                sx={{
+                  width: 25,
+                  height: 25,
+                  background: type.color, 
+                  p: '6px',
+                }}
+              />
+            </Box>
+            {type.name}
+          </MenuItem>
+        ))
       }
     </Select>
   )
