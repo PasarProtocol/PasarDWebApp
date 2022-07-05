@@ -13,18 +13,29 @@ import { reduceHexAddress, isInAppBrowser, fetchFrom, getIpfsUrl, getERCType } f
 export default function ChooseCollection(props) {
   const location = useLocation();
   const { token } = location.state || {}
-  const { isOpen, setOpen, handleChoose, setERCtype } = props;
+  const { isOpen, setOpen, handleChoose, setERCtype, chainType } = props;
   const [selectedId, setSelectedId] = React.useState(-1);
   const [collections, setCollections] = React.useState([]);
+  const [controller, setAbortController] = React.useState(new AbortController());
 
   React.useEffect(async () => {
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+      controller.abort(); // cancel the previous request
+      const newController = new AbortController();
+      const { signal } = newController;
+      setAbortController(newController);
+      let chainParam = -1
+      if(chainType === 'ESC')
+        chainParam = 1
+      else if(chainType === 'ETH')
+        chainParam = 2
+
       let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0]
       if (isInAppBrowser())
         essentialAddress = await window.elastos.getWeb3Provider().address
       
       if(essentialAddress)
-        fetchFrom(`api/v2/sticker/getCollectionByOwner/${essentialAddress}`)
+        fetchFrom(`api/v2/sticker/getCollectionByOwner/${essentialAddress}?marketPlace=${chainParam}`, { signal })
           .then((response) => {
             response.json().then((jsonCollections) => {
               if(!jsonCollections.data)
@@ -36,11 +47,9 @@ export default function ChooseCollection(props) {
               setCollections(tempCollections)
             })
           })
-          .catch(error=>{
-            
-          })
+          .catch(error=>{})
     }
-  }, [])
+  }, [chainType])
 
   React.useEffect(() => {
   }, [collections]);

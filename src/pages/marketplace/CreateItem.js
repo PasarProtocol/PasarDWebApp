@@ -1798,6 +1798,7 @@ export default function CreateItem() {
         setOpen={setChooseCollectionOpen}
         handleChoose = {handleChooseCollection}
         setERCtype = {setSelectedERCtype}
+        chainType = {chainType}
       />
       <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance} actionText="mint NFT from dedicated collection"/>
       <NeedMoreDIADlg isOpen={moreDIAOpen} setOpen={setOpenMoreDIA} balance={diaBalance} actionText="mint and sell more tokens in batch"/>
