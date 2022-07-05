@@ -76,7 +76,7 @@ const MintingTypeButton = (props)=>{
                 </Box>
             }
             {
-                type==="PSRC"&&
+                (type==="PSRC"||type==="PEC")&&
                 <Box sx={commonSx}>
                     <Box draggable = {false} component="img" src="/static/logo-icon.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26}, filter: current===type?'none':'brightness(5)' }} />
                 </Box>
@@ -113,7 +113,7 @@ const MintingTypeButton = (props)=>{
                     // type==="Choose"&&selectedCollection.avatar.length?selectedCollection.symbol:type
                 }
             </Typography>
-            <Typography variant="body2" sx={{ height: 30, fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1, sm: ''} }} noWrap>
+            <Typography variant="body2" sx={{ height: 30, fontSize: {xs: 12, sm: ''}, lineHeight: {xs: 1, sm: 1.2} }}>
                 {
                     type==="Choose"&&selectedCollection.avatar.length?selectedCollection.name:description
                 }

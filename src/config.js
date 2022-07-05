@@ -74,7 +74,7 @@ const escServerForTest = "https://esc-testnet.elastos.io"
 const ApplicationDIDForMain = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 // const ApplicationDIDForTest = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB"
 
-export const {stickerContract, feedsContract, marketContract, v1marketContract, registerContract, diaContract, welaContract, glideContract, 
+export const {stickerContract, stickerEthContract, feedsContract, marketContract, v1marketContract, registerContract, diaContract, welaContract, glideContract, 
   elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, elaOnEthContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
 export const mainDiaContract = addressForProduction.diaContract
 

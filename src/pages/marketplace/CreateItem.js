@@ -49,6 +49,7 @@ import { TOKEN_721_ABI } from '../../abi/token721ABI'
 import { TOKEN_1155_ABI } from '../../abi/token1155ABI'
 import { 
   stickerContract as PASAR_CONTRACT_ADDRESS, 
+  stickerEthContract as PASAR_ETH_CONTRACT_ADDRESS, 
   feedsContract as FEEDS_CONTRACT_ADDRESS, 
   marketContract as MARKET_CONTRACT_ADDRESS, 
   ipfsURL, 
@@ -155,6 +156,10 @@ export default function CreateItem() {
     console.log(pasarLinkChain)
     const currentChain = getChainTypeFromId(pasarLinkChain)
     setChainType(currentChain)
+    if(currentChain === 'ESC')
+      handleClickCollection('PSRC')
+    else if(currentChain === 'ETH')
+      handleClickCollection('PEC')
   }, [pasarLinkChain]);
 
   React.useEffect(() => {
@@ -443,7 +448,7 @@ export default function CreateItem() {
     setMultiProperties(tempMultiProperties)
   }
   const handleClickCollection = (type)=>{
-    if(type==='PSRC' || type==='FSTK'){
+    if(type==='PSRC' || type==='PEC' || type==='FSTK'){
       if(type==='FSTK' && mintype==='Batch')
         setMintType('Single')
       setCollection(type)
@@ -495,7 +500,10 @@ export default function CreateItem() {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           // console.log(accounts)
           let baseAddress = PASAR_CONTRACT_ADDRESS
-          let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, PASAR_CONTRACT_ADDRESS)
+          if(collection === 'PEC')
+            baseAddress = PASAR_ETH_CONTRACT_ADDRESS
+
+          let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, baseAddress)
           if(collection === 'FSTK') {
             baseAddress = FEEDS_CONTRACT_ADDRESS
             stickerContract = new walletConnectWeb3.eth.Contract(FEEDS_CONTRACT_ABI, FEEDS_CONTRACT_ADDRESS)
@@ -643,7 +651,10 @@ export default function CreateItem() {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           // console.log(accounts)
           let baseAddress = PASAR_CONTRACT_ADDRESS
-          let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, PASAR_CONTRACT_ADDRESS)
+          if(collection === 'PEC')
+            baseAddress = PASAR_ETH_CONTRACT_ADDRESS
+
+          let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, baseAddress)
           if(collection === 'FSTK') {
             baseAddress = FEEDS_CONTRACT_ADDRESS
             stickerContract = new walletConnectWeb3.eth.Contract(FEEDS_CONTRACT_ABI, FEEDS_CONTRACT_ADDRESS)
@@ -1084,7 +1095,7 @@ export default function CreateItem() {
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       walletConnectWeb3.eth.getAccounts().then((accounts)=>{
         // console.log(accounts)
-        let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, PASAR_CONTRACT_ADDRESS)
+        let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, collection==='PEC'?PASAR_ETH_CONTRACT_ADDRESS:PASAR_CONTRACT_ADDRESS)
         if(collection === 'FSTK') {
           stickerContract = new walletConnectWeb3.eth.Contract(FEEDS_CONTRACT_ABI, FEEDS_CONTRACT_ADDRESS)
         } else if(collection === 'Choose') {
@@ -1141,7 +1152,7 @@ export default function CreateItem() {
         mintBatch()
   }
   const DiaDegree = getDiaBalanceDegree(diaBalance)
-  const baseTokenGroup = { 'PSRC': PASAR_CONTRACT_ADDRESS, 'FSTK': FEEDS_CONTRACT_ADDRESS, 'Choose': selectedCollection.token }
+  const baseTokenGroup = { 'PSRC': PASAR_CONTRACT_ADDRESS, 'PEC': PASAR_ETH_CONTRACT_ADDRESS, 'FSTK': FEEDS_CONTRACT_ADDRESS, 'Choose': selectedCollection.token }
 
   return (
     <RootStyle title="CreateItem | PASAR">
@@ -1156,8 +1167,8 @@ export default function CreateItem() {
           </Grid>
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
-              <MintingTypeButton type="ESC" description="Elastos Smart Chain" onClick={()=>{handleClickBlockchain("ESC")}} current={chainType} disabled={Boolean(true)}/>
-              <MintingTypeButton type="ETH" description="Ethereum" onClick={()=>{handleClickBlockchain("ETH")}} current={chainType} disabled={Boolean(true)}/>
+              <MintingTypeButton type="ESC" description="Elastos Smart Chain" onClick={()=>{}} current={chainType} disabled={Boolean(true)}/>
+              <MintingTypeButton type="ETH" description="Ethereum" onClick={()=>{}} current={chainType} disabled={Boolean(true)}/>
             </Stack>
           </Grid>
           <Grid item xs={12}>
@@ -1165,8 +1176,17 @@ export default function CreateItem() {
           </Grid>
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
-              <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{handleClickCollection("PSRC")}} current={collection}/>
-              <MintingTypeButton type="FSTK" description="Feeds Collection" onClick={()=>{handleClickCollection("FSTK")}} current={collection}/>
+              {
+                chainType==="ESC" &&
+                <>
+                  <MintingTypeButton type="PSRC" description="Pasar Collection" onClick={()=>{handleClickCollection("PSRC")}} current={collection}/>
+                  <MintingTypeButton type="FSTK" description="Feeds Collection" onClick={()=>{handleClickCollection("FSTK")}} current={collection}/>
+                </>
+              }
+              {
+                chainType==="ETH" &&
+                <MintingTypeButton type="PEC" description="Pasar ETH Collection" onClick={()=>{handleClickCollection("PEC")}} current={collection}/>
+              }
               <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{handleClickCollection("Choose")}} current={collection} selectedCollection={selectedCollection}/>
               {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
