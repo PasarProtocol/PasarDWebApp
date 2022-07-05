@@ -778,8 +778,8 @@ export const checkValidChain = (chainId) => {
   if (
       chainId &&
       (
-        (process.env.REACT_APP_PUBLIC_ENV !== 'development' && chainId !== 20 && chainId !== 1) ||
-        (process.env.REACT_APP_PUBLIC_ENV === 'development' && chainId !== 21 && chainId !== 3)
+        (process.env.REACT_APP_ENV === 'production' && chainId !== 20 && chainId !== 1) ||
+        (process.env.REACT_APP_ENV !== 'production' && chainId !== 21 && chainId !== 3)
       )
   )
     return false
