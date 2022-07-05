@@ -92,6 +92,7 @@ export default function CreateItem() {
   const [itemtype, setItemType] = React.useState("General");
   const [saletype, setSaleType] = React.useState("FixedPrice");
   const [collection, setCollection] = React.useState(baseToken?"Choose":"PSRC");
+  const [chainType, setChainType] = React.useState("ESC");
   const [selectedCollection, handleChooseCollection] = React.useState({token: "", name: "", symbol: "", avatar: ""});
   const [selectedERCtype, setSelectedERCtype] = React.useState(1);
   const [file, setFile] = React.useState(null);
@@ -444,6 +445,9 @@ export default function CreateItem() {
     } 
     else
       setChooseCollectionOpen(true)
+  }
+  const handleClickBlockchain = (type)=>{
+    setChainType(type)
   }
   const progressStep = (pos, index)=>{
     if(mintype!=="Batch")
@@ -1141,6 +1145,15 @@ export default function CreateItem() {
           <span role="img" aria-label="">🔨</span> Create Item 
         </Typography>
         <Grid container direction="row" spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="h4" sx={{fontWeight: 'normal'}}>Blockchain</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Stack spacing={1} direction="row">
+              <MintingTypeButton type="ESC" description="Elastos Smart Chain" onClick={()=>{handleClickBlockchain("ESC")}} current={chainType}/>
+              <MintingTypeButton type="ETH" description="Ethereum" onClick={()=>{handleClickBlockchain("ETH")}} current={chainType}/>
+            </Stack>
+          </Grid>
           <Grid item xs={12}>
             <Typography variant="h4" sx={{fontWeight: 'normal'}}>Collection</Typography>
           </Grid>
