@@ -35,7 +35,7 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser, getCredentialInfo } from '../../utils/common';
+import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser, getCredentialInfo, checkValidChain } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 import { creatAndRegister, prepareConnectToHive } from './HiveAPI';
 
@@ -63,6 +63,7 @@ export default function SignInDialog() {
     openDownloadEssential,
     afterSigninPath,
     diaBalance,
+    pasarLinkChain,
     setOpenTopAlert,
     setOpenSigninEssentialDlg,
     setOpenDownloadEssentialDlg,
@@ -70,7 +71,8 @@ export default function SignInDialog() {
     setAfterSigninPath,
     setSigninEssentialSuccess,
     setPasarLinkAddress,
-    setDiaBalance
+    setDiaBalance,
+    setPasarLinkChain
   } = useSingin();
 
   let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
@@ -125,7 +127,7 @@ export default function SignInDialog() {
         });
   }, [walletAddress])
 
-  // React.useEffect(() => {
+  React.useEffect(() => {
       // EE
       const handleEEAccountsChanged = (accounts) => {
         // console.log(accounts)
@@ -144,13 +146,9 @@ export default function SignInDialog() {
         }
       };
       const handleEEChainChanged = (chainId) => {
-        console.log(chainId)
-        // if (
-        //     chainId &&
-        //     ((process.env.REACT_APP_PUBLIC_ENV !== 'development' && chainId !== 20) ||
-        //         (process.env.REACT_APP_PUBLIC_ENV === 'development' && chainId !== 21))
-        // )
-        //     showChainErrorSnackBar();
+        setPasarLinkChain(chainId)
+        if (!checkValidChain(chainId))
+          setSnackbarOpen(true);
       };
       const handleEEDisconnect = (code, reason) => {
         console.log('Disconnect code: ', code, ', reason: ', reason);
@@ -168,7 +166,7 @@ export default function SignInDialog() {
       walletConnectProvider.on('disconnect', handleEEDisconnect);
       // Subscribe to session disconnection
       walletConnectProvider.on('error', handleEEError);
-  // }, [])
+  }, [])
 
   React.useEffect(async () => {
     initializeWalletConnection();
@@ -176,10 +174,11 @@ export default function SignInDialog() {
       setCoinUSD(res);
     });
 
-    if (chainId !== undefined && chainId !== 21 && chainId !== 20) {
+    if (!checkValidChain(chainId))
       setSnackbarOpen(true);
-    }
 
+    if(chainId)
+      setPasarLinkChain(chainId)
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     if (sessionLinkFlag) {
       // when connected
@@ -260,6 +259,7 @@ export default function SignInDialog() {
         }
       }
       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+      setPasarLinkChain(1)
       setActivatingConnector(null);
       setWalletAddress(null);
       navigate('/marketplace');
@@ -280,6 +280,7 @@ export default function SignInDialog() {
           sessionStorage.removeItem('PASAR_TOKEN');
           sessionStorage.removeItem('PASAR_DID');
           sessionStorage.removeItem('KYCedProof');
+          setPasarLinkChain(1)
           setActivatingConnector(null);
           setWalletAddress(null);
           navigate('/marketplace');
@@ -297,6 +298,7 @@ export default function SignInDialog() {
         sessionStorage.removeItem('PASAR_LINK_ADDRESS');
         sessionStorage.removeItem('PASAR_TOKEN');
         sessionStorage.removeItem('PASAR_DID');
+        setPasarLinkChain(1)
         setActivatingConnector(null);
         setWalletAddress(null);
         navigate('/marketplace');
@@ -314,6 +316,7 @@ export default function SignInDialog() {
           }
         }
         sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+        setPasarLinkChain(1)
         setActivatingConnector(null);
         setWalletAddress(null);
         navigate('/marketplace');
@@ -1012,7 +1015,7 @@ export default function SignInDialog() {
       </Dialog>
       {/* <CredentialsDlg/> */}
       <SnackbarCustom isOpen={isOpenSnackbar} setOpen={setSnackbarOpen}>
-        Wrong network, only Elastos Smart Chain is supported
+        Wrong network, only Elastos Smart Chain and Ethereum is supported
       </SnackbarCustom>
     </>
   );

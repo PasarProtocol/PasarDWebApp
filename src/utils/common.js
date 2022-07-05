@@ -732,6 +732,24 @@ export const chainTypes = [
     color: '#6A70FA'
   }
 ]
+export const checkValidChain = (chainId) => {
+  if (
+      chainId &&
+      (
+        (process.env.REACT_APP_PUBLIC_ENV !== 'development' && chainId !== 20 && chainId !== 1) ||
+        (process.env.REACT_APP_PUBLIC_ENV === 'development' && chainId !== 21 && chainId !== 3)
+      )
+  )
+    return false
+  return true
+}
+export const getChainTypeFromId = (chainId) => {
+  if (chainId===20 || chainId===21)
+    return 'ESC'
+  if (chainId===1 || chainId===3)
+    return 'ETH'
+  return ''
+}
 export const getCoinTypeFromToken = (item) => {
   let coinTypeIndex = 0
   if(item) {
