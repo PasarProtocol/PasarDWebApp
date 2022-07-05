@@ -8,13 +8,13 @@ import { Box, Button } from '@mui/material';
 import { MHidden } from '../@material-extend';
 import AssetCard from '../marketplace/AssetCard';
 import AssetCardSkeleton from '../marketplace/AssetCardSkeleton';
-import { fetchFrom, getAssetImage, getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, coinTypes } from '../../utils/common';
+import { fetchFrom, getAssetImage, setAllTokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, coinTypes, coinTypesForEthereum } from '../../utils/common';
 import { blankAddress } from '../../config'
 // ----------------------------------------------------------------------
 
 const AssetGroupSlider = (props)=>{
   const {isLoading, assets, type} = props
-  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length).fill(0));
+  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
   const [isDragging, setDragging] = React.useState(false);
   const ref = React.useRef()
 
@@ -50,26 +50,6 @@ const AssetGroupSlider = (props)=>{
     }
   }
 
-  React.useEffect(()=>{
-    setInterval(() => {
-      if(ref.current)
-        ref.current.splide.go('>');
-    }, 2500);
-
-    getCoinUSD().then((res) => {
-      setCoinPriceByType(0, res)
-    });
-    getDiaTokenPrice().then((res) => {
-      setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
-    })
-    coinTypes.forEach((token, _i)=>{
-      if(_i<2)
-        return
-      getERC20TokenPrice(token.address).then((res) => {
-        setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice)
-      })
-    })
-  }, [])
   const setCoinPriceByType = (type, value) => {
     setCoinPrice((prevState) => {
       const tempPrice = [...prevState];
@@ -77,6 +57,16 @@ const AssetGroupSlider = (props)=>{
       return tempPrice;
     });
   }
+
+  React.useEffect(()=>{
+    setInterval(() => {
+      if(ref.current)
+        ref.current.splide.go('>');
+    }, 2500);
+
+    setAllTokenPrice(setCoinPriceByType)
+  }, [])
+
   const loadingSkeletons = Array(10).fill(0)
   return (
     <Box sx={{ mx: 0 }}>

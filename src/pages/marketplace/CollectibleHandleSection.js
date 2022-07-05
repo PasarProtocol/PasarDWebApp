@@ -16,7 +16,7 @@ import SettleOrderDlg from '../../components/dialog/SettleOrder'
 import CancelDlg from '../../components/dialog/CancelSale';
 import Countdown from '../../components/Countdown';
 import useSingin from '../../hooks/useSignin';
-import { getTime, getCoinTypeFromToken, getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, coinTypes, coinTypesForEthereum } from '../../utils/common';
+import { getTime, getCoinTypeFromToken, coinTypes, coinTypesForEthereum, setAllTokenPrice } from '../../utils/common';
 import { auctionOrderType } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -45,6 +45,18 @@ export default function CollectibleHandleSection(props) {
   const [coinPrice, setCoinPrice] = useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
   const { pasarLinkAddress } = useSingin()
 
+  const setCoinPriceByType = (type, value) => {
+    setCoinPrice((prevState) => {
+      const tempPrice = [...prevState];
+      tempPrice[type] = value;
+      return tempPrice;
+    });
+  }
+
+  useEffect(()=>{
+    setAllTokenPrice(setCoinPriceByType)
+  }, [])
+
   useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     setSignin(!!sessionLinkFlag)
@@ -57,21 +69,9 @@ export default function CollectibleHandleSection(props) {
     }
   }, [pasarLinkAddress]);
 
+
   useEffect(() => {
     checkHasEnded()
-    getCoinUSD().then((res) => {
-      setCoinPriceByType(0, res)
-    });
-    getDiaTokenPrice().then((res) => {
-      setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
-    })
-    coinTypes.forEach((token, _i)=>{
-      if(_i<2)
-        return
-      getERC20TokenPrice(token.address).then((res) => {
-        setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice)
-      })
-    })
   }, [collectible]);
 
   useEffect(() => {
@@ -87,13 +87,6 @@ export default function CollectibleHandleSection(props) {
     }
     setOpenDisclaimer(true)
     setContinuePurchase(true)
-  }
-  const setCoinPriceByType = (type, value) => {
-    setCoinPrice((prevState) => {
-      const tempPrice = [...prevState];
-      tempPrice[type] = value;
-      return tempPrice;
-    });
   }
 
   const openSignin = (e)=>{
