@@ -29,6 +29,7 @@ export const blankAddress = "0x0000000000000000000000000000000000000000";
 
 const addressForProduction = {
   stickerContract: "0xF63f820F4a0bC6E966D61A4b20d24916713Ebb95",
+  stickerEthContract: "0x2Fe55AE5a47F680064e2d9afd9FcDbEbdb04d1CE",
   feedsContract: "0x020c7303664bc88ae92cE3D380BF361E03B78B81",
   // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
   marketContract: "0xaeA699E4dA22986eB6fa2d714F5AC737Fe93a998",
@@ -47,6 +48,7 @@ const addressForProduction = {
 
 const addressForTest = {
   stickerContract: "0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0",
+  stickerEthContract: "0x2Fe55AE5a47F680064e2d9afd9FcDbEbdb04d1CE",
   feedsContract: "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961",
   // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
   marketContract: "0x19088c509C390F996802B90bdc4bFe6dc3F5AAA7",

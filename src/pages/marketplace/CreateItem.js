@@ -55,12 +55,12 @@ import {
   auctionOrderType 
 } from '../../config'
 import { hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, 
-  isValidLimitPrice, checkWhetherGeneralCollection, getFilteredGasPrice } from '../../utils/common';
+  isValidLimitPrice, checkWhetherGeneralCollection, getFilteredGasPrice, getChainTypeFromId } from '../../utils/common';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useMintDlg from '../../hooks/useMintDlg';
-import useSingin from '../../hooks/useSignin';
+import useSignin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
 // ----------------------------------------------------------------------
 
@@ -127,7 +127,7 @@ export default function CreateItem() {
   const [moreDIAOpen, setOpenMoreDIA] = React.useState(false);
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps } = useMintDlg()
-  const { diaBalance } = useSingin()
+  const { diaBalance, pasarLinkChain } = useSignin()
   const { enqueueSnackbar } = useSnackbar();
   
   const isOffset = useOffSetTop(40);
@@ -150,6 +150,12 @@ export default function CreateItem() {
       return
     setOpenDisclaimer(true)
   }, []);
+
+  React.useEffect(() => {
+    console.log(pasarLinkChain)
+    const currentChain = getChainTypeFromId(pasarLinkChain)
+    setChainType(currentChain)
+  }, [pasarLinkChain]);
 
   React.useEffect(() => {
     if(selectedCollection.token){
@@ -1150,8 +1156,8 @@ export default function CreateItem() {
           </Grid>
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
-              <MintingTypeButton type="ESC" description="Elastos Smart Chain" onClick={()=>{handleClickBlockchain("ESC")}} current={chainType}/>
-              <MintingTypeButton type="ETH" description="Ethereum" onClick={()=>{handleClickBlockchain("ETH")}} current={chainType}/>
+              <MintingTypeButton type="ESC" description="Elastos Smart Chain" onClick={()=>{handleClickBlockchain("ESC")}} current={chainType} disabled={Boolean(true)}/>
+              <MintingTypeButton type="ETH" description="Ethereum" onClick={()=>{handleClickBlockchain("ETH")}} current={chainType} disabled={Boolean(true)}/>
             </Stack>
           </Grid>
           <Grid item xs={12}>

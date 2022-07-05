@@ -12,6 +12,7 @@ const initialState = {
   signinEssentialSuccess: false,
   elaConnectivityService: null,
   pasarLinkAddress: 0,
+  pasarLinkChain: 1,
   setOpenTopAlert: () => {},
   setOpenSigninEssentialDlg: () => {},
   setOpenDownloadEssentialDlg: () => {},
@@ -19,7 +20,8 @@ const initialState = {
   setSigninEssentialSuccess: () => {},
   setElastosConnectivityService: () => {},
   setDiaBalance: () => {},
-  setPasarLinkAddress: () => {}
+  setPasarLinkAddress: () => {},
+  setPasarLinkChain: () => {}
 };
 
 const SigninContext = createContext(initialState);
@@ -38,6 +40,7 @@ function SigninProvider({ children }) {
   const [elaConnectivityService, setElastosConnectivityService] = useState(false);
   const [diaBalance, setDiaBalance] = useState(0);
   const [pasarLinkAddress, setPasarLinkAddress] = useState(0);
+  const [pasarLinkChain, setPasarLinkChain] = useState(1);
 
   return (
     <SigninContext.Provider
@@ -51,6 +54,7 @@ function SigninProvider({ children }) {
         elaConnectivityService,
         diaBalance,
         pasarLinkAddress,
+        pasarLinkChain,
         setOpenTopAlert,
         setOpenSigninEssentialDlg,
         setOpenDownloadEssentialDlg,
@@ -59,7 +63,8 @@ function SigninProvider({ children }) {
         setSigninEssentialSuccess,
         setElastosConnectivityService,
         setDiaBalance,
-        setPasarLinkAddress
+        setPasarLinkAddress,
+        setPasarLinkChain
       }}
     >
       {children}
