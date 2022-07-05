@@ -281,6 +281,48 @@ export function getERC20TokenPrice(tokenAddress, connectProvider = null) {
   });
 }
 
+export function getTokenPriceInEthereum() {
+  return new Promise((resolve, reject) => {
+  // fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD')
+  // fetch("https://api.coinstats.app/public/v1/coins/ethereum?currency=USD")
+    fetch("https://api.coingecko.com/api/v3/simple/price?ids=elastos,ethereum&vs_currencies=usd")
+      .then(res=>res.json())
+      .then(resObj=>{
+        const tempPriceResult = [0, 0]
+        if(resObj && resObj.ethereum)
+          tempPriceResult[0] = resObj.ethereum.usd
+        if(resObj && resObj.elastos)
+          tempPriceResult[1] = resObj.elastos.usd
+        resolve(tempPriceResult)
+      })
+      .catch(e=>{
+        resolve([0, 0])
+      })
+  });
+}
+
+export function setAllTokenPrice(setCoinPriceByType) {
+  getCoinUSD().then((res) => {
+    setCoinPriceByType(0, res)
+  });
+  getDiaTokenPrice().then((res) => {
+    if(!res)
+      return
+    setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
+  })
+  coinTypes.forEach((token, _i)=>{
+    if(_i<2)
+      return
+    getERC20TokenPrice(token.address).then((res) => {
+      if(!res)
+        return
+      setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice)
+    })
+  })
+  getTokenPriceInEthereum().then((res) => {
+    res.forEach((value, _i)=>{setCoinPriceByType(coinTypes.length+_i, value)})
+  })
+}
 export function getDiaTokenInfo(strAddress, connectProvider = null) {
   return getERC20TokenBalance(DIA_CONTRACT_ADDRESS, strAddress, connectProvider)
 }

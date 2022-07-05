@@ -12,7 +12,7 @@ import BaseOptionChart from './BaseOptionChart';
 import LoadingScreen from '../LoadingScreen';
 import StatisticItem from '../explorer/StatisticPanel/StatisticItem'
 import useSettings from '../../hooks/useSettings';
-import { dateRangeBeforeDays, fetchFrom, getCoinTypeFromToken, getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, coinTypes } from '../../utils/common';
+import { dateRangeBeforeDays, fetchFrom, getCoinTypeFromToken, setAllTokenPrice, coinTypes, coinTypesForEthereum } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ export default function ChartArea({by, is4Address}) {
   const [clickedDataPoint, setDataPoint] = useState([0,'']);
   const [isLoadingStatisData, setLoadingStatisData] = useState(false);
   const [isLoadingVolumeChart, setLoadingVolumeChart] = useState(true);
-  const [coinPrice, setCoinPrice] = useState(Array(coinTypes.length).fill(0));
+  const [coinPrice, setCoinPrice] = useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
   const [controller, setAbortController] = useState(new AbortController());
   const baseOptionChart = BaseOptionChart()
   const mergeChartOption = (dates)=>
@@ -73,7 +73,19 @@ export default function ChartArea({by, is4Address}) {
     })
   const [optionDates, setOptionDates] = useState([]);
   const [chartOptions, setChartOptions] = useState(mergeChartOption([]));
+
+  const setCoinPriceByType = (type, value) => {
+    setCoinPrice((prevState) => {
+      const tempPrice = [...prevState];
+      tempPrice[type] = value;
+      return tempPrice;
+    });
+  }
   
+  useEffect(()=>{
+    setAllTokenPrice(setCoinPriceByType)
+  }, [])
+
   useEffect(() => {
     setChartOptions(mergeChartOption(optionDates))
   }, [optionDates, period, themeMode]);
@@ -119,30 +131,6 @@ export default function ChartArea({by, is4Address}) {
       updateChart(period, volumeList);
   }, [isLoadingVolumeChart, volumeList, coinPrice]);
   
-  useEffect(()=>{
-    getCoinUSD().then((res) => {
-      setCoinPriceByType(0, res)
-    });
-    getDiaTokenPrice().then((res) => {
-      setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
-    })
-    coinTypes.forEach((token, _i)=>{
-      if(_i<2)
-        return
-      getERC20TokenPrice(token.address).then((res) => {
-        setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice)
-      })
-    })
-  }, [])
-
-  const setCoinPriceByType = (type, value) => {
-    setCoinPrice((prevState) => {
-      const tempPrice = [...prevState];
-      tempPrice[type] = value;
-      return tempPrice;
-    });
-  }
-
   const updateChart = (period, volumeList) => {
     let days = 0;
     switch(period){

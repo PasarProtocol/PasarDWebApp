@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
 import AssetCardSkeleton from './AssetCardSkeleton';
-import { getAssetImage, getCoinUSD, getDiaTokenPrice, getERC20TokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, coinTypes, coinTypesForEthereum } from '../../utils/common';
+import { getAssetImage, setAllTokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, coinTypes, coinTypesForEthereum } from '../../utils/common';
 import { blankAddress } from '../../config';
 // ----------------------------------------------------------------------
 const StackedGrid = ({
@@ -20,25 +20,6 @@ const StackedGrid = ({
 );
 const GridItems = (props) => {
   const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
-  React.useEffect(()=>{
-    getCoinUSD().then((res) => {
-      setCoinPriceByType(0, res)
-    });
-    getDiaTokenPrice().then((res) => {
-      if(!res)
-        return
-      setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
-    })
-    coinTypes.forEach((token, _i)=>{
-      if(_i<2)
-        return
-      getERC20TokenPrice(token.address).then((res) => {
-        if(!res)
-          return
-        setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice)
-      })
-    })
-  }, [])
   const setCoinPriceByType = (type, value) => {
     setCoinPrice((prevState) => {
       const tempPrice = [...prevState];
@@ -46,6 +27,10 @@ const GridItems = (props) => {
       return tempPrice;
     });
   }
+
+  React.useEffect(()=>{
+    setAllTokenPrice(setCoinPriceByType)
+  }, [])
   return <>
       {props.assets.map((item, index) => {
         const coinType = getCoinTypeFromToken(item)
