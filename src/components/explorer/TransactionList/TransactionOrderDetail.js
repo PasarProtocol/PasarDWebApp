@@ -59,7 +59,7 @@ const StackColStyle = styled(Stack)(({ theme }) => ({
     }
 }));
 export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
-    const { event, tHash, v1Event=false } = item
+    const { event, tHash, v1Event=false, marketPlace=1 } = item
     const method = event!==undefined?event:item.method
     const timestamp = getTime(item.timestamp)
     const price = parseFloat((item.price/ 10 ** 18).toFixed(3))
@@ -75,12 +75,13 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
     if(!methodItem)
         methodItem = {color: 'grey', icon: 'tag', detail: []}
 
-    let totalSum = `${gasFee} ELA`
+    const feeTokenName = marketPlace!==2 ? 'ELA' : 'ETH'
+    let totalSum = `${gasFee} ${feeTokenName}`
     if(method==="BuyOrder") {
-        if(coinType.index===0)
-            totalSum = `${price + gasFee} ELA`
+        if(coinName === feeTokenName)
+            totalSum = `${price + gasFee} ${feeTokenName}`
         else
-            totalSum = `${price} ${coinName} + ${gasFee} ELA`
+            totalSum = `${price} ${coinName} + ${gasFee} ${feeTokenName}`
     }
     return (
         <RootStyle>
@@ -219,7 +220,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                                 </td>
                                                 <td align="right">
                                                     <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                                                        {gasFee} ELA
+                                                        {gasFee} {feeTokenName}
                                                     </Typography>
                                                 </td>
                                             </tr>
@@ -233,7 +234,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                             </td>
                                             <td align="right">
                                                 <Typography variant="body2" color='text.secondary' sx={eventStyle} noWrap>
-                                                    {gasFee} ELA
+                                                    {gasFee} {feeTokenName}
                                                 </Typography>
                                             </td>
                                         </tr>
