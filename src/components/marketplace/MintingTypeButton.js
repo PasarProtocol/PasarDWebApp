@@ -76,7 +76,7 @@ const MintingTypeButton = (props)=>{
                 </Box>
             }
             {
-                (type==="PSRC"||type==="PEC")&&
+                (type==="PSRC"||type==="PSREC")&&
                 <Box sx={commonSx}>
                     <Box draggable = {false} component="img" src="/static/logo-icon.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26}, filter: current===type?'none':'brightness(5)' }} />
                 </Box>
