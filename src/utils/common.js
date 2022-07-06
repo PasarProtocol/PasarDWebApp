@@ -9,12 +9,9 @@ import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sd
 import jwtDecode from 'jwt-decode';
 
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
-import useSignin from '../hooks/useSignin';
 import { 
   ESC_CONTRACT,
   ETH_CONTRACT,
-  stickerContract as STICKER_ADDRESS, 
-  stickerEthContract as STICKER_ETH_ADDRESS, 
   marketContract as MARKET_CONTRACT_ADDRESS, 
   marketEthContract as MARKET_ETH_CONTRACT_ADDRESS, 
   v1marketContract as V1_MARKET_CONTRACT_ADDRESS,
@@ -461,19 +458,19 @@ export function callContractMethod(type, coinType, paramObj) {
             let method = null;
             if (type === 'createOrderForSale') {
               console.log('createOrderForSale');
-              const { _id, _amount, _price, _didUri, _baseAddress = STICKER_ADDRESS } = paramObj;
+              const { _id, _amount, _price, _didUri, _baseAddress } = paramObj;
               console.log(_baseAddress, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri)
               method = marketContract.methods.createOrderForSale(_baseAddress, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri);
             } else if (type === 'createOrderForSaleBatch') {
               console.log('createOrderForSaleBatch');
-              const { _ids, _amounts, _price, _didUri, _baseAddress = STICKER_ADDRESS } = paramObj;
+              const { _ids, _amounts, _price, _didUri, _baseAddress } = paramObj;
               const _prices = Array(_ids.length).fill(_price)
               const _startTimes = Array(_ids.length).fill((new Date().getTime()/1000).toFixed())
               console.log(_baseAddress, _ids, _amounts, pricingContract[coinType], _prices, _startTimes, _didUri)
               method = marketContract.methods.createOrderForSaleBatch(_baseAddress, _ids, _amounts, pricingContract[coinType], _prices, _startTimes, _didUri);
             } else if (type === 'createOrderForAuction') {
               console.log('createOrderForAuction');
-              const { _id, _amount, _minPrice, _reservePrice, _buyoutPrice, _endTime, _didUri, _baseAddress = STICKER_ADDRESS } = paramObj;
+              const { _id, _amount, _minPrice, _reservePrice, _buyoutPrice, _endTime, _didUri, _baseAddress } = paramObj;
               console.log(_baseAddress, _id, _amount, pricingContract[coinType], _minPrice, _reservePrice, _buyoutPrice, (new Date().getTime()/1000).toFixed(), _endTime, _didUri)
               method = marketContract.methods.createOrderForAuction(_baseAddress, _id, _amount, pricingContract[coinType], _minPrice, _reservePrice, _buyoutPrice, (new Date().getTime()/1000).toFixed(), _endTime, _didUri);
             } else if (type === 'buyOrder') {

@@ -16,7 +16,7 @@ import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import DIABadge from '../DIABadge';
 import { removeLeadingZero, isInAppBrowser, coinTypes, callContractMethod, isValidLimitPrice, getDiaBalanceDegree } from '../../utils/common';
-import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
+import { auctionOrderType } from '../../config';
 import useSignin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
 

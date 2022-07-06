@@ -14,8 +14,9 @@ import RingAvatar from '../RingAvatar';
 import IconLinkButtonGroup from '../collection/IconLinkButtonGroup'
 import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, downloadAvatar } from '../signin-dlg/HiveAPI'
 import { downloadFromUrl } from '../signin-dlg/HiveService'
-import { reduceHexAddress, getDidInfoFromAddress, collectionTypes, getDiaTokenInfo } from '../../utils/common';
-import { stickerContract as STICKER_ADDRESS } from '../../config';
+import { reduceHexAddress, getDidInfoFromAddress, collectionTypes, getDiaTokenInfo, getContractAddressInCurrentNetwork } from '../../utils/common';
+import useSingin from '../../hooks/useSignin';
+
 // ----------------------------------------------------------------------
 
 const AvatarBoxStyle = {
@@ -57,10 +58,12 @@ export default function BadgeProfile(props) {
   const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [badge, setBadge] = React.useState({dia: 0, kyc: false});
   const [socials, setSocials] = React.useState({});
+  const { pasarLinkChain } = useSingin()
+  const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker')
 
   const defaultCollection = {
     ...collectionTypes[defaultCollectionType],
-    token: STICKER_ADDRESS,
+    token: PasarContractAddress,
     description: collectionTypes[defaultCollectionType].shortDescription
   }
 

@@ -18,7 +18,7 @@ import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
 import { reduceHexAddress, getAssetImage, fetchFrom, getCollectionTypeFromImageUrl, collectionTypes } from '../../utils/common';
-import { stickerContract as STICKER_ADDRESS } from '../../config';
+import { ESC_CONTRACT } from '../../config';
 
 // ----------------------------------------------------------------------
 
@@ -65,7 +65,6 @@ export default function CollectibleDetail() {
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const imageRef = React.useRef();
   React.useEffect(async () => {
-    const resCollectible = await 
     fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`)
       .then((response) => {
         response.json().then((jsonCollectible) => {
@@ -74,28 +73,29 @@ export default function CollectibleDetail() {
             return
           }
           const jsonData = jsonCollectible.data
-          if(jsonData.baseToken && jsonData.baseToken===STICKER_ADDRESS) {
-            const defaultCollection = getCollectionTypeFromImageUrl(jsonData)
-            jsonData.collection = collectionTypes[defaultCollection].name
-            jsonData.is721 = false
-          }
-          else if(jsonData.baseToken && jsonData.baseToken!==STICKER_ADDRESS) {
-            jsonData.collection = ''
-            jsonData.is721 = false
-            fetchFrom(`api/v2/sticker/getCollection/${jsonData.baseToken}`)
-              .then((response) => {
-                response.json().then((jsonAssets) => {
-                  if(!jsonAssets.data)
-                    return
-                  setCollectible((prevState)=>{
-                    const tempCollectible = {...prevState}
-                    tempCollectible.collection = jsonAssets.data.name
-                    tempCollectible.is721 = jsonAssets.data.is721
-                    return tempCollectible
+          if(jsonData.baseToken) {
+            if(jsonData.baseToken===ESC_CONTRACT.sticker) {
+              const defaultCollection = getCollectionTypeFromImageUrl(jsonData)
+              jsonData.collection = collectionTypes[defaultCollection].name
+              jsonData.is721 = false
+            } else {
+              jsonData.collection = ''
+              jsonData.is721 = false
+              fetchFrom(`api/v2/sticker/getCollection/${jsonData.baseToken}`)
+                .then((response) => {
+                  response.json().then((jsonAssets) => {
+                    if(!jsonAssets.data)
+                      return
+                    setCollectible((prevState)=>{
+                      const tempCollectible = {...prevState}
+                      tempCollectible.collection = jsonAssets.data.name
+                      tempCollectible.is721 = jsonAssets.data.is721
+                      return tempCollectible
+                    });
+                  }).catch((e) => {
                   });
-                }).catch((e) => {
-                });
-              })
+                })
+            }
           }
           setCollectible(jsonData);
           setLoadingCollectible(false);
