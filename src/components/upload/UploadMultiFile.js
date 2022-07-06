@@ -53,7 +53,7 @@ UploadMultiFile.propTypes = {
   sx: PropTypes.object
 };
 
-export default function UploadMultiFile({ error, showPreview = false, files, onRemove, onRemoveAll, isAvatar, sx, ...other }) {
+export default function UploadMultiFile({ error, showPreview = false, files, onRemove, onRemoveAll, isAvatar, disabled, sx, ...other }) {
   const hasFile = files.length > 0;
 
   const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
@@ -127,7 +127,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
             <Typography variant="body2">
               or
             </Typography>
-            <Button variant="contained" {...getRootProps()}>
+            <Button variant="contained" {...getRootProps()} disabled={disabled}>
               Choose File
             </Button>
           </Stack>

@@ -21,6 +21,7 @@ import gifDurations from 'gif-me-duration';
 import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import MintingTypeButton from '../../components/marketplace/MintingTypeButton';
+import NetworkBox from '../../components/marketplace/NetworkBox';
 import ItemTypeButton from '../../components/marketplace/ItemTypeButton';
 import { UploadMultiFile, UploadSingleFile } from '../../components/upload';
 import AssetCard from '../../components/marketplace/AssetCard';
@@ -101,6 +102,7 @@ export default function CreateItem() {
   const [singleName, setSingleName] = React.useState("");
   const [multiNames, setMultiNames] = React.useState([]);
   const [previewFiles, setPreviewFiles] = React.useState([]);
+  const [explicitState, setExplicitState] = React.useState(false);
   const [isPutOnSale, setPutOnSale] = React.useState(false);
   const [isBuynowForAuction, setBuynowForAuction] = React.useState(false);
   const [isReserveForAuction, setReserveForAuction] = React.useState(false);
@@ -153,13 +155,18 @@ export default function CreateItem() {
   }, []);
 
   React.useEffect(() => {
-    console.log(pasarLinkChain)
+    // console.log(pasarLinkChain)
     const currentChain = getChainTypeFromId(pasarLinkChain)
     setChainType(currentChain)
     if(currentChain === 'ESC')
       handleClickCollection('PSRC')
     else if(currentChain === 'ETH')
       handleClickCollection('PEC')
+    else{
+      setMintType('Single')
+      setExplicitState(false)
+      setPutOnSale(false)
+    }
   }, [pasarLinkChain]);
 
   React.useEffect(() => {
@@ -366,6 +373,10 @@ export default function CreateItem() {
     setFiles(filteredItems);
   };
 
+  const handleExplicitState = (event) => {
+    setExplicitState(event.target.checked);
+  };
+  
   const handlePutOnSale = (event) => {
     setPutOnSale(event.target.checked);
   };
@@ -840,7 +851,7 @@ export default function CreateItem() {
           "size": added.origin.size,
           "thumbnail": `pasar:image:${added.thumbnail.path}`,
         },
-        "adult": explicitRef.current.checked,
+        "adult": explicitState,
         "properties": propertiesObj,
       }
 
@@ -1163,12 +1174,16 @@ export default function CreateItem() {
         </Typography>
         <Grid container direction="row" spacing={2}>
           <Grid item xs={12}>
-            <Typography variant="h4" sx={{fontWeight: 'normal'}}>Blockchain</Typography>
+            <Typography variant="h4" sx={{fontWeight: 'normal'}}>
+              Current Network&nbsp;
+              <Tooltip title="This is your current network. You can change to a different network from your wallet network settings" arrow disableInteractive enterTouchDelay={0}>
+                <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
+              </Tooltip>
+            </Typography>
           </Grid>
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
-              <MintingTypeButton type="ESC" description="Elastos Smart Chain" onClick={()=>{}} current={chainType} disabled={Boolean(true)}/>
-              <MintingTypeButton type="ETH" description="Ethereum" onClick={()=>{}} current={chainType} disabled={Boolean(true)}/>
+              <NetworkBox current={chainType}/>
             </Stack>
           </Grid>
           <Grid item xs={12}>
@@ -1187,7 +1202,7 @@ export default function CreateItem() {
                 chainType==="ETH" &&
                 <MintingTypeButton type="PEC" description="Pasar ETH Collection" onClick={()=>{handleClickCollection("PEC")}} current={collection}/>
               }
-              <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{handleClickCollection("Choose")}} current={collection} selectedCollection={selectedCollection}/>
+              <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{handleClickCollection("Choose")}} current={collection} selectedCollection={selectedCollection} disabled={!chainType}/>
               {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
                   <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
@@ -1200,7 +1215,7 @@ export default function CreateItem() {
           </Grid>
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
-              <MintingTypeButton type="Single" description="Single item" onClick={()=>{setMintType("Single")}} current={mintype}/>
+              <MintingTypeButton type="Single" description="Single item" onClick={()=>{setMintType("Single")}} current={mintype} disabled={!chainType}/>
               {
                 !(collection==="Choose" && selectedERCtype===0) && 
                 <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
@@ -1211,7 +1226,7 @@ export default function CreateItem() {
               }
               {
                 collection!=='FSTK' &&
-                <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype}/>
+                <MintingTypeButton type="Batch" description="Multiple non-identical items" onClick={()=>{setMintType("Batch")}} current={mintype} disabled={!chainType}/>
               }
             </Stack>
           </Grid>
@@ -1220,8 +1235,8 @@ export default function CreateItem() {
           </Grid>
           <Grid item xs={12}>
             <Stack spacing={1} direction="row">
-              <ItemTypeButton type="General" onClick={()=>{setItemType("General")}} current={itemtype}/>
-              <ItemTypeButton type="Avatar" onClick={()=>{setItemType("Avatar")}} current={itemtype}/>
+              <ItemTypeButton type="General" onClick={()=>{setItemType("General")}} current={itemtype} disabled={!chainType}/>
+              <ItemTypeButton type="Avatar" onClick={()=>{setItemType("Avatar")}} current={itemtype} disabled={!chainType}/>
             </Stack>
           </Grid>
           <Grid item xs={12} sm={8}>
@@ -1239,7 +1254,8 @@ export default function CreateItem() {
                       onDrop={handleDropSingleFile}
                       isAvatar={itemtype==="Avatar"}
                       onRemove={handleSingleRemove}
-                      accept=".jpg, .png, .jpeg, .gif"/>
+                      accept=".jpg, .png, .jpeg, .gif"
+                      disabled={!chainType}/>
                     <FormHelperText error={isOnValidation&&!file} hidden={!isOnValidation||(isOnValidation&&file!==null)}>Image file is required</FormHelperText>
                   </>:
                   <>
@@ -1252,6 +1268,7 @@ export default function CreateItem() {
                       onRemove={handleRemove}
                       onRemoveAll={handleRemoveAll}
                       accept=".jpg, .png, .jpeg, .gif"
+                      disabled={!chainType}
                       sx={{pb:1}}/>
                     <FormHelperText error={isOnValidation&&!files.length} hidden={!isOnValidation||(isOnValidation&&files.length>0)}>Image files are required</FormHelperText>
                     {files.length>0&&<Divider/>}
@@ -1281,6 +1298,7 @@ export default function CreateItem() {
                         inputProps={{
                           maxLength: 50
                         }}
+                        disabled={!chainType}
                       />
                       <FormHelperText id="name-error-text" hidden={!isOnValidation||(isOnValidation&&singleName.length>0)}>Item name is required</FormHelperText>
                     </FormControl>
@@ -1311,6 +1329,7 @@ export default function CreateItem() {
                     inputProps={{
                       maxLength: 300
                     }}
+                    disabled={!chainType}
                   />
                   <FormHelperText id="description-error-text" hidden={!isOnValidation||(isOnValidation&&description.length>0)}>Description is required</FormHelperText>
                 </FormControl>
@@ -1329,7 +1348,7 @@ export default function CreateItem() {
                     Set this item as explicit and sensitive content
                   </InputLabelStyle>
                   <FormControlLabel
-                    control={<CustomSwitch inputRef={explicitRef}/>}
+                    control={<CustomSwitch checked={explicitState} onChange={handleExplicitState} disabled={!chainType}/>}
                     sx={{mt:-1, mr: 0}}
                     label=""
                   />
@@ -1345,7 +1364,7 @@ export default function CreateItem() {
                     List on market directly after minting
                   </InputLabelStyle>
                   <FormControlLabel
-                    control={<CustomSwitch onChange={handlePutOnSale}/>}
+                    control={<CustomSwitch checked={isPutOnSale} onChange={handlePutOnSale} disabled={!chainType}/>}
                     sx={{mt:-1, mr: 0}}
                     label=""
                   />
@@ -1595,6 +1614,7 @@ export default function CreateItem() {
                         onChange={handleChangeRoyalties}
                         startAdornment={' '}
                         endAdornment='%'
+                        disabled={!chainType}
                       />
                     </FormControl>
                     <Divider/>
@@ -1649,6 +1669,7 @@ export default function CreateItem() {
                               onChange={(e)=>{handleSingleProperties('type', index, e)}}
                               error={isOnValidation&&duproperties.includes(property.type)}
                               helperText={isOnValidation&&duproperties.includes(property.type)?'Duplicated type':''}
+                              disabled={!chainType}
                             />
                           </Grid>
                           <Grid item xs={6}>
@@ -1660,6 +1681,7 @@ export default function CreateItem() {
                               onChange={(e)=>{handleSingleProperties('name', index, e)}}
                               error={isOnValidation&&property.type.length>0&&!property.name.length}
                               helperText={isOnValidation&&property.type.length>0&&!property.name.length?'Can not be empty.':''}
+                              disabled={!chainType}
                             />
                           </Grid>
                         </Grid>
@@ -1712,7 +1734,7 @@ export default function CreateItem() {
               }
               <MHidden width="smDown">
                 <Grid item xs={12}>
-                  <LoadingButton loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth>
+                  <LoadingButton loading={onProgress} variant="contained" onClick={handleMintAction} fullWidth disabled={!chainType}>
                     Create
                   </LoadingButton>
                 </Grid>
