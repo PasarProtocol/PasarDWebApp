@@ -765,7 +765,7 @@ export const socialTypes = ['Website', 'Profile', 'Feeds', 'Twitter', 'Discord',
 export const chainTypes = [
   {
     icon: 'badges/ELA-network.svg',
-    name: 'Elastos Smart Chain (ESC)',
+    name: 'Elastos Smart Chain',
     color: (theme)=>theme.palette.origin.main
   },
   {

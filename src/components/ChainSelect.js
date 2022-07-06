@@ -15,11 +15,7 @@ const MenuProps = {
   },
   variant: "menu"
 }
-const menuItems = [
-  {name: 'All Blockchains', icon: 'blockchain.svg', color: 'black'}, 
-  {...chainTypes[0], name: 'Elastos Smart Chain'}, 
-  {...chainTypes[1]}
-]
+const menuItems = [ {name: 'All Blockchains', icon: 'blockchain.svg', color: 'black'}, ...chainTypes]
 
 export default function ChainSelect({ selected, onChange, sx={} }) {
   const handleChange = (event) => {

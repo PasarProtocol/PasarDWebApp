@@ -474,6 +474,9 @@ export default function CollectibleDetail() {
     chainType = collectible.marketPlace - 1
   else if(!collectible || Object.keys(collectible).length===0)
     chainType = -1
+
+  const tempChainTypes = [...chainTypes]
+  tempChainTypes[0].name = 'Elastos Smart Chain (ESC)'
   return (
     <RootStyle title="Collectible | PASAR">
       <ScrollManager scrollKey="asset-detail-key"/>
@@ -730,10 +733,10 @@ export default function CollectibleDetail() {
                       <Box sx={{borderRadius: '100%', overflow: 'hidden', mr: 1}}>
                         <AvatarStyle 
                           component="img" 
-                          src={`/static/${chainTypes[chainType].icon}`} 
+                          src={`/static/${tempChainTypes[chainType].icon}`} 
                           draggable = {false}
                           sx={{
-                            background: chainTypes[chainType].color, 
+                            background: tempChainTypes[chainType].color, 
                             p: '9px',
                             borderRadius: 0,
                             mr: 0
@@ -741,7 +744,7 @@ export default function CollectibleDetail() {
                         />
                       </Box>
                       <Box sx={{ minWidth: 0, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-                        <Typography variant="body2" sx={{alignItems: 'center', wordBreak: 'break-all'}}>{chainTypes[chainType].name}</Typography>
+                        <Typography variant="body2" sx={{alignItems: 'center', wordBreak: 'break-all'}}>{tempChainTypes[chainType].name}</Typography>
                       </Box>
                     </>
                   }

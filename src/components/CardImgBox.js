@@ -82,8 +82,6 @@ const CardImgBox = (props) => {
       themeProp.baseColor = '#333d48'
       themeProp.highlightColor = '#434d58'
     }
-    const tempChainTypes = [...chainTypes]
-    tempChainTypes[0].name = 'Elastos Smart Chain'
     return (
       <BoxStyle className='card-img' sx={{opacity: isMoreLink?.5:1}}>
         {
@@ -109,8 +107,8 @@ const CardImgBox = (props) => {
           />
         </Box>
         <Box className='chain-type' sx={{position: 'absolute', bottom: 10, width: '100%', textAlign: 'center', opacity: 0, transition: 'opacity .2s'}}>
-          <Box sx={{bgcolor: tempChainTypes[marketPlace-1].color, borderRadius: 2, display: 'inline-flex', px: '10px', py: 1}}>
-            <Typography variant='subtitle2' color='white'>{tempChainTypes[marketPlace-1].name}</Typography>
+          <Box sx={{bgcolor: chainTypes[marketPlace-1].color, borderRadius: 2, display: 'inline-flex', px: '10px', py: 1}}>
+            <Typography variant='subtitle2' color='white'>{chainTypes[marketPlace-1].name}</Typography>
           </Box>
         </Box>
       </BoxStyle>

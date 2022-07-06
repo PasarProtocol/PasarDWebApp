@@ -43,7 +43,7 @@ UploadSingleFile.propTypes = {
   sx: PropTypes.object
 };
 
-export default function UploadSingleFile({ error, file, onRemove, isAvatar, sx, ...other }) {
+export default function UploadSingleFile({ error, file, onRemove, isAvatar, disabled, sx, ...other }) {
   const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
     multiple: false,
     ...other
@@ -116,7 +116,7 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, sx, 
               <Typography variant="body2">
                 or
               </Typography>
-              <Button variant="contained" {...getRootProps()}>
+              <Button variant="contained" {...getRootProps()} disabled={disabled}>
                 Choose File
               </Button>
             </Stack>
