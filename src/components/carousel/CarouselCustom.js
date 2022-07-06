@@ -11,7 +11,7 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import { CarouselControlsPaging2 } from './controls';
 import CopyButton from '../CopyButton';
 import { getTime, reduceHexAddress } from '../../utils/common';
-import {stickerContract, marketContract, blockchain} from '../../config'
+import {marketContract, blockchain} from '../../config'
 
 // ----------------------------------------------------------------------
 

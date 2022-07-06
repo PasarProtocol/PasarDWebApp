@@ -6,20 +6,18 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
 
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import {
-  stickerContract as PASAR_CONTRACT_ADDRESS,
-  feedsContract as FEEDS_CONTRACT_ADDRESS,
-  marketContract as MARKET_CONTRACT_ADDRESS,
-  blankAddress
-} from '../../config';
-import { reduceHexAddress, isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
+import { blankAddress } from '../../config';
+import { reduceHexAddress, isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
+import useSingin from '../../hooks/useSignin';
 
 export default function DeleteItem(props) {
   const { isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate, v1State=false } = props;
-  const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const { pasarLinkChain } = useSingin();
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -29,8 +27,9 @@ export default function DeleteItem(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
+    const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker')
     const contractAbi = STICKER_CONTRACT_ABI;
-    const contractAddress = baseToken || PASAR_CONTRACT_ADDRESS;
+    const contractAddress = baseToken || PasarContractAddress;
     const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
     const _gasPrice = await walletConnectWeb3.eth.getGasPrice();

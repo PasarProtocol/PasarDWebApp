@@ -5,7 +5,7 @@ import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
-import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS, v1marketContract as V1_MARKET_CONTRACT_ADDRESS } from '../../config';
+import { marketContract as MARKET_CONTRACT_ADDRESS, v1marketContract as V1_MARKET_CONTRACT_ADDRESS } from '../../config';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { isInAppBrowser, getFilteredGasPrice } from '../../utils/common';

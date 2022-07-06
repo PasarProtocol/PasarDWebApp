@@ -35,7 +35,7 @@ import CardImgBox from '../CardImgBox';
 import useSingin from '../../hooks/useSignin';
 import BadgeProfile from './BadgeProfile'
 import StyledButton from '../signin-dlg/StyledButton';
-import { auctionOrderType, stickerContract as STICKER_ADDRESS } from '../../config';
+import { auctionOrderType } from '../../config';
 import { getDiaTokenInfo, getCredentialInfo, coinTypes, fetchFrom, collectionTypes, getIpfsUrl } from '../../utils/common';
 
 // ----------------------------------------------------------------------

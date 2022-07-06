@@ -13,14 +13,10 @@ import { useSnackbar } from 'notistack';
 
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import {
-  stickerContract as PASAR_CONTRACT_ADDRESS,
-  feedsContract as FEEDS_CONTRACT_ADDRESS,
-  marketContract as MARKET_CONTRACT_ADDRESS
-} from '../../config';
-import { reduceHexAddress, removeLeadingZero, isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
+import { reduceHexAddress, removeLeadingZero, isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
+import useSingin from '../../hooks/useSignin';
 
 export default function Transfer(props) {
     const {isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate, v1State=false} = props
@@ -30,6 +26,7 @@ export default function Transfer(props) {
     const [isOpenAdvanced, setOpenAdvanced] = React.useState(false);
     const [memo, setMemo] = React.useState('');
     const [isOnValidation, setOnValidation] = React.useState(false);
+    const { pasarLinkChain } = useSingin()
 
     const handleClose = () => {
       setOnValidation(false)
@@ -41,13 +38,14 @@ export default function Transfer(props) {
     }
 
     const callSafeTransferFrom = (_to, _id, _value) => {
+      const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker')
       let walletConnectProvider = Web3.givenProvider;
       if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2')
         walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
       const walletConnectWeb3 = new Web3(walletConnectProvider);
       walletConnectWeb3.eth.getAccounts().then(accounts=>{
         const contractAbi = STICKER_CONTRACT_ABI;
-        const contractAddress = baseToken || PASAR_CONTRACT_ADDRESS;
+        const contractAddress = baseToken || PasarContractAddress;
         const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
     
         walletConnectWeb3.eth.getGasPrice().then(_gasPrice=>{

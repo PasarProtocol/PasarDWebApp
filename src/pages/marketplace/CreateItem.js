@@ -49,15 +49,14 @@ import { FEEDS_STICKER_CONTRACT_ABI as FEEDS_CONTRACT_ABI } from '../../abi/feed
 import { TOKEN_721_ABI } from '../../abi/token721ABI'
 import { TOKEN_1155_ABI } from '../../abi/token1155ABI'
 import { 
-  stickerContract as PASAR_CONTRACT_ADDRESS, 
-  stickerEthContract as PASAR_ETH_CONTRACT_ADDRESS, 
+  ESC_CONTRACT, ETH_CONTRACT,
   feedsContract as FEEDS_CONTRACT_ADDRESS, 
   marketContract as MARKET_CONTRACT_ADDRESS, 
   ipfsURL, 
   auctionOrderType 
 } from '../../config'
 import { hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, 
-  isValidLimitPrice, checkWhetherGeneralCollection, getFilteredGasPrice, getChainTypeFromId } from '../../utils/common';
+  isValidLimitPrice, checkWhetherGeneralCollection, getFilteredGasPrice, getChainTypeFromId, getContractAddressInCurrentNetwork } from '../../utils/common';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
@@ -510,10 +509,7 @@ export default function CreateItem() {
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           // console.log(accounts)
-          let baseAddress = PASAR_CONTRACT_ADDRESS
-          if(collection === 'PSREC')
-            baseAddress = PASAR_ETH_CONTRACT_ADDRESS
-
+          let baseAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker')
           let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, baseAddress)
           if(collection === 'FSTK') {
             baseAddress = FEEDS_CONTRACT_ADDRESS
@@ -661,10 +657,7 @@ export default function CreateItem() {
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
           // console.log(accounts)
-          let baseAddress = PASAR_CONTRACT_ADDRESS
-          if(collection === 'PSREC')
-            baseAddress = PASAR_ETH_CONTRACT_ADDRESS
-
+          let baseAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker')
           let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, baseAddress)
           if(collection === 'FSTK') {
             baseAddress = FEEDS_CONTRACT_ADDRESS
@@ -1106,7 +1099,8 @@ export default function CreateItem() {
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       walletConnectWeb3.eth.getAccounts().then((accounts)=>{
         // console.log(accounts)
-        let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, collection==='PSREC'?PASAR_ETH_CONTRACT_ADDRESS:PASAR_CONTRACT_ADDRESS)
+        const baseAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker')
+        let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, baseAddress)
         if(collection === 'FSTK') {
           stickerContract = new walletConnectWeb3.eth.Contract(FEEDS_CONTRACT_ABI, FEEDS_CONTRACT_ADDRESS)
         } else if(collection === 'Choose') {
@@ -1163,7 +1157,7 @@ export default function CreateItem() {
         mintBatch()
   }
   const DiaDegree = getDiaBalanceDegree(diaBalance)
-  const baseTokenGroup = { 'PSRC': PASAR_CONTRACT_ADDRESS, 'PSREC': PASAR_ETH_CONTRACT_ADDRESS, 'FSTK': FEEDS_CONTRACT_ADDRESS, 'Choose': selectedCollection.token }
+  const baseTokenGroup = { 'PSRC': ESC_CONTRACT.sticker, 'PSREC': ETH_CONTRACT.sticker, 'FSTK': FEEDS_CONTRACT_ADDRESS, 'Choose': selectedCollection.token }
 
   return (
     <RootStyle title="CreateItem | PASAR">

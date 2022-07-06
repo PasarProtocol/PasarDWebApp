@@ -8,7 +8,6 @@ import { useSnackbar } from 'notistack';
 import { Icon } from '@iconify/react';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import {
-  stickerContract as CONTRACT_ADDRESS,
   marketContract as MARKET_CONTRACT_ADDRESS,
   blankAddress
 } from '../../config';
