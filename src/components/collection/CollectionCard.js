@@ -210,7 +210,7 @@ const CollectionCardPaper = (props) => {
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: 0, kyc: false});
-  const { setOpenDownloadEssentialDlg } = useSingin()
+  const { setOpenDownloadEssentialDlg, pasarLinkChain } = useSingin()
   const navigate = useNavigate();
   // const apikey = [
   //   {api: 'getTotalPriceCollectibles', field: 'total'},
@@ -238,8 +238,8 @@ const CollectionCardPaper = (props) => {
   //   }
   // }, [token]);
   React.useEffect(() => {
-    checkWhetherGeneralCollection(token).then(setIsGeneralCollection)
-  }, [token]);
+    checkWhetherGeneralCollection(pasarLinkChain, token).then(setIsGeneralCollection)
+  }, [token, pasarLinkChain]);
   React.useEffect(() => {
     const metaUri = getIpfsUrl(uri)
     if(metaUri) {

@@ -171,11 +171,11 @@ export default function CreateItem() {
 
   React.useEffect(() => {
     if(selectedCollection.token){
-      checkWhetherGeneralCollection(selectedCollection.token)
+      checkWhetherGeneralCollection(pasarLinkChain, selectedCollection.token)
         .then(setIsGeneralCollection)
       setCollection("Choose")
     }
-  }, [selectedCollection.token]);
+  }, [selectedCollection.token, pasarLinkChain]);
 
   React.useEffect(async () => {
     if(mintype!=="Multiple")

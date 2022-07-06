@@ -53,6 +53,8 @@ export default function Explorer() {
         response.json().then((jsonAssets) => {
           if(Array.isArray(jsonAssets.data))
             setCollections(jsonAssets.data);
+          else 
+            setCollections([])
           setLoadingCollections(false);
         }).catch((e) => {
           setLoadingCollections(false);

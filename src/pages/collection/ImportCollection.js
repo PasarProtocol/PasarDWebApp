@@ -27,12 +27,12 @@ import RegisterCollectionDlg from '../../components/dialog/RegisterCollection';
 import NeedMoreDIADlg from '../../components/dialog/NeedMoreDIA';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 
-import {REGISTER_CONTRACT_ABI} from '../../abi/registerABI'
-import {registerContract as CONTRACT_ADDRESS, ipfsURL} from '../../config'
+import { REGISTER_CONTRACT_ABI } from '../../abi/registerABI'
+import { ipfsURL } from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
-import useSingin from '../../hooks/useSignin';
+import useSignin from '../../hooks/useSignin';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, getContractInfo, getFilteredGasPrice, socialTypes, getDiaBalanceDegree, fetchFrom } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, getContractInfo, getFilteredGasPrice, socialTypes, getDiaBalanceDegree, fetchFrom, getContractAddressInCurrentNetwork } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -78,7 +78,7 @@ export default function ImportCollection() {
   const uploadBackgroundRef = React.useRef();
   const descriptionRef = React.useRef();
 
-  const { diaBalance } = useSingin()
+  const { diaBalance, pasarLinkChain } = useSignin()
   const { enqueueSnackbar } = useSnackbar();
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
@@ -322,10 +322,11 @@ export default function ImportCollection() {
         return
       }
 
+      const RegContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'register')
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
-          const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, CONTRACT_ADDRESS)
+          const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, RegContractAddress)
           walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
             const gasPrice = getFilteredGasPrice(_gasPrice)
             console.log("Gas price:", gasPrice); 

@@ -9,9 +9,14 @@ import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sd
 import jwtDecode from 'jwt-decode';
 
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
+import useSignin from '../hooks/useSignin';
 import { 
+  ESC_CONTRACT,
+  ETH_CONTRACT,
   stickerContract as STICKER_ADDRESS, 
+  stickerEthContract as STICKER_ETH_ADDRESS, 
   marketContract as MARKET_CONTRACT_ADDRESS, 
+  marketEthContract as MARKET_ETH_CONTRACT_ADDRESS, 
   v1marketContract as V1_MARKET_CONTRACT_ADDRESS,
   diaContract as DIA_CONTRACT_ADDRESS, 
   mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS,
@@ -21,8 +26,7 @@ import {
   ethUsdcContract as EUSDC_CONTRACT_ADDRESS, 
   bunnyContract as BUNNY_CONTRACT_ADDRESS, 
   bnbBusdContract as BUSD_CONTRACT_ADDRESS, 
-  elaOnEthContract as ELA_ON_ETH_CONTRACT_ADDRESS, 
-  registerContract as REG_CONTRACT_ADDRESS,
+  elaOnEthContract as ELA_ON_ETH_CONTRACT_ADDRESS,
   blankAddress, ipfsURL as PasarIpfs, rpcURL, bunnyContract } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { V1_PASAR_CONTRACT_ABI } from '../abi/pasarV1ABI';
@@ -381,7 +385,7 @@ export async function getERCType(contractAddress, connectProvider = null) {
   }
 }
 
-export async function checkWhetherGeneralCollection(contractAddress, connectProvider = null) {
+export async function checkWhetherGeneralCollection(chainId, contractAddress, connectProvider = null) {
   try{
     let walletConnectWeb3
     if(connectProvider)
@@ -391,7 +395,8 @@ export async function checkWhetherGeneralCollection(contractAddress, connectProv
     else
       walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
 
-    const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, REG_CONTRACT_ADDRESS)
+    const RegContractAddress = getContractAddressInCurrentNetwork(chainId, 'register')
+    const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, RegContractAddress)
     const _isGeneralToken = await registerContract.methods.isGeneralToken(contractAddress).call()
     return _isGeneralToken
   } catch(e) {
@@ -791,6 +796,15 @@ export const getChainTypeFromId = (chainId) => {
   if (chainId===1 || chainId===3)
     return 'ETH'
   return ''
+}
+export const getContractAddressInCurrentNetwork = (chainId, type) => {
+  const currentChain = getChainTypeFromId(chainId)
+  let contractObj = ESC_CONTRACT
+  if(currentChain==='ESC')
+    contractObj = ESC_CONTRACT
+  else if(currentChain==='ETH')
+    contractObj = ETH_CONTRACT
+  return contractObj[type]
 }
 export const getCoinTypeFromToken = (item) => {
   let coinTypeIndex = 0
