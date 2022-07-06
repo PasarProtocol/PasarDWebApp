@@ -34,10 +34,11 @@ import LoadingWrapper from '../../components/LoadingWrapper';
 import {REGISTER_CONTRACT_ABI} from '../../abi/registerABI'
 import {TOKEN_721_ABI} from '../../abi/token721ABI'
 import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
-import {registerContract as CONTRACT_ADDRESS, diaContract as DIA_TOKEN_ADDRESS, ipfsURL, tokenConf} from '../../config'
+import {ipfsURL} from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
+import useSingin from '../../hooks/useSignin';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, fetchFrom, getIpfsUrl, isNumberString, getContractInfo, getFilteredGasPrice, socialTypes } from '../../utils/common';
+import { isInAppBrowser, fetchFrom, getIpfsUrl, isNumberString, getContractInfo, getFilteredGasPrice, socialTypes, getContractAddressInCurrentNetwork } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -89,6 +90,7 @@ export default function EditCollection() {
   const uploadBackgroundRef = React.useRef();
   const descriptionRef = React.useRef();
 
+  const { pasarLinkChain } = useSingin()
   const { enqueueSnackbar } = useSnackbar();
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
@@ -284,10 +286,11 @@ export default function EditCollection() {
         return
       }
 
+      const RegContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'register')
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
-          const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, CONTRACT_ADDRESS)
+          const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, RegContractAddress)
           walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
             const gasPrice = getFilteredGasPrice(_gasPrice)
             console.log("Gas price:", gasPrice); 

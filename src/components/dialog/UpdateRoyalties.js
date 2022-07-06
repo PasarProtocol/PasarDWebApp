@@ -6,15 +6,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
 
 import { REGISTER_CONTRACT_ABI } from '../../abi/registerABI';
-import {
-  registerContract as CONTRACT_ADDRESS,
-  marketContract as MARKET_CONTRACT_ADDRESS,
-  blankAddress
-} from '../../config';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { TextFieldStyle } from '../CustomInput';
-import { removeLeadingZero, isNumberString, reduceHexAddress, isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
+import { removeLeadingZero, isNumberString, getContractAddressInCurrentNetwork, isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
+import useSingin from '../../hooks/useSignin';
 
 export default function UpdateRoyalties(props) {
   const { isOpen, setOpen, name, token, owners=[], feeRates=[] } = props;
@@ -30,6 +26,7 @@ export default function UpdateRoyalties(props) {
   const [onProgress, setOnProgress] = React.useState(false);
   const [isOnValidation, setOnValidation] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
+  const { pasarLinkChain } = useSingin()
 
   const handleClose = () => {
     setOpen(false);
@@ -48,7 +45,9 @@ export default function UpdateRoyalties(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
     
-    const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, CONTRACT_ADDRESS)
+    const RegContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'register')
+    console.log(RegContractAddress)
+    const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, RegContractAddress)
     const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
     const gasPrice = getFilteredGasPrice(_gasPrice)
 
