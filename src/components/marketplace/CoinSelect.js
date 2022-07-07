@@ -1,12 +1,15 @@
 import React, { useState } from "react";
-import {Select, Button, Menu, MenuItem, Box} from '@mui/material';
+import { Select, Button, Menu, MenuItem, Box } from '@mui/material';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import PropTypes from 'prop-types';
-import {coinTypes} from '../../utils/common'
+import { getCoinTypesInCurrentNetwork } from '../../utils/common'
+import useSignin from '../../hooks/useSignin';
 
 export default function CoinSelect({ selected, onChange }) {
   const [isOpenPopup, setOpenPopup] = React.useState(null);
+  const { pasarLinkChain } = useSignin()
+  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain)
 
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);
@@ -34,7 +37,7 @@ export default function CoinSelect({ selected, onChange }) {
         endIcon={<Icon icon={arrowIosDownwardFill}/>}
       >
         <Box component="img" src={`/static/${coinTypes[selected].icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&selected===0?'invert(1)':'none' }} />
-        &nbsp;{coinTypes[selected].name}&nbsp;
+        <span style={{paddingLeft: 4}}>{coinTypes[selected].name}</span>
       </Button>
       <Menu 
         keepMounted

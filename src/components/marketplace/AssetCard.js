@@ -227,9 +227,9 @@ export default function AssetCard(props) {
                 top: '-30%',
                 opacity: 0.18
               },
-              '& .card-img>.chain-type': {
+              '& .card-img>.chain-type': isLink?{
                 opacity: 1
-              }
+              }:{}
             }
           }}
         >

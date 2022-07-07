@@ -802,6 +802,15 @@ export const getContractAddressInCurrentNetwork = (chainId, type) => {
     contractObj = ETH_CONTRACT
   return contractObj[type]
 }
+export const getCoinTypesInCurrentNetwork = (chainId) => {
+  const currentChain = getChainTypeFromId(chainId)
+  let tempCoinTypes = coinTypes
+  if(currentChain==='ESC')
+    tempCoinTypes = coinTypes
+  else if(currentChain==='ETH')
+    tempCoinTypes = coinTypesForEthereum
+  return tempCoinTypes
+}
 export const getMarketAddressByMarketplaceType = (type) => {
   const marketAddresses = [ESC_CONTRACT.market, ETH_CONTRACT.market]
   if(type>=1 && type<=2)
