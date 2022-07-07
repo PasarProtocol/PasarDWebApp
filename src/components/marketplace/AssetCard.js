@@ -36,7 +36,7 @@ import useSingin from '../../hooks/useSignin';
 import BadgeProfile from './BadgeProfile'
 import StyledButton from '../signin-dlg/StyledButton';
 import { auctionOrderType } from '../../config';
-import { getDiaTokenInfo, getCredentialInfo, coinTypes, fetchFrom, collectionTypes, getIpfsUrl } from '../../utils/common';
+import { getDiaTokenInfo, getCredentialInfo, coinTypes, fetchFrom, collectionTypes, getIpfsUrl, getChainTypeFromId } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
@@ -70,7 +70,7 @@ export default function AssetCard(props) {
   const [auctionEnded, setAuctionEnded] = React.useState(false);
   const [continueAction, setContinueAction] = React.useState('');
 
-  const { diaBalance, setOpenDownloadEssentialDlg } = useSingin()
+  const { diaBalance, setOpenDownloadEssentialDlg, pasarLinkChain } = useSingin()
   const { enqueueSnackbar } = useSnackbar();
   
   const isCreatedByMe = myaddress===royaltyOwner
@@ -154,6 +154,7 @@ export default function AssetCard(props) {
     handlePutOnAction('sell')
   }
   const handleClosePopup = (e) => {
+    const chainType = getChainTypeFromId(pasarLinkChain)
     const type = e.target.getAttribute("value")
     switch(type){
       case 'sell':
@@ -199,7 +200,7 @@ export default function AssetCard(props) {
         setOpenDelete(true)
         break;
       case 'transfer':
-        if(diaBalance>=0.01)
+        if(chainType!=='ESC' || diaBalance>=0.01)
           setOpenTransfer(true)
         else
           setOpenBuyDIA(true)
