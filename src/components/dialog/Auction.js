@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import Web3 from 'web3';
-import { ethers } from 'ethers';
 import { addDays } from 'date-fns';
-import * as math from 'mathjs';
 import { useWeb3React } from '@web3-react/core';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, 
   Divider, FormControl, Input, InputLabel, Tooltip, FormControlLabel, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { styled } from '@mui/material/styles';
 import { Icon } from '@iconify/react';
 import { useSnackbar } from 'notistack';
-import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
-import { marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
-import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import StartingDateSelect from '../marketplace/StartingDateSelect'
 import ExpirationDateSelect from '../marketplace/ExpirationDateSelect'
@@ -25,7 +19,7 @@ import CoinTypeLabel from '../CoinTypeLabel';
 import DIABadge from '../DIABadge';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString, 
-  isValidLimitPrice, getDiaBalanceDegree, getFilteredGasPrice } from '../../utils/common';
+  isValidLimitPrice, getDiaBalanceDegree, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 import useSignin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
 
@@ -47,7 +41,7 @@ export default function Auction(props) {
   const { enqueueSnackbar } = useSnackbar();
 
   const context = useWeb3React();
-  const { pasarLinkAddress, diaBalance } = useSignin()
+  const { pasarLinkAddress, pasarLinkChain, diaBalance } = useSignin()
   const { library, chainId, account } = context;
 
   React.useEffect(async () => {
@@ -142,7 +136,7 @@ export default function Auction(props) {
               stickerContract.methods.setApprovalForAll(_operator, true).send(transactionParams)
               .on('receipt', (receipt) => {
                   console.log("setApprovalForAll-receipt", receipt);
-                  callContractMethod('createOrderForAuction', coinType, {
+                  callContractMethod('createOrderForAuction', coinType, pasarLinkChain, {
                     '_id': tokenId,
                     '_amount': 1,
                     '_baseAddress': baseToken,
@@ -162,7 +156,7 @@ export default function Auction(props) {
                   reject(error)
               });
             else
-              callContractMethod('createOrderForAuction', coinType, {
+              callContractMethod('createOrderForAuction', coinType, pasarLinkChain, {
                 '_id': tokenId,
                 '_amount': 1,
                 '_baseAddress': baseToken,
@@ -203,7 +197,8 @@ export default function Auction(props) {
       const _reservePrice = BigInt(reservePrice*1e18).toString();
       const _buyoutPrice = BigInt(buyoutPrice*1e18).toString();
       console.log('--------', tokenId, '--', _startingPrice, '--', _reservePrice, '--', _buyoutPrice, '--', didUri, '--');
-      callSetApprovalForAllAndAuction(MARKET_CONTRACT_ADDRESS, _startingPrice, _reservePrice, _buyoutPrice, didUri).then(result=>{
+      const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
+      callSetApprovalForAllAndAuction(MarketContractAddress, _startingPrice, _reservePrice, _buyoutPrice, didUri).then(result=>{
         if(result){
           setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
           enqueueSnackbar('Auction success!', { variant: 'success' });

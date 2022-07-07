@@ -10,7 +10,6 @@ import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { ERC20_CONTRACT_ABI } from '../../abi/erc20ABI';
-import { marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
@@ -19,7 +18,7 @@ import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, 
-  removeLeadingZero, coinTypes, isValidLimitPrice, getFilteredGasPrice } from '../../utils/common';
+  removeLeadingZero, coinTypes, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 
 export default function PlaceBid(props) {
   const navigate = useNavigate();
@@ -30,7 +29,7 @@ export default function PlaceBid(props) {
   const [isBuynow, setBuynow] = useState(false);
 
   const context = useWeb3React();
-  const { pasarLinkAddress } = useSingin()
+  const { pasarLinkAddress, pasarLinkChain } = useSingin()
   const { updateCount, setUpdateCount } = useAuctionDlg()
 
   const { library, chainId, account } = context;
@@ -64,13 +63,14 @@ export default function PlaceBid(props) {
       const { ethereum } = window;
 
       if (ethereum) {
+        const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
-        const pasarContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, PASAR_CONTRACT_ABI, signer);
+        const pasarContract = new ethers.Contract(MarketContractAddress, PASAR_CONTRACT_ABI, signer);
         signer.getAddress().then(async userAddress=>{
           if(coinType) {
             const erc20Contract = new ethers.Contract(coinType.address, ERC20_CONTRACT_ABI, signer);
-            const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MARKET_CONTRACT_ADDRESS))
+            const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MarketContractAddress))
             console.log(erc20BidderApproved)
             const _gasPrice = await provider.getGasPrice();
             const gasPrice = getFilteredGasPrice(_gasPrice)
@@ -81,7 +81,7 @@ export default function PlaceBid(props) {
                 'gasPrice': gasPrice,
                 'value': 0,
               };
-              const approveTxn = await erc20Contract.approve(MARKET_CONTRACT_ADDRESS, _price, txParams)
+              const approveTxn = await erc20Contract.approve(MarketContractAddress, _price, txParams)
               const erc20BidderApproveStatus = await approveTxn.wait()
               if(!erc20BidderApproveStatus) {
                 enqueueSnackbar(`Approve Transaction Error!`, { variant: 'error' });
@@ -152,10 +152,11 @@ export default function PlaceBid(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
-    const pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, MARKET_CONTRACT_ADDRESS);
+    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
+    const pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, MarketContractAddress);
     if(coinType) {
       const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinType.address);
-      const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MARKET_CONTRACT_ADDRESS).call())
+      const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MarketContractAddress).call())
       const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
       const gasPrice = getFilteredGasPrice(_gasPrice)
       if(erc20BidderApproved < _price*1){
@@ -165,7 +166,7 @@ export default function PlaceBid(props) {
           'gasPrice': gasPrice,
           'value': 0,
         };
-        const erc20BidderApproveStatus = await erc20Contract.methods.approve(MARKET_CONTRACT_ADDRESS, _price).send(txParams)
+        const erc20BidderApproveStatus = await erc20Contract.methods.approve(MarketContractAddress, _price).send(txParams)
         if(!erc20BidderApproveStatus) {
           enqueueSnackbar(`Approve Transaction Error!`, { variant: 'error' });
           setOnProgress(false);

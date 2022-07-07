@@ -9,14 +9,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
-import { marketContract as MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
+import { auctionOrderType } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import StyledButton from '../signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
-import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
+import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 
 export default function SettleOrder(props) {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export default function SettleOrder(props) {
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const context = useWeb3React();
-  const { pasarLinkAddress } = useSingin()
+  const { pasarLinkAddress, pasarLinkChain } = useSingin()
   const { updateCount, setUpdateCount } = useAuctionDlg()
   const { library, chainId, account } = context;
 
@@ -54,7 +54,8 @@ export default function SettleOrder(props) {
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
-        const pasarContract = new ethers.Contract(MARKET_CONTRACT_ADDRESS, PASAR_CONTRACT_ABI, signer);
+        const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
+        const pasarContract = new ethers.Contract(MarketContractAddress, PASAR_CONTRACT_ABI, signer);
         signer.getAddress().then(userAddress=>{
           provider.getGasPrice().then(_gasPrice=>{
             const gasPrice = getFilteredGasPrice(_gasPrice)
@@ -110,7 +111,7 @@ export default function SettleOrder(props) {
   }
 
   const callSettleOrder = (_orderId) => {
-    callContractMethod('settleAuctionOrder', 0, {
+    callContractMethod('settleAuctionOrder', 0, pasarLinkChain, {
       _orderId,
     }).then((success) => {
       enqueueSnackbar('Settle auction order success!', { variant: 'success' });

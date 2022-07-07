@@ -5,17 +5,20 @@ import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
-import { marketContract as MARKET_CONTRACT_ADDRESS, v1marketContract as V1_MARKET_CONTRACT_ADDRESS } from '../../config';
+import { v1marketContract as V1_MARKET_CONTRACT_ADDRESS } from '../../config';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
-import { isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
+import { isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
+import useSignin from '../../hooks/useSignin';
 
 export default function CancelSale(props) {
   const { isOpen, setOpen, name, orderId, OrderId, updateCount, handleUpdate, v1State=false } = props;
+  const [onProgress, setOnProgress] = React.useState(false);
   const { updateCount: updateCount2, setUpdateCount } = useAuctionDlg()
   const { enqueueSnackbar } = useSnackbar();
-  const [onProgress, setOnProgress] = React.useState(false);
+  const { pasarLinkChain } = useSignin()
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -25,8 +28,9 @@ export default function CancelSale(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
+    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
     const contractAbi = PASAR_CONTRACT_ABI;
-    const contractAddress = !v1State ? MARKET_CONTRACT_ADDRESS: V1_MARKET_CONTRACT_ADDRESS;
+    const contractAddress = !v1State ? MarketContractAddress: V1_MARKET_CONTRACT_ADDRESS;
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
     const _gasPrice = await walletConnectWeb3.eth.getGasPrice();

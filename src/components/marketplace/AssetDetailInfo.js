@@ -8,7 +8,7 @@ import { Box, Stack, Typography, Link } from '@mui/material';
 //
 import CopyButton from '../CopyButton';
 import { getTime, reduceHexAddress } from '../../utils/common';
-import { marketContract } from '../../config'
+import { ESC_CONTRACT, ETH_CONTRACT } from '../../config'
 
 // ----------------------------------------------------------------------
 
@@ -86,7 +86,7 @@ export default function AssetDetailInfo({ detail }) {
     'createTime': `${creatimestamp.date} ${creatimestamp.time}`,
     'marketTime': `${marketimestamp.date} ${marketimestamp.time}`,
     'dateOnMarket': dateOnMarket,
-    'holder': detail.holder===marketContract?detail.royaltyOwner:detail.holder
+    'holder': (detail.holder===ESC_CONTRACT.market || detail.holder===ETH_CONTRACT.market)?detail.royaltyOwner:detail.holder
   }
 
   return (
