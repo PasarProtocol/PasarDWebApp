@@ -10,13 +10,13 @@ import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { ERC20_CONTRACT_ABI } from '../../abi/erc20ABI';
-import { marketContract as MARKET_CONTRACT_ADDRESS, v1marketContract as V1_MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
+import { v1marketContract as V1_MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import StyledButton from '../signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
-import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, getFilteredGasPrice, coinTypes } from '../../utils/common';
+import { reduceHexAddress, getContractAddressInCurrentNetwork, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, getFilteredGasPrice, coinTypes } from '../../utils/common';
 
 export default function Purchase(props) {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export default function Purchase(props) {
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const context = useWeb3React();
-  const { pasarLinkAddress } = useSingin()
+  const { pasarLinkAddress, pasarLinkChain } = useSingin()
   const { library, chainId, account } = context;
   const { isOpen, setOpen, info, coinType=0 } = props;
   const { v1State=false } = info
@@ -43,14 +43,15 @@ export default function Purchase(props) {
       const { ethereum } = window;
 
       if (ethereum) {
-        const contractAddress = !v1State ? MARKET_CONTRACT_ADDRESS: V1_MARKET_CONTRACT_ADDRESS;
+        const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
+        const contractAddress = !v1State ? MarketContractAddress: V1_MARKET_CONTRACT_ADDRESS;
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const pasarContract = new ethers.Contract(contractAddress, PASAR_CONTRACT_ABI, signer);
         signer.getAddress().then(async userAddress=>{
           if(coinType) {
             const erc20Contract = new ethers.Contract(coinType.address, ERC20_CONTRACT_ABI, signer);
-            const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MARKET_CONTRACT_ADDRESS))
+            const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MarketContractAddress))
             const _gasPrice = await provider.getGasPrice();
             const gasPrice = getFilteredGasPrice(_gasPrice)
             if(erc20BidderApproved < _price*1){
@@ -60,7 +61,7 @@ export default function Purchase(props) {
                 'gasPrice': gasPrice,
                 'value': 0,
               };
-              const approveTxn = await erc20Contract.approve(MARKET_CONTRACT_ADDRESS, _price, txParams)
+              const approveTxn = await erc20Contract.approve(MarketContractAddress, _price, txParams)
               const erc20BidderApproveStatus = await approveTxn.wait()
               if(!erc20BidderApproveStatus) {
                 enqueueSnackbar(`Approve Transaction Error!`, { variant: 'error' });
@@ -130,13 +131,14 @@ export default function Purchase(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
+    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
     const contractAbi = PASAR_CONTRACT_ABI;
-    const contractAddress = !v1State ? MARKET_CONTRACT_ADDRESS: V1_MARKET_CONTRACT_ADDRESS;
+    const contractAddress = !v1State ? MarketContractAddress: V1_MARKET_CONTRACT_ADDRESS;
 
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
     if(coinType) {
       const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinType.address);
-      const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MARKET_CONTRACT_ADDRESS).call())
+      const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MarketContractAddress).call())
       const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
       const gasPrice = getFilteredGasPrice(_gasPrice)
       if(erc20BidderApproved < _price*1){
@@ -146,7 +148,7 @@ export default function Purchase(props) {
           'gasPrice': gasPrice,
           'value': 0,
         };
-        const erc20BidderApproveStatus = await erc20Contract.methods.approve(MARKET_CONTRACT_ADDRESS, _price).send(txParams)
+        const erc20BidderApproveStatus = await erc20Contract.methods.approve(MarketContractAddress, _price).send(txParams)
         if(!erc20BidderApproveStatus) {
           enqueueSnackbar(`Approve Transaction Error!`, { variant: 'error' });
           setOnProgress(false);

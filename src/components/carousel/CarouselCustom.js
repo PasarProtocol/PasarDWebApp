@@ -11,7 +11,7 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import { CarouselControlsPaging2 } from './controls';
 import CopyButton from '../CopyButton';
 import { getTime, reduceHexAddress } from '../../utils/common';
-import {marketContract, blockchain} from '../../config'
+import {ESC_CONTRACT, ETH_CONTRACT, blockchain} from '../../config'
 
 // ----------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ export default function CarouselCustom({pgsize, detail}) {
     ...detail,
     royalties: `${detail.royalties*100/10**6} %`,
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
-    holder: detail.holder===marketContract?detail.royaltyOwner:detail.holder,
+    holder: (detail.holder===ESC_CONTRACT.market || detail.holder===ETH_CONTRACT.market)?detail.royaltyOwner:detail.holder,
     // collection: 'Feeds NFT Sticker - FSTK',
     tokenStandard: detail.is721?'ERC-721':'ERC-1155',
     'blockchain': blockchain,

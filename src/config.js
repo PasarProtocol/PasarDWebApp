@@ -40,11 +40,7 @@ const addressForProduction = {
   },
   feedsContract: "0x020c7303664bc88ae92cE3D380BF361E03B78B81",
   // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
-  marketContract: "0xaeA699E4dA22986eB6fa2d714F5AC737Fe93a998",
-  marketEthContract: "0x7d797f3564073FFF8E75D9D5Be57EBC01512b554",
   v1marketContract: "0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0",
-  registerContract: "0x3d0AD66765C319c2A1c6330C1d815608543dcc19",
-  registerEthContract: "0x2C8615B32cf6535Eb38DD076aD822E7c2362a4c7",
   diaContract: "0x2C8010Ae4121212F836032973919E8AeC9AEaEE5",
   welaContract: "0x517E9e5d46C1EA8aB6f78677d6114Ef47F71f6c4",
   glideContract: "0xd39eC832FF1CaaFAb2729c76dDeac967ABcA8F27",
@@ -69,11 +65,7 @@ const addressForTest = {
   },
   feedsContract: "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961",
   // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
-  marketContract: "0x19088c509C390F996802B90bdc4bFe6dc3F5AAA7",
-  marketEthContract: "0x7d797f3564073FFF8E75D9D5Be57EBC01512b554",
   v1marketContract: "0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087",
-  registerContract: "0x2b304ffC302b402785294629674A8C2b64cEF897", 
-  registerEthContract: "0x2C8615B32cf6535Eb38DD076aD822E7c2362a4c7",
   diaContract: "0x85946E4b6AB7C5c5C60A7b31415A52C0647E3272",
   welaContract: "0x517E9e5d46C1EA8aB6f78677d6114Ef47F71f6c4",
   glideContract: "0xd39eC832FF1CaaFAb2729c76dDeac967ABcA8F27",
@@ -94,7 +86,7 @@ const escServerForTest = "https://esc-testnet.elastos.io"
 const ApplicationDIDForMain = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 // const ApplicationDIDForTest = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB"
 
-export const {ESC_CONTRACT, ETH_CONTRACT, feedsContract, marketContract, marketEthContract, v1marketContract, registerContract, registerEthContract, diaContract, welaContract, glideContract, 
+export const {ESC_CONTRACT, ETH_CONTRACT, feedsContract, v1marketContract, diaContract, welaContract, glideContract, 
   elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, elaOnEthContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
 export const mainDiaContract = addressForProduction.diaContract
 

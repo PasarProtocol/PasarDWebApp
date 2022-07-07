@@ -38,7 +38,7 @@ import AddressCopyButton from '../../components/AddressCopyButton';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
-import { blankAddress, marketContract } from '../../config'
+import { blankAddress, ESC_CONTRACT, ETH_CONTRACT } from '../../config'
 import { queryAvatarUrl, queryName, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCoinTypeFromToken, getCollectiblesInCollection4Preview,
@@ -331,7 +331,7 @@ export default function CollectibleDetail() {
     fetchFrom(`api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${baseToken}&method=&timeOrder=-1`).then(response => {
       response.json().then(jsonTransactions => {
         setTransRecord(jsonTransactions.data.filter((trans)=>
-          !((trans.event==="SafeTransferFrom"||trans.event==="SafeTransferFromWithMemo") && (trans.to===blankAddress||trans.to===marketContract))
+          !((trans.event==="SafeTransferFrom"||trans.event==="SafeTransferFromWithMemo") && (trans.to===blankAddress||trans.to===ESC_CONTRACT.market||trans.to===ETH_CONTRACT.market))
         ).slice(0,10));
         setLoadingTransRecord(false);
       })

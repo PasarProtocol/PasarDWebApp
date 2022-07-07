@@ -7,16 +7,12 @@ import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { Icon } from '@iconify/react';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import {
-  marketContract as MARKET_CONTRACT_ADDRESS,
-  blankAddress
-} from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
-import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes, isValidLimitPrice, getFilteredGasPrice } from '../../utils/common';
+import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 
 export default function Sell(props) {
   const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate, saleType, royalties } = props;
@@ -26,7 +22,7 @@ export default function Sell(props) {
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [isOnValidation, setOnValidation] = React.useState(false);
-  const { diaBalance } = useSingin()
+  const { diaBalance, pasarLinkChain } = useSingin()
 
   const handleClose = () => {
     setOpen(false);
@@ -71,7 +67,7 @@ export default function Sell(props) {
               stickerContract.methods.setApprovalForAll(_operator, true).send(transactionParams)
               .on('receipt', (receipt) => {
                   console.log("setApprovalForAll-receipt", receipt);
-                  callContractMethod('createOrderForSale', coinType, {
+                  callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
                     '_id': tokenId,
                     '_amount': 1,
                     '_price': _price,
@@ -88,7 +84,7 @@ export default function Sell(props) {
                   reject(error)
               });
             else
-              callContractMethod('createOrderForSale', coinType, {
+              callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
                 '_id': tokenId,
                 '_amount': 1,
                 '_price': _price,
@@ -118,7 +114,8 @@ export default function Sell(props) {
     const didUri = await sendIpfsDidJson();
     const sellPrice = BigInt(price*1e18).toString();
     console.log('--------', tokenId, '--', sellPrice, '--', didUri, '--');
-    callSetApprovalForAllAndSell(MARKET_CONTRACT_ADDRESS, true, sellPrice, didUri).then(result=>{
+    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
+    callSetApprovalForAllAndSell(MarketContractAddress, true, sellPrice, didUri).then(result=>{
       if(result){
         setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
         enqueueSnackbar('Sell NFT success!', { variant: 'success' });

@@ -31,7 +31,7 @@ export default function UpdatePrice(props) {
   const [coinType, setCoinType] = React.useState(0);
   const [isOnValidation, setOnValidation] = React.useState(false);
   
-  const { diaBalance } = useSignin()
+  const { diaBalance, pasarLinkChain } = useSignin()
 
   const handleClose = () => {
     setOpen(false);
@@ -70,8 +70,9 @@ export default function UpdatePrice(props) {
   };
 
   const callChangeOrderPrice = async (_orderId, _price, _reservePrice, _buyoutPrice) => {
-    callContractMethod(orderType===auctionOrderType?'changeAuctionOrderPrice':'changeSaleOrderPrice', coinType, {_orderId, _price, _reservePrice, _buyoutPrice, v1State})
-      .then((success) => {
+    callContractMethod(orderType===auctionOrderType?'changeAuctionOrderPrice':'changeSaleOrderPrice', coinType, pasarLinkChain, {
+      _orderId, _price, _reservePrice, _buyoutPrice, v1State
+    }).then((success) => {
         setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
         enqueueSnackbar('Update price success!', { variant: 'success' });
         setOpen(false);

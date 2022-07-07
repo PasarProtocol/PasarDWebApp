@@ -9,8 +9,8 @@ import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import MethodLabel from '../../MethodLabel';
 import CopyButton from '../../CopyButton';
-import { MethodList, reduceHexAddress, getTime, getCoinTypeFromToken, coinTypes } from '../../../utils/common';
-import {escURL, marketContract, v1marketContract} from '../../../config'
+import { MethodList, reduceHexAddress, getTime, getCoinTypeFromToken, getMarketAddressByMarketplaceType, coinTypes } from '../../../utils/common';
+import {escURL, v1marketContract} from '../../../config'
 
 TransactionOrderDetail.propTypes = {
     item: PropTypes.object.isRequired
@@ -83,6 +83,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
         else
             totalSum = `${price} ${coinName} + ${gasFee} ${feeTokenName}`
     }
+    const marketContractAddress = getMarketAddressByMarketplaceType(marketPlace)
     return (
         <RootStyle>
             <Box
@@ -103,7 +104,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                 if(el.field&&!el.copyable)
                                     value = parseFloat((value / 10 ** 18).toFixed(7))
                                 if(el.field==="marketplace")
-                                    value = !v1Event ? marketContract: v1marketContract
+                                    value = !v1Event ? marketContractAddress: v1marketContract
                                 const displayValue = el.ellipsis?reduceHexAddress(value):value
                                 return (
                                     <StackRowStyle key={index}>

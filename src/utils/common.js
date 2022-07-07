@@ -12,8 +12,6 @@ import { essentialsConnector } from '../components/signin-dlg/EssentialConnectiv
 import { 
   ESC_CONTRACT,
   ETH_CONTRACT,
-  marketContract as MARKET_CONTRACT_ADDRESS, 
-  marketEthContract as MARKET_ETH_CONTRACT_ADDRESS, 
   v1marketContract as V1_MARKET_CONTRACT_ADDRESS,
   diaContract as DIA_CONTRACT_ADDRESS, 
   mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS,
@@ -24,7 +22,7 @@ import {
   bunnyContract as BUNNY_CONTRACT_ADDRESS, 
   bnbBusdContract as BUSD_CONTRACT_ADDRESS, 
   elaOnEthContract as ELA_ON_ETH_CONTRACT_ADDRESS,
-  blankAddress, ipfsURL as PasarIpfs, rpcURL, bunnyContract } from '../config';
+  blankAddress, ipfsURL as PasarIpfs, rpcURL } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { V1_PASAR_CONTRACT_ABI } from '../abi/pasarV1ABI';
 import { ERC20_CONTRACT_ABI } from '../abi/diamondABI';
@@ -437,19 +435,20 @@ export function getShortUrl(url) {
   });
 }
 
-export function callContractMethod(type, coinType, paramObj) {
+export function callContractMethod(type, coinType, chainId, paramObj) {
   return new Promise((resolve, reject) => {
     if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') {
       reject(new Error());
       return;
     }
 
+    const MarketContractAddress = getContractAddressInCurrentNetwork(chainId, 'market')
     const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
     walletConnectWeb3.eth
       .getAccounts()
       .then((accounts) => {
         // console.log(accounts)
-        const marketContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, MARKET_CONTRACT_ADDRESS);
+        const marketContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, MarketContractAddress);
         walletConnectWeb3.eth
           .getGasPrice()
           .then((gasPrice) => {
@@ -802,6 +801,12 @@ export const getContractAddressInCurrentNetwork = (chainId, type) => {
   else if(currentChain==='ETH')
     contractObj = ETH_CONTRACT
   return contractObj[type]
+}
+export const getMarketAddressByMarketplaceType = (type) => {
+  const marketAddresses = [ESC_CONTRACT.market, ETH_CONTRACT.market]
+  if(type>=1 && type<=2)
+    return marketAddresses[type-1]
+  return marketAddresses[0]
 }
 export const getCoinTypeFromToken = (item) => {
   let coinTypeIndex = 0

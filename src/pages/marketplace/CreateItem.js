@@ -51,7 +51,6 @@ import { TOKEN_1155_ABI } from '../../abi/token1155ABI'
 import { 
   ESC_CONTRACT, ETH_CONTRACT,
   feedsContract as FEEDS_CONTRACT_ADDRESS, 
-  marketContract as MARKET_CONTRACT_ADDRESS, 
   ipfsURL, 
   auctionOrderType 
 } from '../../config'
@@ -505,6 +504,7 @@ export default function CreateItem() {
         reject(new Error)
         return
       }
+      const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
@@ -559,18 +559,18 @@ export default function CreateItem() {
                   if(isPutOnSale){
                     setProgress(70)
                     setCurrent(2)
-                    stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
+                    stickerContract.methods.isApprovedForAll(accounts[0], MarketContractAddress).call().then(isApproval=>{
                       console.log("isApprovalForAll=", isApproval);
                       if (!isApproval) {
                         // setOpenAccessDlg(true)
                         // setApprovalFunction(()=>{
-                          stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
+                          stickerContract.methods.setApprovalForAll(MarketContractAddress, true).send(transactionParams)
                             .on('receipt', (receipt) => {
                                 setOpenAccessDlg(false)
                                 setCurrent(3)
                                 console.log("setApprovalForAll-receipt", receipt);
                                 if(saletype === 'FixedPrice')
-                                  callContractMethod('createOrderForSale', coinType, {
+                                  callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
                                     ...paramObj,
                                     ...commonArgs,
                                     '_price': BigInt(price*1e18).toString()
@@ -580,7 +580,7 @@ export default function CreateItem() {
                                     reject(error)
                                   })
                                 else
-                                  callContractMethod('createOrderForAuction', coinType, {
+                                  callContractMethod('createOrderForAuction', coinType, pasarLinkChain, {
                                     ...paramObj,
                                     ...commonArgs,
                                     '_minPrice': BigInt(price*1e18).toString(),
@@ -601,7 +601,7 @@ export default function CreateItem() {
                         // })
                       }
                       else if(saletype === 'FixedPrice')
-                          callContractMethod('createOrderForSale', coinType, {
+                          callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
                             ...paramObj,
                             ...commonArgs,
                             '_price': BigInt(price*1e18).toString()
@@ -611,7 +611,7 @@ export default function CreateItem() {
                             reject(error)
                           })
                       else
-                        callContractMethod('createOrderForAuction', coinType, {
+                        callContractMethod('createOrderForAuction', coinType, pasarLinkChain, {
                           ...paramObj,
                           ...commonArgs,
                           '_minPrice': BigInt(price*1e18).toString(),
@@ -653,6 +653,7 @@ export default function CreateItem() {
         reject(new Error)
         return
       }
+      const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
@@ -712,15 +713,15 @@ export default function CreateItem() {
                     if(isPutOnSale){
                       setProgress(80)
                       setCurrent(2)
-                      stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
+                      stickerContract.methods.isApprovedForAll(accounts[0], MarketContractAddress).call().then(isApproval=>{
                         console.log("isApprovalForAll=", isApproval);
                         if (!isApproval) {
-                            stickerContract.methods.setApprovalForAll(MARKET_CONTRACT_ADDRESS, true).send(transactionParams)
+                            stickerContract.methods.setApprovalForAll(MarketContractAddress, true).send(transactionParams)
                               .on('receipt', (receipt) => {
                                   setOpenAccessDlg(false)
                                   setCurrent(3)
                                   console.log("setApprovalForAll-receipt", receipt);
-                                  callContractMethod('createOrderForSaleBatch', coinType, {
+                                  callContractMethod('createOrderForSaleBatch', coinType, pasarLinkChain, {
                                     ...paramObj,
                                     ...commonArgs,
                                     '_price': BigInt(price*1e18).toString()
@@ -737,7 +738,7 @@ export default function CreateItem() {
                               })
                           // })
                         }
-                        callContractMethod('createOrderForSaleBatch', coinType, {
+                        callContractMethod('createOrderForSaleBatch', coinType, pasarLinkChain, {
                           ...paramObj,
                           ...commonArgs,
                           '_price': BigInt(price*1e18).toString()
@@ -1096,6 +1097,7 @@ export default function CreateItem() {
 
   const handleMintAction = (e) => {
     if(isPutOnSale) {
+      const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       walletConnectWeb3.eth.getAccounts().then((accounts)=>{
         // console.log(accounts)
@@ -1106,7 +1108,7 @@ export default function CreateItem() {
         } else if(collection === 'Choose') {
           stickerContract = new walletConnectWeb3.eth.Contract(ercAbiArr[selectedERCtype], selectedCollection.token)
         }
-        stickerContract.methods.isApprovedForAll(accounts[0], MARKET_CONTRACT_ADDRESS).call().then(isApproval=>{
+        stickerContract.methods.isApprovedForAll(accounts[0], MarketContractAddress).call().then(isApproval=>{
           if(!isApproval)
             setTotalSteps(3)
           else
