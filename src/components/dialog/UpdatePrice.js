@@ -15,7 +15,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import DIABadge from '../DIABadge';
-import { removeLeadingZero, isInAppBrowser, coinTypes, callContractMethod, isValidLimitPrice, getDiaBalanceDegree } from '../../utils/common';
+import { removeLeadingZero, isInAppBrowser, getCoinTypesInCurrentNetwork, callContractMethod, isValidLimitPrice, getDiaBalanceDegree } from '../../utils/common';
 import { auctionOrderType } from '../../config';
 import useSignin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
@@ -98,6 +98,7 @@ export default function UpdatePrice(props) {
   };
 
   const DiaDegree = getDiaBalanceDegree(diaBalance, pasarLinkChain)
+  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain)
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -163,7 +164,7 @@ export default function UpdatePrice(props) {
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive
               <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}>
-                {' '}{rcvprice} {coinType.name}{' '}
+                {' '}{rcvprice} {coinTypes[coinType].name}{' '}
               </Typography>
               per item
             </Typography>

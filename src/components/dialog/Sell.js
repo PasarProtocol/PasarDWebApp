@@ -12,7 +12,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
-import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork, getChainTypeFromId } from '../../utils/common';
+import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, getCoinTypesInCurrentNetwork, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork, getChainTypeFromId } from '../../utils/common';
 
 export default function Sell(props) {
   const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate, saleType, royalties } = props;
@@ -136,6 +136,7 @@ export default function Sell(props) {
     });
   }
 
+  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain)
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <DialogTitle>
@@ -204,7 +205,7 @@ export default function Sell(props) {
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive
               <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}>
-                {' '}{rcvprice} {coinType.name}{' '}
+                {' '}{rcvprice} {coinTypes[coinType].name}{' '}
               </Typography>
               per item
             </Typography>
