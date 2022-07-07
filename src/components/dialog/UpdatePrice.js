@@ -97,7 +97,7 @@ export default function UpdatePrice(props) {
     callChangeOrderPrice(orderId, _updatedPrice, _reservePrice, _buyoutPrice);
   };
 
-  const DiaDegree = getDiaBalanceDegree(diaBalance)
+  const DiaDegree = getDiaBalanceDegree(diaBalance, pasarLinkChain)
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -142,6 +142,9 @@ export default function UpdatePrice(props) {
                 startAdornment={' '}
                 endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
                 aria-describedby="price-error-text"
+                inputProps={{
+                  sx: {flexGrow: 1, width: 'auto'}
+                }}
               />
               <FormHelperText id="price-error-text" hidden={!isOnValidation || (isOnValidation && (price*1))}>Price is required</FormHelperText>
             </FormControl>

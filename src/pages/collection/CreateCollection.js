@@ -460,7 +460,7 @@ export default function CreateCollection() {
   }
   const handleCreateAction = () => {
     const chainType = getChainTypeFromId(pasarLinkChain)
-    const degree = getDiaBalanceDegree(diaBalance)
+    const degree = getDiaBalanceDegree(diaBalance, pasarLinkChain)
     setOnValidation(true)
     if(!name.length)
       scrollToRef(nameRef)

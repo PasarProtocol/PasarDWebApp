@@ -397,7 +397,7 @@ export default function ImportCollection() {
   }
   const handleImportAction = () => {
     const chainType = getChainTypeFromId(pasarLinkChain)
-    const degree = getDiaBalanceDegree(diaBalance)
+    const degree = getDiaBalanceDegree(diaBalance, pasarLinkChain)
     setOnValidation(true)
     if(!contractAddress.length || !autoLoaded || ((collectionInfo.owner!==address) && autoLoaded))
       scrollToRef(contractRef)

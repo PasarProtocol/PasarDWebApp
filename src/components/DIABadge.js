@@ -17,7 +17,7 @@ export default function DIABadge(props) {
   let { degree=0 } = props
   const src = '/static/badges/diamond.svg'
   if(!degree)
-    degree = getDiaBalanceDegree(balance)
+    degree = getDiaBalanceDegree(balance, 0)
   const {background, afterBackground, afterShadowColor, name, min} = ColorSet[degree]
   const tooltipText = isRequire?`Hold a minimum of ${min} DIA (Diamond)`:`${name} Diamond (DIA) token holder`
   const BadgeStyle = degree>0?

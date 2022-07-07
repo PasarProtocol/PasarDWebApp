@@ -214,7 +214,7 @@ export default function Auction(props) {
       });
     }
   }
-  const DiaDegree = getDiaBalanceDegree(diaBalance)
+  const DiaDegree = getDiaBalanceDegree(diaBalance, pasarLinkChain)
 
   const TypographyStyle = {display: 'inline', lineHeight: 1.1}
   return (
@@ -252,6 +252,9 @@ export default function Auction(props) {
             onChange={(e)=>{handleChangePrice(e, 'starting')}}
             startAdornment={' '}
             endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
+            inputProps={{
+              sx: {flexGrow: 1, width: 'auto'}
+            }}
           />
         </FormControl>
         <Divider />
