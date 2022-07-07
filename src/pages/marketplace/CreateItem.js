@@ -54,8 +54,9 @@ import {
   ipfsURL, 
   auctionOrderType 
 } from '../../config'
-import { hash, removeLeadingZero, callContractMethod, isInAppBrowser, coinTypes, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, 
-  isValidLimitPrice, checkWhetherGeneralCollection, getFilteredGasPrice, getChainTypeFromId, getContractAddressInCurrentNetwork } from '../../utils/common';
+import { hash, removeLeadingZero, callContractMethod, isInAppBrowser, getCoinTypesInCurrentNetwork, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, 
+  isValidLimitPrice, checkWhetherGeneralCollection, getFilteredGasPrice, getChainTypeFromId, getContractAddressInCurrentNetwork,
+  coinTypes as coinTypesForESC, coinTypesForEthereum, setAllTokenPrice } from '../../utils/common';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
@@ -127,10 +128,12 @@ export default function CreateItem() {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [moreDIAOpen, setOpenMoreDIA] = React.useState(false);
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
+  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypesForESC.length+coinTypesForEthereum.length).fill(0));
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps } = useMintDlg()
   const { diaBalance, pasarLinkChain } = useSignin()
   const { enqueueSnackbar } = useSnackbar();
-  
+  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain)
+
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
   const APP_BAR_DESKTOP = 88;
@@ -144,9 +147,18 @@ export default function CreateItem() {
   const buyoutPriceRef = React.useRef();
   const navigate = useNavigate();
   
+  const setCoinPriceByType = (type, value) => {
+    setCoinPrice((prevState) => {
+      const tempPrice = [...prevState];
+      tempPrice[type] = value;
+      return tempPrice;
+    });
+  }
+
   React.useEffect(async () => {
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
       navigate('/marketplace')
+    setAllTokenPrice(setCoinPriceByType)
     if(localStorage.getItem('pa-yes') === '1')
       return
     setOpenDisclaimer(true)
@@ -154,6 +166,7 @@ export default function CreateItem() {
 
   React.useEffect(() => {
     // console.log(pasarLinkChain)
+    setCoinType(0)
     const currentChain = getChainTypeFromId(pasarLinkChain)
     setChainType(currentChain)
     if(currentChain === 'ESC')
@@ -220,25 +233,12 @@ export default function CreateItem() {
   }, [itemtype]);
 
   React.useEffect(() => {
-    switch(coinType){
-      case 0:
-        getCoinUSD().then((res) => {
-          setCoinUSD(res);
-        });
-        break;
-      case 1:
-        getDiaTokenPrice()
-          .then((res) => {
-            setCoinUSD(res.token.derivedELA * res.bundle.elaPrice);
-          })
-          .catch((error) => {
-            setCoinUSD(0);
-          });
-        break;
-      default:
-        break;
-    }
-  }, [coinType]);
+    if(chainType === 'ESC')
+      setCoinUSD(coinPrice[coinType]);
+    else if(chainType === 'ETH')
+      setCoinUSD(coinPrice[coinTypesForESC.length+coinType]);
+    else setCoinUSD(0)
+  }, [coinType, chainType, coinPrice]);
 
   const cancelAction = () => {
     setProgress(100)
@@ -1399,6 +1399,9 @@ export default function CreateItem() {
                             <CoinSelect selected={coinType} onChange={setCoinType}/>
                           }
                           aria-describedby="price-error-text"
+                          inputProps={{
+                            sx: {flexGrow: 1, width: 'auto'}
+                          }}
                         />
                         <FormHelperText id="price-error-text" hidden={!isOnValidation||(isOnValidation&&isPutOnSale&&price)}>Price is required</FormHelperText>
                       </FormControl>
@@ -1437,6 +1440,9 @@ export default function CreateItem() {
                             <CoinSelect selected={coinType} onChange={setCoinType}/>
                           }
                           aria-describedby="price-error-text"
+                          inputProps={{
+                            sx: {flexGrow: 1, width: 'auto'}
+                          }}
                         />
                         <FormHelperText id="price-error-text" hidden={!isOnValidation||(isOnValidation&&isPutOnSale&&price)}>Price is required</FormHelperText>
                       </FormControl>
