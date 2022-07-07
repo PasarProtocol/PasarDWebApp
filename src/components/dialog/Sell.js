@@ -174,6 +174,9 @@ export default function Sell(props) {
                 startAdornment={' '}
                 endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
                 aria-describedby="price-error-text"
+                inputProps={{
+                  sx: {flexGrow: 1, width: 'auto'}
+                }}
               />
               <FormHelperText id="price-error-text" hidden={!isOnValidation || (isOnValidation && (price*1))}>Price is required</FormHelperText>
             </FormControl>

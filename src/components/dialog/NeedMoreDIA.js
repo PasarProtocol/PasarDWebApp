@@ -12,7 +12,7 @@ export default function NeedMoreDIA(props) {
   const { library, chainId, account } = context;
 
   const { isOpen, setOpen, balance, actionText="transfer items" } = props;
-  const degree = getDiaBalanceDegree(balance)
+  const degree = getDiaBalanceDegree(balance, 0)
   const handleClose = () => {
     setOpen(false);
   };

@@ -111,8 +111,8 @@ const CellBoxStyle = styled(Box)((props) => {
 
 export default function Features() {  
   const [diaUSD, setDiaUSD] = React.useState(0);
-  const { diaBalance } = useSingin()
-  const degree = getDiaBalanceDegree(diaBalance)
+  const { diaBalance, pasarLinkChain } = useSingin()
+  const degree = getDiaBalanceDegree(diaBalance, pasarLinkChain)
 
   React.useEffect(() => {
     getDiaTokenPrice()

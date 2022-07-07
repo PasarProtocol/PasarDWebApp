@@ -183,8 +183,11 @@ export const getBalanceByAllCoinTypes = (connectProvider, balanceHandler) =>
     })
   })
 
-export const getDiaBalanceDegree = (balance) => {
+export const getDiaBalanceDegree = (balance, chainId) => {
+  const chainType = getChainTypeFromId(chainId)
   const diaBalance = balance*1
+  if(chainType === 'ETH')
+    return 4
   if(diaBalance >= 1)
     return 3
   if(diaBalance >= 0.1)
