@@ -1147,7 +1147,7 @@ export default function CreateItem() {
       if(mintype!=="Batch"){
         if(duproperties.length || singleProperties.filter(el=>el.type.length>0&&!el.name.length).length)
           enqueueSnackbar('Properties are invalid.', { variant: 'warning' });
-        else if(collection==='Choose' && degree===0)
+        else if(chainType==='ESC' && collection==='Choose' && degree===0)
           setOpenBuyDIA(true)
         else
           mintSingle()

@@ -40,7 +40,7 @@ import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import useSingin from '../../hooks/useSignin';
 import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
-import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
+import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, getChainTypeFromId } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ export default function MyProfile() {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: 0, kyc: false});
   const [socials, setSocials] = React.useState({});
-  const { diaBalance } = useSingin()
+  const { diaBalance, pasarLinkChain } = useSingin()
 
   const context = useWeb3React();
   const { account } = context;
@@ -310,8 +310,9 @@ export default function MyProfile() {
   }
 
   const handleNavlink = (e)=>{
+    const currentChain = getChainTypeFromId(pasarLinkChain)
     const path = e.target.getAttribute('to')
-    if(diaBalance>=0.01)
+    if(currentChain!=='ESC' || diaBalance>=0.01)
       navigate(path)
     else
       setOpenBuyDIA(true)

@@ -13,7 +13,7 @@ import CollectionCardSkeleton from '../../components/collection/CollectionCardSk
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
-import { fetchFrom, collectionTypes } from '../../utils/common';
+import { fetchFrom, collectionTypes, getChainTypeFromId } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ export default function Explorer() {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [needOptionToBelow, setOptionToBelow] = React.useState(false);
   const [controller, setAbortController] = React.useState(new AbortController());
-  const { diaBalance, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin()
+  const { diaBalance, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath, pasarLinkChain } = useSingin()
 
   React.useEffect(() => {
     handleResize()
@@ -72,9 +72,10 @@ export default function Explorer() {
   }
   window.addEventListener('resize', handleResize);
   const handleNavlink = (e)=>{
+    const currentChain = getChainTypeFromId(pasarLinkChain)
     const path = e.target.getAttribute('to')
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
-      if(diaBalance>=0.01)
+      if(currentChain!=='ESC' || diaBalance>=0.01)
         navigate(path)
       else
         setOpenBuyDIA(true)
