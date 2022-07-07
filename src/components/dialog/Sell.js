@@ -12,7 +12,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
-import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
+import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, coinTypes, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork, getChainTypeFromId } from '../../utils/common';
 
 export default function Sell(props) {
   const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate, saleType, royalties } = props;
@@ -61,41 +61,45 @@ export default function Sell(props) {
               'value': 0
           };
     
-          stickerContract.methods.isApprovedForAll(accounts[0], _operator).call().then(isApproval=>{
-            console.log("isApprovalForAll=", isApproval);
-            if (!isApproval)
-              stickerContract.methods.setApprovalForAll(_operator, true).send(transactionParams)
-              .on('receipt', (receipt) => {
-                  console.log("setApprovalForAll-receipt", receipt);
-                  callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
-                    '_id': tokenId,
-                    '_amount': 1,
-                    '_price': _price,
-                    '_didUri': _didUri,
-                    '_baseAddress': baseToken
-                  }).then((success) => {
-                    resolve(success)
-                  }).catch(error=>{
+          stickerContract.methods.isApprovedForAll(accounts[0], _operator).call()
+            .then(isApproval=>{
+              console.log("isApprovalForAll=", isApproval);
+              if (!isApproval)
+                stickerContract.methods.setApprovalForAll(_operator, true).send(transactionParams)
+                .on('receipt', (receipt) => {
+                    console.log("setApprovalForAll-receipt", receipt);
+                    callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
+                      '_id': tokenId,
+                      '_amount': 1,
+                      '_price': _price,
+                      '_didUri': _didUri,
+                      '_baseAddress': baseToken
+                    }).then((success) => {
+                      resolve(success)
+                    }).catch(error=>{
+                      reject(error)
+                    })
+                })
+                .on('error', (error, receipt) => {
+                    console.error("setApprovalForAll-error", error);
                     reject(error)
-                  })
-              })
-              .on('error', (error, receipt) => {
-                  console.error("setApprovalForAll-error", error);
+                });
+              else
+                callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
+                  '_id': tokenId,
+                  '_amount': 1,
+                  '_price': _price,
+                  '_didUri': _didUri,
+                  '_baseAddress': baseToken
+                }).then((success) => {
+                  resolve(success)
+                }).catch(error=>{
                   reject(error)
-              });
-            else
-              callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
-                '_id': tokenId,
-                '_amount': 1,
-                '_price': _price,
-                '_didUri': _didUri,
-                '_baseAddress': baseToken
-              }).then((success) => {
-                resolve(success)
-              }).catch(error=>{
-                reject(error)
-              })
-          })
+                })
+            })
+            .catch(error=>{
+              reject(error)
+            })
         })
         
       })
@@ -106,7 +110,8 @@ export default function Sell(props) {
     setOnValidation(true)
     if(!(price*1))
       return
-    if(coinType!==0 && diaBalance*1===0) {
+    const chainType = getChainTypeFromId(pasarLinkChain)
+    if(chainType==='ESC' && coinType!==0 && diaBalance*1===0) {
       enqueueSnackbar('Sorry, you need to hold a minimum of 0.01 DIA to sell nft via other ERC20 tokens.', { variant: 'warning' });
       return
     }
