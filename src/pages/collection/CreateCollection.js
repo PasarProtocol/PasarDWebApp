@@ -38,7 +38,7 @@ import useOffSetTop from '../../hooks/useOffSetTop';
 import useSingin from '../../hooks/useSignin';
 
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, socialTypes, getDiaBalanceDegree, fetchFrom, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, getChainTypeFromId, socialTypes, getDiaBalanceDegree, fetchFrom, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
@@ -459,6 +459,7 @@ export default function CreateCollection() {
     window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
   }
   const handleCreateAction = () => {
+    const chainType = getChainTypeFromId(pasarLinkChain)
     const degree = getDiaBalanceDegree(diaBalance)
     setOnValidation(true)
     if(!name.length)
@@ -477,7 +478,7 @@ export default function CreateCollection() {
       enqueueSnackbar('Fee recipient address is invalid.', { variant: 'warning' });
     else if(recipientRoyaltiesGroup.reduce((sum, el)=>sum+=el.royalties*1, 0)>30)
       enqueueSnackbar('Total royalties must not be more than 30%', { variant: 'warning' });
-    else if((degree===0&&collectionCount>=1) || (degree===1&&collectionCount>=2) || (degree===2&&collectionCount>=5) || (degree===3&&collectionCount>=10))
+    else if(chainType==='ESC' && ((degree===0&&collectionCount>=1) || (degree===1&&collectionCount>=2) || (degree===2&&collectionCount>=5) || (degree===3&&collectionCount>=10)))
       setOpenMoreDIA(true)
     else
       createCollection()
