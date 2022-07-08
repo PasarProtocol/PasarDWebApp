@@ -332,7 +332,9 @@ export function setAllTokenPrice(setCoinPriceByType) {
 export function getDiaTokenInfo(strAddress, connectProvider = null) {
   return getERC20TokenBalance(DIA_CONTRACT_ADDRESS, strAddress, connectProvider)
 }
-
+export function getElaOnEthTokenInfo(strAddress, connectProvider = null) {
+  return getERC20TokenBalance(ELA_ON_ETH_CONTRACT_ADDRESS, strAddress, connectProvider)
+}
 function getERC20TokenBalance(erc20ContractAddress, strAddress, connectProvider = null) {
   return new Promise((resolve, reject) => {
     try{

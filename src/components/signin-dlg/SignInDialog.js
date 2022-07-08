@@ -35,7 +35,8 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getDiaTokenPrice, fetchFrom, clearCacheData, isInAppBrowser, getCredentialInfo, checkValidChain } from '../../utils/common';
+import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getElaOnEthTokenInfo, getDiaTokenPrice, fetchFrom, getTokenPriceInEthereum, isInAppBrowser, 
+  getCredentialInfo, checkValidChain, getChainTypeFromId } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 import { creatAndRegister, prepareConnectToHive } from './HiveAPI';
 
@@ -85,8 +86,12 @@ export default function SignInDialog() {
   const [isOpenAccountPopup, setOpenAccountPopup] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
   const [balance, setBalance] = useState(0);
+  const [elaOnEthBalance, setElaOnEthBalance] = useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [diaUSD, setDiaUSD] = React.useState(0);
+  const [tokenPricesInETH, setTokenPricesInETH] = React.useState([0, 0]);
+  
+  const [chainType, setChainType] = React.useState('ESC');
   const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
   const navigate = useNavigate();
 
@@ -113,6 +118,11 @@ export default function SignInDialog() {
   }, [sessionLinkFlag, activatingConnector, account, chainId]);
 
   React.useEffect(() => {
+    const currentChainType = getChainTypeFromId(pasarLinkChain)
+    if(pasarLinkChain)
+      setChainType(currentChainType)
+  }, [pasarLinkChain])
+  React.useEffect(() => {
     if(walletAddress)
       fetchFrom(`api/v2/sticker/checkV1NFTByWallet/${walletAddress}`, {})
         .then(response => {
@@ -134,12 +144,11 @@ export default function SignInDialog() {
         if(accounts.length && walletAddress) {
           setWalletAddress(accounts[0])
           getDiaTokenInfo(accounts[0], walletConnectProvider)
-            .then((dia) => {
-              setDiaBalance(dia);
-            })
-            .catch((error) => {
-              setDiaBalance(0);
-            });
+            .then((dia) => { setDiaBalance(dia) })
+            .catch((e) => { setDiaBalance(0) })
+          getElaOnEthTokenInfo(accounts[0], walletConnectProvider)
+            .then((ela) => { setElaOnEthBalance(ela) })
+            .catch((e) => { setElaOnEthBalance(0) })
           getBalance(walletConnectProvider).then((res) => {
             setBalance(math.round(res / 1e18, 4));
           });
@@ -173,12 +182,7 @@ export default function SignInDialog() {
     getCoinUSD().then((res) => {
       setCoinUSD(res);
     });
-
-    if (!checkValidChain(chainId))
-      setSnackbarOpen(true);
-
-    if(chainId)
-      setPasarLinkChain(chainId)
+    getTokenPriceInEthereum().then((res)=>{ setTokenPricesInETH(res) })
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     if (sessionLinkFlag) {
       // when connected
@@ -190,16 +194,6 @@ export default function SignInDialog() {
           .catch((error) => {
             setDiaUSD(0);
           });
-        getDiaTokenInfo(account, library.provider)
-          .then((dia) => {
-            setDiaBalance(dia);
-          })
-          .catch((error) => {
-            setDiaBalance(0);
-          });
-        getBalance(library.provider).then((res) => {
-          setBalance(math.round(res / 1e18, 4));
-        });
       } else if (sessionLinkFlag === '2') {
         if (isInAppBrowser()) {
           const elastosWeb3Provider = await window.elastos.getWeb3Provider();
@@ -210,16 +204,6 @@ export default function SignInDialog() {
             .catch((error) => {
               setDiaUSD(0);
             });
-          getDiaTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
-            .then((dia) => {
-              setDiaBalance(dia);
-            })
-            .catch((error) => {
-              setDiaBalance(0);
-            });
-          getBalance(elastosWeb3Provider).then((res) => {
-            setBalance(math.round(res / 1e18, 4));
-          });
           // setWalletAddress(await window.elastos.getWeb3Provider().address);
         } else if (essentialsConnector.getWalletConnectProvider()) {
           const essentialProvider = essentialsConnector.getWalletConnectProvider();
@@ -230,13 +214,52 @@ export default function SignInDialog() {
             .catch((error) => {
               setDiaUSD(0);
             });
+          // setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+        }
+      }
+    }
+  }, [sessionLinkFlag]);
+
+  React.useEffect(async () => {
+    if(chainId) {
+      setPasarLinkChain(chainId)
+      if (!checkValidChain(chainId))
+        setSnackbarOpen(true);
+    }
+    sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+    if (sessionLinkFlag) {
+      // when connected
+      if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
+        getDiaTokenInfo(account, library.provider)
+          .then((dia) => { setDiaBalance(dia) })
+          .catch((e) => { setDiaBalance(0) })
+        getElaOnEthTokenInfo(account, library.provider)
+          .then((ela) => { setElaOnEthBalance(ela) })
+          .catch((e) => { setElaOnEthBalance(0) })
+        getBalance(library.provider).then((res) => {
+          setBalance(math.round(res / 1e18, 4));
+        });
+      } else if (sessionLinkFlag === '2') {
+        if (isInAppBrowser()) {
+          const elastosWeb3Provider = await window.elastos.getWeb3Provider();
+          getDiaTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
+            .then((dia) => { setDiaBalance(dia) })
+            .catch((e) => { setDiaBalance(0) })
+          getElaOnEthTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
+            .then((ela) => { setElaOnEthBalance(ela) })
+            .catch((e) => { setElaOnEthBalance(0) })
+          getBalance(elastosWeb3Provider).then((res) => {
+            setBalance(math.round(res / 1e18, 4));
+          });
+          // setWalletAddress(await window.elastos.getWeb3Provider().address);
+        } else if (essentialsConnector.getWalletConnectProvider()) {
+          const essentialProvider = essentialsConnector.getWalletConnectProvider();
           getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-            .then((dia) => {
-              setDiaBalance(dia);
-            })
-            .catch((error) => {
-              setDiaBalance(0);
-            });
+            .then((dia) => { setDiaBalance(dia) })
+            .catch((e) => { setDiaBalance(0) })
+          getElaOnEthTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
+            .then((ela) => { setElaOnEthBalance(ela) })
+            .catch((e) => { setElaOnEthBalance(0) })
           getBalance(essentialProvider).then((res) => {
             setBalance(math.round(res / 1e18, 4));
           });
@@ -244,7 +267,7 @@ export default function SignInDialog() {
         }
       }
     }
-  }, [sessionLinkFlag, account, active, chainId, activatingConnector]);
+  }, [sessionLinkFlag, account, active, chainId, activatingConnector, chainType]);
 
   // listen for disconnect from essentials / wallet connect
   React.useEffect(async () => {
@@ -543,6 +566,11 @@ export default function SignInDialog() {
     }
   };
 
+  let totalBalance = 0
+  if(chainType==='ESC')
+    totalBalance = math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2)
+  else if(chainType==='ETH')
+    totalBalance = math.round(math.round(tokenPricesInETH[0] * balance, 2) + math.round(tokenPricesInETH[1] * elaOnEthBalance, 2), 2)
   return (
     <>
       {walletAddress ? (
@@ -590,7 +618,7 @@ export default function SignInDialog() {
                 >
                   <Typography variant="h6">Total Balance</Typography>
                   <Typography variant="h3" color="origin.main">
-                    USD {math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2)}
+                    USD {totalBalance}
                   </Typography>
                   <Button
                     href="https://glidefinance.io/swap"
@@ -603,62 +631,128 @@ export default function SignInDialog() {
                     Add funds
                   </Button>
                 </PaperRecord>
-                <PaperRecord sx={{ p: 1.5 }}>
-                  <Stack direction="row" alignItems="center" spacing={2}>
-                    <Box
-                      draggable={false}
-                      component="img"
-                      alt=""
-                      src="/static/elastos.svg"
-                      sx={{ width: 24, height: 24, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}
-                    />
-                    <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                      <Typography variant="body2"> ELA </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {' '}
-                        Elastos (ESC){' '}
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <Typography variant="body2" align="right">
-                        {' '}
-                        {balance}{' '}
-                      </Typography>
-                      <Typography variant="body2" align="right" color="text.secondary">
-                        {' '}
-                        USD {math.round(coinUSD * balance, 2)}{' '}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </PaperRecord>
-                <PaperRecord sx={{ p: 1.5 }}>
-                  <Stack direction="row" alignItems="center" spacing={2}>
-                    <Box
-                      draggable={false}
-                      component="img"
-                      alt=""
-                      src="/static/badges/diamond.svg"
-                      sx={{ width: 24, height: 24 }}
-                    />
-                    <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                      <Typography variant="body2"> DIA </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {' '}
-                        Diamond (ESC){' '}
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <Typography variant="body2" align="right">
-                        {' '}
-                        {diaBalance}{' '}
-                      </Typography>
-                      <Typography variant="body2" align="right" color="text.secondary">
-                        {' '}
-                        USD {math.round(diaUSD * diaBalance, 2)}{' '}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </PaperRecord>
+                {
+                  chainType==='ESC' &&
+                  <>
+                    <PaperRecord sx={{ p: 1.5 }}>
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                        <Box
+                          draggable={false}
+                          component="img"
+                          alt=""
+                          src="/static/elastos.svg"
+                          sx={{ width: 24, height: 24, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}
+                        />
+                        <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                          <Typography variant="body2"> ELA </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {' '}
+                            Elastos (ESC){' '}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" align="right">
+                            {' '}
+                            {balance}{' '}
+                          </Typography>
+                          <Typography variant="body2" align="right" color="text.secondary">
+                            {' '}
+                            USD {math.round(coinUSD * balance, 2)}{' '}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </PaperRecord>
+                    <PaperRecord sx={{ p: 1.5 }}>
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                        <Box
+                          draggable={false}
+                          component="img"
+                          alt=""
+                          src="/static/badges/diamond.svg"
+                          sx={{ width: 24, height: 24 }}
+                        />
+                        <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                          <Typography variant="body2"> DIA </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {' '}
+                            Diamond (ESC){' '}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" align="right">
+                            {' '}
+                            {diaBalance}{' '}
+                          </Typography>
+                          <Typography variant="body2" align="right" color="text.secondary">
+                            {' '}
+                            USD {math.round(diaUSD * diaBalance, 2)}{' '}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </PaperRecord>
+                  </>
+                }
+                {
+                  chainType==='ETH' &&
+                  <>
+                    <PaperRecord sx={{ p: 1.5 }}>
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                        <Box
+                          draggable={false}
+                          component="img"
+                          alt=""
+                          src="/static/erc20/ETH.svg"
+                          sx={{ width: 24, height: 24, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}
+                        />
+                        <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                          <Typography variant="body2"> ETH </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {' '}
+                            Ether (Ethereum){' '}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" align="right">
+                            {' '}
+                            {balance}{' '}
+                          </Typography>
+                          <Typography variant="body2" align="right" color="text.secondary">
+                            {' '}
+                            USD {math.round(tokenPricesInETH[0] * balance, 2)}{' '}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </PaperRecord>
+                    <PaperRecord sx={{ p: 1.5 }}>
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                        <Box
+                          draggable={false}
+                          component="img"
+                          alt=""
+                          src="/static/erc20/ELAonETH.svg"
+                          sx={{ width: 24, height: 24 }}
+                        />
+                        <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                          <Typography variant="body2"> ELA on ETH </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {' '}
+                            Elastos (Ethereum){' '}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant="body2" align="right">
+                            {' '}
+                            {elaOnEthBalance}{' '}
+                          </Typography>
+                          <Typography variant="body2" align="right" color="text.secondary">
+                            {' '}
+                            USD {math.round(tokenPricesInETH[1] * elaOnEthBalance, 2)}{' '}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </PaperRecord>
+                  </>
+                }
               </Stack>
             </Box>
             <MenuItem to="/profile" onClick={closeAccountMenu} component={RouterLink}>
