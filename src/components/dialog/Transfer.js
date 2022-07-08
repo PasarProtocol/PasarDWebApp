@@ -62,10 +62,11 @@ export default function Transfer(props) {
             .then(collectionType => {
               const contractAbi = collectionABIs[collectionType];
               const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-              let contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id, _value)
+              let contractMethod
               if(collectionType === 0)
                 contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id)
-
+              else
+                contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id, _value)
               contractMethod.send(transactionParams)
                 .on('transactionHash', (hash) => {
                   console.log('transactionHash', hash);
