@@ -10,7 +10,7 @@ import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { ERC20_CONTRACT_ABI } from '../../abi/erc20ABI';
-import { v1marketContract as V1_MARKET_CONTRACT_ADDRESS, auctionOrderType } from '../../config';
+import { v1marketContract as V1_MARKET_CONTRACT_ADDRESS, auctionOrderType, blankAddress } from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
@@ -50,7 +50,7 @@ export default function Purchase(props) {
         const signer = provider.getSigner();
         const pasarContract = new ethers.Contract(contractAddress, PASAR_CONTRACT_ABI, signer);
         signer.getAddress().then(async userAddress=>{
-          if(coinType.address) {
+          if(coinType.address !== blankAddress) {
             const erc20Contract = new ethers.Contract(coinType.address, ERC20_CONTRACT_ABI, signer);
             const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MarketContractAddress))
             const _gasPrice = await provider.getGasPrice();
@@ -137,7 +137,7 @@ export default function Purchase(props) {
     const contractAddress = !v1State ? MarketContractAddress: V1_MARKET_CONTRACT_ADDRESS;
 
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-    if(coinType.address) {
+    if(coinType.address !== blankAddress) {
       const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinType.address);
       const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MarketContractAddress).call())
       const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
