@@ -1168,7 +1168,7 @@ export default function CreateItem() {
           <span role="img" aria-label="">🔨</span> Create Item 
         </Typography>
         <Grid container direction="row" spacing={2}>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <Typography variant="h4" sx={{fontWeight: 'normal'}}>
               Current Network&nbsp;
               <Tooltip title="This is your current network. You can change to a different network from your wallet network settings" arrow disableInteractive enterTouchDelay={0}>
@@ -1180,7 +1180,7 @@ export default function CreateItem() {
             <Stack spacing={1} direction="row">
               <NetworkBox current={chainType}/>
             </Stack>
-          </Grid>
+          </Grid> */}
           <Grid item xs={12}>
             <Typography variant="h4" sx={{fontWeight: 'normal'}}>Collection</Typography>
           </Grid>
