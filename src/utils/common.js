@@ -153,24 +153,28 @@ export const getBalance = async (connectProvider) => {
   return balance;
 };
 
-export const getBalanceByAllCoinTypes = (connectProvider, balanceHandler) =>
+export const getBalanceByAllCoinTypes = (connectProvider, chainId, balanceHandler) =>
   new Promise((resolve, reject) => {
     if (!connectProvider) {
       resolve(false)
       return
     }
-    
+    const currentCoinTypes = getCoinTypesInCurrentNetwork(chainId)
+    const chainType = getChainTypeFromId(chainId)
+    let startPos = 0
+    if(chainType === 'ETH')
+      startPos = coinTypes.length
     // const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(connectProvider);
     walletConnectWeb3.eth.getAccounts().then(accounts=>{
-      const getBalanceFuncs = coinTypes.map((coin, _i)=>{
+      const getBalanceFuncs = currentCoinTypes.map((coin, _i)=>{
         if(coin.address === blankAddress) 
           return walletConnectWeb3.eth.getBalance(accounts[0]).then(balance=>{
-            balanceHandler(_i, math.round(balance / 1e18, 4))
+            balanceHandler(_i+startPos, math.round(balance / 1e18, 4))
           }).catch(err=>{})
 
         return getERC20TokenBalance(coin.address, accounts[0], connectProvider).then(balance=>{
-          balanceHandler(_i, balance*1)
+          balanceHandler(_i+startPos, balance*1)
         }).catch(err=>{})
       })
       Promise.all(getBalanceFuncs).then(res=>{

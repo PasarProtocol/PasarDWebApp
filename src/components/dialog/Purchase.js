@@ -16,20 +16,21 @@ import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import StyledButton from '../signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
-import { reduceHexAddress, getContractAddressInCurrentNetwork, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, getFilteredGasPrice, coinTypes } from '../../utils/common';
+import { reduceHexAddress, getContractAddressInCurrentNetwork, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, getFilteredGasPrice, coinTypes, 
+  coinTypesForEthereum } from '../../utils/common';
 
 export default function Purchase(props) {
   const navigate = useNavigate();
-  const [balanceArray, setBalanceArray] = useState(Array(coinTypes.length).fill(0));
+  const [balanceArray, setBalanceArray] = useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const context = useWeb3React();
   const { pasarLinkAddress, pasarLinkChain } = useSingin()
   const { library, chainId, account } = context;
-  const { isOpen, setOpen, info, coinType=0 } = props;
+  const { isOpen, setOpen, info, coinType={} } = props;
   const { v1State=false } = info
   
-  const coinBalance = balanceArray[coinType]
+  const coinBalance = balanceArray[coinType.index]
   const coinName = coinType.name
   let priceInfo = info.Price;
   if(info.orderType===auctionOrderType && info.buyoutPrice)
@@ -49,7 +50,7 @@ export default function Purchase(props) {
         const signer = provider.getSigner();
         const pasarContract = new ethers.Contract(contractAddress, PASAR_CONTRACT_ABI, signer);
         signer.getAddress().then(async userAddress=>{
-          if(coinType) {
+          if(coinType.address) {
             const erc20Contract = new ethers.Contract(coinType.address, ERC20_CONTRACT_ABI, signer);
             const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MarketContractAddress))
             const _gasPrice = await provider.getGasPrice();
@@ -76,7 +77,7 @@ export default function Purchase(props) {
               'from': userAddress,
               'gasPrice': gasPrice.toBigInt(),
               'gasLimit': 5000000,
-              'value': coinType===0?_price:0
+              'value': coinType.index===0?_price:0
             };
 
             let contractMethod = pasarContract.buyOrder(_orderId, 'did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK', transactionParams)
@@ -136,7 +137,7 @@ export default function Purchase(props) {
     const contractAddress = !v1State ? MarketContractAddress: V1_MARKET_CONTRACT_ADDRESS;
 
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-    if(coinType) {
+    if(coinType.address) {
       const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinType.address);
       const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MarketContractAddress).call())
       const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
@@ -163,7 +164,7 @@ export default function Purchase(props) {
       'from': accounts[0],
       'gasPrice': gasPrice,
       // 'gas': 5000000,
-      'value': coinType===0?_price:0
+      'value': coinType.index===0?_price:0
     };
     let contractMethod = pasarContract.methods.buyOrder(_orderId, _didUri)
     if(info.orderType===auctionOrderType)
@@ -217,21 +218,22 @@ export default function Purchase(props) {
 
   React.useEffect(async () => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+    setBalanceArray(Array(coinTypes.length+coinTypesForEthereum.length).fill(0))
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library)
-        getBalanceByAllCoinTypes(library.provider, setBalanceByCoinType)
+        getBalanceByAllCoinTypes(library.provider, pasarLinkChain, setBalanceByCoinType)
       else if (sessionLinkFlag === '2'){
         if (isInAppBrowser()) {
           const elastosWeb3Provider = await window.elastos.getWeb3Provider()
-          getBalanceByAllCoinTypes(elastosWeb3Provider, setBalanceByCoinType)
+          getBalanceByAllCoinTypes(elastosWeb3Provider, pasarLinkChain, setBalanceByCoinType)
         } else if(essentialsConnector.getWalletConnectProvider()) {
-          getBalanceByAllCoinTypes(essentialsConnector.getWalletConnectProvider(), setBalanceByCoinType)
+          getBalanceByAllCoinTypes(essentialsConnector.getWalletConnectProvider(), pasarLinkChain, setBalanceByCoinType)
         }
       }
       else if (sessionLinkFlag === '3')
-        getBalanceByAllCoinTypes(walletconnect.getProvider(), setBalanceByCoinType)
+        getBalanceByAllCoinTypes(walletconnect.getProvider(), pasarLinkChain, setBalanceByCoinType)
     }
-  }, [account, chainId, pasarLinkAddress]);
+  }, [account, chainId, pasarLinkAddress, pasarLinkChain]);
 
   const price = priceInfo / 1e18;
   const platformFee = math.round((price * 2) / 100, 4);
