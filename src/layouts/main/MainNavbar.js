@@ -14,6 +14,7 @@ import useSignin from '../../hooks/useSignin';
 import { MHidden } from '../../components/@material-extend';
 import SearchBox from '../../components/SearchBox';
 import Searchbar from '../../components/Searchbar';
+import NetworkCircle from '../../components/NetworkCircle'
 import SignInDialog from '../../components/signin-dlg/SignInDialog';
 //
 import MenuDesktop from './MenuDesktop';
@@ -132,6 +133,7 @@ export default function MainNavbar() {
             />
           </MHidden>
           <SignInDialog/>
+          <NetworkCircle/>
           <MHidden width="mdDown">
             <Button
               variant="outlined"
