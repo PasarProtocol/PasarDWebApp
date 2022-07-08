@@ -12,8 +12,10 @@ import arrowIosUpwardFill from '@iconify/icons-eva/arrow-ios-upward-fill';
 import { useSnackbar } from 'notistack';
 
 import { InputStyle, InputLabelStyle } from '../CustomInput';
-import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import { reduceHexAddress, removeLeadingZero, isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
+// import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
+import { TOKEN_721_ABI } from '../../abi/token721ABI';
+import { TOKEN_1155_ABI } from '../../abi/token1155ABI';
+import { reduceHexAddress, removeLeadingZero, isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork, getERCType } from '../../utils/common';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
 import useSingin from '../../hooks/useSignin';
@@ -27,6 +29,7 @@ export default function Transfer(props) {
     const [memo, setMemo] = React.useState('');
     const [isOnValidation, setOnValidation] = React.useState(false);
     const { pasarLinkChain } = useSingin()
+    const collectionABIs = [TOKEN_721_ABI, TOKEN_1155_ABI]
 
     const handleClose = () => {
       setOnValidation(false)
@@ -43,42 +46,51 @@ export default function Transfer(props) {
       if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2')
         walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
       const walletConnectWeb3 = new Web3(walletConnectProvider);
-      walletConnectWeb3.eth.getAccounts().then(accounts=>{
-        const contractAbi = STICKER_CONTRACT_ABI;
-        const contractAddress = baseToken || PasarContractAddress;
-        const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-    
+      walletConnectWeb3.eth.getAccounts().then(accounts=>{    
         walletConnectWeb3.eth.getGasPrice().then(_gasPrice=>{
           const gasPrice = getFilteredGasPrice(_gasPrice)
           console.log('Sending transaction with account address:', accounts[0]);
           const transactionParams = {
             'from': accounts[0],
             'gasPrice': gasPrice,
-            'gas': 5000000,
+            'gas': 8000000,
             'value': 0
           };
       
-          stickerContract.methods
-            .safeTransferFrom(accounts[0], _to, _id, _value)
-            .send(transactionParams)
-            .on('transactionHash', (hash) => {
-              console.log('transactionHash', hash);
+          const contractAddress = baseToken || PasarContractAddress;
+          getERCType(contractAddress, walletConnectProvider)
+            .then(collectionType => {
+              const contractAbi = collectionABIs[collectionType];
+              const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+              let contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id, _value)
+              if(collectionType === 0)
+                contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id)
+
+              contractMethod.send(transactionParams)
+                .on('transactionHash', (hash) => {
+                  console.log('transactionHash', hash);
+                })
+                .on('receipt', (receipt) => {
+                  console.log('receipt', receipt);
+                  setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
+                  enqueueSnackbar('Transfer NFT success!', { variant: 'success' });
+                  setOnProgress(false);
+                  setOpen(false);
+                })
+                .on('confirmation', (confirmationNumber, receipt) => {
+                  console.log('confirmation', confirmationNumber, receipt);
+                })
+                .on('error', (error, receipt) => {
+                  console.error('error', error);
+                  enqueueSnackbar('Transfer NFT error!', { variant: 'warning' });
+                  setOnProgress(false);
+                })
             })
-            .on('receipt', (receipt) => {
-              console.log('receipt', receipt);
-              setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
-              enqueueSnackbar('Transfer NFT success!', { variant: 'success' });
+            .catch(err=>{
+              enqueueSnackbar('Transfer NFT error!', { variant: 'error' });
               setOnProgress(false);
-              setOpen(false);
             })
-            .on('confirmation', (confirmationNumber, receipt) => {
-              console.log('confirmation', confirmationNumber, receipt);
-            })
-            .on('error', (error, receipt) => {
-              console.error('error', error);
-              enqueueSnackbar('Transfer NFT error!', { variant: 'warning' });
-              setOnProgress(false);
-            })
+
         }).catch(err=>{
           enqueueSnackbar('Transfer NFT error!', { variant: 'error' });
           setOnProgress(false);
