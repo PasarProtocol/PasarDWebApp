@@ -99,7 +99,7 @@ export default function PlaceBid(props) {
               'from': userAddress,
               'gasPrice': gasPrice.toBigInt(),
               'gasLimit': 5000000,
-              'value': coinType.index===0?_price:0
+              'value': coinType.address === blankAddress?_price:0
             };
             
             const contractMethod = pasarContract.bidForOrder(_orderId, _price, '', transactionParams)
@@ -188,7 +188,7 @@ export default function PlaceBid(props) {
       'from': accounts[0],
       'gasPrice': gasPrice,
       // 'gas': 5000000,
-      'value': coinType.index===0?_price:0
+      'value': coinType.address === blankAddress?_price:0
     };
     // console.log(_orderId, _price, _didUri)
     const contractMethod = pasarContract.methods.bidForOrder(_orderId, _price, _didUri)

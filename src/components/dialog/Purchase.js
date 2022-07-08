@@ -77,7 +77,7 @@ export default function Purchase(props) {
               'from': userAddress,
               'gasPrice': gasPrice.toBigInt(),
               'gasLimit': 5000000,
-              'value': coinType.index===0?_price:0
+              'value': coinType.address === blankAddress?_price:0
             };
 
             let contractMethod = pasarContract.buyOrder(_orderId, 'did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK', transactionParams)
@@ -164,7 +164,7 @@ export default function Purchase(props) {
       'from': accounts[0],
       'gasPrice': gasPrice,
       // 'gas': 5000000,
-      'value': coinType.index===0?_price:0
+      'value': coinType.address === blankAddress?_price:0
     };
     let contractMethod = pasarContract.methods.buyOrder(_orderId, _didUri)
     if(info.orderType===auctionOrderType)
