@@ -17,8 +17,8 @@ import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
-import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, 
-  removeLeadingZero, coinTypes, coinTypesForEthereum, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
+import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, getCoinTypesInCurrentNetwork,
+  removeLeadingZero, coinTypes, coinTypesForEthereum, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork, getChainTypeFromId } from '../../utils/common';
 
 export default function PlaceBid(props) {
   const navigate = useNavigate();
@@ -35,7 +35,9 @@ export default function PlaceBid(props) {
   const { library, chainId, account } = context;
   const { isOpen, setOpen, info, coinType={} } = props;
 
+  const chainType = getChainTypeFromId(pasarLinkChain)
   const coinBalance = balanceArray[coinType.index]
+  console.log(balanceArray, coinType.index)
   const coinName = coinType.name
   const targetPrice = isBuynow?math.round(info.buyoutPrice / 1e18, 3):bidPrice
   const actionText = isBuynow?"Buy NFT":"Bid NFT"
@@ -246,21 +248,22 @@ export default function PlaceBid(props) {
   }
   React.useEffect(async () => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+    setBalanceArray(Array(coinTypes.length+coinTypesForEthereum.length).fill(0))
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library)
-        getBalanceByAllCoinTypes(library.provider, setBalanceByCoinType)
+        getBalanceByAllCoinTypes(library.provider, pasarLinkChain, setBalanceByCoinType)
       else if (sessionLinkFlag === '2'){
         if (isInAppBrowser()) {
           const elastosWeb3Provider = await window.elastos.getWeb3Provider()
-          getBalanceByAllCoinTypes(elastosWeb3Provider, setBalanceByCoinType)
+          getBalanceByAllCoinTypes(elastosWeb3Provider, pasarLinkChain, setBalanceByCoinType)
         } else if(essentialsConnector.getWalletConnectProvider()) {
-          getBalanceByAllCoinTypes(essentialsConnector.getWalletConnectProvider(), setBalanceByCoinType)
+          getBalanceByAllCoinTypes(essentialsConnector.getWalletConnectProvider(), pasarLinkChain, setBalanceByCoinType)
         }
       }
       else if (sessionLinkFlag === '3')
-        getBalanceByAllCoinTypes(walletconnect.getProvider(), setBalanceByCoinType)
+        getBalanceByAllCoinTypes(walletconnect.getProvider(), pasarLinkChain, setBalanceByCoinType)
     }
-  }, [account, chainId, pasarLinkAddress]);
+  }, [account, chainId, pasarLinkAddress, pasarLinkChain]);
 
   const price = Math.max(info.Price / 1e18, targetPrice);
   const platformFee = math.round((price * 2) / 100, 4);
