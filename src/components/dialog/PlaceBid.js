@@ -19,6 +19,7 @@ import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, getCoinTypesInCurrentNetwork,
   removeLeadingZero, coinTypes, coinTypesForEthereum, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork, getChainTypeFromId } from '../../utils/common';
+import { blankAddress } from '../../config'
 
 export default function PlaceBid(props) {
   const navigate = useNavigate();
@@ -70,7 +71,7 @@ export default function PlaceBid(props) {
         const signer = provider.getSigner();
         const pasarContract = new ethers.Contract(MarketContractAddress, PASAR_CONTRACT_ABI, signer);
         signer.getAddress().then(async userAddress=>{
-          if(coinType.address) {
+          if(coinType.address !== blankAddress) {
             const erc20Contract = new ethers.Contract(coinType.address, ERC20_CONTRACT_ABI, signer);
             const erc20BidderApproved = BigInt(await erc20Contract.allowance(userAddress, MarketContractAddress))
             console.log(erc20BidderApproved)
@@ -156,9 +157,13 @@ export default function PlaceBid(props) {
 
     const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
     const pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, MarketContractAddress);
-    if(coinType.address) {
+    if(coinType.address !== blankAddress) {
       const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinType.address);
       const erc20BidderApproved = BigInt(await erc20Contract.methods.allowance(accounts[0], MarketContractAddress).call())
+      // erc20Contract.methods.allowance(accounts[0], MarketContractAddress).call()
+      //   .then(result=>{
+      //     const erc20BidderApproved = BigInt(result)
+      //   })
       const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
       const gasPrice = getFilteredGasPrice(_gasPrice)
       if(erc20BidderApproved < _price*1){
