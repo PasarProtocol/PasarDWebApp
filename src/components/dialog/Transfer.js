@@ -41,6 +41,7 @@ export default function Transfer(props) {
     }
 
     const callSafeTransferFrom = (_to, _id, _value) => {
+      const PASAR_DATA_MAGIC = "NFT Market PasarV2"
       const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker')
       let walletConnectProvider = Web3.givenProvider;
       if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2')
@@ -53,7 +54,7 @@ export default function Transfer(props) {
           const transactionParams = {
             'from': accounts[0],
             'gasPrice': gasPrice,
-            'gas': 8000000,
+            'gas': 5000000,
             'value': 0
           };
       
@@ -64,9 +65,9 @@ export default function Transfer(props) {
               const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
               let contractMethod
               if(collectionType === 0)
-                contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id)
+                contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id, Buffer.from(PASAR_DATA_MAGIC))
               else
-                contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id, _value)
+                contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id, _value, Buffer.from(PASAR_DATA_MAGIC))
               contractMethod.send(transactionParams)
                 .on('transactionHash', (hash) => {
                   console.log('transactionHash', hash);
