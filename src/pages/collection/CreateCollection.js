@@ -33,7 +33,7 @@ import { essentialsConnector } from '../../components/signin-dlg/EssentialConnec
 import {REGISTER_CONTRACT_ABI} from '../../abi/registerABI'
 import {TOKEN_721_ABI} from '../../abi/token721ABI'
 import {TOKEN_1155_ABI} from '../../abi/token1155ABI'
-import {diaContract as DIA_TOKEN_ADDRESS, ipfsURL, tokenConf} from '../../config'
+import {blankAddress, diaContract as DIA_TOKEN_ADDRESS, ipfsURL, tokenConf} from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSingin from '../../hooks/useSignin';
 
@@ -99,6 +99,7 @@ export default function CreateCollection() {
   const APP_BAR_MOBILE = 64;
   const APP_BAR_DESKTOP = 88;
   const navigate = useNavigate();
+  const chainType = getChainTypeFromId(pasarLinkChain)
   
   React.useEffect(async () => {
     if(sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2')
@@ -323,6 +324,9 @@ export default function CreateCollection() {
         return
       }
       const diaTokenValue = BigInt((10 ** tokenConf.diaDecimals * tokenConf.diaValue * tokenConf.nPPM) / tokenConf.PPM).toString();
+      let deployArgs = [name, symbol, paramObj._uri, DIA_TOKEN_ADDRESS, diaTokenValue]
+      if(chainType !== 'ESC')
+        deployArgs = [name, symbol, paramObj._uri, blankAddress, '0']
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
       // getCurrentWeb3Provider().then((walletConnectWeb3) => {
         walletConnectWeb3.eth.getAccounts().then((accounts)=>{
@@ -332,7 +336,7 @@ export default function CreateCollection() {
             const gasPrice = getFilteredGasPrice(_gasPrice)
             registerContract = registerContract.deploy({
               data: '0x'.concat(raw(`../../bytecode/${tokenCode}`)),
-              arguments: [name, symbol, paramObj._uri, DIA_TOKEN_ADDRESS, diaTokenValue],
+              arguments: deployArgs,
             })
             const transactionParams = {
               'from': accounts[0],
@@ -459,7 +463,6 @@ export default function CreateCollection() {
     window.scrollTo({top: ref.current.offsetTop-fixedHeight, behavior: 'smooth'})
   }
   const handleCreateAction = () => {
-    const chainType = getChainTypeFromId(pasarLinkChain)
     const degree = getDiaBalanceDegree(diaBalance, pasarLinkChain)
     setOnValidation(true)
     if(!name.length)
