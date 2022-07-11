@@ -208,6 +208,9 @@ export default function UpdatePrice(props) {
                     onChange={handleChangeReservePrice}
                     startAdornment={' '}
                     endAdornment={<CoinTypeLabel type={coinType}/>}
+                    inputProps={{
+                      sx: {flexGrow: 1, width: 'auto'}
+                    }}
                   />
                 </FormControl>
                 <Divider />
@@ -248,6 +251,9 @@ export default function UpdatePrice(props) {
                     onChange={handleChangeBuyoutPrice}
                     startAdornment={' '}
                     endAdornment={<CoinTypeLabel type={coinType}/>}
+                    inputProps={{
+                      sx: {flexGrow: 1, width: 'auto'}
+                    }}
                   />
                 </FormControl>
                 <Divider />

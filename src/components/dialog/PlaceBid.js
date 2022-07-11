@@ -326,6 +326,9 @@ export default function PlaceBid(props) {
                 onChange={handleChangeBidPrice}
                 startAdornment={' '}
                 endAdornment={<CoinTypeLabel type={coinType}/>}
+                inputProps={{
+                  sx: {flexGrow: 1, width: 'auto'}
+                }}
               />
             </FormControl>
             <Divider />

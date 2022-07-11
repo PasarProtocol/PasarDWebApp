@@ -19,7 +19,7 @@ import CoinTypeLabel from '../CoinTypeLabel';
 import DIABadge from '../DIABadge';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString, 
-  isValidLimitPrice, getDiaBalanceDegree, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
+  isValidLimitPrice, getDiaBalanceDegree, getFilteredGasPrice, getContractAddressInCurrentNetwork, getCoinTypesInCurrentNetwork } from '../../utils/common';
 import useSignin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
 
@@ -43,6 +43,7 @@ export default function Auction(props) {
   const context = useWeb3React();
   const { pasarLinkAddress, pasarLinkChain, diaBalance } = useSignin()
   const { library, chainId, account } = context;
+  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain)
 
   React.useEffect(async () => {
     if(isOpen)
@@ -339,8 +340,11 @@ export default function Auction(props) {
                   onChange={(e)=>{handleChangePrice(e, 'reserve')}}
                   startAdornment={' '}
                   endAdornment={
-                    <CoinTypeLabel type={coinType}/>
+                    <CoinTypeLabel type={coinTypes[coinType]}/>
                   }
+                  inputProps={{
+                    sx: {flexGrow: 1, width: 'auto'}
+                  }}
                 />
               </FormControl>
               <Divider/>
@@ -402,8 +406,11 @@ export default function Auction(props) {
                   onChange={(e)=>{handleChangePrice(e, 'buyout')}}
                   startAdornment={' '}
                   endAdornment={
-                    <CoinTypeLabel type={coinType}/>
+                    <CoinTypeLabel type={coinTypes[coinType]}/>
                   }
+                  inputProps={{
+                    sx: {flexGrow: 1, width: 'auto'}
+                  }}
                 />
               </FormControl>
               <Divider/>

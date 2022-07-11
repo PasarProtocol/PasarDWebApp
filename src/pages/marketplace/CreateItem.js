@@ -1515,9 +1515,12 @@ export default function CreateItem() {
                               onChange={handleChangeReservePrice}
                               startAdornment={' '}
                               endAdornment={
-                                <CoinTypeLabel type={coinType}/>
+                                <CoinTypeLabel type={coinTypes[coinType]}/>
                               }
                               aria-describedby="reserve-price-error-text"
+                              inputProps={{
+                                sx: {flexGrow: 1, width: 'auto'}
+                              }}
                             />
                             <FormHelperText id="reserve-price-error-text" hidden={!(isOnValidation&&isPutOnSale&&!reservePrice)}>Please input Reserve Price</FormHelperText>
                           </FormControl>
@@ -1580,9 +1583,12 @@ export default function CreateItem() {
                               onChange={handleChangeBuyoutPrice}
                               startAdornment={' '}
                               endAdornment={
-                                <CoinTypeLabel type={coinType}/>
+                                <CoinTypeLabel type={coinTypes[coinType]}/>
                               }
                               aria-describedby="buyout-price-error-text"
+                              inputProps={{
+                                sx: {flexGrow: 1, width: 'auto'}
+                              }}
                             />
                             <FormHelperText id="buyout-price-error-text" hidden={!(isOnValidation&&isPutOnSale&&!buyoutPrice)}>Please input Buy Now Price</FormHelperText>
                           </FormControl>
