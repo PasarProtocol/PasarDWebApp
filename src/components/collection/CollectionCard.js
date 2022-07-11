@@ -17,7 +17,8 @@ import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
 import Badge from '../Badge';
 import DIABadge from '../DIABadge';
 import useSingin from '../../hooks/useSignin';
-import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, coinTypes, getInfoFromDID, getAssetImage, checkWhetherGeneralCollection } from '../../utils/common';
+import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, coinTypes, getInfoFromDID, getAssetImage, 
+  checkWhetherGeneralCollection, chainTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const avatarStyle = {
@@ -48,6 +49,9 @@ const paperStyle = {
   '&:hover .cover-image': {
     OTransform: 'scale(1.2)',
     transform: 'scale(1.2)'
+  },
+  '&:hover .network': {
+    display: 'block'
   }
 }
 const forceHoverStyle = {
@@ -77,7 +81,7 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
 }));
 
 const CollectionImgBox = (props) => {
-  const { name, background: backgroundImg, avatar, totalCount, realData, collectibles, token } = props;
+  const { name, background: backgroundImg, avatar, totalCount, realData, collectibles, token, marketPlace } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openGroupBox, setOpenGroupBox] = React.useState(false);
   const imageStyle = {
@@ -117,6 +121,19 @@ const CollectionImgBox = (props) => {
           />
         }
       </Stack>
+      {
+        !!marketPlace && 
+        <Tooltip title={chainTypes[marketPlace-1].name} arrow enterTouchDelay={0}>
+          <Box className='network' sx={{borderRadius: '100%', overflow: 'hidden', position: 'absolute', right: 8, top: 8, display: 'none'}}>
+            <Box 
+              component="img" 
+              src={`/static/${chainTypes[marketPlace-1].icon}`} 
+              draggable = {false}
+              sx={{ background: chainTypes[marketPlace-1].color, width: 30, height: 30, p: '7px' }}
+            />
+          </Box>
+        </Tooltip>
+      }
       {
         !avatar || avatar.startsWith('/static')?
         <MarkBoxStyle {...avatarAction}>
@@ -341,7 +358,7 @@ const CollectionCardPaper = (props) => {
     setOpenPopup(null);
   };
 
-  const imgBoxProps = {avatar, background, name, totalCount, realData, collectibles, token}
+  const imgBoxProps = {avatar, background, name, totalCount, realData, collectibles, token, marketPlace}
   return (
       <PaperRecord sx={isPreview?{ overflow: 'hidden' } : { overflow: 'hidden', ...paperStyle, ...(isOpenPopup?forceHoverStyle:{}) }}>
         <Box>
