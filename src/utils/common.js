@@ -698,7 +698,8 @@ export const collectionTypes = [
     avatar: '/static/logo-icon-white.svg',
     shortDescription: 'Pasar default collection',
     description: 'A collection of all items minted using the Pasar Collection Contract',
-    token: 2
+    token: 2,
+    marketPlace: 1
   },
   {
     symbol: 'FSTK',
@@ -706,7 +707,8 @@ export const collectionTypes = [
     avatar: '/static/feeds-sticker.svg',
     shortDescription: 'Feeds default collection',
     description: 'A collection of all items minted using the Feeds NFT Stickers Contract',
-    token: 1
+    token: 1,
+    marketPlace: 1
   },
   // {
   //   symbol: 'Bunny',

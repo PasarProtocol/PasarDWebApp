@@ -272,8 +272,9 @@ export default function Searchbar({placeholder}) {
                         </ListItem>
                         <Divider />
                         {
-                          instanceSearchResult.collections.map((item, _i)=>(
-                            <ListItemButton key={_i} component={RouterLink} to={`/collections/detail/${item.token}`} onClick={handleLinkClick}>
+                          instanceSearchResult.collections.map((item, _i)=>{
+                            const { token, marketPlace=1 } = item
+                            return <ListItemButton key={_i} component={RouterLink} to={`/collections/detail/${marketPlace}${token}`} onClick={handleLinkClick}>
                               <ListItemAvatar>
                                 <Avatar alt="Collection" src={instanceCollectionAvatar[_i]} sx={{width: 30, height: 30}} />
                               </ListItemAvatar>
@@ -287,7 +288,7 @@ export default function Searchbar({placeholder}) {
                                 }}
                               />
                             </ListItemButton>
-                          ))
+                          })
                         }
                       </>
                     }
