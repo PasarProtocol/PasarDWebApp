@@ -646,7 +646,7 @@ export default function CollectibleDetail() {
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>{collectible.description}</Typography>
               <Stack sx={{mt: 2}} spacing={1}>
-                <Typography variant="subtitle2">Creator</Typography>
+                <Typography variant="subtitle2">Minted By</Typography>
                 <Stack direction='row'>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
                     <Link to={`/profile/others/${collectible.royaltyOwner}`} component={RouterLink} color='text.primary' sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
