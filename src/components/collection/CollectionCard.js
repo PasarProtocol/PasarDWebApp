@@ -441,12 +441,13 @@ const CollectionCardPaper = (props) => {
 
 export default function CollectionCard(props) {
   const { info, isPreview=false, isDragging } = props
+  const { token, marketPlace=1} = info
   const [isOpenUpdateRoyalties, setUpdateRoyaltiesOpen] = React.useState(false);
   const navigate = useNavigate();
 
   const route2Detail = () => {
     if(!isDragging)
-      navigate(`/collections/detail/${info.token}`);
+      navigate(`/collections/detail/${marketPlace}${token}`);
   }
 
   return (

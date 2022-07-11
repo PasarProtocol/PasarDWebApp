@@ -92,6 +92,7 @@ export default function CollectionDetail() {
   let socials = {}
 
   const [isLoadingCollection, setLoadingCollection] = React.useState(true);
+  const [collectionParam, setCollectionParam] = React.useState({marketPlace: params.collection.charAt(0)*1, address: params.collection.substr(1)});
   const [collection, setCollection] = React.useState({});
   const [metaObj, setMetaObj] = React.useState({});
   const [didName, setDidName] = React.useState('');
@@ -113,7 +114,6 @@ export default function CollectionDetail() {
   });
   const [totalCount, setTotalCount] = React.useState(0);
   const [order, setOrder] = React.useState(sessionFilterProps.order || 0);
-  const [chainType, setChainType] = React.useState(sessionFilterProps.chainType || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
 
@@ -130,9 +130,13 @@ export default function CollectionDetail() {
     }
   }
   
-  React.useEffect(async () => {
+  React.useEffect(() => {
+    const tempParam = {}
+    tempParam.marketPlace = params.collection.charAt(0)*1
+    tempParam.address = params.collection.substr(1)
+    setCollectionParam(tempParam)
     setLoadingCollection(true);
-    fetchFrom(`api/v2/sticker/getCollection/${params.collection}`)
+    fetchFrom(`api/v2/sticker/getCollection/${tempParam.address}`)
       .then((response) => {
         response.json().then((jsonAssets) => {
           setCollection(jsonAssets.data);
@@ -186,14 +190,14 @@ export default function CollectionDetail() {
     setLoadingAssets(true);
 
     const bodyParams = {
-      baseToken: params.collection,
+      baseToken: collectionParam.address,
       attribute: Object.keys(selectedAttributes).length?selectedAttributes:"",
       status: statusFilter,
       itemType: itemTypeFilter,
       minPrice: range.min!==''?range.min*1e18:'',
       maxPrice: range.max!==''?range.max*1e18:'',
       order,
-      marketPlace: chainType,
+      marketPlace: collectionParam.marketPlace,
       keyword: params.key?params.key:'',
       pageNum: page,
       pageSize: showCount,
@@ -231,9 +235,9 @@ export default function CollectionDetail() {
         if(e.code !== e.ABORT_ERR)
           setLoadingAssets(false);
       });
-    sessionStorage.setItem("filter-props-other", JSON.stringify({selectedBtns, selectedAttributes, range, selectedTokens, adult, order, chainType}))
+    sessionStorage.setItem("filter-props-other", JSON.stringify({selectedBtns, selectedAttributes, range, selectedTokens, adult, order}))
     setFilterForm({selectedBtns, selectedAttributes, range, selectedTokens, adult, order})
-  }, [page, showCount, selectedBtns, selectedAttributes, selectedTokens, adult, range, order, chainType, params.key, params.collection]);
+  }, [page, showCount, selectedBtns, selectedAttributes, selectedTokens, adult, range, order, params.key, collectionParam]);
   
   const handleDispmode = (event, mode) => {
     if(mode===null)
@@ -534,7 +538,6 @@ export default function CollectionDetail() {
                     </Box>
                     <Box sx={{display: 'flex'}}>
                       <AssetSortSelect selected={order} onChange={setOrder}/>
-                      <ChainSelect selected={chainType} onChange={setChainType}/>
                       <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                         <ToggleButton value={0}>
                           <GridViewSharpIcon />
@@ -567,7 +570,7 @@ export default function CollectionDetail() {
                         p: 1
                       }}
                       filterProps = {{selectedBtns, selectedTokens, selectedAttributes, range, adult, order}}
-                      {...{btnGroup, handleFilter, address: params.collection}}
+                      {...{btnGroup, handleFilter, address: collectionParam.address, marketPlace: collectionParam.marketPlace}}
                     />
                   </Box>
                   <Box
@@ -577,7 +580,6 @@ export default function CollectionDetail() {
                     <MHidden width="smUp">
                       <Box sx={{display: 'flex', p: '10px', pb: 1}}>
                         <AssetSortSelect selected={order} onChange={setOrder} sx={{flex: 1}}/>
-                        <ChainSelect selected={chainType} onChange={setChainType}/>
                         <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                           <ToggleButton value={0}>
                             <SquareIcon />
@@ -685,7 +687,7 @@ export default function CollectionDetail() {
                   }}
                   filterProps = {filterForm}
                   handleFilter = {handleFilterMobile}
-                  {...{btnGroup, address: params.collection}}
+                  {...{btnGroup, address: collectionParam.address, marketPlace: collectionParam.marketPlace}}
                 />
                 <Divider />
                 <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>

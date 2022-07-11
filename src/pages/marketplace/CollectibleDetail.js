@@ -703,7 +703,7 @@ export default function CollectibleDetail() {
                 <Typography variant="subtitle2">Collection</Typography>
                 {
                   collection?
-                  <Link to={`/collections/detail/${collection.token}`} component={RouterLink} sx={{ color: 'inherit' }}>
+                  <Link to={`/collections/detail/${collection.marketPlace}${collection.token}`} component={RouterLink} sx={{ color: 'inherit' }}>
                     <Stack direction='row'>
                       {
                         collection.avatar?
@@ -859,7 +859,7 @@ export default function CollectibleDetail() {
                 <AccordionDetails sx={{pb: '50px', position: 'relative', px: '20px'}}>
                   <Stack direction="row" spacing={2}>
                     <MHidden width="smDown">
-                      <Link to={`/collections/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
+                      <Link to={`/collections/detail/${collection.marketPlace}${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
                           {
                             collection.avatar?
                             <AvatarStyle draggable = {false} component="img" src={collection.avatar} sx={{ minWidth: 40 }} />:
@@ -870,7 +870,7 @@ export default function CollectibleDetail() {
                     <Stack spacing={1} sx={{ minWidth: 0, flexGrow: 1 }}>
                         <Stack direction="row">
                           <MHidden width="smUp">
-                            <Link to={`/collections/detail/${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
+                            <Link to={`/collections/detail/${collection.marketPlace}${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
                                 {
                                   collection.avatar?
                                   <AvatarStyle draggable = {false} component="img" src={collection.avatar} sx={{ minWidth: 40 }} />:

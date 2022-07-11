@@ -98,7 +98,7 @@ export default function BadgeProfile(props) {
     setOpen(false);
   };
 
-  const {avatar, token} = collection || defaultCollection
+  const {avatar, token, marketPlace=1} = collection || defaultCollection
   let {name, description} = collection || defaultCollection
   let dispAddress = reduceHexAddress(token)
   if(type===2){
@@ -256,7 +256,7 @@ export default function BadgeProfile(props) {
                     <>
                       {
                         collection?
-                        <Link to={`/collections/detail/${token}`} component={RouterLink} color='text.primary'>
+                        <Link to={`/collections/detail/${marketPlace}${token}`} component={RouterLink} color='text.primary'>
                           <Box sx={{ backgroundColor: 'black', borderRadius: '100%', width: 60, height: 60, display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
                             <Box draggable = {false} component="img" src={avatar} sx={{ width: avatar&&avatar.startsWith('/static')?35:60 }} />
                           </Box>
@@ -295,7 +295,7 @@ export default function BadgeProfile(props) {
                   <>
                     {
                       collection?
-                      <Link to={`/collections/detail/${token}`} component={RouterLink} color='text.primary'>
+                      <Link to={`/collections/detail/${marketPlace}${token}`} component={RouterLink} color='text.primary'>
                         <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
                       </Link>:
                       <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>

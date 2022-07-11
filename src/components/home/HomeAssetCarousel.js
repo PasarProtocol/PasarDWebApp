@@ -42,7 +42,7 @@ const CardStyle = styled(Card)(({ theme }) => ({
 }));
 
 function CarouselInCollection({collection}) {
-    const {name, collectibles, token} = collection
+    const { name, collectibles, token, marketPlace=1 } = collection
     const getConfigurableProps = () => ({
         showArrows: false,
         showStatus: false,
@@ -60,7 +60,7 @@ function CarouselInCollection({collection}) {
         transitionTime: 0,
     });
     return (
-        <Link to={`/collections/detail/${token}`} component={RouterLink}>
+        <Link to={`/collections/detail/${marketPlace}${token}`} component={RouterLink}>
             <BoxStyle className="carousel-box">
                 <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
                     {
