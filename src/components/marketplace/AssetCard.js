@@ -87,7 +87,7 @@ export default function AssetCard(props) {
   React.useEffect(() => {
     let isMounted = true;
     if(baseToken) {
-      fetchFrom(`api/v2/sticker/getCollection/${baseToken}`)
+      fetchFrom(`api/v2/sticker/getCollection/${baseToken}?marketPlace=${marketPlace}`)
         .then((response) => {
           response.json().then((jsonAssets) => {
             if(!jsonAssets.data || !isMounted)

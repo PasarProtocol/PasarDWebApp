@@ -81,7 +81,7 @@ export default function CollectibleDetail() {
             } else {
               jsonData.collection = ''
               jsonData.is721 = false
-              fetchFrom(`api/v2/sticker/getCollection/${jsonData.baseToken}`)
+              fetchFrom(`api/v2/sticker/getCollection/${jsonData.baseToken}?marketPlace=${jsonData.marketPlace}`)
                 .then((response) => {
                   response.json().then((jsonAssets) => {
                     if(!jsonAssets.data)

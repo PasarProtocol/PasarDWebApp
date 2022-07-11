@@ -25,13 +25,13 @@ const RootStyle = styled('div')(({ theme, index }) => {
   }
 });
 export default function StatisticItem(props) {
-  const {index, address, field} = props
+  const {index, address, marketPlace=1, field} = props
   const [realData, setRealData] = React.useState(0);
   const api = apikey[index-1];
   
   React.useEffect(async () => {
     if(address) {
-      const resRealData = await fetchFrom(`api/v2/sticker/${api}/${address}`)
+      const resRealData = await fetchFrom(`api/v2/sticker/${api}/${address}?marketPlace=${marketPlace}`)
       const jsonData = await resRealData.json()
       setTimeout(()=>{setRealData(jsonData.data[field])}, 100)
     }

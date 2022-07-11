@@ -197,14 +197,14 @@ export default function CollectibleDetail() {
       const assetImageUrl = getAssetImage(collectible, false)
       setImageUrl(assetImageUrl)
       
-      fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${collectible.baseToken}`)
+      fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${collectible.baseToken}?marketPlace=${collectible.marketPlace}`)
         .then((response) => {
           response.json().then((jsonData) => {
             if(jsonData.data)
               setTotalCountInCollection(jsonData.data.total)
           })
         })
-      fetchFrom(`api/v2/sticker/getAttributeOfCollection/${collectible.baseToken}`)
+      fetchFrom(`api/v2/sticker/getAttributeOfCollection/${collectible.baseToken}?marketPlace=${collectible.marketPlace}`)
         .then((response) => {
           response.json().then((jsonData) => {
             if(jsonData.data)
@@ -237,7 +237,7 @@ export default function CollectibleDetail() {
       try{
         setCollectible(jsonCollectible.data);
 
-        fetchFrom(`api/v2/sticker/getCollection/${jsonCollectible.data.baseToken}`)
+        fetchFrom(`api/v2/sticker/getCollection/${jsonCollectible.data.baseToken}?marketPlace=${jsonCollectible.data.marketPlace}`)
           .then((response) => {
             response.json().then((jsonAssets) => {
               if(!jsonAssets.data)

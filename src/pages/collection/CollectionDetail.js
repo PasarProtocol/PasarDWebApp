@@ -136,7 +136,7 @@ export default function CollectionDetail() {
     tempParam.address = params.collection.substr(1)
     setCollectionParam(tempParam)
     setLoadingCollection(true);
-    fetchFrom(`api/v2/sticker/getCollection/${tempParam.address}`)
+    fetchFrom(`api/v2/sticker/getCollection/${tempParam.address}?marketPlace=${tempParam.marketPlace}`)
       .then((response) => {
         response.json().then((jsonAssets) => {
           setCollection(jsonAssets.data);
@@ -477,7 +477,7 @@ export default function CollectionDetail() {
                   </Stack>
                 }
                 <Box>
-                  <StatisticPanel address={collection.token}/>
+                  <StatisticPanel address={collection.token} marketPlace={collection.marketPlace}/>
                 </Box>
                 <Typography variant="body2" component="div" align="center" color='text.secondary' sx={{ maxWidth: 900, m: 'auto !important', pt: 2, wordBreak: 'break-all' }}>
                   {description}
