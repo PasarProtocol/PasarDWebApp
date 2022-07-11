@@ -66,7 +66,7 @@ const tokenStandard = {
 const _gasLimit = 5000000;
 export default function EditCollection() {
   const location = useLocation();
-  const { token: baseToken } = location.state || {}
+  const { token: baseToken, marketPlace } = location.state || {}
   const [isLoadingCollection, setLoadingCollection] = React.useState(false);
   const [address, setAddress] = React.useState('')
   const [standard, setStandard] = React.useState("ERC-721");
@@ -102,7 +102,7 @@ export default function EditCollection() {
       navigate('/marketplace')
 
     setLoadingCollection(true)
-    fetchFrom(`api/v2/sticker/getCollection/${baseToken}`)
+    fetchFrom(`api/v2/sticker/getCollection/${baseToken}?marketPlace=${marketPlace}`)
       .then((response) => {
         response.json().then((jsonAssets) => {
           setLoadingCollection(false)

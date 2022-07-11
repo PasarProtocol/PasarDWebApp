@@ -43,7 +43,7 @@ export default function CollectionFilterPan(props){
 
   React.useEffect(()=>{
     let isMounted = true;
-    fetchFrom(`api/v2/sticker/getAttributeOfCollection/${address}`)
+    fetchFrom(`api/v2/sticker/getAttributeOfCollection/${address}?marketPlace=${marketPlace}`)
       .then((response) => {
         response.json().then((jsonData) => {
           if(jsonData.data && isMounted){

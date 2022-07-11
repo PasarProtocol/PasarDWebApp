@@ -81,7 +81,7 @@ export default function ChooseCollection(props) {
     
     if(collections.length) {
       collections.forEach((item, _i)=>{
-        fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${item.token}`)
+        fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${item.token}?marketPlace=${item.marketPlace}`)
           .then((response) => {
             response.json().then((jsonData) => {
               setCollections((prevStatus)=>{

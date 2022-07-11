@@ -119,7 +119,7 @@ const CollectionImgBox = (props) => {
       </Stack>
       {
         !avatar || avatar.startsWith('/static')?
-        <MarkBoxStyle>
+        <MarkBoxStyle {...avatarAction}>
           <Box draggable = {false} component="img" src={avatar} />
         </MarkBoxStyle>:
         <AvatarBoxStyle draggable = {false} component="img" src={avatar} {...avatarAction}/>
@@ -200,7 +200,7 @@ const CollectionImgBox = (props) => {
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider, isOwned=false, openRoyaltiesDlg } = props
-  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, collectibles=[], tokenJson={} } = info
+  const { name, uri='', owner='', token, totalCount=0, floorPrice=0, totalOwner=0, totalPrice=0, marketPlace=1, collectibles=[], tokenJson={} } = info
   let { description='', avatar='', background='' } = info
   const realData = [totalPrice, floorPrice, totalOwner]
 
@@ -325,7 +325,7 @@ const CollectionCardPaper = (props) => {
           setOpenDownloadEssentialDlg(true)
           return
         }
-        navigate(`/collections/edit`, {state: {token}});
+        navigate(`/collections/edit`, {state: {token, marketPlace}});
         break;
       case 'royalties':
         if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'){
