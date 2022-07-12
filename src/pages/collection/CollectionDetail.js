@@ -477,7 +477,7 @@ export default function CollectionDetail() {
                   </Stack>
                 }
                 <Box>
-                  <StatisticPanel address={collection.token} marketPlace={collection.marketPlace}/>
+                  <StatisticPanel {...collection}/>
                 </Box>
                 <Typography variant="body2" component="div" align="center" color='text.secondary' sx={{ maxWidth: 900, m: 'auto !important', pt: 2, wordBreak: 'break-all' }}>
                   {description}

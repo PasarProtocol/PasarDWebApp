@@ -5,9 +5,7 @@ import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import { Typography, Grid, Card, Stack } from '@mui/material';
 
-import { fetchFrom } from '../../../utils/common';
 // ----------------------------------------------------------------------
-const apikey = ['getTotalPriceCollectibles', 'getTotalCountCollectibles', 'getFloorPriceCollectibles', 'getOwnersOfCollection']
 const RootStyle = styled('div')(({ theme, index }) => {
   let sm = {};
   if(index%2===0)
@@ -25,17 +23,12 @@ const RootStyle = styled('div')(({ theme, index }) => {
   }
 });
 export default function StatisticItem(props) {
-  const {index, address, marketPlace=1, field} = props
-  const [realData, setRealData] = React.useState(0);
-  const api = apikey[index-1];
-  
-  React.useEffect(async () => {
-    if(address) {
-      const resRealData = await fetchFrom(`api/v2/sticker/${api}/${address}?marketPlace=${marketPlace}`)
-      const jsonData = await resRealData.json()
-      setTimeout(()=>{setRealData(jsonData.data[field])}, 100)
-    }
-  }, [address]);
+  const { index, value } = props
+  const [realData, setRealData] = React.useState(0)
+  React.useEffect(()=>{
+    if(value)
+      setTimeout(()=>{setRealData(value)}, 500)
+  }, [value])
 
   return (
     <RootStyle index={index}>
