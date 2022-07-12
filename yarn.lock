@@ -1550,34 +1550,6 @@
   dependencies:
     prop-types "^15.6.0"
 
-"@elastosfoundation/did-js-sdk@^2.2.3":
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/@elastosfoundation/did-js-sdk/-/did-js-sdk-2.2.3.tgz#504a446f745200d58d2d9deb61d9cae019c3560c"
-  integrity sha512-LYbpkmZxrIkpt3kOtM3yCN1iCNUQXZUg9KiU+eu9xxqVU9/0z99+j65E6syZpP3aFDn34MgUNNpyMnW22sIXTQ==
-  dependencies:
-    assert "^2.0.0"
-    axios "^0.21.1"
-    bip32 "^2.0.6"
-    bn.js "^5.2.0"
-    browserfs "^1.4.3"
-    bs58 "^4.0.1"
-    bs58check "^2.1.2"
-    btoa "^1.2.1"
-    buffer "^5.6.0"
-    create-hash "^1.2.0"
-    crypto-browserify "^3.12.0"
-    dayjs "^1.10.4"
-    ecdh-crypto "^1.0.5"
-    elliptic "^6.5.4"
-    events "^3.3.0"
-    jose "^4.3.7"
-    jsonwebtoken "^8.5.1"
-    lodash "^4.17.20"
-    secp256r1 "0.0.3"
-    stream-browserify "^3.0.0"
-    string_decoder "^1.3.0"
-    util "^0.12.3"
-
 "@elastosfoundation/did-js-sdk@^2.2.4":
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/@elastosfoundation/did-js-sdk/-/did-js-sdk-2.2.6.tgz#b9d5785da21492e7f00d38075d08d38ec8bc1a52"
@@ -1607,7 +1579,7 @@
     typedoc "0.22.11"
     util "0.12.4"
 
-"@elastosfoundation/did-js-sdk@^2.2.7":
+"@elastosfoundation/did-js-sdk@^2.2.7", "@elastosfoundation/did-js-sdk@^2.2.9":
   version "2.2.9"
   resolved "https://registry.yarnpkg.com/@elastosfoundation/did-js-sdk/-/did-js-sdk-2.2.9.tgz#f4f7ab0357f0bcb756e9f235ae9215fcec2d4878"
   integrity sha512-m1MD1YwbMyRldUbyFIFM0A+5R09LPPtVucE8YA4FCdTnED9bQoJQfEF7Mb1I3cDtr99qaA4MYR7HrkzFliGpNg==
@@ -1636,7 +1608,7 @@
     typedoc "0.22.11"
     util "0.12.4"
 
-"@elastosfoundation/elastos-connectivity-sdk-js@latest":
+"@elastosfoundation/elastos-connectivity-sdk-js@^1.0.23":
   version "1.0.23"
   resolved "https://registry.yarnpkg.com/@elastosfoundation/elastos-connectivity-sdk-js/-/elastos-connectivity-sdk-js-1.0.23.tgz#5fa34cd6d6dd50a58366555589608303a52fd296"
   integrity sha512-neTbQM2QTcXBVfkm5v8lpj+bnmQhEhHTbIm07/Wiqfpow2AJ/1uPDoZPa6gCKO3qWVbKIQR5o6hY6kIXrGZDkQ==
@@ -1648,7 +1620,7 @@
     svelte-i18n "^3.3.6"
     web3-core "^1.6.1"
 
-"@elastosfoundation/essentials-connector-client-browser@latest":
+"@elastosfoundation/essentials-connector-client-browser@^1.0.37":
   version "1.0.38"
   resolved "https://registry.yarnpkg.com/@elastosfoundation/essentials-connector-client-browser/-/essentials-connector-client-browser-1.0.38.tgz#600967e74c01ce35f14b9000aa0ead4d675a4d75"
   integrity sha512-raXo4jLSZ+PraedV0zoo93m0wWlkzasiP88nfN1mLaAreWaaChqwWqswV5rHkm2sTBAey8cMdvOkwrDwddLA7g==
@@ -5436,7 +5408,7 @@ assert-plus@1.0.0, assert-plus@^1.0.0:
   resolved "https://registry.yarnpkg.com/assert-plus/-/assert-plus-1.0.0.tgz#f12e0f3c5d77b0b1cdd9146942e4e96c1e4dd525"
   integrity sha1-8S4PPF13sLHN2RRpQuTpbB5N1SU=
 
-assert@2.0.0, assert@^2.0.0:
+assert@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/assert/-/assert-2.0.0.tgz#95fc1c616d48713510680f2eaf2d10dd22e02d32"
   integrity sha512-se5Cd+js9dXJnu6Ag2JFc00t+HmHOen+8Q+L7O9zI0PqQXr20uk2J0XQqMxZEeo5U50o8Nvmmx7dZrl+Ufr35A==
@@ -5588,7 +5560,7 @@ axios-mock-adapter@^1.20.0:
     is-blob "^2.1.0"
     is-buffer "^2.0.5"
 
-axios@0.21.4, axios@^0.21.0, axios@^0.21.1, axios@^0.21.4:
+axios@0.21.4, axios@^0.21.0, axios@^0.21.4:
   version "0.21.4"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
   integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
@@ -5959,7 +5931,7 @@ bindings@^1.3.0, bindings@^1.5.0:
   dependencies:
     file-uri-to-path "1.0.0"
 
-bip32@2.0.6, bip32@^2.0.6:
+bip32@2.0.6:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/bip32/-/bip32-2.0.6.tgz#6a81d9f98c4cd57d05150c60d8f9e75121635134"
   integrity sha512-HpV5OMLLGTjSVblmrtYRfFFKuQB+GArM0+XP8HGWfJ5vxYBqo+DesvJwOdC2WJ3bCkZShGf0QIfoIpeomVzVdA==
@@ -6264,7 +6236,7 @@ browserslist@^4.19.1:
     node-releases "^2.0.1"
     picocolors "^1.0.0"
 
-bs58@4.0.1, bs58@^4.0.0, bs58@^4.0.1:
+bs58@4.0.1, bs58@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/bs58/-/bs58-4.0.1.tgz#be161e76c354f6f788ae4071f63f34e8c4f0a42a"
   integrity sha1-vhYedsNU9veIrkBx9j806MTwpCo=
@@ -7324,7 +7296,7 @@ crypt@0.0.2:
   resolved "https://registry.yarnpkg.com/crypt/-/crypt-0.0.2.tgz#88d7ff7ec0dfb86f713dc87bbb42d044d3e6c41b"
   integrity sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs=
 
-crypto-browserify@3.12.0, crypto-browserify@^3.11.0, crypto-browserify@^3.12.0:
+crypto-browserify@3.12.0, crypto-browserify@^3.11.0:
   version "3.12.0"
   resolved "https://registry.yarnpkg.com/crypto-browserify/-/crypto-browserify-3.12.0.tgz#396cf9f3137f03e4b8e532c58f698254e00f80ec"
   integrity sha512-fz4spIh+znjO2VjL+IdhEpRJ3YN6sMzITSBijk6FK2UvTqruSQW+/cCZTSNsMiZNvUeq0CqurF+dAbyiGOY6Wg==
@@ -8256,11 +8228,6 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
-
-ecdh-crypto@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/ecdh-crypto/-/ecdh-crypto-1.0.5.tgz#9ed8e92fb6551cb6349937710ac4452eaf2eb868"
-  integrity sha512-096LZk5v/EAyrCw/57eq36TNitb9HHbOCltntfBrpfQo1avxtrwJw7G2E7RS5sxKBuf5hhickwxGb+yHRsxMzA==
 
 ecdsa-sig-formatter@1.0.11:
   version "1.0.11"
@@ -9239,7 +9206,7 @@ eventemitter3@^2.0.3:
   resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-2.0.3.tgz"
   integrity sha1-teEHm1n7XhuidxwKmTvgYKWMmbo=
 
-events@3.3.0, events@^3.0.0, events@^3.3.0:
+events@3.3.0, events@^3.0.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
   integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==
@@ -12243,11 +12210,6 @@ jose@4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/jose/-/jose-4.5.0.tgz#92829d8cf846351eb55aaaf94f252fb1d191f2d5"
   integrity sha512-GFcVFQwYQKbQTUOo2JlpFGXTkgBw26uzDsRMD2q1WgSKNSnpKS9Ug7bdQ8dS+p4sZHNH6iRPu6WK2jLIjspaMA==
-
-jose@^4.3.7:
-  version "4.3.9"
-  resolved "https://registry.yarnpkg.com/jose/-/jose-4.3.9.tgz#da879cae1bc688e20c7114d131655e853442a383"
-  integrity sha512-G/HK0vtRZpfZ7OfMdzwIJf0rmJ5SWEGJGNwOYmLKPxiRo0ozdvcUKXEW+XhMjFTxbE9+5OSIFUpeQ8M8gyMzbg==
 
 js-base64@^2.3.2:
   version "2.6.4"
@@ -18129,7 +18091,7 @@ string.prototype.trimstart@^1.0.4:
     call-bind "^1.0.2"
     define-properties "^1.1.3"
 
-string_decoder@1.3.0, string_decoder@^1.0.0, string_decoder@^1.1.1, string_decoder@^1.3.0:
+string_decoder@1.3.0, string_decoder@^1.0.0, string_decoder@^1.1.1:
   version "1.3.0"
   resolved "https://registry.npmjs.org/string_decoder/-/string_decoder-1.3.0.tgz"
   integrity sha512-hkRX8U1WjJFd8LsDJ2yQ/wWWxaopEsABU1XfkM8A+j0+85JAGppt16cr1Whg6KIbb4okU6Mql6BOj+uup/wKeA==
@@ -19323,7 +19285,7 @@ util@0.10.3:
   dependencies:
     inherits "2.0.1"
 
-util@0.12.4, util@^0.12.0, util@^0.12.3:
+util@0.12.4, util@^0.12.0:
   version "0.12.4"
   resolved "https://registry.yarnpkg.com/util/-/util-0.12.4.tgz#66121a31420df8f01ca0c464be15dfa1d1850253"
   integrity sha512-bxZ9qtSlGUWSOy9Qa9Xgk11kSslpuZwaxCg4sNIDj6FLucDab2JxnHwyNTCpHMtK1MjoQiWQ6DiUMZYbSrO+Sw==
