@@ -37,6 +37,8 @@ import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup
 import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
+import ChainSelect from '../../components/ChainSelect';
+import AssetSortSelect from '../../components/AssetSortSelect';
 import useSingin from '../../hooks/useSignin';
 import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
@@ -85,7 +87,6 @@ export default function MyProfile() {
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
   const [isLoadingCollection, setLoadingCollection] = React.useState(false);
   const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):defaultDispMode);
-  const [orderType, setOrderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(params.type!==undefined?parseInt(params.type, 10):0);
   const [walletAddress, setWalletAddress] = React.useState(null);
@@ -93,6 +94,8 @@ export default function MyProfile() {
   const [didInfo, setDidInfo] = React.useState({name: '', description: ''});
   const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [updateCount, setUpdateCount] = React.useState(0);
+  const [order, setOrder] = React.useState(0);
+  const [chainType, setChainType] = React.useState(0);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [badge, setBadge] = React.useState({dia: 0, kyc: false});
   const [socials, setSocials] = React.useState({});
@@ -265,7 +268,7 @@ export default function MyProfile() {
       .fill(0)
       .forEach((_, i) => {
         setLoadingAssetsOfType(i, true);
-        fetchFrom(`api/v2/sticker/${apiNames[i]}/${walletAddress}?orderType=${orderType}`, { signal })
+        fetchFrom(`api/v2/sticker/${apiNames[i]}/${walletAddress}?orderType=${order}`, { signal })
           .then((response) => {
             response.json().then((jsonAssets) => {
               setAssetsOfType(i, jsonAssets.data);
@@ -278,7 +281,7 @@ export default function MyProfile() {
             if (e.code !== e.ABORT_ERR) setLoadingAssetsOfType(i, false);
           });
       });
-  }, [walletAddress, orderType, updateCount]);
+  }, [walletAddress, order, chainType, updateCount]);
 
   React.useEffect(async () => {
     if(walletAddress) {
@@ -379,21 +382,24 @@ export default function MyProfile() {
               </Tooltip>
             }
           </Stack>
-          {/* <MHidden width="smUp">
-            <ToolGroupStyle>
-              <MyItemsSortSelect onChange={setOrderType} sx={{ flex: 1 }} />
-              <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-                <ToggleButton value={0}>
-                  <SquareIcon />
-                </ToggleButton>
-                <ToggleButton value={1}>
-                  <GridViewSharpIcon />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </ToolGroupStyle>
-          </MHidden> */}
+          <MHidden width="smUp">
+            <Stack spacing={1} pt={1} px='10px'>
+              <Stack direction='row' sx={{justifyContent: 'end'}}>
+                <AssetSortSelect selected={order} onChange={setOrder} sx={{flex: 1}}/>
+                <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                  <ToggleButton value={0}>
+                    <GridViewSharpIcon />
+                  </ToggleButton>
+                  <ToggleButton value={1}>
+                    <AppsIcon />
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </Stack>
+            <ChainSelect selected={chainType} onChange={setChainType} sx={{width: '100%'}}/>
+            </Stack>
+          </MHidden>
         </Box>
-        <Box sx={{ display: 'flex', position: 'relative', mb: 2, justifyContent: 'center' }} align="center">
+        <Box sx={{ display: 'flex', position: 'relative', justifyContent: 'center' }} align="center">
           <Tabs 
             value={tabValue}
             variant="scrollable"
@@ -420,9 +426,12 @@ export default function MyProfile() {
             <Tab label={`Sold (${assets[4].length})`} value={4} />
             <Tab label={`Collections (${collections.length})`} value={5} />
           </Tabs>
-          {/* <MHidden width="smDown">
-            <ToolGroupStyle>
-              <MyItemsSortSelect onChange={setOrderType} />
+        </Box>
+        <MHidden width="smDown">
+          <Stack spacing={1} pt={1} px='10px'>
+            <Stack direction='row' sx={{justifyContent: 'end'}}>
+              <AssetSortSelect selected={order} onChange={setOrder}/>
+              <ChainSelect selected={chainType} onChange={setChainType}/>
               <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
                 <ToggleButton value={0}>
                   <GridViewSharpIcon />
@@ -431,9 +440,9 @@ export default function MyProfile() {
                   <AppsIcon />
                 </ToggleButton>
               </ToggleButtonGroup>
-            </ToolGroupStyle>
-          </MHidden> */}
-        </Box>
+            </Stack>
+          </Stack>
+        </MHidden>
         <Box
           sx={{
             width: '100%',
