@@ -29,6 +29,7 @@ import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { isInAppBrowser, getCredentialInfo, getDiaTokenInfo, reduceHexAddress } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
+import { DidResolverUrl } from '../../config'
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -243,8 +244,7 @@ export default function EditProfile() {
           // return Promise.reject(new Error("Error while trying to get the presentation"))
         }
         if(!DIDBackend.isInitialized()) {
-          const resolverUrl = 'https://api.trinity-tech.cn/eid';
-          DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
+          DIDBackend.initialize(new DefaultDIDAdapter(DidResolverUrl));
         }
   
         // Check presentation validity (genuine, not tampered)

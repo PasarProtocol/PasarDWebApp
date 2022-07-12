@@ -39,6 +39,7 @@ import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getElaOnEthT
   getCredentialInfo, checkValidChain, getChainTypeFromId } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 import { creatAndRegister, prepareConnectToHive } from './HiveAPI';
+import { DidResolverUrl } from '../../config'
 
 const firebaseConfig = {
   apiKey: "AIzaSyC1hdxto7LGxQiYYOGOgXz9Xq9nHX1C4z0",
@@ -393,8 +394,7 @@ export default function SignInDialog() {
       if (presentation) {
         const did = presentation.getHolder().getMethodSpecificId() || '';
 
-        const resolverUrl = 'https://api.trinity-tech.cn/eid';
-        DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
+        DIDBackend.initialize(new DefaultDIDAdapter(DidResolverUrl));
         // verify
         const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
         // const valid = await vp.isValid();
