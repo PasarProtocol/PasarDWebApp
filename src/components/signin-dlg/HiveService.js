@@ -1,7 +1,7 @@
 import {InsertOptions, File as HiveFile, ScriptRunner, Vault, AppContext, Logger as HiveLogger } from "@elastosfoundation/hive-js-sdk";
 import {JWTParserBuilder, JWTHeader, DID as DID2, DIDBackend, DefaultDIDAdapter, JSONObject, VerifiablePresentation  } from '@elastosfoundation/did-js-sdk';
 import {connectivity, DID as ConDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
-import { ApplicationDID } from '../../config'
+import { ApplicationDID, DidResolverUrl } from '../../config'
 
 let hiveVault 
 let scriptRunners = {}
@@ -9,11 +9,10 @@ let scriptRunners = {}
 const creatAppContext = async (appInstanceDidDocument, userDidString) => {
   try {
     HiveLogger.setDefaultLevel(HiveLogger.TRACE)
-    const resolver = "https://api.trinity-tech.cn/eid"
-    DIDBackend.initialize(new DefaultDIDAdapter(resolver))
+    DIDBackend.initialize(new DefaultDIDAdapter(DidResolverUrl))
     try {
       const catchPath = '/data/userDir/data/store/catch'
-      AppContext.setupResolver(resolver, catchPath)
+      AppContext.setupResolver(DidResolverUrl, catchPath)
     } catch (error) {
       console.log("AppContext.setupResolver error: ",error)
     }

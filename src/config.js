@@ -85,6 +85,7 @@ const escServerForTest = "https://esc-testnet.elastos.io"
 
 const ApplicationDIDForMain = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 // const ApplicationDIDForTest = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB"
+export const DidResolverUrl = 'https://api.trinity-tech.io/eid'
 
 export const {ESC_CONTRACT, ETH_CONTRACT, feedsContract, v1marketContract, diaContract, welaContract, glideContract, 
   elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, elaOnEthContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest

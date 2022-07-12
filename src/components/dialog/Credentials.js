@@ -11,7 +11,7 @@ import useSingin from '../../hooks/useSignin';
 import ElastosConnectivityService from '../../utils/elastosConnectivityService';
 import TransLoadingButton from '../TransLoadingButton';
 import { fetchFrom } from '../../utils/common';
-import { trustedProviders } from '../../config';
+import { trustedProviders, DidResolverUrl } from '../../config';
 
 export default function Credentials() {
   const { openCredentials, elaConnectivityService, setOpenCredentials, setElastosConnectivityService } = useSingin();
@@ -43,8 +43,7 @@ export default function Credentials() {
         return
         // return Promise.reject(new Error("Error while trying to get the presentation"))
       }
-      const resolverUrl = 'https://api.trinity-tech.cn/eid';
-      DIDBackend.initialize(new DefaultDIDAdapter(resolverUrl));
+      DIDBackend.initialize(new DefaultDIDAdapter(DidResolverUrl));
     } catch (error) {
       stopProvide("Request credentials error")
       try {
