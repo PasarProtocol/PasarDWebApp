@@ -42,7 +42,7 @@ const CardStyle = styled(Card)(({ theme }) => ({
 }));
 
 function CarouselInCollection({collection}) {
-    const { name, collectibles, token, marketPlace=1 } = collection
+    const { name, collectiblesOnMarket, token, marketPlace=1 } = collection
     const getConfigurableProps = () => ({
         showArrows: false,
         showStatus: false,
@@ -64,7 +64,7 @@ function CarouselInCollection({collection}) {
             <BoxStyle className="carousel-box">
                 <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
                     {
-                        collectibles.slice(0,5).map((each, index) => {
+                        collectiblesOnMarket.slice(0,5).map((each, index) => {
                             const imageSrc = getAssetImage(each, false)
                             return <Box key={index} sx={{
                                 // position: 'relative',
@@ -103,11 +103,11 @@ export default function HomeAssetCarousel() {
     
     React.useEffect(() => {
         setLoadingCollections(true);
-        fetchFrom(`api/v2/sticker/getCollection?sort=0&onMarket=${true}`, {})
+        fetchFrom(`api/v2/sticker/getCollection?sort=0`, {})
           .then((response) => {
             response.json().then((jsonAssets) => {
                 if(Array.isArray(jsonAssets.data)){
-                    const tempCollectionData = jsonAssets.data.filter(collection=>collection.collectibles.length>1)
+                    const tempCollectionData = jsonAssets.data.filter(collection=>collection.collectiblesOnMarket.length>1)
                     setCollections(tempCollectionData.slice(0, 3));
                 }
                 setLoadingCollections(false);
