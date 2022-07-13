@@ -39,7 +39,7 @@ import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { blankAddress, ESC_CONTRACT, ETH_CONTRACT } from '../../config'
-import { queryAvatarUrl, queryName, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
+import { queryAvatarUrl, queryName, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCoinTypeFromToken, getCollectiblesInCollection4Preview,
   setAllTokenPrice, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, getCollectionTypeFromImageUrl, 
@@ -274,14 +274,6 @@ export default function CollectibleDetail() {
             setBadgeOfUser('owner', 'dia', dia)
           else setBadgeOfUser('owner', 'dia', 0)
         })
-        getCredentialInfo(jsonCollectible.data.royaltyOwner).then(proofData=>{
-          if(proofData)
-            setBadgeOfUser('creator', 'kyc', true)
-        })
-        getCredentialInfo(jsonCollectible.data.holder).then(proofData=>{
-          if(proofData)
-            setBadgeOfUser('owner', 'kyc', true)
-        })
         if(jsonCollectible.data.royaltyOwner === jsonCollectible.data.holder){
           getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
             .then((info) => {
@@ -387,6 +379,29 @@ export default function CollectibleDetail() {
                 return tempAvatar;
               });
           }
+        })
+        queryKycMe(targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length){
+            if(type==='all')
+              setBadge((prevState)=>{
+                const tempState = {...prevState}
+                tempState.creator.kyc = true
+                tempState.owner.kyc = true
+                return tempState
+              })
+            else
+              setBadgeOfUser(type, 'kyc', true)
+          }
+          else
+            if(type==='all')
+              setBadge((prevState)=>{
+                const tempState = {...prevState}
+                tempState.creator.kyc = false
+                tempState.owner.kyc = false
+                return tempState
+              })
+            else
+              setBadgeOfUser(type, 'kyc', false)
         })
       })
       .catch(e=>{
@@ -659,13 +674,13 @@ export default function CollectibleDetail() {
                     </Link>
                     <Stack spacing={.6} direction="row">
                       {
-                        badge.creator.dia>0 && <DIABadge balance={badge.creator.dia}/>
-                      }
-                      {
                         badge.creator.kyc&&
                         <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
                           <Box><Badge name="kyc"/></Box>
                         </Tooltip>
+                      }
+                      {
+                        badge.creator.dia>0 && <DIABadge balance={badge.creator.dia}/>
                       }
                       {/* <Badge name="pasar"/>
                       <Badge name="diamond"/>
@@ -688,13 +703,13 @@ export default function CollectibleDetail() {
                     </Link>
                     <Stack spacing={.6} direction="row">
                       {
-                        badge.owner.dia>0 && <DIABadge balance={badge.owner.dia}/>
-                      }
-                      {
                         badge.owner.kyc&&
                         <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
                           <Box><Badge name="kyc"/></Box>
                         </Tooltip>
+                      }
+                      {
+                        badge.owner.dia>0 && <DIABadge balance={badge.owner.dia}/>
                       }
                       {/* <Badge name="thumbdown" value="13"/> */}
                     </Stack>
