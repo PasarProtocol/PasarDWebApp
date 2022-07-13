@@ -341,10 +341,7 @@ export default function MyProfile() {
                   {didInfo.name || reduceHexAddress(walletAddress)}
                 </span>
               </Link>
-              <Stack sx={{justifyContent: 'center', alignItems: 'center'}} spacing={1} direction="row">
-                {
-                  badge.dia>0 && <DIABadge balance={badge.dia}/>
-                }
+              <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
                 {
                   badge.kyc&&
                   <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
@@ -384,6 +381,11 @@ export default function MyProfile() {
           <Box sx={{py: 1.5}}>
             <IconLinkButtonGroup {...socials}/>
           </Box>
+          <Stack sx={{justifyContent: 'center'}} spacing={1} direction="row">
+            {
+              badge.dia>0 && <DIABadge balance={badge.dia}/>
+            }
+          </Stack>
           <MHidden width="smUp">
             <Stack spacing={1} pt={1} px='10px'>
               <Stack direction='row' sx={{justifyContent: 'end'}}>

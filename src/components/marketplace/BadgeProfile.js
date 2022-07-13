@@ -302,9 +302,19 @@ export default function BadgeProfile(props) {
                     }
                   </>:
 
-                  <Link to={`/profile/others/${walletAddress}`} component={RouterLink} color='text.primary'>
-                    <Typography variant='h5' sx={{ pt: 2 }}>{name}</Typography>
-                  </Link>
+                  <Stack direction="row" sx={{justifyContent: 'center', pt: 2, pb: 1}} spacing={1}>
+                    <Link to={`/profile/others/${walletAddress}`} component={RouterLink} color='text.primary'>
+                      <Typography variant='h5'>{name}</Typography>
+                    </Link>
+                    <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
+                      {
+                        badge.kyc&&
+                        <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
+                          <Box><Badge name="kyc"/></Box>
+                        </Tooltip>
+                      }
+                    </Stack>
+                  </Stack>
                 }
                 {
                   dispAddress&&(
@@ -330,15 +340,9 @@ export default function BadgeProfile(props) {
                 }
                 {
                   type===2&&
-                  <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia>0 || badge.kyc)?2:0}}>
+                  <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia>0)?2:0}}>
                     {
                       badge.dia>0 && <DIABadge balance={badge.dia}/>
-                    }
-                    {
-                      badge.kyc&&
-                      <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                        <Box><Badge name="kyc"/></Box>
-                      </Tooltip>
                     }
                   </Stack>
                 }
