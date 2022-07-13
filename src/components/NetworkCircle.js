@@ -9,6 +9,8 @@ const NetworkCircle = (props)=>{
     const { pasarLinkChain } = useSignin()
 
     React.useEffect(()=>{
+        if(!pasarLinkChain)
+            return
         const currentChain = getChainTypeFromId(pasarLinkChain)
         setChainType(currentChain)
         if(currentChain==='ESC' || currentChain==='ETH')
