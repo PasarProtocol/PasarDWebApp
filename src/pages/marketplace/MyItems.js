@@ -324,11 +324,24 @@ export default function MyItems() {
             />
           </Box>
           <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
-            <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink} color='text.primary'>
-              <span role="img" aria-label="">
-                {didInfo.name || reduceHexAddress(walletAddress)}
-              </span>
-            </Link>
+            <Stack direction="row" sx={{justifyContent: 'center'}} spacing={2}>
+              <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink} color='text.primary'>
+                <span role="img" aria-label="">
+                  {didInfo.name || reduceHexAddress(walletAddress)}
+                </span>
+              </Link>
+              <Stack sx={{justifyContent: 'center', alignItems: 'center'}} spacing={1} direction="row">
+                {
+                  badge.dia>0 && <DIABadge balance={badge.dia}/>
+                }
+                {
+                  badge.kyc&&
+                  <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
+                    <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
+                  </Tooltip>
+                }
+              </Stack>
+            </Stack>
             {
               didInfo.name.length>0 &&
               <Typography variant="subtitle2" noWrap>{reduceHexAddress(walletAddress)}</Typography>
@@ -344,17 +357,6 @@ export default function MyItems() {
               <IconLinkButtonGroup {...socials}/>
             </Box>
           }
-          <Stack sx={{justifyContent: 'center', pt: 1}} spacing={1} direction="row">
-            {
-              badge.dia>0 && <DIABadge balance={badge.dia}/>
-            }
-            {
-              badge.kyc&&
-              <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
-              </Tooltip>
-            }
-          </Stack>
           {/* <MHidden width="smUp">
             <ToolGroupStyle>
               <MyItemsSortSelect onChange={setOrderType} sx={{ flex: 1 }} />
