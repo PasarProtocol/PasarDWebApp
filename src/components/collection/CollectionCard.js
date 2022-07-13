@@ -124,7 +124,7 @@ const CollectionImgBox = (props) => {
       {
         !!marketPlace && 
         <Tooltip title={chainTypes[marketPlace-1].name} arrow enterTouchDelay={0}>
-          <Box className='network' sx={{borderRadius: '100%', overflow: 'hidden', position: 'absolute', right: 8, top: 8, display: 'none'}}>
+          <Box className='network' sx={{borderRadius: '100%', overflow: 'hidden', position: 'absolute', left: 8, top: 8, display: 'none'}}>
             <Box 
               component="img" 
               src={`/static/${chainTypes[marketPlace-1].icon}`} 

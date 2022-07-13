@@ -12,7 +12,7 @@ const initialState = {
   signinEssentialSuccess: false,
   elaConnectivityService: null,
   pasarLinkAddress: 0,
-  pasarLinkChain: 1,
+  pasarLinkChain: 0,
   setOpenTopAlert: () => {},
   setOpenSigninEssentialDlg: () => {},
   setOpenDownloadEssentialDlg: () => {},
@@ -40,7 +40,7 @@ function SigninProvider({ children }) {
   const [elaConnectivityService, setElastosConnectivityService] = useState(false);
   const [diaBalance, setDiaBalance] = useState(0);
   const [pasarLinkAddress, setPasarLinkAddress] = useState(0);
-  const [pasarLinkChain, setPasarLinkChain] = useState(1);
+  const [pasarLinkChain, setPasarLinkChain] = useState(0);
 
   return (
     <SigninContext.Provider
