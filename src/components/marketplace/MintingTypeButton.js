@@ -25,6 +25,7 @@ const MintingTypeButton = (props)=>{
         m: 'auto',
         backgroundColor: current===type?'text.primary':'text.disabled'
     }
+    const psrcIndex = {"PSRC": 0, "PSREC": 1}
     return(
         <Paper
             component={ButtonBase}
@@ -77,13 +78,13 @@ const MintingTypeButton = (props)=>{
             }
             {
                 (type==="PSRC"||type==="PSREC")&&
-                <Box sx={commonSx}>
-                    <Box draggable = {false} component="img" src="/static/logo-icon.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26}, filter: current===type?'none':'brightness(5)' }} />
+                <Box sx={{...commonSx, backgroundColor: current===type?chainTypes[psrcIndex[type]].color:'text.disabled'}}>
+                    <Box draggable = {false} component="img" src="/static/logo-icon-white.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26}, filter: current===type?'none':'brightness(5)' }} />
                 </Box>
             }
             {
                 type==="FSTK"&&
-                <Box sx={commonSx}>
+                <Box sx={{...commonSx, backgroundColor: current===type?(theme)=>theme.palette.grey[900]:'text.disabled'}}>
                     <Box draggable = {false} component="img" src="/static/feeds-collection.svg" sx={{ width: {xs: 18, sm: 26}, height: {xs: 18, sm: 26}, filter: current===type?'none':'brightness(5)' }} />
                 </Box>
             }
