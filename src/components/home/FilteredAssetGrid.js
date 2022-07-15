@@ -16,7 +16,6 @@ const AssetGroupSlider = (props)=>{
   const {isLoading, assets, type} = props
   const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
   const [isDragging, setDragging] = React.useState(false);
-  const ref = React.useRef()
 
   const settings = {
     rewind: true,
@@ -72,12 +71,12 @@ const AssetGroupSlider = (props)=>{
       {
         isLoading?
         <Box>
-          <Splide options={ settings }>
+          <Splide options={settings}>
             {
-              loadingSkeletons.map((item, index)=>(
+              loadingSkeletons.map((_, index)=>(
                 <SplideSlide key={index}>
                   <Box sx={{p: 2}}>
-                    <AssetCardSkeleton key={index}/>
+                    <AssetCardSkeleton/>
                   </Box>
                 </SplideSlide>
               ))
@@ -85,7 +84,7 @@ const AssetGroupSlider = (props)=>{
           </Splide>
         </Box>:
 
-        <Splide options={ settings }>
+        <Splide options={settings}>
           {
             assets.map((item, index)=>{
               const coinType = getCoinTypeFromToken(item)
