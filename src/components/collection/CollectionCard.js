@@ -457,7 +457,7 @@ const CollectionCardPaper = (props) => {
 };
 
 export default function CollectionCard(props) {
-  const { info, isPreview=false, isDragging } = props
+  const { info, isPreview=false, isDragging=false } = props
   const { token, marketPlace=1} = info
   const [isOpenUpdateRoyalties, setUpdateRoyaltiesOpen] = React.useState(false);
   const navigate = useNavigate();
