@@ -2,14 +2,14 @@ import React from 'react';
 import {round} from 'mathjs'
 import {isMobile} from 'react-device-detect';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
-import '@splidejs/react-splide/dist/css/splide.min.css';
+import '@splidejs/splide/dist/css/splide.min.css';
 // material
 import { Box, Button } from '@mui/material';
 import { MHidden } from '../@material-extend';
+import { CarouselControlsPaging2 } from '../carousel/controls';
 import AssetCard from '../marketplace/AssetCard';
 import AssetCardSkeleton from '../marketplace/AssetCardSkeleton';
-import { fetchFrom, getAssetImage, setAllTokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, coinTypes, coinTypesForEthereum } from '../../utils/common';
-import { blankAddress } from '../../config'
+import { fetchFrom, getAssetImage, setAllTokenPrice, getCoinTypeFromToken, coinTypes, coinTypesForEthereum } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const AssetGroupSlider = (props)=>{
@@ -18,19 +18,22 @@ const AssetGroupSlider = (props)=>{
   const [isDragging, setDragging] = React.useState(false);
   const ref = React.useRef()
 
-  const settings = { 
+  const settings = {
     rewind: true,
-    // type: 'loop',
-    // autoplay: true,
+    // gap : '1rem',
+    arrows: false,
+    autoplay: true,
+    cloneStatus: true,
+    // type: "loop",
+    // focus: 'center',
+    pagination: false,
     pauseOnHover: false,
-    resetProgress: true,
-    updateOnMove: true,
-    live: true,
+    pauseOnFocus: false,
+    resetProgress: false,
     perPage: 4,
     perMove: 1,
-    speed: 2500,
-    lazyLoad: 'nearby',
-    preloadPages: 4,
+    interval: 2500,
+    lazyLoad: true,
     breakpoints: {
       3000: {
         perPage: 5,
@@ -43,10 +46,11 @@ const AssetGroupSlider = (props)=>{
       },
       800: {
         perPage: 2,
+        // perMove: 2
       },
       600: {
         perPage: 1,
-      },
+      }
     }
   }
 
@@ -59,56 +63,59 @@ const AssetGroupSlider = (props)=>{
   }
 
   React.useEffect(()=>{
-    setInterval(() => {
-      if(ref.current)
-        ref.current.splide.go('>');
-    }, 2500);
-
     setAllTokenPrice(setCoinPriceByType)
   }, [])
 
   const loadingSkeletons = Array(10).fill(0)
   return (
     <Box sx={{ mx: 0 }}>
-      <Splide ref={ref} options={settings}>
-        {
-          isLoading?
-          loadingSkeletons.map((item, index)=>(
-            <SplideSlide key={index}>
-              <Box sx={{p: 2}}>
-                <AssetCardSkeleton key={index}/>
-              </Box>
-            </SplideSlide>
-          )):
-          assets.map((item, index)=>{
-            const coinType = getCoinTypeFromToken(item)
+      {
+        isLoading?
+        <Box>
+          <Splide options={ settings }>
+            {
+              loadingSkeletons.map((item, index)=>(
+                <SplideSlide key={index}>
+                  <Box sx={{p: 2}}>
+                    <AssetCardSkeleton key={index}/>
+                  </Box>
+                </SplideSlide>
+              ))
+            }
+          </Splide>
+        </Box>:
 
-            return <SplideSlide key={index}>
-                <Box sx={{
-                  p: 2,
-                  '& h5 img': {
-                    display: 'inline'
-                  }
-                }}>
-                  <AssetCard
-                    {...item}
-                    thumbnail={getAssetImage(item, true)}
-                    name={item.name && item.name}
-                    price={round(item.price/1e18, 3)}
-                    saleType={item.SaleType || item.saleType}
-                    type={0}
-                    isLink={1&&true}
-                    coinUSD={coinPrice[coinType.index]}
-                    coinType={coinType}
-                    isDragging={isDragging}
-                    showPrice={type==='recent_sold'}
-                    // defaultCollectionType={getCollectionTypeFromImageUrl(item)}
-                  />
-                </Box>
-              </SplideSlide>
-          })
-        }
-      </Splide>
+        <Splide options={ settings }>
+          {
+            assets.map((item, index)=>{
+              const coinType = getCoinTypeFromToken(item)
+              return <SplideSlide key={index}>
+                  <Box sx={{
+                    p: 2,
+                    '& h5 img': {
+                      display: 'inline'
+                    }
+                  }}>
+                    <AssetCard
+                      {...item}
+                      thumbnail={getAssetImage(item, true)}
+                      name={item.name && item.name}
+                      price={round(item.price/1e18, 3)}
+                      saleType={item.SaleType || item.saleType}
+                      type={0}
+                      isLink={Boolean(true)}
+                      coinUSD={coinPrice[coinType.index]}
+                      coinType={coinType}
+                      isDragging={isDragging}
+                      showPrice={type==='recent_sold'}
+                      // defaultCollectionType={getCollectionTypeFromImageUrl(item)}
+                    />
+                  </Box>
+                </SplideSlide>
+            })
+          }
+        </Splide>
+      }
     </Box>
   )
 }
@@ -123,6 +130,7 @@ export default function FilteredAssetGrid(props){
     filterApi = "api/v2/sticker/getRecentlySold"
   else if(type === 'live_auction')
     filterApi = `api/v2/sticker/getDetailedCollectibles?collectionType=&tokenType=&status=On Auction,Has Ended&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=${count}`
+
   React.useEffect(() => {
     setLoadingCollectibles(true);
     fetchFrom(filterApi)
