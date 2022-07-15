@@ -250,7 +250,7 @@ export default function MyProfile() {
     })
   }
   const apiNames = ['getListedCollectiblesByAddress', 'getOwnCollectiblesByAddress', 'getBidCollectiblesByAddress', 'getCreatedCollectiblesByAddress', 'getSoldCollectiblesByAddress'];
-  const typeNames = ['listed', 'owned', "bid", 'created', 'sold'];
+  const typeNames = ['listed', 'owned', "bid", 'minted', 'sold'];
   React.useEffect(async () => {
     if(walletAddress){
       getDiaTokenInfo(walletAddress).then(dia=>{
@@ -426,7 +426,7 @@ export default function MyProfile() {
             <Tab label={`Listed (${assets[0].length})`} value={0} />
             <Tab label={`Owned (${assets[1].length})`} value={1} />
             <Tab label={`Bids (${assets[2].length})`} value={2} />
-            <Tab label={`Created (${assets[3].length})`} value={3} />
+            <Tab label={`Minted (${assets[3].length})`} value={3} />
             <Tab label={`Sold (${assets[4].length})`} value={4} />
             <Tab label={`Collections (${collections.length})`} value={5} />
           </Tabs>

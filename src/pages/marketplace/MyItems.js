@@ -249,7 +249,7 @@ export default function MyItems() {
     })
   }
   const apiNames = ['getListedCollectiblesByAddress', 'getOwnCollectiblesByAddress', 'getCreatedCollectiblesByAddress'];
-  const typeNames = ['listed', 'owned', 'created'];
+  const typeNames = ['listed', 'owned', 'minted'];
   React.useEffect(async () => {
     if(walletAddress){
       getDiaTokenInfo(walletAddress).then(dia=>{
@@ -377,7 +377,7 @@ export default function MyItems() {
           <Tabs value={tabValue} onChange={handleSwitchTab} TabIndicatorProps={{ style: { background: '#FF5082' } }}>
             <Tab label={`Listed (${assets[0].length})`} value={0} />
             <Tab label={`Owned (${assets[1].length})`} value={1} />
-            <Tab label={`Created (${assets[2].length})`} value={2} />
+            <Tab label={`Minted (${assets[2].length})`} value={2} />
             <Tab label={`Collections (${collections.length})`} value={3} />
           </Tabs>
           {/* <MHidden width="smDown">
