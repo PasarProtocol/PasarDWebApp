@@ -207,7 +207,7 @@ export default function UpdatePrice(props) {
                     value={reservePrice}
                     onChange={handleChangeReservePrice}
                     startAdornment={' '}
-                    endAdornment={<CoinTypeLabel type={coinType}/>}
+                    endAdornment={<CoinTypeLabel type={coinTypes[coinType]}/>}
                     inputProps={{
                       sx: {flexGrow: 1, width: 'auto'}
                     }}
@@ -250,7 +250,7 @@ export default function UpdatePrice(props) {
                     value={buyoutPrice}
                     onChange={handleChangeBuyoutPrice}
                     startAdornment={' '}
-                    endAdornment={<CoinTypeLabel type={coinType}/>}
+                    endAdornment={<CoinTypeLabel type={coinTypes[coinType]}/>}
                     inputProps={{
                       sx: {flexGrow: 1, width: 'auto'}
                     }}
