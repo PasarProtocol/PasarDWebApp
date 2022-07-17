@@ -6,19 +6,18 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
 
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import {
-  stickerContract as CONTRACT_ADDRESS,
-  marketContract as MARKET_CONTRACT_ADDRESS,
-  blankAddress
-} from '../../config';
-import { reduceHexAddress, isInAppBrowser } from '../../utils/common';
+import { blankAddress } from '../../config';
+import { reduceHexAddress, isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
+import useSingin from '../../hooks/useSignin';
 
 export default function DeleteItem(props) {
-  const { isOpen, setOpen, title, tokenId, updateCount, handleUpdate } = props;
-  const { enqueueSnackbar } = useSnackbar();
+  const { isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate, v1State=false } = props;
   const [onProgress, setOnProgress] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const { pasarLinkChain } = useSingin();
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -28,11 +27,13 @@ export default function DeleteItem(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
+    const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker')
     const contractAbi = STICKER_CONTRACT_ABI;
-    const contractAddress = CONTRACT_ADDRESS;
+    const contractAddress = baseToken || PasarContractAddress;
     const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
-    const gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const gasPrice = getFilteredGasPrice(_gasPrice)
 
     console.log('Sending transaction with account address:', accounts[0]);
     const transactionParams = {
@@ -59,7 +60,7 @@ export default function DeleteItem(props) {
       })
       .on('error', (error, receipt) => {
         console.error('error', error);
-        enqueueSnackbar('Burn NFT error!', { variant: 'warning' });
+        enqueueSnackbar('Burn NFT error!', { variant: 'error' });
         setOnProgress(false);
       });
   };
@@ -91,7 +92,7 @@ export default function DeleteItem(props) {
         <Typography variant="h5" sx={{ color: 'text.secondary' }}>
           You are about to send{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-            {title}
+            {name}
           </Typography>{' '}
           to the burn address below
         </Typography>

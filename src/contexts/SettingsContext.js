@@ -116,6 +116,7 @@ const initialState = {
   themeColor: 'custom',
   themeStretch: false,
   onChangeMode: () => {},
+  changeMode: () => {},
   onChangeDirection: () => {},
   onChangeColor: () => {},
   onToggleStretch: () => {},
@@ -141,6 +142,13 @@ function SettingsProvider({ children }) {
     setSettings({
       ...settings,
       themeMode: event.target.value
+    });
+  };
+
+  const changeMode = (mode) => {
+    setSettings({
+      ...settings,
+      themeMode: mode
     });
   };
 
@@ -171,6 +179,7 @@ function SettingsProvider({ children }) {
         ...settings,
         // Mode
         onChangeMode,
+        changeMode,
         // Direction
         onChangeDirection,
         // Color

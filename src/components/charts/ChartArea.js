@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
+import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import { merge } from 'lodash';
+import * as math from 'mathjs';
 import { styled } from '@mui/material/styles';
 import { Card, CardHeader, Stack, Grid, ToggleButton, ToggleButtonGroup, Select, MenuItem } from '@mui/material';
 import ReactApexChart from 'react-apexcharts';
@@ -9,7 +11,8 @@ import ReactApexChart from 'react-apexcharts';
 import BaseOptionChart from './BaseOptionChart';
 import LoadingScreen from '../LoadingScreen';
 import StatisticItem from '../explorer/StatisticPanel/StatisticItem'
-import { dateRangeBeforeDays, fetchFrom } from '../../utils/common';
+import useSettings from '../../hooks/useSettings';
+import { dateRangeBeforeDays, fetchFrom, getCoinTypeFromToken, setAllTokenPrice, coinTypes, coinTypesForEthereum } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -32,7 +35,11 @@ const getUTCdate = (date)=>{
   return [m, d, y].join("-");
 }
 export default function ChartArea({by, is4Address}) {
-  const params = useParams();
+  const params = useParams(); // params.address
+  const location = useLocation();
+  // const { tokenId, baseToken } = location.state || {}
+  const [ tokenId, baseToken ] = params.args?params.args.split('&'):['', '']
+  const { themeMode } = useSettings();
   const [period, setPeriod] = useState('a');
   const [volumeType, setType] = useState(by==="address"?1:0);
   const [volumeList, setVolumeList] = useState([]);
@@ -41,13 +48,17 @@ export default function ChartArea({by, is4Address}) {
   const [clickedDataPoint, setDataPoint] = useState([0,'']);
   const [isLoadingStatisData, setLoadingStatisData] = useState(false);
   const [isLoadingVolumeChart, setLoadingVolumeChart] = useState(true);
+  const [coinPrice, setCoinPrice] = useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
   const [controller, setAbortController] = useState(new AbortController());
   const baseOptionChart = BaseOptionChart()
   const mergeChartOption = (dates)=>
     merge(baseOptionChart, {
       xaxis: {
         type: 'datetime',
-        categories: dates
+        categories: dates,
+        labels: {
+          datetimeUTC: false
+        },
       },
       chart: {
         events: {
@@ -58,16 +69,33 @@ export default function ChartArea({by, is4Address}) {
           }
         }
       },
-      tooltip: { x: { format: 'dd/MM/yy HH:mm' } }
-    });
+      tooltip: { x: { format: (period!=='d'&&period!==null)?'dd/MM/yy':'dd/MM/yy HH:mm' }, theme: themeMode }
+    })
+  const [optionDates, setOptionDates] = useState([]);
   const [chartOptions, setChartOptions] = useState(mergeChartOption([]));
+
+  const setCoinPriceByType = (type, value) => {
+    setCoinPrice((prevState) => {
+      const tempPrice = [...prevState];
+      tempPrice[type] = value;
+      return tempPrice;
+    });
+  }
   
+  useEffect(()=>{
+    setAllTokenPrice(setCoinPriceByType)
+  }, [])
+
+  useEffect(() => {
+    setChartOptions(mergeChartOption(optionDates))
+  }, [optionDates, period, themeMode]);
+
   useEffect(async () => {
     if(by!=="address")
       return
     setLoadingStatisData(true)
 
-    const resRealData = await fetchFrom(`sticker/api/v1/getStastisDataByWalletAddr?walletAddr=${params.address}`)
+    const resRealData = await fetchFrom(`api/v2/sticker/getStastisDataByWalletAddr/${params.address}`)
     const jsonData = await resRealData.json()
     const statisData = [jsonData.data.assets, jsonData.data.sold, jsonData.data.purchased, jsonData.data.transactions]
     setStatisData(statisData)
@@ -83,10 +111,10 @@ export default function ChartArea({by, is4Address}) {
     setLoadingVolumeChart(true);
     let suburl = '';
     if(by==="collectible")
-      suburl = `getNftPriceByTokenId?tokenId=${params.collection}`
+      suburl = `getNftPriceByTokenId/${tokenId}/${baseToken}`
     else if(by==="address")
-      suburl = `getTotalRoyaltyandTotalSaleByWalletAddr?walletAddr=${params.address}&type=${volumeType}`
-    fetchFrom(`sticker/api/v1/${suburl}`, { signal }).then(response => {
+      suburl = `getTotalRoyaltyandTotalSaleByWalletAddr/${params.address}?type=${volumeType}`
+    fetchFrom(`api/v2/sticker/${suburl}`, { signal }).then(response => {
       response.json().then(jsonVolume => {
         if(jsonVolume.data)
           setVolumeList(jsonVolume.data);
@@ -99,8 +127,9 @@ export default function ChartArea({by, is4Address}) {
   }, [volumeType, params.address]);
   
   useEffect(() => {
-    updateChart(period, volumeList);
-  }, [volumeList]);
+    if(!isLoadingVolumeChart && !coinPrice.filter(price=>!price).length)
+      updateChart(period, volumeList);
+  }, [isLoadingVolumeChart, volumeList, coinPrice]);
   
   const updateChart = (period, volumeList) => {
     let days = 0;
@@ -116,21 +145,26 @@ export default function ChartArea({by, is4Address}) {
         days = 7;
         break;
       case 'd':
-        days = 1;
+        days = 2;
         break;
       default:
-        days = 1;
+        days = 2;
         break;
     }
     const dates = dateRangeBeforeDays(days)
-    const tempValueArray = Array(days).fill(0)
+    const tempValueArray = Array(dates.length).fill(0)
     volumeList.forEach(item=>{
-      const indexOfDate = dates.indexOf(item.onlyDate.substring(0,10));
+      const coinType = getCoinTypeFromToken(item)
+      let seekDate = format(item.onlyDate*1000, 'yyyy-MM-dd')
+      if(period==='d' || period===null)
+        seekDate = format(item.onlyDate*1000, 'yyyy-MM-dd HH:00')
+      const indexOfDate = dates.indexOf(seekDate);
       const value = item.price!==undefined?item.price:item.value;
       if(indexOfDate>=0)
-        tempValueArray[indexOfDate] = parseFloat((value/10**18).toFixed(7));
+        tempValueArray[indexOfDate] = math.round(tempValueArray[indexOfDate]+math.round(value/10**18, 4)*coinPrice[coinType.index], 4);
     })
-    setChartOptions(mergeChartOption(dates))
+    setOptionDates(dates)
+    // setChartOptions(mergeChartOption(dates))
     setChartValueArray(tempValueArray)
     setDataPoint([tempValueArray[0], getUTCdate(dates[0])]);
   };
@@ -173,7 +207,7 @@ export default function ChartArea({by, is4Address}) {
         )
       }
       <StackStyle>
-        <CardHeader title={`${clickedDataPoint[0]} ELA`} subheader={clickedDataPoint[1]}
+        <CardHeader title={`${clickedDataPoint[0]} USD`} subheader={clickedDataPoint[1]}
           sx={{
             p: 0,
             px: 2,
@@ -188,7 +222,7 @@ export default function ChartArea({by, is4Address}) {
               onChange={handleType}
               inputProps={{ 'aria-label': 'Without label' }}
               size="small"
-              sx={{mx: 1}}
+              sx={{mx: 1, '&.Mui-focused fieldset': (theme)=>theme.palette.mode==='dark'?{borderColor: '#919eab52 !important'}:{}}}
             >
               {
                 by==="collectible"?

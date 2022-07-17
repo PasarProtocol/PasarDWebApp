@@ -810,7 +810,7 @@ export default function CreateItem() {
                     ):(
                       <AssetCard
                         thumbnail={isString(file) ? file : file.preview}
-                        title={singleName}
+                        name={singleName}
                         description={description}
                         price={price}
                         quantity={quantity}

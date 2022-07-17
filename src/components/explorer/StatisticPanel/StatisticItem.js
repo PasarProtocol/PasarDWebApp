@@ -31,9 +31,9 @@ export default function StatisticItem(props) {
   React.useEffect(async () => {
     if(props.forAddress)
       return
-    const resRealData = await fetchFrom(`sticker/api/v1/${api}`)
+    const resRealData = await fetchFrom(`api/v2/sticker/${api}`)
     const jsonData = await resRealData.json()
-    setTimeout(()=>{setRealData(jsonData.data)}, 100)
+    setTimeout(()=>{setRealData(jsonData.data || 0)}, 100)
   }, []);
 
   return (

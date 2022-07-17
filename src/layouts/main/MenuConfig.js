@@ -27,17 +27,35 @@ const menuConfig = [
     disable: false
   },
   {
+    title: 'Collections',
+    icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
+    path: PATH_PAGE.collection,
+    disable: false
+  },
+  {
     title: 'Create',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
     path: PATH_PAGE.create,
     disable: false
   },
   {
-    title: 'Docs',
+    title: 'Features',
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
-    path: PATH_DOCS,
-    disable: true
-  }
+    path: PATH_PAGE.features,
+    disable: false
+  },
+  // {
+  //   title: 'Rewards',
+  //   icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
+  //   path: PATH_PAGE.rewards,
+  //   disable: false
+  // },
+  // {
+  //   title: 'Docs',
+  //   icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
+  //   path: PATH_DOCS,
+  //   disable: true
+  // }
 ];
 
 export default menuConfig;

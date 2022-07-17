@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import StyledButton from '../signin-dlg/StyledButton';
 
 export default function NeedBuyDIA(props) {
   const context = useWeb3React();
   const { library, chainId, account } = context;
 
-  const { isOpen, setOpen, balance } = props;
+  const { isOpen, setOpen, balance, actionText="transfer items" } = props;
   const handleClose = () => {
     setOpen(false);
   };
@@ -40,7 +41,7 @@ export default function NeedBuyDIA(props) {
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
             0.01 DIA
           </Typography>
-          {' '}in order to transfer items
+          {' '}in order to {actionText}
         </Typography>
         <Grid container sx={{ mt: 2, display: 'block' }}>
           <Grid item xs={12}>
@@ -62,14 +63,14 @@ export default function NeedBuyDIA(props) {
           </Grid>
         </Grid>
         <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-          <Button
+          <StyledButton
             variant="contained"
             href="https://glidefinance.io/swap"
             target="_blank"
             fullWidth
           >
             Buy DIA
-          </Button>
+          </StyledButton>
         </Box>
         <Typography variant="caption" display="block" sx={{ color: 'text.secondary' }} gutterBottom align="center">
           We do not own your private keys and cannot access your funds

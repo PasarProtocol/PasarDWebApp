@@ -5,6 +5,19 @@ module.exports.PASAR_CONTRACT_ABI = [
       {
         "indexed": true,
         "internalType": "address",
+        "name": "_codeAddress",
+        "type": "address"
+      }
+    ],
+    "name": "CodeUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "_operator",
         "type": "address"
       },
@@ -71,6 +84,56 @@ module.exports.PASAR_CONTRACT_ABI = [
       }
     ],
     "name": "ERC1155Received",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_operator",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes",
+        "name": "_data",
+        "type": "bytes"
+      }
+    ],
+    "name": "ERC721TokenReceived",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_libraryAddress",
+        "type": "address"
+      }
+    ],
+    "name": "LibraryContract",
     "type": "event"
   },
   {
@@ -164,6 +227,30 @@ module.exports.PASAR_CONTRACT_ABI = [
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_platformAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_platformFee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "_royaltyOwners",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "_royaltyFees",
+        "type": "uint256[]"
+      },
+      {
         "indexed": true,
         "internalType": "address",
         "name": "_seller",
@@ -180,11 +267,42 @@ module.exports.PASAR_CONTRACT_ABI = [
         "internalType": "uint256",
         "name": "_orderId",
         "type": "uint256"
+      }
+    ],
+    "name": "OrderFees",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_seller",
+        "type": "address"
       },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_royaltyOwner",
+        "name": "_buyer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "_orderId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_baseToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_quoteToken",
         "type": "address"
       },
       {
@@ -196,7 +314,13 @@ module.exports.PASAR_CONTRACT_ABI = [
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_royalty",
+        "name": "_royaltyFee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_platformFee",
         "type": "uint256"
       }
     ],
@@ -207,7 +331,7 @@ module.exports.PASAR_CONTRACT_ABI = [
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address",
         "name": "_seller",
         "type": "address"
@@ -220,6 +344,12 @@ module.exports.PASAR_CONTRACT_ABI = [
       },
       {
         "indexed": true,
+        "internalType": "address",
+        "name": "_baseToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "_tokenId",
         "type": "uint256"
@@ -231,9 +361,33 @@ module.exports.PASAR_CONTRACT_ABI = [
         "type": "uint256"
       },
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
+      },
+      {
         "indexed": false,
         "internalType": "uint256",
         "name": "_minPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_reservePrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_buyoutPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_startTime",
         "type": "uint256"
       },
       {
@@ -250,7 +404,7 @@ module.exports.PASAR_CONTRACT_ABI = [
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address",
         "name": "_seller",
         "type": "address"
@@ -263,6 +417,12 @@ module.exports.PASAR_CONTRACT_ABI = [
       },
       {
         "indexed": true,
+        "internalType": "address",
+        "name": "_baseToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "_tokenId",
         "type": "uint256"
@@ -274,50 +434,25 @@ module.exports.PASAR_CONTRACT_ABI = [
         "type": "uint256"
       },
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
+      },
+      {
         "indexed": false,
         "internalType": "uint256",
         "name": "_price",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_startTime",
+        "type": "uint256"
       }
     ],
     "name": "OrderForSale",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_platformAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_platformFee",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_seller",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_buyer",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "_orderId",
-        "type": "uint256"
-      }
-    ],
-    "name": "OrderPlatformFee",
     "type": "event"
   },
   {
@@ -346,9 +481,64 @@ module.exports.PASAR_CONTRACT_ABI = [
         "internalType": "uint256",
         "name": "_newPrice",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_oldReservePrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newReservePrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_oldBuyoutPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newBuyoutPrice",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_oldQuoteToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_newQuoteToken",
+        "type": "address"
       }
     ],
     "name": "OrderPriceChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
     "type": "event"
   },
   {
@@ -356,6 +546,11 @@ module.exports.PASAR_CONTRACT_ABI = [
       {
         "internalType": "uint256",
         "name": "_orderId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_value",
         "type": "uint256"
       },
       {
@@ -390,6 +585,29 @@ module.exports.PASAR_CONTRACT_ABI = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_buyer",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_orderId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_didUri",
+        "type": "string"
+      }
+    ],
+    "name": "buyOrderViaSwapper",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "_orderId",
         "type": "uint256"
@@ -411,15 +629,58 @@ module.exports.PASAR_CONTRACT_ABI = [
         "internalType": "uint256",
         "name": "_price",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_reservePrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_buyoutPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
       }
     ],
-    "name": "changeOrderPrice",
+    "name": "changeAuctionOrderPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_orderId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
+      }
+    ],
+    "name": "changeSaleOrderPrice",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_baseToken",
+        "type": "address"
+      },
       {
         "internalType": "uint256",
         "name": "_tokenId",
@@ -431,8 +692,28 @@ module.exports.PASAR_CONTRACT_ABI = [
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_minPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_reservePrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_buyoutPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_startTime",
         "type": "uint256"
       },
       {
@@ -454,6 +735,11 @@ module.exports.PASAR_CONTRACT_ABI = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_baseToken",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_tokenId",
         "type": "uint256"
@@ -464,8 +750,18 @@ module.exports.PASAR_CONTRACT_ABI = [
         "type": "uint256"
       },
       {
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_price",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_startTime",
         "type": "uint256"
       },
       {
@@ -475,6 +771,49 @@ module.exports.PASAR_CONTRACT_ABI = [
       }
     ],
     "name": "createOrderForSale",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_baseToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_tokenIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amounts",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_prices",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_startTimes",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "string",
+        "name": "_didUri",
+        "type": "string"
+      }
+    ],
+    "name": "createOrderForSaleBatch",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -513,16 +852,6 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
-            "name": "paid",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "royalty",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "joinTime",
             "type": "uint256"
           },
@@ -532,7 +861,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.BuyerInfo",
+        "internalType": "struct IPasarV2DataAndEvents.BuyerInfo",
         "name": "",
         "type": "tuple"
       }
@@ -574,16 +903,6 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
-            "name": "paid",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "royalty",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "joinTime",
             "type": "uint256"
           },
@@ -593,7 +912,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.BuyerInfo",
+        "internalType": "struct IPasarV2DataAndEvents.BuyerInfo",
         "name": "",
         "type": "tuple"
       }
@@ -635,16 +954,6 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
-            "name": "paid",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "royalty",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "joinTime",
             "type": "uint256"
           },
@@ -654,7 +963,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.BuyerInfo[]",
+        "internalType": "struct IPasarV2DataAndEvents.BuyerInfo[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -670,6 +979,47 @@ module.exports.PASAR_CONTRACT_ABI = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_buyer",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
+      }
+    ],
+    "name": "getBuyerFeeInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "paid",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royalty",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "platformFee",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IPasarV2DataAndEvents.BuyerFeeInfo",
+        "name": "",
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",
@@ -708,6 +1058,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -718,8 +1073,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -736,6 +1111,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -758,13 +1143,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -778,7 +1178,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo",
         "name": "",
         "type": "tuple"
       }
@@ -819,6 +1219,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -829,8 +1234,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -847,6 +1272,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -869,13 +1304,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -889,7 +1339,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo[]",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -930,6 +1380,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -940,8 +1395,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -958,6 +1433,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -980,13 +1465,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -1000,7 +1500,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo",
         "name": "",
         "type": "tuple"
       }
@@ -1041,6 +1541,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -1051,8 +1556,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -1069,6 +1594,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -1091,13 +1626,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -1111,7 +1661,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo[]",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -1126,6 +1676,19 @@ module.exports.PASAR_CONTRACT_ABI = [
       {
         "internalType": "address",
         "name": "_codeAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getLibraryContract",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "_libraryAddress",
         "type": "address"
       }
     ],
@@ -1173,6 +1736,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -1183,8 +1751,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -1201,6 +1789,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -1223,13 +1821,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -1243,7 +1856,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo",
         "name": "",
         "type": "tuple"
       }
@@ -1279,6 +1892,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -1289,8 +1907,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -1307,6 +1945,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -1329,13 +1977,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -1349,7 +2012,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo[]",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -1398,6 +2061,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -1408,8 +2076,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -1426,6 +2114,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -1448,13 +2146,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -1468,7 +2181,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo",
         "name": "",
         "type": "tuple"
       }
@@ -1504,6 +2217,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -1514,8 +2232,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -1532,6 +2270,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -1554,13 +2302,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -1574,7 +2337,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo[]",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -1590,88 +2353,6 @@ module.exports.PASAR_CONTRACT_ABI = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_orderId",
-        "type": "uint256"
-      }
-    ],
-    "name": "getOrderExtraById",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "sellerUri",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "buyerUri",
-            "type": "string"
-          },
-          {
-            "internalType": "address",
-            "name": "platformAddr",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "platformFee",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct IPasarUpgraded.OrderExtraInfo",
-        "name": "",
-        "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "_orderIds",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "getOrderExtraByIdBatch",
-    "outputs": [
-      {
-        "components": [
-          {
-            "internalType": "string",
-            "name": "sellerUri",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "buyerUri",
-            "type": "string"
-          },
-          {
-            "internalType": "address",
-            "name": "platformAddr",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "platformFee",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct IPasarUpgraded.OrderExtraInfo[]",
-        "name": "",
-        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",
@@ -1729,16 +2410,6 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
-            "name": "earned",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "royalty",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "joinTime",
             "type": "uint256"
           },
@@ -1748,7 +2419,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.SellerInfo",
+        "internalType": "struct IPasarV2DataAndEvents.SellerInfo",
         "name": "",
         "type": "tuple"
       }
@@ -1790,16 +2461,6 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
-            "name": "earned",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "royalty",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "joinTime",
             "type": "uint256"
           },
@@ -1809,7 +2470,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.SellerInfo",
+        "internalType": "struct IPasarV2DataAndEvents.SellerInfo",
         "name": "",
         "type": "tuple"
       }
@@ -1851,16 +2512,6 @@ module.exports.PASAR_CONTRACT_ABI = [
           },
           {
             "internalType": "uint256",
-            "name": "earned",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "royalty",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
             "name": "joinTime",
             "type": "uint256"
           },
@@ -1870,7 +2521,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.SellerInfo[]",
+        "internalType": "struct IPasarV2DataAndEvents.SellerInfo[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -1886,6 +2537,47 @@ module.exports.PASAR_CONTRACT_ABI = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_seller",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_quoteToken",
+        "type": "address"
+      }
+    ],
+    "name": "getSellerFeeInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "earned",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royalty",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "platformFee",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IPasarV2DataAndEvents.SellerFeeInfo",
+        "name": "",
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",
@@ -1924,6 +2616,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -1934,8 +2631,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -1952,6 +2669,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -1974,13 +2701,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -1994,7 +2736,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo",
         "name": "",
         "type": "tuple"
       }
@@ -2035,6 +2777,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -2045,8 +2792,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -2063,6 +2830,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -2085,13 +2862,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -2105,7 +2897,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo[]",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo[]",
         "name": "",
         "type": "tuple[]"
       }
@@ -2146,6 +2938,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -2156,8 +2953,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -2174,6 +2991,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -2196,13 +3023,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -2216,7 +3058,7 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo",
         "name": "",
         "type": "tuple"
       }
@@ -2257,6 +3099,11 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "baseToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "tokenId",
             "type": "uint256"
@@ -2267,8 +3114,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "quoteToken",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "reservePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "buyoutPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
             "type": "uint256"
           },
           {
@@ -2285,6 +3152,16 @@ module.exports.PASAR_CONTRACT_ABI = [
             "internalType": "address",
             "name": "buyerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "sellerUri",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "buyerUri",
+            "type": "string"
           },
           {
             "internalType": "uint256",
@@ -2307,13 +3184,28 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           },
           {
+            "internalType": "address[]",
+            "name": "royaltyOwners",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "royaltyFees",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyFeeTotal",
+            "type": "uint256"
+          },
+          {
             "internalType": "address",
-            "name": "royaltyOwner",
+            "name": "platformAddr",
             "type": "address"
           },
           {
             "internalType": "uint256",
-            "name": "royaltyFee",
+            "name": "platformFee",
             "type": "uint256"
           },
           {
@@ -2327,22 +3219,9 @@ module.exports.PASAR_CONTRACT_ABI = [
             "type": "uint256"
           }
         ],
-        "internalType": "struct IPasarInfo.OrderInfo[]",
+        "internalType": "struct IPasarV2DataAndEvents.OrderInfo[]",
         "name": "",
         "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getTokenAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -2365,14 +3244,24 @@ module.exports.PASAR_CONTRACT_ABI = [
     "inputs": [],
     "name": "initialize",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "pure",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "address",
-        "name": "_tokenAddress",
+        "name": "_library",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_registry",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_dexSwapper",
         "type": "address"
       }
     ],
@@ -2473,6 +3362,40 @@ module.exports.PASAR_CONTRACT_ABI = [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_operator",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_from",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "_data",
+        "type": "bytes"
+      }
+    ],
+    "name": "onERC721Received",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "owner",
     "outputs": [
@@ -2483,6 +3406,52 @@ module.exports.PASAR_CONTRACT_ABI = [
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pasarRegistry",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "_registry",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pasarSwapper",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "_swapper",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_libraryAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setLibraryContract",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -2499,6 +3468,19 @@ module.exports.PASAR_CONTRACT_ABI = [
       }
     ],
     "name": "setPlatformFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_dexSwapper",
+        "type": "address"
+      }
+    ],
+    "name": "setSwapper",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -2532,14 +3514,14 @@ module.exports.PASAR_CONTRACT_ABI = [
         "type": "bool"
       }
     ],
-    "stateMutability": "pure",
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "address",
-        "name": "_owner",
+        "name": "newOwner",
         "type": "address"
       }
     ],

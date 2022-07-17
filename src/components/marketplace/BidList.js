@@ -1,40 +1,53 @@
+import React from 'react'
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
-import { Box, Stack, Link, Typography, IconButton } from '@mui/material';
+import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import palette from '../../theme/palette'
 
 // material
 import LoadingScreen from '../LoadingScreen';
-import { reduceHexAddress, getTime } from '../../utils/common';
+import Jazzicon from '../Jazzicon';
+import { reduceHexAddress, getTime, getDidInfoFromAddress, coinTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
-  trans: PropTypes.object.isRequired,
-  isLast: PropTypes.bool.isRequired
+  trans: PropTypes.object.isRequired
 };
-function TransItem({ trans, isLast }) {
-  const sx = isLast?{}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2};
-  const timeObj = getTime(trans.date)
-  const avatar = "glide"
+function TransItem({ trans, coinType }) {
+  const [didName, setDidName] = React.useState('');
+  const timeObj = getTime(trans.timestamp)
+  React.useEffect(() => {
+    if(trans.buyerAddr) {
+        getDidInfoFromAddress(trans.buyerAddr)
+          .then((info) => {
+            setDidName(info.name)
+          })
+          .catch((e) => {
+          })
+    }
+  }, [trans]);
+  const coinName = coinType.name
+
   return (
-      <Stack direction="row" spacing={2} sx={sx}>
-          <Box
-              component="img"
-              alt=""
-              src={`/static/${avatar}.png`}
-              sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer', background: 'black', p: 1 }}
-          />
-          <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+      <Stack direction="row" spacing={2}>
+          <Box sx={{minWidth: 48, display: 'flex'}}>
+            <Jazzicon
+              address={trans.buyerAddr}
+              size={48}
+              sx={{mr: 0}}
+            />
+          </Box>
+          <Box sx={{ minWidth: 0, width: '100%' }}>
               <Typography variant="body2" noWrap>
-                {parseFloat((trans.price/10**18).toFixed(7))} ELA
+                {parseFloat((trans.price/10**18).toFixed(7))} {coinName}
               </Typography>
-              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
-                  by {reduceHexAddress(trans.to)}
+              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }}>
+                  by {didName || reduceHexAddress(trans.buyerAddr)}
               </Typography>
           </Box>
-          <Box>
-              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
-                  {timeObj.date} {timeObj.time}
+          <Box sx={{ whiteSpace: 'nowrap' }}>
+              <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right">
+                  {timeObj.date} <wbr/>{timeObj.time}
               </Typography>
           </Box>
       </Stack>
@@ -43,13 +56,18 @@ function TransItem({ trans, isLast }) {
 export default function BitList(props) {
   return (
     <Stack spacing={2}>
-      {props.isLoading && <LoadingScreen />}
+      {/* {props.isLoading && <LoadingScreen />} */}
       {props.dataList.map((trans, index) => (
+        <Box key={index}>
           <TransItem 
-            key={index}
             trans={trans}
-            isLast={index===props.dataList.length-1}
+            coinType={props.coinType}
           />
+          {
+            index<props.dataList.length-1&&
+            <Divider sx={{pb: 2}}/>
+          }
+        </Box>
       ))}
     </Stack>
   );

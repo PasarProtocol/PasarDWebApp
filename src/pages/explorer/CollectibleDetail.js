@@ -1,6 +1,6 @@
 // material
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
@@ -17,7 +17,8 @@ import TransactionCollectibleDetail from '../../components/explorer/TransactionL
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { reduceHexAddress, getAssetImage, fetchFrom } from '../../utils/common';
+import { reduceHexAddress, getAssetImage, fetchFrom, getCollectionTypeFromImageUrl, collectionTypes } from '../../utils/common';
+import { ESC_CONTRACT } from '../../config';
 
 // ----------------------------------------------------------------------
 
@@ -48,7 +49,10 @@ const PaperStyle = (props) => (
 // ----------------------------------------------------------------------
 const DefaultPageSize = 5;
 export default function CollectibleDetail() {
-  const params = useParams(); // params.collection
+  // const location = useLocation();
+  // const { tokenId, baseToken } = location.state || {}
+  const params = useParams()
+  const [ tokenId, baseToken ] = params.args.split('&')
   const [collectible, setCollectible] = React.useState({});
   const [transRecord, setTransRecord] = React.useState([]);
   const [detailPageSize, setDetailPageSize] = React.useState(DefaultPageSize);
@@ -61,11 +65,45 @@ export default function CollectibleDetail() {
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const imageRef = React.useRef();
   React.useEffect(async () => {
-    const resCollectible = await fetchFrom(`sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`);
-    const jsonCollectible = await resCollectible.json();
-    setCollectible(jsonCollectible.data);
-    setLoadingCollectible(false);
-
+    fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`)
+      .then((response) => {
+        response.json().then((jsonCollectible) => {
+          if(!jsonCollectible.data){
+            setLoadingCollectible(false);
+            return
+          }
+          const jsonData = jsonCollectible.data
+          if(jsonData.baseToken) {
+            if(jsonData.baseToken===ESC_CONTRACT.sticker) {
+              const defaultCollection = getCollectionTypeFromImageUrl(jsonData)
+              jsonData.collection = collectionTypes[defaultCollection].name
+              jsonData.is721 = false
+            } else {
+              jsonData.collection = ''
+              jsonData.is721 = false
+              fetchFrom(`api/v2/sticker/getCollection/${jsonData.baseToken}?marketPlace=${jsonData.marketPlace}`)
+                .then((response) => {
+                  response.json().then((jsonAssets) => {
+                    if(!jsonAssets.data)
+                      return
+                    setCollectible((prevState)=>{
+                      const tempCollectible = {...prevState}
+                      tempCollectible.collection = jsonAssets.data.name
+                      tempCollectible.is721 = jsonAssets.data.is721
+                      return tempCollectible
+                    });
+                  }).catch((e) => {
+                  });
+                })
+            }
+          }
+          setCollectible(jsonData);
+          setLoadingCollectible(false);
+        })
+      })
+      .catch(error=>{
+        setLoadingCollectible(false);
+      })
     
     function handleResize() {
       const { innerWidth: width } = window;
@@ -89,7 +127,7 @@ export default function CollectibleDetail() {
     setAbortController(newController);
 
     setLoadingTransRecord(true);
-    fetchFrom(`sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetchFrom(`api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${baseToken}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
         setTotalCount(jsonTransactions.data.length)
         const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {
@@ -121,6 +159,17 @@ export default function CollectibleDetail() {
     else
       setDetailPageSize(pgsize)
   }
+
+  const handleErrorImage = (e) => {
+    if(e.target.src.indexOf("pasarprotocol.io") >= 0) {
+      e.target.src = getAssetImage(collectible, false, 1)
+    } else if(e.target.src.indexOf("ipfs.ela") >= 0) {
+      e.target.src = getAssetImage(collectible, false, 2)
+    } else {
+      e.target.src = '/static/circle-loading.svg'
+    }
+  }
+
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">
@@ -135,9 +184,9 @@ export default function CollectibleDetail() {
                   draggable = {false}
                   component="img"
                   alt={collectible.name}
-                  src={getAssetImage(collectible)}
+                  src={getAssetImage(collectible, false)}
                   onLoad={onImgLoad}
-                  onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
+                  onError={handleErrorImage}
                   sx={{ width: '100%', borderRadius: 1, mr: 2 }}
                   ref={imageRef}
               />
@@ -200,7 +249,7 @@ export default function CollectibleDetail() {
                       // defaultExpanded={1&&true}
                       sx={{
                         border: '1px solid',
-                        borderColor: 'action.disabledBackground',
+                        borderColor: item[0].event==='Burn'?'#e45f14':'action.disabledBackground',
                         boxShadow: (theme) => theme.customShadows.z1
                       }}
                     >
@@ -219,7 +268,7 @@ export default function CollectibleDetail() {
                       </AccordionDetails>
                     </Accordion>:
                     
-                    <PaperRecord sx={{p:2}}>
+                    <PaperRecord sx={{p:2, borderColor: item.event==='Burn'?'#e45f14':'action.disabledBackground'}}>
                       <TransactionOrderDetail
                         isAlone={1&&true}
                         item={ item }

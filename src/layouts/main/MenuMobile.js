@@ -1,10 +1,10 @@
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
-import { useState, useEffect } from 'react';
 import menu2Fill from '@iconify/icons-eva/menu-2-fill';
-import twitterIcon from '@iconify/icons-ant-design/twitter';
 // import telegramIcon from '@iconify/icons-ic/outline-telegram';
-import TelegramIcon from '@mui/icons-material/Telegram';
+import twitterIcon from '@iconify/icons-ant-design/twitter';
+import mediumIcon from '@iconify/icons-ant-design/medium';
 import githubIcon from '@iconify/icons-ant-design/github'
 import discordIcon from '@iconify/icons-ic/baseline-discord';
 import { NavLink as RouterLink, useLocation, useNavigate } from 'react-router-dom';
@@ -20,8 +20,11 @@ import Scrollbar from '../../components/Scrollbar';
 import ModeSwitch from '../../components/mode-switch';
 import { MIconButton, MFab } from '../../components/@material-extend';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import DonateDlg from '../../components/dialog/Donate';
 import useSingin from '../../hooks/useSignin';
+import useSettings from '../../hooks/useSettings';
 import { isInAppBrowser } from '../../utils/common';
+import { PATH_DOCS } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -38,6 +41,13 @@ const ListItemStyle = styled(ListItemButton)(({ theme }) => ({
   color: theme.palette.text.secondary
 }));
 
+const SOCIALS = [
+  // { name: 'TelegramIcon', icon: telegramIcon },
+  { name: 'Medium', icon: mediumIcon, url: 'https://medium.com/@protocolpasar' },
+  { name: 'Twitter', icon: twitterIcon, url: 'https://twitter.com/PasarProtocol' },
+  { name: 'Discord', icon: discordIcon, url: 'https://discord.gg/RPbcBv8ckh' },
+  { name: 'Github', icon: githubIcon, url: 'https://github.com/PasarProtocol' }
+];
 // ----------------------------------------------------------------------
 
 // MenuMobileItem.propTypes = {
@@ -101,9 +111,9 @@ function MenuMobileItem(props) {
         // end={path === '/'}
         sx={{
           '&.active': {
-            color: 'primary.main',
+            color: 'text.primary',
             fontWeight: 'fontWeightMedium',
-            bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+            bgcolor: (theme) => alpha(theme.palette.text.primary, theme.palette.action.selectedOpacity)
           }
         }}
       >
@@ -115,9 +125,9 @@ function MenuMobileItem(props) {
         sx={{
           cursor: 'pointer',
           '&.active': {
-            color: 'primary.main',
+            color: 'text.primary',
             fontWeight: 'fontWeightMedium',
-            bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+            bgcolor: (theme) => alpha(theme.palette.text.primary, theme.palette.action.selectedOpacity)
           }
         }}
         onClick={e=>openSignin(path)}
@@ -135,9 +145,9 @@ function MenuMobileItem(props) {
         // end={path === '/'}
         sx={{
           '&.active': {
-            color: 'primary.main',
+            color: 'text.primary',
             fontWeight: 'fontWeightMedium',
-            bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity)
+            bgcolor: (theme) => alpha(theme.palette.text.primary, theme.palette.action.selectedOpacity)
           }
         }}
       >
@@ -178,7 +188,11 @@ export default function MenuMobile(props) {
   const { isOffset, isHome, navConfig } = props
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
+  const [donateOpen, setDonateOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  
+  const { themeMode } = useSettings();
+  const fabColorType = themeMode==='light'?'primary':'default'
 
   useEffect(() => {
     if (drawerOpen) {
@@ -236,47 +250,48 @@ export default function MenuMobile(props) {
         </Scrollbar>
         <Box sx={{ flexGrow: 1 }} />
         <Container>
-          <Grid container dir="ltr" sx={{pb: 3}}>
-            {/* <Grid item xs={4} align="center">
-              <MFab color="info" size="medium">
-                <TelegramIcon sx={{ fontSize: 30 }} />
-              </MFab>
-            </Grid> */}
-            <Grid item xs={6} align="center">
-              <MFab color="info" size="medium" href="https://discord.gg/RPbcBv8ckh" component={Link} target="_blank">
-                <Icon icon={discordIcon} width={30} height={30} />
-              </MFab>
-            </Grid>
-            <Grid item xs={6} align="center">
-              <MFab color="info" size="medium" href="https://github.com/PasarProtocol" component={Link} target="_blank">
-                <Icon icon={githubIcon} width={30} height={30} />
-              </MFab>
-            </Grid>
-            {/* <Grid item xs={4} align="center">
-              <MFab color="info" size="medium">
-                <Icon icon={twitterIcon} width={30} height={30} />
-              </MFab>
-            </Grid> */}
+          <Grid container dir="ltr" sx={{pb: 1}}>
+            {
+              SOCIALS.map((social, _i) => (
+                <Grid key={_i} item xs={3} align="center">
+                  <MFab size="small" color={fabColorType} href={social.url} component={Link} target="_blank">
+                    <Icon icon={social.icon} width={20} height={22} />
+                  </MFab>
+                </Grid>
+              ))
+            }
           </Grid>
-          {/* <Box
+          <Box
             sx={{
-              py: 3,
+              pb: 1,
               display: 'flex',
               justifyContent: 'center'
             }}
           >
             <ModeSwitch/>
-          </Box> */}
+          </Box>
           <CopyRight>
-            Pasar Protocol 2021 | Donate <span role="img" aria-label="">❤️</span>
+            Pasar Protocol 2021 |{' '}
+            <Link onClick={()=>{setDonateOpen(true)}} underline="always" sx={{color: 'inherit'}}>
+              Donate <span role="img" aria-label="">❤️</span>
+            </Link>
           </CopyRight>
           <CopyRight>
-            Privacy Policy | Disclaimer️
+            <Link
+              href={PATH_DOCS}
+              target="_blank"
+              underline="always"
+              sx={{color: 'inherit'}}
+            >
+              Docs
+            </Link>
+            {' '}| Privacy Policy | Disclaimer️
           </CopyRight>
           <CopyRight>
-            v1 - {generatedGitInfo.gitCommitHash}
+            v2 - {generatedGitInfo.gitCommitHash}
           </CopyRight>
         </Container>
+        <DonateDlg isOpen={donateOpen} setOpen={setDonateOpen}/>
       </Drawer>
     </>
   );

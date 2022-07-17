@@ -21,7 +21,7 @@ export default function HomeAssetCard() {
     const [isAssetLoading, setAssetLoading] = React.useState(true);
 
     React.useEffect(() => {
-        fetchFrom('sticker/api/v1/getLatestPurchasedToken').then(response => {
+        fetchFrom('api/v2/sticker/getLatestPurchasedToken').then(response => {
             response.json().then(jsonAsset => {
                 if(jsonAsset.data)
                     setAsset(jsonAsset.data);
@@ -41,7 +41,7 @@ export default function HomeAssetCard() {
                 asset!=null&&
                 <>
                     <Link to={`/profile/others/${asset.royaltyOwner}`} component={RouterLink}>
-                        <CardImgBox src={getAssetImage(asset)}/>
+                        <CardImgBox src={getAssetImage(asset, false)}/>
                     </Link>
                     <Stack direction="row" sx={{py: 2}}>
                         <Box sx={{flexGrow: 1, minWidth: 0}}>

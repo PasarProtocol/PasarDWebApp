@@ -30,7 +30,7 @@ export default function MintBatchName(props) {
   const [fromNumber, setFromNumber] = useState("");
   
   React.useEffect(async () => {
-    const fnum = fromNumber!==""?parseInt(fromNumber, 10):0
+    const fnum = fromNumber!==""?parseInt(fromNumber, 10):1
     const nameArr = [...Array(uploadedCount)].map((el, id)=>`${namePrefix}${(fnum+id).toString().padStart(padNum, "0")}`)
     handleNameGroup([...nameArr])
     if(nameArr.length>3){
@@ -69,7 +69,7 @@ export default function MintBatchName(props) {
           </Stack>
         </Grid>
         <Grid item xs={6} sm={3}>
-          <TypographyStyle variant="caption">From (Number)<br/>Leave blank if not needed</TypographyStyle>
+          <TypographyStyle variant="caption">Starting Number</TypographyStyle>
           <TextField type="number" label="Example: 1" size="small" fullWidth onChange={(e)=>{setFromNumber(e.target.value)}}/>
         </Grid>
         <Grid item xs={6} sm={3}>

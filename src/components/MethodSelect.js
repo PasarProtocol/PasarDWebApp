@@ -7,6 +7,8 @@ const options = [
     "CancelOrder",
     "ChangeOrderPrice",
     "CreateOrderForSale",
+    "CreateOrderForAuction",
+    "BidForOrder",
     "Mint",
     "SafeTransferFrom",
     "SafeTransferFromWithMemo",
@@ -23,6 +25,15 @@ const MenuProps = {
     },
     variant: "menu"
 };
+const checkboxStyle = {
+  py:0,
+  '&.Mui-checked': {
+    color: 'text.primary'
+  },
+  '&.MuiCheckbox-indeterminate': {
+    color: 'text.secondary'
+  }
+}
 export default function MethodSelect({onChange}) {
   const [selected, setSelected] = useState([]);
   const isAllSelected =
@@ -61,7 +72,7 @@ export default function MethodSelect({onChange}) {
               indeterminate={
                 selected.length > 0 && selected.length < options.length
               }
-              sx={{py:0}}
+              sx={checkboxStyle}
             />
           </ListItemIcon>
           <ListItemText
@@ -71,7 +82,7 @@ export default function MethodSelect({onChange}) {
         {options.map((option) => (
           <MenuItem key={option} value={option}>
             <ListItemIcon>
-              <Checkbox checked={selected.indexOf(option) > -1} sx={{py:0}} />
+              <Checkbox checked={selected.indexOf(option) > -1} sx={checkboxStyle}/>
             </ListItemIcon>
             <ListItemText primary={option} />
           </MenuItem>

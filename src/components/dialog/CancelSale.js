@@ -5,15 +5,20 @@ import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
-import { stickerContract as CONTRACT_ADDRESS, marketContract as MARKET_CONTRACT_ADDRESS } from '../../config';
+import { v1marketContract as V1_MARKET_CONTRACT_ADDRESS } from '../../config';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
-import { isInAppBrowser } from '../../utils/common';
+import { isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
+import useAuctionDlg from '../../hooks/useAuctionDlg';
+import useSignin from '../../hooks/useSignin';
 
 export default function CancelSale(props) {
-  const { isOpen, setOpen, title, orderId, updateCount, handleUpdate } = props;
-  const { enqueueSnackbar } = useSnackbar();
+  const { isOpen, setOpen, name, orderId, OrderId, updateCount, handleUpdate, v1State=false } = props;
   const [onProgress, setOnProgress] = React.useState(false);
+  const { updateCount: updateCount2, setUpdateCount } = useAuctionDlg()
+  const { enqueueSnackbar } = useSnackbar();
+  const { pasarLinkChain } = useSignin()
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -23,11 +28,13 @@ export default function CancelSale(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
+    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
     const contractAbi = PASAR_CONTRACT_ABI;
-    const contractAddress = MARKET_CONTRACT_ADDRESS;
+    const contractAddress = !v1State ? MarketContractAddress: V1_MARKET_CONTRACT_ADDRESS;
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
-    const gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
+    const gasPrice = getFilteredGasPrice(_gasPrice)
 
     console.log('Sending transaction with account address:', accounts[0]);
     const transactionParams = {
@@ -45,8 +52,13 @@ export default function CancelSale(props) {
       })
       .on('receipt', (receipt) => {
         console.log('receipt', receipt);
-        setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
-        enqueueSnackbar('Cancel sale success!', { variant: 'success' });
+        if(handleUpdate)
+          setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
+        else
+          setTimeout(()=>{
+            setUpdateCount(updateCount2+1)
+          }, 1000)
+        enqueueSnackbar('Cancel sale Success!', { variant: 'success' });
         setOpen(false);
       })
       .on('confirmation', (confirmationNumber, receipt) => {
@@ -54,15 +66,16 @@ export default function CancelSale(props) {
       })
       .on('error', (error, receipt) => {
         console.error('error', error);
-        enqueueSnackbar('Cancel sale error!', { variant: 'warning' });
+        enqueueSnackbar('Cancel sale Error!', { variant: 'error' });
         setOnProgress(false);
       });
   };
 
   const cancelSale = async () => {
     setOnProgress(true);
-    console.log('orderId:', orderId);
-    await callCancelOrder(orderId);
+    const _orderId = orderId!==undefined?orderId:OrderId
+    console.log('orderId:', _orderId);
+    await callCancelOrder(_orderId);
   };
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -84,11 +97,11 @@ export default function CancelSale(props) {
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
           Unlist Item
         </Typography>
-        <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }}>
+        <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }} align="center">
           You are about to remove{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-            {title}
-          </Typography>{' '}
+            {name}
+          </Typography><br/>
           from the marketplace
         </Typography>
         <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>

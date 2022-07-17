@@ -5,6 +5,7 @@ import MainLayout from '../layouts/main';
 import LogoOnlyLayout from '../layouts/LogoOnlyLayout';
 // components
 import LoadingScreen from '../components/LoadingScreen';
+import { AuctionDlgProvider } from '../contexts/AuctionDlgContext';
 import { MintDlgProvider } from '../contexts/MintDlgContext';
 
 // ----------------------------------------------------------------------
@@ -56,7 +57,7 @@ export default function Router() {
           children: [
             { path: 'collectible', element: <Collectible /> },
             { path: 'collectible/:collection', element: <Collectible /> },
-            { path: 'collectible/detail/:collection', element: <CollectibleDetail /> },
+            { path: 'collectible/detail/:args', element: <CollectibleDetail /> },
             { path: 'transaction', element: <Transaction /> },
             { path: 'transaction/:transaction', element: <Transaction /> },
             { path: 'transaction/detail/:address', element: <AddressDetail /> },
@@ -68,21 +69,33 @@ export default function Router() {
         {
           path: 'marketplace',
           children: [
-            { path: 'detail/:collection', element: <MarketCollectibleDetail /> },
+            { path: 'detail/:args', element: <AuctionDlgProvider><MarketCollectibleDetail /></AuctionDlgProvider> },
             { path: 'search', element: <Navigate to="/marketplace" replace /> },
             { path: 'search/:key', element: <MarketExplorer /> },
           ]
         },
         { path: 'create', element: <MintDlgProvider><CreateItem /></MintDlgProvider> },
-        { path: 'profile', element: <Navigate to="/404" replace /> },
+        { path: 'collections', element: <CollectionExplorer /> },
+        {
+          path: 'collections',
+          children: [
+            { path: 'detail/:collection', element: <CollectionDetail /> },
+            { path: 'create', element: <CreateCollection /> },
+            { path: 'import', element: <ImportCollection /> },
+            { path: 'edit', element: <EditCollection /> },
+          ]
+        },
+        { path: 'profile', element: <MyProfile /> },
         {
           path: 'profile',
           children: [
-            { path: 'myitem', element: <MyItems /> },
-            { path: 'myitem/:type', element: <MyItems /> },
+            { path: 'edit', element: <EditProfile /> },
+            { path: 'myitem/:type', element: <MyProfile /> },
             { path: 'others/:address', element: <MyItems /> },
           ]
         },
+        { path: 'features', element: <Features /> },
+        { path: 'rewards', element: <Rewards /> },
       ]
     },
     { path: '*', element: <Navigate to="/404" replace /> }
@@ -102,5 +115,17 @@ const MarketHome = Loadable(lazy(() => import('../pages/MarketHome')));
 const MarketExplorer = Loadable(lazy(() => import('../pages/marketplace/Explorer')));
 const CreateItem = Loadable(lazy(() => import('../pages/marketplace/CreateItem')));
 const MyItems = Loadable(lazy(() => import('../pages/marketplace/MyItems')));
+const MyProfile = Loadable(lazy(() => import('../pages/marketplace/MyProfile')));
+const EditProfile = Loadable(lazy(() => import('../pages/marketplace/EditProfile')));
+// Collection
+const CollectionExplorer = Loadable(lazy(() => import('../pages/collection/Explorer')));
+const CollectionDetail = Loadable(lazy(() => import('../pages/collection/CollectionDetail')));
+const CreateCollection = Loadable(lazy(() => import('../pages/collection/CreateCollection')));
+const EditCollection = Loadable(lazy(() => import('../pages/collection/EditCollection')));
+const ImportCollection = Loadable(lazy(() => import('../pages/collection/ImportCollection')));
+// Features
+const Features = Loadable(lazy(() => import('../pages/features/Features')));
+// Rewards
+const Rewards = Loadable(lazy(() => import('../pages/rewards/Rewards')));
 
 const NotFound = Loadable(lazy(() => import('../pages/Page404')));

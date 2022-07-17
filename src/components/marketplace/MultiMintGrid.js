@@ -24,12 +24,12 @@ const GridItems = (props) => (
           exit={{ opacity: 0 }}
         >
           <AssetCard
+            {...props}
             thumbnail={src}
-            title={props.multiNames[index]}
-            description={props.description}
-            price={props.price}
-            quantity={props.quantity}
+            name={props.multiNames[index]}
             isLink={false}
+            type={0}
+            defaultCollectionType={0}
           />
         </motion.div>
       ))}
@@ -38,7 +38,7 @@ const GridItems = (props) => (
 export default function MultiMintGrid(props){
   return(
     <StackedGrid>
-      <GridItems {...props} />
+      <GridItems {...props}/>
     </StackedGrid>
   )
 }
