@@ -1,58 +1,45 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
 import * as math from 'mathjs';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  IconButton,
-  Typography,
-  Input,
-  FormControl,
-  InputLabel,
-  Divider,
-  Grid,
-  Tooltip,
-  Icon,
-  Button,
-  Box
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Input, FormControl, InputLabel, Divider, Grid, Tooltip, Button, Box, FormHelperText } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
+import { Icon } from '@iconify/react';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import {
-  stickerContract as CONTRACT_ADDRESS,
-  marketContract as MARKET_CONTRACT_ADDRESS,
-  blankAddress
-} from '../../config';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
-import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser } from '../../utils/common';
-
-const InputStyle = styled(Input)(({ theme }) => ({
-  '&:before': {
-    borderWidth: 0
-  }
-}));
+import { InputStyle, InputLabelStyle } from '../CustomInput';
+import useSingin from '../../hooks/useSignin';
+import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, getCoinTypesInCurrentNetwork, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork, getChainTypeFromId } from '../../utils/common';
 
 export default function Sell(props) {
-  const { isOpen, setOpen, title, tokenId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate, saleType, royalties } = props;
   const [price, setPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
+  const [coinType, setCoinType] = React.useState(0);
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
+  const [isOnValidation, setOnValidation] = React.useState(false);
+  const { diaBalance, pasarLinkChain } = useSingin()
+
   const handleClose = () => {
     setOpen(false);
+    setOnProgress(false);
+    setPrice('')
+    setRcvPrice(0)
+    setOnValidation(false)
   };
 
   const handleChangePrice = (event) => {
     let priceValue = event.target.value;
     if (priceValue < 0) return;
     priceValue = removeLeadingZero(priceValue);
+    if (!isValidLimitPrice(priceValue)) return;
     setPrice(priceValue);
-    setRcvPrice(math.round((priceValue * 98) / 100, 3));
+    const royaltyFee = saleType === 'Primary Sale' ? 0 : math.round((priceValue * royalties) / 10 ** 6, 4);
+    setRcvPrice(math.round((priceValue * 98) / 100 - royaltyFee, 3));
   };
 
   const callSetApprovalForAllAndSell = (_operator, _approved, _price, _didUri) => (
@@ -61,11 +48,10 @@ export default function Sell(props) {
       // const accounts = await walletConnectWeb3.eth.getAccounts();
       walletConnectWeb3.eth.getAccounts().then((accounts)=>{
 
-        const contractAbi = STICKER_CONTRACT_ABI;
-        const contractAddress = CONTRACT_ADDRESS; // Elastos Testnet
-        const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+        const stickerContract = new walletConnectWeb3.eth.Contract(STICKER_CONTRACT_ABI, baseToken);
         
-        walletConnectWeb3.eth.getGasPrice().then((gasPrice)=>{
+        walletConnectWeb3.eth.getGasPrice().then((_gasPrice)=>{
+          const gasPrice = getFilteredGasPrice(_gasPrice)
           console.log("Gas price:", gasPrice);
           // console.log("Sending transaction with account address:", accounts[0]);
           const transactionParams = {
@@ -75,39 +61,45 @@ export default function Sell(props) {
               'value': 0
           };
     
-          stickerContract.methods.isApprovedForAll(accounts[0], _operator).call().then(isApproval=>{
-            console.log("isApprovalForAll=", isApproval);
-            if (!isApproval)
-              stickerContract.methods.setApprovalForAll(_operator, true).send(transactionParams)
-              .on('receipt', (receipt) => {
-                  console.log("setApprovalForAll-receipt", receipt);
-                  callContractMethod('createOrderForSale', {
-                    '_id': tokenId,
-                    '_amount': 1,
-                    '_price': _price,
-                    '_didUri': _didUri
-                  }).then((success) => {
-                    resolve(success)
-                  }).catch(error=>{
+          stickerContract.methods.isApprovedForAll(accounts[0], _operator).call()
+            .then(isApproval=>{
+              console.log("isApprovalForAll=", isApproval);
+              if (!isApproval)
+                stickerContract.methods.setApprovalForAll(_operator, true).send(transactionParams)
+                .on('receipt', (receipt) => {
+                    console.log("setApprovalForAll-receipt", receipt);
+                    callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
+                      '_id': tokenId,
+                      '_amount': 1,
+                      '_price': _price,
+                      '_didUri': _didUri,
+                      '_baseAddress': baseToken
+                    }).then((success) => {
+                      resolve(success)
+                    }).catch(error=>{
+                      reject(error)
+                    })
+                })
+                .on('error', (error, receipt) => {
+                    console.error("setApprovalForAll-error", error);
                     reject(error)
-                  })
-              })
-              .on('error', (error, receipt) => {
-                  console.error("setApprovalForAll-error", error);
+                });
+              else
+                callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
+                  '_id': tokenId,
+                  '_amount': 1,
+                  '_price': _price,
+                  '_didUri': _didUri,
+                  '_baseAddress': baseToken
+                }).then((success) => {
+                  resolve(success)
+                }).catch(error=>{
                   reject(error)
-              });
-            else
-              callContractMethod('createOrderForSale', {
-                '_id': tokenId,
-                '_amount': 1,
-                '_price': _price,
-                '_didUri': _didUri
-              }).then((success) => {
-                resolve(success)
-              }).catch(error=>{
-                reject(error)
-              })
-          })
+                })
+            })
+            .catch(error=>{
+              reject(error)
+            })
         })
         
       })
@@ -115,23 +107,36 @@ export default function Sell(props) {
   )
 
   const putOnSale = async () => {
+    setOnValidation(true)
+    if(!(price*1))
+      return
+    const chainType = getChainTypeFromId(pasarLinkChain)
+    if(chainType==='ESC' && coinType!==0 && diaBalance*1===0) {
+      enqueueSnackbar('Sorry, you need to hold a minimum of 0.01 DIA to sell nft via other ERC20 tokens.', { variant: 'warning' });
+      return
+    }
     setOnProgress(true);
     const didUri = await sendIpfsDidJson();
     const sellPrice = BigInt(price*1e18).toString();
     console.log('--------', tokenId, '--', sellPrice, '--', didUri, '--');
-    callSetApprovalForAllAndSell(MARKET_CONTRACT_ADDRESS, true, sellPrice, didUri).then(result=>{
+    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
+    callSetApprovalForAllAndSell(MarketContractAddress, true, sellPrice, didUri).then(result=>{
       if(result){
         setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
         enqueueSnackbar('Sell NFT success!', { variant: 'success' });
         setOpen(false);
       } else {
-        enqueueSnackbar('Sell NFT error!', { variant: 'warning' });
+        enqueueSnackbar('Sell NFT error!', { variant: 'error' });
+        setOnProgress(false);
       }
     }).catch(e=>{
+      enqueueSnackbar('Sell NFT error!', { variant: 'error' });
+      setOnProgress(false);
       console.log(e)
     });
   }
 
+  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain)
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <DialogTitle>
@@ -156,7 +161,7 @@ export default function Sell(props) {
           Item:
         </Typography>
         <Typography variant="subtitle1" sx={{ display: 'inline' }}>
-          {title}
+          {name}
         </Typography>
         <Grid container>
           <Grid item xs={12}>
@@ -165,16 +170,21 @@ export default function Sell(props) {
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <FormControl variant="standard" sx={{ width: '100%' }}>
-              <InputLabel htmlFor="input-with-price">Enter a fixed price of each item</InputLabel>
+            <FormControl error={isOnValidation && !(price*1)} variant="standard" sx={{ width: '100%' }}>
+              <InputLabelStyle htmlFor="input-with-price">Enter a fixed price of each item</InputLabelStyle>
               <InputStyle
                 type="number"
                 id="input-with-price"
                 value={price}
                 onChange={handleChangePrice}
                 startAdornment={' '}
-                endAdornment={<CoinSelect />}
+                endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
+                aria-describedby="price-error-text"
+                inputProps={{
+                  sx: {flexGrow: 1, width: 'auto'}
+                }}
               />
+              <FormHelperText id="price-error-text" hidden={!isOnValidation || (isOnValidation && (price*1))}>Price is required</FormHelperText>
             </FormControl>
             <Divider />
             <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main' }}>
@@ -187,10 +197,16 @@ export default function Sell(props) {
               >
                 <Icon icon="eva:info-outline" style={{ marginBottom: -4, fontSize: 18 }} />
               </Tooltip>
+              {
+                (royalties*1)>0 &&
+                <>,&nbsp;Royalty fee {math.round(royalties/1e4, 2)}%</>
+              }
             </Typography>
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive
-              <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}> {rcvprice} ELA </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}>
+                {' '}{rcvprice} {coinTypes[coinType].name}{' '}
+              </Typography>
               per item
             </Typography>
           </Grid>

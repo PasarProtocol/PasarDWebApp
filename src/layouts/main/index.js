@@ -11,6 +11,8 @@ import { Box } from '@mui/material';
 // components
 import MainNavbar from './MainNavbar';
 import MainFooter from './MainFooter';
+import useSettings from '../../hooks/useSettings';
+import useSingin from '../../hooks/useSignin';
 
 // ----------------------------------------------------------------------
 
@@ -34,7 +36,7 @@ function ScrollTop(props) {
       <Box
         onClick={handleClick}
         role="presentation"
-        sx={{ position: 'fixed', bottom: 56, right: 32, zIndex: 1 }}
+        sx={{ position: 'fixed', bottom: {xs: 56, sm: 36}, right: 22, zIndex: 2 }}
       >
         {children}
       </Box>
@@ -56,18 +58,22 @@ const BodyStyle = styled('div')(({ theme, footerhidden }) => (
 ));
 
 export default function MainLayout() {
+  const { themeMode } = useSettings();
   const { pathname } = useLocation();
+  const { openTopAlert } = useSingin()
   const isHome = pathname === '/';
-  const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create' || pathname === '/create/' || pathname.startsWith('/marketplace/search');
+  const isContainerXl = isHome || pathname === '/collection';
+  const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create'
+   || pathname === '/create/' || pathname.startsWith('/marketplace/search') || pathname.startsWith('/collections/detail');
   return (
     <>
       <MainNavbar />
-      <BodyStyle footerhidden={isFooterHiddenPage?1:0}>
+      <BodyStyle footerhidden={isFooterHiddenPage?1:0} style={{paddingTop: openTopAlert?50:0, transition: 'padding-top 0.3s'}}>
         <Outlet />
       </BodyStyle>
-      <MainFooter hidden={isFooterHiddenPage} isHome={isHome}/>
+      <MainFooter hidden={isFooterHiddenPage} isContainerXl={isContainerXl}/>
       <ScrollTop>
-        <Fab variant="contained" size="small" aria-label="scroll back to top">
+        <Fab variant="contained" size="small" aria-label="scroll back to top" color={themeMode==='light'?'primary':'default'}>
           <KeyboardArrowUpIcon />
         </Fab>
       </ScrollTop>

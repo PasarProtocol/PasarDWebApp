@@ -1,13 +1,14 @@
 import React from 'react';
-import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
-import {round} from 'mathjs'
+import { useLocation, Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
+import { round } from 'mathjs'
+import { format } from 'date-fns';
 import Lightbox from 'react-image-lightbox';
 import { FacebookShareButton, TwitterShareButton, FacebookIcon, TwitterIcon } from "react-share";
 import { Icon } from '@iconify/react';
 import { useWeb3React } from "@web3-react/core";
 import { styled } from '@mui/material/styles';
 import { Link, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Tooltip,
-  Typography, Box, Modal, Backdrop, Menu, MenuItem, Button, IconButton, Toolbar } from '@mui/material';
+  Typography, Box, Modal, Backdrop, Menu, MenuItem, Button, IconButton, Toolbar, SvgIcon, Avatar } from '@mui/material';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
@@ -15,26 +16,34 @@ import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CloseIcon from '@mui/icons-material/Close';
 
 // components
 import { MFab, MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
+import CollectibleHandleSection from './CollectibleHandleSection'
 import LoadingScreen from '../../components/LoadingScreen';
-import Countdown from '../../components/Countdown';
 import AssetDetailInfo from '../../components/marketplace/AssetDetailInfo';
 import CollectibleHistory from '../../components/marketplace/CollectibleHistory';
 import BidList from '../../components/marketplace/BidList';
+import AssetCard from '../../components/marketplace/AssetCard';
 import Badge from '../../components/Badge';
+import DIABadge from '../../components/DIABadge';
 import Jazzicon from '../../components/Jazzicon';
-import PurchaseDlg from '../../components/dialog/Purchase'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager'
+import AddressCopyButton from '../../components/AddressCopyButton';
+import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import useSingin from '../../hooks/useSignin';
-import {blankAddress, marketContract} from '../../config'
-import { reduceHexAddress, getAssetImage, getTime, getCoinUSD, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser } from '../../utils/common';
+import useAuctionDlg from '../../hooks/useAuctionDlg';
+import { blankAddress, ESC_CONTRACT, ETH_CONTRACT } from '../../config'
+import { queryAvatarUrl, queryName, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
+import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
+import { reduceHexAddress, getAssetImage, getDiaTokenInfo, fetchFrom, getCoinTypeFromToken, getCollectiblesInCollection4Preview,
+  setAllTokenPrice, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo, getCollectionTypeFromImageUrl, 
+  getShortUrl, getIpfsUrl, collectionTypes, coinTypes, coinTypesForEthereum, chainTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -48,13 +57,15 @@ const RootStyle = styled(Page)(({ theme }) => ({
     paddingBottom: theme.spacing(3)
   }
 }));
-
+const SectionSx = {
+  border: '1px solid',
+  borderColor: 'action.disabledBackground',
+  boxShadow: (theme) => theme.customShadows.z1,
+}
 const PaperStyle = (props) => (
   <Paper
     sx={{
-        border: '1px solid',
-        borderColor: 'action.disabledBackground',
-        boxShadow: (theme) => theme.customShadows.z1,
+        ...SectionSx,
         p: '20px',
         ...props.sx
     }}
@@ -70,76 +81,138 @@ const ToolGroupStyle = styled(Box)(({ theme }) => ({
     right: 0
   }
 }));
-const AvatarStyle = styled(Box)(({ theme }) => ({
+const AvatarStyle = styled(Box)(({ theme, src }) => ({
   width: 40,
   height: 40,
   borderRadius: '100%',
-  backgroundColor: 'black',
+  backgroundColor: src?'unset':'black',
   marginRight: 8
 }));
-const StickyPaperStyle = styled(Paper)(({ theme }) => ({
-  position: 'sticky',
-  bottom: 0,
-  boxShadow: 'rgb(230 230 230) 0px -5px 12px',
-  marginTop: theme.spacing(2),
-  padding: theme.spacing(2),
-  borderRadius: '16px 16px 0 0'
-}));
-const Property = ({type, name}) => (
+const Property = ({type, name, percentage}) => (
   <Paper
     sx={{
         border: '1px solid',
         borderColor: 'action.disabledBackground',
         p: '20px',
-        display: 'inline-block'
+        display: 'inline-block',
+        textAlign: 'center'
     }}
   >
-    <Typography variant="body2" color="origin.main">{type}</Typography>
+    <Typography variant="subtitle2" color="origin.main">{type}</Typography>
     <Typography variant="body2">{name}</Typography>
+    {
+      !!percentage&&
+      <Typography variant="body2" color="text.secondary">{percentage}% trait</Typography>
+    }
   </Paper>
 )
 const BackdropStyle = styled(Backdrop)(({ theme }) => ({
   background: 'rgba(0, 0, 0, 0.8)'
 }));
+const BidStatus = ({isReserveMet}) => (
+  <Typography variant="h5" component='div' color='origin.main' sx={{ display: 'inline-flex', alignItems: 'center' }}>
+    {
+      `Reserve Price ${isReserveMet?'Met':'Not Met'}`
+    }
+    <Box sx={{ width: 26, height: 26, borderRadius: 2, ml: 1, p: '5px', backgroundColor: isReserveMet?'#7CB342':'#D60000', display: 'inline-flex' }}>
+      <SvgIcon sx={{fontSize: 18, color:'success.contrastText'}}>
+        <ShoppingCartIcon/>
+      </SvgIcon>
+    </Box>
+  </Typography>
+)
+
 // ----------------------------------------------------------------------
 export default function CollectibleDetail() {
   const navigate = useNavigate();
-  const params = useParams(); // params.collection
+  // const location = useLocation();
+  // const { tokenId, baseToken } = location.state || {}
+  const params = useParams()
+  const [ tokenId, baseToken ] = params.args.split('&')
   const [isFullScreen, setFullScreen] = React.useState(false);
   const [isOpenSharePopup, setOpenSharePopup] = React.useState(null);
   const [isOpenMorePopup, setOpenMorePopup] = React.useState(null);
-  const [coinUSD, setCoinUSD] = React.useState(0);
   const [address, setAddress] = React.useState('');
+  const [shareUrl, setShareUrl] = React.useState(window.location.href);
 
   const [collectible, setCollectible] = React.useState({});
-  const [diaBadge, setDiaBadge] = React.useState({creator: false, owner: false});
+  const [collection, setCollection] = React.useState(null);
+  const [badge, setBadge] = React.useState({creator: {dia: 0, kyc: false}, owner: {dia: 0, kyc: false}});
+  const [collectionBadge, setCollectionBadge] = React.useState({dia: 0, kyc: false});
   const [didName, setDidName] = React.useState({creator: '', owner: ''});
-  const [isForAuction, setForAuction] = React.useState(false);
+  const [avatarUrl, setAvatarUrl] = React.useState({creator: null, owner: null});
   const [transRecord, setTransRecord] = React.useState([]);
-  const [bidList, setBidList] = React.useState([]);
+  const [collectiblesInCollection, setCollectiblesInCollection] = React.useState([]);
   const [isLoadingCollectible, setLoadingCollectible] = React.useState(true);
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
-  const [isLoadingBidList, setLoadingBid] = React.useState(true);
+  const [imageUrl, setImageUrl] = React.useState('');
   const [isLoadedImage, setLoadedImage] = React.useState(false);
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
-  const [isOpenPurchase, setPurchaseOpen] = React.useState(false);
-  const [didSignin, setSignin] = React.useState(false);
-  const [buyClicked, setBuyClicked] = React.useState(false);
+  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
+  const [dispCountInCollection, setDispCountInCollection] = React.useState(3);
+  const [totalCountInCollection, setTotalCountInCollection] = React.useState(0);
+  const [collectionAttributes, setCollectionAttributes] = React.useState({});
   const { pasarLinkAddress } = useSingin()
-
+  const { updateCount } = useAuctionDlg()
+  
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
   
   const context = useWeb3React()
   const { account } = context;
-  React.useEffect(async() => {
-    const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-    setSignin(!!sessionLinkFlag)
-    if(buyClicked&&!!sessionLinkFlag){
-      setBuyClicked(false)
-      setTimeout(()=>{setPurchaseOpen(true)}, 300)
+
+  const defaultCollection = collectionTypes[0]
+  
+  const setCoinPriceByType = (type, value) => {
+    setCoinPrice((prevState) => {
+      const tempPrice = [...prevState];
+      tempPrice[type] = value;
+      return tempPrice;
+    });
+  }
+
+  React.useEffect(()=>{
+    setAllTokenPrice(setCoinPriceByType)
+  }, [])
+
+  React.useEffect(() => {
+    getShortUrl(window.location.href).then((shortUrl)=>{
+      setShareUrl(shortUrl)
+    })
+    determineDispCount()
+  }, [tokenId])
+
+  function determineDispCount() {
+    const { innerWidth: width } = window;
+    if(width>900) // in case of md
+      setDispCountInCollection(4)
+    else if(width>700)
+      setDispCountInCollection(3)
+    else
+      setDispCountInCollection(2)
+  }
+  
+  React.useEffect(() => {
+    if(collectible.baseToken) {
+      const assetImageUrl = getAssetImage(collectible, false)
+      setImageUrl(assetImageUrl)
+      
+      fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${collectible.baseToken}?marketPlace=${collectible.marketPlace}`)
+        .then((response) => {
+          response.json().then((jsonData) => {
+            if(jsonData.data)
+              setTotalCountInCollection(jsonData.data.total)
+          })
+        })
+      fetchFrom(`api/v2/sticker/getAttributeOfCollection/${collectible.baseToken}?marketPlace=${collectible.marketPlace}`)
+        .then((response) => {
+          response.json().then((jsonData) => {
+            if(jsonData.data)
+              setCollectionAttributes(jsonData.data)
+          })
+        })
     }
-  }, [pasarLinkAddress]);
+  }, [collectible]);
 
   React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
@@ -155,28 +228,60 @@ export default function CollectibleDetail() {
       if(sessionLinkFlag==='3')
         walletconnect.getAccount().then(setAddress)
     }
-  }, [account]);
+  }, [account, pasarLinkAddress]);
   React.useEffect(async () => {
     window.scrollTo(0,0)
-    setCoinUSD(await getCoinUSD())
-    const resCollectible = await fetchFrom(`sticker/api/v1/getCollectibleByTokenId?tokenId=${params.collection}`);
+    const resCollectible = await fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`);
     const jsonCollectible = await resCollectible.json();
     if(jsonCollectible.data){
       try{
         setCollectible(jsonCollectible.data);
+
+        fetchFrom(`api/v2/sticker/getCollection/${jsonCollectible.data.baseToken}?marketPlace=${jsonCollectible.data.marketPlace}`)
+          .then((response) => {
+            response.json().then((jsonAssets) => {
+              if(!jsonAssets.data)
+                return
+              setCollection({...jsonAssets.data, description: '', avatar: '', socials: {}});
+              const metaUri = getIpfsUrl(jsonAssets.data.uri)
+              if(metaUri) {
+                fetch(metaUri)
+                  .then(response => response.json())
+                  .then(data => {
+                    setCollection((prevState)=>{
+                      const tempState = {...prevState}
+                      tempState.description = data.data.description
+                      tempState.avatar = getIpfsUrl(data.data.avatar)
+                      tempState.socials = data.data.socials
+                      return tempState
+                    });
+                  })
+                  .catch(console.log);
+              }
+            }).catch((e) => {
+            });
+          })
+        getCollectiblesInCollection4Preview(jsonCollectible.data.baseToken, 5).then(res=>{
+          setCollectiblesInCollection(res.filter(item=>item.tokenId !== tokenId))
+        })
         getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
           if(dia!=='0')
-            setDiaBadgeOfUser('creator', true)
+            setBadgeOfUser('creator', 'dia', dia)
+          else setBadgeOfUser('creator', 'dia', 0)
         })
         getDiaTokenInfo(jsonCollectible.data.holder).then(dia=>{
           if(dia!=='0')
-            setDiaBadgeOfUser('owner', true)
+            setBadgeOfUser('owner', 'dia', dia)
+          else setBadgeOfUser('owner', 'dia', 0)
         })
         if(jsonCollectible.data.royaltyOwner === jsonCollectible.data.holder){
           getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
             .then((info) => {
-              if(info.name)
+              if(info.name){
                 setDidName({creator: info.name, owner: info.name})
+                if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+                  fetchProfileData(info.did, info.name || '')
+              }
             })
             .catch((e) => {
             })
@@ -184,6 +289,8 @@ export default function CollectibleDetail() {
           getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
             .then((info) => {
               setDidNameOfUser('creator', info.name || '')
+              if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+                fetchProfileData(info.did, info.name || '', 'creator')
             })
             .catch((e) => {
             })
@@ -191,34 +298,32 @@ export default function CollectibleDetail() {
           getDidInfoFromAddress(jsonCollectible.data.holder)
             .then((info) => {
               setDidNameOfUser('owner', info.name || '')
+              if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+                fetchProfileData(info.did, info.name || '', 'owner')
             })
             .catch((e) => {
             })
         }
-        if(jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0)
+        if(
+          (jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length>0) ||
+          (jsonCollectible.data.attribute && Object.keys(jsonCollectible.data.attribute).length>0)
+        )
           setPropertiesAccordionOpen(true)
+        else 
+          setPropertiesAccordionOpen(false)
       } catch(e) {
         console.log(e)
       }
     }
     setLoadingCollectible(false);
-    // setForAuction(true);
-
-    const tempBidArr = [
-      {'price': 50000000000000000000, 'to': '0x504342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431},
-      {'price': 60000000000000000000, 'to': '0x604342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431},
-      {'price': 70000000000000000000, 'to': '0x704342BF737Cce34F764E1EB0951AfbB1a3fcd10', 'date': 1641398431}
-    ]
-    setBidList(tempBidArr)
-    setLoadingBid(false)
-  }, []);
+  }, [updateCount, tokenId]);
   
   React.useEffect(async () => {
     setLoadingTransRecord(true);
-    fetchFrom(`sticker/api/v1/getTranDetailsByTokenId?tokenId=${params.collection}&method=&timeOrder=-1`).then(response => {
+    fetchFrom(`api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${baseToken}&method=&timeOrder=-1`).then(response => {
       response.json().then(jsonTransactions => {
         setTransRecord(jsonTransactions.data.filter((trans)=>
-          !((trans.event==="SafeTransferFrom"||trans.event==="SafeTransferFromWithMemo") && (trans.to===blankAddress||trans.to===marketContract))
+          !((trans.event==="SafeTransferFrom"||trans.event==="SafeTransferFromWithMemo") && (trans.to===blankAddress||trans.to===ESC_CONTRACT.market||trans.to===ETH_CONTRACT.market))
         ).slice(0,10));
         setLoadingTransRecord(false);
       })
@@ -226,10 +331,85 @@ export default function CollectibleDetail() {
       if(e.code !== e.ABORT_ERR)
         setLoadingTransRecord(false);
     });
-  }, []);
+  }, [updateCount, tokenId]);
+
+  const fetchProfileData = (targetDid, didInfo, type='all')=>{
+    queryName(targetDid)
+      .then((res)=>{
+        if(res.find_message && res.find_message.items.length) {
+          const displayName = res.find_message.items[0].display_name
+          if(type==='all')
+            setDidName({creator: displayName, owner: displayName})
+          else
+            setDidNameOfUser(type, displayName)
+        }
+
+        queryAvatarUrl(targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length) {
+            const avatarUrl = res.find_message.items[0].display_name
+            downloadFromUrl(avatarUrl).then(avatarData=>{
+              if(avatarData && avatarData.length) {
+                const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
+                if(type==='all')
+                  setAvatarUrl({creator: base64Content, owner: base64Content})
+                else
+                  setAvatarOfUser(type, base64Content)
+              }
+            })
+          }
+        })
+        downloadAvatar(targetDid).then((res)=>{
+          if(res && res.length) {
+            const base64Content = res.reduce((content, code)=>{
+              content=`${content}${String.fromCharCode(code)}`;
+              return content
+            }, '')
+            const displayAvatar = `data:image/png;base64,${base64Content}`
+            if(type==='all')
+              setAvatarUrl((prevState)=>{
+                if(!prevState.creator)
+                  return {creator: displayAvatar, owner: displayAvatar}
+                return prevState
+              })
+            else
+              setAvatarUrl((prevState) => {
+                const tempAvatar = {...prevState};
+                if(!tempAvatar[type])
+                  tempAvatar[type] = displayAvatar;
+                return tempAvatar;
+              });
+          }
+        })
+        queryKycMe(targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length){
+            if(type==='all')
+              setBadge((prevState)=>{
+                const tempState = {...prevState}
+                tempState.creator.kyc = true
+                tempState.owner.kyc = true
+                return tempState
+              })
+            else
+              setBadgeOfUser(type, 'kyc', true)
+          }
+          else
+            if(type==='all')
+              setBadge((prevState)=>{
+                const tempState = {...prevState}
+                tempState.creator.kyc = false
+                tempState.owner.kyc = false
+                return tempState
+              })
+            else
+              setBadgeOfUser(type, 'kyc', false)
+        })
+      })
+      .catch(e=>{
+      })
+  }
 
   const onImgLoad = ({target:img}) => {
-    if(img.alt)
+    if(img.alt && img.src)
       setLoadedImage(true)
     handleResize()
   }
@@ -247,12 +427,12 @@ export default function CollectibleDetail() {
   const handleCloseMorePopup = () => {
     setOpenMorePopup(null);
   };
-  
-  const setDiaBadgeOfUser = (type, value) => {
-    setDiaBadge((prevState) => {
-      const tempDiaBadge = {...prevState};
-      tempDiaBadge[type] = value;
-      return tempDiaBadge;
+
+  const setBadgeOfUser = (usertype, badgetype, value) => {
+    setBadge((prevState) => {
+      const tempBadge = {...prevState};
+      tempBadge[usertype][badgetype] = value;
+      return tempBadge;
     });
   };
   
@@ -263,8 +443,16 @@ export default function CollectibleDetail() {
       return tempDidName;
     });
   };
+  const setAvatarOfUser = (type, value) => {
+    setAvatarUrl((prevState) => {
+      const tempAvatar = {...prevState};
+      tempAvatar[type] = value;
+      return tempAvatar;
+    });
+  };
 
   function handleResize() {
+    determineDispCount()
     if(!imageRef.current)
       return
     const { innerWidth: winWidth, innerHeight: winHeight } = window;
@@ -280,18 +468,30 @@ export default function CollectibleDetail() {
       }
     }
   }
-  
-  const openSignin = (e)=>{
-    if(document.getElementById("signin")){
-      setBuyClicked(true)
-      document.getElementById("signin").click()
-    }
-  }
-  
   window.addEventListener('resize', handleResize);
-  const properties = collectible&&collectible.properties?collectible.properties:{}
+  
+  const handleErrorImage = (e) => {
+    if(e.target.src.indexOf("pasarprotocol.io") >= 0) {
+      e.target.src = getAssetImage(collectible, true, 1)
+    } else if(e.target.src.indexOf("ipfs.ela") >= 0) {
+      e.target.src = getAssetImage(collectible, true, 2)
+    } else {
+      e.target.src = '/static/broken-image.svg'
+    }
+    setImageUrl(e.target.src)
+  }
+  let properties = {}
+  if(collectible && (collectible.properties || collectible.attribute))
+    properties = collectible.properties || collectible.attribute
 
-  const tempDeadLine = getTime(new Date('2022-01-25').getTime()/1000)
+  let chainType = 0
+  if(collectible.marketPlace>=1 && collectible.marketPlace<=2)
+    chainType = collectible.marketPlace - 1
+  else if(!collectible || Object.keys(collectible).length===0)
+    chainType = -1
+
+  const tempChainTypes = [...chainTypes]
+  tempChainTypes[0].name = 'Elastos Smart Chain (ESC)'
   return (
     <RootStyle title="Collectible | PASAR">
       <ScrollManager scrollKey="asset-detail-key"/>
@@ -299,23 +499,33 @@ export default function CollectibleDetail() {
         sx={{
           py: 6,
           mb: 2,
-          bgcolor: (theme) => (theme.palette.mode === 'light' ? 'grey.200' : 'grey.800')
+          bgcolor: (theme) => (theme.palette.mode === 'light' ? 'grey.200' : '#060c14')
         }}
       >
         <Container maxWidth="lg" align="center" sx={{position: 'relative', px: {sm: 3, md: 12}}}>
           <Box sx={{position: 'relative', display: 'inline-block'}}>
+            {
+              !isLoadedImage && 
+              <Box
+                  draggable = {false}
+                  component="img"
+                  alt={collectible.name}
+                  src='/static/circle-loading.svg'
+                  sx={{ maxHeight: 400, borderRadius: 1 }}
+              />
+            }
             <Box
                 draggable = {false}
                 component="img"
                 alt={collectible.name}
-                src={getAssetImage(collectible)}
+                src={imageUrl}
                 onLoad={onImgLoad}
-                onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
-                sx={{ maxHeight: 400, borderRadius: 1 }}
+                onError={handleErrorImage}
+                sx={{ maxHeight: 400, borderRadius: 1, display: isLoadedImage?'block':'none' }}
                 ref={imageRef}
             />
             {
-              address!==collectible.holder&&isLoadedImage&&
+              address!==collectible.holder && isLoadedImage && !imageUrl.endsWith('broken-image.svg') &&
               <Box
                   draggable = {false}
                   component="img"
@@ -325,7 +535,7 @@ export default function CollectibleDetail() {
             }
           </Box>
           <ToolGroupStyle>
-            <MFab size="small" onClick={()=>{setFullScreen(!isFullScreen)}}>
+            <MFab size="small" onClick={()=>{setFullScreen(!isFullScreen)}} disabled={!isLoadedImage || imageUrl.endsWith('broken-image.svg')}>
               <FullscreenIcon />
             </MFab>
             <MFab size="small" sx={{ml: 1}} onClick={openSharePopupMenu}>
@@ -342,7 +552,7 @@ export default function CollectibleDetail() {
               >
               <MenuItem onClick={handleCloseSharePopup}>
                 <FacebookShareButton
-                  url={window.location.href}
+                  url={shareUrl}
                   // quote="Check out this item on Pasar"
                   description="share item"
                   style={{display: 'flex', alignItems: 'center'}}
@@ -352,7 +562,7 @@ export default function CollectibleDetail() {
               </MenuItem>
               <MenuItem onClick={handleCloseSharePopup}>
                 <TwitterShareButton
-                  url={window.location.href}
+                  url={shareUrl}
                   description="share item"
                   style={{display: 'flex', alignItems: 'center'}}
                 >
@@ -409,20 +619,22 @@ export default function CollectibleDetail() {
                   <CloseIcon />
                 </IconButton>
               </Toolbar>
-              <Box sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)'
-              }}
-                ref={imageBoxRef}>
+              <Box 
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)'
+                }}
+                ref={imageBoxRef}
+              >
                 <Box
                     draggable = {false}
                     component="img"
                     alt={collectible.name}
-                    src={getAssetImage(collectible)}
-                    onLoad={onImgLoad}
-                    onError={(e) => {e.target.src = '/static/circle-loading.svg';}}
+                    src={imageUrl}
+                    // onLoad={onImgLoad}
+                    onError={(e) => {e.target.src = '/static/broken-image.svg'}}
                     sx={{ width: '100%', height: '100%' }}
                 />
                 {
@@ -444,24 +656,31 @@ export default function CollectibleDetail() {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <PaperStyle>
-              <Typography variant="h4">
+              <Typography variant="h4" sx={{wordBreak: 'break-all'}}>
                   {collectible.name}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>{collectible.description}</Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>{collectible.description}</Typography>
               <Stack sx={{mt: 2}} spacing={1}>
-                <Typography variant="subtitle2">Creator</Typography>
+                <Typography variant="subtitle2">Minted By</Typography>
                 <Stack direction='row'>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    <Link to={`/profile/others/${collectible.royaltyOwner}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
-                      <Jazzicon address={collectible.royaltyOwner}/>
+                    <Link to={`/profile/others/${collectible.royaltyOwner}`} component={RouterLink} color='text.primary' sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
+                      {
+                        avatarUrl.creator?
+                        <Avatar alt="user" src={avatarUrl.creator} sx={{width: 40, height: 40, mr: 1}} />:
+                        <Jazzicon address={collectible.royaltyOwner}/>
+                      }
                       {didName.creator?didName.creator:reduceHexAddress(collectible.royaltyOwner)}
                     </Link>
                     <Stack spacing={.6} direction="row">
                       {
-                        diaBadge.creator&&
-                        <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                          <Box><Badge name="diamond"/></Box>
+                        badge.creator.kyc&&
+                        <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
+                          <Box><Badge name="kyc"/></Box>
                         </Tooltip>
+                      }
+                      {
+                        badge.creator.dia>0 && <DIABadge balance={badge.creator.dia}/>
                       }
                       {/* <Badge name="pasar"/>
                       <Badge name="diamond"/>
@@ -474,99 +693,93 @@ export default function CollectibleDetail() {
                 <Typography variant="subtitle2">Owner</Typography>
                 <Stack direction='row'>
                   <Typography variant="body2" component="span" sx={{display: 'flex', alignItems: 'center'}}>
-                    <Link to={`/profile/others/${collectible.holder}`} component={RouterLink} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
-                      <Jazzicon address={collectible.holder}/>
+                    <Link to={`/profile/others/${collectible.holder}`} component={RouterLink} color='text.primary' sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}>
+                      {
+                        avatarUrl.owner?
+                        <Avatar alt="user" src={avatarUrl.owner} sx={{width: 40, height: 40, mr: 1}} />:
+                        <Jazzicon address={collectible.holder}/>
+                      }
                       {didName.owner?didName.owner:reduceHexAddress(collectible.holder)}
                     </Link>
                     <Stack spacing={.6} direction="row">
                       {
-                        diaBadge.owner&&
-                        <Tooltip title="Diamond (DIA) token holder" arrow enterTouchDelay={0}>
-                          <Box><Badge name="diamond"/></Box>
+                        badge.owner.kyc&&
+                        <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
+                          <Box><Badge name="kyc"/></Box>
                         </Tooltip>
+                      }
+                      {
+                        badge.owner.dia>0 && <DIABadge balance={badge.owner.dia}/>
                       }
                       {/* <Badge name="thumbdown" value="13"/> */}
                     </Stack>
                   </Typography>
                 </Stack>
                 <Typography variant="subtitle2">Collection</Typography>
+                {
+                  collection?
+                  <Link to={`/collections/detail/${collection.marketPlace}${collection.token}`} component={RouterLink} sx={{ color: 'inherit' }}>
+                    <Stack direction='row'>
+                      {
+                        collection.avatar?
+                        <AvatarStyle draggable = {false} component="img" src={collection.avatar} />:
+                        <AvatarStyle sx={{ p: 1 }} />
+                      }
+                      <Box sx={{ minWidth: 0, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{alignItems: 'center', wordBreak: 'break-all'}}>{collection.name} ({collection.symbol})</Typography>
+                      </Box>
+                    </Stack>
+                  </Link>:
+                  <Stack direction='row'>
+                    <Box sx={{ width: 40, height: 40, borderRadius: '100%', p: 1, backgroundColor: 'black', display: 'flex', mr: 1 }}>
+                      <Box draggable = {false} component="img" src={defaultCollection.avatar}/>
+                    </Box>
+                    <Box sx={{ minWidth: 0, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                      <Typography variant="body2" sx={{alignItems: 'center', wordBreak: 'break-all'}}>{defaultCollection.name} ({defaultCollection.symbol})</Typography>
+                    </Box>
+                  </Stack>
+                }
+                <Typography variant="subtitle2">Blockchain</Typography>
                 <Stack direction='row'>
-                  <AvatarStyle draggable = {false} component="img" src="/static/feeds-sticker.svg" sx={{ p: 1 }} />
-                  <Typography variant="body2" sx={{display: 'flex', alignItems: 'center'}}>Feeds NFT Sticker (FSTK)</Typography>
+                  {
+                    chainType<0?
+                    <AvatarStyle draggable = {false} sx={{background: (theme)=>theme.palette.origin.main}}/>:
+                    <>
+                      <Box sx={{borderRadius: '100%', overflow: 'hidden', mr: 1}}>
+                        <AvatarStyle 
+                          component="img" 
+                          src={`/static/${tempChainTypes[chainType].icon}`} 
+                          draggable = {false}
+                          sx={{
+                            background: tempChainTypes[chainType].color, 
+                            p: '9px',
+                            borderRadius: 0,
+                            mr: 0
+                          }}
+                        />
+                      </Box>
+                      <Box sx={{ minWidth: 0, flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                        <Typography variant="body2" sx={{alignItems: 'center', wordBreak: 'break-all'}}>{tempChainTypes[chainType].name}</Typography>
+                      </Box>
+                    </>
+                  }
                 </Stack>
               </Stack>
             </PaperStyle>
+            <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
             {
-              isForAuction?(
-                <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
-                  <Grid container direction="row">
-                    <Grid item xs={6}>
-                      <Typography variant="h4">Current bid</Typography>
-                      <Typography variant="h3" color="origin.main">50 ELA</Typography>
-                      <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD 150.11</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Stack direction="row">
-                        <AccessTimeIcon/>&nbsp;
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>Ends {tempDeadLine.date} {tempDeadLine.time}</Typography>
-                      </Stack>
-                      <Countdown deadline="2022-01-25"/>
-                    </Grid>
-                  </Grid>
-                  <MHidden width="smDown">
-                    <Button variant="contained" fullWidth onClick={()=>{}} sx={{mt: 2, textTransform: 'none'}}>
-                      Place a bid
-                    </Button>
-                  </MHidden>
-                </PaperStyle>
-              ):(
-                <PaperStyle sx={{mt: 2, minHeight: {xs: 'unset', sm: 200}}}>
-                {
-                  isLoadingCollectible?
-                  <LoadingScreen/>:
-                  <>
-                    {
-                      collectible.SaleType === "Not on sale"?
-                      <>
-                        <Typography variant="h4">This item is currently</Typography>
-                        <Typography variant="h3" color="origin.main">Not on Sale</Typography>
-                        <MHidden width="smDown">
-                          <Button variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}} sx={{mt: 2}}>Go back to Marketplace</Button>
-                        </MHidden>
-                      </>:
-                      <>
-                        <Typography variant="h4">On sale for a fixed price of</Typography>
-                        <Typography variant="h3" color="origin.main">{round(collectible.Price/1e18, 3)} ELA</Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>≈ USD {round(coinUSD*collectible.Price/1e18, 3)}</Typography>
-                        {
-                          address!==collectible.holder && address!==collectible.royaltyOwner &&
-                          <MHidden width="smDown">
-                            {
-                              didSignin?
-                              <Button variant="contained" fullWidth onClick={(e)=>{setPurchaseOpen(true)}} sx={{mt: 2}}>
-                                Buy
-                              </Button>:
-                              <Button variant="contained" fullWidth onClick={openSignin} sx={{mt: 2}}>
-                                Sign in to Buy
-                              </Button>
-                            }
-                          </MHidden>
-                        }
-                      </>
-                    }
-                  </>
-                }
-                </PaperStyle>
-              )
+              isLoadingCollectible?
+              <LoadingScreen/>:
+              <CollectibleHandleSection {...{collectible, address}}/>
             }
-
+            </PaperStyle>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <PaperStyle sx={{height: '100%', p: '15px 32px', position: 'relative'}}>
+            <PaperStyle sx={{height: '100%', p: '15px 20px', position: 'relative'}}>
               <Typography variant="h5" sx={{ my: 1 }}>Item Details</Typography>
               <AssetDetailInfo detail={collectible}/>
               <Button
-                to={`/explorer/collectible/detail/${collectible.tokenId}`}
+                to={`/explorer/collectible/detail/${[collectible.tokenId, collectible.baseToken].join('&')}`}
                 size="small"
                 color="inherit"
                 component={RouterLink}
@@ -578,11 +791,19 @@ export default function CollectibleDetail() {
             </PaperStyle>
           </Grid>
           {
-            isForAuction&&(
+            collectible.listBid&&collectible.listBid.length>0&&(
               <Grid item xs={12}>
                 <PaperStyle>
-                  <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>Bids</Typography>
-                  <BidList isLoading={isLoadingBidList} dataList={bidList}/>
+                  <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>
+                    Bids
+                    {
+                      !!(collectible.reservePrice*1)&&
+                      <>
+                        {' '}- <BidStatus isReserveMet={collectible.listBid[0].price/1e18 >= collectible.reservePrice/1e18}/>
+                      </>
+                    }
+                  </Typography>
+                  <BidList dataList={collectible.listBid} coinType={getCoinTypeFromToken(collectible)}/>
                 </PaperStyle>
               </Grid>
             )
@@ -591,25 +812,26 @@ export default function CollectibleDetail() {
             isPropertiesAccordionOpen&&
             <Grid item xs={12}>
               <Accordion
-                defaultExpanded={1&&true}
-                sx={{
-                  border: '1px solid',
-                  borderColor: 'action.disabledBackground',
-                  boxShadow: (theme) => theme.customShadows.z1
-                }}
+                defaultExpanded={Boolean(true)}
+                sx={{...SectionSx}}
               >
                 <AccordionSummary 
-                  expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+                  expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: '20px'}}>
                   <Typography variant="h5">Properties</Typography>
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails sx={{px: '20px'}}>
                   <Grid container spacing={1}>
                     {
-                      Object.keys(properties).map((type, index)=>(
-                        <Grid item key={index}>
-                          <Property type={type} name={properties[type]}/>
+                      Object.keys(properties).map((type, index)=>{
+                        let countInTrait = 0
+                        const typeValue = properties[type]
+                        if(collectionAttributes[type] && collectionAttributes[type][typeValue])
+                          countInTrait = collectionAttributes[type][typeValue]
+                        const percentage = totalCountInCollection?round(countInTrait*100 / totalCountInCollection, 2):0
+                        return <Grid item key={index}>
+                          <Property type={type} name={typeValue} percentage={percentage}/>
                         </Grid>
-                      ))
+                      })
                     }
                   </Grid>
                 </AccordionDetails>
@@ -618,20 +840,16 @@ export default function CollectibleDetail() {
           }
           <Grid item xs={12}>
             <Accordion
-                defaultExpanded={1&&true}
-                sx={{
-                  border: '1px solid',
-                  borderColor: 'action.disabledBackground',
-                  boxShadow: (theme) => theme.customShadows.z1
-                }}
+                defaultExpanded={Boolean(true)}
+                sx={{...SectionSx}}
               >
-              <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: 4}}>
+              <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: '20px'}}>
                 <Typography variant="h5">History</Typography>
               </AccordionSummary>
-              <AccordionDetails sx={{pb: '50px', position: 'relative', px: 4}}>
+              <AccordionDetails sx={{pb: '50px', position: 'relative', px: '20px'}}>
                 <CollectibleHistory isLoading={isLoadingTransRecord} dataList={transRecord} creator={{address: collectible.royaltyOwner, name: didName.creator}}/>
                 <Button
-                  to={`/explorer/collectible/detail/${collectible.tokenId}`}
+                  to={`/explorer/collectible/detail/${[collectible.tokenId, collectible.baseToken].join('&')}`}
                   size="small"
                   color="inherit"
                   component={RouterLink}
@@ -643,8 +861,106 @@ export default function CollectibleDetail() {
               </AccordionDetails>
             </Accordion>
           </Grid>
+          {
+            collection&&
+            <Grid item xs={12}>
+              <Accordion
+                  defaultExpanded={Boolean(true)}
+                  sx={{...SectionSx}}
+                >
+                <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20}/>} sx={{px: '20px'}}>
+                  <Typography variant="h5">About this collection</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{pb: '50px', position: 'relative', px: '20px'}}>
+                  <Stack direction="row" spacing={2}>
+                    <MHidden width="smDown">
+                      <Link to={`/collections/detail/${collection.marketPlace}${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
+                          {
+                            collection.avatar?
+                            <AvatarStyle draggable = {false} component="img" src={collection.avatar} sx={{ minWidth: 40 }} />:
+                            <AvatarStyle sx={{ p: 1, minWidth: 40 }} />
+                          }
+                      </Link>
+                    </MHidden>
+                    <Stack spacing={1} sx={{ minWidth: 0, flexGrow: 1 }}>
+                        <Stack direction="row">
+                          <MHidden width="smUp">
+                            <Link to={`/collections/detail/${collection.marketPlace}${collection.token}`} component={RouterLink} sx={{ display: 'flex', color: 'inherit' }}>
+                                {
+                                  collection.avatar?
+                                  <AvatarStyle draggable = {false} component="img" src={collection.avatar} sx={{ minWidth: 40 }} />:
+                                  <AvatarStyle sx={{ p: 1, minWidth: 40 }} />
+                                }
+                            </Link>
+                          </MHidden>
+                          <Typography variant="subtitle2" sx={{display: 'flex', alignItems: 'center'}}>{collection.name}</Typography>
+                        </Stack>
+                        <Typography variant="body2" color='text.secondary' sx={{wordBreak: 'break-all'}}>{collection.description}</Typography>
+                        {
+                          !!collection.owner && !!collection.token &&
+                          <Box>
+                            <Tooltip title="Owner Address" arrow enterTouchDelay={0}>
+                              <Box sx={{mr: 1, mb: 1, display: 'inline-flex'}}>
+                                <AddressCopyButton type='diamond' address={collection.owner}/>
+                              </Box>
+                            </Tooltip>
+                            <Tooltip title="Contract Address" arrow enterTouchDelay={0}>
+                              <Box sx={{display: 'inline-flex'}}>
+                                <AddressCopyButton type='contract' address={collection.token}/>
+                              </Box>
+                            </Tooltip>
+                          </Box>
+                        }
+                        <IconLinkButtonGroup {...collection.socials} align='left'/>
+                        <Stack spacing={1} sx={{}}>
+                        {
+                          collectionBadge.dia>0 && <DIABadge balance={collectionBadge.dia}/>
+                        }
+                        {
+                          collectionBadge.kyc&&
+                          <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
+                            <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
+                          </Tooltip>
+                        }
+                        {
+                          collectiblesInCollection.length>2&&
+                          <Stack direction="column" spacing={1} sx={{width: '100%'}}>
+                            <Typography variant="subtitle2">More from this collection</Typography>
+                            <Box display="grid" gridTemplateColumns={`repeat(${dispCountInCollection}, minmax(0px, 1fr))`} gap={1.5}>
+                              {
+                                collectiblesInCollection.slice(0, dispCountInCollection).map((item, _i)=>{
+                                  const coinType = getCoinTypeFromToken(item)
+                                  return <AssetCard
+                                      key={_i}
+                                      {...item}
+                                      thumbnail={getAssetImage(item, true)}
+                                      price={round(item.price/1e18, 3)}
+                                      saleType={item.SaleType || item.saleType}
+                                      type={0}
+                                      isLink={Boolean(true)}
+                                      coinUSD={coinPrice[coinType.index]}
+                                      coinType={coinType}
+                                      // defaultCollectionType={getCollectionTypeFromImageUrl(item)}
+                                      isMoreLink={collectiblesInCollection.slice(0, dispCountInCollection).length===_i+1}
+                                    />
+                                })
+                              }
+                            </Box>
+                          </Stack>
+                        }
+                      </Stack>
+                    </Stack>
+                  </Stack>
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
+          }
           <Grid item xs={12}>
-            <Link to={`/explorer/collectible/detail/${collectible.tokenId}`} component={RouterLink} underline="none">
+            <Link
+              to={`/explorer/collectible/detail/${[collectible.tokenId, collectible.baseToken].join('&')}`}
+              component={RouterLink}
+              underline="none"
+            >
               <PaperStyle sx={{position: 'relative'}}>
                 <Stack direction="row" sx={{alignItems: 'center'}}>
                   <Typography variant="h5" sx={{ my: 1, flex: 1 }}>
@@ -656,41 +972,11 @@ export default function CollectibleDetail() {
             </Link>
           </Grid>
         </Grid>
-        <MHidden width="smUp">
-          {
-            isForAuction&&
-            <StickyPaperStyle>
-              <Button variant="contained" fullWidth onClick={()=>{}}>
-                Place a bid
-              </Button>
-            </StickyPaperStyle>
-          }
-          {
-            !isForAuction && 
-            <>
-              {
-                collectible.SaleType === "Not on sale"?
-                <StickyPaperStyle>
-                  <Button variant="contained" fullWidth onClick={(e)=>{navigate('/marketplace')}} sx={{mt: 2}}>Go back to Marketplace</Button>
-                </StickyPaperStyle>:
-                address!==collectible.holder && address!==collectible.royaltyOwner &&
-                <StickyPaperStyle>
-                  {
-                    didSignin?
-                    <Button variant="contained" fullWidth onClick={()=>{setPurchaseOpen(true)}}>
-                      Buy
-                    </Button>:
-                    <Button variant="contained" fullWidth onClick={openSignin}>
-                      Sign in to Buy
-                    </Button>
-                  }
-                </StickyPaperStyle>
-              }
-            </>
-          }
-        </MHidden>
+        {
+          !isLoadingCollectible&&
+          <CollectibleHandleSection {...{collectible, address}} onlyHandle={Boolean(true)}/>
+        }
       </Container>
-      <PurchaseDlg isOpen={isOpenPurchase} setOpen={setPurchaseOpen} info={collectible}/>
     </RootStyle>
   );
 }

@@ -1,33 +1,44 @@
+import React, { useState, useRef } from "react";
 import PropTypes from 'prop-types';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, NavLink as RouterLink } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { useState } from 'react';
 import searchFill from '@iconify/icons-eva/search-fill';
+import closeFill from '@iconify/icons-eva/close-fill';
 // material
 import { styled, alpha } from '@mui/material/styles';
-import {
-  Box,
-  Input,
-  Slide,
-  Button,
-  InputAdornment,
-  ClickAwayListener,
-  IconButton
-} from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import { Box, Input, Slide, Button, InputAdornment, ClickAwayListener, IconButton, List, ListItem, Divider, ListItemButton, 
+  ListItemIcon, ListItemText, ListItemAvatar, Avatar, Paper } from '@mui/material';
 
+import { customShadows } from '../theme/shadows';
+import Jazzicon from './Jazzicon';
+import { fetchFrom, getIpfsUrl, reduceHexAddress, getAssetImage } from '../utils/common';
 // ----------------------------------------------------------------------
 
 const APPBAR_MOBILE = 64;
 const APPBAR_DESKTOP = 92;
 
-const SearchbarStyle = styled('div')(({ theme }) => ({
+const ListWrapperStyle = styled(Paper)(({ theme }) => ({
+  width: '100%',
+  border: `solid 1px ${theme.palette.divider}`,
+  boxShadow: theme.palette.mode==='light'?customShadows.dark.z8:customShadows.light.z8,
+  borderRadius: '0 0 16px 16px'
+}));
+
+const SearchBox = styled('div')(({ theme }) => ({
   top: 0,
   left: 0,
   zIndex: 99,
   width: '100%',
   display: 'flex',
+  flexDirection: 'column',
   position: 'absolute',
   alignItems: 'center',
+}));
+
+const SearchbarStyle = styled('div')(({ theme }) => ({
+  display: 'flex',
+  width: '100%',
   height: APPBAR_MOBILE,
   backdropFilter: 'blur(6px)',
   WebkitBackdropFilter: 'blur(6px)', // Fix on Mobile
@@ -40,12 +51,32 @@ const SearchbarStyle = styled('div')(({ theme }) => ({
   }
 }));
 
-// ----------------------------------------------------------------------
+const ListItemTextStyle = styled(ListItemText)(({ theme }) => ({
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+}));
 
+const defaultPlaceHolder = "Search name, description, address and token ID"
+// ----------------------------------------------------------------------
 export default function Searchbar({placeholder}) {
   const [isOpen, setOpen] = useState(false);
+  const [needClose, setShowClose] = useState(false)
+  const [showAutocomplete, setShowAutocomplete] = useState(false)
+  const [isOutOfSearchField, setLeaveSearchField] = useState(true)
+  const [instanceSearchResult, setInstanceSearchResult] = useState(null);
+  const [instanceCollectionAvatar, setInstanceCollectionAvatar] = useState({});
+  const [isLoadingInstanceSearch, setLoadingInstanceSearch] = useState(false);
+  const [linkToState, setLinkToState] = useState(false);
+  const [searchStr, setSearchStr] = useState("")
+  const [controller, setAbortController] = useState(new AbortController());
   const params = useParams(); // params.key
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const ref = useRef()
+
+  if(placeholder === defaultPlaceHolder && !pathname.startsWith('/explorer'))
+    placeholder = 'Search items, creators and token ID'
 
   const handleOpen = () => {
     setOpen((prev) => !prev);
@@ -53,14 +84,103 @@ export default function Searchbar({placeholder}) {
 
   const handleClose = () => {
     setOpen(false);
+    setShowClose(false)
+    setSearchStr('')
   };
 
   const handleChange = (e)=>{
     if(e.which===13) { // press enter
-        navigate(`/explorer/search/${e.target.value}`);
+      changeAction(e.target.value)
     }
   }
 
+  const changeAction = (value)=>{
+    if(pathname.startsWith('/explorer'))
+      navigate(`/explorer/search/${value}`);
+    else
+      navigate(`/marketplace/search/${value}`);
+  }
+  
+  const clearSearch = (e)=>{
+    if(ref.current){
+      ref.current.value = ''
+      ref.current.focus()
+      setShowClose(false)
+      setSearchStr('')
+    }
+  }
+  React.useEffect(()=>{
+    setShowAutocomplete(false)
+  }, [linkToState])
+
+  React.useEffect(()=>{
+    setInstanceCollectionAvatar({})
+    if(!instanceSearchResult)
+      return
+    instanceSearchResult.collections.forEach((item, _i)=>{
+      const metaUri = getIpfsUrl(item.uri)
+      if(metaUri) {
+        fetch(metaUri)
+          .then(response => response.json())
+          .then(res => {
+            setInstanceCollectionAvatar((prevState)=>{
+              const tempState = {...prevState}
+              tempState[_i] = getIpfsUrl(res.data.avatar)
+              return tempState
+            })
+          })
+          .catch(console.log);
+      }
+    })
+  }, [instanceSearchResult])
+
+  const determineClose = (e)=>{
+    if(e.target.value.length){
+      controller.abort(); // cancel the previous request
+      const newController = new AbortController();
+      const {signal} = newController;
+      setAbortController(newController);
+      setLoadingInstanceSearch(true);
+
+      fetchFrom(`api/v2/sticker/getInstanceSearchResult?search=${e.target.value}`, { signal })
+        .then((response) => {
+          response.json().then((jsonAssets) => {
+            setLoadingInstanceSearch(false);
+            if(!jsonAssets.data){
+              setInstanceSearchResult(null)
+              return
+            }
+            const tempResult = {...jsonAssets.data}
+            tempResult.items = tempResult.items.map((item)=>{
+              const tempItem = {...item, avatar: getAssetImage(item, true)}
+              return tempItem
+            })
+            setInstanceSearchResult(tempResult)
+          }).catch((e) => {
+            setLoadingInstanceSearch(false);
+          });
+        })
+        .catch(e => {
+          setLoadingInstanceSearch(false);
+        });
+      setShowAutocomplete(true)
+    } else {
+      setInstanceSearchResult(null)
+    }
+    setSearchStr(e.target.value)
+    setShowClose(e.target.value.length>0)
+  }
+
+  const handleBlurAction = (e)=>{
+    if(isOutOfSearchField)
+      setShowAutocomplete(false)
+    else
+      ref.current.focus()
+  }
+
+  const handleLinkClick = (e)=>{
+    setLinkToState(!linkToState)
+  }
   return (
     <ClickAwayListener onClickAway={handleClose}>
       <div>
@@ -71,28 +191,177 @@ export default function Searchbar({placeholder}) {
         )}
 
         <Slide direction="down" in={isOpen} mountOnEnter unmountOnExit>
-          <SearchbarStyle
-            onKeyPress={handleChange}
-          >
-            <Input
-              autoFocus
-              fullWidth
-              disableUnderline
-              placeholder={placeholder}
-              defaultValue={params.key}
-              startAdornment={
-                <InputAdornment position="start">
-                  <Box
-                    component={Icon}
-                    icon={searchFill}
-                    sx={{ color: 'text.disabled', width: 20, height: 20 }}
-                  />
-                </InputAdornment>
-              }
-              sx={{ mr: 1 }}
-            />
-            {/* <Button variant="contained" onClick={handleClose}> Search </Button> */}
-          </SearchbarStyle>
+          <SearchBox>
+            <SearchbarStyle
+              onBlur={handleBlurAction}
+              onMouseDown={(e)=>{setShowAutocomplete(true)}}
+              onMouseEnter={(e)=>{setLeaveSearchField(false)}}
+              onMouseLeave={(e)=>{setLeaveSearchField(true)}}
+              onKeyPress={handleChange}
+              onChange={determineClose}
+            >
+              <Input
+                inputRef={ref}
+                autoFocus
+                fullWidth
+                disableUnderline
+                placeholder={placeholder}
+                defaultValue={params.key}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <Box
+                      component={Icon}
+                      icon={searchFill}
+                      sx={{ color: 'text.disabled', width: 20, height: 20 }}
+                    />
+                  </InputAdornment>
+                }
+                endAdornment={
+                  <>
+                    {
+                      isLoadingInstanceSearch &&
+                      <Box sx={{ display: 'flex' }}>
+                        <CircularProgress size={25}/>
+                      </Box>
+                    }
+                    {
+                      needClose &&
+                      <InputAdornment position="end">
+                        <IconButton size='small' onClick={clearSearch}>
+                          <Box component={Icon} icon={closeFill} sx={{ color: 'text.disabled' }}/>
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                  </>
+                }
+                sx={{ mr: 1 }}
+              />
+              {/* <Button variant="contained" onClick={handleClose}> Search </Button> */}
+            </SearchbarStyle>
+            {
+              searchStr.length>0 && 
+              showAutocomplete && 
+              !isLoadingInstanceSearch && 
+              instanceSearchResult &&
+              (instanceSearchResult.collections.length>0 || instanceSearchResult.items.length>0 || instanceSearchResult.accounts.length>0) &&
+              <Box 
+                onMouseDown={(e)=>{
+                  if(isOutOfSearchField)
+                    setShowAutocomplete(false)
+                }}
+                sx={{width: '100%', overflow: 'auto', inset: `${APPBAR_MOBILE}px 0px 0px`, position: 'fixed', zIndex: -1}}
+              >
+                <ListWrapperStyle
+                  onBlur={handleBlurAction}
+                  onMouseDown={(e)=>{setShowAutocomplete(true)}}
+                  onMouseEnter={(e)=>{setLeaveSearchField(false)}}
+                  onMouseLeave={(e)=>{setLeaveSearchField(true)}}
+                >
+                  <List
+                    component="nav"
+                    aria-labelledby="nested-list-subheader"
+                  >
+                    {
+                      instanceSearchResult.collections.length>0 &&
+                      <>
+                        <ListItem>
+                          <ListItemText
+                            primary="Collections"
+                            sx={{color: 'text.secondary'}}
+                          />
+                        </ListItem>
+                        <Divider />
+                        {
+                          instanceSearchResult.collections.map((item, _i)=>{
+                            const { token, marketPlace=1 } = item
+                            return <ListItemButton key={_i} component={RouterLink} to={`/collections/detail/${marketPlace}${token}`} onClick={handleLinkClick}>
+                              <ListItemAvatar>
+                                <Avatar alt="Collection" src={instanceCollectionAvatar[_i]} sx={{width: 30, height: 30}} />
+                              </ListItemAvatar>
+                              <ListItemTextStyle
+                                primary={item.name}
+                                secondary={`by ${reduceHexAddress(item.owner)}`}
+                                primaryTypographyProps={{
+                                  style: {
+                                    display: 'inline'
+                                  }
+                                }}
+                              />
+                            </ListItemButton>
+                          })
+                        }
+                      </>
+                    }
+                    {
+                      instanceSearchResult.items.length>0 &&
+                      <>
+                        <ListItem>
+                          <ListItemText
+                            primary="Items"
+                            sx={{color: 'text.secondary'}}
+                          />
+                        </ListItem>
+                        <Divider />
+                        {
+                          instanceSearchResult.items.map((item, _i)=>(
+                            <ListItemButton
+                              key={_i}
+                              component={RouterLink}
+                              to={`/marketplace/detail/${[item.tokenId, item.baseToken].join('&')}`}
+                              // state={{tokenId: item.tokenId, baseToken: item.baseToken}}
+                              onClick={handleLinkClick}
+                            >
+                              <ListItemAvatar>
+                                <Avatar alt="NFT" src={item.avatar} sx={{width: 30, height: 30}} />
+                              </ListItemAvatar>
+                              <ListItemTextStyle
+                                primary={item.name}
+                                secondary={item.status}
+                                primaryTypographyProps={{
+                                  style: {
+                                    display: 'inline'
+                                  }
+                                }}
+                              />
+                            </ListItemButton>
+                          ))
+                        }
+                      </>
+                    }
+                    {
+                      instanceSearchResult.accounts.length>0 &&
+                      <>
+                        <ListItem>
+                          <ListItemText
+                            primary="Accounts"
+                            sx={{color: 'text.secondary'}}
+                          />
+                        </ListItem>
+                        <Divider />
+                        {
+                          instanceSearchResult.accounts.map((item, _i)=>(
+                            <ListItemButton key={_i} component={RouterLink} to={`/profile/others/${item.address}`} onClick={handleLinkClick}>
+                              <ListItemAvatar>
+                                <Jazzicon address={item.address} size={30} sx={{mr: 0}}/>
+                              </ListItemAvatar>
+                              <ListItemText
+                                primary={reduceHexAddress(item.address)}
+                                primaryTypographyProps={{
+                                  style: {
+                                    display: 'inline'
+                                  }
+                                }}
+                              />
+                            </ListItemButton>
+                          ))
+                        }
+                      </>
+                    }
+                  </List>
+                </ListWrapperStyle>
+              </Box>
+            }
+          </SearchBox>
         </Slide>
       </div>
     </ClickAwayListener>
@@ -103,5 +372,5 @@ Searchbar.propTypes = {
   placeholder: PropTypes.string,
 };
 Searchbar.defaultProps = {
-  placeholder: "Search name, description, address and token ID"
+  placeholder: defaultPlaceHolder
 };

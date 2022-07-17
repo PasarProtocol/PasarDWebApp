@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { formatDistance } from 'date-fns';
 import { Link as RouterLink } from 'react-router-dom';
 // material
-import { Box, Stack, Link, Typography } from '@mui/material';
+import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
 import { reduceHexAddress, getAssetImage } from '../../../utils/common';
@@ -11,33 +11,43 @@ import CopyButton from '../../CopyButton';
 
 
 CollectibleItem.propTypes = {
-  news: PropTypes.object.isRequired,
-  isLast: PropTypes.bool.isRequired
+  collectible: PropTypes.object.isRequired
 };
 
-function CollectibleItem({ news, isLast, sx }) {
-  const { image, title, tokenId, tokenIdHex, postedAt, creator } = news;
-  const style = isLast?{...sx}:{borderBottom: '1px solid', borderColor: 'grey.300', pb: 2, ...sx};
+function CollectibleItem({ collectible }) {
+  const { image, name, tokenId, baseToken, tokenIdHex, createTime, royaltyOwner: creator } = collectible;
+  const imageUrl = getAssetImage(collectible, true)
+
+  const handleErrorImage = (e) => {
+    if(e.target.src.indexOf("pasarprotocol.io") >= 0) {
+      e.target.src = getAssetImage(collectible, true, 1)
+    } else if(e.target.src.indexOf("ipfs.ela") >= 0) {
+      e.target.src = getAssetImage(collectible, true, 2)
+    } else {
+      e.target.src = '/static/broken-image.svg'
+    }
+  }
+
   return (
-      <Stack direction="row" alignItems="center" spacing={2} sx={style}>
-          <Link to={`/explorer/collectible/detail/${tokenId}`} component={RouterLink} sx={{borderRadius: 1}} >
+      <Stack direction="row" alignItems="center" spacing={2}>
+          <Link to={`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`} component={RouterLink} sx={{borderRadius: 1}} >
             <Box
                 draggable = {false}
                 component="img"
-                alt={title}
-                src={image}
-                onError={(e) => e.target.src = '/static/broken-image.svg'}
+                alt={name}
+                src={imageUrl}
+                onError={handleErrorImage}
                 sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer' }}
             />
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-              <Typography color="inherit" variant="subtitle2" noWrap>
-                <Link to={`/explorer/collectible/detail/${tokenId}`} component={RouterLink}>
-                  {title}
-                </Link>
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                <Link to={`/explorer/transaction/detail/${creator}`} component={RouterLink}>
+              <Link to={`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`} component={RouterLink} color="text.primary">
+                <Typography variant="subtitle2" noWrap>
+                  {name}
+                </Typography>
+              </Link>
+              <Typography variant="body2" noWrap>
+                <Link to={`/explorer/transaction/detail/${creator}`} component={RouterLink} color="text.secondary">
                   Creator : {reduceHexAddress(creator)}
                 </Link>
                 <CopyButton text={creator}/>
@@ -45,7 +55,7 @@ function CollectibleItem({ news, isLast, sx }) {
           </Box>
           <Box>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
-                  {formatDistance(postedAt, new Date(), { addSuffix: true }).replace("about","").trim()}
+                  {formatDistance(createTime*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary', pb: '5px' }} align="right" noWrap>
                   Token ID : {reduceHexAddress(tokenIdHex)}
@@ -60,19 +70,18 @@ export default function NewestCollectibles(props) {
     <CollectionView title={props.title} to="collectible">
       {props.isLoading && <LoadingScreen />}
       {props.dataList.map((collectible, index) => (
-          <CollectibleItem 
-            key={index}
-            news={{
-              image: getAssetImage(collectible, true),
-              title: collectible.name,
-              creator: collectible.royaltyOwner,
-              postedAt: collectible.createTime*1000,
-              tokenId: collectible.tokenId,
-              tokenIdHex: collectible.tokenIdHex
-            }}
-            isLast={index===props.dataList.length-1}
-          />
+        <Box key={index}>
+          <CollectibleItem collectible={collectible}/>
+          {
+            index<props.dataList.length-1&&
+            <Divider sx={{pb: 2}}/>
+          }
+        </Box>
       ))}
+      {
+        !props.isLoading && !props.dataList.length &&
+        <Typography variant="h5" align='center' sx={{mt: 2}}>No collectible found!</Typography>
+      }
     </CollectionView>
   );
 }

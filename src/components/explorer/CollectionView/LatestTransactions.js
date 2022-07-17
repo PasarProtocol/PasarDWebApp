@@ -1,28 +1,25 @@
 import PropTypes from 'prop-types';
 import { formatDistance } from 'date-fns';
 import { Icon } from '@iconify/react';
-import { Box, Stack, Link, Typography, IconButton } from '@mui/material';
+import { Box, Stack, Link, Typography, IconButton, Divider } from '@mui/material';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
-import palette from '../../../theme/palette'
 
 // material
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
-import MethodLabel from '../../MethodLabel';
 import { MethodList, reduceHexAddress } from '../../../utils/common';
+import { escURL } from '../../../config';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,
-  isLast: PropTypes.bool.isRequired
 };
-function TransItem({ trans, isLast }) {
-  const sx = isLast?{}:{borderBottom: '1px solid', borderColor: palette.light.grey['300'], pb: 2};
+export function TransItem({ trans }) {
   let methodItem = MethodList.find((item)=>item.method===trans.event)
     if(!methodItem)
         methodItem = {color: 'grey', icon: 'tag', detail: []}
   return (
-      <Stack direction="row" spacing={2} sx={sx}>
-          <Link href={`/explorer/transaction/${trans.tHash}`} underline="none" sx={{borderRadius: 1}} >
+      <Stack direction="row" spacing={2}>
+          <Link href={`/explorer/collectible/detail/${[trans.tokenId, trans.baseToken].join('&')}`} underline="none" sx={{borderRadius: 1}} >
             <Box
                 component="img"
                 alt=""
@@ -31,8 +28,8 @@ function TransItem({ trans, isLast }) {
             />
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-              <Typography variant="body2" color='text.secondary' noWrap>
-                <Link href={`https://esc.elastos.io/tx/${trans.tHash}`} target="_blank">
+              <Typography variant="body2" noWrap>
+                <Link href={`${escURL}/tx/${trans.tHash}`} target="_blank" color='text.secondary'>
                   Tx Hash : {reduceHexAddress(trans.tHash)}
                   <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                       <Icon icon={externalLinkFill} width="17px"/>
@@ -56,12 +53,18 @@ export default function LatestTransactions(props) {
     <CollectionView title={props.title} to="transaction">
       {props.isLoading && <LoadingScreen />}
       {props.dataList.map((trans, index) => (
-          <TransItem 
-            key={index}
-            trans={trans}
-            isLast={index===props.dataList.length-1}
-          />
+        <Box key={index}>
+          <TransItem trans={trans}/>
+          {
+            index<props.dataList.length-1&&
+            <Divider sx={{pb: 2}}/>
+          }
+        </Box>
       ))}
+      {
+        !props.isLoading && !props.dataList.length &&
+        <Typography variant="h5" align='center' sx={{mt: 2}}>No transaction found!</Typography>
+      }
     </CollectionView>
   );
 }

@@ -15,7 +15,7 @@ const RootStyle = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   padding: 40,
-  backgroundColor: theme.palette.background.default
+  backgroundColor: theme.palette.background.primary
 }));
 
 // ----------------------------------------------------------------------

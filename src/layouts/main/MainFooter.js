@@ -1,27 +1,33 @@
+import React from 'react';
 import { Icon } from '@iconify/react';
 import twitterFill from '@iconify/icons-ant-design/twitter-circle';
 import telegramIcon from '@iconify/icons-ic/round-telegram';
+import mediumIcon from '@iconify/icons-ant-design/medium-circle-filled';
 
 // material
 import { styled } from '@mui/material/styles';
 import { Grid, Link, Divider, Container, Typography, IconButton, Stack, Box } from '@mui/material';
 import generatedGitInfo from '../../generatedGitInfo.json';
 import palette from '../../theme/palette';
+import DonateDlg from '../../components/dialog/Donate';
 import ModeSwitch from '../../components/mode-switch';
+import { PATH_DOCS } from '../../routes/paths';
+
 // ----------------------------------------------------------------------
 
 const SOCIALS = [
-  { name: 'TelegramIcon', icon: telegramIcon },
-  { name: 'Twitter', icon: twitterFill }
+  // { name: 'TelegramIcon', icon: telegramIcon },
+  { name: 'Medium', icon: mediumIcon, url: 'https://medium.com/@protocolpasar' },
+  { name: 'Twitter', icon: twitterFill, url: 'https://twitter.com/PasarProtocol' }
 ];
 
-const RootStyle = styled('div')(({ theme, sx }) => ({
+const RootStyle = styled(Box)(({ theme, sx }) => ({
   ...sx,
   position: 'absolute',
   bottom: 0,
   width: '100%',
   // position: 'relative',
-  backgroundColor: '#c4c4c4',
+  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : '#c4c4c4',
   [theme.breakpoints.down('md')]: {
     display: 'none'
   }
@@ -44,13 +50,15 @@ function CopyRight(prop) {
     </Typography>
   );
 }
-export default function MainFooter({ hidden, isHome }) {
+export default function MainFooter({ hidden, isContainerXl }) {
+  const [donateOpen, setOpenDonate] = React.useState(false);
+
   const sx = hidden ? { display: 'none' } : {};
-  if (isHome) sx.backgroundColor = '#0d0d0d';
+  // if (isHome) sx.backgroundColor = '#0d0d0d';
   return (
     <RootStyle sx={sx}>
       <Divider />
-      <Container maxWidth="lg" sx={{ pt: 6 }}>
+      <Container maxWidth={isContainerXl?"xl":"lg"} sx={{ pt: 6, px: isContainerXl?{sm: 3, md: 6, lg: 9}:{}}}>
         <Grid
           container
           justifyContent={{ xs: 'center', md: 'space-between' }}
@@ -66,7 +74,7 @@ export default function MainFooter({ hidden, isHome }) {
                 draggable={false}
                 component="img"
                 src="/static/elastos.svg"
-                sx={{ width: 21, display: 'inline', pl: 0.5 }}
+                sx={{ width: 21, display: 'inline', pl: 0.5, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}
               />
             </h3>
             <Typography variant="body2" sx={{ pr: { md: 5 }, color: 'GrayText' }}>
@@ -82,11 +90,11 @@ export default function MainFooter({ hidden, isHome }) {
               justifyContent={{ xs: 'center', md: 'flex-end' }}
               sx={{ mb: { xs: 5, md: 0 } }}
             >
-              {/* {SOCIALS.map((social) => (
-                <IconButton key={social.name} color="inherit" sx={{ p: 0 }}>
+              {SOCIALS.map((social) => (
+                <IconButton key={social.name} color="inherit" sx={{ p: 0 }} component={Link} href={social.url} target="_blank">
                   <Icon icon={social.icon} width={40} height={40} />
                 </IconButton>
-              ))} */}
+              ))}
               <IconButton
                 color="inherit"
                 sx={{ p: '2px' }}
@@ -134,7 +142,7 @@ export default function MainFooter({ hidden, isHome }) {
             {/* <Stack
               direction="row"
               justifyContent={{ xs: 'center', md: 'flex-end' }}>
-                <ModeSwitch sx={{ mt: 1, mb: 1 }} defaultChecked />
+                <ModeSwitch />
             </Stack> */}
           </Grid>
         </Grid>
@@ -145,23 +153,35 @@ export default function MainFooter({ hidden, isHome }) {
             textAlign: { xs: 'center', md: 'left' },
             mt: 2,
             borderTop: '1px solid',
-            borderColor: palette.light.grey['300']
+            // borderColor: palette.light.grey['300']
+            borderColor: (theme)=>theme.palette.mode==='light'?theme.palette.grey['300']:'#343b44'
           }}
         >
           <Grid item xs={12} md={6}>
             <CopyRight textAlign="left">
-              Pasar Protocol 2021 | Donate{' '}
-              <span role="img" aria-label="">
-                ❤️
-              </span>{' '}
-              v1 - {generatedGitInfo.gitCommitHash}
+              Pasar Protocol 2021 |{' '}
+              <Link onClick={()=>{setOpenDonate(true)}} color='GrayText' sx={{cursor: 'pointer'}}>
+                Donate <span role="img" aria-label="">❤️</span>
+              </Link>
+              {' '}
+              v2 - {generatedGitInfo.gitCommitHash}
             </CopyRight>
           </Grid>
           <Grid item xs={12} md={6}>
-            <CopyRight textAlign="right">Privacy Policy | Disclaimer️</CopyRight>
+            <CopyRight textAlign="right">
+              <Link
+                href={PATH_DOCS}
+                target="_blank"
+                sx={{color: 'inherit'}}
+              >
+                Docs
+              </Link>
+              {' '}| Privacy Policy | Disclaimer️
+            </CopyRight>
           </Grid>
         </Grid>
       </Container>
+      <DonateDlg isOpen={donateOpen} setOpen={setOpenDonate}/>
     </RootStyle>
   );
 }

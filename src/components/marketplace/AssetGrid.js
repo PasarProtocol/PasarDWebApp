@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
 import AssetCardSkeleton from './AssetCardSkeleton';
-import { getAssetImage } from '../../utils/common';
+import { getAssetImage, setAllTokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, coinTypes, coinTypesForEthereum } from '../../utils/common';
+import { blankAddress } from '../../config';
 // ----------------------------------------------------------------------
 const StackedGrid = ({
   // gridItemWidth = "250px",
@@ -17,52 +18,49 @@ const StackedGrid = ({
     {children}
   </Box>
 );
-const GridItems = (props) => (
-    <AnimatePresence>
-      {props.items.map((item, index) => (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {
-            item?
+const GridItems = (props) => {
+  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
+  const setCoinPriceByType = (type, value) => {
+    setCoinPrice((prevState) => {
+      const tempPrice = [...prevState];
+      tempPrice[type] = value;
+      return tempPrice;
+    });
+  }
+
+  React.useEffect(()=>{
+    setAllTokenPrice(setCoinPriceByType)
+  }, [])
+  return <>
+      {props.assets.map((item, index) => {
+        const coinType = getCoinTypeFromToken(item)
+
+        return item?
             <AssetCard
-              thumbnail={getAssetImage(item, true)}
-              title={item.name && item.name}
-              description={item.description}
+              key={index}
+              {...item}
               price={round(item.price/1e18, 3)}
-              quantity={item.quantity}
-              tokenId={item.tokenId}
               saleType={item.SaleType?item.SaleType:item.saleType}
-              type={props.type}
-              isLink={1&&true}
-              orderId={item.orderId}
-              royaltyOwner={item.royaltyOwner}
-              holder={item.holder}
+              isLink={Boolean(true)}
+              coinUSD={coinPrice[coinType.index]}
+              coinType={coinType}
+              // defaultCollectionType={getCollectionTypeFromImageUrl(item)}
               {...props}
             />:
-            <AssetCardSkeleton/>
-          }
-        </motion.div>
-      ))}
-    </AnimatePresence>
-);
+            <AssetCardSkeleton key={index}/>
+      })}
+    </>
+}
 export default function AssetGrid(props){
+  const { dispmode, assets, type=0, myaddress, updateCount, handleUpdate } = props
   let itemWidth = 200
-  if(props.dispmode===0)
+  if(dispmode===0)
     itemWidth = isMobile?230:270
   else itemWidth = isMobile?150:200
+
   return(
     <StackedGrid itemWidth={itemWidth}>
-      <GridItems 
-        items={props.assets}
-        type={props.type?props.type:0}
-        myaddress={props.myaddress}
-        updateCount={props.updateCount}
-        handleUpdate={props.handleUpdate}
-      />
+      <GridItems {...{assets, type, myaddress, updateCount, handleUpdate}}/>
     </StackedGrid>
   )
 }

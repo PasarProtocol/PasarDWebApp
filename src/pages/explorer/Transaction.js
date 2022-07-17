@@ -61,11 +61,13 @@ export default function Transaction() {
     setAbortController(newController);
 
     setLoadingTransactions(true);
-    fetchFrom(`sticker/api/v1/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetchFrom(`api/v2/sticker/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonTransactions => {
-        setTotalCount(jsonTransactions.data.total)
-        setPages(Math.ceil(jsonTransactions.data.total/showCount));
-        setTransactions(jsonTransactions.data.results);
+        if(jsonTransactions.data) {
+          setTotalCount(jsonTransactions.data.total)
+          setPages(Math.ceil(jsonTransactions.data.total/showCount));
+          setTransactions(jsonTransactions.data.results);
+        }
         setLoadingTransactions(false);
       })
     }).catch(e => {
@@ -159,11 +161,15 @@ export default function Transaction() {
           ))}
         </Grid>
         {
-            transactions.length>0&&
+            transactions.length>0 &&
             <StackStyle  sx={{ mt: 2, display: 'block' }}>
                 <Pagination page={page} pages={pages} onChange={setPage}/>
                 <ShowSelect count={showCount} onChange={changeShowCount}/>
             </StackStyle>
+        }
+        {
+            !isLoadingTransactions && !transactions.length &&
+            <Typography variant="h4" align='center' sx={{mt: 2}}>No transaction found!</Typography>
         }
       </Container>
     </RootStyle>

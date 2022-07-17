@@ -53,7 +53,7 @@ UploadMultiFile.propTypes = {
   sx: PropTypes.object
 };
 
-export default function UploadMultiFile({ error, showPreview = false, files, onRemove, onRemoveAll, isAvatar, sx, ...other }) {
+export default function UploadMultiFile({ error, showPreview = false, files, onRemove, onRemoveAll, isAvatar, disabled, sx, ...other }) {
   const hasFile = files.length > 0;
 
   const { getRootProps, getInputProps, isDragActive, isDragReject, fileRejections } = useDropzone({
@@ -67,7 +67,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
         py: 1,
         px: 2,
         mt: 3,
-        borderColor: 'error.light',
+        borderColor: (theme)=>`error.${theme.palette.mode}`,
         bgcolor: (theme) => alpha(theme.palette.error.main, 0.08)
       }}
     >
@@ -98,8 +98,8 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
           ...(isDragActive && { opacity: 0.72 }),
           ...((isDragReject || error) && {
             color: 'error.main',
-            borderColor: 'error.light',
-            bgcolor: 'error.lighter'
+            borderColor: (theme)=>`error.${theme.palette.mode}`,
+            bgcolor: (theme)=>`error.${theme.palette.mode}er`
           })
         }}
         onClick={(e)=>e.preventDefault()}
@@ -109,7 +109,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
         <Box>
           <Typography variant="body2" align="center">
             File types supported:PNG, JPEG, JPG, GIF<br/>
-            Range: 2~20 items per batch
+            Range: 2~10 items per batch
             {isAvatar&&(
               <>
                 <br/>Canvas size must be 600x600 pixels<br/>Max. size:5 MB<br/>Recommended GIF animation length: Less than 10 seconds
@@ -127,7 +127,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
             <Typography variant="body2">
               or
             </Typography>
-            <Button variant="contained" {...getRootProps()}>
+            <Button variant="contained" {...getRootProps()} disabled={disabled}>
               Choose File
             </Button>
           </Stack>
@@ -137,7 +137,7 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
       {fileRejections.length > 0 && <ShowRejectionItems />}
 
       <List disablePadding sx={{ ...(hasFile && { my: 3 }) }}>
-        <AnimatePresence>
+        {/* <AnimatePresence> */}
           {files.map((file) => {
             const { name, size, preview } = file;
             const key = isString(file) ? file : name;
@@ -146,8 +146,8 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
               return (
                 <ListItem
                   key={key}
-                  component={motion.div}
-                  {...varFadeInRight}
+                  // component={motion.div}
+                  // {...varFadeInRight}
                   sx={{
                     p: 0,
                     m: 0.5,
@@ -216,12 +216,12 @@ export default function UploadMultiFile({ error, showPreview = false, files, onR
               </ListItem>
             );
           })}
-        </AnimatePresence>
+        {/* </AnimatePresence> */}
       </List>
 
       {hasFile && (
         <Stack direction="row" justifyContent="flex-end">
-          <Button onClick={onRemoveAll} sx={{ mr: 1.5 }}>
+          <Button onClick={onRemoveAll} sx={{ mr: 1.5 }} color='inherit'>
             Remove all
           </Button>
           {/* <Button variant="contained">Upload files</Button> */}

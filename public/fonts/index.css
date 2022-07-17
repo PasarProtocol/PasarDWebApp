@@ -19,3 +19,6 @@
 .walletconnect-modal__mobile__toggle a {
   color: black;
 }
+div[class^='bg svelte-'] {
+  display: none;
+}

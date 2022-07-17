@@ -41,7 +41,7 @@ export default function SearchResult() {
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
   React.useEffect(async () => {
     setLoadingCollectibles(true);
-    fetchFrom(`sticker/api/v1/search?key=${params.key}`).then(response => {
+    fetchFrom(`api/v2/sticker/search/${params.key}`).then(response => {
       response.json().then(jsonCollectibles => {
         setTotalCount(jsonCollectibles.data.result.length)
         setCollectibles(jsonCollectibles.data.result);
@@ -53,8 +53,8 @@ export default function SearchResult() {
     });
   }, [params.key]);
   
-  const link2Detail = (tokenId)=>{
-    navigate(`/explorer/collectible/detail/${tokenId}`);
+  const link2Detail = (tokenId, baseToken)=>{
+    navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   }
   return (
     <RootStyle title="Search | PASAR">
@@ -67,14 +67,17 @@ export default function SearchResult() {
         </StackStyle>
         {isLoadingCollectibles && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
         <Grid container spacing={2}>
-        {!collectibles.length&&<Grid item xs={12} align="center"><h3>No matching collectible found!</h3></Grid>}
+        {
+          !isLoadingCollectibles && !collectibles.length &&
+          <Grid item xs={12} align="center"><h3>No matching collectible found!</h3></Grid>
+        }
         {collectibles.map((item, key) => (
           <Grid key={key} item xs={12}>
               <PaperRecord sx={{
                   textAlign: 'center',
                   cursor: 'pointer'
                 }}
-                onClick={()=>link2Detail(item.tokenId)}
+                onClick={()=>link2Detail(item.tokenId, item.baseToken)}
               >
                 <CollectibleListItem
                     item={item}

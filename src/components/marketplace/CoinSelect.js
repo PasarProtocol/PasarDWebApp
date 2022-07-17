@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import {Select, Button, Menu, MenuItem, Box} from '@mui/material';
+import { Select, Button, Menu, MenuItem, Box } from '@mui/material';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import PropTypes from 'prop-types';
+import { getCoinTypesInCurrentNetwork } from '../../utils/common'
+import useSignin from '../../hooks/useSignin';
 
-export default function CoinSelect({ onChange }) {
-  const coins = [{icon: 'elastos.svg', name: 'ELA'}]
-  const [selected, setSelected] = useState(0);
+export default function CoinSelect({ selected, onChange }) {
   const [isOpenPopup, setOpenPopup] = React.useState(null);
+  const { pasarLinkChain } = useSignin()
+  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain)
 
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);
@@ -15,11 +17,27 @@ export default function CoinSelect({ onChange }) {
   const handleClosePopup = () => {
     setOpenPopup(null);
   };
+  const handleSelect = (index) => {
+    onChange(index)
+    handleClosePopup();
+  }
   return (
     <>
-      <Button color="inherit" size="small" sx={{px: 1, py: .5}} onClick={openPopupMenu}>
-        <Box component="img" src={`/static/${coins[selected].icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coins[selected].name}
-        <Icon icon={arrowIosDownwardFill} width={20} height={20}/>
+      <Button 
+        color="inherit" 
+        size="small" 
+        sx={{
+          px: 1, 
+          py: .5,
+          textTransform: 'none',
+          fontWeight: 'normal',
+          fontSize: '1rem'
+        }} 
+        onClick={openPopupMenu}
+        endIcon={<Icon icon={arrowIosDownwardFill}/>}
+      >
+        <Box component="img" src={`/static/${coinTypes[selected].icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&selected===0?'invert(1)':'none' }} />
+        <span style={{paddingLeft: 4}}>{coinTypes[selected].name}</span>
       </Button>
       <Menu 
         keepMounted
@@ -30,9 +48,9 @@ export default function CoinSelect({ onChange }) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {coins.map((coin, index)=>(
-          <MenuItem key={index} onClick={()=>{handleClosePopup(); setSelected(index)}}>
-            <Box component="img" src={`/static/${coin.icon}`} sx={{ width: 18, display: 'inline' }} />&nbsp;{coin.name}
+        {coinTypes.map((coin, index)=>(
+          <MenuItem key={index} onClick={()=>{handleSelect(index)}} selected={index===selected}>
+            <Box component="img" src={`/static/${coin.icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&index===0?'invert(1)':'none' }} />&nbsp;{coin.name}
           </MenuItem>
         ))}
       </Menu>

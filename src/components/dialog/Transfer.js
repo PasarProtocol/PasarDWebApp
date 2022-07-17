@@ -10,47 +10,45 @@ import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import arrowIosUpwardFill from '@iconify/icons-eva/arrow-ios-upward-fill';
 import { useSnackbar } from 'notistack';
-import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
-import {
-  stickerContract as CONTRACT_ADDRESS,
-  marketContract as MARKET_CONTRACT_ADDRESS
-} from '../../config';
-import { reduceHexAddress, removeLeadingZero, isInAppBrowser } from '../../utils/common';
+
+import { InputStyle, InputLabelStyle } from '../CustomInput';
+// import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
+import { TOKEN_721_ABI } from '../../abi/token721ABI';
+import { TOKEN_1155_ABI } from '../../abi/token1155ABI';
+import { reduceHexAddress, removeLeadingZero, isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork, getERCType } from '../../utils/common';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
-
-const InputStyle = styled(Input)(({ theme }) => ({
-    '&:before': {
-        borderWidth: 0
-    }
-}));
+import useSingin from '../../hooks/useSignin';
 
 export default function Transfer(props) {
-    const {isOpen, setOpen, title, tokenId} = props
+    const {isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate, v1State=false} = props
     const { enqueueSnackbar } = useSnackbar();
     const [onProgress, setOnProgress] = React.useState(false);
     const [address, setAddress] = React.useState('');
     const [isOpenAdvanced, setOpenAdvanced] = React.useState(false);
     const [memo, setMemo] = React.useState('');
     const [isOnValidation, setOnValidation] = React.useState(false);
+    const { pasarLinkChain } = useSingin()
+    const collectionABIs = [TOKEN_721_ABI, TOKEN_1155_ABI]
 
     const handleClose = () => {
-        setOnValidation(false)
-        setOnProgress(false)
-        setOpen(false);
+      setOnValidation(false)
+      setOnProgress(false)
+      setOpen(false);
+      setAddress('')
+      setMemo('')
+      setOpenAdvanced(false)
     }
 
     const callSafeTransferFrom = (_to, _id, _value) => {
+      const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker')
       let walletConnectProvider = Web3.givenProvider;
       if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2')
         walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
       const walletConnectWeb3 = new Web3(walletConnectProvider);
-      walletConnectWeb3.eth.getAccounts().then(accounts=>{
-        const contractAbi = STICKER_CONTRACT_ABI;
-        const contractAddress = CONTRACT_ADDRESS;
-        const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
-    
-        walletConnectWeb3.eth.getGasPrice().then(gasPrice=>{
+      walletConnectWeb3.eth.getAccounts().then(accounts=>{    
+        walletConnectWeb3.eth.getGasPrice().then(_gasPrice=>{
+          const gasPrice = getFilteredGasPrice(_gasPrice)
           console.log('Sending transaction with account address:', accounts[0]);
           const transactionParams = {
             'from': accounts[0],
@@ -59,26 +57,41 @@ export default function Transfer(props) {
             'value': 0
           };
       
-          stickerContract.methods
-            .safeTransferFrom(accounts[0], _to, _id, _value)
-            .send(transactionParams)
-            .on('transactionHash', (hash) => {
-              console.log('transactionHash', hash);
+          const contractAddress = baseToken || PasarContractAddress;
+          getERCType(contractAddress, walletConnectProvider)
+            .then(collectionType => {
+              const contractAbi = collectionABIs[collectionType];
+              const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
+              let contractMethod
+              if(collectionType === 0)
+                contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id)
+              else
+                contractMethod = stickerContract.methods.safeTransferFrom(accounts[0], _to, _id, _value)
+              contractMethod.send(transactionParams)
+                .on('transactionHash', (hash) => {
+                  console.log('transactionHash', hash);
+                })
+                .on('receipt', (receipt) => {
+                  console.log('receipt', receipt);
+                  setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
+                  enqueueSnackbar('Transfer NFT success!', { variant: 'success' });
+                  setOnProgress(false);
+                  setOpen(false);
+                })
+                .on('confirmation', (confirmationNumber, receipt) => {
+                  console.log('confirmation', confirmationNumber, receipt);
+                })
+                .on('error', (error, receipt) => {
+                  console.error('error', error);
+                  enqueueSnackbar('Transfer NFT error!', { variant: 'warning' });
+                  setOnProgress(false);
+                })
             })
-            .on('receipt', (receipt) => {
-              console.log('receipt', receipt);
-              enqueueSnackbar('Transfer NFT success!', { variant: 'success' });
+            .catch(err=>{
+              enqueueSnackbar('Transfer NFT error!', { variant: 'error' });
               setOnProgress(false);
-              setOpen(false);
             })
-            .on('confirmation', (confirmationNumber, receipt) => {
-              console.log('confirmation', confirmationNumber, receipt);
-            })
-            .on('error', (error, receipt) => {
-              console.error('error', error);
-              enqueueSnackbar('Transfer NFT error!', { variant: 'warning' });
-              setOnProgress(false);
-            })
+
         }).catch(err=>{
           enqueueSnackbar('Transfer NFT error!', { variant: 'error' });
           setOnProgress(false);
@@ -122,24 +135,24 @@ export default function Transfer(props) {
               <Typography variant="body1" sx={{color: 'text.secondary', display: 'inline', pr: 1, py: 2}}>
                   Item: 
               </Typography>
-              <Typography variant="subtitle1" sx={{display: 'inline'}}>{title}</Typography>
+              <Typography variant="subtitle1" sx={{display: 'inline'}}>{name}</Typography>
               <Grid container>
                 <Grid item xs={12}>
                   <Typography variant="h4" sx={{fontWeight: 'normal'}}>Wallet Address</Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <FormControl variant="standard" error={isOnValidation&&!address.length} sx={{width: '100%'}}>
-                    <InputLabel htmlFor="input-with-price">
+                    <InputLabelStyle htmlFor="input-with-price">
                       Enter recipient wallet address
-                    </InputLabel>
+                    </InputLabelStyle>
                     <InputStyle
                       id="input-with-price"
                       value={address}
                       onChange={(e)=>setAddress(e.target.value)}
                       startAdornment={' '}
-                      endAdornment={
-                        <QrCodeScannerIcon/>
-                      }
+                      // endAdornment={
+                      //   <QrCodeScannerIcon/>
+                      // }
                     />
                     <FormHelperText hidden={!isOnValidation||(isOnValidation&&address.length>0)}>Wallet address is required</FormHelperText>
                   </FormControl>
@@ -157,9 +170,9 @@ export default function Transfer(props) {
                     </Grid>
                     <Grid item xs={12}>
                       <FormControl variant="standard" sx={{width: '100%'}}>
-                        <InputLabel htmlFor="input-with-price">
+                        <InputLabelStyle htmlFor="input-with-price">
                           Enter memo Transferred via Pasar
-                        </InputLabel>
+                        </InputLabelStyle>
                         <InputStyle
                           id="input-with-price"
                           value={memo}

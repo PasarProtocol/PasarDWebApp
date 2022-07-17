@@ -3,10 +3,17 @@ import { LoadingButton } from '@mui/lab';
 
 const LoadingButtonStyled = styled(LoadingButton)(({ theme }) => ({
   minWidth: 200,
+  backgroundColor: theme.palette.mode==='light'?theme.palette.text.primary:theme.palette.grey[700],
+  // color: theme.palette.background.default,
+  '&:hover': theme.palette.mode==='dark'?{
+    backgroundColor: theme.palette.grey[600]
+    // backgroundColor: theme.palette.action.active
+  }:{},
   '&.Mui-disabled': {
     paddingLeft: 40,
     color: theme.palette.origin.main,
-    borderColor: theme.palette.origin.main
+    borderColor: theme.palette.origin.main,
+    backgroundColor: 'unset'
   }
 }));
 
@@ -18,6 +25,10 @@ export default function TransLoadingButton(props) {
     variant={props.loading?"outlined":"contained"}
     fullWidth
     onClick={props.onClick}>
-    {props.loading?"Please Sign Transaction From Wallet":props.children}
+    {props.loading?props.loadingText:props.children}
   </LoadingButtonStyled>;
 }
+
+TransLoadingButton.defaultProps = {
+  loadingText: "Please Sign Transaction From Wallet",
+};

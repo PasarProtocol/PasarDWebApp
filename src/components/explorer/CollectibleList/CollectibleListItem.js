@@ -16,6 +16,17 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
 }));
 export default function CollectibleListItem({ item }) {
     const { thumbnail, name, createTime, royaltyOwner, tokenIdHex } = item;
+    
+    const handleErrorImage = (e) => {
+        if(e.target.src.indexOf("pasarprotocol.io") >= 0) {
+            e.target.src = getAssetImage(item, true, 1)
+        } else if(e.target.src.indexOf("ipfs.ela") >= 0) {
+            e.target.src = getAssetImage(item, true, 2)
+        } else {
+            e.target.src = '/static/broken-image.svg'
+        }
+    }
+    
     return (
         <Stack direction="row" alignItems="center" spacing={2} sx={{p:2}}>
             <Box
@@ -23,7 +34,7 @@ export default function CollectibleListItem({ item }) {
                 component="img"
                 alt={name}
                 src={getAssetImage(item, true)}
-                onError={(e) => e.target.src = '/static/broken-image.svg'}
+                onError={handleErrorImage}
                 sx={{ width: 48, height: 48, borderRadius: 1 }}
             />
             <Grid container sx={{ width: (theme) => `calc(100% - ${theme.spacing(2)} - 48px)` }}>
@@ -37,9 +48,9 @@ export default function CollectibleListItem({ item }) {
                         </Typography>
                         <CopyButton text={royaltyOwner}/>
                     </Stack>
-                    <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} align="left" noWrap>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }} align="left" noWrap>
                         Token ID : {tokenIdHex}
-                    </TypographyStyle>
+                    </Typography>
                 </Grid>
                 <Grid item xs={4}>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} align="right" noWrap>

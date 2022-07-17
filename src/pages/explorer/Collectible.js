@@ -52,7 +52,7 @@ export default function Collectible() {
     setAbortController(newController);
 
     setLoadingCollectibles(true);
-    fetchFrom(`sticker/api/v1/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal }).then(response => {
+    fetchFrom(`api/v2/sticker/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal }).then(response => {
       response.json().then(jsonCollectibles => {
         setTotalCount(jsonCollectibles.data.total)
         setPages(Math.ceil(jsonCollectibles.data.total/showCount));
@@ -71,8 +71,8 @@ export default function Collectible() {
   const handleDateOrder = (selected)=>{
     setTimeOrder(selected)
   }
-  const link2Detail = (tokenId)=>{
-    navigate(`/explorer/collectible/detail/${tokenId}`);
+  const link2Detail = (tokenId, baseToken)=>{
+    navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   }
   return (
     <RootStyle title="Collectible | PASAR">
@@ -94,7 +94,7 @@ export default function Collectible() {
                         textAlign: 'center',
                         cursor: 'pointer'
                       }}
-                      onClick={()=>link2Detail(item.tokenId)}
+                      onClick={()=>link2Detail(item.tokenId, item.baseToken)}
                     >
                         <CollectibleListItem
                             item={item}
@@ -105,11 +105,15 @@ export default function Collectible() {
             </Grid>
         </Scrollbar>
         {
-            collectibles.length>0&&
+            collectibles.length>0 &&
             <StackStyle  sx={{ mt: 2, display: 'block' }}>
                 <Pagination page={page} pages={pages} onChange={setPage}/>
                 <ShowSelect count={showCount} onChange={changeShowCount}/>
             </StackStyle>
+        }
+        {
+            !isLoadingCollectibles && !collectibles.length &&
+            <Typography variant="h4" align='center'>No collectible found!</Typography>
         }
       </Container>
     </RootStyle>

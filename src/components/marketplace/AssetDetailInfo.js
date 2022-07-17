@@ -7,14 +7,14 @@ import { useTheme, styled } from '@mui/material/styles';
 import { Box, Stack, Typography, Link } from '@mui/material';
 //
 import CopyButton from '../CopyButton';
-import { getTime } from '../../utils/common';
-import { marketContract } from '../../config'
+import { getTime, reduceHexAddress } from '../../utils/common';
+import { ESC_CONTRACT, ETH_CONTRACT } from '../../config'
 
 // ----------------------------------------------------------------------
 
 const DETAILINFO_ICONS = ['hash', 'cash-hand', 'basket', 'tag', 'calendar-hammer', 'calendar-market', 'qricon']
 const DETAILINFO_TITLE = ['Token ID', 'Royalties', 'Quantity', 'Sale Type', 'Created Date', 'Date on Market', 'Item Type']
-const DETAILINFO_KEYS = ['tokenIdHex', 'royalties', 'quantity', 'SaleType', 'createTime', 'dateOnMarket', 'type']
+const DETAILINFO_KEYS = ['tokenIdHex', 'royalties', 'quantity', 'SaleType', 'createTime', 'marketTime', 'type']
 
 const RootStyle = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -23,10 +23,16 @@ const RootStyle = styled('div')(({ theme }) => ({
 }));
 
 // ----------------------------------------------------------------------
-const DetailItem = ({ item, isLast, value })=>{
+const DetailItem = (props)=>{
+  const { item, isLast, value } = props
   const { icon, title } = item;
-  if(item.key==='type'&&value)
-    value = value.charAt(0).toUpperCase().concat(value.substring(1))
+  let displayValue = value
+  if(value){
+    if(item.key==='type')
+      displayValue = value.charAt(0).toUpperCase().concat(value.substring(1))
+    if(item.key==='tokenIdHex')
+      displayValue = reduceHexAddress(value)
+  }
   const sx = isLast?{}:{borderBottom: '1px solid', borderColor: (theme) => `${theme.palette.grey[500_32]}`, pb: 1};
   const iconSrc = `/static/${icon}.svg`;
   return (
@@ -46,9 +52,9 @@ const DetailItem = ({ item, isLast, value })=>{
                   {
                     (title==="Creator" || title==="Owner")?
                     <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink}>
-                      {value}
+                      {displayValue}
                     </Link>:
-                    value
+                    displayValue
                   }
                 </Typography>
                 {
@@ -67,6 +73,7 @@ export default function AssetDetailInfo({ detail }) {
     'key': DETAILINFO_KEYS[index],
   }))
   const creatimestamp = getTime(detail.createTime)
+  const marketimestamp = getTime(detail.marketTime)
   let dateOnMarket = detail.DateOnMarket
   if(dateOnMarket!=='Not on sale'){
     const timestamp = getTime(dateOnMarket)
@@ -77,8 +84,9 @@ export default function AssetDetailInfo({ detail }) {
     ...detail,
     'royalties': `${detail.royalties*100/10**6} %`,
     'createTime': `${creatimestamp.date} ${creatimestamp.time}`,
+    'marketTime': `${marketimestamp.date} ${marketimestamp.time}`,
     'dateOnMarket': dateOnMarket,
-    'holder': detail.holder===marketContract?detail.royaltyOwner:detail.holder
+    'holder': (detail.holder===ESC_CONTRACT.market || detail.holder===ETH_CONTRACT.market)?detail.royaltyOwner:detail.holder
   }
 
   return (
