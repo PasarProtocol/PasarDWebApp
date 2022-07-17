@@ -506,8 +506,8 @@ export default function AssetCard(props) {
           </Box>
         </PaperRecord>
         <DisclaimerDlg isOpen={disclaimerOpen} setOpen={setOpenDisclaimer}/>
-        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} {...dlgProps} saleType={saleType} royalties={royalties}/>
-        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} {...dlgProps} orderType={orderType}/>
+        <SellDlg isOpen={sellOpen} setOpen={setOpenSell} {...dlgProps} isMinter={royaltyOwner===myaddress} royalties={royalties}/>
+        <UpdateDlg isOpen={updateOpen} setOpen={setOpenUpdate} {...dlgProps} saleType={saleType} royalties={royalties} orderType={orderType}/>
         <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} {...dlgProps}/>
         <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} {...dlgProps}/>
         <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps}/>

@@ -15,7 +15,7 @@ import useSingin from '../../hooks/useSignin';
 import { removeLeadingZero, callContractMethod, sendIpfsDidJson, isInAppBrowser, getCoinTypesInCurrentNetwork, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork, getChainTypeFromId } from '../../utils/common';
 
 export default function Sell(props) {
-  const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate, saleType, royalties } = props;
+  const { isOpen, setOpen, name, tokenId, baseToken, updateCount, handleUpdate, isMinter=false, royalties } = props;
   const [price, setPrice] = React.useState('');
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [coinType, setCoinType] = React.useState(0);
@@ -38,7 +38,7 @@ export default function Sell(props) {
     priceValue = removeLeadingZero(priceValue);
     if (!isValidLimitPrice(priceValue)) return;
     setPrice(priceValue);
-    const royaltyFee = saleType === 'Primary Sale' ? 0 : math.round((priceValue * royalties) / 10 ** 6, 4);
+    const royaltyFee = isMinter ? 0 : math.round((priceValue * royalties) / 10 ** 6, 4);
     setRcvPrice(math.round((priceValue * 98) / 100 - royaltyFee, 3));
   };
 
@@ -198,7 +198,7 @@ export default function Sell(props) {
                 <Icon icon="eva:info-outline" style={{ marginBottom: -4, fontSize: 18 }} />
               </Tooltip>
               {
-                (royalties*1)>0 &&
+                !isMinter && (royalties*1)>0 &&
                 <>,&nbsp;Royalty fee {math.round(royalties/1e4, 2)}%</>
               }
             </Typography>

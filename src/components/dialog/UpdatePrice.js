@@ -3,7 +3,8 @@ import { Link as RouterLink } from 'react-router-dom';
 import Web3 from 'web3';
 import * as math from 'mathjs';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Stack, Input, FormControl, InputLabel, Divider, 
-  Grid, Tooltip, Icon, Button, Box, FormHelperText, Link } from '@mui/material';
+  Grid, Tooltip, Button, Box, FormHelperText, Link } from '@mui/material';
+import { Icon } from '@iconify/react';
 import CloseIcon from '@mui/icons-material/Close';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
@@ -21,7 +22,7 @@ import useSignin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
 
 export default function UpdatePrice(props) {
-  const { isOpen, setOpen, name, orderId, orderType, updateCount, handleUpdate, v1State=false } = props;
+  const { isOpen, setOpen, name, orderId, saleType, orderType, updateCount, handleUpdate, v1State=false, royalties } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [price, setPrice] = React.useState('');
@@ -50,7 +51,8 @@ export default function UpdatePrice(props) {
     priceValue = removeLeadingZero(priceValue);
     if (!isValidLimitPrice(priceValue)) return;
     setPrice(priceValue);
-    setRcvPrice(math.round((priceValue * 98) / 100, 3));
+    const royaltyFee = saleType==='Primary Sale' ? 0 : math.round((priceValue * royalties) / 10 ** 6, 4);
+    setRcvPrice(math.round((priceValue * 98) / 100 - royaltyFee, 3));
   };
 
   const handleChangeReservePrice = (event) => {
@@ -160,6 +162,10 @@ export default function UpdatePrice(props) {
               >
                 <Icon icon="eva:info-outline" style={{ marginBottom: -4, fontSize: 18 }} />
               </Tooltip>
+              {
+                saleType!=="Primary Sale" && (royalties*1)>0 &&
+                <>,&nbsp;Royalty fee {math.round(royalties/1e4, 2)}%</>
+              }
             </Typography>
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive
