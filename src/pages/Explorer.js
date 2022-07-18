@@ -72,10 +72,10 @@ export default function Explorer() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={6}>
             <MHidden width="mdDown">
-              <NewestCollectibles title="Newest Collectibles" dataList={[...newestCollectibles]} isLoading={isLoadingCollectibles}/>
+              <NewestCollectibles title="Newest Items" dataList={[...newestCollectibles]} isLoading={isLoadingCollectibles}/>
             </MHidden>
             <MHidden width="mdUp">
-              <NewestCollectibles title="Newest Collectibles" dataList={[...newestCollectibles].splice(0,5)} isLoading={isLoadingCollectibles}/>
+              <NewestCollectibles title="Newest Items" dataList={[...newestCollectibles].splice(0,5)} isLoading={isLoadingCollectibles}/>
             </MHidden>
           </Grid>
           <Grid item xs={12} md={6} lg={6}>

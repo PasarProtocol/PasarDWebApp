@@ -20,12 +20,10 @@ export default function StatisticPanel() {
     <RootStyle>
       <Grid container>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="Trading Volume" index={1}>
-            <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
-          </StatisticItem>
+          <StatisticItem title="📈 Trading Volume" index={1}/>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="🖼 Collectibles" index={2}/>
+          <StatisticItem title="🖼 Items" index={2}/>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
           <StatisticItem title="✉️ Transactions" index={3}/>
