@@ -736,27 +736,27 @@ export const coinTypes = [
     address: WELA_CONTRACT_ADDRESS
   },
   {
-    icon: 'erc20/Glide.png',
+    icon: 'erc20/Glide.svg',
     name: 'GLIDE',
     address: GLIDE_CONTRACT_ADDRESS
   },
   {
-    icon: 'erc20/Elk.png',
+    icon: 'erc20/Elk.svg',
     name: 'ELK',
     address: ELK_CONTRACT_ADDRESS
   },
   {
-    icon: 'erc20/EUSDC.png',
+    icon: 'erc20/EUSDC.svg',
     name: 'ethUSDC',
     address: EUSDC_CONTRACT_ADDRESS
   },
   {
-    icon: 'erc20/Bunny.png',
+    icon: 'erc20/Bunny.svg',
     name: 'BUNNY',
     address: BUNNY_CONTRACT_ADDRESS
   },
   {
-    icon: 'erc20/BUSD.png',
+    icon: 'erc20/BUSD.svg',
     name: 'bnbBUSD',
     address: BUSD_CONTRACT_ADDRESS
   }
