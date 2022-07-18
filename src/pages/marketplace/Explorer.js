@@ -176,6 +176,15 @@ export default function MarketExplorer() {
     if(itemTypeFilter==='general')
       itemTypeFilter = itemTypeFilter.concat(',image')
     setLoadingAssets(true);
+    let collectionTypeStr = ''
+    let chainTypeForCollection = 0
+    selectedCollections.forEach((collectionAddr, _i)=>{
+      collectionTypeStr = collectionTypeStr.concat(collectionTypeStr.length?',':'', collectionAddr.substr(2))
+      if(chainTypeForCollection !== collectionAddr.charAt(0)*1 && chainTypeForCollection < 3)
+      chainTypeForCollection += collectionAddr.charAt(0)*1
+    })
+    chainTypeForCollection %= 3
+
     let tokenTypeStr = ''
     let chainTypeForToken = 0
     selectedTokens.forEach((tokenAddr, _i)=>{
@@ -190,7 +199,7 @@ export default function MarketExplorer() {
     if(!loadNext)
       setAssets([])
     fetchFrom(`api/v2/sticker/getDetailedCollectibles?`+
-      `collectionType=${selectedCollections.join(',')}&`+
+      `collectionType=${collectionTypeStr}&`+
       `tokenType=${tokenTypeStr}&`+
       `status=${statusFilter}&`+
       `itemType=${itemTypeFilter}&`+
@@ -198,7 +207,7 @@ export default function MarketExplorer() {
       `minPrice=${range.min!==''?range.min*1e18:''}&`+
       `maxPrice=${range.max!==''?range.max*1e18:''}&`+
       `order=${order}&`+
-      `marketPlace=${chainTypeForToken || chainType}&`+
+      `marketPlace=${chainTypeForCollection || chainTypeForToken || chainType}&`+
       `keyword=${params.key?params.key:''}&`+
       `pageNum=${page}&`+
       `pageSize=${showCount}`, { signal })
