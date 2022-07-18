@@ -17,13 +17,22 @@ const RootStyle = styled(Card)(({ theme }) => ({
 }));
 
 export default function StatisticPanel(props) {
-  const { floorPrice=0, totalCount=0, totalOwner=0, totalPrice=0 } = props
+  const { floorPrice=0, totalCount=0, totalOwner=0, totalPrice=0, marketPlace=1 } = props
+  const volumeIconTypes = [
+    {icon: 'elastos.svg', style: { filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }},
+    {icon: 'ethereum.svg', style: { filter: (theme)=>theme.palette.mode==='light'?'invert(0.8)':'invert(0.2)', width: 16 }}
+  ]
+  let volumeIcon = {}
+  if(marketPlace>0)
+    volumeIcon = volumeIconTypes[marketPlace-1]
+  else
+    [volumeIcon] = volumeIconTypes
   return (
     <RootStyle>
       <Grid container>
         <Grid item xs={6} sm={3} md={3}>
           <StatisticItem title="Trading Volume" index={1} value={totalPrice}>
-            <Box component="img" src="/static/elastos.svg" sx={{ width: 18, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
+            <Box component="img" src={`/static/${volumeIcon.icon}`} sx={{ width: 18, display: 'inline', verticalAlign: 'middle', ...volumeIcon.style }} />
           </StatisticItem>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
