@@ -40,7 +40,7 @@ export default function StatisticItem(props) {
                 formatValue={(n) => n.toLocaleString('en')}
                 stepPrecision={0}
             />
-            <Typography variant="body" sx={{ color: 'text.secondary' }}>
+            <Typography variant="body" sx={{ color: 'text.secondary', display: 'flex', justifyContent: 'center', gap: '6px' }}>
                 {props.children} {props.title}
             </Typography>
         </Stack>
