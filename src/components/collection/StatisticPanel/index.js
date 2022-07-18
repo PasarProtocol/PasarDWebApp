@@ -30,7 +30,7 @@ const StatisticPanel = (props) => {
           <StatisticItem title="🖼 Items" index={2} value={totalCount}/>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="🔻 Floor Price" index={3} value={floorPrice}/>
+          <StatisticItem title="🔻 Floor Price" index={3} value={floorPrice} marketPlace={marketPlace}/>
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
           <StatisticItem title="💪 Owners" index={4} value={totalOwner}/>
