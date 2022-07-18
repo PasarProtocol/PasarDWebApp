@@ -62,7 +62,7 @@ export default function AssetFilterPan(props){
             return tempItem
           })
 
-          const allCollections = [...resCollections]
+          const allCollections = resCollections.map(collection=>({...collection, token: `${collection.marketPlace}-${collection.token}`}))
           setCollections(allCollections);
           setFilterCollections(allCollections)
         })
