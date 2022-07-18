@@ -22,7 +22,7 @@ import {
   bunnyContract as BUNNY_CONTRACT_ADDRESS, 
   bnbBusdContract as BUSD_CONTRACT_ADDRESS, 
   elaOnEthContract as ELA_ON_ETH_CONTRACT_ADDRESS,
-  blankAddress, ipfsURL as PasarIpfs, rpcURL } from '../config';
+  blankAddress, ipfsURL as PasarIpfs, rpcURL, ExplorerServer } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { V1_PASAR_CONTRACT_ABI } from '../abi/pasarV1ABI';
 import { ERC20_CONTRACT_ABI } from '../abi/diamondABI';
@@ -803,6 +803,21 @@ export const getChainTypeFromId = (chainId) => {
   if (chainId===1 || chainId===3)
     return 'ETH'
   return ''
+}
+export const getExplorerSrvByNetwork = (netType) => {
+  let explorerSrvUrl = ""
+  switch(netType) {
+    case 1:
+      explorerSrvUrl = ExplorerServer.ESC
+      break;
+    case 2:
+      explorerSrvUrl = ExplorerServer.ETH
+      break;
+    default:
+      explorerSrvUrl = ExplorerServer.ESC
+      break;
+  }
+  return explorerSrvUrl
 }
 export const getContractAddressInCurrentNetwork = (chainId, type) => {
   const currentChain = getChainTypeFromId(chainId)
