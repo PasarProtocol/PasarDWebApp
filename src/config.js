@@ -80,8 +80,16 @@ const addressForTest = {
 const rpcUrlForMain = "https://api.elastos.io/eth"
 const rpcUrlForTest = "https://api-testnet.elastos.io/eth"
 
-const escServerForMain = "https://esc.elastos.io"
-const escServerForTest = "https://esc-testnet.elastos.io"
+const NetworkExplorerServer = {
+  MainNet: {
+    ESC: "https://esc.elastos.io",
+    ETH: "https://etherscan.io"
+  },
+  TestNet: {
+    ESC: "https://esc-testnet.elastos.io",
+    ETH: "https://ropsten.etherscan.io"
+  }
+}
 
 const ApplicationDIDForMain = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 // const ApplicationDIDForTest = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB"
@@ -93,7 +101,7 @@ export const mainDiaContract = addressForProduction.diaContract
 
 export const ipfsURL = process.env.REACT_APP_ENV==="production"?process.env.REACT_APP_IPFS_URL_PRODUCTION:process.env.REACT_APP_IPFS_URL_TEST
 export const rpcURL = process.env.REACT_APP_ENV==="production"?rpcUrlForMain:rpcUrlForTest
-export const escURL = process.env.REACT_APP_ENV==="production"?escServerForMain:escServerForTest
+export const ExplorerServer = process.env.REACT_APP_ENV==="production" ? NetworkExplorerServer.MainNet : NetworkExplorerServer.TestNet
 export const ApplicationDID = ApplicationDIDForMain
 
 export const trustedProviders = [

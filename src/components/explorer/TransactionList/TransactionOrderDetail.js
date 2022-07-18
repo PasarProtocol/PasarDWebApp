@@ -9,8 +9,8 @@ import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import MethodLabel from '../../MethodLabel';
 import CopyButton from '../../CopyButton';
-import { MethodList, reduceHexAddress, getTime, getCoinTypeFromToken, getMarketAddressByMarketplaceType, coinTypes } from '../../../utils/common';
-import {escURL, v1marketContract} from '../../../config'
+import { MethodList, reduceHexAddress, getTime, getCoinTypeFromToken, getMarketAddressByMarketplaceType, getExplorerSrvByNetwork } from '../../../utils/common';
+import {v1marketContract} from '../../../config'
 
 TransactionOrderDetail.propTypes = {
     item: PropTypes.object.isRequired
@@ -84,6 +84,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
             totalSum = `${price} ${coinName} + ${gasFee} ${feeTokenName}`
     }
     const marketContractAddress = getMarketAddressByMarketplaceType(marketPlace)
+    const explorerSrvUrl = getExplorerSrvByNetwork(marketPlace)
     return (
         <RootStyle>
             <Box
@@ -154,7 +155,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                                             Tx Hash&nbsp;
                                         </TypographyStyle>
                                         <TypographyStyle variant="body2" sx={{ flex: 1 }} noWrap align="right" alignsm="left">
-                                            <Link href={`${escURL}/tx/${tHash}`} color='text.secondary' sx={{ borderRadius: 1, ...eventStyle }} target="_blank">
+                                            <Link href={`${explorerSrvUrl}/tx/${tHash}`} color='text.secondary' sx={{ borderRadius: 1, ...eventStyle }} target="_blank">
                                                 {reduceHexAddress(tHash)}
                                                 <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                                                     <Icon icon={externalLinkFill} width="17px" {...eventStyle}/>

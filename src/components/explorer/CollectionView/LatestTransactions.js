@@ -7,16 +7,16 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 // material
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
-import { MethodList, reduceHexAddress } from '../../../utils/common';
-import { escURL } from '../../../config';
+import { MethodList, reduceHexAddress, getExplorerSrvByNetwork } from '../../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,
 };
 export function TransItem({ trans }) {
   let methodItem = MethodList.find((item)=>item.method===trans.event)
-    if(!methodItem)
-        methodItem = {color: 'grey', icon: 'tag', detail: []}
+  if(!methodItem)
+      methodItem = {color: 'grey', icon: 'tag', detail: []}
+  const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
   return (
       <Stack direction="row" spacing={2}>
           <Link href={`/explorer/collectible/detail/${[trans.tokenId, trans.baseToken].join('&')}`} underline="none" sx={{borderRadius: 1}} >
@@ -29,7 +29,7 @@ export function TransItem({ trans }) {
           </Link>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
               <Typography variant="body2" noWrap>
-                <Link href={`${escURL}/tx/${trans.tHash}`} target="_blank" color='text.secondary'>
+                <Link href={`${explorerSrvUrl}/tx/${trans.tHash}`} target="_blank" color='text.secondary'>
                   Tx Hash : {reduceHexAddress(trans.tHash)}
                   <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                       <Icon icon={externalLinkFill} width="17px"/>
