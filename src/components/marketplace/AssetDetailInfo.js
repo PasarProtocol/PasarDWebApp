@@ -8,7 +8,7 @@ import { Box, Stack, Typography, Link } from '@mui/material';
 //
 import CopyButton from '../CopyButton';
 import { getTime, reduceHexAddress } from '../../utils/common';
-import { ESC_CONTRACT, ETH_CONTRACT } from '../../config'
+import { MAIN_CONTRACT } from '../../config'
 
 // ----------------------------------------------------------------------
 
@@ -80,13 +80,14 @@ export default function AssetDetailInfo({ detail }) {
     dateOnMarket = `${timestamp.date} ${timestamp.time}`
   }
   
+  const checkIfHolderIsMarket = Object.values(MAIN_CONTRACT).findIndex(item=>item.market===detail.holder)
   const detailInfo = {
     ...detail,
     'royalties': `${detail.royalties*100/10**6} %`,
     'createTime': `${creatimestamp.date} ${creatimestamp.time}`,
     'marketTime': `${marketimestamp.date} ${marketimestamp.time}`,
     'dateOnMarket': dateOnMarket,
-    'holder': (detail.holder===ESC_CONTRACT.market || detail.holder===ETH_CONTRACT.market)?detail.royaltyOwner:detail.holder
+    'holder': checkIfHolderIsMarket<0?detail.holder:detail.royaltyOwner
   }
 
   return (

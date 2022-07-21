@@ -10,8 +10,7 @@ import jwtDecode from 'jwt-decode';
 
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
 import { 
-  ESC_CONTRACT,
-  ETH_CONTRACT,
+  MAIN_CONTRACT,
   v1marketContract as V1_MARKET_CONTRACT_ADDRESS,
   diaContract as DIA_CONTRACT_ADDRESS, 
   mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS,
@@ -161,9 +160,7 @@ export const getBalanceByAllCoinTypes = (connectProvider, chainId, balanceHandle
     }
     const currentCoinTypes = getCoinTypesInCurrentNetwork(chainId)
     const chainType = getChainTypeFromId(chainId)
-    let startPos = 0
-    if(chainType === 'ETH')
-      startPos = coinTypes.length
+    const startPos = getStartPosOfCoinTypeByChainType(chainType)
     // const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(connectProvider);
     walletConnectWeb3.eth.getAccounts().then(accounts=>{
@@ -721,7 +718,7 @@ export const collectionTypes = [
   //   description: 'Bunny Punk is a collection of 1,000 unique 3D well-designed Bunnies united together to get on the Elastos Smart chain Each Bunny Punk is unique and exclusive based on a hundred traits. The objective is to build the strongest Elastos NFT community and project.'
   // }
 ]
-export const coinTypes = [
+const coinTypes = [
   {
     icon: 'elastos.svg',
     name: 'ELA',
@@ -763,7 +760,7 @@ export const coinTypes = [
     address: BUSD_CONTRACT_ADDRESS
   }
 ]
-export const coinTypesForEthereum = [
+const coinTypesForEthereum = [
   {
     icon: 'erc20/ETH.svg',
     name: 'ETH',
@@ -776,9 +773,9 @@ export const coinTypesForEthereum = [
   }
 ]
 export const coinTypesGroup = {
-  coinTypesForESC: coinTypes,
-  coinTypesForEthereum,
-  coinTypesForFSN: [
+  'ESC': coinTypes,
+  'ETH': coinTypesForEthereum,
+  'FSN': [
     {
       icon: 'erc20/FSN.svg',
       name: 'FSN',
@@ -808,8 +805,8 @@ export const checkValidChain = (chainId) => {
   if (
       chainId &&
       (
-        (process.env.REACT_APP_ENV === 'production' && chainId !== 20 && chainId !== 1) ||
-        (process.env.REACT_APP_ENV !== 'production' && chainId !== 21 && chainId !== 3)
+        (process.env.REACT_APP_ENV === 'production' && chainId !== 20 && chainId !== 1 && chainId !== 32659) ||
+        (process.env.REACT_APP_ENV !== 'production' && chainId !== 21 && chainId !== 3 && chainId !== 46688)
       )
   )
     return false
@@ -820,7 +817,13 @@ export const getChainTypeFromId = (chainId) => {
     return 'ESC'
   if (chainId===1 || chainId===3)
     return 'ETH'
+  if (chainId===32659 || chainId===46688)
+    return 'FSN'
   return ''
+}
+export const getStartPosOfCoinTypeByChainType = (chainType) => {
+  const coinClassIndex = Math.max(Object.keys(coinTypesGroup).indexOf(chainType), 0)
+  return Object.values(coinTypesGroup).splice(0, coinClassIndex).reduce((sum, item)=>sum+item.length, 0)
 }
 export const getExplorerSrvByNetwork = (netType) => {
   let explorerSrvUrl = ""
@@ -839,11 +842,9 @@ export const getExplorerSrvByNetwork = (netType) => {
 }
 export const getContractAddressInCurrentNetwork = (chainId, type) => {
   const currentChain = getChainTypeFromId(chainId)
-  let contractObj = ESC_CONTRACT
-  if(currentChain==='ESC')
-    contractObj = ESC_CONTRACT
-  else if(currentChain==='ETH')
-    contractObj = ETH_CONTRACT
+  let contractObj = MAIN_CONTRACT.ESC
+  if(currentChain)
+    contractObj = MAIN_CONTRACT[currentChain]
   return contractObj[type]
 }
 export const getCoinTypesGroup4Filter = () => {
@@ -863,11 +864,11 @@ export const getCoinTypesInCurrentNetwork = (chainId) => {
   if(currentChain==='ESC')
     tempCoinTypes = coinTypes
   else if(currentChain==='ETH')
-    tempCoinTypes = coinTypesForEthereum
+    tempCoinTypes = coinTypesGroup.ETH
   return tempCoinTypes
 }
 export const getMarketAddressByMarketplaceType = (type) => {
-  const marketAddresses = [ESC_CONTRACT.market, ETH_CONTRACT.market]
+  const marketAddresses = Object.values(MAIN_CONTRACT).map(item=>item.market)
   if(type>=1 && type<=2)
     return marketAddresses[type-1]
   return marketAddresses[0]
@@ -881,9 +882,9 @@ export const getCoinTypeFromToken = (item) => {
       coinTypeIndex = coinTypeIndex<0?0:coinTypeIndex
       return {index: coinTypeIndex, ...coinTypes[coinTypeIndex]}
     }
-    coinTypeIndex = coinTypesForEthereum.findIndex(el=>el.address===quoteToken)
+    coinTypeIndex = coinTypesGroup.ETH.findIndex(el=>el.address===quoteToken)
     coinTypeIndex = coinTypeIndex<0?0:coinTypeIndex
-    return {index: coinTypeIndex+coinTypes.length, ...coinTypesForEthereum[coinTypeIndex]}
+    return {index: coinTypeIndex+coinTypes.length, ...coinTypesGroup.ETH[coinTypeIndex]}
   }
   return {index: coinTypeIndex, ...coinTypes[coinTypeIndex]}
 }

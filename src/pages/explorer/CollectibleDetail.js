@@ -18,7 +18,7 @@ import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
 import { reduceHexAddress, getAssetImage, fetchFrom, getCollectionTypeFromImageUrl, collectionTypes } from '../../utils/common';
-import { ESC_CONTRACT } from '../../config';
+import { MAIN_CONTRACT } from '../../config';
 
 // ----------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ export default function CollectibleDetail() {
           }
           const jsonData = jsonCollectible.data
           if(jsonData.baseToken) {
-            if(jsonData.baseToken===ESC_CONTRACT.sticker) {
+            if(jsonData.baseToken===MAIN_CONTRACT.ESC.sticker) {
               const defaultCollection = getCollectionTypeFromImageUrl(jsonData)
               jsonData.collection = collectionTypes[defaultCollection].name
               jsonData.is721 = false

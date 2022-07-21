@@ -33,7 +33,7 @@ export default function CollectionFilterPan(props){
   const {sx, scrollMaxHeight, btnGroup, filterProps, handleFilter, address, marketPlace=1} = props
   const {range, selectedBtns, selectedAttributes={}} = filterProps
   const coinTypeClass = Object.values(coinTypesGroup)
-  const coinTypes = marketPlace?coinTypeClass[marketPlace-1]:coinTypesGroup.coinTypesForESC
+  const coinTypes = marketPlace?coinTypeClass[marketPlace-1]:coinTypesGroup.ESC
   const [minVal, setMinVal] = React.useState(range?range.min:'');
   const [maxVal, setMaxVal] = React.useState(range?range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);

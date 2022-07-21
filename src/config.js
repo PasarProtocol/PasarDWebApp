@@ -28,15 +28,22 @@ export const donationAddress = "0x48353677e2aDe5f164a3731d7b18e22Ac0AbaFea";
 export const blankAddress = "0x0000000000000000000000000000000000000000";
 
 const addressForProduction = {
-  ESC_CONTRACT: {
-    sticker: "0xF63f820F4a0bC6E966D61A4b20d24916713Ebb95",
-    market: "0xaeA699E4dA22986eB6fa2d714F5AC737Fe93a998",
-    register: "0x3d0AD66765C319c2A1c6330C1d815608543dcc19"
-  },
-  ETH_CONTRACT: {
-    sticker: "0x020c7303664bc88ae92cE3D380BF361E03B78B81",
-    market: "0x940b857f2D5FA0cf9f0345B43C0e3308cD9E4A62",
-    register: "0x24A7af00c8d03F2FeEb89045B2B93c1D7C3ffB08"
+  MAIN_CONTRACT: {
+    ESC: {
+      sticker: "0xF63f820F4a0bC6E966D61A4b20d24916713Ebb95",
+      market: "0xaeA699E4dA22986eB6fa2d714F5AC737Fe93a998",
+      register: "0x3d0AD66765C319c2A1c6330C1d815608543dcc19"
+    },
+    ETH: {
+      sticker: "0x020c7303664bc88ae92cE3D380BF361E03B78B81",
+      market: "0x940b857f2D5FA0cf9f0345B43C0e3308cD9E4A62",
+      register: "0x24A7af00c8d03F2FeEb89045B2B93c1D7C3ffB08"
+    },
+    FSN: {
+      sticker: blankAddress,
+      market: "0xf99068a66aE783dCe4f7a811b09fe1CF071E4414",
+      register: "0xf99068a66aE783dCe4f7a811b09fe1CF071E4414"
+    }
   },
   feedsContract: "0x020c7303664bc88ae92cE3D380BF361E03B78B81",
   // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
@@ -53,15 +60,22 @@ const addressForProduction = {
 }
 
 const addressForTest = {
-  ESC_CONTRACT: {
-    sticker: "0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0",
-    market: "0x19088c509C390F996802B90bdc4bFe6dc3F5AAA7",
-    register: "0x2b304ffC302b402785294629674A8C2b64cEF897"
-  },
-  ETH_CONTRACT: {
-    sticker: "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961", // "0xAB5bB5FcEFc9703814AF68077387BC09Be12190b"
-    market: "0x61EAE56bc110249648fB9eAe7eA4cfa185e0A498", // "0x7d797f3564073FFF8E75D9D5Be57EBC01512b554"
-    register: "0xC1d40312232ec4b308E69713A98c3A2b21c8F5E0" // "0x2C8615B32cf6535Eb38DD076aD822E7c2362a4c7"
+  MAIN_CONTRACT: {
+    ESC: {
+      sticker: "0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0",
+      market: "0x19088c509C390F996802B90bdc4bFe6dc3F5AAA7",
+      register: "0x2b304ffC302b402785294629674A8C2b64cEF897"
+    },
+    ETH: {
+      sticker: "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961",
+      market: "0x61EAE56bc110249648fB9eAe7eA4cfa185e0A498",
+      register: "0xC1d40312232ec4b308E69713A98c3A2b21c8F5E0"
+    },
+    FSN: {
+      sticker: blankAddress,
+      market: "0xf99068a66aE783dCe4f7a811b09fe1CF071E4414",
+      register: "0xf99068a66aE783dCe4f7a811b09fe1CF071E4414"
+    }
   },
   feedsContract: "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961",
   // erc20Contract: "0xf5d461622Df01421c3b6082F962fD7711E94a579",
@@ -95,7 +109,7 @@ const ApplicationDIDForMain = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 // const ApplicationDIDForTest = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB"
 export const DidResolverUrl = 'https://api.trinity-tech.io/eid'
 
-export const {ESC_CONTRACT, ETH_CONTRACT, feedsContract, v1marketContract, diaContract, welaContract, glideContract, 
+export const {MAIN_CONTRACT, feedsContract, v1marketContract, diaContract, welaContract, glideContract, 
   elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, elaOnEthContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
 export const mainDiaContract = addressForProduction.diaContract
 

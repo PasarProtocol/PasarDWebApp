@@ -1109,7 +1109,7 @@ export default function SignInDialog() {
       </Dialog>
       {/* <CredentialsDlg/> */}
       <SnackbarCustom isOpen={isOpenSnackbar} setOpen={setSnackbarOpen}>
-        Wrong network, only Elastos Smart Chain and Ethereum is supported
+        Wrong network, only Elastos Smart Chain, Ethereum and Fusion is supported
       </SnackbarCustom>
     </>
   );
