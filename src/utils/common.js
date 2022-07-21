@@ -291,7 +291,7 @@ export function getTokenPriceInEthereum() {
   return new Promise((resolve, reject) => {
   // fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD')
   // fetch("https://api.coinstats.app/public/v1/coins/ethereum?currency=USD")
-    fetch("https://api.coingecko.com/api/v3/simple/price?ids=elastos,ethereum&vs_currencies=usd")
+    fetch("https://api.coingecko.com/api/v3/simple/price?ids=elastos,ethereum,fsn&vs_currencies=usd")
       .then(res=>res.json())
       .then(resObj=>{
         const tempPriceResult = [0, 0]
@@ -299,10 +299,12 @@ export function getTokenPriceInEthereum() {
           tempPriceResult[0] = resObj.ethereum.usd
         if(resObj && resObj.elastos)
           tempPriceResult[1] = resObj.elastos.usd
+        if(resObj && resObj.fsn)
+          tempPriceResult[2] = resObj.fsn.usd
         resolve(tempPriceResult)
       })
       .catch(e=>{
-        resolve([0, 0])
+        resolve([0, 0, 0])
       })
   });
 }
@@ -773,6 +775,17 @@ export const coinTypesForEthereum = [
     address: ELA_ON_ETH_CONTRACT_ADDRESS
   }
 ]
+export const coinTypesGroup = {
+  coinTypesForESC: coinTypes,
+  coinTypesForEthereum,
+  coinTypesForFSN: [
+    {
+      icon: 'erc20/FSN.svg',
+      name: 'FSN',
+      address: blankAddress
+    },
+  ]
+}
 export const socialTypes = ['Website', 'Profile', 'Feeds', 'Twitter', 'Discord', 'Telegram', 'Medium']
 export const chainTypes = [
   {
@@ -784,6 +797,11 @@ export const chainTypes = [
     icon: 'badges/ETH-network.svg',
     name: 'Ethereum',
     color: '#6A70FA'
+  },
+  {
+    icon: 'badges/FSN-network.svg',
+    name: 'Fusion',
+    color: '#1e9ada'
   }
 ]
 export const checkValidChain = (chainId) => {
@@ -828,6 +846,17 @@ export const getContractAddressInCurrentNetwork = (chainId, type) => {
     contractObj = ETH_CONTRACT
   return contractObj[type]
 }
+export const getCoinTypesGroup4Filter = () => {
+  const coinTypesArr = [[]]
+  Object.entries(coinTypesGroup).forEach((coinTypes, _i) => {
+    const tempCoinTypes = coinTypes[1].map((coinType)=>({...coinType, address: `${_i+1}-${coinType.address}`}))
+    coinTypesArr.push(tempCoinTypes)
+    coinTypesArr[0] = [...coinTypesArr[0], ...tempCoinTypes]
+  })
+  return coinTypesArr
+}
+export const getTotalCountOfCoinTypes = () => Object.entries(coinTypesGroup).reduce((total, item)=>total+item[1].length, 0)
+
 export const getCoinTypesInCurrentNetwork = (chainId) => {
   const currentChain = getChainTypeFromId(chainId)
   let tempCoinTypes = coinTypes

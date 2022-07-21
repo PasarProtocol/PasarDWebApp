@@ -11,7 +11,7 @@ import CustomSwitch from '../custom-switch';
 import SearchBox from '../SearchBox';
 import Scrollbar from '../Scrollbar';
 import StyledButton from '../signin-dlg/StyledButton';
-import { coinTypes, coinTypesForEthereum, collectionTypes, fetchFrom, getIpfsUrl } from '../../utils/common'
+import { collectionTypes, fetchFrom, getIpfsUrl, getCoinTypesGroup4Filter } from '../../utils/common'
 // ----------------------------------------------------------------------
 const DrawerStyle = styled(Drawer)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -33,9 +33,7 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
   backgroundColor: 'unset'
 }))
 export default function AssetFilterPan(props){
-  const tempCoinTypesForESC = coinTypes.map((coinType)=>({...coinType, address: `1-${coinType.address}`}))
-  const tempCoinTypesForEthereum = coinTypesForEthereum.map((coinType)=>({...coinType, address: `2-${coinType.address}`}))
-  const coinTypeClass = [[...tempCoinTypesForESC, ...tempCoinTypesForEthereum], tempCoinTypesForESC, tempCoinTypesForEthereum]
+  const coinTypeClass = getCoinTypesGroup4Filter()
   const {sx, scrollMaxHeight, btnGroup, filterProps, handleFilter} = props
   const {chainType=0} = filterProps
   const [minVal, setMinVal] = React.useState(filterProps.range?filterProps.range.min:'');
