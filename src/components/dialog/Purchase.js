@@ -16,12 +16,11 @@ import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import StyledButton from '../signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
-import { reduceHexAddress, getContractAddressInCurrentNetwork, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, getFilteredGasPrice, coinTypes, 
-  coinTypesForEthereum } from '../../utils/common';
+import { reduceHexAddress, getContractAddressInCurrentNetwork, getBalanceByAllCoinTypes, callContractMethod, getTotalCountOfCoinTypes, sendIpfsDidJson, isInAppBrowser, getFilteredGasPrice } from '../../utils/common';
 
 export default function Purchase(props) {
   const navigate = useNavigate();
-  const [balanceArray, setBalanceArray] = useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
+  const [balanceArray, setBalanceArray] = useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const context = useWeb3React();
@@ -218,7 +217,7 @@ export default function Purchase(props) {
 
   React.useEffect(async () => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-    setBalanceArray(Array(coinTypes.length+coinTypesForEthereum.length).fill(0))
+    setBalanceArray(Array(getTotalCountOfCoinTypes()).fill(0))
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library)
         getBalanceByAllCoinTypes(library.provider, pasarLinkChain, setBalanceByCoinType)

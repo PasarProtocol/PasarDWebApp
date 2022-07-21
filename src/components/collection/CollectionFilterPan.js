@@ -10,7 +10,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CustomSwitch from '../custom-switch';
 import SearchBox from '../SearchBox';
 import Scrollbar from '../Scrollbar';
-import {fetchFrom, coinTypes as coinTypesForESC, coinTypesForEthereum} from '../../utils/common'
+import {fetchFrom, coinTypesGroup} from '../../utils/common'
 // ----------------------------------------------------------------------
 const DrawerStyle = styled(Drawer)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -32,8 +32,8 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
 export default function CollectionFilterPan(props){
   const {sx, scrollMaxHeight, btnGroup, filterProps, handleFilter, address, marketPlace=1} = props
   const {range, selectedBtns, selectedAttributes={}} = filterProps
-  const coinTypeClass = [coinTypesForESC, coinTypesForEthereum]
-  const coinTypes = marketPlace?coinTypeClass[marketPlace-1]:coinTypesForESC
+  const coinTypeClass = Object.values(coinTypesGroup)
+  const coinTypes = marketPlace?coinTypeClass[marketPlace-1]:coinTypesGroup.coinTypesForESC
   const [minVal, setMinVal] = React.useState(range?range.min:'');
   const [maxVal, setMaxVal] = React.useState(range?range.max:'');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);

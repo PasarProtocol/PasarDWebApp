@@ -17,13 +17,13 @@ import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
-import { reduceHexAddress, getBalance, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, getCoinTypesInCurrentNetwork,
-  removeLeadingZero, coinTypes, coinTypesForEthereum, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork, getChainTypeFromId } from '../../utils/common';
+import { reduceHexAddress, getBalanceByAllCoinTypes, callContractMethod, sendIpfsDidJson, isInAppBrowser, getTotalCountOfCoinTypes,
+  removeLeadingZero, isValidLimitPrice, getFilteredGasPrice, getContractAddressInCurrentNetwork, getChainTypeFromId } from '../../utils/common';
 import { blankAddress } from '../../config'
 
 export default function PlaceBid(props) {
   const navigate = useNavigate();
-  const [balanceArray, setBalanceArray] = useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
+  const [balanceArray, setBalanceArray] = useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = useState(false);
   const [bidPrice, setBidPrice] = useState('');
@@ -253,7 +253,7 @@ export default function PlaceBid(props) {
   }
   React.useEffect(async () => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-    setBalanceArray(Array(coinTypes.length+coinTypesForEthereum.length).fill(0))
+    setBalanceArray(Array(getTotalCountOfCoinTypes()).fill(0))
     if (sessionLinkFlag) {
       if (sessionLinkFlag === '1' && library)
         getBalanceByAllCoinTypes(library.provider, pasarLinkChain, setBalanceByCoinType)
