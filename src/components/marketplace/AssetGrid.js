@@ -6,8 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
 import AssetCardSkeleton from './AssetCardSkeleton';
-import { getAssetImage, setAllTokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, coinTypes, coinTypesForEthereum } from '../../utils/common';
-import { blankAddress } from '../../config';
+import { getAssetImage, setAllTokenPrice, getCollectionTypeFromImageUrl, getCoinTypeFromToken, getTotalCountOfCoinTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 const StackedGrid = ({
   // gridItemWidth = "250px",
@@ -19,7 +18,7 @@ const StackedGrid = ({
   </Box>
 );
 const GridItems = (props) => {
-  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
+  const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const setCoinPriceByType = (type, value) => {
     setCoinPrice((prevState) => {
       const tempPrice = [...prevState];

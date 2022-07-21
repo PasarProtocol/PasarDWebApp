@@ -9,12 +9,12 @@ import { MHidden } from '../@material-extend';
 import { CarouselControlsPaging2 } from '../carousel/controls';
 import AssetCard from '../marketplace/AssetCard';
 import AssetCardSkeleton from '../marketplace/AssetCardSkeleton';
-import { fetchFrom, getAssetImage, setAllTokenPrice, getCoinTypeFromToken, coinTypes, coinTypesForEthereum } from '../../utils/common';
+import { fetchFrom, getAssetImage, setAllTokenPrice, getCoinTypeFromToken, getTotalCountOfCoinTypes } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const AssetGroupSlider = (props)=>{
   const {isLoading, assets, type} = props
-  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
+  const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const [isDragging, setDragging] = React.useState(false);
 
   const settings = {

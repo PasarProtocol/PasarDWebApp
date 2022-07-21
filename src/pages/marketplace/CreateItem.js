@@ -54,9 +54,8 @@ import {
   ipfsURL, 
   auctionOrderType 
 } from '../../config'
-import { hash, removeLeadingZero, callContractMethod, isInAppBrowser, getCoinTypesInCurrentNetwork, getCoinUSD, getDiaTokenPrice, getDiaBalanceDegree, 
-  isValidLimitPrice, checkWhetherGeneralCollection, getFilteredGasPrice, getChainTypeFromId, getContractAddressInCurrentNetwork,
-  coinTypes as coinTypesForESC, coinTypesForEthereum, setAllTokenPrice } from '../../utils/common';
+import { hash, removeLeadingZero, callContractMethod, isInAppBrowser, getCoinTypesInCurrentNetwork, getDiaBalanceDegree, isValidLimitPrice, checkWhetherGeneralCollection, 
+  getFilteredGasPrice, getChainTypeFromId, getContractAddressInCurrentNetwork, coinTypesGroup, getTotalCountOfCoinTypes, setAllTokenPrice } from '../../utils/common';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
@@ -128,7 +127,7 @@ export default function CreateItem() {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [moreDIAOpen, setOpenMoreDIA] = React.useState(false);
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
-  const [coinPrice, setCoinPrice] = React.useState(Array(coinTypesForESC.length+coinTypesForEthereum.length).fill(0));
+  const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps } = useMintDlg()
   const { diaBalance, pasarLinkChain } = useSignin()
   const { enqueueSnackbar } = useSnackbar();
@@ -236,7 +235,7 @@ export default function CreateItem() {
     if(chainType === 'ESC')
       setCoinUSD(coinPrice[coinType]);
     else if(chainType === 'ETH')
-      setCoinUSD(coinPrice[coinTypesForESC.length+coinType]);
+      setCoinUSD(coinPrice[coinTypesGroup.coinTypesForESC.length+coinType]);
     else setCoinUSD(0)
   }, [coinType, chainType, coinPrice]);
 
