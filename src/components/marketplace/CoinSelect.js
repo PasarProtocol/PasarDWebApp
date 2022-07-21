@@ -21,6 +21,11 @@ export default function CoinSelect({ selected, onChange }) {
     onChange(index)
     handleClosePopup();
   }
+  const filterProp = (coinType) => {
+    if(coinType.name==='ELA')
+      return (theme)=>theme.palette.mode==='dark'?'invert(1)':'none'
+    return 'unset'
+  }
   return (
     <>
       <Button 
@@ -36,7 +41,7 @@ export default function CoinSelect({ selected, onChange }) {
         onClick={openPopupMenu}
         endIcon={<Icon icon={arrowIosDownwardFill}/>}
       >
-        <Box component="img" src={`/static/${coinTypes[selected].icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&selected===0?'invert(1)':'none' }} />
+        <Box component="img" src={`/static/${coinTypes[selected].icon}`} sx={{ width: 18, display: 'inline', filter: filterProp(coinTypes[selected]) }} />
         <span style={{paddingLeft: 4}}>{coinTypes[selected].name}</span>
       </Button>
       <Menu 
@@ -50,7 +55,7 @@ export default function CoinSelect({ selected, onChange }) {
       >
         {coinTypes.map((coin, index)=>(
           <MenuItem key={index} onClick={()=>{handleSelect(index)}} selected={index===selected}>
-            <Box component="img" src={`/static/${coin.icon}`} sx={{ width: 18, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&index===0?'invert(1)':'none' }} />&nbsp;{coin.name}
+            <Box component="img" src={`/static/${coin.icon}`} sx={{ width: 18, display: 'inline', filter: filterProp(coin) }} />&nbsp;{coin.name}
           </MenuItem>
         ))}
       </Menu>
