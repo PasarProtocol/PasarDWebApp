@@ -13,16 +13,16 @@ const NetworkCircle = (props)=>{
             return
         const currentChain = getChainTypeFromId(pasarLinkChain)
         setChainType(currentChain)
-        if(currentChain==='ESC' || currentChain==='ETH')
-            setChainIndex(currentChain==='ESC'?0:1)
+        if(currentChain)
+            setChainIndex(chainTypes.findIndex(item=>item.symbol===currentChain))
     }, [pasarLinkChain])
     
-    let networkName = ''
-    if(chainType === 'ESC')
-        networkName = chainTypes[0].name
-    else if(chainType === 'ETH')
-        networkName = chainTypes[1].name
-    else networkName = 'Unsupported network'
+    let networkName = 'Unsupported network'
+    if(chainType) {
+        const chainItem = chainTypes.find(item=>item.symbol===chainType)
+        if(chainItem)
+            networkName = chainItem.name
+    }
 
     const iconFilter = (theme)=>{
         if(!chainType)
