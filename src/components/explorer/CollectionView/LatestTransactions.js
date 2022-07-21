@@ -42,7 +42,7 @@ export function TransItem({ trans }) {
           </Box>
           <Box>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
-                  {formatDistance(trans.timestamp*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
+                  {trans.timestamp ? formatDistance(trans.timestamp*1000, new Date(), { addSuffix: true }).replace("about","").trim() : ''}
               </Typography>
           </Box>
       </Stack>

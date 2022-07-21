@@ -12,7 +12,7 @@ import BaseOptionChart from './BaseOptionChart';
 import LoadingScreen from '../LoadingScreen';
 import StatisticItem from '../explorer/StatisticPanel/StatisticItem'
 import useSettings from '../../hooks/useSettings';
-import { dateRangeBeforeDays, fetchFrom, getCoinTypeFromToken, setAllTokenPrice, coinTypes, coinTypesForEthereum } from '../../utils/common';
+import { dateRangeBeforeDays, fetchFrom, getCoinTypeFromToken, setAllTokenPrice, getTotalCountOfCoinTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ export default function ChartArea({by, is4Address}) {
   const [clickedDataPoint, setDataPoint] = useState([0,'']);
   const [isLoadingStatisData, setLoadingStatisData] = useState(false);
   const [isLoadingVolumeChart, setLoadingVolumeChart] = useState(true);
-  const [coinPrice, setCoinPrice] = useState(Array(coinTypes.length+coinTypesForEthereum.length).fill(0));
+  const [coinPrice, setCoinPrice] = useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const [controller, setAbortController] = useState(new AbortController());
   const baseOptionChart = BaseOptionChart()
   const mergeChartOption = (dates)=>
