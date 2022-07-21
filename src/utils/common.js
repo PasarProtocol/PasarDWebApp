@@ -788,16 +788,19 @@ export const chainTypes = [
   {
     icon: 'badges/ELA-network.svg',
     name: 'Elastos Smart Chain',
+    symbol: 'ESC',
     color: (theme)=>theme.palette.origin.main
   },
   {
     icon: 'badges/ETH-network.svg',
     name: 'Ethereum',
+    symbol: 'ETH',
     color: '#6A70FA'
   },
   {
     icon: 'badges/FSN-network.svg',
     name: 'Fusion',
+    symbol: 'FSN',
     color: '#1e9ada'
   }
 ]
