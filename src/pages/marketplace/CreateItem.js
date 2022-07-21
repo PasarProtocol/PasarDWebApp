@@ -49,7 +49,7 @@ import { FEEDS_STICKER_CONTRACT_ABI as FEEDS_CONTRACT_ABI } from '../../abi/feed
 import { TOKEN_721_ABI } from '../../abi/token721ABI'
 import { TOKEN_1155_ABI } from '../../abi/token1155ABI'
 import { 
-  ESC_CONTRACT, ETH_CONTRACT,
+  MAIN_CONTRACT,
   feedsContract as FEEDS_CONTRACT_ADDRESS, 
   ipfsURL, 
   auctionOrderType 
@@ -235,7 +235,7 @@ export default function CreateItem() {
     if(chainType === 'ESC')
       setCoinUSD(coinPrice[coinType]);
     else if(chainType === 'ETH')
-      setCoinUSD(coinPrice[coinTypesGroup.coinTypesForESC.length+coinType]);
+      setCoinUSD(coinPrice[coinTypesGroup.ESC.length+coinType]);
     else setCoinUSD(0)
   }, [coinType, chainType, coinPrice]);
 
@@ -1157,7 +1157,7 @@ export default function CreateItem() {
       else
         mintBatch()
   }
-  const baseTokenGroup = { 'PSRC': ESC_CONTRACT.sticker, 'PSREC': ETH_CONTRACT.sticker, 'FSTK': FEEDS_CONTRACT_ADDRESS, 'Choose': selectedCollection.token }
+  const baseTokenGroup = { 'PSRC': MAIN_CONTRACT.ESC.sticker, 'PSREC': MAIN_CONTRACT.ETH.sticker, 'FSTK': FEEDS_CONTRACT_ADDRESS, 'Choose': selectedCollection.token }
 
   return (
     <RootStyle title="CreateItem | PASAR">
