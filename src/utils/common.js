@@ -863,11 +863,9 @@ export const getTotalCountOfCoinTypes = () => Object.entries(coinTypesGroup).red
 
 export const getCoinTypesInCurrentNetwork = (chainId) => {
   const currentChain = getChainTypeFromId(chainId)
-  let tempCoinTypes = coinTypes
-  if(currentChain==='ESC')
-    tempCoinTypes = coinTypes
-  else if(currentChain==='ETH')
-    tempCoinTypes = coinTypesGroup.ETH
+  let tempCoinTypes = coinTypesGroup.ESC
+  if(currentChain)
+    tempCoinTypes = coinTypesGroup[currentChain]
   return tempCoinTypes
 }
 export const getMarketAddressByMarketplaceType = (type) => {
