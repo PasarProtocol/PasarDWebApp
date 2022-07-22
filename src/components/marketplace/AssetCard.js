@@ -36,7 +36,7 @@ import useSingin from '../../hooks/useSignin';
 import BadgeProfile from './BadgeProfile'
 import StyledButton from '../signin-dlg/StyledButton';
 import { auctionOrderType } from '../../config';
-import { getDiaTokenInfo, getCredentialInfo, coinTypes, fetchFrom, collectionTypes, getIpfsUrl, getChainTypeFromId } from '../../utils/common';
+import { fetchFrom, collectionTypes, getIpfsUrl, getChainTypeFromId } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const TimeCountBoxStyle = styled(Box)(({ theme }) => ({

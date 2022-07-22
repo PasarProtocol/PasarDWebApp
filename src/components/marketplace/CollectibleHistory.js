@@ -9,7 +9,7 @@ import palette from '../../theme/palette'
 
 // material
 import LoadingScreen from '../LoadingScreen';
-import { MethodList, reduceHexAddress, getDidInfoFromAddress, getCoinTypeFromToken, coinTypes } from '../../utils/common';
+import { MethodList, reduceHexAddress, getDidInfoFromAddress, getCoinTypeFromToken } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired

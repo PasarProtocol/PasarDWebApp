@@ -35,7 +35,7 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getElaOnEthTokenInfo, getDiaTokenPrice, fetchFrom, getTokenPriceInEthereum, isInAppBrowser, getFSNBalance,
+import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getElaOnEthTokenInfo, getDiaTokenPrice, fetchFrom, getTokenPriceInEthereum, isInAppBrowser,
   getCredentialInfo, checkValidChain, getChainTypeFromId } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 import { creatAndRegister, prepareConnectToHive } from './HiveAPI';

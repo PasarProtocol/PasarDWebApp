@@ -8,7 +8,7 @@ import palette from '../../theme/palette'
 // material
 import LoadingScreen from '../LoadingScreen';
 import Jazzicon from '../Jazzicon';
-import { reduceHexAddress, getTime, getDidInfoFromAddress, coinTypes } from '../../utils/common';
+import { reduceHexAddress, getTime, getDidInfoFromAddress } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired
