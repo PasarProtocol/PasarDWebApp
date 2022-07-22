@@ -452,10 +452,10 @@ export default function SignInDialog() {
         if (isInAppBrowser())
           essentialAddress = await window.elastos.getWeb3Provider().address
         setWalletAddress(essentialAddress);
-        getCredentialInfo(essentialAddress).then(proofData=>{
-          if(proofData)
-            sessionStorage.setItem('KYCedProof', proofData)
-        })
+        // getCredentialInfo(essentialAddress).then(proofData=>{
+        //   if(proofData)
+        //     sessionStorage.setItem('KYCedProof', proofData)
+        // })
         setActivatingConnector(essentialsConnector);
         setSigninEssentialSuccess(true);
         
