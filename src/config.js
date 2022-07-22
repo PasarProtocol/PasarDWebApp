@@ -97,11 +97,13 @@ const rpcUrlForTest = "https://api-testnet.elastos.io/eth"
 const NetworkExplorerServer = {
   MainNet: {
     ESC: "https://esc.elastos.io",
-    ETH: "https://etherscan.io"
+    ETH: "https://etherscan.io",
+    FSN: "https://fsnscan.com"
   },
   TestNet: {
     ESC: "https://esc-testnet.elastos.io",
-    ETH: "https://ropsten.etherscan.io"
+    ETH: "https://ropsten.etherscan.io",
+    FSN: "https://blocks.fusionnetwork.io/#!/transaction"
   }
 }
 

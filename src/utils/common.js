@@ -842,6 +842,9 @@ export const getExplorerSrvByNetwork = (netType) => {
     case 2:
       explorerSrvUrl = ExplorerServer.ETH
       break;
+    case 3:
+      explorerSrvUrl = ExplorerServer.FSN
+      break;
     default:
       explorerSrvUrl = ExplorerServer.ESC
       break;
