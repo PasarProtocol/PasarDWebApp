@@ -55,7 +55,7 @@ import {
   auctionOrderType 
 } from '../../config'
 import { hash, removeLeadingZero, callContractMethod, isInAppBrowser, getCoinTypesInCurrentNetwork, getDiaBalanceDegree, isValidLimitPrice, checkWhetherGeneralCollection, 
-  getFilteredGasPrice, getChainTypeFromId, getContractAddressInCurrentNetwork, coinTypesGroup, getTotalCountOfCoinTypes, setAllTokenPrice } from '../../utils/common';
+  getFilteredGasPrice, getChainTypeFromId, getContractAddressInCurrentNetwork, coinTypesGroup, getTotalCountOfCoinTypes, setAllTokenPrice, getStartPosOfCoinTypeByChainType } from '../../utils/common';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
@@ -128,7 +128,7 @@ export default function CreateItem() {
   const [moreDIAOpen, setOpenMoreDIA] = React.useState(false);
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
-  const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps, getStartPosOfCoinTypeByChainType } = useMintDlg()
+  const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps } = useMintDlg()
   const { diaBalance, pasarLinkChain } = useSignin()
   const { enqueueSnackbar } = useSnackbar();
   const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain)
