@@ -128,7 +128,7 @@ export default function CreateItem() {
   const [moreDIAOpen, setOpenMoreDIA] = React.useState(false);
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
-  const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps } = useMintDlg()
+  const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setApprovalFunction, setCurrent, setTotalSteps, getStartPosOfCoinTypeByChainType } = useMintDlg()
   const { diaBalance, pasarLinkChain } = useSignin()
   const { enqueueSnackbar } = useSnackbar();
   const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain)
@@ -232,10 +232,10 @@ export default function CreateItem() {
   }, [itemtype]);
 
   React.useEffect(() => {
-    if(chainType === 'ESC')
-      setCoinUSD(coinPrice[coinType]);
-    else if(chainType === 'ETH')
-      setCoinUSD(coinPrice[coinTypesGroup.ESC.length+coinType]);
+    if(chainType) {
+      const startPos = getStartPosOfCoinTypeByChainType(chainType)
+      setCoinUSD(coinPrice[startPos+coinType])
+    }
     else setCoinUSD(0)
   }, [coinType, chainType, coinPrice]);
 

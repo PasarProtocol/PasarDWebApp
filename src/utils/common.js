@@ -794,18 +794,21 @@ export const chainTypes = [
     icon: 'badges/ELA-network.svg',
     name: 'Elastos Smart Chain',
     symbol: 'ESC',
+    token: 'ELA',
     color: (theme)=>theme.palette.origin.main
   },
   {
     icon: 'badges/ETH-network.svg',
     name: 'Ethereum',
     symbol: 'ETH',
+    token: 'ETH',
     color: '#6A70FA'
   },
   {
     icon: 'badges/FSN-network.svg',
     name: 'Fusion',
     symbol: 'FSN',
+    token: 'FSN',
     color: '#1e9ada'
   }
 ]
@@ -835,20 +838,11 @@ export const getStartPosOfCoinTypeByChainType = (chainType) => {
 }
 export const getExplorerSrvByNetwork = (netType) => {
   let explorerSrvUrl = ""
-  switch(netType) {
-    case 1:
-      explorerSrvUrl = ExplorerServer.ESC
-      break;
-    case 2:
-      explorerSrvUrl = ExplorerServer.ETH
-      break;
-    case 3:
-      explorerSrvUrl = ExplorerServer.FSN
-      break;
-    default:
-      explorerSrvUrl = ExplorerServer.ESC
-      break;
-  }
+  const chainType = chainTypes[netType-1]
+  if(chainType)
+    explorerSrvUrl = ExplorerServer[chainType.symbol]
+  else
+    explorerSrvUrl = ExplorerServer.ESC
   return explorerSrvUrl
 }
 export const getContractAddressInCurrentNetwork = (chainId, type) => {
@@ -878,7 +872,7 @@ export const getCoinTypesInCurrentNetwork = (chainId) => {
 }
 export const getMarketAddressByMarketplaceType = (type) => {
   const marketAddresses = Object.values(MAIN_CONTRACT).map(item=>item.market)
-  if(type>=1 && type<=2)
+  if(type>0 && type<=marketAddresses.length)
     return marketAddresses[type-1]
   return marketAddresses[0]
 }
@@ -886,16 +880,20 @@ export const getCoinTypeFromToken = (item) => {
   let coinTypeIndex = 0
   if(item) {
     const { quoteToken=blankAddress, marketPlace=1 } = item
-    if(marketPlace!==2) {
-      coinTypeIndex = coinTypes.findIndex(el=>el.address===quoteToken)
-      coinTypeIndex = coinTypeIndex<0?0:coinTypeIndex
-      return {index: coinTypeIndex, ...coinTypes[coinTypeIndex]}
+    let tempCoinTypes = []
+    let tempChainType = ""
+    if(marketPlace>0 && marketPlace<=Object.keys(coinTypesGroup).length) {
+      tempCoinTypes = Object.values(coinTypesGroup)[marketPlace-1]
+      tempChainType = Object.keys(coinTypesGroup)[marketPlace-1]
+    } else {
+      tempCoinTypes = coinTypesGroup.ESC
+      tempChainType = "ESC"
     }
-    coinTypeIndex = coinTypesGroup.ETH.findIndex(el=>el.address===quoteToken)
-    coinTypeIndex = coinTypeIndex<0?0:coinTypeIndex
-    return {index: coinTypeIndex+coinTypes.length, ...coinTypesGroup.ETH[coinTypeIndex]}
+    const startPos = getStartPosOfCoinTypeByChainType(tempChainType)
+    coinTypeIndex = Math.max(tempCoinTypes.findIndex(el=>el.address===quoteToken), 0)
+    return {index: coinTypeIndex+startPos, ...tempCoinTypes[coinTypeIndex]}
   }
-  return {index: coinTypeIndex, ...coinTypes[coinTypeIndex]}
+  return {index: coinTypeIndex, ...coinTypesGroup.ESC[coinTypeIndex]}
 }
 export const sendIpfsDidJson = async () => {
   const client = create(`${PasarIpfs}/`);

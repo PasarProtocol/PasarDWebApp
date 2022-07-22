@@ -571,6 +571,8 @@ export default function SignInDialog() {
     totalBalance = math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2)
   else if(chainType==='ETH')
     totalBalance = math.round(math.round(tokenPricesInETH[0] * balance, 2) + math.round(tokenPricesInETH[1] * elaOnEthBalance, 2), 2)
+  else if(chainType==='FSN')
+    totalBalance = math.round(tokenPricesInETH[2] * balance, 2)
 
   const balanceListByNetwork = {
     ESC: [
