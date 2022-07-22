@@ -486,7 +486,7 @@ export default function CollectibleDetail() {
     properties = collectible.properties || collectible.attribute
 
   let chainType = 0
-  if(collectible.marketPlace>=1 && collectible.marketPlace<=2)
+  if(collectible.marketPlace && collectible.marketPlace<=chainTypes.length)
     chainType = collectible.marketPlace - 1
   else if(!collectible || Object.keys(collectible).length===0)
     chainType = -1
