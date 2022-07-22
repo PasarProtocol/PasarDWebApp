@@ -310,10 +310,10 @@ const CollectionCardPaper = (props) => {
           setBadgeFlag('dia', dia)
         else setBadgeFlag('dia', 0)
       })
-      getCredentialInfo(owner).then(proofData=>{
-        if(proofData)
-          setBadgeFlag('kyc', true)
-      })
+      // getCredentialInfo(owner).then(proofData=>{
+      //   if(proofData)
+      //     setBadgeFlag('kyc', true)
+      // })
     }
   }, [owner]);
   
@@ -440,16 +440,16 @@ const CollectionCardPaper = (props) => {
               </TypographyStyle>
             }
             <Stack sx={{justifyContent: 'center', pt: 1}} spacing={1} direction="row">
-            {
-              badge.dia>0 && <DIABadge balance={badge.dia}/>
-            }
-            {
-              badge.kyc&&
-              <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
-              </Tooltip>
-            }
-          </Stack>
+              {
+                badge.dia>0 && <DIABadge balance={badge.dia}/>
+              }
+              {
+                badge.kyc&&
+                <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
+                  <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
+                </Tooltip>
+              }
+            </Stack>
           </Stack>
         </Box>
       </PaperRecord>

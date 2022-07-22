@@ -73,8 +73,8 @@ const addressForTest = {
     },
     FSN: {
       sticker: blankAddress,
-      market: "0xf99068a66aE783dCe4f7a811b09fe1CF071E4414",
-      register: "0xf99068a66aE783dCe4f7a811b09fe1CF071E4414"
+      market: "0xa18279eBDfA5747e79DBFc23fa999b4Eaf2A9780",
+      register: "0x020c7303664bc88ae92cE3D380BF361E03B78B81"
     }
   },
   feedsContract: "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961",
