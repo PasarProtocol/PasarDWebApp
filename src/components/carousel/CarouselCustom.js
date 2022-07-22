@@ -10,7 +10,7 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 //
 import { CarouselControlsPaging2 } from './controls';
 import CopyButton from '../CopyButton';
-import { getTime, reduceHexAddress } from '../../utils/common';
+import { getTime, reduceHexAddress, chainTypes } from '../../utils/common';
 import { MAIN_CONTRACT, blockchain } from '../../config'
 
 // ----------------------------------------------------------------------
@@ -132,6 +132,14 @@ export default function CarouselCustom({pgsize, detail}) {
       sx: { mt: 3 }
     })
   };
+  
+  const tempChainTypes = [...chainTypes]
+  tempChainTypes[0].name = 'Elastos Smart Chain (ESC)'
+  let chainType = 0
+  if(detail.marketPlace && detail.marketPlace<=chainTypes.length)
+    chainType = detail.marketPlace - 1
+  const network = tempChainTypes[chainType].name
+
   const creatimestamp = getTime(detail.createTime)
   const checkIfHolderIsMarket = Object.values(MAIN_CONTRACT).findIndex(item=>item.market===detail.holder)
   const detailInfo = {
@@ -141,7 +149,7 @@ export default function CarouselCustom({pgsize, detail}) {
     holder: checkIfHolderIsMarket<0?detail.holder:detail.royaltyOwner,
     // collection: 'Feeds NFT Sticker - FSTK',
     tokenStandard: detail.is721?'ERC-721':'ERC-1155',
-    'blockchain': blockchain,
+    blockchain: network,
     // status: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?'Not on sale':'Listed on Pasar'
     status: detail.DateOnMarket&&detail.DateOnMarket.startsWith('Not')?0:1
   }
