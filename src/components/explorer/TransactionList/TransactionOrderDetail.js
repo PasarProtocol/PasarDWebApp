@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import MethodLabel from '../../MethodLabel';
 import CopyButton from '../../CopyButton';
-import { MethodList, reduceHexAddress, getTime, getCoinTypeFromToken, getMarketAddressByMarketplaceType, getExplorerSrvByNetwork } from '../../../utils/common';
+import { MethodList, reduceHexAddress, getTime, getCoinTypeFromToken, getMarketAddressByMarketplaceType, getExplorerSrvByNetwork, chainTypes } from '../../../utils/common';
 import {v1marketContract} from '../../../config'
 
 TransactionOrderDetail.propTypes = {
@@ -75,7 +75,11 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
     if(!methodItem)
         methodItem = {color: 'grey', icon: 'tag', detail: []}
 
-    const feeTokenName = marketPlace!==2 ? 'ELA' : 'ETH'
+    const tempChainType = chainTypes[marketPlace-1]
+    let feeTokenName = 'ELA'
+    if(tempChainType)
+        feeTokenName = tempChainType.token
+
     let totalSum = `${gasFee} ${feeTokenName}`
     if(method==="BuyOrder") {
         if(coinName === feeTokenName)

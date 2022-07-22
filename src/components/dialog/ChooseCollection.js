@@ -8,7 +8,7 @@ import checkCircleIcon from '@iconify-icons/akar-icons/circle-check-fill';
 
 import StyledButton from '../signin-dlg/StyledButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
-import { reduceHexAddress, isInAppBrowser, fetchFrom, getIpfsUrl, getERCType } from '../../utils/common';
+import { reduceHexAddress, isInAppBrowser, fetchFrom, getIpfsUrl, getERCType, chainTypes } from '../../utils/common';
 
 export default function ChooseCollection(props) {
   const location = useLocation();
@@ -24,16 +24,11 @@ export default function ChooseCollection(props) {
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
-      let chainParam = -1
-      if(chainType === 'ESC')
-        chainParam = 1
-      else if(chainType === 'ETH')
-        chainParam = 2
-
       let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0]
       if (isInAppBrowser())
         essentialAddress = await window.elastos.getWeb3Provider().address
       
+      const chainParam = chainTypes.findIndex(item=>item.symbol===chainType)
       if(essentialAddress)
         fetchFrom(`api/v2/sticker/getCollectionByOwner/${essentialAddress}?marketPlace=${chainParam}`, { signal })
           .then((response) => {
