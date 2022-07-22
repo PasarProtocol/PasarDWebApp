@@ -17,7 +17,7 @@ import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
 import Badge from '../Badge';
 import DIABadge from '../DIABadge';
 import useSingin from '../../hooks/useSignin';
-import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, coinTypes, getInfoFromDID, getAssetImage, 
+import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, getInfoFromDID, getAssetImage, 
   checkWhetherGeneralCollection, chainTypes } from '../../utils/common';
 
 // ----------------------------------------------------------------------
