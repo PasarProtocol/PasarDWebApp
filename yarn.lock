@@ -1620,10 +1620,10 @@
     svelte-i18n "^3.3.6"
     web3-core "^1.6.1"
 
-"@elastosfoundation/essentials-connector-client-browser@^1.0.37":
-  version "1.0.38"
-  resolved "https://registry.yarnpkg.com/@elastosfoundation/essentials-connector-client-browser/-/essentials-connector-client-browser-1.0.38.tgz#600967e74c01ce35f14b9000aa0ead4d675a4d75"
-  integrity sha512-raXo4jLSZ+PraedV0zoo93m0wWlkzasiP88nfN1mLaAreWaaChqwWqswV5rHkm2sTBAey8cMdvOkwrDwddLA7g==
+"@elastosfoundation/essentials-connector-client-browser@1.0.41":
+  version "1.0.41"
+  resolved "https://registry.yarnpkg.com/@elastosfoundation/essentials-connector-client-browser/-/essentials-connector-client-browser-1.0.41.tgz#203e4dbc72b0fc3b101489255b469540c09935f1"
+  integrity sha512-X8e1ZImID08APjxmoWSQBf/gX3ubswsBOAG4q3EGQ1yCEngrRr0lMi1V5wTeYtLDurNJOcn5tbh/TlJqGJMdlQ==
   dependencies:
     "@elastosfoundation/did-js-sdk" "^2.2.7"
     "@walletconnect/client" "^1.7.0"
