@@ -7,7 +7,7 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 // material
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
-import { MethodList, reduceHexAddress, getExplorerSrvByNetwork } from '../../../utils/common';
+import { MethodList, reduceHexAddress, getExplorerSrvByNetwork, chainTypes } from '../../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,
@@ -17,6 +17,12 @@ export function TransItem({ trans }) {
   if(!methodItem)
       methodItem = {color: 'grey', icon: 'tag', detail: []}
   const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
+
+  const tempChainType = chainTypes[trans.marketPlace-1]
+  let feeTokenName = 'ELA'
+  if(tempChainType)
+      feeTokenName = tempChainType.token
+
   return (
       <Stack direction="row" spacing={2}>
           <Link href={`/explorer/collectible/detail/${[trans.tokenId, trans.baseToken].join('&')}`} underline="none" sx={{borderRadius: 1}} >
@@ -37,7 +43,7 @@ export function TransItem({ trans }) {
                 </Link>
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
-                  Tx Fee : {trans.gasFee?trans.gasFee:0} ELA
+                  Tx Fee : {trans.gasFee || 0} {feeTokenName}
               </Typography>
           </Box>
           <Box>
