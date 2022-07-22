@@ -28,18 +28,46 @@ export default function ChooseCollection(props) {
       if (isInAppBrowser())
         essentialAddress = await window.elastos.getWeb3Provider().address
       
-      const chainParam = chainTypes.findIndex(item=>item.symbol===chainType)
+      const chainParam = chainTypes.findIndex(item=>item.symbol===chainType)+1
       if(essentialAddress)
         fetchFrom(`api/v2/sticker/getCollectionByOwner/${essentialAddress}?marketPlace=${chainParam}`, { signal })
           .then((response) => {
             response.json().then((jsonCollections) => {
               if(!jsonCollections.data)
                 return
-              const tempCollections = jsonCollections.data.map((item, index)=>{
+              const resCollections = jsonCollections.data.map((item, index)=>{
                 const tempItem = {...item, avatar: '', index}
                 return tempItem
               })
-              setCollections(tempCollections)
+              setCollections(resCollections)
+              resCollections.forEach((item, _i)=>{
+                fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${item.token}?marketPlace=${item.marketPlace}`)
+                  .then((response) => {
+                    response.json().then((jsonData) => {
+                      setCollections((prevStatus)=>{
+                        const tempCollections = [...prevStatus]
+                        tempCollections[_i].items = jsonData.data.total
+                        return tempCollections
+                      })
+                    })
+                  })
+                
+                if(!item.uri || item.avatar)
+                  return
+                const metaUri = getIpfsUrl(item.uri)
+                if(metaUri) {
+                  fetch(metaUri)
+                    .then(response => response.json())
+                    .then(data => {
+                      setCollections((prevStatus)=>{
+                        const tempCollections = [...prevStatus]
+                        tempCollections[_i].avatar = getIpfsUrl(data.data.avatar)
+                        return tempCollections
+                      })
+                    })
+                    .catch(console.log);
+                }
+              })
             })
           })
           .catch(error=>{})
@@ -72,37 +100,6 @@ export default function ChooseCollection(props) {
           }
         }
       }
-    }
-    
-    if(collections.length) {
-      collections.forEach((item, _i)=>{
-        fetchFrom(`api/v2/sticker/getTotalCountCollectibles/${item.token}?marketPlace=${item.marketPlace}`)
-          .then((response) => {
-            response.json().then((jsonData) => {
-              setCollections((prevStatus)=>{
-                const tempCollections = [...prevStatus]
-                tempCollections[_i].items = jsonData.data.total
-                return tempCollections
-              })
-            })
-          })
-        
-        if(!item.uri || item.avatar)
-          return
-        const metaUri = getIpfsUrl(item.uri)
-        if(metaUri) {
-          fetch(metaUri)
-            .then(response => response.json())
-            .then(data => {
-              setCollections((prevStatus)=>{
-                const tempCollections = [...prevStatus]
-                tempCollections[_i].avatar = getIpfsUrl(data.data.avatar)
-                return tempCollections
-              })
-            })
-            .catch(console.log);
-        }
-      })
     }
   }, [collections.length]);
 
