@@ -547,11 +547,13 @@ export function callContractMethod(type, coinType, chainId, paramObj) {
   });
 }
 
-export function getContractInfo(strAddress) {
+export function getContractInfo(connectProvider, strAddress) {
   return new Promise((resolve, reject) => {
     try{
       let walletConnectWeb3
-      if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+      if(connectProvider)
+        walletConnectWeb3 = new Web3(connectProvider)
+      else if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
         walletConnectWeb3 = new Web3(Web3.givenProvider || Web3.currentProvider || window.ethereum)
       else
         walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));

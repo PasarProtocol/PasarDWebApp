@@ -38,7 +38,7 @@ import useOffSetTop from '../../hooks/useOffSetTop';
 import useSingin from '../../hooks/useSignin';
 
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, removeLeadingZero, isNumberString, getContractInfo, getChainTypeFromId, socialTypes, getDiaBalanceDegree, fetchFrom, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
+import { isInAppBrowser, removeLeadingZero, isNumberString, getChainTypeFromId, socialTypes, getDiaBalanceDegree, fetchFrom, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)
