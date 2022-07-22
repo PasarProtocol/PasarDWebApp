@@ -316,7 +316,7 @@ export function setAllTokenPrice(setCoinPriceByType) {
     setCoinPriceByType(0, res)
   });
   getDiaTokenPrice().then((res) => {
-    if(!res)
+    if(!res || !res.token)
       return
     setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
   })
@@ -324,7 +324,7 @@ export function setAllTokenPrice(setCoinPriceByType) {
     if(_i<2)
       return
     getERC20TokenPrice(token.address).then((res) => {
-      if(!res)
+      if(!res || !res.token)
         return
       setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice)
     })
