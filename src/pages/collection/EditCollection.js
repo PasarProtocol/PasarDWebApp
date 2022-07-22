@@ -38,7 +38,7 @@ import {ipfsURL} from '../../config'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSingin from '../../hooks/useSignin';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
-import { isInAppBrowser, fetchFrom, getIpfsUrl, isNumberString, getContractInfo, getFilteredGasPrice, socialTypes, getContractAddressInCurrentNetwork } from '../../utils/common';
+import { isInAppBrowser, fetchFrom, getIpfsUrl, isNumberString, getFilteredGasPrice, socialTypes, getContractAddressInCurrentNetwork } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const client = create(`${ipfsURL}/`)

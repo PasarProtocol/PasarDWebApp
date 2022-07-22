@@ -196,7 +196,7 @@ export default function ImportCollection() {
     return isString(file)?file:file.preview
   }
   const getCollectionInfo = (inputAddress) => {
-    getContractInfo(inputAddress).then(res=>{
+    getContractInfo(essentialsConnector.getWalletConnectProvider(), inputAddress).then(res=>{
       setCollectionInfo(res)
       setAutoLoaded(true)
     }).catch(e=>{
