@@ -151,6 +151,11 @@ export const getBalance = async (connectProvider) => {
   const balance = await walletConnectWeb3.eth.getBalance(accounts[0]);
   return balance;
 };
+export const getFSNBalance = async (address) => {
+  const walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider("https://testnet.fusionnetwork.io"));
+  const balance = await walletConnectWeb3.eth.getBalance(address);
+  return balance;
+};
 
 export const getBalanceByAllCoinTypes = (connectProvider, chainId, balanceHandler) =>
   new Promise((resolve, reject) => {
@@ -187,7 +192,7 @@ export const getBalanceByAllCoinTypes = (connectProvider, chainId, balanceHandle
 export const getDiaBalanceDegree = (balance, chainId) => {
   const chainType = getChainTypeFromId(chainId)
   const diaBalance = balance*1
-  if(chainType === 'ETH')
+  if(chainType && chainType !== 'ESC')
     return 4
   if(diaBalance >= 1)
     return 3

@@ -35,7 +35,7 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
-import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getElaOnEthTokenInfo, getDiaTokenPrice, fetchFrom, getTokenPriceInEthereum, isInAppBrowser, 
+import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getElaOnEthTokenInfo, getDiaTokenPrice, fetchFrom, getTokenPriceInEthereum, isInAppBrowser, getFSNBalance,
   getCredentialInfo, checkValidChain, getChainTypeFromId } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 import { creatAndRegister, prepareConnectToHive } from './HiveAPI';
@@ -571,6 +571,20 @@ export default function SignInDialog() {
     totalBalance = math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2)
   else if(chainType==='ETH')
     totalBalance = math.round(math.round(tokenPricesInETH[0] * balance, 2) + math.round(tokenPricesInETH[1] * elaOnEthBalance, 2), 2)
+
+  const balanceListByNetwork = {
+    ESC: [
+      { icon: 'elastos.svg', symbol: 'ELA', name: 'Elastos (ESC)', balance, balanceUSD: coinUSD * balance },
+      { icon: 'badges/diamond.svg', symbol: 'DIA', name: 'Diamond (ESC)', balance: diaBalance, balanceUSD: diaUSD * diaBalance },
+    ],
+    ETH: [
+      { icon: 'erc20/ETH.svg', symbol: 'ETH', name: 'Ether (Ethereum)', balance, balanceUSD: tokenPricesInETH[0] * balance },
+      { icon: 'erc20/ELAonETH.svg', symbol: 'ELA on ETH', name: 'Elastos (Ethereum)', balance: elaOnEthBalance, balanceUSD: tokenPricesInETH[1] * elaOnEthBalance },
+    ],
+    FSN: [
+      { icon: 'erc20/FSN.svg', symbol: 'FSN', name: 'Fusion (FSN)', balance, balanceUSD: tokenPricesInETH[2] * balance },
+    ]
+  }
   return (
     <>
       {walletAddress ? (
@@ -632,126 +646,34 @@ export default function SignInDialog() {
                   </Button>
                 </PaperRecord>
                 {
-                  chainType==='ESC' &&
-                  <>
-                    <PaperRecord sx={{ p: 1.5 }}>
+                  !!chainType &&
+                  balanceListByNetwork[chainType].map((item, _i)=>(
+                    <PaperRecord sx={{ p: 1.5 }} key={_i}>
                       <Stack direction="row" alignItems="center" spacing={2}>
                         <Box
                           draggable={false}
                           component="img"
                           alt=""
-                          src="/static/elastos.svg"
-                          sx={{ width: 24, height: 24, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}
+                          src={`/static/${item.icon}`}
+                          sx={{ width: 24, height: 24, filter: item.symbol==="ELA" ? (theme)=>(theme.palette.mode==='dark'?'invert(1)':'none') : 'unset' }}
                         />
                         <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                          <Typography variant="body2"> ELA </Typography>
+                          <Typography variant="body2"> {item.symbol} </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {' '}
-                            Elastos (ESC){' '}
+                            {' '}{item.name}{' '}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="body2" align="right">
-                            {' '}
-                            {balance}{' '}
+                            {' '}{item.balance}{' '}
                           </Typography>
                           <Typography variant="body2" align="right" color="text.secondary">
-                            {' '}
-                            USD {math.round(coinUSD * balance, 2)}{' '}
+                            {' '}USD {math.round(item.balanceUSD, 2)}{' '}
                           </Typography>
                         </Box>
                       </Stack>
                     </PaperRecord>
-                    <PaperRecord sx={{ p: 1.5 }}>
-                      <Stack direction="row" alignItems="center" spacing={2}>
-                        <Box
-                          draggable={false}
-                          component="img"
-                          alt=""
-                          src="/static/badges/diamond.svg"
-                          sx={{ width: 24, height: 24 }}
-                        />
-                        <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                          <Typography variant="body2"> DIA </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {' '}
-                            Diamond (ESC){' '}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography variant="body2" align="right">
-                            {' '}
-                            {diaBalance}{' '}
-                          </Typography>
-                          <Typography variant="body2" align="right" color="text.secondary">
-                            {' '}
-                            USD {math.round(diaUSD * diaBalance, 2)}{' '}
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </PaperRecord>
-                  </>
-                }
-                {
-                  chainType==='ETH' &&
-                  <>
-                    <PaperRecord sx={{ p: 1.5 }}>
-                      <Stack direction="row" alignItems="center" spacing={2}>
-                        <Box
-                          draggable={false}
-                          component="img"
-                          alt=""
-                          src="/static/erc20/ETH.svg"
-                          sx={{ width: 24, height: 24, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}
-                        />
-                        <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                          <Typography variant="body2"> ETH </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {' '}
-                            Ether (Ethereum){' '}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography variant="body2" align="right">
-                            {' '}
-                            {balance}{' '}
-                          </Typography>
-                          <Typography variant="body2" align="right" color="text.secondary">
-                            {' '}
-                            USD {math.round(tokenPricesInETH[0] * balance, 2)}{' '}
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </PaperRecord>
-                    <PaperRecord sx={{ p: 1.5 }}>
-                      <Stack direction="row" alignItems="center" spacing={2}>
-                        <Box
-                          draggable={false}
-                          component="img"
-                          alt=""
-                          src="/static/erc20/ELAonETH.svg"
-                          sx={{ width: 24, height: 24 }}
-                        />
-                        <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                          <Typography variant="body2"> ELA on ETH </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {' '}
-                            Elastos (Ethereum){' '}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography variant="body2" align="right">
-                            {' '}
-                            {elaOnEthBalance}{' '}
-                          </Typography>
-                          <Typography variant="body2" align="right" color="text.secondary">
-                            {' '}
-                            USD {math.round(tokenPricesInETH[1] * elaOnEthBalance, 2)}{' '}
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </PaperRecord>
-                  </>
+                  ))
                 }
               </Stack>
             </Box>
