@@ -190,6 +190,8 @@ export default function SignInDialog() {
       if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
         getDiaTokenPrice(library.provider)
           .then((res) => {
+            if(!res || !res.token)
+              return
             setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
           })
           .catch((error) => {
@@ -200,6 +202,8 @@ export default function SignInDialog() {
           const elastosWeb3Provider = await window.elastos.getWeb3Provider();
           getDiaTokenPrice(elastosWeb3Provider)
             .then((res) => {
+              if(!res || !res.token)
+                return
               setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
             })
             .catch((error) => {
@@ -210,6 +214,8 @@ export default function SignInDialog() {
           const essentialProvider = essentialsConnector.getWalletConnectProvider();
           getDiaTokenPrice(essentialProvider)
             .then((res) => {
+              if(!res || !res.token)
+                return
               setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
             })
             .catch((error) => {

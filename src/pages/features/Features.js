@@ -117,6 +117,8 @@ export default function Features() {
   React.useEffect(() => {
     getDiaTokenPrice()
       .then((res) => {
+        if(!res || !res.token)
+          return
         setDiaUSD(math.round(res.token.derivedELA * res.bundle.elaPrice, 2));
       })
       .catch((error) => {
