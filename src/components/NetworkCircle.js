@@ -35,6 +35,7 @@ const NetworkCircle = (props)=>{
                 align="center"
                 sx={{
                     minWidth: 40, 
+                    width: 40,
                     height: 40,
                     p: 1,
                     ml: 1,
