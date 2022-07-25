@@ -9,10 +9,12 @@ import { customShadows } from '../theme/shadows';
 Badge.propTypes = {
   name: PropTypes.string
 };
-const backColor = {"pasar": "#FF5082", "diamond": "#E5E5E5", "user": "#E8EC21", "kyc": "#000", "thumbup": "#25CD7C", "thumbdown": "#D60000", "custom": "#2B86DA"}
+const backColor = {"pasar": "#FF5082", "diamond": "#E5E5E5", "user": "#E8EC21", "kyc": "transparent", "thumbup": "#25CD7C", "thumbdown": "#D60000", "custom": "#2B86DA"}
 export default function Badge({ name, value="", sx }) {
   const src = `/static/badges/${name}.svg`
   const color = backColor[name]
+  const containerSx = name==='kyc' ? {} : { p: value.length?'5px 10px':'3px', boxShadow: (theme)=>theme.palette.mode==='light'?customShadows.dark.origin:customShadows.light.origin }
+  const imgSx = { width: value.length?16:20, height: value.length?16:20 }
   return (
     <Stack
       direction='row'
@@ -20,8 +22,8 @@ export default function Badge({ name, value="", sx }) {
         height: 26,
         backgroundColor: color,
         borderRadius: '100%',
-        p: value.length?'5px 10px':'3px',
-        boxShadow: (theme)=>theme.palette.mode==='light'?customShadows.dark.origin:customShadows.light.origin,
+        alignItems: 'center',
+        ...containerSx,
         ...sx
       }}
     >
@@ -30,7 +32,7 @@ export default function Badge({ name, value="", sx }) {
         component="img"
         alt=""
         src={src}
-        sx={{ width: value.length?16:20, height: value.length?16:20 }}
+        sx={imgSx}
       />
       {
         value.length>0 && <Typography variant="body2" sx={{display: 'flex', alignItems: 'center', color: 'white', pl: .5}}>{value}</Typography>
