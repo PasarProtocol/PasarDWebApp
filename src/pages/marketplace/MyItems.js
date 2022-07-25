@@ -324,7 +324,7 @@ export default function MyItems() {
             />
           </Box>
           <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
-            <Stack direction="row" sx={{justifyContent: 'center'}} spacing={2}>
+            <Stack direction="row" sx={{justifyContent: 'center'}}>
               <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink} color='text.primary'>
                 <span role="img" aria-label="">
                   {didInfo.name || reduceHexAddress(walletAddress)}
@@ -334,7 +334,7 @@ export default function MyItems() {
                 {
                   badge.kyc&&
                   <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                    <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
+                    <Box sx={{display: 'inline-flex'}} ml={2}><Badge name="kyc"/></Box>
                   </Tooltip>
                 }
               </Stack>
