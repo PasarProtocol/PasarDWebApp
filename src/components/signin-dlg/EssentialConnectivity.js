@@ -1,5 +1,6 @@
 import { connectivity } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
+import { ApplicationDID } from '../../config';
 
 export const essentialsConnector = new EssentialsConnector();
 
@@ -18,6 +19,7 @@ export function initConnectivitySDK() {
   }
 
   connectivity.registerConnector(essentialsConnector).then(() => {
+    connectivity.setApplicationDID(ApplicationDID);
     connectivityInitialized = true;
 
     console.log('essentialsConnector', essentialsConnector);
