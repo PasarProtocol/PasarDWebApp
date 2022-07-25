@@ -268,7 +268,7 @@ export default function MyProfile() {
       .fill(0)
       .forEach((_, i) => {
         setLoadingAssetsOfType(i, true);
-        fetchFrom(`api/v2/sticker/${apiNames[i]}/${walletAddress}?orderType=${order}`, { signal })
+        fetchFrom(`api/v2/sticker/${apiNames[i]}/${walletAddress}?orderType=${order}&marketPlace=${chainType}`, { signal })
           .then((response) => {
             response.json().then((jsonAssets) => {
               setAssetsOfType(i, jsonAssets.data);
@@ -335,7 +335,7 @@ export default function MyProfile() {
             />
           </Box>
           <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
-            <Stack direction="row" sx={{justifyContent: 'center'}} spacing={2}>
+            <Stack direction="row" sx={{justifyContent: 'center'}}>
               <Link to={`/explorer/transaction/detail/${walletAddress}`} component={RouterLink} color='text.primary'>
                 <span role="img" aria-label="">
                   {didInfo.name || reduceHexAddress(walletAddress)}
@@ -345,7 +345,7 @@ export default function MyProfile() {
                 {
                   badge.kyc&&
                   <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                    <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
+                    <Box sx={{display: 'inline-flex'}} ml={2}><Badge name="kyc"/></Box>
                   </Tooltip>
                 }
               </Stack>
@@ -399,7 +399,7 @@ export default function MyProfile() {
                   </ToggleButton>
                 </ToggleButtonGroup>
               </Stack>
-            <ChainSelect selected={chainType} onChange={setChainType} sx={{width: '100%'}}/>
+              <ChainSelect selected={chainType} onChange={setChainType} sx={{width: '100%'}}/>
             </Stack>
           </MHidden>
         </Box>
