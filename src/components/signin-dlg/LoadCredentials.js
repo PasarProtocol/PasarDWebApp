@@ -126,7 +126,7 @@ export const fetchHiveScriptPicture = async (hiveScriptUrl, did) => {
 
 export const getUserCredentials = async (did) => {
   try {
-    let avatarUrl;
+    let avatarUrl = '';
     const credentials = await getCredentialsFromDID(did);
     if (credentials && credentials.avatar) {
       const hiveAvatarUrl = getHiveAvatarUrlFromDIDAvatarCredential(credentials.avatar);
