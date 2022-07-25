@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import { Stack, Box, Typography } from '@mui/material';
 
-import { customShadows } from '../theme/shadows';
+import { customShadows } from '../../theme/shadows';
 // ----------------------------------------------------------------------
 
 Badge.propTypes = {
@@ -13,8 +13,8 @@ const backColor = {"pasar": "#FF5082", "diamond": "#E5E5E5", "user": "#E8EC21", 
 export default function Badge({ name, value="", sx }) {
   const src = `/static/badges/${name}.svg`
   const color = backColor[name]
-  const containerSx = name==='kyc' ? {} : { p: value.length?'5px 10px':'3px', boxShadow: (theme)=>theme.palette.mode==='light'?customShadows.dark.origin:customShadows.light.origin }
-  const imgSx = { width: value.length?16:20, height: value.length?16:20 }
+  const containerSx = name==='kyc' ? { height: '100%', maxHeight: '2rem', maxWidth: '2rem' } : { p: value.length?'5px 10px':'3px', boxShadow: (theme)=>theme.palette.mode==='light'?customShadows.dark.origin:customShadows.light.origin }
+  const imgSx = name==='kyc' ? { height: '100%' } : { width: value.length?16:20, height: value.length?16:20 }
   return (
     <Stack
       direction='row'

@@ -31,8 +31,9 @@ import RingAvatar from '../../components/RingAvatar';
 import AddressCopyButton from '../../components/AddressCopyButton';
 import StatisticPanel from '../../components/collection/StatisticPanel'
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
-import Badge from '../../components/Badge';
-import DIABadge from '../../components/DIABadge';
+import Badge from '../../components/badge/Badge';
+import KYCBadge from '../../components/badge/KYCBadge';
+import DIABadge from '../../components/badge/DIABadge';
 import { fetchFrom, getIpfsUrl, reduceHexAddress, getDidInfoFromAddress, getInfoFromDID } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -490,7 +491,7 @@ export default function CollectionDetail() {
                   {
                     badge.kyc&&
                     <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                      <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
+                      <Box sx={{display: 'inline-flex'}}><KYCBadge/></Box>
                     </Tooltip>
                   }
                 </Stack>
