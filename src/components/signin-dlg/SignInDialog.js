@@ -188,7 +188,7 @@ export default function SignInDialog() {
     if (sessionLinkFlag) {
       // when connected
       if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
-        getDiaTokenPrice(library.provider)
+        getDiaTokenPrice()
           .then((res) => {
             if(!res || !res.token)
               return
@@ -199,8 +199,7 @@ export default function SignInDialog() {
           });
       } else if (sessionLinkFlag === '2') {
         if (isInAppBrowser()) {
-          const elastosWeb3Provider = await window.elastos.getWeb3Provider();
-          getDiaTokenPrice(elastosWeb3Provider)
+          getDiaTokenPrice()
             .then((res) => {
               if(!res || !res.token)
                 return
@@ -211,8 +210,7 @@ export default function SignInDialog() {
             });
           // setWalletAddress(await window.elastos.getWeb3Provider().address);
         } else if (essentialsConnector.getWalletConnectProvider()) {
-          const essentialProvider = essentialsConnector.getWalletConnectProvider();
-          getDiaTokenPrice(essentialProvider)
+          getDiaTokenPrice()
             .then((res) => {
               if(!res || !res.token)
                 return
