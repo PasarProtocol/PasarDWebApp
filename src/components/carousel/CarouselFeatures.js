@@ -12,7 +12,7 @@ import checkCircleOutlineIcon from '@iconify-icons/akar-icons/circle-check';
 import crossCircleFillIcon from '@iconify-icons/akar-icons/circle-x-fill';
 import crossCircleOutlineIcon from '@iconify-icons/akar-icons/circle-x';
 //
-import DIABadge from '../DIABadge';
+import DIABadge from '../badge/DIABadge';
 import { CarouselControlsPaging2 } from './controls';
 import { getTime, reduceHexAddress } from '../../utils/common';
 

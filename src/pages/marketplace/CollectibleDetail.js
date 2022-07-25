@@ -28,8 +28,9 @@ import AssetDetailInfo from '../../components/marketplace/AssetDetailInfo';
 import CollectibleHistory from '../../components/marketplace/CollectibleHistory';
 import BidList from '../../components/marketplace/BidList';
 import AssetCard from '../../components/marketplace/AssetCard';
-import Badge from '../../components/Badge';
-import DIABadge from '../../components/DIABadge';
+import Badge from '../../components/badge/Badge';
+import KYCBadge from '../../components/badge/KYCBadge';
+import DIABadge from '../../components/badge/DIABadge';
 import Jazzicon from '../../components/Jazzicon';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
@@ -677,7 +678,7 @@ export default function CollectibleDetail() {
                       {
                         badge.creator.kyc&&
                         <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                          <Box><Badge name="kyc"/></Box>
+                          <Box><KYCBadge/></Box>
                         </Tooltip>
                       }
                       {
@@ -706,7 +707,7 @@ export default function CollectibleDetail() {
                       {
                         badge.owner.kyc&&
                         <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                          <Box><Badge name="kyc"/></Box>
+                          <Box><KYCBadge/></Box>
                         </Tooltip>
                       }
                       {
@@ -920,7 +921,7 @@ export default function CollectibleDetail() {
                         {
                           collectionBadge.kyc&&
                           <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                            <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
+                            <Box sx={{display: 'inline-flex'}}><KYCBadge/></Box>
                           </Tooltip>
                         }
                         {

@@ -14,8 +14,9 @@ import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack,
 
 import PaperRecord from '../PaperRecord';
 import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
-import Badge from '../Badge';
-import DIABadge from '../DIABadge';
+import Badge from '../badge/Badge';
+import KYCBadge from '../badge/KYCBadge';
+import DIABadge from '../badge/DIABadge';
 import useSingin from '../../hooks/useSignin';
 import { getDidInfoFromAddress, reduceHexAddress, getIpfsUrl, getDiaTokenInfo, getCredentialInfo, fetchFrom, getInfoFromDID, getAssetImage, 
   checkWhetherGeneralCollection, chainTypes } from '../../utils/common';
@@ -446,7 +447,7 @@ const CollectionCardPaper = (props) => {
               {
                 badge.kyc&&
                 <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                  <Box sx={{display: 'inline-flex'}}><Badge name="kyc"/></Box>
+                  <Box sx={{display: 'inline-flex'}}><KYCBadge/></Box>
                 </Tooltip>
               }
             </Stack>

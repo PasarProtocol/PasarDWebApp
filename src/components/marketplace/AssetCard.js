@@ -20,7 +20,7 @@ import SyncAltSharpIcon from '@mui/icons-material/SyncAltSharp';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import GavelIcon from '@mui/icons-material/Gavel';
 
-import Badge from '../Badge';
+import Badge from '../badge/Badge';
 import PaperRecord from '../PaperRecord';
 import DisclaimerDlg from '../dialog/Disclaimer';
 import SellDlg from '../dialog/Sell';

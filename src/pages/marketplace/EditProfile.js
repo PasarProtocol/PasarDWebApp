@@ -20,8 +20,9 @@ import { UploadAvatar } from '../../components/upload';
 import CustomSwitch from '../../components/custom-switch';
 import ElastosConnectivityService from '../../utils/elastosConnectivityService';
 import TransLoadingButton from '../../components/TransLoadingButton';
-import Badge from '../../components/Badge';
-import DIABadge from '../../components/DIABadge';
+import Badge from '../../components/badge/Badge';
+import KYCBadge from '../../components/badge/KYCBadge';
+import DIABadge from '../../components/badge/DIABadge';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, 
   deleteAvatarUrl, deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe, 
@@ -397,7 +398,7 @@ export default function EditProfile() {
                   {
                     badge.kyc&&
                     <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                      <Box><Badge name="kyc"/></Box>
+                      <Box><KYCBadge/></Box>
                     </Tooltip>
                   }
                 </Stack>
@@ -473,7 +474,7 @@ export default function EditProfile() {
                   {
                     badge.kyc&&
                     <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                      <Box><Badge name="kyc"/></Box>
+                      <Box><KYCBadge/></Box>
                     </Tooltip>
                   }
                 </Stack>

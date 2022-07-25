@@ -16,7 +16,7 @@ import CoinSelect from '../marketplace/CoinSelect';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import CustomSwitch from '../custom-switch';
 import CoinTypeLabel from '../CoinTypeLabel';
-import DIABadge from '../DIABadge';
+import DIABadge from '../badge/DIABadge';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { reduceHexAddress, getBalance, callContractMethod, sendIpfsDidJson, isInAppBrowser, removeLeadingZero, getDateTimeString, 
   isValidLimitPrice, getDiaBalanceDegree, getFilteredGasPrice, getContractAddressInCurrentNetwork, getCoinTypesInCurrentNetwork } from '../../utils/common';

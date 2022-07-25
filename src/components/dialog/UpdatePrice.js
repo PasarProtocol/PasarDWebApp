@@ -15,7 +15,7 @@ import CoinSelect from '../marketplace/CoinSelect';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
-import DIABadge from '../DIABadge';
+import DIABadge from '../badge/DIABadge';
 import { removeLeadingZero, isInAppBrowser, getCoinTypesInCurrentNetwork, callContractMethod, isValidLimitPrice, getDiaBalanceDegree } from '../../utils/common';
 import { auctionOrderType } from '../../config';
 import useSignin from '../../hooks/useSignin';
