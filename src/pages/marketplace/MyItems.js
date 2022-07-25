@@ -33,6 +33,7 @@ import CollectionCardSkeleton from '../../components/collection/CollectionCardSk
 import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI'
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
+import { getUserCredentials } from '../../components/signin-dlg/LoadCredentials';
 
 // ----------------------------------------------------------------------
 
@@ -147,6 +148,21 @@ export default function MyItems() {
     // ----------------------------------------------------------
     
   }, [account, params.address]);
+
+  React.useEffect(() => {
+    const getCredentialsList = async () => {
+      const info = await getDidInfoFromAddress(params.address);
+      console.log('++++++++++++', info)
+      const credentials = await getUserCredentials(info.did); 
+      console.log('+++++++++', credentials)
+      
+      const myInfo = await getDidInfoFromAddress(`did:elastos:${localStorage.getItem('PASAR_DID')}`);
+      console.log('++++++++++++', myInfo)
+      const myCredentials = await getUserCredentials(myInfo.did); 
+      console.log('+++++++++', myCredentials)
+    }
+    getCredentialsList();
+  }, []);
 
   const fetchProfileData = (targetDid, didInfo)=>{
     queryName(targetDid)
