@@ -287,7 +287,7 @@ export default function MyProfile() {
   React.useEffect(async () => {
     if(walletAddress) {
       setLoadingCollection(true);
-      fetchFrom(`api/v2/sticker/getCollectionByOwner/${walletAddress}`)
+      fetchFrom(`api/v2/sticker/getCollectionByOwner/${walletAddress}?marketPlace=${chainType}`)
         .then((response) => {
           response.json().then((jsonAssets) => {
             setCollections(jsonAssets.data);
@@ -300,7 +300,7 @@ export default function MyProfile() {
           if (e.code !== e.ABORT_ERR) setLoadingCollection(false);
         });
     }
-  }, [walletAddress]);
+  }, [walletAddress, chainType]);
   
   const handleDispmode = (event, mode) => {
     if (mode === null)
