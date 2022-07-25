@@ -207,7 +207,7 @@ export default function MarketHome() {
                   Popular Collections <span role="img" aria-label="">🔥</span>
                 </TitleStyle>
                 <Button
-                    to='/collection'
+                    to='/collections'
                     size="small"
                     color="inherit"
                     component={RouterLink}
