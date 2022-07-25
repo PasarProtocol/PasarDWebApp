@@ -11,7 +11,6 @@ import crossCircleOutlineIcon from '@iconify-icons/akar-icons/circle-x';
 // components
 import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
-import Badge from '../../components/badge/Badge';
 import DIABadge from '../../components/badge/DIABadge';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import CarouselFeatures from '../../components/carousel/CarouselFeatures';
@@ -114,25 +113,8 @@ export default function Features() {
   const [diaUSD, setDiaUSD] = React.useState(0);
   const { diaBalance, pasarLinkChain } = useSingin()
   const degree = getDiaBalanceDegree(diaBalance, pasarLinkChain)
-  const url = 'https://openseauserdata.com/files/85c7d180b0bda300127766ff9583697d.mp4#t=0.001';
-  // const url = 'https://bunn.mypinata.cloud/ipfs/QmVtsiQTcgjenjr6znWkUVpdBobANetbpt5MDF9uYmbbra';
 
   React.useEffect(() => {
-    let pp = new Date()
-    const startTime = pp.getTime()
-    fetch(url)
-      .then( response => {
-        console.log( response.headers.get("content-type") );
-        pp = new Date()
-        console.log((pp.getTime() - startTime)/1000)
-        return response.blob()
-      })
-      .then( blob => {
-        console.log(URL.createObjectURL(blob))
-        pp = new Date()
-        console.log((pp.getTime() - startTime)/1000)
-      })
-
     getDiaTokenPrice()
       .then((res) => {
         if(!res || !res.token)
@@ -176,23 +158,6 @@ export default function Features() {
       <Container maxWidth="lg">
         <Typography variant="h2" align="center" sx={{mb: 3}}>
           Features
-          {/* <Box component='img' src={url} alt="aa" onLoad={(e)=>{console.log(123)}}/> */}
-          {/* <video autoPlay width="320" height="240" controls onLoad={(e)=>{console.log(123)}}>
-            <source src={url} type="video/mp4"  onLoad={(e)=>{console.log(123)}}/>
-            <track src="captions_en.vtt" kind="captions" />
-          </video> */}
-        </Typography>
-        <Typography variant="h2" component="div" align="center" sx={{ position: 'relative', lineHeight: 1.1 }}>
-          <Stack direction="row" sx={{justifyContent: 'center'}}>
-              <span role="img" aria-label="">
-                asdfewfew
-              </span>
-            <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
-                <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                  <Box sx={{display: 'inline-flex'}} ml={2}><Badge name="kyc"/></Box>
-                </Tooltip>
-            </Stack>
-          </Stack>
         </Typography>
         <Typography variant="h5" sx={{fontWeight: 'normal', color: 'text.secondary', mb: 2}}>
           There are 4 types of Diamond (DIA) holders, namely Basic, Bronze, Silver and Gold.
