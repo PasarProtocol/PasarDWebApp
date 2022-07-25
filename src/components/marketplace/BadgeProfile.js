@@ -7,8 +7,9 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BoltIcon from '@mui/icons-material/Bolt';
 import { Icon } from '@iconify/react';
 
-import Badge from '../Badge';
-import DIABadge from '../DIABadge';
+import Badge from '../badge/Badge';
+import KYCBadge from '../badge/KYCBadge';
+import DIABadge from '../badge/DIABadge';
 import Jazzicon from '../Jazzicon';
 import RingAvatar from '../RingAvatar';
 import IconLinkButtonGroup from '../collection/IconLinkButtonGroup'
@@ -310,7 +311,7 @@ export default function BadgeProfile(props) {
                       {
                         badge.kyc&&
                         <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                          <Box><Badge name="kyc"/></Box>
+                          <Box><KYCBadge/></Box>
                         </Tooltip>
                       }
                     </Stack>

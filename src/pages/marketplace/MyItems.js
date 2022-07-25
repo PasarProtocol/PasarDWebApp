@@ -24,8 +24,9 @@ import MyItemsSortSelect from '../../components/MyItemsSortSelect';
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import { useEagerConnect } from '../../components/signin-dlg/hook';
 import RingAvatar from '../../components/RingAvatar';
-import Badge from '../../components/Badge';
-import DIABadge from '../../components/DIABadge';
+import Badge from '../../components/badge/Badge';
+import KYCBadge from '../../components/badge/KYCBadge';
+import DIABadge from '../../components/badge/DIABadge';
 import AddressCopyButton from '../../components/AddressCopyButton';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import CollectionCard from '../../components/collection/CollectionCard';
@@ -334,7 +335,7 @@ export default function MyItems() {
                 {
                   badge.kyc&&
                   <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                    <Box sx={{display: 'inline-flex'}} ml={2}><Badge name="kyc"/></Box>
+                    <Box sx={{display: 'inline-flex'}} ml={2}><KYCBadge size="large"/></Box>
                   </Tooltip>
                 }
               </Stack>

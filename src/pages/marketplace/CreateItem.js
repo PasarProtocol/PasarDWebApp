@@ -42,7 +42,7 @@ import StartingDateSelect from '../../components/marketplace/StartingDateSelect'
 import ExpirationDateSelect from '../../components/marketplace/ExpirationDateSelect'
 import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/CustomInput';
 import CoinTypeLabel from '../../components/CoinTypeLabel';
-import DIABadge from '../../components/DIABadge';
+import DIABadge from '../../components/badge/DIABadge';
 
 import { STICKER_CONTRACT_ABI as PASAR_CONTRACT_ABI } from '../../abi/stickerABI'
 import { FEEDS_STICKER_CONTRACT_ABI as FEEDS_CONTRACT_ABI } from '../../abi/feedsStickerABI'

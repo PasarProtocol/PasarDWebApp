@@ -2,8 +2,8 @@
 import { useTheme } from '@mui/material/styles';
 import { Stack, Box, Typography, Tooltip } from '@mui/material';
 
-import { customShadows } from '../theme/shadows';
-import {getDiaBalanceDegree} from '../utils/common'
+import { customShadows } from '../../theme/shadows';
+import { getDiaBalanceDegree } from '../../utils/common'
 // ----------------------------------------------------------------------
 
 const ColorSet = [
