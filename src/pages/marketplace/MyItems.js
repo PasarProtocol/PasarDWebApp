@@ -371,9 +371,7 @@ export default function MyItems() {
               <Stack sx={{ justifyContent: 'center', alignItems: 'center' }}>
                 {badge.kyc && (
                   <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                    <Box sx={{ display: 'inline-flex' }} ml={2}>
-                      <KYCBadge size="large" />
-                    </Box>
+                    <Box sx={{display: 'inline-flex'}} ml={2}><KYCBadge size="large"/></Box>
                   </Tooltip>
                 )}
               </Stack>
