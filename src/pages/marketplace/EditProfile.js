@@ -28,6 +28,7 @@ import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter
   deleteAvatarUrl, deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe, 
   updateAvatarUrl, updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe, uploadAvatar, downloadAvatar } from '../../components/signin-dlg/HiveAPI';
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
+import { getUserCredentials } from '../../components/signin-dlg/LoadCredentials';
 import { isInAppBrowser, getCredentialInfo, getDiaTokenInfo, reduceHexAddress } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 import { DidResolverUrl } from '../../config'
@@ -82,13 +83,14 @@ export default function EditProfile() {
 
   const updateProfileData = [updateAvatarUrl, updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe]
   const deleteProfileData = [deleteAvatarUrl, deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe]
-  const queryProfileSocials = {
-    website: queryWebsite,
-    twitter: queryTwitter,
-    discord: queryDiscord,
-    telegram: queryTelegram,
-    medium: queryMedium
-  }
+  // const queryProfileSocials = {
+  //   website: queryWebsite,
+  //   twitter: queryTwitter,
+  //   discord: queryDiscord,
+  //   telegram: queryTelegram,
+  //   medium: queryMedium
+  // }
+  const socialTypes = [ 'website', 'twitter', 'discord', 'telegram', 'medium' ]
     
   React.useEffect(async () => {
     // updateAvatarUrl('hive://did:elastos:inSeTvmVDj6to7dHSZgkRZuUJYc9yHJChN@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1636346252993?params={"empty":0}').then(res=>{
@@ -110,79 +112,137 @@ export default function EditProfile() {
       })
 
       const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`
-      queryName(targetDid)
-        .then((res)=>{
-          if(res.find_message && res.find_message.items.length) {
-            setDidInfoValue('name', res.find_message.items[0].display_name)
+      getUserCredentials(targetDid)
+        .then(credentials => {
+          if(!credentials)
+            return
+
+          if(credentials.name) {
+            setDidInfoValue('name', credentials.name);
             handleSetChecked(1)
-          } else {
-            setDidInfoValue('name', '')
+          }
+          else setDidInfoValue('name', '');
+
+          if(credentials.description) {
+            setDidInfoValue('description', credentials.description);
+            handleSetChecked(2)
+          }
+          else setDidInfoValue('description', '');
+
+          if(credentials.avatarUrl) {
+            const base64Content = credentials.avatarUrl.reduce((content, code)=>{
+              content=`${content}${String.fromCharCode(code)}`;
+              return content
+            }, '')
+            setAvatarUrl((prevState)=>{
+              if(!checkedItem[0])
+                return `data:image/png;base64,${base64Content}`
+              return prevState
+            })
           }
 
-          queryDescription(targetDid).then((res)=>{
-            if(res.find_message && res.find_message.items.length) {
-              setDidInfoValue('description', res.find_message.items[0].display_name)
-              handleSetChecked(2)
-            } else {
-              setDidInfoValue('description', '')
-            }
-          })
-          queryAvatarUrl(targetDid).then((res)=>{
-            if(res.find_message && res.find_message.items.length) {
-              const avatarUrl = res.find_message.items[0].display_name
-              handleSetChecked(0)
-              downloadFromUrl(avatarUrl).then(avatarData=>{
-                if(avatarData && avatarData.length) {
-                  const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
-                  setAvatarUrl(base64Content)
-                }
-              })
-            }
-          })
-          downloadAvatar(targetDid).then((res)=>{
-            if(res && res.length) {
-              const base64Content = res.reduce((content, code)=>{
-                content=`${content}${String.fromCharCode(code)}`;
-                return content
-              }, '')
-              setAvatarUrl((prevState)=>{
-                if(!checkedItem[0])
-                  return `data:image/png;base64,${base64Content}`
-                return prevState
-              })
-            }
-          })
-          queryKycMe(targetDid).then((res)=>{
-            if(res.find_message && res.find_message.items.length) {
-              setBadgeFlag('kyc', true)
-              handleSetChecked(8)
+          if(credentials.kycMe) {
+            setBadgeFlag('kyc', true)
+            handleSetChecked(8)
+          }
+          else
+            setBadgeFlag('kyc', false)
+
+          socialTypes.forEach((type, _i) => {
+            if (credentials[type]) {
+              setSocials((prevState) => {
+                const tempState = { ...prevState };
+                tempState[type] = credentials[type];
+                return tempState;
+              });
+              handleSetChecked(_i+3)
             }
             else
-              setBadgeFlag('kyc', false)
-          })
-          Object.keys(queryProfileSocials).forEach((field, _i)=>{
-            queryProfileSocials[field](targetDid).then((res)=>{
-              if(res.find_message && res.find_message.items.length) {
-                setSocials((prevState) => {
-                  const tempState = {...prevState}
-                  tempState[field] = res.find_message.items[0].display_name
-                  return tempState
-                })
-                handleSetChecked(_i+3)
-              } else {
-                setSocials((prevState) => {
-                  const tempState = {...prevState}
-                  delete tempState[field]
-                  return tempState
-                })
-              }
-            })
-          })
+              setSocials((prevState) => {
+                const tempState = {...prevState}
+                delete tempState[type]
+                return tempState
+              })
+          });
         })
         .catch(e=>{
           enqueueSnackbar('Loading data failed', { variant: 'error' });
           console.log(e)
         })
+
+      // queryName(targetDid)
+      //   .then((res)=>{
+      //     if(res.find_message && res.find_message.items.length) {
+      //       setDidInfoValue('name', res.find_message.items[0].display_name)
+      //       handleSetChecked(1)
+      //     } else {
+      //       setDidInfoValue('name', '')
+      //     }
+
+      //     queryDescription(targetDid).then((res)=>{
+      //       if(res.find_message && res.find_message.items.length) {
+      //         setDidInfoValue('description', res.find_message.items[0].display_name)
+      //         handleSetChecked(2)
+      //       } else {
+      //         setDidInfoValue('description', '')
+      //       }
+      //     })
+      //     queryAvatarUrl(targetDid).then((res)=>{
+      //       if(res.find_message && res.find_message.items.length) {
+      //         const avatarUrl = res.find_message.items[0].display_name
+      //         handleSetChecked(0)
+      //         downloadFromUrl(avatarUrl).then(avatarData=>{
+      //           if(avatarData && avatarData.length) {
+      //             const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
+      //             setAvatarUrl(base64Content)
+      //           }
+      //         })
+      //       }
+      //     })
+      //     downloadAvatar(targetDid).then((res)=>{
+      //       if(res && res.length) {
+      //         const base64Content = res.reduce((content, code)=>{
+      //           content=`${content}${String.fromCharCode(code)}`;
+      //           return content
+      //         }, '')
+      //         setAvatarUrl((prevState)=>{
+      //           if(!checkedItem[0])
+      //             return `data:image/png;base64,${base64Content}`
+      //           return prevState
+      //         })
+      //       }
+      //     })
+      //     queryKycMe(targetDid).then((res)=>{
+      //       if(res.find_message && res.find_message.items.length) {
+      //         setBadgeFlag('kyc', true)
+      //         handleSetChecked(8)
+      //       }
+      //       else
+      //         setBadgeFlag('kyc', false)
+      //     })
+      //     Object.keys(queryProfileSocials).forEach((field, _i)=>{
+      //       queryProfileSocials[field](targetDid).then((res)=>{
+      //         if(res.find_message && res.find_message.items.length) {
+      //           setSocials((prevState) => {
+      //             const tempState = {...prevState}
+      //             tempState[field] = res.find_message.items[0].display_name
+      //             return tempState
+      //           })
+      //           handleSetChecked(_i+3)
+      //         } else {
+      //           setSocials((prevState) => {
+      //             const tempState = {...prevState}
+      //             delete tempState[field]
+      //             return tempState
+      //           })
+      //         }
+      //       })
+      //     })
+      //   })
+      //   .catch(e=>{
+      //     enqueueSnackbar('Loading data failed', { variant: 'error' });
+      //     console.log(e)
+      //   })
     }
   }, [updateState]);
 
