@@ -348,17 +348,26 @@ export default function CollectibleDetail() {
           else
             setDidNameOfUser(type, credentials.name)
         }
-
+        
         if(credentials.avatarUrl) {
-          downloadFromUrl(credentials.avatarUrl).then((avatarData) => {
-            if (avatarData && avatarData.length) {
-              const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`;
-              if(type==='all')
-                setAvatarUrl({creator: base64Content, owner: base64Content})
-              else
-                setAvatarOfUser(type, base64Content)
-            }
-          });
+          const base64Content = credentials.avatarUrl.reduce((content, code)=>{
+            content=`${content}${String.fromCharCode(code)}`;
+            return content
+          }, '')
+          const displayAvatar = `data:image/png;base64,${base64Content}`
+          if(type==='all')
+            setAvatarUrl((prevState)=>{
+              if(!prevState.creator)
+                return {creator: displayAvatar, owner: displayAvatar}
+              return prevState
+            })
+          else
+            setAvatarUrl((prevState) => {
+              const tempAvatar = {...prevState};
+              if(!tempAvatar[type])
+                tempAvatar[type] = displayAvatar;
+              return tempAvatar;
+            });
         }
 
         if(credentials.kycMe) {

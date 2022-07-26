@@ -126,12 +126,15 @@ export default function BadgeProfile(props) {
         else setDidInfoValue('description', didInfo.bio);
 
         if(credentials.avatarUrl) {
-          downloadFromUrl(credentials.avatarUrl).then((avatarData) => {
-            if (avatarData && avatarData.length) {
-              const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`;
-              setAvatarUrl(base64Content);
-            }
-          });
+          const base64Content = credentials.avatarUrl.reduce((content, code)=>{
+            content=`${content}${String.fromCharCode(code)}`;
+            return content
+          }, '')
+          setAvatarUrl((prevState)=>{
+            if(!prevState)
+              return `data:image/png;base64,${base64Content}`
+            return prevState
+          })
         }
 
         if(credentials.kycMe)
