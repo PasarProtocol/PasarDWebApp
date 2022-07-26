@@ -129,6 +129,7 @@
     "react-grid-carousel": "^1.0.1",
     "react-helmet-async": "^1.1.2",
     "react-hook-form": "^7.15.3",
+    "react-hover-video-player": "^9.7.0",
     "react-i18next": "^11.12.0",
     "react-image-lightbox": "^5.1.4",
     "react-imgix": "9.0.2",
