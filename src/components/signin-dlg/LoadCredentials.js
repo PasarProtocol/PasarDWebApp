@@ -76,7 +76,10 @@ export const fetchHiveScriptPictureToDataUrl = async (hiveScriptUrl, did) => {
   if (!hiveScriptUrl) return null;
   return new Promise((resolve) => {
     fetchHiveScriptPicture(hiveScriptUrl, did).then((rawPicture) => {
-      resolve(rawImageToBase64DataUrl(rawPicture));
+      if(!rawPicture)
+        resolve('')
+      else
+        resolve(rawImageToBase64DataUrl(rawPicture));
     });
   });
 };
@@ -125,7 +128,6 @@ export const fetchHiveScriptPicture = async (hiveScriptUrl, did) => {
 };
 
 export const getUserCredentials = async (did) => {
-    console.log(did, '+++++')
   try {
     let avatarUrl = '';
     const credentials = await getCredentialsFromDID(did);
