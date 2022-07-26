@@ -19,7 +19,6 @@ const RootStyle = styled(Card)(({ theme }) => ({
 
 const StatisticPanel = (props) => {
   const { floorPrice=0, totalCount=0, totalOwner=0, totalPrice=0, marketPlace } = props
-  console.log("child render");
   return (
     <RootStyle>
       <Grid container>

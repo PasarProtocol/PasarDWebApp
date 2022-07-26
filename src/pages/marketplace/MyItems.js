@@ -5,20 +5,7 @@ import SwipeableViews from 'react-swipeable-views';
 import { isMobile } from 'react-device-detect';
 
 import { styled } from '@mui/material/styles';
-import {
-  Container,
-  Stack,
-  Typography,
-  Tab,
-  Tabs,
-  Link,
-  Button,
-  Grid,
-  Box,
-  ToggleButtonGroup,
-  ToggleButton,
-  Tooltip
-} from '@mui/material';
+import { Container, Stack, Typography, Tab, Tabs, Link, Button, Grid, Box, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material';
 // import { TabContext, TabList, TabPanel } from '@mui/lab';
 import SquareIcon from '@mui/icons-material/Square';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -57,15 +44,8 @@ import {
   downloadAvatar
 } from '../../components/signin-dlg/HiveAPI';
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService';
-import {
-  reduceHexAddress,
-  getDiaTokenInfo,
-  fetchFrom,
-  getInfoFromDID,
-  getDidInfoFromAddress,
-  isInAppBrowser,
-  getCredentialInfo
-} from '../../utils/common';
+import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
+
 import { getUserCredentials } from '../../components/signin-dlg/LoadCredentials';
 
 // ----------------------------------------------------------------------
@@ -127,13 +107,14 @@ export default function MyItems() {
   const context = useWeb3React();
   const { account } = context;
 
-  const queryProfileSocials = {
-    website: queryWebsite,
-    twitter: queryTwitter,
-    discord: queryDiscord,
-    telegram: queryTelegram,
-    medium: queryMedium
-  };
+  // const queryProfileSocials = {
+  //   website: queryWebsite,
+  //   twitter: queryTwitter,
+  //   discord: queryDiscord,
+  //   telegram: queryTelegram,
+  //   medium: queryMedium
+  // };
+  const socialTypes = [ 'website', 'twitter', 'discord', 'telegram', 'medium' ]
   React.useEffect(() => {
     if (params.address && params.address !== myAddress) {
       setWalletAddress(params.address);
@@ -179,72 +160,99 @@ export default function MyItems() {
     // ----------------------------------------------------------
   }, [account, params.address]);
 
-  React.useEffect(() => {
-    const getCredentialsList = async () => {
-      const info = await getDidInfoFromAddress(params.address);
-      console.log('++++++++++++', info);
-      const credentials = await getUserCredentials(info.did);
-      console.log('+++++++++', credentials);
-
-      const myCredentials = await getUserCredentials(`did:elastos:${sessionStorage.getItem('PASAR_DID')}`);
-      console.log('+++++++++', myCredentials);
-    };
-    getCredentialsList();
-  }, []);
-
   const fetchProfileData = (targetDid, didInfo) => {
-    queryName(targetDid)
-      .then((res) => {
-        if (res.find_message && res.find_message.items.length)
-          setDidInfoValue('name', res.find_message.items[0].display_name);
+    getUserCredentials(targetDid)
+      .then(credentials => {
+        if(!credentials)
+          return
+
+        if(credentials.name)
+          setDidInfoValue('name', credentials.name);
         else setDidInfoValue('name', didInfo.name);
 
-        queryDescription(targetDid).then((res) => {
-          if (res.find_message && res.find_message.items.length)
-            setDidInfoValue('description', res.find_message.items[0].display_name);
-          else setDidInfoValue('description', didInfo.bio);
-        });
-        queryAvatarUrl(targetDid).then((res) => {
-          if (res.find_message && res.find_message.items.length) {
-            const avatarUrl = res.find_message.items[0].display_name;
-            downloadFromUrl(avatarUrl).then((avatarData) => {
-              if (avatarData && avatarData.length) {
-                const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`;
-                setAvatarUrl(base64Content);
-              }
-            });
-          }
-        });
-        downloadAvatar(targetDid).then((res) => {
-          if (res && res.length) {
-            const base64Content = res.reduce((content, code) => {
-              content = `${content}${String.fromCharCode(code)}`;
-              return content;
-            }, '');
-            setAvatarUrl((prevState) => {
-              if (!prevState) return `data:image/png;base64,${base64Content}`;
-              return prevState;
-            });
-          }
-        });
-        queryKycMe(targetDid).then((res) => {
-          if (res.find_message && res.find_message.items.length) setBadgeFlag('kyc', true);
-          else setBadgeFlag('kyc', false);
-        });
-        Object.keys(queryProfileSocials).forEach((field) => {
-          queryProfileSocials[field](targetDid).then((res) => {
-            if (res.find_message && res.find_message.items.length)
-              setSocials((prevState) => {
-                const tempState = { ...prevState };
-                tempState[field] = res.find_message.items[0].display_name;
-                return tempState;
-              });
+        if(credentials.description)
+          setDidInfoValue('description', credentials.description);
+        else setDidInfoValue('description', didInfo.bio);
+
+        if(credentials.avatarUrl) {
+          downloadFromUrl(credentials.avatarUrl).then((avatarData) => {
+            if (avatarData && avatarData.length) {
+              const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`;
+              setAvatarUrl(base64Content);
+            }
           });
+        }
+
+        if(credentials.kycMe)
+          setBadgeFlag('kyc', true)
+        else
+          setBadgeFlag('kyc', false)
+
+        socialTypes.forEach((type) => {
+          if (credentials[type])
+            setSocials((prevState) => {
+              const tempState = { ...prevState };
+              tempState[type] = credentials[type];
+              return tempState;
+            });
         });
       })
-      .catch((e) => {
-        console.log(e);
-      });
+
+    // queryName(targetDid)
+    //   .then((res) => {
+    //     if (res.find_message && res.find_message.items.length)
+    //       setDidInfoValue('name', res.find_message.items[0].display_name);
+    //     else setDidInfoValue('name', didInfo.name);
+
+    //     queryDescription(targetDid).then((res) => {
+    //       if (res.find_message && res.find_message.items.length)
+    //         setDidInfoValue('description', res.find_message.items[0].display_name);
+    //       else setDidInfoValue('description', didInfo.bio);
+    //     });
+    //     queryAvatarUrl(targetDid).then((res) => {
+    //       if (res.find_message && res.find_message.items.length) {
+    //         const avatarUrl = res.find_message.items[0].display_name;
+    //         downloadFromUrl(avatarUrl).then((avatarData) => {
+    //           if (avatarData && avatarData.length) {
+    //             const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`;
+    //             setAvatarUrl(base64Content);
+    //           }
+    //         });
+    //       }
+    //     });
+    //     downloadAvatar(targetDid).then((res) => {
+    //       if (res && res.length) {
+    //         const base64Content = res.reduce((content, code) => {
+    //           content = `${content}${String.fromCharCode(code)}`;
+    //           return content
+    //         }, '')
+    //         setAvatarUrl((prevState) => {
+    //           if(!prevState)
+    //             return `data:image/png;base64,${base64Content}`
+    //           return prevState
+    //         })
+    //       }
+    //     });
+    //     queryKycMe(targetDid).then((res) => {
+    //       if(res.find_message && res.find_message.items.length)
+    //         setBadgeFlag('kyc', true)
+    //       else
+    //         setBadgeFlag('kyc', false)
+    //     })
+    //     Object.keys(queryProfileSocials).forEach((field) => {
+    //       queryProfileSocials[field](targetDid).then((res) => {
+    //         if (res.find_message && res.find_message.items.length)
+    //           setSocials((prevState) => {
+    //             const tempState = { ...prevState };
+    //             tempState[field] = res.find_message.items[0].display_name;
+    //             return tempState;
+    //           });
+    //       });
+    //     });
+    //   })
+    //   .catch((e) => {
+    //     console.log(e);
+    //   });
   };
 
   const setDidInfoValue = (field, value) => {
@@ -292,9 +300,10 @@ export default function MyItems() {
   React.useEffect(async () => {
     if (walletAddress) {
       getDiaTokenInfo(walletAddress).then((dia) => {
-        if (dia !== '0') setBadgeFlag('dia', dia);
-        else setBadgeFlag('dia', 0);
-      });
+        if(dia!=='0')
+          setBadgeFlag('dia', dia)
+        else setBadgeFlag('dia', 0)
+      })
     }
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
@@ -345,7 +354,8 @@ export default function MyItems() {
   }, [walletAddress]);
 
   const handleDispmode = (event, mode) => {
-    if (mode === null) return;
+    if (mode === null)
+      return
     sessionStorage.setItem('disp-mode', mode);
     setDispmode(mode);
   };
@@ -369,11 +379,12 @@ export default function MyItems() {
                 </span>
               </Link>
               <Stack sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                {badge.kyc && (
+                {
+                  badge.kyc&&
                   <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
                     <Box sx={{display: 'inline-flex'}} ml={2}><KYCBadge size="large"/></Box>
                   </Tooltip>
-                )}
+                }
               </Stack>
             </Stack>
             {didInfo.name.length > 0 && (
@@ -387,13 +398,16 @@ export default function MyItems() {
               </Typography>
             )}
           </Typography>
-          {Object.keys(socials).length > 0 && (
+          {
+            Object.keys(socials).length>0 && 
             <Box sx={{ py: 1.5 }}>
-              <IconLinkButtonGroup {...socials} />
+              <IconLinkButtonGroup {...socials}/>
             </Box>
-          )}
+          }
           <Stack sx={{ justifyContent: 'center', pt: 1 }} spacing={1} direction="row">
-            {badge.dia > 0 && <DIABadge balance={badge.dia} />}
+            {
+              badge.dia>0 && <DIABadge balance={badge.dia}/>
+            }
           </Stack>
           {/* <MHidden width="smUp">
             <ToolGroupStyle>
@@ -490,10 +504,7 @@ export default function MyItems() {
                     </Grid>
                   ) : (
                     <Stack sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                      <Typography variant="h3" align="center">
-                        {' '}
-                        No Collections Found{' '}
-                      </Typography>
+                      <Typography variant="h3" align="center"> No Collections Found </Typography>
                       <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>
                         We could not find any of your collections
                       </Typography>
@@ -502,13 +513,13 @@ export default function MyItems() {
                 </Box>
               ) : (
                 <Grid container spacing={2}>
-                  {Array(3)
-                    .fill(0)
-                    .map((item, index) => (
+                  {
+                    Array(3).fill(0).map((item, index)=>(
                       <Grid item key={index} xs={12} sm={6} md={4}>
-                        <CollectionCardSkeleton key={index} />
+                        <CollectionCardSkeleton key={index}/>
                       </Grid>
-                    ))}
+                    ))
+                  }
                 </Grid>
               )}
             </Box>
