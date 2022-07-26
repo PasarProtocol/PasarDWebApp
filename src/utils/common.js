@@ -76,10 +76,10 @@ export const getIpfsUrl = (uri, ipfsType = 0) => {
   if (!uri) return '';
   const ipfsUrl = ipfsUrls[ipfsType]
   if((uri.match(/:/g) || []).length !== 2){
-    const ipfsStrPos = uri.search('/ipfs/')
-    if(ipfsStrPos<0)
+    // const ipfsStrPos = uri.search('/ipfs/')
+    // if(ipfsStrPos<0)
       return uri
-    return `${ipfsUrl}${uri.substr(ipfsStrPos)}`;
+    // return `${ipfsUrl}${uri.substr(ipfsStrPos)}`;
   }
 
   const prefixLen = uri.split(':', 2).join(':').length;
