@@ -85,11 +85,7 @@ export const fetchHiveScriptPictureToDataUrl = async (hiveScriptUrl, did) => {
 };
 
 export const rawImageToBase64DataUrl = (rawImg) => {
-  // const base64Data = Buffer.from(rawImg).toString('base64');
-  const base64Data = rawImg.reduce((content, code)=>{
-    content=`${content}${String.fromCharCode(code)}`;
-    return content
-  }, '')
+  const base64Data = Buffer.from(rawImg).toString('base64');
   return `data:image/png;base64,${base64Data}`;
 };
 
