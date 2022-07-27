@@ -439,7 +439,7 @@ export default function AssetCard(props) {
             <Stack direction="row">
               <Typography variant="h6" noWrap sx={{flexGrow: 1, fontSize: {xs: '1rem'}}}>{name}</Typography>
               {
-                orderType===auctionOrderType?
+                orderType===auctionOrderType && saleType!=="Not on sale"?
                 <Tooltip title={currentBidPrice?"Top Bid":"Starting Price"} arrow enterTouchDelay={0}>
                   <Typography variant="subtitle2" sx={{display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em'}} noWrap>
                     {math.round((currentBidPrice)/1e18, 3) || price} {coinType.name}

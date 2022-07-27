@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, Link as RouterLink, useParams, useNavigate } from 'react-router-dom';
 import { round } from 'mathjs'
+import ReactPlayer from 'react-player/lazy'
 import { format } from 'date-fns';
 import Lightbox from 'react-image-lightbox';
 import { FacebookShareButton, TwitterShareButton, FacebookIcon, TwitterIcon } from "react-share";
@@ -154,6 +155,8 @@ export default function CollectibleDetail() {
   const [dispCountInCollection, setDispCountInCollection] = React.useState(3);
   const [totalCountInCollection, setTotalCountInCollection] = React.useState(0);
   const [collectionAttributes, setCollectionAttributes] = React.useState({});
+  const [isVideo, setIsVideo] = React.useState(false)
+  const [videoIsLoaded, setVideoIsLoaded] = React.useState(false)
   const { pasarLinkAddress } = useSingin()
   const { updateCount } = useAuctionDlg()
   
@@ -213,8 +216,27 @@ export default function CollectibleDetail() {
               setCollectionAttributes(jsonData.data)
           })
         })
+      fetch(assetImageUrl)
+        .then(response => {
+          const contentype = response.headers.get("content-type")
+          if(contentype.startsWith('video')) {
+            setIsVideo(true)
+          }
+        })
+        .catch(console.log)
     }
   }, [collectible]);
+
+  // React.useEffect(()=>{
+  //   if(isVideo) {
+  //     const obj = document.getElementById('videoId');
+  //     obj.addEventListener('loadeddata', () => {
+  //       if(obj.readyState >= 2) {
+  //         setVideoIsLoaded(true)
+  //       }
+  //     });
+  //   }
+  // }, [isVideo])
 
   React.useEffect(async() => {
     const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS')
@@ -231,6 +253,7 @@ export default function CollectibleDetail() {
         walletconnect.getAccount().then(setAddress)
     }
   }, [account, pasarLinkAddress]);
+  
   React.useEffect(async () => {
     window.scrollTo(0,0)
     const resCollectible = await fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`);
@@ -563,7 +586,7 @@ export default function CollectibleDetail() {
         <Container maxWidth="lg" align="center" sx={{position: 'relative', px: {sm: 3, md: 12}}}>
           <Box sx={{position: 'relative', display: 'inline-block'}}>
             {
-              !isLoadedImage && 
+              ((!isVideo && !isLoadedImage) || (isVideo && !videoIsLoaded)) &&
               <Box
                   draggable = {false}
                   component="img"
@@ -572,18 +595,29 @@ export default function CollectibleDetail() {
                   sx={{ maxHeight: 400, borderRadius: 1 }}
               />
             }
-            <Box
-                draggable = {false}
-                component="img"
-                alt={collectible.name}
-                src={imageUrl}
-                onLoad={onImgLoad}
-                onError={handleErrorImage}
-                sx={{ maxHeight: 400, borderRadius: 1, display: isLoadedImage?'block':'none' }}
-                ref={imageRef}
-            />
             {
-              address!==collectible.holder && isLoadedImage && !imageUrl.endsWith('broken-image.svg') &&
+              !isVideo?
+              <Box
+                  draggable = {false}
+                  component="img"
+                  alt={collectible.name}
+                  src={imageUrl}
+                  onLoad={onImgLoad}
+                  onError={handleErrorImage}
+                  sx={{ maxHeight: 400, borderRadius: 1, display: isLoadedImage?'block':'none' }}
+                  ref={imageRef}
+              />:
+              <ReactPlayer playing 
+                loop={Boolean(true)} 
+                muted={Boolean(true)} 
+                url={imageUrl} 
+                onReady={()=>{setVideoIsLoaded(true)}} 
+                width='100%' 
+                height={videoIsLoaded?360:0}
+              />
+            }
+            {
+              address!==collectible.holder && ((!isVideo && isLoadedImage) || (isVideo && videoIsLoaded)) && !imageUrl.endsWith('broken-image.svg') &&
               <Box
                   draggable = {false}
                   component="img"
@@ -593,7 +627,7 @@ export default function CollectibleDetail() {
             }
           </Box>
           <ToolGroupStyle>
-            <MFab size="small" onClick={()=>{setFullScreen(!isFullScreen)}} disabled={!isLoadedImage || imageUrl.endsWith('broken-image.svg')}>
+            <MFab size="small" onClick={()=>{setFullScreen(!isFullScreen)}} disabled={((!isVideo && !isLoadedImage) || (isVideo && !videoIsLoaded)) || imageUrl.endsWith('broken-image.svg')}>
               <FullscreenIcon />
             </MFab>
             <MFab size="small" sx={{ml: 1}} onClick={openSharePopupMenu}>
@@ -686,17 +720,27 @@ export default function CollectibleDetail() {
                 }}
                 ref={imageBoxRef}
               >
-                <Box
-                    draggable = {false}
-                    component="img"
-                    alt={collectible.name}
-                    src={imageUrl}
-                    // onLoad={onImgLoad}
-                    onError={(e) => {e.target.src = '/static/broken-image.svg'}}
-                    sx={{ width: '100%', height: '100%' }}
-                />
                 {
-                  address!==collectible.holder&&isLoadedImage&&
+                  !isVideo?
+                  <Box
+                      draggable = {false}
+                      component="img"
+                      alt={collectible.name}
+                      src={imageUrl}
+                      // onLoad={onImgLoad}
+                      onError={(e) => {e.target.src = '/static/broken-image.svg'}}
+                      sx={{ width: '100%', height: '100%' }}
+                  />:
+                  <ReactPlayer playing 
+                    loop={Boolean(true)} 
+                    muted={Boolean(true)} 
+                    url={imageUrl} 
+                    width='100%' 
+                    height='100%'
+                  />
+                }
+                {
+                  address!==collectible.holder && ((!isVideo && isLoadedImage) || (isVideo && videoIsLoaded)) &&
                   <Box
                       draggable = {false}
                       component="img"
