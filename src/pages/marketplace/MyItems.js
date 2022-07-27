@@ -501,7 +501,7 @@ export default function MyItems() {
                     <Grid container spacing={2}>
                       {collections.map((info, index) => (
                         <Grid item key={index} xs={12} sm={6} md={4}>
-                          <CollectionCard info={info} isOwned={Boolean(true)} />
+                          <CollectionCard info={info} isOwned={myAddress===info.owner} />
                         </Grid>
                       ))}
                     </Grid>
