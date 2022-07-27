@@ -143,28 +143,42 @@ const getQueryDataFromObject = (resQuery) => {
 };
 
 export const getCredentialsFromPasar = async (did) => {
-  let avatarUrl = '';
-  const resQueryAvatarUrl = queryAvatarUrl(did);
-  if (resQueryAvatarUrl.find_message && resQueryAvatarUrl.find_message.items.length) {
-    const dataQueryAvatarUrl = resQueryAvatarUrl.find_message.items[0].display_name;
-    const avatarData = downloadFromUrl(dataQueryAvatarUrl);
-    if (avatarData && avatarData.length) avatarUrl = `data:image/png;base64,${avatarData.toString('base64')}`;
+  try {
+    let avatarUrl = '';
+    const resQueryAvatarUrl = await queryAvatarUrl(did);
+    if (resQueryAvatarUrl.find_message && resQueryAvatarUrl.find_message.items.length) {
+      const dataQueryAvatarUrl = resQueryAvatarUrl.find_message.items[0].display_name;
+      const avatarData = await downloadFromUrl(dataQueryAvatarUrl);
+      if (avatarData && avatarData.length) avatarUrl = `data:image/png;base64,${avatarData.toString('base64')}`;
+    }
+    const name = getQueryDataFromObject(await queryName(did));
+    const description = getQueryDataFromObject(await queryDescription(did));
+    const website = getQueryDataFromObject(await queryWebsite(did));
+    const twitter = getQueryDataFromObject(await queryTwitter(did));
+    const discord = getQueryDataFromObject(await queryDiscord(did));
+    const telegram = getQueryDataFromObject(await queryTelegram(did));
+    const medium = getQueryDataFromObject(await queryMedium(did));
+    const kycMe = getQueryDataFromObject(await queryKycMe(did));
+    return { avatarUrl, name, description, website, twitter, discord, telegram, medium, kycMe };
+  } catch (err) {
+    console.error(err);
+    return {
+      avatarUrl: '',
+      name: '',
+      description: '',
+      website: '',
+      twitter: '',
+      discord: '',
+      telegram: '',
+      medium: '',
+      kycMe: ''
+    };
   }
-  const name = getQueryDataFromObject(await queryName(did));
-  const description = getQueryDataFromObject(await queryDescription(did));
-  const website = getQueryDataFromObject(await queryWebsite(did));
-  const twitter = getQueryDataFromObject(await queryTwitter(did));
-  const discord = getQueryDataFromObject(await queryDiscord(did));
-  const telegram = getQueryDataFromObject(await queryTelegram(did));
-  const medium = getQueryDataFromObject(await queryMedium(did));
-  const kycMe = getQueryDataFromObject(await queryKycMe(did));
-  return { avatarUrl, name, description, website, twitter, discord, telegram, medium, kycMe };
 };
 
 export const getUserCredentials = async (did) => {
   try {
     const pasarCredential = await getCredentialsFromPasar(did);
-    console.log('+++', pasarCredential);
     let avatarUrl = '';
     const credentials = await getCredentialsFromDID(did);
     if (credentials && credentials.avatar) {
