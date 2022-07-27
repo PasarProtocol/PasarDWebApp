@@ -164,13 +164,8 @@ export default function MyProfile() {
           else setDidInfoValue('description', bio);
 
           if(credentials.avatarUrl) {
-            // const base64Content = credentials.avatarUrl.reduce((content, code)=>{
-            //   content=`${content}${String.fromCharCode(code)}`;
-            //   return content
-            // }, '')
             setAvatarUrl((prevState)=>{
               if(!prevState)
-              // data:image/png;base64,
                 return credentials.avatarUrl
               return prevState
             })

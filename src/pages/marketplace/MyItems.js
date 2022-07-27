@@ -175,13 +175,13 @@ export default function MyItems() {
         else setDidInfoValue('description', didInfo.bio);
 
         if(credentials.avatarUrl) {
-          const base64Content = credentials.avatarUrl.reduce((content, code)=>{
-            content=`${content}${String.fromCharCode(code)}`;
-            return content
-          }, '')
+          // const base64Content = credentials.avatarUrl.reduce((content, code)=>{
+          //   content=`${content}${String.fromCharCode(code)}`;
+          //   return content
+          // }, '')
           setAvatarUrl((prevState)=>{
             if(!prevState)
-              return `data:image/png;base64,${base64Content}`
+              return credentials.avatarUrl
             return prevState
           })
         }
