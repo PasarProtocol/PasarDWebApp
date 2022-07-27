@@ -32,7 +32,7 @@ const creatAppContext = async (appInstanceDidDocument, userDidString) => {
       const authToken = await generateHiveAuthPresentationJWT(jwtToken)
     return authToken
     }
-  }, userDidString);
+  }, userDidString, ApplicationDID);
   return context
   } catch (error) {
     console.log("creatAppContext error: ",error)
