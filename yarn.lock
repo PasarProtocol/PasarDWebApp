@@ -1634,7 +1634,7 @@
     web3 "^1.6.1"
     web3-core "^1.6.1"
 
-"@elastosfoundation/hive-js-sdk@^2.7.2":
+"@elastosfoundation/hive-js-sdk@^2.7.4":
   version "2.7.4"
   resolved "https://registry.yarnpkg.com/@elastosfoundation/hive-js-sdk/-/hive-js-sdk-2.7.4.tgz#fffa5ff9c416b2c7ebba94ddf45f0af3ac1d6e68"
   integrity sha512-MS5V/A2BItLkGbvKo7PLP3ro5U5qxa8Y6+NsTYE7ODEqu/QJxwNdkIFHOrbGrRfUZSGA0ARycbcgq19sfMVv5w==

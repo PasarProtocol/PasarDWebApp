@@ -212,7 +212,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
               .setAudience(claims.getIssuer())
               .setIssuedAt(dayjs().unix())
               .setExpiration(dayjs().add(3, 'month').unix())
-              .setNotBefore(dayjs().unix())
+              .setNotBefore(dayjs().subtract(3, 'minutes').unix())
               .claimsWithJson('presentation', presentation.toString(true))
               .sign(appInstanceDIDInfo.storePassword);
 
