@@ -2,6 +2,7 @@ import {InsertOptions, File as HiveFile, ScriptRunner, Vault, AppContext, Logger
 import {JWTParserBuilder, JWTHeader, DID as DID2, DIDBackend, DefaultDIDAdapter, JSONObject, VerifiablePresentation  } from '@elastosfoundation/did-js-sdk';
 import {connectivity, DID as ConDID} from "@elastosfoundation/elastos-connectivity-sdk-js";
 import { ApplicationDID, DidResolverUrl } from '../../config'
+import { getAppContext } from "./LoadCredentials";
 
 let hiveVault 
 let scriptRunners = {}
@@ -44,8 +45,9 @@ const createVault = async () => {
   try {
     const pasarDid = sessionStorage.getItem('PASAR_DID')
     const userDid = `did:elastos:${pasarDid}`
-    const appinstanceDocument = await getAppInstanceDIDDoc()
-    const context = await creatAppContext(appinstanceDocument, userDid)
+    // const appinstanceDocument = await getAppInstanceDIDDoc()
+    // const context = await creatAppContext(appinstanceDocument, userDid)
+    const context = await getAppContext(userDid)
     const hiveVault = new Vault(context)
 
     const scriptRunner = await creatScriptRunner(userDid)
@@ -64,8 +66,9 @@ const createVault = async () => {
 }
 
 const creatScriptRunner = async (targetDid) => {
-  const appinstanceDocument = await getAppInstanceDIDDoc()
-  const context = await creatAppContext(appinstanceDocument, targetDid)
+  // const appinstanceDocument = await getAppInstanceDIDDoc()
+  // const context = await creatAppContext(appinstanceDocument, targetDid)
+  const context = await getAppContext(targetDid)
   const scriptRunner = new ScriptRunner(context)
   if (scriptRunners === undefined) {
     scriptRunners = {}

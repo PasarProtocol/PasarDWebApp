@@ -17,6 +17,18 @@ import {
 import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
 import { BrowserConnectivitySDKHiveAuthHelper } from './BrowserConnectivitySDKHiveAuthHelper';
 import { DidResolverUrl } from '../../config';
+import {
+  queryAvatarUrl,
+  queryDescription,
+  queryDiscord,
+  queryKycMe,
+  queryMedium,
+  queryName,
+  queryTelegram,
+  queryTwitter,
+  queryWebsite
+} from './HiveAPI';
+import { downloadFromUrl } from './HiveService';
 
 export const getAppContext = async (did) => {
   const instBCSHAH = new BrowserConnectivitySDKHiveAuthHelper(DidResolverUrl);
@@ -76,10 +88,8 @@ export const fetchHiveScriptPictureToDataUrl = async (hiveScriptUrl, did) => {
   if (!hiveScriptUrl) return null;
   return new Promise((resolve) => {
     fetchHiveScriptPicture(hiveScriptUrl, did).then((rawPicture) => {
-      if(!rawPicture)
-        resolve('')
-      else
-        resolve(rawImageToBase64DataUrl(rawPicture));
+      if (!rawPicture) resolve('');
+      else resolve(rawImageToBase64DataUrl(rawPicture));
     });
   });
 };
@@ -127,22 +137,48 @@ export const fetchHiveScriptPicture = async (hiveScriptUrl, did) => {
   }
 };
 
+const getQueryDataFromObject = (resQuery) => {
+  if (resQuery.find_message && resQuery.find_message.items.length) return resQuery.find_message.items[0].display_name;
+  return '';
+};
+
+export const getCredentialsFromPasar = async (did) => {
+  let avatarUrl = '';
+  const resQueryAvatarUrl = queryAvatarUrl(did);
+  if (resQueryAvatarUrl.find_message && resQueryAvatarUrl.find_message.items.length) {
+    const dataQueryAvatarUrl = resQueryAvatarUrl.find_message.items[0].display_name;
+    const avatarData = downloadFromUrl(dataQueryAvatarUrl);
+    if (avatarData && avatarData.length) avatarUrl = `data:image/png;base64,${avatarData.toString('base64')}`;
+  }
+  const name = getQueryDataFromObject(await queryName(did));
+  const description = getQueryDataFromObject(await queryDescription(did));
+  const website = getQueryDataFromObject(await queryWebsite(did));
+  const twitter = getQueryDataFromObject(await queryTwitter(did));
+  const discord = getQueryDataFromObject(await queryDiscord(did));
+  const telegram = getQueryDataFromObject(await queryTelegram(did));
+  const medium = getQueryDataFromObject(await queryMedium(did));
+  const kycMe = getQueryDataFromObject(await queryKycMe(did));
+  return { avatarUrl, name, description, website, twitter, discord, telegram, medium, kycMe };
+};
+
 export const getUserCredentials = async (did) => {
   try {
+    const pasarCredential = await getCredentialsFromPasar(did);
+    console.log('+++', pasarCredential);
     let avatarUrl = '';
     const credentials = await getCredentialsFromDID(did);
     if (credentials && credentials.avatar) {
       const hiveAvatarUrl = getHiveAvatarUrlFromDIDAvatarCredential(credentials.avatar);
       if (did && credentials.avatar) avatarUrl = await fetchHiveScriptPictureToDataUrl(hiveAvatarUrl, did);
     }
-    const name = credentials.name || '';
-    const description = credentials.description || '';
-    const website = credentials.website || '';
-    const twitter = credentials.twitter || '';
-    const discord = credentials.discord || '';
-    const telegram = credentials.telegram || '';
-    const medium = credentials.medium || '';
-    const kycMe = credentials.kyc_me || '';
+    const name = credentials.name || pasarCredential.name || '';
+    const description = credentials.description || pasarCredential.description || '';
+    const website = credentials.website || pasarCredential.website || '';
+    const twitter = credentials.twitter || pasarCredential.twitter || '';
+    const discord = credentials.discord || pasarCredential.discord || '';
+    const telegram = credentials.telegram || pasarCredential.telegram || '';
+    const medium = credentials.medium || pasarCredential.medium || '';
+    const kycMe = credentials.kyc_me || pasarCredential.kycMe || '';
     return { avatarUrl, name, description, website, twitter, discord, telegram, medium, kycMe };
   } catch (err) {
     console.log(err);
