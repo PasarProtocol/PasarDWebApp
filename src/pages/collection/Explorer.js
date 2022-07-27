@@ -8,6 +8,7 @@ import { Grid, Container, Stack, Typography, Link, Button, Box, ToggleButtonGrou
 import Page from '../../components/Page';
 import CollectionSortSelect from '../../components/CollectionSortSelect';
 import ChainSelect from '../../components/ChainSelect';
+import CategorySelect from '../../components/collection/CategorySelect';
 import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
@@ -36,6 +37,7 @@ export default function Explorer() {
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
   const [orderType, setOrderType] = React.useState(0);
   const [chainType, setChainType] = React.useState(0);
+  const [category, setCategory] = React.useState(0);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [needOptionToBelow, setOptionToBelow] = React.useState(false);
   const [controller, setAbortController] = React.useState(new AbortController());
@@ -48,7 +50,7 @@ export default function Explorer() {
     const { signal } = newController;
     setAbortController(newController);
     setLoadingCollections(true);
-    fetchFrom(`api/v2/sticker/getCollection?sort=${orderType}&marketPlace=${chainType}`, { signal })
+    fetchFrom(`api/v2/sticker/getCollection?sort=${orderType}&marketPlace=${chainType}&category=${category}`, { signal })
       .then((response) => {
         response.json().then((jsonAssets) => {
           if(Array.isArray(jsonAssets.data))
@@ -63,9 +65,9 @@ export default function Explorer() {
       .catch((e) => {
         if (e.code !== e.ABORT_ERR) setLoadingCollections(false);
       });
-  }, [orderType, chainType]);
+  }, [orderType, chainType, category]);
   function handleResize() {
-    if(sortOptions[orderType].length>15 && window.innerWidth<750)
+    if(sortOptions[orderType].length>15 && window.outerWidth<900)
       setOptionToBelow(true)
     else
       setOptionToBelow(false)
@@ -114,6 +116,7 @@ export default function Explorer() {
                 <>
                   <ChainSelect selected={chainType} onChange={setChainType} />
                   <CollectionSortSelect onChange={setOrderType} orderType={orderType} sortOptions={sortOptions} />
+                  <CategorySelect is4filter={Boolean(true)} selected={category} onChange={setCategory} />
                 </>
               }
             </Stack>
@@ -123,6 +126,7 @@ export default function Explorer() {
             <>
               <ChainSelect selected={chainType} onChange={setChainType} sx={{mt: 1, width: '100%'}}/>
               <CollectionSortSelect onChange={setOrderType} orderType={orderType} sortOptions={sortOptions} sx={{mt: 1, width: '100%'}}/>
+              <CategorySelect is4filter={Boolean(true)} selected={category} onChange={setCategory} sx={{mt: 1, width: '100%'}} />
             </>
           }
         </Box>

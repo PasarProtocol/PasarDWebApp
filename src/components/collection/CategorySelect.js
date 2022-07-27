@@ -14,13 +14,14 @@ const MenuProps = {
   },
   variant: "menu"
 }
-const menuItems = ['General', 'Art', 'Collectibles', 'Photography', 'Trading Cards', 'Utility', 'Domains']
+const categories = ['General', 'Art', 'Collectibles', 'Photography', 'Trading Cards', 'Utility', 'Domains']
 
 export default function CategorySelect(props) {
-  const { selected, onChange, sx = {} } = props
+  const { selected, onChange, is4filter = false, sx = {} } = props
   const handleChange = (event) => {
     onChange(event.target.value);
   }
+  const menuItems = is4filter ? ['All Categories', ...categories] : categories
   return (
     <Select
       // defaultValue={0}
@@ -30,10 +31,13 @@ export default function CategorySelect(props) {
       size="small"
       sx={{mr: 1, ...sx}}
       MenuProps={MenuProps}
-      fullWidth
+      fullWidth={!is4filter}
     >
       {
-        menuItems.map((type, i)=><MenuItem key={i} value={type} autoFocus={selected===type}>{type}</MenuItem>)
+        menuItems.map((type, _i)=>{
+          const value = is4filter?_i:type
+          return <MenuItem key={_i} value={value} autoFocus={selected===value}>{type}</MenuItem>
+        })
       }
     </Select>
   )
