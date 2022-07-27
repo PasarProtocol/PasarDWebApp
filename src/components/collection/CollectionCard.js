@@ -12,6 +12,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { Box, Grid, Button, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip, Popper, Fade } from '@mui/material';
 
+import VolumeIcon from './VolumeIcon';
 import PaperRecord from '../PaperRecord';
 import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
 import Badge from '../badge/Badge';
@@ -154,27 +155,34 @@ const CollectionImgBox = (props) => {
         {
           ({ TransitionProps }) => (
             <Fade {...TransitionProps}>
-              <Stack sx={{minWidth: 300, maxWidth: 400, p: 2, alignItems: 'center', borderRadius: 1, boxShadow: (theme) => theme.customShadows.z12, background: (theme) => theme.palette.background.paper}}>
+              <Stack sx={{minWidth: 320, maxWidth: 400, p: 2, alignItems: 'center', borderRadius: 1, boxShadow: (theme) => theme.customShadows.z12, background: (theme) => theme.palette.background.paper}}>
                 <Typography variant="h5" align='center' sx={{width: '100%'}} noWrap>{name}</Typography>
                 <TypographyStyle variant="subtitle2" color="text.secondary" noWrap>{totalCount} items</TypographyStyle>
                 <Grid container sx={{pt: 2}}>
                   <Grid item sm={4} textAlign="center">
-                    <Typography variant="h6" noWrap>{realData[0].toLocaleString("en-US")}</Typography>
+                    <Stack spacing={1} direction="row" justifyContent='center'>
+                      <VolumeIcon marketPlace={marketPlace}/>
+                      <Typography variant="h6" noWrap>
+                        {realData[0].toLocaleString("en-US")}
+                      </Typography>
+                    </Stack>
                     <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline-flex' }}>
-                      <Box component="img" src="/static/elastos.svg" sx={{ width: 14, mr: .5, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
-                      {' '}Volume
+                      <span role="img" aria-label="">📈 Volume</span>
                     </Typography>
                   </Grid>
                   <Grid item sm={4} textAlign="center">
-                    <Typography variant="h6" noWrap>{realData[1]}</Typography>
+                    <Stack spacing={1} direction="row" justifyContent='center'>
+                      <VolumeIcon marketPlace={marketPlace}/>
+                      <Typography variant="h6" noWrap> {realData[1]} </Typography>
+                    </Stack>
                     <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline-flex' }}>
-                      <span role="img" aria-label="">🔻</span> Floor Price
+                      <span role="img" aria-label="">🔻 Floor Price</span>
                     </Typography>
                   </Grid>
                   <Grid item sm={4} textAlign="center">
                     <Typography variant="h6" noWrap>{realData[2]}</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', display: 'inline-flex' }}>
-                      <span role="img" aria-label="">💪</span> Owners
+                      <span role="img" aria-label="">💪 Owners</span>
                     </Typography>
                   </Grid>
                 </Grid>
