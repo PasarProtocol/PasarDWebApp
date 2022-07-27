@@ -29,7 +29,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
 
   constructor(didResolverUrl) {
     try {
-      AppContext.setupResolver(didResolverUrl, '/anyfakedir/browserside/for/didstores');
+      AppContext.setupResolver(didResolverUrl, '/data/userDir/data/store/catch');
     } catch (e) {
       if (e instanceof DIDResolverAlreadySetupException) {
         // silent error, it's ok
