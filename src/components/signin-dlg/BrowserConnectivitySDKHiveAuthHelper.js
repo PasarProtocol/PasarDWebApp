@@ -213,7 +213,6 @@ export class BrowserConnectivitySDKHiveAuthHelper {
               .setIssuedAt(dayjs().unix())
               .setExpiration(dayjs().add(3, 'month').unix())
               .setNotBefore(dayjs().unix())
-              .setAllowedClockSkewSeconds(300)
               .claimsWithJson('presentation', presentation.toString(true))
               .sign(appInstanceDIDInfo.storePassword);
 
