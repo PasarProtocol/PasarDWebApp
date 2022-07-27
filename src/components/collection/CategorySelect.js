@@ -14,7 +14,7 @@ const MenuProps = {
   },
   variant: "menu"
 }
-const menuItems = ['General', 'Art', 'Collectibles', 'Photography', 'Trading Cards', 'Utility']
+const menuItems = ['General', 'Art', 'Collectibles', 'Photography', 'Trading Cards', 'Utility', 'Domains']
 
 export default function CategorySelect(props) {
   const { selected, onChange, sx = {} } = props
