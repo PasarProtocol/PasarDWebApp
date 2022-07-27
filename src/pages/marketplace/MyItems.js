@@ -161,8 +161,10 @@ export default function MyItems() {
   }, [account, params.address]);
 
   const fetchProfileData = (targetDid, didInfo) => {
-    getUserCredentials(targetDid)
+    const kk = `did:elastos:iVHBSHGFMLzNQGXiX4abtSo9uVY7SjAevB`
+    getUserCredentials(kk)
       .then(credentials => {
+        console.log(credentials, "----------------------------------")
         if(!credentials)
           return
 
@@ -200,6 +202,7 @@ export default function MyItems() {
             });
         });
       })
+      .catch(e=>{console.log(e, "###############")})
 
     // queryName(targetDid)
     //   .then((res) => {

@@ -1,6 +1,7 @@
 // material
 import React from 'react';
 import { useLocation, useParams } from 'react-router-dom';
+import ReactPlayer from 'react-player/lazy'
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
@@ -63,6 +64,8 @@ export default function CollectibleDetail() {
   const [isLoadingTransRecord, setLoadingTransRecord] = React.useState(true);
   const [totalCount, setTotalCount] = React.useState(0);
   const [isLoadedImage, setLoadedImage] = React.useState(false);
+  const [isVideo, setIsVideo] = React.useState(false)
+  const [videoIsLoaded, setVideoIsLoaded] = React.useState(false)
   const imageRef = React.useRef();
   React.useEffect(async () => {
     fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`)
@@ -99,6 +102,15 @@ export default function CollectibleDetail() {
           }
           setCollectible(jsonData);
           setLoadingCollectible(false);
+          const assetImageUrl = getAssetImage(jsonData, false)
+          fetch(assetImageUrl)
+            .then(response => {
+              const contentype = response.headers.get("content-type")
+              if(contentype.startsWith('video')) {
+                setIsVideo(true)
+              }
+            })
+            .catch(console.log)
         })
       })
       .catch(error=>{
@@ -166,10 +178,11 @@ export default function CollectibleDetail() {
     } else if(e.target.src.indexOf("ipfs.ela") >= 0) {
       e.target.src = getAssetImage(collectible, false, 2)
     } else {
-      e.target.src = '/static/circle-loading.svg'
+      e.target.src = '/static/broken-image.svg'
     }
   }
 
+  const imageUrl = getAssetImage(collectible, false)
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">
@@ -180,18 +193,39 @@ export default function CollectibleDetail() {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <PaperStyle sx={{position: 'relative'}}>
-              <Box
-                  draggable = {false}
-                  component="img"
-                  alt={collectible.name}
-                  src={getAssetImage(collectible, false)}
-                  onLoad={onImgLoad}
-                  onError={handleErrorImage}
-                  sx={{ width: '100%', borderRadius: 1, mr: 2 }}
-                  ref={imageRef}
-              />
               {
-                isLoadedImage&&
+                ((!isVideo && !isLoadedImage) || (isVideo && !videoIsLoaded)) &&
+                <Box
+                    draggable = {false}
+                    component="img"
+                    alt={collectible.name}
+                    src='/static/circle-loading.svg'
+                    sx={{ width: '100%', borderRadius: 1, mr: 2 }}
+                />
+              }
+              {
+                !isVideo?
+                <Box
+                    draggable = {false}
+                    component="img"
+                    alt={collectible.name}
+                    src={imageUrl}
+                    onLoad={onImgLoad}
+                    onError={handleErrorImage}
+                    sx={{ width: '100%', borderRadius: 1, mr: 2, display: isLoadedImage?'block':'none' }}
+                    ref={imageRef}
+                />:
+                <ReactPlayer playing 
+                    loop={Boolean(true)} 
+                    muted={Boolean(true)} 
+                    url={imageUrl} 
+                    onReady={()=>{setVideoIsLoaded(true)}} 
+                    width="100%" 
+                    height={videoIsLoaded?'100%':0}
+                />
+              }
+              {
+                ((!isVideo && isLoadedImage) || (isVideo && videoIsLoaded)) && !imageUrl.endsWith('broken-image.svg') &&
                 <Box
                     draggable = {false}
                     component="img"
