@@ -130,13 +130,9 @@ export default function EditProfile() {
           else setDidInfoValue('description', '');
 
           if(credentials.avatarUrl) {
-            const base64Content = credentials.avatarUrl.reduce((content, code)=>{
-              content=`${content}${String.fromCharCode(code)}`;
-              return content
-            }, '')
             setAvatarUrl((prevState)=>{
               if(!checkedItem[0])
-                return `data:image/png;base64,${base64Content}`
+                return credentials.avatarUrl
               return prevState
             })
           }
