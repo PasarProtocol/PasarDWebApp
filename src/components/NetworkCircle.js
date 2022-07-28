@@ -39,7 +39,7 @@ const NetworkCircle = (props)=>{
                     height: 40,
                     p: 1,
                     ml: 1,
-                    borderWidth: 1,
+                    borderWidth: 0,
                     borderStyle: 'solid',
                     borderColor: 'action.disabledBackground',
                     borderRadius: '100%',

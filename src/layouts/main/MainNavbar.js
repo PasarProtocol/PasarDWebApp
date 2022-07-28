@@ -60,6 +60,7 @@ export default function MainNavbar() {
   const isLight = themeMode === 'light';
   const isHome = pathname === '/explorer';
   const isMarketHome = pathname === '' || pathname === '/';
+  const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
 
   return (
     <AppBar sx={{ boxShadow: 0, bgcolor: 'transparent' }}>
@@ -133,7 +134,9 @@ export default function MainNavbar() {
             />
           </MHidden>
           <SignInDialog/>
-          <NetworkCircle/>
+          {
+            !!sessionLinkFlag && <NetworkCircle/>
+          }
           <MHidden width="mdDown">
             <Button
               variant="outlined"
