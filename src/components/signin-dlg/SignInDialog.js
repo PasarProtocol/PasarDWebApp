@@ -35,6 +35,8 @@ import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
+import RingAvatar from '../RingAvatar';
+import { getUserCredentials } from './LoadCredentials';
 import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getElaOnEthTokenInfo, getDiaTokenPrice, fetchFrom, getTokenPriceInEthereum, isInAppBrowser,
   getCredentialInfo, checkValidChain, getChainTypeFromId } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
@@ -90,6 +92,7 @@ export default function SignInDialog() {
   const [elaOnEthBalance, setElaOnEthBalance] = useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [diaUSD, setDiaUSD] = React.useState(0);
+  const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [tokenPricesInETH, setTokenPricesInETH] = React.useState([0, 0]);
   
   const [chainType, setChainType] = React.useState('ESC');
@@ -156,6 +159,7 @@ export default function SignInDialog() {
         }
       };
       const handleEEChainChanged = (chainId) => {
+        // alert(chainId)
         setPasarLinkChain(chainId)
         if (!checkValidChain(chainId))
           setSnackbarOpen(true);
@@ -172,6 +176,7 @@ export default function SignInDialog() {
       walletConnectProvider.on('accountsChanged', handleEEAccountsChanged);
       // Subscribe to chainId change
       walletConnectProvider.on('chainChanged', handleEEChainChanged);
+      // walletConnectProvider.on('networkChanged', (chainId)=>{alert(2); alert(chainId)});
       // Subscribe to session disconnection
       walletConnectProvider.on('disconnect', handleEEDisconnect);
       // Subscribe to session disconnection
@@ -462,7 +467,21 @@ export default function SignInDialog() {
         // })
         setActivatingConnector(essentialsConnector);
         setSigninEssentialSuccess(true);
-        
+        const targetDid = `did:elastos:${did}`
+        getUserCredentials(targetDid)
+          .then(credentials => {
+            if(!credentials)
+              return
+
+            if(credentials.avatarUrl) {
+              setAvatarUrl((prevState)=>{
+                if(!prevState)
+                  return credentials.avatarUrl
+                return prevState
+              })
+            }
+          })
+
         if (afterSigninPath) {
           setOpenSigninEssentialDlg(false);
           navigate(afterSigninPath);
@@ -596,7 +615,19 @@ export default function SignInDialog() {
       {walletAddress ? (
         <>
           <MFab id="signin" size="small" onClick={openAccountMenu} onMouseEnter={openAccountMenu}>
-            <AccountCircleOutlinedIcon />
+            {/* <AccountCircleOutlinedIcon /> */}
+            <RingAvatar
+              avatar={avatarUrl}
+              isImage={!!avatarUrl}
+              address={walletAddress}
+              size={30}
+              outersx={{
+                p: '3px',
+                border: '2px solid transparent',
+                width: 40,
+                height: 40
+              }}
+            />
           </MFab>
           <Menu
             keepMounted
