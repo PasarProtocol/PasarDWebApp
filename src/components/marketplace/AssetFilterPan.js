@@ -130,7 +130,7 @@ export default function AssetFilterPan(props){
 
   const applyRange = (e)=>{
     const range = {min: minVal, max: maxVal}
-    if(minVal>maxVal && maxVal!==''){
+    if(minVal*1>maxVal*1 && maxVal!==''){
       setErrRangeInput(true)
       return
     }
