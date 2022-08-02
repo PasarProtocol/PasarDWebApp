@@ -138,6 +138,7 @@ export default function CreateItem() {
   const APP_BAR_DESKTOP = 88;
   // const royaltiesRef = React.useRef();
   const explicitRef = React.useRef();
+  const collectionRef = React.useRef();
   const uploadRef = React.useRef();
   const nameRef = React.useRef();
   const descriptionRef = React.useRef();
@@ -173,6 +174,7 @@ export default function CreateItem() {
     else if(currentChain === 'ETH')
       handleClickCollection('PSREC')
     else{
+      setCollection('')
       setMintType('Single')
       setExplicitState(false)
       setPutOnSale(false)
@@ -1096,6 +1098,12 @@ export default function CreateItem() {
 
   const DiaDegree = getDiaBalanceDegree(diaBalance, pasarLinkChain)
   const handleMintAction = (e) => {
+    setOnValidation(true)
+    if(!collection) {
+      scrollToRef(collectionRef)
+      return
+    }
+
     if(isPutOnSale) {
       const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
       const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
@@ -1118,7 +1126,6 @@ export default function CreateItem() {
     } else {
       setTotalSteps(1)
     }
-    setOnValidation(true)
     
     if(mintype!=="Batch"&&!file || mintype==="Batch"&&!files.length)
       scrollToRef(uploadRef)
@@ -1158,7 +1165,6 @@ export default function CreateItem() {
         mintBatch()
   }
   const baseTokenGroup = { 'PSRC': MAIN_CONTRACT.ESC.sticker, 'PSREC': MAIN_CONTRACT.ETH.sticker, 'FSTK': FEEDS_CONTRACT_ADDRESS, 'Choose': selectedCollection.token }
-
   return (
     <RootStyle title="CreateItem | PASAR">
       <ProgressBar isFinished={(progress===0||progress===100||!onProgress)} progress={progress} />
@@ -1180,7 +1186,7 @@ export default function CreateItem() {
               <NetworkBox current={chainType}/>
             </Stack>
           </Grid> */}
-          <Grid item xs={12}>
+          <Grid item xs={12} ref={collectionRef}>
             <Typography variant="h4" sx={{fontWeight: 'normal'}}>Collection</Typography>
           </Grid>
           <Grid item xs={12}>
@@ -1196,13 +1202,30 @@ export default function CreateItem() {
                 chainType==="ETH" &&
                 <MintingTypeButton type="PSREC" description="Pasar ETH Collection" onClick={()=>{handleClickCollection("PSREC")}} current={collection}/>
               }
-              <MintingTypeButton type="Choose" description="existing collection" onClick={()=>{handleClickCollection("Choose")}} current={collection} selectedCollection={selectedCollection} disabled={!chainType}/>
+              <MintingTypeButton 
+                type="Choose" 
+                description="existing collection" 
+                onClick={()=>{handleClickCollection("Choose")}} 
+                current={collection} 
+                selectedCollection={selectedCollection} 
+                disabled={!chainType}
+                sx={
+                  isOnValidation&&!collection
+                  ? {
+                    borderColor: '#FFA48D',
+                    borderStyle: 'dashed',
+                    color: '#FF4842'
+                  }
+                  : {}
+                }
+              />
               {/* <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
                 <div>
                   <MintingTypeButton type="ERC-1155" description="Create own collection" onClick={()=>{setCollection("ERC-1155")}} current={collection} disabled={1&&true}/>
                 </div>
               </Tooltip> */}
             </Stack>
+            <FormHelperText error={isOnValidation&&!collection} hidden={!(isOnValidation&&!collection)}>Collection is required</FormHelperText>
           </Grid>
           <Grid item xs={12}>
             <Typography variant="h4" sx={{fontWeight: 'normal'}}>Minting Type</Typography>
