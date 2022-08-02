@@ -1,25 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Dialog,
-  Stack,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Snackbar,
-  Alert,
-  DialogContentText,
-  IconButton,
-  Typography,
-  Grid,
-  Avatar,
-  Box,
-  Link,
-  Menu,
-  MenuItem
-} from '@mui/material';
+import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
 import * as math from 'mathjs';
 import { Icon } from '@iconify/react';
 import { styled } from '@mui/material/styles';
@@ -37,8 +19,8 @@ import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import jwtDecode from 'jwt-decode';
 import { isUndefined, update } from 'lodash';
-import firebase from 'firebase/app';
-import { registerAnalytics } from '@firebase/analytics';
+import firebase from "firebase/app"
+import { registerAnalytics } from "@firebase/analytics";
 
 import { DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
@@ -101,7 +83,7 @@ export default function SignInDialog() {
   const [diaUSD, setDiaUSD] = React.useState(0);
   const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [tokenPricesInETH, setTokenPricesInETH] = React.useState([0, 0]);
-
+  
   const [chainType, setChainType] = React.useState('ESC');
   const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
   const navigate = useNavigate();
@@ -129,36 +111,39 @@ export default function SignInDialog() {
   }, [sessionLinkFlag, activatingConnector, account, chainId]);
 
   React.useEffect(() => {
-    const currentChainType = getChainTypeFromId(pasarLinkChain);
-    if (pasarLinkChain) setChainType(currentChainType);
-  }, [pasarLinkChain]);
+    const currentChainType = getChainTypeFromId(pasarLinkChain)
+    if(pasarLinkChain)
+      setChainType(currentChainType)
+  }, [pasarLinkChain])
   React.useEffect(() => {
-    if (walletAddress)
+    if(walletAddress)
       fetchFrom(`api/v2/sticker/checkV1NFTByWallet/${walletAddress}`, {})
-        .then((response) => {
-          response.json().then((jsonResult) => {
-            if (jsonResult.data) {
-              setOpenTopAlert(true);
+        .then(response => {
+          response.json().then(jsonResult => {
+            if(jsonResult.data){
+              setOpenTopAlert(true)
             } else {
-              setOpenTopAlert(false);
+              setOpenTopAlert(false)
             }
-          });
-        })
-        .catch((e) => {});
-  }, [walletAddress]);
+          })
+        }).catch(e => {
+        });
+  }, [walletAddress])
 
   React.useEffect(() => {
-    // EE
-    const handleEEAccountsChanged = (accounts) => {
-      // console.log(accounts)
-      if (accounts.length && walletAddress) {
-        setWalletAddress(accounts[0]);
-        getDiaTokenInfo(accounts[0], walletConnectProvider)
-          .then((dia) => {
-            setDiaBalance(dia);
-          })
-          .catch((e) => {
-            setDiaBalance(0);
+      // EE
+      const handleEEAccountsChanged = (accounts) => {
+        // console.log(accounts)
+        if(accounts.length && walletAddress) {
+          setWalletAddress(accounts[0])
+          getDiaTokenInfo(accounts[0], walletConnectProvider)
+            .then((dia) => { setDiaBalance(dia) })
+            .catch((e) => { setDiaBalance(0) })
+          getElaOnEthTokenInfo(accounts[0], walletConnectProvider)
+            .then((ela) => { setElaOnEthBalance(ela) })
+            .catch((e) => { setElaOnEthBalance(0) })
+          getBalance(walletConnectProvider).then((res) => {
+            setBalance(math.round(res / 1e18, 4));
           });
         }
       };
@@ -192,16 +177,15 @@ export default function SignInDialog() {
     getCoinUSD().then((res) => {
       setCoinUSD(res);
     });
-    getTokenPriceInEthereum().then((res) => {
-      setTokenPricesInETH(res);
-    });
+    getTokenPriceInEthereum().then((res)=>{ setTokenPricesInETH(res) })
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     if (sessionLinkFlag) {
       // when connected
       if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
         getDiaTokenPrice()
           .then((res) => {
-            if (!res || !res.token) return;
+            if(!res || !res.token)
+              return
             setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
           })
           .catch((error) => {
@@ -211,7 +195,8 @@ export default function SignInDialog() {
         if (isInAppBrowser()) {
           getDiaTokenPrice()
             .then((res) => {
-              if (!res || !res.token) return;
+              if(!res || !res.token)
+                return
               setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
             })
             .catch((error) => {
@@ -221,7 +206,8 @@ export default function SignInDialog() {
         } else if (essentialsConnector.getWalletConnectProvider()) {
           getDiaTokenPrice()
             .then((res) => {
-              if (!res || !res.token) return;
+              if(!res || !res.token)
+                return
               setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
             })
             .catch((error) => {
@@ -234,28 +220,21 @@ export default function SignInDialog() {
   }, [sessionLinkFlag]);
 
   React.useEffect(async () => {
-    if (chainId) {
-      setPasarLinkChain(chainId);
-      if (!checkValidChain(chainId)) setSnackbarOpen(true);
+    if(chainId) {
+      setPasarLinkChain(chainId)
+      if (!checkValidChain(chainId))
+        setSnackbarOpen(true);
     }
     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     if (sessionLinkFlag) {
       // when connected
       if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
         getDiaTokenInfo(account, library.provider)
-          .then((dia) => {
-            setDiaBalance(dia);
-          })
-          .catch((e) => {
-            setDiaBalance(0);
-          });
+          .then((dia) => { setDiaBalance(dia) })
+          .catch((e) => { setDiaBalance(0) })
         getElaOnEthTokenInfo(account, library.provider)
-          .then((ela) => {
-            setElaOnEthBalance(ela);
-          })
-          .catch((e) => {
-            setElaOnEthBalance(0);
-          });
+          .then((ela) => { setElaOnEthBalance(ela) })
+          .catch((e) => { setElaOnEthBalance(0) })
         getBalance(library.provider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
         });
@@ -263,19 +242,11 @@ export default function SignInDialog() {
         if (isInAppBrowser()) {
           const elastosWeb3Provider = await window.elastos.getWeb3Provider();
           getDiaTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
-            .then((dia) => {
-              setDiaBalance(dia);
-            })
-            .catch((e) => {
-              setDiaBalance(0);
-            });
+            .then((dia) => { setDiaBalance(dia) })
+            .catch((e) => { setDiaBalance(0) })
           getElaOnEthTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
-            .then((ela) => {
-              setElaOnEthBalance(ela);
-            })
-            .catch((e) => {
-              setElaOnEthBalance(0);
-            });
+            .then((ela) => { setElaOnEthBalance(ela) })
+            .catch((e) => { setElaOnEthBalance(0) })
           getBalance(elastosWeb3Provider).then((res) => {
             setBalance(math.round(res / 1e18, 4));
           });
@@ -283,19 +254,11 @@ export default function SignInDialog() {
         } else if (essentialsConnector.getWalletConnectProvider()) {
           const essentialProvider = essentialsConnector.getWalletConnectProvider();
           getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-            .then((dia) => {
-              setDiaBalance(dia);
-            })
-            .catch((e) => {
-              setDiaBalance(0);
-            });
+            .then((dia) => { setDiaBalance(dia) })
+            .catch((e) => { setDiaBalance(0) })
           getElaOnEthTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-            .then((ela) => {
-              setElaOnEthBalance(ela);
-            })
-            .catch((e) => {
-              setElaOnEthBalance(0);
-            });
+            .then((ela) => { setElaOnEthBalance(ela) })
+            .catch((e) => { setElaOnEthBalance(0) })
           getBalance(essentialProvider).then((res) => {
             setBalance(math.round(res / 1e18, 4));
           });
@@ -318,7 +281,7 @@ export default function SignInDialog() {
         }
       }
       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-      setPasarLinkChain(1);
+      setPasarLinkChain(1)
       setActivatingConnector(null);
       setWalletAddress(null);
       navigate('/marketplace');
@@ -339,7 +302,7 @@ export default function SignInDialog() {
           sessionStorage.removeItem('PASAR_TOKEN');
           sessionStorage.removeItem('PASAR_DID');
           sessionStorage.removeItem('KYCedProof');
-          setPasarLinkChain(1);
+          setPasarLinkChain(1)
           setActivatingConnector(null);
           setWalletAddress(null);
           navigate('/marketplace');
@@ -357,7 +320,7 @@ export default function SignInDialog() {
         sessionStorage.removeItem('PASAR_LINK_ADDRESS');
         sessionStorage.removeItem('PASAR_TOKEN');
         sessionStorage.removeItem('PASAR_DID');
-        setPasarLinkChain(1);
+        setPasarLinkChain(1)
         setActivatingConnector(null);
         setWalletAddress(null);
         navigate('/marketplace');
@@ -375,7 +338,7 @@ export default function SignInDialog() {
           }
         }
         sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-        setPasarLinkChain(1);
+        setPasarLinkChain(1)
         setActivatingConnector(null);
         setWalletAddress(null);
         navigate('/marketplace');
@@ -383,29 +346,30 @@ export default function SignInDialog() {
       }
     }
   }, [essentialsConnector.hasWalletConnectSession(), active]);
-
+  
   // ------------ MM, WC Connect ------------ //
   const handleChooseWallet = async (wallet) => {
     let currentConnector = null;
     if (wallet === 'metamask') {
       currentConnector = injected;
       await activate(currentConnector);
-    } else if (wallet === 'walletconnect') {
+    }
+    else if (wallet === 'walletconnect') {
       currentConnector = walletconnect;
       await resetWalletConnector(currentConnector);
       await activate(currentConnector);
     }
     const retAddress = await currentConnector.getAccount();
-    if (!isUndefined(retAddress)) {
+    if(!isUndefined(retAddress)) {
       console.log('loged in');
       if (currentConnector === injected) {
         sessionLinkFlag = '1';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
-        setPasarLinkAddress(1);
+        setPasarLinkAddress(1)
       } else if (currentConnector === walletconnect) {
         sessionLinkFlag = '3';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 3);
-        setPasarLinkAddress(3);
+        setPasarLinkAddress(3)
       }
       setActivatingConnector(currentConnector);
       setWalletAddress(await currentConnector.getAccount());
@@ -423,11 +387,7 @@ export default function SignInDialog() {
     // let presentation;
     try {
       const presentation = await didAccess.requestCredentials({
-        claims: [
-          DID.simpleIdClaim('Your avatar', 'avatar', false),
-          DID.simpleIdClaim('Your name', 'name', false),
-          DID.simpleIdClaim('Your description', 'description', false)
-        ]
+        claims: [DID.simpleIdClaim('Your avatar', 'avatar', false), DID.simpleIdClaim('Your name', 'name', false), DID.simpleIdClaim('Your description', 'description', false)]
       });
       if (presentation) {
         const did = presentation.getHolder().getMethodSpecificId() || '';
@@ -469,23 +429,26 @@ export default function SignInDialog() {
         sessionStorage.setItem('PASAR_DID', did);
         sessionLinkFlag = '2';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
-        setPasarLinkAddress(2);
+        setPasarLinkAddress(2)
         setOpenSigninDlg(false);
 
         // HIVE START
         // TODO: IMPROVE HIVE LOGIN
         prepareConnectToHive()
-          .then((res) => creatAndRegister(true))
+          .then(res=>(
+            creatAndRegister(true)
+          ))
           // .then(result=>{
           //   // createProfileCollection()
           // })
-          .catch((error) => {
-            console.log('Register scripting error: ', error);
-          });
+          .catch(error=>{
+            console.log("Register scripting error: ", error)
+          })
         // HIVE END
 
-        let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0];
-        if (isInAppBrowser()) essentialAddress = await window.elastos.getWeb3Provider().address;
+        let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0]
+        if (isInAppBrowser())
+          essentialAddress = await window.elastos.getWeb3Provider().address
         setWalletAddress(essentialAddress);
         // getCredentialInfo(essentialAddress).then(proofData=>{
         //   if(proofData)
@@ -543,15 +506,17 @@ export default function SignInDialog() {
   };
   // ----------------------------------- //
 
-  const handleClickOpenSinginDlg = async () => {
-    if (isInAppBrowser()) {
+  const handleClickOpenSinginDlg = async() => {
+    if(isInAppBrowser()){
       if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
         await signOutWithEssentials();
         await signInWithEssentials();
       } else {
         await signInWithEssentials();
       }
-    } else setOpenSigninDlg(true);
+    }
+    else
+      setOpenSigninDlg(true);
   };
   const handleClickOpenDownloadDlg = () => {
     setOpenSigninDlg(false);
@@ -588,8 +553,9 @@ export default function SignInDialog() {
   const closeAccountMenu = async (e) => {
     setOpenAccountPopup(null);
     if (e.target.getAttribute('value') === 'credentials') {
-      setOpenCredentials(true);
-    } else if (e.target.getAttribute('value') === 'signout') {
+      setOpenCredentials(true)
+    }
+    else if (e.target.getAttribute('value') === 'signout') {
       await activate(null);
       if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
         try {
@@ -612,47 +578,27 @@ export default function SignInDialog() {
     }
   };
 
-  let totalBalance = 0;
-  if (chainType === 'ESC')
-    totalBalance = math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2);
-  else if (chainType === 'ETH')
-    totalBalance = math.round(
-      math.round(tokenPricesInETH[0] * balance, 2) + math.round(tokenPricesInETH[1] * elaOnEthBalance, 2),
-      2
-    );
-  else if (chainType === 'FSN') totalBalance = math.round(tokenPricesInETH[2] * balance, 2);
+  let totalBalance = 0
+  if(chainType==='ESC')
+    totalBalance = math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2)
+  else if(chainType==='ETH')
+    totalBalance = math.round(math.round(tokenPricesInETH[0] * balance, 2) + math.round(tokenPricesInETH[1] * elaOnEthBalance, 2), 2)
+  else if(chainType==='FSN')
+    totalBalance = math.round(tokenPricesInETH[2] * balance, 2)
 
   const balanceListByNetwork = {
     ESC: [
       { icon: 'elastos.svg', symbol: 'ELA', name: 'Elastos (ESC)', balance, balanceUSD: coinUSD * balance },
-      {
-        icon: 'badges/diamond.svg',
-        symbol: 'DIA',
-        name: 'Diamond (ESC)',
-        balance: diaBalance,
-        balanceUSD: diaUSD * diaBalance
-      }
+      { icon: 'badges/diamond.svg', symbol: 'DIA', name: 'Diamond (ESC)', balance: diaBalance, balanceUSD: diaUSD * diaBalance },
     ],
     ETH: [
-      {
-        icon: 'erc20/ETH.svg',
-        symbol: 'ETH',
-        name: 'Ether (Ethereum)',
-        balance,
-        balanceUSD: tokenPricesInETH[0] * balance
-      },
-      {
-        icon: 'erc20/ELAonETH.svg',
-        symbol: 'ELA on ETH',
-        name: 'Elastos (Ethereum)',
-        balance: elaOnEthBalance,
-        balanceUSD: tokenPricesInETH[1] * elaOnEthBalance
-      }
+      { icon: 'erc20/ETH.svg', symbol: 'ETH', name: 'Ether (Ethereum)', balance, balanceUSD: tokenPricesInETH[0] * balance },
+      { icon: 'erc20/ELAonETH.svg', symbol: 'ELA on ETH', name: 'Elastos (Ethereum)', balance: elaOnEthBalance, balanceUSD: tokenPricesInETH[1] * elaOnEthBalance },
     ],
     FSN: [
-      { icon: 'erc20/FSN.svg', symbol: 'FSN', name: 'Fusion (FSN)', balance, balanceUSD: tokenPricesInETH[2] * balance }
+      { icon: 'erc20/FSN.svg', symbol: 'FSN', name: 'Fusion (FSN)', balance, balanceUSD: tokenPricesInETH[2] * balance },
     ]
-  };
+  }
   return (
     <>
       {walletAddress ? (
@@ -725,8 +671,9 @@ export default function SignInDialog() {
                     Add funds
                   </Button>
                 </PaperRecord>
-                {!!chainType &&
-                  balanceListByNetwork[chainType].map((item, _i) => (
+                {
+                  !!chainType &&
+                  balanceListByNetwork[chainType].map((item, _i)=>(
                     <PaperRecord sx={{ p: 1.5 }} key={_i}>
                       <Stack direction="row" alignItems="center" spacing={2}>
                         <Box
@@ -734,35 +681,26 @@ export default function SignInDialog() {
                           component="img"
                           alt=""
                           src={`/static/${item.icon}`}
-                          sx={{
-                            width: 24,
-                            height: 24,
-                            filter:
-                              item.symbol === 'ELA'
-                                ? (theme) => (theme.palette.mode === 'dark' ? 'invert(1)' : 'none')
-                                : 'unset'
-                          }}
+                          sx={{ width: 24, height: 24, filter: item.symbol==="ELA" ? (theme)=>(theme.palette.mode==='dark'?'invert(1)':'none') : 'unset' }}
                         />
                         <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                           <Typography variant="body2"> {item.symbol} </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {' '}
-                            {item.name}{' '}
+                            {' '}{item.name}{' '}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="body2" align="right">
-                            {' '}
-                            {item.balance}{' '}
+                            {' '}{item.balance}{' '}
                           </Typography>
                           <Typography variant="body2" align="right" color="text.secondary">
-                            {' '}
-                            USD {math.round(item.balanceUSD, 2)}{' '}
+                            {' '}USD {math.round(item.balanceUSD, 2)}{' '}
                           </Typography>
                         </Box>
                       </Stack>
                     </PaperRecord>
-                  ))}
+                  ))
+                }
               </Stack>
             </Box>
             <MenuItem to="/profile" onClick={closeAccountMenu} component={RouterLink}>
@@ -1075,9 +1013,8 @@ export default function SignInDialog() {
             Download Essentials
           </Typography>
           <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
-            A DID is required in order to create or{' '}
-            {openDownloadEssential === true ? 'sell items' : 'import collections'} on Pasar. Get your own DID by
-            downloading the Elastos Essentials mobile app now!
+            A DID is required in order to create or {openDownloadEssential===true?'sell items':'import collections'} on Pasar. Get your own DID by downloading the Elastos
+            Essentials mobile app now!
           </Typography>
           <Typography variant="body2" display="block" gutterBottom align="center" sx={{ mt: 4 }}>
             Web3.0 super wallet with Decentralized Identifier (DID)
