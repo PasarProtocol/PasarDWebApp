@@ -329,7 +329,7 @@ export default function AssetCard(props) {
                   </div>
                 }
                 {
-                  type===2&&sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2'&&(
+                  (type===2 || type===3) && sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && (
                     (
                       isListedOwnedByMe&&
                       <div>
@@ -459,7 +459,7 @@ export default function AssetCard(props) {
                 type===1||
                 type===2&&(isListedOwnedByMe)||
                 type===2&&isListedByOthers||
-                type===3&&!auctionEnded
+                type===3&&(saleType!=="Not on sale" && !auctionEnded)
               ) &&
               <Stack direction='row'>
                 <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 20, m: 'auto', display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
@@ -472,18 +472,18 @@ export default function AssetCard(props) {
             {
               (
                 (type===0&&saleType==="Not on sale"&&!showPrice)||
-                (type===2&&isUnlistedByOthers)
+                ((type===2||type===3)&&isUnlistedByOthers)
               ) &&
               <Typography variant="h6" sx={{color: "origin.main", fontSize: {xs: '1rem'}}} align='center'>
                 Not on Sale
               </Typography>
             }
             {
-              (type===2&&isUnlistedOwnedByMe)&&
+              ((type===2||type===3)&&isUnlistedOwnedByMe)&&
               <StyledButton variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={handleSell}>Sell</StyledButton>
             }
             {
-              (type===3&&auctionEnded)&&
+              (type===3&&(saleType!=="Not on sale"&&auctionEnded))&&
               <StyledButton variant="contained" size="small" fullWidth sx={{mt: 1, mb: .5}} onClick={(e)=>{setSettleOrderOpen(true)}}>Claim Item</StyledButton>
             }
             {/* {
