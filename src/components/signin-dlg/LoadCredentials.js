@@ -1,19 +1,4 @@
-import {
-  VaultSubscription,
-  AboutService,
-  ServiceEndpoint,
-  HttpClient,
-  AuthService,
-  BackupSubscription,
-  Provider,
-  SubscriptionService,
-  AlreadyExistsException,
-  Vault,
-  NotFoundException,
-  InsertOptions,
-  BackupResultResult,
-  ScriptRunner
-} from '@elastosfoundation/hive-js-sdk';
+import { ServiceEndpoint, HttpClient } from '@elastosfoundation/hive-js-sdk';
 import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
 import { BrowserConnectivitySDKHiveAuthHelper } from './BrowserConnectivitySDKHiveAuthHelper';
 import { DidResolverUrl } from '../../config';
@@ -177,22 +162,22 @@ export const getCredentialsFromPasar = async (did) => {
 };
 
 export const getUserCredentials = async (did) => {
+  const pasarCredential = await getCredentialsFromPasar(did);
   try {
-    const pasarCredential = await getCredentialsFromPasar(did);
     let avatarUrl = '';
     const credentials = await getCredentialsFromDID(did);
     if (credentials && credentials.avatar) {
       const hiveAvatarUrl = getHiveAvatarUrlFromDIDAvatarCredential(credentials.avatar);
       if (did && credentials.avatar) avatarUrl = await fetchHiveScriptPictureToDataUrl(hiveAvatarUrl, did);
     }
-    const name = credentials.name || pasarCredential.name || '';
-    const description = credentials.description || pasarCredential.description || '';
-    const website = credentials.website || pasarCredential.website || '';
-    const twitter = credentials.twitter || pasarCredential.twitter || '';
-    const discord = credentials.discord || pasarCredential.discord || '';
-    const telegram = credentials.telegram || pasarCredential.telegram || '';
-    const medium = credentials.medium || pasarCredential.medium || '';
-    const kycMe = credentials.kyc_me || pasarCredential.kycMe || '';
+    const name = pasarCredential.name ? pasarCredential.name : credentials.name || '';
+    const description = pasarCredential.description ? pasarCredential.description : credentials.description || '';
+    const website = pasarCredential.website ? pasarCredential.website : credentials.website || '';
+    const twitter = pasarCredential.twitter ? pasarCredential.twitter : credentials.twitter || '';
+    const discord = pasarCredential.discord ? pasarCredential.discord : credentials.discord || '';
+    const telegram = pasarCredential.telegram ? pasarCredential.telegram : credentials.telegram || '';
+    const medium = pasarCredential.medium ? pasarCredential.medium : credentials.medium || '';
+    const kycMe = pasarCredential.kycMe ? pasarCredential.kycMe : credentials.kyc_me || '';
     return { avatarUrl, name, description, website, twitter, discord, telegram, medium, kycMe };
   } catch (err) {
     console.log(err);
