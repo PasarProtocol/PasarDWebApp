@@ -140,8 +140,13 @@ const registerFileDownloadScripting = (scriptName) => (
 )
 
 export const queryAvatarUrl = async(targetDid, appid = ApplicationDID) => {
-  const result = await callQueryScript(AVATAR_URL, targetDid, appid)
-  return result
+  try {
+    const result = await callQueryScript(AVATAR_URL, targetDid, appid)
+    return result
+  } catch (err) {
+    console.log(err)
+    return {}
+  }
 }
 
 export const queryName = async(targetDid, appid = ApplicationDID) => {
@@ -432,10 +437,11 @@ export const uploadAvatar = async(imgBase64) =>{
 export const downloadAvatar = async(targetDid) => {
   try {
     const data = await downloadImageScripting(targetDid, AVATAR, AVATAR_REMOTE_PATH)
-  return data
+    return data
   } catch (error) {
     console.log(`download avatar error: ${error}`)
-    throw error
+    return ""
+    // throw error
   }
 }
 

@@ -110,8 +110,8 @@ const NetworkExplorerServer = {
 const ApplicationDIDForMain = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 // const ApplicationDIDForTest = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB"
 export const DidResolverUrl = 
-// 'https://api.trinity-tech.io/eid'
-  process.env.REACT_APP_ENV === 'production' ? 'mainnet' : 'testnet';
+'https://api.trinity-tech.io/eid'
+  // process.env.REACT_APP_ENV === 'production' ? 'mainnet' : 'testnet';
 
 export const {MAIN_CONTRACT, feedsContract, v1marketContract, diaContract, welaContract, glideContract, 
   elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, elaOnEthContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest

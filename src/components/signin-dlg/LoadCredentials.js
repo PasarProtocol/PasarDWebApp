@@ -4,14 +4,15 @@ import { BrowserConnectivitySDKHiveAuthHelper } from './BrowserConnectivitySDKHi
 import { DidResolverUrl } from '../../config';
 import {
   queryAvatarUrl,
-  queryDescription,
-  queryDiscord,
-  queryKycMe,
-  queryMedium,
   queryName,
-  queryTelegram,
+  queryDescription,
+  queryWebsite,
   queryTwitter,
-  queryWebsite
+  queryDiscord,
+  queryTelegram,
+  queryMedium,
+  queryKycMe,
+  downloadAvatar
 } from './HiveAPI';
 import { downloadFromUrl } from './HiveService';
 
@@ -135,6 +136,15 @@ export const getCredentialsFromPasar = async (did) => {
       const dataQueryAvatarUrl = resQueryAvatarUrl.find_message.items[0].display_name;
       const avatarData = await downloadFromUrl(dataQueryAvatarUrl);
       if (avatarData && avatarData.length) avatarUrl = `data:image/png;base64,${avatarData.toString('base64')}`;
+    } else {
+      const resDownloadAvatarUrl = await downloadAvatar(did)
+      if (resDownloadAvatarUrl && resDownloadAvatarUrl.length) {
+        const base64Content = resDownloadAvatarUrl.reduce((content, code) => {
+          content = `${content}${String.fromCharCode(code)}`;
+          return content
+        }, '')
+        avatarUrl = `data:image/png;base64,${base64Content}`
+      }
     }
     const name = getQueryDataFromObject(await queryName(did));
     const description = getQueryDataFromObject(await queryDescription(did));

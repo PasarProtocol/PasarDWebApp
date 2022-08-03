@@ -130,7 +130,6 @@ export default function MyItems() {
       const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`;
       const token = sessionStorage.getItem('PASAR_TOKEN');
       const user = jwtDecode(token);
-      const { name, bio } = user;
       fetchProfileData(targetDid, user);
     } else {
       setWalletAddress(myAddress);
@@ -175,15 +174,7 @@ export default function MyItems() {
         else setDidInfoValue('description', didInfo.bio);
 
         if(credentials.avatarUrl) {
-          // const base64Content = credentials.avatarUrl.reduce((content, code)=>{
-          //   content=`${content}${String.fromCharCode(code)}`;
-          //   return content
-          // }, '')
-          setAvatarUrl((prevState)=>{
-            if(!prevState)
-              return credentials.avatarUrl
-            return prevState
-          })
+          setAvatarUrl(credentials.avatarUrl)
         }
 
         if(credentials.kycMe)
