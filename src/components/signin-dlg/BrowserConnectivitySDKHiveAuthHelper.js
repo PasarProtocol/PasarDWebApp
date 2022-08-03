@@ -29,7 +29,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
 
   constructor(didResolverUrl) {
     try {
-      AppContext.setupResolver(didResolverUrl, '/anyfakedir/browserside/for/didstores');
+      AppContext.setupResolver(didResolverUrl, '/data/userDir/data/store/catch');
     } catch (e) {
       if (e instanceof DIDResolverAlreadySetupException) {
         // silent error, it's ok
@@ -212,7 +212,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
               .setAudience(claims.getIssuer())
               .setIssuedAt(dayjs().unix())
               .setExpiration(dayjs().add(3, 'month').unix())
-              .setNotBefore(dayjs().unix())
+              .setNotBefore(dayjs().subtract(3, 'minutes').unix())
               .claimsWithJson('presentation', presentation.toString(true))
               .sign(appInstanceDIDInfo.storePassword);
 
