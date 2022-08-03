@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
-import { formatDistance } from 'date-fns';
 import { Box, Stack, Link, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CopyButton from '../../CopyButton';
-import { getAssetImage } from '../../../utils/common';
+import { getAssetImage, getDateDistance } from '../../../utils/common';
 
 CollectibleListItem.propTypes = {
     item: PropTypes.object.isRequired
@@ -54,7 +53,7 @@ export default function CollectibleListItem({ item }) {
                 </Grid>
                 <Grid item xs={4}>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} align="right" noWrap>
-                        {formatDistance(createTime*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
+                        {getDateDistance(createTime)}
                     </TypographyStyle>
                 </Grid>
             </Grid>
