@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types';
-import { formatDistance } from 'date-fns';
 import { Link as RouterLink } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { Box, Stack, Link, Typography, Grid, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import MethodLabel from '../../MethodLabel';
-import { reduceHexAddress, getAssetImage, MethodList, getExplorerSrvByNetwork } from '../../../utils/common';
+import { reduceHexAddress, getAssetImage, MethodList, getExplorerSrvByNetwork, getDateDistance } from '../../../utils/common';
 
 TransactionListItem.propTypes = {
     item: PropTypes.object.isRequired
@@ -93,7 +92,7 @@ export default function TransactionListItem({ item }) {
                         Date
                     </TypographyStyle>
                     <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="right">
-                        {formatDistance(item.timestamp*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
+                        {getDateDistance(item.timestamp)}
                     </TypographyStyle>
                 </Grid>
             </Grid>

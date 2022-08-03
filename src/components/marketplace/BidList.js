@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
-import { formatDistance } from 'date-fns';
 import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import palette from '../../theme/palette'
 

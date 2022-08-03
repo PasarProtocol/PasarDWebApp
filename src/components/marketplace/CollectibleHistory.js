@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
-import { formatDistance } from 'date-fns';
 import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import { Icon } from '@iconify/react';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
@@ -9,7 +8,7 @@ import palette from '../../theme/palette'
 
 // material
 import LoadingScreen from '../LoadingScreen';
-import { MethodList, reduceHexAddress, getDidInfoFromAddress, getCoinTypeFromToken } from '../../utils/common';
+import { MethodList, reduceHexAddress, getDidInfoFromAddress, getCoinTypeFromToken, getDateDistance } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired
@@ -61,7 +60,7 @@ function TransItem(props) {
           </Box>
           <Box>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
-                  {formatDistance(trans.timestamp*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
+                  {getDateDistance(trans.timestamp)}
               </Typography>
           </Box>
       </Stack>

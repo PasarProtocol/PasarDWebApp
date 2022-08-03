@@ -3,7 +3,7 @@ import Web3 from 'web3';
 import * as math from 'mathjs';
 import { createHash } from 'crypto';
 import { create, urlSource } from 'ipfs-http-client';
-import { format, subDays, subHours, differenceInDays } from 'date-fns';
+import { format, subDays, subHours, formatDistance } from 'date-fns';
 import Jazzicon from '@metamask/jazzicon';
 import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
 import jwtDecode from 'jwt-decode';
@@ -66,6 +66,8 @@ export const getTime = (timestamp) => {
 };
 
 export const getDateTimeString = (date) => `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+
+export const getDateDistance = (timestamp) => timestamp ? formatDistance(timestamp*1000, new Date(), { addSuffix: true }).replace("about","").trim() : ''
 
 export const getTimeZone = () => {
   const e = String(-(new Date).getTimezoneOffset() / 60);
