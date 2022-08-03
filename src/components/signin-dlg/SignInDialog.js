@@ -55,20 +55,8 @@ import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
 import RingAvatar from '../RingAvatar';
 import { getUserCredentials } from './LoadCredentials';
-import {
-  reduceHexAddress,
-  getBalance,
-  getCoinUSD,
-  getDiaTokenInfo,
-  getElaOnEthTokenInfo,
-  getDiaTokenPrice,
-  fetchFrom,
-  getTokenPriceInEthereum,
-  isInAppBrowser,
-  getCredentialInfo,
-  checkValidChain,
-  getChainTypeFromId
-} from '../../utils/common';
+import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getElaOnEthTokenInfo, getDiaTokenPrice, fetchFrom, getTokenPriceInEthereum, isInAppBrowser,
+  getCredentialInfo, checkValidChain, getChainTypeFromId } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 import { creatAndRegister, prepareConnectToHive } from './HiveAPI';
 import { DidResolverUrl, firebaseConfig } from '../../config';
@@ -172,41 +160,32 @@ export default function SignInDialog() {
           .catch((e) => {
             setDiaBalance(0);
           });
-        getElaOnEthTokenInfo(accounts[0], walletConnectProvider)
-          .then((ela) => {
-            setElaOnEthBalance(ela);
-          })
-          .catch((e) => {
-            setElaOnEthBalance(0);
-          });
-        getBalance(walletConnectProvider).then((res) => {
-          setBalance(math.round(res / 1e18, 4));
-        });
-      }
-    };
-    const handleEEChainChanged = (chainId) => {
-      // alert(chainId)
-      setPasarLinkChain(chainId);
-      if (!checkValidChain(chainId)) setSnackbarOpen(true);
-    };
-    const handleEEDisconnect = (code, reason) => {
-      console.log('Disconnect code: ', code, ', reason: ', reason);
-      signOutWithEssentials();
-    };
-    const handleEEError = (code, reason) => {
-      console.error(code, reason);
-    };
+        }
+      };
+      const handleEEChainChanged = (chainId) => {
+        // alert(chainId)
+        setPasarLinkChain(chainId)
+        if (!checkValidChain(chainId))
+          setSnackbarOpen(true);
+      };
+      const handleEEDisconnect = (code, reason) => {
+        console.log('Disconnect code: ', code, ', reason: ', reason);
+        signOutWithEssentials();
+      };
+      const handleEEError = (code, reason) => {
+        console.error(code, reason);
+      };
 
-    // Subscribe to accounts change
-    walletConnectProvider.on('accountsChanged', handleEEAccountsChanged);
-    // Subscribe to chainId change
-    walletConnectProvider.on('chainChanged', handleEEChainChanged);
-    // walletConnectProvider.on('networkChanged', (chainId)=>{alert(2); alert(chainId)});
-    // Subscribe to session disconnection
-    walletConnectProvider.on('disconnect', handleEEDisconnect);
-    // Subscribe to session disconnection
-    walletConnectProvider.on('error', handleEEError);
-  }, []);
+      // Subscribe to accounts change
+      walletConnectProvider.on('accountsChanged', handleEEAccountsChanged);
+      // Subscribe to chainId change
+      walletConnectProvider.on('chainChanged', handleEEChainChanged);
+      // walletConnectProvider.on('networkChanged', (chainId)=>{alert(2); alert(chainId)});
+      // Subscribe to session disconnection
+      walletConnectProvider.on('disconnect', handleEEDisconnect);
+      // Subscribe to session disconnection
+      walletConnectProvider.on('error', handleEEError);
+  }, [])
 
   React.useEffect(async () => {
     initializeWalletConnection();
@@ -514,17 +493,20 @@ export default function SignInDialog() {
         // })
         setActivatingConnector(essentialsConnector);
         setSigninEssentialSuccess(true);
-        const targetDid = `did:elastos:${did}`;
-        getUserCredentials(targetDid).then((credentials) => {
-          if (!credentials) return;
+        const targetDid = `did:elastos:${did}`
+        getUserCredentials(targetDid)
+          .then(credentials => {
+            if(!credentials)
+              return
 
-          if (credentials.avatarUrl) {
-            setAvatarUrl((prevState) => {
-              if (!prevState) return credentials.avatarUrl;
-              return prevState;
-            });
-          }
-        });
+            if(credentials.avatarUrl) {
+              setAvatarUrl((prevState)=>{
+                if(!prevState)
+                  return credentials.avatarUrl
+                return prevState
+              })
+            }
+          })
 
         if (afterSigninPath) {
           setOpenSigninEssentialDlg(false);
