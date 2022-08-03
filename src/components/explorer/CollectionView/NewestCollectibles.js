@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types';
-import { formatDistance } from 'date-fns';
 import { Link as RouterLink } from 'react-router-dom';
 // material
 import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
-import { reduceHexAddress, getAssetImage } from '../../../utils/common';
 import CopyButton from '../../CopyButton';
+import { reduceHexAddress, getAssetImage, getDateDistance } from '../../../utils/common';
 // ----------------------------------------------------------------------
 
 
@@ -55,7 +54,7 @@ function CollectibleItem({ collectible }) {
           </Box>
           <Box>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
-                  {formatDistance(createTime*1000, new Date(), { addSuffix: true }).replace("about","").trim()}
+                  {getDateDistance(createTime)}
               </Typography>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary', pb: '5px' }} align="right" noWrap>
                   Token ID : {reduceHexAddress(tokenIdHex)}

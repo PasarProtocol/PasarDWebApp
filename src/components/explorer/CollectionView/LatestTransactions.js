@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { formatDistance } from 'date-fns';
 import { Icon } from '@iconify/react';
 import { Box, Stack, Link, Typography, IconButton, Divider } from '@mui/material';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
@@ -7,7 +6,7 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 // material
 import CollectionView from './Template'
 import LoadingScreen from '../../LoadingScreen';
-import { MethodList, reduceHexAddress, getExplorerSrvByNetwork, chainTypes } from '../../../utils/common';
+import { MethodList, reduceHexAddress, getExplorerSrvByNetwork, chainTypes, getDateDistance } from '../../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,
@@ -48,7 +47,7 @@ export function TransItem({ trans }) {
           </Box>
           <Box>
               <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} align="right" noWrap>
-                  {trans.timestamp ? formatDistance(trans.timestamp*1000, new Date(), { addSuffix: true }).replace("about","").trim() : ''}
+                  {getDateDistance(trans.timestamp)}
               </Typography>
           </Box>
       </Stack>
