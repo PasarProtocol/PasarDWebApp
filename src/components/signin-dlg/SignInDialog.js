@@ -40,7 +40,8 @@ import { getUserCredentials } from './LoadCredentials';
 import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getElaOnEthTokenInfo, getDiaTokenPrice, fetchFrom, getTokenPriceInEthereum, isInAppBrowser,
   getCredentialInfo, checkValidChain, getChainTypeFromId } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
-import { creatAndRegister, prepareConnectToHive } from './HiveAPI';
+import { creatAndRegister, prepareConnectToHive, queryAvatarUrl, downloadAvatar } from './HiveAPI';
+import { downloadFromUrl } from './HiveService'
 import { DidResolverUrl, firebaseConfig } from '../../config';
 
 // Initialize Firebase
@@ -100,6 +101,8 @@ export default function SignInDialog() {
             ? await window.elastos.getWeb3Provider().address
             : essentialsConnector.getWalletConnectProvider().wc.accounts[0]
         );
+        const mydid = sessionStorage.getItem('PASAR_DID')
+        getAvatarUrl(mydid)
         setActivatingConnector(essentialsConnector);
       } else if (sessionLinkFlag === '3') {
         setActivatingConnector(walletconnect);
@@ -110,11 +113,40 @@ export default function SignInDialog() {
     }
   }, [sessionLinkFlag, activatingConnector, account, chainId]);
 
+  const getAvatarUrl = (did) => {
+    const targetDid = `did:elastos:${did}`
+    queryAvatarUrl(targetDid).then((res) => {
+      if (res.find_message && res.find_message.items.length) {
+        const avatarUrl = res.find_message.items[0].display_name;
+        downloadFromUrl(avatarUrl).then((avatarData) => {
+          if (avatarData && avatarData.length) {
+            const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`;
+            setAvatarUrl(base64Content);
+          }
+        });
+      }
+    });
+    downloadAvatar(targetDid).then((res) => {
+      if (res && res.length) {
+        const base64Content = res.reduce((content, code) => {
+          content = `${content}${String.fromCharCode(code)}`;
+          return content
+        }, '')
+        setAvatarUrl((prevState) => {
+          if(!prevState)
+            return `data:image/png;base64,${base64Content}`
+          return prevState
+        })
+      }
+    });
+  }
+
   React.useEffect(() => {
     const currentChainType = getChainTypeFromId(pasarLinkChain)
     if(pasarLinkChain)
       setChainType(currentChainType)
   }, [pasarLinkChain])
+
   React.useEffect(() => {
     if(walletAddress)
       fetchFrom(`api/v2/sticker/checkV1NFTByWallet/${walletAddress}`, {})
@@ -456,20 +488,7 @@ export default function SignInDialog() {
         // })
         setActivatingConnector(essentialsConnector);
         setSigninEssentialSuccess(true);
-        const targetDid = `did:elastos:${did}`
-        getUserCredentials(targetDid)
-          .then(credentials => {
-            if(!credentials)
-              return
-
-            if(credentials.avatarUrl) {
-              setAvatarUrl((prevState)=>{
-                if(!prevState)
-                  return credentials.avatarUrl
-                return prevState
-              })
-            }
-          })
+        getAvatarUrl(did)
 
         if (afterSigninPath) {
           setOpenSigninEssentialDlg(false);

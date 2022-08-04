@@ -360,133 +360,134 @@ export default function CollectibleDetail() {
   }, [updateCount, tokenId]);
 
   const fetchProfileData = (targetDid, didInfo, type='all')=>{
-    getUserCredentials(targetDid)
-      .then(credentials => {
-        if(!credentials)
-          return
+    // getUserCredentials(targetDid)
+    //   .then(credentials => {
+    //     if(!credentials)
+    //       return
 
-        if(credentials.name){
-          if(type==='all')
-            setDidName({creator: credentials.name, owner: credentials.name})
-          else
-            setDidNameOfUser(type, credentials.name)
-        }
-        
-        if(credentials.avatarUrl) {
-          const base64Content = credentials.avatarUrl.reduce((content, code)=>{
-            content=`${content}${String.fromCharCode(code)}`;
-            return content
-          }, '')
-          const displayAvatar = `data:image/png;base64,${base64Content}`
-          if(type==='all')
-            setAvatarUrl((prevState)=>{
-              if(!prevState.creator)
-                return {creator: displayAvatar, owner: displayAvatar}
-              return prevState
-            })
-          else
-            setAvatarUrl((prevState) => {
-              const tempAvatar = {...prevState};
-              if(!tempAvatar[type])
-                tempAvatar[type] = displayAvatar;
-              return tempAvatar;
-            });
-        }
-
-        if(credentials.kycMe) {
-          if(type==='all')
-            setBadge((prevState)=>{
-              const tempState = {...prevState}
-              tempState.creator.kyc = true
-              tempState.owner.kyc = true
-              return tempState
-            })
-          else
-            setBadgeOfUser(type, 'kyc', true)
-        } else
-          if(type==='all')
-            setBadge((prevState)=>{
-              const tempState = {...prevState}
-              tempState.creator.kyc = false
-              tempState.owner.kyc = false
-              return tempState
-            })
-          else
-            setBadgeOfUser(type, 'kyc', false)
-      })
-
-    // queryName(targetDid)
-    //   .then((res)=>{
-    //     if(res.find_message && res.find_message.items.length) {
-    //       const displayName = res.find_message.items[0].display_name
+    //     if(credentials.name){
     //       if(type==='all')
-    //         setDidName({creator: displayName, owner: displayName})
+    //         setDidName({creator: credentials.name, owner: credentials.name})
     //       else
-    //         setDidNameOfUser(type, displayName)
+    //         setDidNameOfUser(type, credentials.name)
+    //     }
+        
+    //     if(credentials.avatarUrl) {
+    //       const base64Content = credentials.avatarUrl.reduce((content, code)=>{
+    //         content=`${content}${String.fromCharCode(code)}`;
+    //         return content
+    //       }, '')
+    //       const displayAvatar = `data:image/png;base64,${base64Content}`
+    //       if(type==='all')
+    //         setAvatarUrl((prevState)=>{
+    //           if(!prevState.creator)
+    //             return {creator: displayAvatar, owner: displayAvatar}
+    //           return prevState
+    //         })
+    //       else
+    //         setAvatarUrl((prevState) => {
+    //           const tempAvatar = {...prevState};
+    //           if(!tempAvatar[type])
+    //             tempAvatar[type] = displayAvatar;
+    //           return tempAvatar;
+    //         });
     //     }
 
-    //     queryAvatarUrl(targetDid).then((res)=>{
-    //       if(res.find_message && res.find_message.items.length) {
-    //         const avatarUrl = res.find_message.items[0].display_name
-    //         downloadFromUrl(avatarUrl).then(avatarData=>{
-    //           if(avatarData && avatarData.length) {
-    //             const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
-    //             if(type==='all')
-    //               setAvatarUrl({creator: base64Content, owner: base64Content})
-    //             else
-    //               setAvatarOfUser(type, base64Content)
-    //           }
+    //     if(credentials.kycMe) {
+    //       if(type==='all')
+    //         setBadge((prevState)=>{
+    //           const tempState = {...prevState}
+    //           tempState.creator.kyc = true
+    //           tempState.owner.kyc = true
+    //           return tempState
     //         })
-    //       }
-    //     })
-    //     downloadAvatar(targetDid).then((res)=>{
-    //       if(res && res.length) {
-    //         const base64Content = res.reduce((content, code)=>{
-    //           content=`${content}${String.fromCharCode(code)}`;
-    //           return content
-    //         }, '')
-    //         const displayAvatar = `data:image/png;base64,${base64Content}`
-    //         if(type==='all')
-    //           setAvatarUrl((prevState)=>{
-    //             if(!prevState.creator)
-    //               return {creator: displayAvatar, owner: displayAvatar}
-    //             return prevState
-    //           })
-    //         else
-    //           setAvatarUrl((prevState) => {
-    //             const tempAvatar = {...prevState};
-    //             if(!tempAvatar[type])
-    //               tempAvatar[type] = displayAvatar;
-    //             return tempAvatar;
-    //           });
-    //       }
-    //     })
-    //     queryKycMe(targetDid).then((res)=>{
-    //       if(res.find_message && res.find_message.items.length){
-    //         if(type==='all')
-    //           setBadge((prevState)=>{
-    //             const tempState = {...prevState}
-    //             tempState.creator.kyc = true
-    //             tempState.owner.kyc = true
-    //             return tempState
-    //           })
-    //         else
-    //           setBadgeOfUser(type, 'kyc', true)
-    //       }
     //       else
-    //         if(type==='all')
-    //           setBadge((prevState)=>{
-    //             const tempState = {...prevState}
-    //             tempState.creator.kyc = false
-    //             tempState.owner.kyc = false
-    //             return tempState
-    //           })
-    //         else
-    //           setBadgeOfUser(type, 'kyc', false)
-    //     })
+    //         setBadgeOfUser(type, 'kyc', true)
+    //     } else
+    //       if(type==='all')
+    //         setBadge((prevState)=>{
+    //           const tempState = {...prevState}
+    //           tempState.creator.kyc = false
+    //           tempState.owner.kyc = false
+    //           return tempState
+    //         })
+    //       else
+    //         setBadgeOfUser(type, 'kyc', false)
     //   })
-    //   .catch(e=>{
-    //   })
+
+    queryName(targetDid)
+      .then((res)=>{
+        if(res.find_message && res.find_message.items.length) {
+          const displayName = res.find_message.items[0].display_name
+          if(type==='all')
+            setDidName({creator: displayName, owner: displayName})
+          else
+            setDidNameOfUser(type, displayName)
+        }
+
+        queryAvatarUrl(targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length) {
+            const avatarUrl = res.find_message.items[0].display_name
+            downloadFromUrl(avatarUrl).then(avatarData=>{
+              if(avatarData && avatarData.length) {
+                const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
+                if(type==='all')
+                  setAvatarUrl({creator: base64Content, owner: base64Content})
+                else
+                  setAvatarOfUser(type, base64Content)
+              }
+            })
+          }
+        })
+        downloadAvatar(targetDid).then((res)=>{
+          if(res && res.length) {
+            const base64Content = res.reduce((content, code)=>{
+              content=`${content}${String.fromCharCode(code)}`;
+              return content
+            }, '')
+            const displayAvatar = `data:image/png;base64,${base64Content}`
+            if(type==='all')
+              setAvatarUrl((prevState)=>{
+                if(!prevState.creator)
+                  return {creator: displayAvatar, owner: displayAvatar}
+                return prevState
+              })
+            else
+              setAvatarUrl((prevState) => {
+                const tempAvatar = {...prevState};
+                if(!tempAvatar[type])
+                  tempAvatar[type] = displayAvatar;
+                return tempAvatar;
+              });
+          }
+        })
+        queryKycMe(targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length){
+            if(type==='all')
+              setBadge((prevState)=>{
+                const tempState = {...prevState}
+                tempState.creator.kyc = true
+                tempState.owner.kyc = true
+                return tempState
+              })
+            else
+              setBadgeOfUser(type, 'kyc', true)
+          }
+          else
+            if(type==='all')
+              setBadge((prevState)=>{
+                const tempState = {...prevState}
+                tempState.creator.kyc = false
+                tempState.owner.kyc = false
+                return tempState
+              })
+            else
+              setBadgeOfUser(type, 'kyc', false)
+        })
+      })
+      .catch(e=>{
+        console.log(e)
+      })
   }
 
   const onImgLoad = ({target:img}) => {

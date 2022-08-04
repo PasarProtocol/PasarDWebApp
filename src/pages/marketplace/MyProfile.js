@@ -113,7 +113,7 @@ export default function MyProfile() {
     telegram: queryTelegram,
     medium: queryMedium
   }
-  const socialTypes = [ 'website', 'twitter', 'discord', 'telegram', 'medium' ]
+  // const socialTypes = [ 'website', 'twitter', 'discord', 'telegram', 'medium' ]
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   // const triedEager = useEagerConnect();
   React.useEffect(async() => {

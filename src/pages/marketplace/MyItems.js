@@ -107,14 +107,14 @@ export default function MyItems() {
   const context = useWeb3React();
   const { account } = context;
 
-  // const queryProfileSocials = {
-  //   website: queryWebsite,
-  //   twitter: queryTwitter,
-  //   discord: queryDiscord,
-  //   telegram: queryTelegram,
-  //   medium: queryMedium
-  // };
-  const socialTypes = [ 'website', 'twitter', 'discord', 'telegram', 'medium' ]
+  const queryProfileSocials = {
+    website: queryWebsite,
+    twitter: queryTwitter,
+    discord: queryDiscord,
+    telegram: queryTelegram,
+    medium: queryMedium
+  };
+  // const socialTypes = [ 'website', 'twitter', 'discord', 'telegram', 'medium' ]
   React.useEffect(() => {
     if (params.address && params.address !== myAddress) {
       setWalletAddress(params.address);
@@ -160,93 +160,93 @@ export default function MyItems() {
   }, [account, params.address]);
 
   const fetchProfileData = (targetDid, didInfo) => {
-    getUserCredentials(targetDid)
-      .then(credentials => {
-        if(!credentials)
-          return
+    // getUserCredentials(targetDid)
+    //   .then(credentials => {
+    //     if(!credentials)
+    //       return
 
-        if(credentials.name)
-          setDidInfoValue('name', credentials.name);
-        else setDidInfoValue('name', didInfo.name);
-
-        if(credentials.description)
-          setDidInfoValue('description', credentials.description);
-        else setDidInfoValue('description', didInfo.bio);
-
-        if(credentials.avatarUrl) {
-          setAvatarUrl(credentials.avatarUrl)
-        }
-
-        if(credentials.kycMe)
-          setBadgeFlag('kyc', true)
-        else
-          setBadgeFlag('kyc', false)
-
-        socialTypes.forEach((type) => {
-          if (credentials[type])
-            setSocials((prevState) => {
-              const tempState = { ...prevState };
-              tempState[type] = credentials[type];
-              return tempState;
-            });
-        });
-      })
-
-    // queryName(targetDid)
-    //   .then((res) => {
-    //     if (res.find_message && res.find_message.items.length)
-    //       setDidInfoValue('name', res.find_message.items[0].display_name);
+    //     if(credentials.name)
+    //       setDidInfoValue('name', credentials.name);
     //     else setDidInfoValue('name', didInfo.name);
 
-    //     queryDescription(targetDid).then((res) => {
-    //       if (res.find_message && res.find_message.items.length)
-    //         setDidInfoValue('description', res.find_message.items[0].display_name);
-    //       else setDidInfoValue('description', didInfo.bio);
-    //     });
-    //     queryAvatarUrl(targetDid).then((res) => {
-    //       if (res.find_message && res.find_message.items.length) {
-    //         const avatarUrl = res.find_message.items[0].display_name;
-    //         downloadFromUrl(avatarUrl).then((avatarData) => {
-    //           if (avatarData && avatarData.length) {
-    //             const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`;
-    //             setAvatarUrl(base64Content);
-    //           }
+    //     if(credentials.description)
+    //       setDidInfoValue('description', credentials.description);
+    //     else setDidInfoValue('description', didInfo.bio);
+
+    //     if(credentials.avatarUrl) {
+    //       setAvatarUrl(credentials.avatarUrl)
+    //     }
+
+    //     if(credentials.kycMe)
+    //       setBadgeFlag('kyc', true)
+    //     else
+    //       setBadgeFlag('kyc', false)
+
+    //     socialTypes.forEach((type) => {
+    //       if (credentials[type])
+    //         setSocials((prevState) => {
+    //           const tempState = { ...prevState };
+    //           tempState[type] = credentials[type];
+    //           return tempState;
     //         });
-    //       }
-    //     });
-    //     downloadAvatar(targetDid).then((res) => {
-    //       if (res && res.length) {
-    //         const base64Content = res.reduce((content, code) => {
-    //           content = `${content}${String.fromCharCode(code)}`;
-    //           return content
-    //         }, '')
-    //         setAvatarUrl((prevState) => {
-    //           if(!prevState)
-    //             return `data:image/png;base64,${base64Content}`
-    //           return prevState
-    //         })
-    //       }
-    //     });
-    //     queryKycMe(targetDid).then((res) => {
-    //       if(res.find_message && res.find_message.items.length)
-    //         setBadgeFlag('kyc', true)
-    //       else
-    //         setBadgeFlag('kyc', false)
-    //     })
-    //     Object.keys(queryProfileSocials).forEach((field) => {
-    //       queryProfileSocials[field](targetDid).then((res) => {
-    //         if (res.find_message && res.find_message.items.length)
-    //           setSocials((prevState) => {
-    //             const tempState = { ...prevState };
-    //             tempState[field] = res.find_message.items[0].display_name;
-    //             return tempState;
-    //           });
-    //       });
     //     });
     //   })
-    //   .catch((e) => {
-    //     console.log(e);
-    //   });
+
+    queryName(targetDid)
+      .then((res) => {
+        if (res.find_message && res.find_message.items.length)
+          setDidInfoValue('name', res.find_message.items[0].display_name);
+        else setDidInfoValue('name', didInfo.name);
+
+        queryDescription(targetDid).then((res) => {
+          if (res.find_message && res.find_message.items.length)
+            setDidInfoValue('description', res.find_message.items[0].display_name);
+          else setDidInfoValue('description', didInfo.bio);
+        });
+        queryAvatarUrl(targetDid).then((res) => {
+          if (res.find_message && res.find_message.items.length) {
+            const avatarUrl = res.find_message.items[0].display_name;
+            downloadFromUrl(avatarUrl).then((avatarData) => {
+              if (avatarData && avatarData.length) {
+                const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`;
+                setAvatarUrl(base64Content);
+              }
+            });
+          }
+        });
+        downloadAvatar(targetDid).then((res) => {
+          if (res && res.length) {
+            const base64Content = res.reduce((content, code) => {
+              content = `${content}${String.fromCharCode(code)}`;
+              return content
+            }, '')
+            setAvatarUrl((prevState) => {
+              if(!prevState)
+                return `data:image/png;base64,${base64Content}`
+              return prevState
+            })
+          }
+        });
+        queryKycMe(targetDid).then((res) => {
+          if(res.find_message && res.find_message.items.length)
+            setBadgeFlag('kyc', true)
+          else
+            setBadgeFlag('kyc', false)
+        })
+        Object.keys(queryProfileSocials).forEach((field) => {
+          queryProfileSocials[field](targetDid).then((res) => {
+            if (res.find_message && res.find_message.items.length)
+              setSocials((prevState) => {
+                const tempState = { ...prevState };
+                tempState[field] = res.find_message.items[0].display_name;
+                return tempState;
+              });
+          });
+        });
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
   const setDidInfoValue = (field, value) => {
