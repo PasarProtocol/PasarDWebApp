@@ -696,6 +696,7 @@ export default function CollectionDetail() {
                   <Button
                     endIcon={<CheckIcon/>}
                     onClick={applyFilterForm}
+                    color="inherit"
                   >
                     Done
                   </Button>
