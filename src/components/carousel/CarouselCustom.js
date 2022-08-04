@@ -16,7 +16,7 @@ import { MAIN_CONTRACT, blockchain } from '../../config'
 // ----------------------------------------------------------------------
 
 const CAROUSEL_ICONS = ['marketplace', 'description', 'hammer', 'diamond', 'hash', 'cash-hand', 'basket', 'collection', 'contract-address', 'calendar-hammer', 'ethereum', 'blockchain']
-const CAROUSEL_TITLE = ['Status', 'Description', 'Creator', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Collection', 'Contract Address', 'Created Date', 'Token Standard', 'Blockchain']
+const CAROUSEL_TITLE = ['Status', 'Description', 'Minted By', 'Owner', 'Token ID', 'Royalties', 'Quantity', 'Collection', 'Contract Address', 'Created Date', 'Token Standard', 'Blockchain']
 const CAROUSEL_KEYS = ['status', 'description', 'royaltyOwner', 'holder', 'tokenIdHex', 'royalties', 'quantity', 'collection', 'baseToken', 'createTime', 'tokenStandard', 'blockchain']
 const CAROUSEL_COPYABLE = [false, false, true, true, true, false, false, false, true, false, false, false, false]
 
@@ -68,7 +68,7 @@ const DetailItem = (props)=>{
                   }
                   {
                     title!=="Status"&&(
-                      (title==="Creator" || title==="Owner")?
+                      (title==="Minted By" || title==="Owner")?
                       <Link to={`/explorer/transaction/detail/${value}`} component={RouterLink} color='text.secondary'>
                         {displayValue}
                       </Link>:

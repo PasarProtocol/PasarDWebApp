@@ -47,7 +47,7 @@ function CollectibleItem({ collectible }) {
               </Link>
               <Typography variant="body2" noWrap>
                 <Link to={`/explorer/transaction/detail/${creator}`} component={RouterLink} color="text.secondary">
-                  Creator : {reduceHexAddress(creator)}
+                  Minted By : {reduceHexAddress(creator)}
                 </Link>
                 <CopyButton text={creator}/>
               </Typography>

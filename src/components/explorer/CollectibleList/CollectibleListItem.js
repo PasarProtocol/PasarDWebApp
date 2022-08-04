@@ -43,7 +43,7 @@ export default function CollectibleListItem({ item }) {
                     </Typography>
                     <Stack sx={{flexDirection: 'row'}}>
                         <Typography variant="body2" sx={{ color: 'text.secondary', width: "auto", pt: '2px' }} align="left" noWrap>
-                            Creator : <Link to={`/explorer/transaction/detail/${royaltyOwner}`} component={RouterLink} sx={{ color: 'text.secondary'}} onClick={(e)=>{e.stopPropagation()}}>{royaltyOwner}</Link>
+                            Minted By : <Link to={`/explorer/transaction/detail/${royaltyOwner}`} component={RouterLink} sx={{ color: 'text.secondary'}} onClick={(e)=>{e.stopPropagation()}}>{royaltyOwner}</Link>
                         </Typography>
                         <CopyButton text={royaltyOwner}/>
                     </Stack>
