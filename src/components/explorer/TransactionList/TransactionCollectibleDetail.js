@@ -29,7 +29,7 @@ export default function TransactionCollectibleDetail({ item }) {
             <Grid container spacing={2}>
                 <Grid item xs={7} sm={4}>
                     <Typography color="inherit" variant="subtitle2" noWrap>
-                        Creator
+                        Minted By
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                         {tokenIdHex}
