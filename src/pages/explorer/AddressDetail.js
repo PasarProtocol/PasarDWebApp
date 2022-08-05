@@ -1,10 +1,10 @@
 // material
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { Link as RouterLink, useParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
-import { Box, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Paper, Typography, FormControlLabel, Select, MenuItem } from '@mui/material';
+import { Box, Container, Accordion, AccordionSummary, AccordionDetails, Stack, Grid, Link, Typography, FormControlLabel, Select, MenuItem } from '@mui/material';
 // components
 import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
@@ -129,11 +129,13 @@ export default function AddressDetail() {
   return (
     <RootStyle title="Transaction | PASAR">
       <Container maxWidth="lg">
-        <Stack sx={{mb: 2, flexDirection: 'row'}}>
+        <Stack sx={{mb: 2, flexDirection: 'row', alignItems: 'center'}}>
           <Typography variant="h4" sx={{ width: "auto" }} noWrap>
+            <Link to={`/profile/others/${params.address}`} component={RouterLink} color="inherit">
               {params.address}
+            </Link>
           </Typography>
-          <CopyButton text={params.address}/>
+          <CopyButton text={params.address} sx={{height: 'fit-content'}}/>
         </Stack>
         <Grid container spacing={2}>
           <Grid item xs={12}>
