@@ -47,7 +47,7 @@ const RootStyle = styled(Page)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 const credentialItems = [
-  {title: 'Avatar', description: 'avatar', id: 'avatar'},
+  // {title: 'Avatar', description: 'avatar', id: 'avatar'},
   {title: 'Name', description: 'name', id: 'name'},
   {title: 'Description', description: 'description', id: 'description'},
   {title: 'Website', description: 'website', id: 'website'},
@@ -68,7 +68,7 @@ const DescriptionStyle = {
   wordWrap: 'break-word'
 }
 export default function EditProfile() {
-  const [checkedItem, setCheckedItem] = React.useState(Array(8).fill(false));
+  const [checkedItem, setCheckedItem] = React.useState(Array(7).fill(false));
   const [walletAddress, setWalletAddress] = React.useState(null);
   const [onProgress, setOnProgress] = React.useState(false);
   const [avatarUrl, setAvatarUrl] = React.useState(null);
@@ -90,7 +90,6 @@ export default function EditProfile() {
     telegram: queryTelegram,
     medium: queryMedium
   }
-  // const socialTypes = [ 'website', 'twitter', 'discord', 'telegram', 'medium' ]
     
   React.useEffect(async () => {
     // updateAvatarUrl('hive://did:elastos:inSeTvmVDj6to7dHSZgkRZuUJYc9yHJChN@did:elastos:ig1nqyyJhwTctdLyDFbZomSbZSjyMN1uor/getMainIdentityAvatar1636346252993?params={"empty":0}').then(res=>{
@@ -112,65 +111,11 @@ export default function EditProfile() {
       })
 
       const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`
-      // getUserCredentials(targetDid)
-      //   .then(credentials => {
-      //     if(!credentials)
-      //       return
-
-      //     if(credentials.name) {
-      //       setDidInfoValue('name', credentials.name);
-      //       handleSetChecked(1)
-      //     }
-      //     else setDidInfoValue('name', '');
-
-      //     if(credentials.description) {
-      //       setDidInfoValue('description', credentials.description);
-      //       handleSetChecked(2)
-      //     }
-      //     else setDidInfoValue('description', '');
-
-      //     if(credentials.avatarUrl) {
-      //       setAvatarUrl((prevState)=>{
-      //         if(!checkedItem[0])
-      //           return credentials.avatarUrl
-      //         return prevState
-      //       })
-      //     }
-
-      //     if(credentials.kycMe) {
-      //       setBadgeFlag('kyc', true)
-      //       handleSetChecked(8)
-      //     }
-      //     else
-      //       setBadgeFlag('kyc', false)
-
-      //     socialTypes.forEach((type, _i) => {
-      //       if (credentials[type]) {
-      //         setSocials((prevState) => {
-      //           const tempState = { ...prevState };
-      //           tempState[type] = credentials[type];
-      //           return tempState;
-      //         });
-      //         handleSetChecked(_i+3)
-      //       }
-      //       else
-      //         setSocials((prevState) => {
-      //           const tempState = {...prevState}
-      //           delete tempState[type]
-      //           return tempState
-      //         })
-      //     });
-      //   })
-      //   .catch(e=>{
-      //     enqueueSnackbar('Loading data failed', { variant: 'error' });
-      //     console.log(e)
-      //   })
-
       queryName(targetDid)
         .then((res)=>{
           if(res.find_message && res.find_message.items.length) {
             setDidInfoValue('name', res.find_message.items[0].display_name)
-            handleSetChecked(1)
+            handleSetChecked(0)
           } else {
             setDidInfoValue('name', '')
           }
@@ -178,21 +123,9 @@ export default function EditProfile() {
           queryDescription(targetDid).then((res)=>{
             if(res.find_message && res.find_message.items.length) {
               setDidInfoValue('description', res.find_message.items[0].display_name)
-              handleSetChecked(2)
+              handleSetChecked(1)
             } else {
               setDidInfoValue('description', '')
-            }
-          })
-          queryAvatarUrl(targetDid).then((res)=>{
-            if(res.find_message && res.find_message.items.length) {
-              const avatarUrl = res.find_message.items[0].display_name
-              handleSetChecked(0)
-              downloadFromUrl(avatarUrl).then(avatarData=>{
-                if(avatarData && avatarData.length) {
-                  const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
-                  setAvatarUrl(base64Content)
-                }
-              })
             }
           })
           downloadAvatar(targetDid).then((res)=>{
@@ -201,17 +134,13 @@ export default function EditProfile() {
                 content=`${content}${String.fromCharCode(code)}`;
                 return content
               }, '')
-              setAvatarUrl((prevState)=>{
-                if(!checkedItem[0])
-                  return `data:image/png;base64,${base64Content}`
-                return prevState
-              })
+              setAvatarUrl(`data:image/png;base64,${base64Content}`)
             }
           })
           queryKycMe(targetDid).then((res)=>{
             if(res.find_message && res.find_message.items.length) {
               setBadgeFlag('kyc', true)
-              handleSetChecked(8)
+              handleSetChecked(7)
             }
             else
               setBadgeFlag('kyc', false)
@@ -224,7 +153,7 @@ export default function EditProfile() {
                   tempState[field] = res.find_message.items[0].display_name
                   return tempState
                 })
-                handleSetChecked(_i+3)
+                handleSetChecked(_i+2)
               } else {
                 setSocials((prevState) => {
                   const tempState = {...prevState}
@@ -273,14 +202,6 @@ export default function EditProfile() {
       return tempState
     })
   };
-
-  const handleDropAvatar = React.useCallback((acceptedFiles) => {
-    const file = acceptedFiles[0];
-    if (file) {
-      const tempFileObj = Object.assign(file, {preview: URL.createObjectURL(file)})
-      setAvatarUrl(tempFileObj);
-    }
-  }, []);
 
   const stopProvide = (errMsg)=>{
     setOnProgress(false)
@@ -354,48 +275,30 @@ export default function EditProfile() {
         await Promise.all(credentialItems.slice(0, credentialItems.length-1).map((item, _i)=>{
           const updateFunc = updateProfileData[_i]
           if(profileData[item.id] && checkedItem[_i])
-            return updateFunc(profileData[item.id])
-          return updateFunc('', "private")
+            return updateFunc(profileData[item.id], "public")
+          return updateFunc("", "private")
         }))
         // console.log(profileData)
         // updateName(profileData.name)
-        if(checkedItem[8] && profileData){
+        if(checkedItem[7] && profileData){
           const {BirthDateCredential, GenderCredential, CountryCredential} = profileData
           const tempKYCdata = { birthdate: BirthDateCredential, gender: GenderCredential, country: CountryCredential }
-          await updateKycMe(JSON.stringify(tempKYCdata))
+          await updateKycMe(JSON.stringify(tempKYCdata), "public")
           // const vpBuffer = Buffer.from(kycVerifiablePresentation.serialize())
           // const encodedPresentation = bs58.encode(vpBuffer)
           // sessionStorage.setItem('KYCedProof', encodedPresentation)
         } else {
-          await updateKycMe('', 'private')
+          await updateKycMe("", "private")
           // deleteKycMe()
         }
       } else {
-        const deleteProfileFuncArr = updateProfileData.map(func=>func('', 'private'))
+        const deleteProfileFuncArr = updateProfileData.map(func=>func("", "private"))
         // const deleteProfileFuncArr = deleteProfileData.map(func=>func())
         await Promise.all(deleteProfileFuncArr)
       }
-      if(avatarUrl && !isString(avatarUrl)) {
-        const reader = new window.FileReader();
-        reader.readAsArrayBuffer(avatarUrl);
-        reader.onloadend = async() => {
-          try {
-            const fileContent = Buffer.from(reader.result)
-            const bs64Content = fileContent.toString('base64')
-            await uploadAvatar(bs64Content)
-            enqueueSnackbar('Save action success', { variant: 'success' });
-            setUpdateState(!updateState)
-            setOnProgress(false)
-          } catch (error) {
-            enqueueSnackbar('Save avatar error', { variant: 'error' });
-            setOnProgress(false)
-          }
-        }
-      } else {
-        enqueueSnackbar('Save action success', { variant: 'success' });
-        setUpdateState(!updateState)
-        setOnProgress(false)
-      }
+      enqueueSnackbar('Save action success', { variant: 'success' });
+      setUpdateState(!updateState)
+      setOnProgress(false)
     } catch (error) {
       stopProvide("Request credentials error")
       try {
@@ -424,13 +327,12 @@ export default function EditProfile() {
             <Grid item xs={12}>
               <Typography variant="h4" sx={{fontWeight: 'normal'}}>Avatar</Typography>
               <Paper sx={{ border: '1px solid', borderColor: 'action.disabledBackground', p: 3, mt: 3, textAlign: 'center' }}>
-                <UploadAvatar
-                  accept="image/*"
-                  file={avatarUrl}
-                  onDrop={handleDropAvatar}
-                  size={90}
+                <RingAvatar
                   address={walletAddress}
-                  sx={{}}
+                  isImage={!!avatarUrl}
+                  avatar={avatarUrl}
+                  size={80}
+                  outersx={{m: 'auto'}}
                 />
                 <Typography variant='h3' sx={{ pt: 2 }}>{didInfo.name || reduceHexAddress(walletAddress)}</Typography>
                 {
@@ -500,13 +402,12 @@ export default function EditProfile() {
             <Grid item sm={5}>
               <Typography variant="h4" sx={{fontWeight: 'normal'}}>Preview</Typography>
               <Paper sx={{ border: '1px solid', borderColor: 'action.disabledBackground', p: 3, mt: 3, textAlign: 'center' }}>
-                <UploadAvatar
-                  accept="image/*"
-                  file={avatarUrl}
-                  onDrop={handleDropAvatar}
-                  size={110}
+                <RingAvatar
                   address={walletAddress}
-                  sx={{}}
+                  isImage={!!avatarUrl}
+                  avatar={avatarUrl}
+                  size={110}
+                  outersx={{m: 'auto'}}
                 />
                 <Typography variant='h3' sx={{ pt: 2 }}>{didInfo.name || reduceHexAddress(walletAddress)}</Typography>
                 {
