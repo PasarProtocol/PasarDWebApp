@@ -26,7 +26,7 @@ import DIABadge from '../../components/badge/DIABadge';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup'
 import { queryAvatarUrl, queryName, queryDescription, queryWebsite, queryTwitter, queryDiscord, queryTelegram, queryMedium, queryKycMe, 
   deleteAvatarUrl, deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe, 
-  updateAvatarUrl, updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe, uploadAvatar, downloadAvatar } from '../../components/signin-dlg/HiveAPI';
+  updateAvatarUrl, updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI';
 import { downloadFromUrl } from '../../components/signin-dlg/HiveService'
 import { getUserCredentials } from '../../components/signin-dlg/LoadCredentials';
 import { isInAppBrowser, getCredentialInfo, getDiaTokenInfo, reduceHexAddress } from '../../utils/common';

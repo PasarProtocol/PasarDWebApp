@@ -161,17 +161,17 @@ export default function BadgeProfile(props) {
           else
             setDidInfoValue('description', didInfo.bio)
         })
-        queryAvatarUrl(targetDid).then((res)=>{
-          if(res.find_message && res.find_message.items.length) {
-            const avatarUrl = res.find_message.items[0].display_name
-            downloadFromUrl(avatarUrl).then(avatarData=>{
-              if(avatarData && avatarData.length) {
-                const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
-                setAvatarUrl(base64Content)
-              }
-            })
-          }
-        })
+        // queryAvatarUrl(targetDid).then((res)=>{
+        //   if(res.find_message && res.find_message.items.length) {
+        //     const avatarUrl = res.find_message.items[0].display_name
+        //     downloadFromUrl(avatarUrl).then(avatarData=>{
+        //       if(avatarData && avatarData.length) {
+        //         const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`
+        //         setAvatarUrl(base64Content)
+        //       }
+        //     })
+        //   }
+        // })
         downloadAvatar(targetDid).then((res)=>{
           if(res && res.length) {
             const base64Content = res.reduce((content, code)=>{
