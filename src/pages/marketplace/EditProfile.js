@@ -47,7 +47,7 @@ const RootStyle = styled(Page)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 const credentialItems = [
-  // {title: 'Avatar', description: 'avatar', id: 'avatar'},
+  {title: 'Avatar', description: 'avatar', id: 'avatar'},
   {title: 'Name', description: 'name', id: 'name'},
   {title: 'Description', description: 'description', id: 'description'},
   {title: 'Website', description: 'website', id: 'website'},
@@ -68,7 +68,7 @@ const DescriptionStyle = {
   wordWrap: 'break-word'
 }
 export default function EditProfile() {
-  const [checkedItem, setCheckedItem] = React.useState(Array(7).fill(false));
+  const [checkedItem, setCheckedItem] = React.useState(Array(8).fill(false));
   const [walletAddress, setWalletAddress] = React.useState(null);
   const [onProgress, setOnProgress] = React.useState(false);
   const [avatarUrl, setAvatarUrl] = React.useState(null);
@@ -280,7 +280,7 @@ export default function EditProfile() {
         }))
         // console.log(profileData)
         // updateName(profileData.name)
-        if(checkedItem[7] && profileData){
+        if(checkedItem[8] && profileData){
           const {BirthDateCredential, GenderCredential, CountryCredential} = profileData
           const tempKYCdata = { birthdate: BirthDateCredential, gender: GenderCredential, country: CountryCredential }
           await updateKycMe(JSON.stringify(tempKYCdata), "public")
