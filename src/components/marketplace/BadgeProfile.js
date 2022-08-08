@@ -249,13 +249,17 @@ export default function BadgeProfile(props) {
         }
         {
           type===2&&
-          <>
+          <Box sx={{ position: 'relative' }}>
             {
               avatarUrl?
               <Avatar alt="user" src={avatarUrl} sx={{width: 26, height: 26, display: 'inline-flex'}} />:
               <Jazzicon address={walletAddress} size={26} sx={{mr: 0}}/>
             }
-          </>
+            {
+              badge.kyc&&
+              <Box sx={{ position: 'absolute', bottom: 0, right: -5, width: 16 }}><KYCBadge/></Box>
+            }
+          </Box>
         }
         {
           type===3&&
