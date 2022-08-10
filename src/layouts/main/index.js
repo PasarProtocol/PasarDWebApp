@@ -63,8 +63,15 @@ export default function MainLayout() {
   const { openTopAlert } = useSingin()
   const isHome = pathname === '/';
   const isContainerXl = isHome || pathname === '/collections';
-  const isFooterHiddenPage = pathname === '/marketplace' || pathname === '/marketplace/' || pathname === '/create'
-   || pathname === '/create/' || pathname.startsWith('/marketplace/search') || pathname.startsWith('/collections/detail');
+  const isFooterHiddenPage = 
+    pathname === '/marketplace' || 
+    pathname === '/marketplace/' || 
+    pathname === '/create' || 
+    pathname === '/create/' || 
+    pathname === '/activity' || 
+    pathname === '/activity/' || 
+    pathname.startsWith('/marketplace/search') || 
+    pathname.startsWith('/collections/detail');
   return (
     <>
       <MainNavbar />
