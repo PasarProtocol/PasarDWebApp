@@ -20,16 +20,18 @@ import { MHidden, MIconButton } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import LoadingScreen from '../../components/LoadingScreen';
-import ChainSelect from '../../components/ChainSelect';
+import KYCBadge from '../../components/badge/KYCBadge';
 import ActivityPeriodSelect from '../../components/ActivityPeriodSelect';
 import ActivityFilterPan from '../../components/activity/ActivityFilterPan';
 import TabletImgBox from '../../components/activity/TabletImgBox'
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
+import { queryName, queryKycMe } from '../../components/signin-dlg/HiveAPI'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSignin from '../../hooks/useSignin';
-import { fetchFrom, MethodList, setAllTokenPrice, getTotalCountOfCoinTypes, getCoinTypeFromToken, reduceHexAddress, getDateDistance } from '../../utils/common';
+
+import { fetchFrom, MethodList, setAllTokenPrice, getTotalCountOfCoinTypes, getCoinTypeFromToken, reduceHexAddress, getDateDistance, getDidInfoFromAddress } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -125,33 +127,9 @@ export default function MarketExplorer() {
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
   // const [activities, setActivity] = React.useState([]);
-  const [activities, setActivity] = React.useState([{
-    "_id": "62f4a11492e7d1083f48c404",
-    "blockNumber": 7369397,
-    "marketPlace": 3,
-    "tokenId": "79829147512736634719551218892238588924174987477326859535778640470300681938890",
-    "from": "0x0000000000000000000000000000000000000000",
-    "gasFee": 0.0075,
-    "timestamp": 1658839826,
-    "to": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
-    "event": "CreateOrderForSale",
-    "tHash": "0x53cdb6e55b896fe9113aff652689c2495d8dda25828905b1cbb4421efcced885",
-    "royaltyFee": "0",
-    "name": "first1",
-    "royalties": "0",
-    "asset": "pasar:image:QmNc2K6rxHX8zsoAdewfe4dtX6NTu8NLMtm4pkw9uv7WGu",
-    "royaltyOwner": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
-    "thumbnail": "pasar:image:QmRJwYzZnZacEz5TjNGRkZzBzXaaB9NPY24aZJi9hNoRAi",
-    "data": {},
-    "tokenJsonVersion": "2",
-    "quoteToken": "0x0000000000000000000000000000000000000000",
-    "baseToken": "0xEcedc8942e20150691Bd6A622442108d4c6572d7",
-    "price": "2000000000000000000",
-    "collection": "Pasar Collection",
-    "v1Event": null
-  }]);
-  const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
-  const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
+  const [activities, setActivity] = React.useState([]);
+  const [infoByAddress, setInfoByAddress] = React.useState({});
+  const [addressGroup, setAddressByGroup] = React.useState([]);
   const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
   const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
   const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):defaultDispMode);
@@ -162,7 +140,6 @@ export default function MarketExplorer() {
   });
   const [totalCount, setTotalCount] = React.useState(0);
   const [period, setPeriod] = React.useState(4);
-  const [chainType, setChainType] = React.useState(sessionFilterProps.chainType || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingActivity, setLoadingActivity] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
@@ -204,6 +181,69 @@ export default function MarketExplorer() {
     handleDispInLaptopSize()
     setAllTokenPrice(setCoinPriceByType)
   }, [])
+
+  React.useEffect(() => {
+    addressGroup.forEach((addr) => {
+      if(!infoByAddress[addr]) {
+        getDidInfoFromAddress(addr)
+          .then((info) => {
+            if(info.name){
+              setInfoByAddress((prevState) => {
+                const tempInfo = {...prevState};
+                tempInfo[addr] = {name: info.name};
+                return tempInfo;
+              })
+              if(sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+                fetchProfileData(info.did, addr)
+            }
+          })
+          .catch((e) => {})
+      }
+    })
+  }, [addressGroup])
+
+  const fetchProfileData = (targetDid, address)=>{
+    queryName(targetDid)
+      .then((res)=>{
+        if(res.find_message && res.find_message.items.length) {
+          const displayName = res.find_message.items[0].display_name
+          setInfoByAddress((prevState) => {
+            const tempInfo = {...prevState};
+            tempInfo[address] = {name: displayName};
+            return tempInfo;
+          })
+        }
+        queryKycMe(targetDid).then((res)=>{
+          if(res.find_message && res.find_message.items.length){
+            setInfoByAddress((prevState) => {
+              const tempInfo = {...prevState};
+              tempInfo[address].kyc = true;
+              return tempInfo;
+            })
+          }
+        })
+      })
+      .catch(e=>{})
+  }
+
+  // const fetchProfile4Test = (targetDid, address)=>{
+  //   setTimeout(()=>{
+  //     const displayName = "Stiartsly"
+  //     setInfoByAddress((prevState) => {
+  //       const tempInfo = {...prevState};
+  //       tempInfo[address] = {name: displayName};
+  //       return tempInfo;
+  //     })
+  //     setTimeout(()=>{
+  //       setInfoByAddress((prevState) => {
+  //         const tempInfo = {...prevState};
+  //         tempInfo[address].kyc = true;
+  //         return tempInfo;
+  //       })
+  //     }, 3000)
+  //   }, 5000)
+  // }
+
   React.useEffect(async () => {
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
@@ -239,6 +279,39 @@ export default function MarketExplorer() {
     //   }).catch(e => {
     //     setLoadingActivity(false);
     //   });
+    const tempResult = [{
+      "_id": "62f4a11492e7d1083f48c404",
+      "blockNumber": 7369397,
+      "marketPlace": 3,
+      "tokenId": "79829147512736634719551218892238588924174987477326859535778640470300681938890",
+      "from": "0x0000000000000000000000000000000000000000",
+      "gasFee": 0.0075,
+      "timestamp": 1658839826,
+      "to": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
+      "event": "CreateOrderForSale",
+      "tHash": "0x53cdb6e55b896fe9113aff652689c2495d8dda25828905b1cbb4421efcced885",
+      "royaltyFee": "0",
+      "name": "first1",
+      "royalties": "0",
+      "asset": "pasar:image:QmNc2K6rxHX8zsoAdewfe4dtX6NTu8NLMtm4pkw9uv7WGu",
+      "royaltyOwner": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
+      "thumbnail": "pasar:image:QmRJwYzZnZacEz5TjNGRkZzBzXaaB9NPY24aZJi9hNoRAi",
+      "data": {},
+      "tokenJsonVersion": "2",
+      "quoteToken": "0x0000000000000000000000000000000000000000",
+      "baseToken": "0xEcedc8942e20150691Bd6A622442108d4c6572d7",
+      "price": "2000000000000000000",
+      "collection": "Pasar Collection",
+      "v1Event": null
+    }]
+    const addressGroup = []
+    tempResult.forEach(trans => {
+      addressGroup.push(trans.from)
+      addressGroup.push(trans.to)
+    });
+    const uniqueAddresses = [...new Set(addressGroup)];
+    setAddressByGroup(uniqueAddresses)
+    setActivity(tempResult)
     sessionStorage.setItem("activity-filter-props", JSON.stringify({selectedBtns}))
     setFilterForm({selectedBtns})
   }, [page, showCount, selectedBtns, params.key]);
@@ -450,10 +523,6 @@ export default function MarketExplorer() {
                                       if(!methodItem)
                                           methodItem = {color: 'grey', icon: 'tag', detail: []}
                                       // const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
-                                      // const tempChainType = chainTypes[trans.marketPlace-1]
-                                      // let feeTokenName = 'ELA'
-                                      // if(tempChainType)
-                                      //     feeTokenName = tempChainType.token
                                       cellcontent = 
                                         <Stack direction="row" alignItems="center" spacing={2}>
                                           <Box
@@ -494,8 +563,17 @@ export default function MarketExplorer() {
                                       break;
                                     case "from":
                                     case "to": {
-                                      const dispAddress = reduceHexAddress(trans[column.id])
-                                      cellcontent = <Typography variant="body2" color="origin.main">{dispAddress}</Typography>
+                                      const addrstr = trans[column.id]
+                                      const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr)
+                                      cellcontent = 
+                                        <Stack direction="row" spacing={1} alignItems="center" display="inline-flex">
+                                          <Typography variant="body2" color="origin.main" display="inline-flex">
+                                            {dispAddress}
+                                          </Typography>
+                                          {
+                                            infoByAddress[addrstr] && infoByAddress[addrstr].kyc && <KYCBadge/>
+                                          }
+                                        </Stack>
                                     }
                                       break;
                                     case "timestamp":
