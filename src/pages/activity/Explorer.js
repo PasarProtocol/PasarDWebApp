@@ -23,12 +23,13 @@ import LoadingScreen from '../../components/LoadingScreen';
 import ChainSelect from '../../components/ChainSelect';
 import ActivityPeriodSelect from '../../components/ActivityPeriodSelect';
 import ActivityFilterPan from '../../components/activity/ActivityFilterPan';
+import TabletImgBox from '../../components/activity/TabletImgBox'
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSignin from '../../hooks/useSignin';
-import { fetchFrom } from '../../utils/common';
+import { fetchFrom, MethodList } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -98,12 +99,12 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 }));
 // ----------------------------------------------------------------------
 const COLUMNS = [
-  { id: 'Type', label: 'Type', minWidth: 170, align: 'center' },
-  { id: 'Item', label: 'Item', minWidth: 170, align: 'center' },
-  { id: 'Price', label: 'Price', minWidth: 170, align: 'center' },
-  { id: 'From', label: 'From', minWidth: 170, align: 'center' },
-  { id: 'To', label: 'To', minWidth: 170, align: 'center' },
-  { id: 'Time', label: 'Time', minWidth: 170, align: 'center' },
+  { id: 'event', label: 'Type', minWidth: 170, align: 'center' },
+  { id: 'image', label: 'Item', minWidth: 170, align: 'center' },
+  { id: 'price', label: 'Price', minWidth: 170, align: 'center' },
+  { id: 'from', label: 'From', minWidth: 170, align: 'center' },
+  { id: 'to', label: 'To', minWidth: 170, align: 'center' },
+  { id: 'timestamp', label: 'Time', minWidth: 170, align: 'center' },
 ];
 export default function MarketExplorer() {
   const sessionDispMode = sessionStorage.getItem("disp-mode")
@@ -122,7 +123,30 @@ export default function MarketExplorer() {
   const defaultDispMode = isMobile?1:0
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
-  const [assets, setAssets] = React.useState([]);
+  // const [activities, setActivity] = React.useState([]);
+  const [activities, setActivity] = React.useState([{
+    "_id": "62f4a11492e7d1083f48c404",
+    "blockNumber": 7369397,
+    "marketPlace": 3,
+    "tokenId": "79829147512736634719551218892238588924174987477326859535778640470300681938890",
+    "from": "0x0000000000000000000000000000000000000000",
+    "gasFee": 0.0075,
+    "timestamp": 1658839826,
+    "to": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
+    "event": "Mint",
+    "tHash": "0x53cdb6e55b896fe9113aff652689c2495d8dda25828905b1cbb4421efcced885",
+    "royaltyFee": "0",
+    "name": "first1",
+    "royalties": "0",
+    "asset": "pasar:image:QmNc2K6rxHX8zsoAdewfe4dtX6NTu8NLMtm4pkw9uv7WGu",
+    "royaltyOwner": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
+    "thumbnail": "pasar:image:QmRJwYzZnZacEz5TjNGRkZzBzXaaB9NPY24aZJi9hNoRAi",
+    "data": {},
+    "tokenJsonVersion": "2",
+    "quoteToken": "0x0000000000000000000000000000000000000000",
+    "baseToken": "0xEcedc8942e20150691Bd6A622442108d4c6572d7",
+    "v1Event": null
+  }]);
   const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
   const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
   const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
@@ -137,7 +161,7 @@ export default function MarketExplorer() {
   const [period, setPeriod] = React.useState(4);
   const [chainType, setChainType] = React.useState(sessionFilterProps.chainType || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
-  const [isLoadingAssets, setLoadingAssets] = React.useState(false);
+  const [isLoadingActivity, setLoadingActivity] = React.useState(false);
 
   const [loadNext, setLoadNext] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -173,35 +197,34 @@ export default function MarketExplorer() {
     setAbortController(newController);
     let statusFilter = btnGroup.status.filter((name, index)=>selectedBtns.indexOf(index)>=0)
     statusFilter = (statusFilter.length===btnGroup.status.length || statusFilter.length===0)?'All':statusFilter.join(",")
-    setLoadingAssets(true);
+    setLoadingActivity(true);
 
-    if(!loadNext)
-      setAssets([])
-    fetchFrom(`api/v2/sticker/getDetailedCollectibles?`+
-      `status=${statusFilter}&`+
-      `period=${period}&`+
-      `pageNum=${page}&`+
-      `pageSize=${showCount}`, { signal })
-      .then(response => {
-        response.json().then(jsonAssets => {
-          if(jsonAssets.data){
-            setTotalCount(jsonAssets.data.total)
-            setPages(Math.ceil(jsonAssets.data.total/showCount));
-            if(loadNext)
-              setAssets([...assets, ...jsonAssets.data.result]);
-            else {
-              setAssets(jsonAssets.data.result);
-              // window.scrollTo(0,0)
-            }
-          }
-          setAlreadyMounted(false)
-          setLoadNext(false)
-          setLoadingAssets(false)
-        })
-      }).catch(e => {
-        if(e.code !== e.ABORT_ERR)
-          setLoadingAssets(false);
-      });
+    // if(!loadNext)
+    //   setActivity([])
+    // fetchFrom(`api/v2/sticker/getDetailedCollectibles?`+
+    //   `status=${statusFilter}&`+
+    //   `period=${period}&`+
+    //   `pageNum=${page}&`+
+    //   `pageSize=${showCount}`, { signal })
+    //   .then(response => {
+    //     response.json().then(jsonAssets => {
+    //       if(jsonAssets.data){
+    //         setTotalCount(jsonAssets.data.total)
+    //         setPages(Math.ceil(jsonAssets.data.total/showCount));
+    //         if(loadNext)
+    //           setActivity([...activities, ...jsonAssets.data.result]);
+    //         else {
+    //           setActivity(jsonAssets.data.result);
+    //           // window.scrollTo(0,0)
+    //         }
+    //       }
+    //       setAlreadyMounted(false)
+    //       setLoadNext(false)
+    //       setLoadingActivity(false)
+    //     })
+    //   }).catch(e => {
+    //     setLoadingActivity(false);
+    //   });
     sessionStorage.setItem("activity-filter-props", JSON.stringify({selectedBtns}))
     setFilterForm({selectedBtns})
   }, [page, showCount, selectedBtns, params.key]);
@@ -288,7 +311,7 @@ export default function MarketExplorer() {
   const closeFilter = (e)=>{
     setFilterView(!isFilterView&&1)
   }
-  const loadingSkeletons = Array(25).fill(null)
+  const loadingSkeletons = Array(10).fill(null)
   return (
     <ScrollManager scrollKey="asset-list-key" isAlreadyMounted={isAlreadyMounted}>
       {({ connectScrollTarget, ...props }) => 
@@ -348,7 +371,7 @@ export default function MarketExplorer() {
                 </ToolbarStyle>
                 {/* {isOffset && <ToolbarShadowStyle />} */}
               </AppBarStyle>
-              {/* {isLoadingAssets && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>} */}
+              {/* {isLoadingActivity && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>} */}
               <Box sx={{ display: 'flex' }}>
                 <Box
                   component="nav"
@@ -380,12 +403,12 @@ export default function MarketExplorer() {
                     </Box>
                   </MHidden>
                   <InfiniteScroll
-                    dataLength={assets.length}
+                    dataLength={activities.length}
                     next={fetchMoreData}
                     hasMore={page<pages}
                     loader={<h4>Loading...</h4>}
                     endMessage={
-                      !isLoadingAssets&&!assets.length&&<Typography variant="h4" align='center'>No matching activity found!</Typography>
+                      !isLoadingActivity&&!activities.length&&<Typography variant="h4" align='center'>No matching activity found!</Typography>
                     }
                     style={{padding: '10px'}}
                   >
@@ -402,18 +425,50 @@ export default function MarketExplorer() {
                         </TableHead>
 
                         <TableBody>
-                          {/* {GROUPING_TABLE.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                            <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                              {COLUMNS.map((column) => {
-                                const value = row[column.id];
-                                return (
-                                  <TableCell key={column.id} align={column.align}>
-                                    {column.format && typeof value === 'number' ? column.format(value) : value}
-                                  </TableCell>
-                                );
-                              })}
-                            </TableRow>
-                          ))} */}
+                          {
+                            activities.map((trans, _i) => (
+                              <TableRow hover tabIndex={-1} key={_i}>
+                                {COLUMNS.map((column) => {
+                                  let cellcontent = ''
+                                  switch(column.id) {
+                                    case "event": {
+                                      let methodItem = MethodList.find((item)=>item.method===trans.event)
+                                      if(!methodItem)
+                                          methodItem = {color: 'grey', icon: 'tag', detail: []}
+                                      // const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
+                                      // const tempChainType = chainTypes[trans.marketPlace-1]
+                                      // let feeTokenName = 'ELA'
+                                      // if(tempChainType)
+                                      //     feeTokenName = tempChainType.token
+                                      cellcontent = 
+                                        <Stack direction="row" alignItems="center" spacing={1}>
+                                          <Box
+                                            component="img"
+                                            alt=""
+                                            src={`/static/${methodItem.icon}.svg`}
+                                            sx={{ width: 50, height: 50, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
+                                          />
+                                          <Typography variant="subtitle2">{trans.event}</Typography>
+                                        </Stack>
+                                    }
+                                      break;
+                                    case "image":
+                                      cellcontent = 
+                                        <Box sx={{width: 50, height: 50}}>
+                                          <TabletImgBox {...trans}/>
+                                        </Box>
+                                      break;
+                                    default:
+                                      break;
+                                  }
+                                  return (
+                                    <TableCell key={column.id} align={column.align}>
+                                      {cellcontent}
+                                    </TableCell>
+                                  );
+                                })}
+                              </TableRow>
+                          ))}
                         </TableBody>
                       </Table>
                     </TableContainer>
