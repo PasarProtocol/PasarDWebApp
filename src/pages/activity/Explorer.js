@@ -1,8 +1,8 @@
-// material
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import InfiniteScroll from "react-infinite-scroll-component";
 import { isMobile } from 'react-device-detect';
+import * as math from 'mathjs';
 import { Container, Stack, Typography, AppBar, Toolbar, Paper, Divider, Backdrop, Table, TableRow, TableHead, TableBody, TableCell, TableContainer,
   Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { Icon } from '@iconify/react';
@@ -29,7 +29,7 @@ import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSignin from '../../hooks/useSignin';
-import { fetchFrom, MethodList } from '../../utils/common';
+import { fetchFrom, MethodList, setAllTokenPrice, getTotalCountOfCoinTypes, getCoinTypeFromToken } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -133,7 +133,7 @@ export default function MarketExplorer() {
     "gasFee": 0.0075,
     "timestamp": 1658839826,
     "to": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
-    "event": "Mint",
+    "event": "CreateOrderForSale",
     "tHash": "0x53cdb6e55b896fe9113aff652689c2495d8dda25828905b1cbb4421efcced885",
     "royaltyFee": "0",
     "name": "first1",
@@ -145,6 +145,8 @@ export default function MarketExplorer() {
     "tokenJsonVersion": "2",
     "quoteToken": "0x0000000000000000000000000000000000000000",
     "baseToken": "0xEcedc8942e20150691Bd6A622442108d4c6572d7",
+    "price": "2000000000000000000",
+    "collection": "Pasar Collection",
     "v1Event": null
   }]);
   const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
@@ -162,6 +164,7 @@ export default function MarketExplorer() {
   const [chainType, setChainType] = React.useState(sessionFilterProps.chainType || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingActivity, setLoadingActivity] = React.useState(false);
+  const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
 
   const [loadNext, setLoadNext] = React.useState(false);
   const [page, setPage] = React.useState(1);
@@ -187,8 +190,18 @@ export default function MarketExplorer() {
       setDispmode(tempDefaultDispMode)
   }
   window.addEventListener('resize', handleDispInLaptopSize);
+  
+  const setCoinPriceByType = (type, value) => {
+    setCoinPrice((prevState) => {
+      const tempPrice = [...prevState];
+      tempPrice[type] = value;
+      return tempPrice;
+    });
+  }
+
   React.useEffect(() => {
     handleDispInLaptopSize()
+    setAllTokenPrice(setCoinPriceByType)
   }, [])
   React.useEffect(async () => {
     controller.abort(); // cancel the previous request
@@ -441,7 +454,7 @@ export default function MarketExplorer() {
                                       // if(tempChainType)
                                       //     feeTokenName = tempChainType.token
                                       cellcontent = 
-                                        <Stack direction="row" alignItems="center" spacing={1}>
+                                        <Stack direction="row" alignItems="center" spacing={2}>
                                           <Box
                                             component="img"
                                             alt=""
@@ -454,9 +467,29 @@ export default function MarketExplorer() {
                                       break;
                                     case "image":
                                       cellcontent = 
-                                        <Box sx={{width: 50, height: 50}}>
-                                          <TabletImgBox {...trans}/>
-                                        </Box>
+                                        <Stack direction="row" spacing={2}>
+                                          <Box sx={{width: 50, height: 50}}>
+                                            <TabletImgBox {...trans}/>
+                                          </Box>
+                                          <Stack flexGrow={1} textAlign="left">
+                                            <Typography variant="body2" color="text.secondary">{trans.collection}</Typography>
+                                            <Typography variant="subtitle2">{trans.name}</Typography>
+                                          </Stack>
+                                        </Stack>
+                                      break;
+                                    case "price": {
+                                      const priceVal = trans.price ? math.round(trans.price/1e18, 3) : 0
+                                      const coinType = getCoinTypeFromToken(trans)
+                                      const coinUSD = coinPrice[coinType.index]
+                                      cellcontent = 
+                                        <Stack flexGrow={1}>
+                                          <Stack direction='row' spacing={1}>
+                                            <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 20, m: 'auto', display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
+                                            <Typography variant="subtitle1" color="origin.main" flexGrow={1} textAlign="left">{priceVal}</Typography>
+                                          </Stack>
+                                          <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline-flex', alignItems: 'end'}}>≈ USD {math.round(coinUSD * priceVal, 2)}</Typography>
+                                        </Stack>
+                                    }
                                       break;
                                     default:
                                       break;
