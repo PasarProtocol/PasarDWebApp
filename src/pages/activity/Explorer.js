@@ -29,7 +29,7 @@ import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSignin from '../../hooks/useSignin';
-import { fetchFrom, MethodList, setAllTokenPrice, getTotalCountOfCoinTypes, getCoinTypeFromToken } from '../../utils/common';
+import { fetchFrom, MethodList, setAllTokenPrice, getTotalCountOfCoinTypes, getCoinTypeFromToken, reduceHexAddress, getDateDistance } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -106,6 +106,7 @@ const COLUMNS = [
   { id: 'to', label: 'To', minWidth: 170, align: 'center' },
   { id: 'timestamp', label: 'Time', minWidth: 170, align: 'center' },
 ];
+const EventNames = { "BuyOrder": "Sale", "CreateOrderForSale": "Listed", "Mint": "Minted" }
 export default function MarketExplorer() {
   const sessionDispMode = sessionStorage.getItem("disp-mode")
   const sessionFilterProps = JSON.parse(sessionStorage.getItem("activity-filter-props")) || {}
@@ -461,7 +462,7 @@ export default function MarketExplorer() {
                                             src={`/static/${methodItem.icon}.svg`}
                                             sx={{ width: 50, height: 50, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
                                           />
-                                          <Typography variant="subtitle2">{trans.event}</Typography>
+                                          <Typography variant="subtitle2">{ EventNames[trans.event] || trans.event }</Typography>
                                         </Stack>
                                     }
                                       break;
@@ -482,14 +483,23 @@ export default function MarketExplorer() {
                                       const coinType = getCoinTypeFromToken(trans)
                                       const coinUSD = coinPrice[coinType.index]
                                       cellcontent = 
-                                        <Stack flexGrow={1}>
+                                        <Stack display="inline-flex" textAlign="left">
                                           <Stack direction='row' spacing={1}>
-                                            <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 20, m: 'auto', display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
-                                            <Typography variant="subtitle1" color="origin.main" flexGrow={1} textAlign="left">{priceVal}</Typography>
+                                            <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 20, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
+                                            <Typography variant="subtitle1" color="origin.main" flexGrow={1} textAlign="left" display='inline-flex'>{priceVal}</Typography>
                                           </Stack>
-                                          <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline-flex', alignItems: 'end'}}>≈ USD {math.round(coinUSD * priceVal, 2)}</Typography>
+                                          <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline'}}>≈ USD {math.round(coinUSD * priceVal, 2)}</Typography>
                                         </Stack>
                                     }
+                                      break;
+                                    case "from":
+                                    case "to": {
+                                      const dispAddress = reduceHexAddress(trans[column.id])
+                                      cellcontent = <Typography variant="body2" color="origin.main">{dispAddress}</Typography>
+                                    }
+                                      break;
+                                    case "timestamp":
+                                      cellcontent = <Typography variant="body2" color="text.secondary">{getDateDistance(trans.timestamp)}</Typography>
                                       break;
                                     default:
                                       break;

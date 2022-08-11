@@ -122,7 +122,7 @@ const TabletImgBox = (props) => {
         {
           ((!isVideo && !isAfterLoad) || (isVideo && !videoIsLoaded)) &&
           <SkeletonTheme {...themeProp}>
-            <Skeleton style={{ justifyContent: 'center', aspectRatio: '1/1', padding: 2, zIndex: 1}} />
+            <Skeleton style={{ justifyContent: 'center', aspectRatio: '1/1', padding: 2, zIndex: 1, display: 'flex'}} />
           </SkeletonTheme>
         }
         <Box className='img-box' ref={imageRef}>
