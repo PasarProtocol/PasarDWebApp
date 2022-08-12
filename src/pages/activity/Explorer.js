@@ -24,6 +24,7 @@ import KYCBadge from '../../components/badge/KYCBadge';
 import ActivityPeriodSelect from '../../components/ActivityPeriodSelect';
 import ActivityFilterPan from '../../components/activity/ActivityFilterPan';
 import TabletImgBox from '../../components/activity/TabletImgBox'
+import ActivitySkeleton from '../../components/activity/ActivitySkeleton'
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
@@ -251,7 +252,7 @@ export default function MarketExplorer() {
     setAbortController(newController);
     let statusFilter = btnGroup.status.filter((name, index)=>selectedBtns.indexOf(index)>=0)
     statusFilter = (statusFilter.length===btnGroup.status.length || statusFilter.length===0)?'All':statusFilter.join(",")
-    setLoadingActivity(true);
+    // setLoadingActivity(true);
 
     // if(!loadNext)
     //   setActivity([])
@@ -499,7 +500,7 @@ export default function MarketExplorer() {
                     }
                     style={{padding: '10px'}}
                   >
-                    <TableContainer sx={{ minWidth: 800, maxHeight: 400 }}>
+                    <TableContainer>
                       <Table stickyHeader>
                         <TableHead>
                           <TableRow>
@@ -511,7 +512,7 @@ export default function MarketExplorer() {
                           </TableRow>
                         </TableHead>
 
-                        <TableBody>
+                        <TableBody>                          
                           {
                             activities.map((trans, _i) => (
                               <TableRow hover tabIndex={-1} key={_i}>
@@ -590,6 +591,10 @@ export default function MarketExplorer() {
                                 })}
                               </TableRow>
                           ))}
+                          {
+                            isLoadingActivity &&
+                            loadingSkeletons.map(item=><ActivitySkeleton/>)
+                          }
                         </TableBody>
                       </Table>
                     </TableContainer>
