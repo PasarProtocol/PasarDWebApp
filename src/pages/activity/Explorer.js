@@ -4,7 +4,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { isMobile } from 'react-device-detect';
 import * as math from 'mathjs';
 import { Container, Stack, Typography, AppBar, Toolbar, Paper, Divider, Backdrop, Table, TableRow, TableHead, TableBody, TableCell, TableContainer,
-  Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
+  Button, Box, ToggleButtonGroup, ToggleButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Icon } from '@iconify/react';
 import { alpha, styled } from '@mui/material/styles';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -305,6 +305,24 @@ export default function MarketExplorer() {
       "collection": "Pasar Collection",
       "v1Event": null
     }]
+
+    // {"_id":"62f5fb18a952cb669a672be6",
+    // "baseToken":"0x5077cC46C07031e6817260cF9D4f8AB87B2695d1",
+    // "marketPlace":1,
+    // "tokenId":"51147440653500780236201495935999804034446075351049896361291044545585391186538",
+    // "asset":"pasar:image:QmeBWfJjraZLMPuvC5GNAsbtB4iWxjM8DzkKxgvtxzURLn",
+    // "blockNumber":13435579,
+    // "buyerAddr":"0x0000000000000000000000000000000000000000",
+    // "collectionName":"collection with very long name",
+    // "description":"88888888888888888888",
+    // "marketTime":1658988274,
+    // "name":"Hello Kitty-8",
+    // "orderId":"110",
+    // "price":"4000000000000000000",
+    // "quoteToken":"0x0000000000000000000000000000000000000000",
+    // "sellerAddr":"0x2EfC48bf0F8217235E34Ef88FA3F347eF9fc5191",
+    // "thumbnail":"pasar:image:QmeBWfJjraZLMPuvC5GNAsbtB4iWxjM8DzkKxgvtxzURLn","type":"Listed"}
+
     const addressGroup = []
     tempResult.forEach(trans => {
       addressGroup.push(trans.from)
@@ -500,104 +518,159 @@ export default function MarketExplorer() {
                     }
                     style={{padding: '10px'}}
                   >
-                    <TableContainer>
-                      <Table stickyHeader>
-                        <TableHead>
-                          <TableRow>
-                            {COLUMNS.map((column) => (
-                              <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>
-                                {column.label}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        </TableHead>
+                    <MHidden width="mdDown">
+                      <TableContainer>
+                        <Table stickyHeader>
+                          <TableHead>
+                            <TableRow>
+                              {COLUMNS.map((column) => (
+                                <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>
+                                  {column.label}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          </TableHead>
 
-                        <TableBody>                          
-                          {
-                            activities.map((trans, _i) => (
-                              <TableRow hover tabIndex={-1} key={_i}>
-                                {COLUMNS.map((column) => {
-                                  let cellcontent = ''
-                                  switch(column.id) {
-                                    case "event": {
-                                      let methodItem = MethodList.find((item)=>item.method===trans.event)
-                                      if(!methodItem)
-                                          methodItem = {color: 'grey', icon: 'tag', detail: []}
-                                      // const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
-                                      cellcontent = 
-                                        <Stack direction="row" alignItems="center" spacing={2}>
-                                          <Box
-                                            component="img"
-                                            alt=""
-                                            src={`/static/${methodItem.icon}.svg`}
-                                            sx={{ width: 50, height: 50, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
-                                          />
-                                          <Typography variant="subtitle2">{ EventNames[trans.event] || trans.event }</Typography>
-                                        </Stack>
-                                    }
-                                      break;
-                                    case "image":
-                                      cellcontent = 
-                                        <Stack direction="row" spacing={2}>
-                                          <Box sx={{width: 50, height: 50}}>
-                                            <TabletImgBox {...trans}/>
-                                          </Box>
-                                          <Stack flexGrow={1} textAlign="left">
-                                            <Typography variant="body2" color="text.secondary">{trans.collection}</Typography>
-                                            <Typography variant="subtitle2">{trans.name}</Typography>
+                          <TableBody>                          
+                            {
+                              activities.map((trans, _i) => (
+                                <TableRow hover tabIndex={-1} key={_i}>
+                                  {COLUMNS.map((column) => {
+                                    let cellcontent = ''
+                                    switch(column.id) {
+                                      case "event": {
+                                        let methodItem = MethodList.find((item)=>item.method===trans.event)
+                                        if(!methodItem)
+                                            methodItem = {color: 'grey', icon: 'tag', detail: []}
+                                        // const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
+                                        cellcontent = 
+                                          <Stack direction="row" alignItems="center" spacing={2}>
+                                            <Box
+                                              component="img"
+                                              alt=""
+                                              src={`/static/${methodItem.icon}.svg`}
+                                              sx={{ width: 50, height: 50, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
+                                            />
+                                            <Typography variant="subtitle2">{ EventNames[trans.event] || trans.event }</Typography>
                                           </Stack>
-                                        </Stack>
-                                      break;
-                                    case "price": {
-                                      const priceVal = trans.price ? math.round(trans.price/1e18, 3) : 0
-                                      const coinType = getCoinTypeFromToken(trans)
-                                      const coinUSD = coinPrice[coinType.index]
-                                      cellcontent = 
-                                        <Stack display="inline-flex" textAlign="left">
-                                          <Stack direction='row' spacing={1}>
-                                            <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 20, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
-                                            <Typography variant="subtitle1" color="origin.main" flexGrow={1} textAlign="left" display='inline-flex'>{priceVal}</Typography>
+                                      }
+                                        break;
+                                      case "image":
+                                        cellcontent = 
+                                          <Stack direction="row" spacing={2}>
+                                            <Box sx={{width: 50, height: 50}}>
+                                              <TabletImgBox {...trans}/>
+                                            </Box>
+                                            <Stack flexGrow={1} textAlign="left">
+                                              <Typography variant="body2" color="text.secondary">{trans.collection}</Typography>
+                                              <Typography variant="subtitle2">{trans.name}</Typography>
+                                            </Stack>
                                           </Stack>
-                                          <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline'}}>≈ USD {math.round(coinUSD * priceVal, 2)}</Typography>
-                                        </Stack>
+                                        break;
+                                      case "price": {
+                                        const priceVal = trans.price ? math.round(trans.price/1e18, 3) : 0
+                                        const coinType = getCoinTypeFromToken(trans)
+                                        const coinUSD = coinPrice[coinType.index]
+                                        cellcontent = 
+                                          <Stack display="inline-flex" textAlign="left">
+                                            <Stack direction='row' spacing={1}>
+                                              <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 20, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
+                                              <Typography variant="subtitle1" color="origin.main" flexGrow={1} textAlign="left" display='inline-flex'>{priceVal}</Typography>
+                                            </Stack>
+                                            <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline'}}>≈ USD {math.round(coinUSD * priceVal, 2)}</Typography>
+                                          </Stack>
+                                      }
+                                        break;
+                                      case "from":
+                                      case "to": {
+                                        const addrstr = trans[column.id]
+                                        const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr)
+                                        cellcontent = 
+                                          <Stack direction="row" spacing={1} alignItems="center" display="inline-flex">
+                                            <Typography variant="body2" color="origin.main" display="inline-flex">
+                                              {dispAddress}
+                                            </Typography>
+                                            {
+                                              infoByAddress[addrstr] && infoByAddress[addrstr].kyc && <KYCBadge/>
+                                            }
+                                          </Stack>
+                                      }
+                                        break;
+                                      case "timestamp":
+                                        cellcontent = <Typography variant="body2" color="text.secondary">{getDateDistance(trans.timestamp)}</Typography>
+                                        break;
+                                      default:
+                                        break;
                                     }
-                                      break;
-                                    case "from":
-                                    case "to": {
-                                      const addrstr = trans[column.id]
-                                      const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr)
-                                      cellcontent = 
-                                        <Stack direction="row" spacing={1} alignItems="center" display="inline-flex">
-                                          <Typography variant="body2" color="origin.main" display="inline-flex">
-                                            {dispAddress}
-                                          </Typography>
-                                          {
-                                            infoByAddress[addrstr] && infoByAddress[addrstr].kyc && <KYCBadge/>
-                                          }
-                                        </Stack>
-                                    }
-                                      break;
-                                    case "timestamp":
-                                      cellcontent = <Typography variant="body2" color="text.secondary">{getDateDistance(trans.timestamp)}</Typography>
-                                      break;
-                                    default:
-                                      break;
-                                  }
-                                  return (
-                                    <TableCell key={column.id} align={column.align}>
-                                      {cellcontent}
-                                    </TableCell>
-                                  );
-                                })}
-                              </TableRow>
-                          ))}
-                          {
-                            isLoadingActivity &&
-                            loadingSkeletons.map(item=><ActivitySkeleton/>)
-                          }
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                                    return (
+                                      <TableCell key={column.id} align={column.align}>
+                                        {cellcontent}
+                                      </TableCell>
+                                    );
+                                  })}
+                                </TableRow>
+                            ))}
+                            {
+                              isLoadingActivity &&
+                              loadingSkeletons.map(item=><ActivitySkeleton/>)
+                            }
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </MHidden>
+                    <MHidden width="mdUp">
+                      {
+                        activities.map((trans, _i) => {
+                          const priceVal = trans.price ? math.round(trans.price/1e18, 3) : 0
+                          const coinType = getCoinTypeFromToken(trans)
+                          return <Accordion 
+                            expanded={false}
+                            // onClick={(e) => handleAccordClick(key)}
+                            sx={{
+                              border: '1px solid',
+                              borderColor: 'action.disabledBackground',
+                              boxShadow: (theme) => theme.customShadows.z1
+                            }}
+                          >
+                            <AccordionSummary>
+                              <Stack direction="row" spacing={1} width="100%" alignItems="center">
+                                <Box sx={{width: 50, height: 50}}>
+                                  <TabletImgBox {...trans}/>
+                                </Box>
+                                <Stack flex={1}>
+                                  <Stack direction="row">
+                                    <Typography variant="body2" color="text.secondary" noWrap>{trans.collection}</Typography>
+                                    <Box flexGrow={1}/>
+                                    <Typography variant="body2" color="text.secondary" display="inline">{ EventNames[trans.event] || trans.event }</Typography>
+                                  </Stack>
+                                  <Stack direction="row">
+                                    <Typography variant="subtitle2" noWrap>{trans.name}</Typography>
+                                    <Box flexGrow={1}/>
+                                    <Stack direction='row' spacing={1}>
+                                      <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 16, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
+                                      <Typography variant="subtitle2" color="origin.main" flexGrow={1} textAlign="left" display='inline-flex'>{priceVal}</Typography>
+                                    </Stack>
+                                  </Stack>
+                                  <Stack direction="row">
+                                    <Box>
+                                      <Typography variant="body2" color="text.secondary" noWrap>+ more</Typography>
+                                    </Box>
+                                    <Box flexGrow={1}/>
+                                    <Typography variant="body2" color="text.secondary">{getDateDistance(trans.timestamp)}</Typography>
+                                  </Stack>
+                                </Stack>
+                              </Stack>
+                            </AccordionSummary>
+                            {/* <AccordionDetails>
+                              <TransactionOrderDetail
+                                  isAlone={false}
+                                  item={item}
+                              />
+                            </AccordionDetails> */}
+                          </Accordion>
+                        })
+                      }
+                    </MHidden>
                   </InfiniteScroll>
                 </Box>
               </Box>
