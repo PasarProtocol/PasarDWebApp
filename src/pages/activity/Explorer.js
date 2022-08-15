@@ -104,7 +104,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 const COLUMNS = [
   { id: 'type', label: 'Type', minWidth: 170, align: 'center' },
   { id: 'image', label: 'Item', minWidth: 170, align: 'center' },
-  { id: 'price', label: 'Price', minWidth: 170, align: 'center' },
+  { id: 'price', label: 'Price', minWidth: 170 },
   { id: 'buyerAddr', label: 'From', minWidth: 170, align: 'center' },
   { id: 'sellerAddr', label: 'To', minWidth: 170, align: 'center' },
   { id: 'marketTime', label: 'Time', minWidth: 170, align: 'center' },
@@ -232,24 +232,6 @@ export default function MarketExplorer() {
       .catch(e=>{})
   }
 
-  // const fetchProfile4Test = (targetDid, address)=>{
-  //   setTimeout(()=>{
-  //     const displayName = "Stiartsly"
-  //     setInfoByAddress((prevState) => {
-  //       const tempInfo = {...prevState};
-  //       tempInfo[address] = {name: displayName};
-  //       return tempInfo;
-  //     })
-  //     setTimeout(()=>{
-  //       setInfoByAddress((prevState) => {
-  //         const tempInfo = {...prevState};
-  //         tempInfo[address].kyc = true;
-  //         return tempInfo;
-  //       })
-  //     }, 3000)
-  //   }, 5000)
-  // }
-
   React.useEffect(async () => {
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
@@ -279,8 +261,8 @@ export default function MarketExplorer() {
             }
             const tempAddressGroup = [...addressGroup]
             jsonAssets.data.data.forEach(trans => {
-              tempAddressGroup.push(trans.from)
-              tempAddressGroup.push(trans.to)
+              tempAddressGroup.push(trans.buyerAddr)
+              tempAddressGroup.push(trans.sellerAddr)
             });
             const uniqueAddresses = [...new Set(tempAddressGroup)];
             setAddressByGroup(uniqueAddresses)
@@ -292,40 +274,6 @@ export default function MarketExplorer() {
       }).catch(e => {
         setLoadingActivity(false);
       });
-    // const tempResult = [{
-    //   "_id": "62f4a11492e7d1083f48c404",
-    //   "blockNumber": 7369397,
-    //   "marketPlace": 3,
-    //   "tokenId": "79829147512736634719551218892238588924174987477326859535778640470300681938890",
-    //   "buyerAddr":"0x0000000000000000000000000000000000000000",
-    //   "gasFee": 0.0075,
-    //   "marketTime":1658988274,
-    //   "sellerAddr":"0x2EfC48bf0F8217235E34Ef88FA3F347eF9fc5191",
-    //   "tHash": "0x53cdb6e55b896fe9113aff652689c2495d8dda25828905b1cbb4421efcced885",
-    //   "royaltyFee": "0",
-    //   "name": "first1",
-    //   "royalties": "0",
-    //   "asset": "pasar:image:QmNc2K6rxHX8zsoAdewfe4dtX6NTu8NLMtm4pkw9uv7WGu",
-    //   "royaltyOwner": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
-    //   "thumbnail": "pasar:image:QmRJwYzZnZacEz5TjNGRkZzBzXaaB9NPY24aZJi9hNoRAi",
-    //   "data": {},
-    //   "tokenJsonVersion": "2",
-    //   "quoteToken": "0x0000000000000000000000000000000000000000",
-    //   "baseToken": "0xEcedc8942e20150691Bd6A622442108d4c6572d7",
-    //   "price": "2000000000000000000",
-    //   "collectionName":"collection with very long name",
-    //   "v1Event": null,
-    //   "type": "Listed"
-    // }]
-
-    // const addressGroup = []
-    // tempResult.forEach(trans => {
-    //   addressGroup.push(trans.from)
-    //   addressGroup.push(trans.to)
-    // });
-    // const uniqueAddresses = [...new Set(addressGroup)];
-    // setAddressByGroup(uniqueAddresses)
-    // setActivity(tempResult)
     sessionStorage.setItem("activity-filter-props", JSON.stringify({selectedBtns}))
     setFilterForm({selectedBtns})
   }, [page, showCount, selectedBtns, period, params.key]);
@@ -496,7 +444,7 @@ export default function MarketExplorer() {
                 </Box>
                 <Box
                   component="main"
-                  sx={{ flexGrow: 1, width: { md: `calc(100% - ${drawerWidth*isFilterView}px)` }, m: '-10px' }}
+                  sx={{ flexGrow: 1, width: { xs: '100%', md: `calc(100% - ${drawerWidth*isFilterView}px)` }, m: '-10px' }}
                 >
                   <MHidden width="mdUp">
                     <Box sx={{display: 'flex', p: '10px', pb: 1}}>
@@ -629,30 +577,33 @@ export default function MarketExplorer() {
                             }}
                             key={_i}
                           >
-                            <AccordionSummary>
+                            <AccordionSummary sx={{ '& .MuiAccordionSummary-content': {width: "100%"} }}>
                               <Stack direction="row" spacing={1} width="100%" alignItems="center">
                                 <Box sx={{width: 50, height: 50}}>
                                   <TabletImgBox {...trans}/>
                                 </Box>
-                                <Stack flex={1}>
+                                <Stack flex={1} minWidth={0}>
                                   <Stack direction="row">
-                                    <Typography variant="body2" color="text.secondary" noWrap>{trans.collectionName}</Typography>
-                                    <Box flexGrow={1}/>
-                                    <Typography variant="body2" color="text.secondary" display="inline">{ trans.type }</Typography>
-                                  </Stack>
-                                  <Stack direction="row">
-                                    <Typography variant="subtitle2" noWrap>{trans.name}</Typography>
-                                    <Box flexGrow={1}/>
-                                    <Stack direction='row' spacing={1}>
-                                      <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 16, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
-                                      <Typography variant="subtitle2" color="origin.main" flexGrow={1} textAlign="left" display='inline-flex'>{priceVal}</Typography>
-                                    </Stack>
-                                  </Stack>
-                                  <Stack direction="row">
+                                    <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                                      <Typography variant="body2" color="text.secondary" noWrap>{trans.collectionName}</Typography>
+                                    </Box>
                                     <Box>
+                                      <Typography variant="body2" color="text.secondary" display="inline">{ trans.type }</Typography>
+                                    </Box>
+                                  </Stack>
+                                  <Stack direction="row">
+                                    <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                                      <Typography variant="subtitle2" noWrap>{trans.name}</Typography>
+                                    </Box>
+                                    {/* <Stack direction='row' spacing={1}> */}
+                                      <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 16, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
+                                      <Typography variant="subtitle2" color="origin.main" textAlign="left" display='inline-flex' ml={1}>{priceVal}</Typography>
+                                    {/* </Stack> */}
+                                  </Stack>
+                                  <Stack direction="row">
+                                    <Box flexGrow={1}>
                                       <Typography variant="body2" color="text.secondary" noWrap>+ more</Typography>
                                     </Box>
-                                    <Box flexGrow={1}/>
                                     <Typography variant="body2" color="text.secondary">{getDateDistance(trans.marketTime)}</Typography>
                                   </Stack>
                                 </Stack>
