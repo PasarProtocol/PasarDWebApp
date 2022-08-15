@@ -7,7 +7,7 @@ import PaperRecord from '../PaperRecord';
 import useSettings from '../../hooks/useSettings';
 // ----------------------------------------------------------------------
 
-export default function TransSkeleton() {
+export default function ActivitySkeleton() {
   const { themeMode } = useSettings();
   const themeProp = {}
   if(themeMode==="dark"){
@@ -17,8 +17,8 @@ export default function TransSkeleton() {
   return (
     <TableRow tabIndex={-1}>
       {
-        Array(2).fill(0).map(item => (
-          <TableCell>
+        Array(2).fill(0).map((item, _i) => (
+          <TableCell key={_i}>
             <Box sx={{pb: 1}}>
               <SkeletonTheme {...themeProp}>
                 <Stack direction="row" spacing={2} alignItems="center">
@@ -33,8 +33,8 @@ export default function TransSkeleton() {
         ))
       }
       {
-        Array(4).fill(0).map(item => (
-          <TableCell>
+        Array(4).fill(0).map((item, _i) => (
+          <TableCell key={_i}>
             <Box sx={{pb: 1}}>
               <SkeletonTheme {...themeProp}>
                 <Stack direction="row" spacing={2} alignItems="center">

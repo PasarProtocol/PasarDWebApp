@@ -102,13 +102,18 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 }));
 // ----------------------------------------------------------------------
 const COLUMNS = [
-  { id: 'event', label: 'Type', minWidth: 170, align: 'center' },
+  { id: 'type', label: 'Type', minWidth: 170, align: 'center' },
   { id: 'image', label: 'Item', minWidth: 170, align: 'center' },
   { id: 'price', label: 'Price', minWidth: 170, align: 'center' },
-  { id: 'from', label: 'From', minWidth: 170, align: 'center' },
-  { id: 'to', label: 'To', minWidth: 170, align: 'center' },
-  { id: 'timestamp', label: 'Time', minWidth: 170, align: 'center' },
+  { id: 'buyerAddr', label: 'From', minWidth: 170, align: 'center' },
+  { id: 'sellerAddr', label: 'To', minWidth: 170, align: 'center' },
+  { id: 'marketTime', label: 'Time', minWidth: 170, align: 'center' },
 ];
+const EventByType = {
+  "Minted": "Mint",
+  "Listed": "CreateOrderForSale",
+  "Sale": "BuyOrder"
+}
 const EventNames = { "BuyOrder": "Sale", "CreateOrderForSale": "Listed", "Mint": "Minted" }
 export default function MarketExplorer() {
   const sessionDispMode = sessionStorage.getItem("disp-mode")
@@ -251,89 +256,79 @@ export default function MarketExplorer() {
     const {signal} = newController;
     setAbortController(newController);
     let statusFilter = btnGroup.status.filter((name, index)=>selectedBtns.indexOf(index)>=0)
-    statusFilter = (statusFilter.length===btnGroup.status.length || statusFilter.length===0)?'All':statusFilter.join(",")
-    // setLoadingActivity(true);
+    statusFilter = ((statusFilter.length===0)?btnGroup.status.join(","):statusFilter.join(",")).toLowerCase()
+    setLoadingActivity(true);
 
-    // if(!loadNext)
-    //   setActivity([])
-    // fetchFrom(`api/v2/sticker/getDetailedCollectibles?`+
-    //   `status=${statusFilter}&`+
-    //   `period=${period}&`+
-    //   `pageNum=${page}&`+
-    //   `pageSize=${showCount}`, { signal })
-    //   .then(response => {
-    //     response.json().then(jsonAssets => {
-    //       if(jsonAssets.data){
-    //         setTotalCount(jsonAssets.data.total)
-    //         setPages(Math.ceil(jsonAssets.data.total/showCount));
-    //         if(loadNext)
-    //           setActivity([...activities, ...jsonAssets.data.result]);
-    //         else {
-    //           setActivity(jsonAssets.data.result);
-    //           // window.scrollTo(0,0)
-    //         }
-    //       }
-    //       setAlreadyMounted(false)
-    //       setLoadNext(false)
-    //       setLoadingActivity(false)
-    //     })
-    //   }).catch(e => {
-    //     setLoadingActivity(false);
-    //   });
-    const tempResult = [{
-      "_id": "62f4a11492e7d1083f48c404",
-      "blockNumber": 7369397,
-      "marketPlace": 3,
-      "tokenId": "79829147512736634719551218892238588924174987477326859535778640470300681938890",
-      "from": "0x0000000000000000000000000000000000000000",
-      "gasFee": 0.0075,
-      "timestamp": 1658839826,
-      "to": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
-      "event": "CreateOrderForSale",
-      "tHash": "0x53cdb6e55b896fe9113aff652689c2495d8dda25828905b1cbb4421efcced885",
-      "royaltyFee": "0",
-      "name": "first1",
-      "royalties": "0",
-      "asset": "pasar:image:QmNc2K6rxHX8zsoAdewfe4dtX6NTu8NLMtm4pkw9uv7WGu",
-      "royaltyOwner": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
-      "thumbnail": "pasar:image:QmRJwYzZnZacEz5TjNGRkZzBzXaaB9NPY24aZJi9hNoRAi",
-      "data": {},
-      "tokenJsonVersion": "2",
-      "quoteToken": "0x0000000000000000000000000000000000000000",
-      "baseToken": "0xEcedc8942e20150691Bd6A622442108d4c6572d7",
-      "price": "2000000000000000000",
-      "collection": "Pasar Collection",
-      "v1Event": null
-    }]
+    if(!loadNext)
+      setActivity([])
+    fetchFrom(`api/v2/sticker/listnft?`+
+      `event=${statusFilter}&`+
+      `duration=${period}&`+
+      `pageNumStr=${page}&`+
+      `pageSizeStr=${showCount}`, { signal })
+      .then(response => {
+        response.json().then(jsonAssets => {
+          if(jsonAssets.data){
+            setTotalCount(jsonAssets.data.total)
+            setPages(Math.ceil(jsonAssets.data.total/showCount));
+            if(loadNext)
+              setActivity([...activities, ...jsonAssets.data.data]);
+            else {
+              setActivity(jsonAssets.data.data);
+              // window.scrollTo(0,0)
+            }
+            const tempAddressGroup = [...addressGroup]
+            jsonAssets.data.data.forEach(trans => {
+              tempAddressGroup.push(trans.from)
+              tempAddressGroup.push(trans.to)
+            });
+            const uniqueAddresses = [...new Set(tempAddressGroup)];
+            setAddressByGroup(uniqueAddresses)
+          }
+          setAlreadyMounted(false)
+          setLoadNext(false)
+          setLoadingActivity(false)
+        })
+      }).catch(e => {
+        setLoadingActivity(false);
+      });
+    // const tempResult = [{
+    //   "_id": "62f4a11492e7d1083f48c404",
+    //   "blockNumber": 7369397,
+    //   "marketPlace": 3,
+    //   "tokenId": "79829147512736634719551218892238588924174987477326859535778640470300681938890",
+    //   "buyerAddr":"0x0000000000000000000000000000000000000000",
+    //   "gasFee": 0.0075,
+    //   "marketTime":1658988274,
+    //   "sellerAddr":"0x2EfC48bf0F8217235E34Ef88FA3F347eF9fc5191",
+    //   "tHash": "0x53cdb6e55b896fe9113aff652689c2495d8dda25828905b1cbb4421efcced885",
+    //   "royaltyFee": "0",
+    //   "name": "first1",
+    //   "royalties": "0",
+    //   "asset": "pasar:image:QmNc2K6rxHX8zsoAdewfe4dtX6NTu8NLMtm4pkw9uv7WGu",
+    //   "royaltyOwner": "0x93b76C16e8A2c61a3149dF3AdCbE604be1F4137b",
+    //   "thumbnail": "pasar:image:QmRJwYzZnZacEz5TjNGRkZzBzXaaB9NPY24aZJi9hNoRAi",
+    //   "data": {},
+    //   "tokenJsonVersion": "2",
+    //   "quoteToken": "0x0000000000000000000000000000000000000000",
+    //   "baseToken": "0xEcedc8942e20150691Bd6A622442108d4c6572d7",
+    //   "price": "2000000000000000000",
+    //   "collectionName":"collection with very long name",
+    //   "v1Event": null,
+    //   "type": "Listed"
+    // }]
 
-    // {"_id":"62f5fb18a952cb669a672be6",
-    // "baseToken":"0x5077cC46C07031e6817260cF9D4f8AB87B2695d1",
-    // "marketPlace":1,
-    // "tokenId":"51147440653500780236201495935999804034446075351049896361291044545585391186538",
-    // "asset":"pasar:image:QmeBWfJjraZLMPuvC5GNAsbtB4iWxjM8DzkKxgvtxzURLn",
-    // "blockNumber":13435579,
-    // "buyerAddr":"0x0000000000000000000000000000000000000000",
-    // "collectionName":"collection with very long name",
-    // "description":"88888888888888888888",
-    // "marketTime":1658988274,
-    // "name":"Hello Kitty-8",
-    // "orderId":"110",
-    // "price":"4000000000000000000",
-    // "quoteToken":"0x0000000000000000000000000000000000000000",
-    // "sellerAddr":"0x2EfC48bf0F8217235E34Ef88FA3F347eF9fc5191",
-    // "thumbnail":"pasar:image:QmeBWfJjraZLMPuvC5GNAsbtB4iWxjM8DzkKxgvtxzURLn","type":"Listed"}
-
-    const addressGroup = []
-    tempResult.forEach(trans => {
-      addressGroup.push(trans.from)
-      addressGroup.push(trans.to)
-    });
-    const uniqueAddresses = [...new Set(addressGroup)];
-    setAddressByGroup(uniqueAddresses)
-    setActivity(tempResult)
+    // const addressGroup = []
+    // tempResult.forEach(trans => {
+    //   addressGroup.push(trans.from)
+    //   addressGroup.push(trans.to)
+    // });
+    // const uniqueAddresses = [...new Set(addressGroup)];
+    // setAddressByGroup(uniqueAddresses)
+    // setActivity(tempResult)
     sessionStorage.setItem("activity-filter-props", JSON.stringify({selectedBtns}))
     setFilterForm({selectedBtns})
-  }, [page, showCount, selectedBtns, params.key]);
+  }, [page, showCount, selectedBtns, period, params.key]);
   
   const handleBtns = (num)=>{
     const tempBtns = [...selectedBtns]
@@ -514,7 +509,7 @@ export default function MarketExplorer() {
                     hasMore={page<pages}
                     loader={<h4>Loading...</h4>}
                     endMessage={
-                      !isLoadingActivity&&!activities.length&&<Typography variant="h4" align='center'>No matching activity found!</Typography>
+                      !isLoadingActivity&&!activities.length&&<Typography variant="h4" align='center' mt={4}>No matching activity found!</Typography>
                     }
                     style={{padding: '10px'}}
                   >
@@ -538,8 +533,9 @@ export default function MarketExplorer() {
                                   {COLUMNS.map((column) => {
                                     let cellcontent = ''
                                     switch(column.id) {
-                                      case "event": {
-                                        let methodItem = MethodList.find((item)=>item.method===trans.event)
+                                      case "type": {
+                                        const originEvent = EventByType[trans.type]
+                                        let methodItem = MethodList.find((item)=>item.method===originEvent)
                                         if(!methodItem)
                                             methodItem = {color: 'grey', icon: 'tag', detail: []}
                                         // const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
@@ -551,7 +547,7 @@ export default function MarketExplorer() {
                                               src={`/static/${methodItem.icon}.svg`}
                                               sx={{ width: 50, height: 50, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
                                             />
-                                            <Typography variant="subtitle2">{ EventNames[trans.event] || trans.event }</Typography>
+                                            <Typography variant="subtitle2">{ trans.type }</Typography>
                                           </Stack>
                                       }
                                         break;
@@ -562,7 +558,7 @@ export default function MarketExplorer() {
                                               <TabletImgBox {...trans}/>
                                             </Box>
                                             <Stack flexGrow={1} textAlign="left">
-                                              <Typography variant="body2" color="text.secondary">{trans.collection}</Typography>
+                                              <Typography variant="body2" color="text.secondary">{trans.collectionName}</Typography>
                                               <Typography variant="subtitle2">{trans.name}</Typography>
                                             </Stack>
                                           </Stack>
@@ -581,8 +577,8 @@ export default function MarketExplorer() {
                                           </Stack>
                                       }
                                         break;
-                                      case "from":
-                                      case "to": {
+                                      case "buyerAddr":
+                                      case "sellerAddr": {
                                         const addrstr = trans[column.id]
                                         const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr)
                                         cellcontent = 
@@ -596,8 +592,8 @@ export default function MarketExplorer() {
                                           </Stack>
                                       }
                                         break;
-                                      case "timestamp":
-                                        cellcontent = <Typography variant="body2" color="text.secondary">{getDateDistance(trans.timestamp)}</Typography>
+                                      case "marketTime":
+                                        cellcontent = <Typography variant="body2" color="text.secondary">{getDateDistance(trans.marketTime)}</Typography>
                                         break;
                                       default:
                                         break;
@@ -612,7 +608,7 @@ export default function MarketExplorer() {
                             ))}
                             {
                               isLoadingActivity &&
-                              loadingSkeletons.map(item=><ActivitySkeleton/>)
+                              loadingSkeletons.map((_, _i)=><ActivitySkeleton key={_i}/>)
                             }
                           </TableBody>
                         </Table>
@@ -631,6 +627,7 @@ export default function MarketExplorer() {
                               borderColor: 'action.disabledBackground',
                               boxShadow: (theme) => theme.customShadows.z1
                             }}
+                            key={_i}
                           >
                             <AccordionSummary>
                               <Stack direction="row" spacing={1} width="100%" alignItems="center">
@@ -639,9 +636,9 @@ export default function MarketExplorer() {
                                 </Box>
                                 <Stack flex={1}>
                                   <Stack direction="row">
-                                    <Typography variant="body2" color="text.secondary" noWrap>{trans.collection}</Typography>
+                                    <Typography variant="body2" color="text.secondary" noWrap>{trans.collectionName}</Typography>
                                     <Box flexGrow={1}/>
-                                    <Typography variant="body2" color="text.secondary" display="inline">{ EventNames[trans.event] || trans.event }</Typography>
+                                    <Typography variant="body2" color="text.secondary" display="inline">{ trans.type }</Typography>
                                   </Stack>
                                   <Stack direction="row">
                                     <Typography variant="subtitle2" noWrap>{trans.name}</Typography>
@@ -656,7 +653,7 @@ export default function MarketExplorer() {
                                       <Typography variant="body2" color="text.secondary" noWrap>+ more</Typography>
                                     </Box>
                                     <Box flexGrow={1}/>
-                                    <Typography variant="body2" color="text.secondary">{getDateDistance(trans.timestamp)}</Typography>
+                                    <Typography variant="body2" color="text.secondary">{getDateDistance(trans.marketTime)}</Typography>
                                   </Stack>
                                 </Stack>
                               </Stack>
