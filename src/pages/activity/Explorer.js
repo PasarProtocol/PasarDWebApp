@@ -4,7 +4,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { isMobile } from 'react-device-detect';
 import * as math from 'mathjs';
 import { Container, Stack, Typography, AppBar, Toolbar, Paper, Divider, Backdrop, Table, TableRow, TableHead, TableBody, TableCell, TableContainer,
-  Button, Box, ToggleButtonGroup, ToggleButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+  Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material';
 import { Icon } from '@iconify/react';
 import { alpha, styled } from '@mui/material/styles';
 import AppsIcon from '@mui/icons-material/Apps';
@@ -25,6 +25,7 @@ import ActivityPeriodSelect from '../../components/ActivityPeriodSelect';
 import ActivityFilterPan from '../../components/activity/ActivityFilterPan';
 import TabletImgBox from '../../components/activity/TabletImgBox'
 import ActivitySkeleton from '../../components/activity/ActivitySkeleton'
+import ActivityAccordion from '../../components/activity/ActivityAccordion'
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
@@ -132,12 +133,10 @@ export default function MarketExplorer() {
   const defaultDispMode = isMobile?1:0
   const isOffset = useOffSetTop(20);
   const navigate = useNavigate();
-  // const [activities, setActivity] = React.useState([]);
   const [activities, setActivity] = React.useState([]);
   const [infoByAddress, setInfoByAddress] = React.useState({});
   const [addressGroup, setAddressByGroup] = React.useState([]);
   const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
-  const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
   const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):defaultDispMode);
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({
@@ -267,7 +266,6 @@ export default function MarketExplorer() {
             const uniqueAddresses = [...new Set(tempAddressGroup)];
             setAddressByGroup(uniqueAddresses)
           }
-          setAlreadyMounted(false)
           setLoadNext(false)
           setLoadingActivity(false)
         })
@@ -362,365 +360,313 @@ export default function MarketExplorer() {
   }
   const loadingSkeletons = Array(10).fill(null)
   return (
-    <ScrollManager scrollKey="asset-list-key" isAlreadyMounted={isAlreadyMounted}>
-      {({ connectScrollTarget, ...props }) => 
-        <RootStyle title="Activity | PASAR">
-          <Stack direction="row">
-            <Container maxWidth={false}>
-              <AppBarStyle sx={{ boxShadow: 0, bgcolor: 'transparent', top: isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP, zIndex: 1099 }}>
-                <ToolbarStyle
-                  sx={{
-                    ...(isOffset && {
-                      bgcolor: 'background.default',
-                    })
-                  }}
-                >
-                  <Stack width="100%" direction="row">
-                    <Box sx={{flex:1}}>
-                      <Button
-                        variant="contained"
-                        color="origin"
-                        startIcon={isFilterView?<Icon icon={arrowIosBackFill} />:''}
-                        endIcon={isFilterView?'':<Icon icon={arrowIosForwardFill} />}
-                        onClick={closeFilter}
-                      >
-                        Filters
-                      </Button>
-                      <Typography variant="body2" sx={{ ml: 1, display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
-                      <Stack spacing={1} sx={{display: 'inline', pl: 1}} direction="row">
-                        {
-                          selectedBtns.map((nameId, index)=>{
-                            const buttonName = [...btnGroup.status][nameId]
-                            return <Button
-                              key={index}
-                              variant="outlined"
-                              color="origin"
-                              endIcon={<CloseIcon />}
-                              onClick={()=>{handleBtns(nameId)}}
-                            >
-                              {buttonName}
-                            </Button>
-                          })
-                        }
-                        {
-                          selectedBtns.length>0&&
-                          <Button
-                            color="inherit"
-                            onClick={handleClearAll}
-                          >
-                            Clear All
-                          </Button>
-                        }
-                      </Stack>
-                    </Box>
-                    <Box sx={{display: 'flex'}}>
-                      <ActivityPeriodSelect selected={period} onChange={setPeriod}/>
-                    </Box>
-                  </Stack>
-                </ToolbarStyle>
-                {/* {isOffset && <ToolbarShadowStyle />} */}
-              </AppBarStyle>
-              {/* {isLoadingActivity && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>} */}
-              <Box sx={{ display: 'flex' }}>
-                <Box
-                  component="nav"
-                  sx={{ width: drawerWidth*isFilterView, flexShrink: 0, display: {xs: 'none', sm: 'none', md: 'block'}, transition: 'width ease .5s' }}
-                  aria-label="mailbox folders"
-                >
-                  <ActivityFilterPan 
-                    sx={{
-                      pt: 3,
-                      '& .MuiDrawer-paper': {
-                        transition: 'all ease .5s',
-                        width: drawerWidth,
-                        top: isOffset?APP_BAR_MOBILE+48:APP_BAR_DESKTOP+48,
-                        left: drawerWidth*(isFilterView-1) 
-                      },
-                    }}
-                    scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
-                    filterProps = {{selectedBtns}}
-                    {...{btnGroup, handleFilter}}
-                  />
-                </Box>
-                <Box
-                  component="main"
-                  sx={{ flexGrow: 1, width: { xs: '100%', md: `calc(100% - ${drawerWidth*isFilterView}px)` }, m: '-10px' }}
-                >
-                  <MHidden width="mdUp">
-                    <Box sx={{display: 'flex', p: '10px', pb: 1}}>
-                      <ActivityPeriodSelect selected={period} onChange={setPeriod}/>
-                    </Box>
-                  </MHidden>
-                  <InfiniteScroll
-                    dataLength={activities.length}
-                    next={fetchMoreData}
-                    hasMore={page<pages}
-                    loader={<h4>Loading...</h4>}
-                    endMessage={
-                      !isLoadingActivity&&!activities.length&&<Typography variant="h4" align='center' mt={4}>No matching activity found!</Typography>
-                    }
-                    style={{padding: '10px'}}
-                  >
-                    <MHidden width="mdDown">
-                      <TableContainer>
-                        <Table stickyHeader>
-                          <TableHead>
-                            <TableRow>
-                              {COLUMNS.map((column) => (
-                                <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>
-                                  {column.label}
-                                </TableCell>
-                              ))}
-                            </TableRow>
-                          </TableHead>
-
-                          <TableBody>                          
-                            {
-                              activities.map((trans, _i) => (
-                                <TableRow hover tabIndex={-1} key={_i}>
-                                  {COLUMNS.map((column) => {
-                                    let cellcontent = ''
-                                    switch(column.id) {
-                                      case "type": {
-                                        const originEvent = EventByType[trans.type]
-                                        let methodItem = MethodList.find((item)=>item.method===originEvent)
-                                        if(!methodItem)
-                                            methodItem = {color: 'grey', icon: 'tag', detail: []}
-                                        // const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
-                                        cellcontent = 
-                                          <Stack direction="row" alignItems="center" spacing={2}>
-                                            <Box
-                                              component="img"
-                                              alt=""
-                                              src={`/static/${methodItem.icon}.svg`}
-                                              sx={{ width: 50, height: 50, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
-                                            />
-                                            <Typography variant="subtitle2">{ trans.type }</Typography>
-                                          </Stack>
-                                      }
-                                        break;
-                                      case "image":
-                                        cellcontent = 
-                                          <Stack direction="row" spacing={2}>
-                                            <Box sx={{width: 50, height: 50}}>
-                                              <TabletImgBox {...trans}/>
-                                            </Box>
-                                            <Stack flexGrow={1} textAlign="left">
-                                              <Typography variant="body2" color="text.secondary">{trans.collectionName}</Typography>
-                                              <Typography variant="subtitle2">{trans.name}</Typography>
-                                            </Stack>
-                                          </Stack>
-                                        break;
-                                      case "price": {
-                                        const priceVal = trans.price ? math.round(trans.price/1e18, 3) : 0
-                                        const coinType = getCoinTypeFromToken(trans)
-                                        const coinUSD = coinPrice[coinType.index]
-                                        cellcontent = 
-                                          <Stack display="inline-flex" textAlign="left">
-                                            <Stack direction='row' spacing={1}>
-                                              <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 20, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
-                                              <Typography variant="subtitle1" color="origin.main" flexGrow={1} textAlign="left" display='inline-flex'>{priceVal}</Typography>
-                                            </Stack>
-                                            <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline'}}>≈ USD {math.round(coinUSD * priceVal, 2)}</Typography>
-                                          </Stack>
-                                      }
-                                        break;
-                                      case "buyerAddr":
-                                      case "sellerAddr": {
-                                        const addrstr = trans[column.id]
-                                        const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr)
-                                        cellcontent = 
-                                          <Stack direction="row" spacing={1} alignItems="center" display="inline-flex">
-                                            <Typography variant="body2" color="origin.main" display="inline-flex">
-                                              {dispAddress}
-                                            </Typography>
-                                            {
-                                              infoByAddress[addrstr] && infoByAddress[addrstr].kyc && <KYCBadge/>
-                                            }
-                                          </Stack>
-                                      }
-                                        break;
-                                      case "marketTime":
-                                        cellcontent = <Typography variant="body2" color="text.secondary">{getDateDistance(trans.marketTime)}</Typography>
-                                        break;
-                                      default:
-                                        break;
-                                    }
-                                    return (
-                                      <TableCell key={column.id} align={column.align}>
-                                        {cellcontent}
-                                      </TableCell>
-                                    );
-                                  })}
-                                </TableRow>
-                            ))}
-                            {
-                              isLoadingActivity &&
-                              loadingSkeletons.map((_, _i)=><ActivitySkeleton key={_i}/>)
-                            }
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </MHidden>
-                    <MHidden width="mdUp">
-                      {
-                        activities.map((trans, _i) => {
-                          const priceVal = trans.price ? math.round(trans.price/1e18, 3) : 0
-                          const coinType = getCoinTypeFromToken(trans)
-                          return <Accordion 
-                            expanded={false}
-                            // onClick={(e) => handleAccordClick(key)}
-                            sx={{
-                              border: '1px solid',
-                              borderColor: 'action.disabledBackground',
-                              boxShadow: (theme) => theme.customShadows.z1
-                            }}
-                            key={_i}
-                          >
-                            <AccordionSummary sx={{ '& .MuiAccordionSummary-content': {width: "100%"} }}>
-                              <Stack direction="row" spacing={1} width="100%" alignItems="center">
-                                <Box sx={{width: 50, height: 50}}>
-                                  <TabletImgBox {...trans}/>
-                                </Box>
-                                <Stack flex={1} minWidth={0}>
-                                  <Stack direction="row">
-                                    <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                                      <Typography variant="body2" color="text.secondary" noWrap>{trans.collectionName}</Typography>
-                                    </Box>
-                                    <Box>
-                                      <Typography variant="body2" color="text.secondary" display="inline">{ trans.type }</Typography>
-                                    </Box>
-                                  </Stack>
-                                  <Stack direction="row">
-                                    <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                                      <Typography variant="subtitle2" noWrap>{trans.name}</Typography>
-                                    </Box>
-                                    {/* <Stack direction='row' spacing={1}> */}
-                                      <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 16, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
-                                      <Typography variant="subtitle2" color="origin.main" textAlign="left" display='inline-flex' ml={1}>{priceVal}</Typography>
-                                    {/* </Stack> */}
-                                  </Stack>
-                                  <Stack direction="row">
-                                    <Box flexGrow={1}>
-                                      <Typography variant="body2" color="text.secondary" noWrap>+ more</Typography>
-                                    </Box>
-                                    <Typography variant="body2" color="text.secondary">{getDateDistance(trans.marketTime)}</Typography>
-                                  </Stack>
-                                </Stack>
-                              </Stack>
-                            </AccordionSummary>
-                            {/* <AccordionDetails>
-                              <TransactionOrderDetail
-                                  isAlone={false}
-                                  item={item}
-                              />
-                            </AccordionDetails> */}
-                          </Accordion>
-                        })
-                      }
-                    </MHidden>
-                  </InfiniteScroll>
-                </Box>
-              </Box>
-            </Container>
-          </Stack>
-          <MHidden width="mdUp">
-            <FilterBtnContainerStyle>
-              <Button
-                size="large"
-                variant="contained"
-                color="origin"
-                onClick={closeFilter}
-              >
-                Filters
-                {
-                  filterForm.selectedBtns&&filterForm.selectedBtns.length>0&&
-                  <FilterBtnBadgeStyle>{filterForm.selectedBtns.length}</FilterBtnBadgeStyle>
-                }
-              </Button>
-            </FilterBtnContainerStyle>
-            
-            <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isFilterView!==1} onClick={closeFilter} />
-            <Box
+    <RootStyle title="Activity | PASAR">
+      <Stack direction="row">
+        <Container maxWidth={false}>
+          <AppBarStyle sx={{ boxShadow: 0, bgcolor: 'transparent', top: isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP, zIndex: 1099 }}>
+            <ToolbarStyle
               sx={{
-                top: 12,
-                bottom: 12,
-                right: 0,
-                position: 'fixed',
-                zIndex: 1210,
-                ...(!isFilterView && { right: 12 })
+                ...(isOffset && {
+                  bgcolor: 'background.default',
+                })
               }}
             >
-              <Paper
-                sx={{
-                  height: 1,
-                  width: '0px',
-                  maxWidth: 400,
-                  overflow: 'hidden',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  boxShadow: (theme) => theme.customShadows.z24,
-                  transition: (theme) => theme.transitions.create('width'),
-                  ...(!isFilterView && { width: 'calc(100vw - 24px)' })
-                }}
-              >
-                {
-                  filterForm.selectedBtns&&filterForm.selectedBtns.length>0&&
-                  <>
-                    <Box sx={{ pt: 2, pb: 1, pr: 1, pl: 2.5 }}>
-                      {
-                        filterForm.selectedBtns.map((nameId, index)=>{
-                          const buttonName = [...btnGroup.status][nameId]
-                          return <Button
-                            key={index}
-                            variant="outlined"
-                            color="origin"
-                            endIcon={<CloseIcon />}
-                            onClick={()=>{handleBtnsMobile(nameId)}}
-                            sx={{mr: 1, mb: 1}}
-                          >
-                            {buttonName}
-                          </Button>
-                        })
-                      }
+              <Stack width="100%" direction="row">
+                <Box sx={{flex:1}}>
+                  <Button
+                    variant="contained"
+                    color="origin"
+                    startIcon={isFilterView?<Icon icon={arrowIosBackFill} />:''}
+                    endIcon={isFilterView?'':<Icon icon={arrowIosForwardFill} />}
+                    onClick={closeFilter}
+                  >
+                    Filters
+                  </Button>
+                  <Typography variant="body2" sx={{ ml: 1, display: 'inline-block' }}>{totalCount.toLocaleString('en')} items</Typography>
+                  <Stack spacing={1} sx={{display: 'inline', pl: 1}} direction="row">
+                    {
+                      selectedBtns.map((nameId, index)=>{
+                        const buttonName = [...btnGroup.status][nameId]
+                        return <Button
+                          key={index}
+                          variant="outlined"
+                          color="origin"
+                          endIcon={<CloseIcon />}
+                          onClick={()=>{handleBtns(nameId)}}
+                        >
+                          {buttonName}
+                        </Button>
+                      })
+                    }
+                    {
+                      selectedBtns.length>0&&
                       <Button
                         color="inherit"
-                        onClick={()=>{handleFilterMobile('clear_all', null)}}
-                        sx={{mb: 1}}
+                        onClick={handleClearAll}
                       >
                         Clear All
                       </Button>
-                    </Box>
-                    <Divider />
-                  </>
+                    }
+                  </Stack>
+                </Box>
+                <Box sx={{display: 'flex'}}>
+                  <ActivityPeriodSelect selected={period} onChange={setPeriod}/>
+                </Box>
+              </Stack>
+            </ToolbarStyle>
+            {/* {isOffset && <ToolbarShadowStyle />} */}
+          </AppBarStyle>
+          {/* {isLoadingActivity && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>} */}
+          <Box sx={{ display: 'flex' }}>
+            <Box
+              component="nav"
+              sx={{ width: drawerWidth*isFilterView, flexShrink: 0, display: {xs: 'none', sm: 'none', md: 'block'}, transition: 'width ease .5s' }}
+              aria-label="mailbox folders"
+            >
+              <ActivityFilterPan 
+                sx={{
+                  pt: 3,
+                  '& .MuiDrawer-paper': {
+                    transition: 'all ease .5s',
+                    width: drawerWidth,
+                    top: isOffset?APP_BAR_MOBILE+48:APP_BAR_DESKTOP+48,
+                    left: drawerWidth*(isFilterView-1) 
+                  },
+                }}
+                scrollMaxHeight = {`calc(100vh - ${isOffset?APP_BAR_MOBILE:APP_BAR_DESKTOP}px - 48px)`}
+                filterProps = {{selectedBtns}}
+                {...{btnGroup, handleFilter}}
+              />
+            </Box>
+            <Box
+              component="main"
+              sx={{ flexGrow: 1, width: { xs: '100%', md: `calc(100% - ${drawerWidth*isFilterView}px)` }, m: '-10px' }}
+            >
+              <MHidden width="mdUp">
+                <Box sx={{display: 'flex', p: '10px', pb: 1}}>
+                  <ActivityPeriodSelect selected={period} onChange={setPeriod}/>
+                </Box>
+              </MHidden>
+              <InfiniteScroll
+                dataLength={activities.length}
+                next={fetchMoreData}
+                hasMore={page<pages}
+                loader={<h4>Loading...</h4>}
+                endMessage={
+                  !isLoadingActivity&&!activities.length&&<Typography variant="h4" align='center' mt={4}>No matching activity found!</Typography>
                 }
-                <Box style={{height: '100%'}}>
-                  <Scrollbar>
-                    <ActivityFilterPan 
-                      sx={{
-                      }}
-                      filterProps = {filterForm}
-                      handleFilter = {handleFilterMobile}
-                      {...{btnGroup}}
-                    />
-                  </Scrollbar>
+                style={{padding: '10px'}}
+              >
+                <MHidden width="mdDown">
+                  <TableContainer>
+                    <Table stickyHeader>
+                      <TableHead>
+                        <TableRow>
+                          {COLUMNS.map((column) => (
+                            <TableCell key={column.id} align={column.align} style={{ minWidth: column.minWidth }}>
+                              {column.label}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+
+                      <TableBody>                          
+                        {
+                          activities.map((trans, _i) => (
+                            <TableRow hover tabIndex={-1} key={_i}>
+                              {COLUMNS.map((column) => {
+                                let cellcontent = ''
+                                switch(column.id) {
+                                  case "type": {
+                                    const originEvent = EventByType[trans.type]
+                                    let methodItem = MethodList.find((item)=>item.method===originEvent)
+                                    if(!methodItem)
+                                        methodItem = {color: 'grey', icon: 'tag', detail: []}
+                                    // const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
+                                    cellcontent = 
+                                      <Stack direction="row" alignItems="center" spacing={2}>
+                                        <Box
+                                          component="img"
+                                          alt=""
+                                          src={`/static/${methodItem.icon}.svg`}
+                                          sx={{ width: 50, height: 50, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
+                                        />
+                                        <Typography variant="subtitle2">{ trans.type }</Typography>
+                                      </Stack>
+                                  }
+                                    break;
+                                  case "image":
+                                    cellcontent = 
+                                      <Stack direction="row" spacing={2}>
+                                        <Box sx={{width: 50, height: 50}}>
+                                          <TabletImgBox {...trans}/>
+                                        </Box>
+                                        <Stack flexGrow={1} textAlign="left">
+                                          <Typography variant="body2" color="text.secondary">{trans.collectionName}</Typography>
+                                          <Typography variant="subtitle2">{trans.name}</Typography>
+                                        </Stack>
+                                      </Stack>
+                                    break;
+                                  case "price": {
+                                    const priceVal = trans.price ? math.round(trans.price/1e18, 3) : 0
+                                    const coinType = getCoinTypeFromToken(trans)
+                                    const coinUSD = coinPrice[coinType.index]
+                                    cellcontent = 
+                                      <Stack display="inline-flex" textAlign="left">
+                                        <Stack direction='row' spacing={1}>
+                                          <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 20, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
+                                          <Typography variant="subtitle1" color="origin.main" flexGrow={1} textAlign="left" display='inline-flex'>{priceVal}</Typography>
+                                        </Stack>
+                                        <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline'}}>≈ USD {math.round(coinUSD * priceVal, 2)}</Typography>
+                                      </Stack>
+                                  }
+                                    break;
+                                  case "buyerAddr":
+                                  case "sellerAddr": {
+                                    const addrstr = trans[column.id]
+                                    const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr)
+                                    cellcontent = 
+                                      <Stack direction="row" spacing={1} alignItems="center" display="inline-flex">
+                                        <Typography variant="body2" color="origin.main" display="inline-flex">
+                                          {dispAddress}
+                                        </Typography>
+                                        {
+                                          infoByAddress[addrstr] && infoByAddress[addrstr].kyc && <KYCBadge/>
+                                        }
+                                      </Stack>
+                                  }
+                                    break;
+                                  case "marketTime":
+                                    cellcontent = <Typography variant="body2" color="text.secondary">{getDateDistance(trans.marketTime)}</Typography>
+                                    break;
+                                  default:
+                                    break;
+                                }
+                                return (
+                                  <TableCell key={column.id} align={column.align}>
+                                    {cellcontent}
+                                  </TableCell>
+                                );
+                              })}
+                            </TableRow>
+                        ))}
+                        {
+                          isLoadingActivity &&
+                          loadingSkeletons.map((_, _i)=><ActivitySkeleton key={_i}/>)
+                        }
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </MHidden>
+                <MHidden width="mdUp">
+                  {
+                    React.useMemo(() => (
+                      activities.map((trans, _i) => (
+                        <ActivityAccordion trans={trans} coinPrice={coinPrice} infoByAddress={infoByAddress} key={_i}/>
+                      ))
+                    ), [activities, coinPrice, infoByAddress])
+                  }
+                </MHidden>
+              </InfiniteScroll>
+            </Box>
+          </Box>
+        </Container>
+      </Stack>
+      <MHidden width="mdUp">
+        <FilterBtnContainerStyle>
+          <Button
+            size="large"
+            variant="contained"
+            color="origin"
+            onClick={closeFilter}
+          >
+            Filters
+            {
+              filterForm.selectedBtns&&filterForm.selectedBtns.length>0&&
+              <FilterBtnBadgeStyle>{filterForm.selectedBtns.length}</FilterBtnBadgeStyle>
+            }
+          </Button>
+        </FilterBtnContainerStyle>
+        
+        <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isFilterView!==1} onClick={closeFilter} />
+        <Box
+          sx={{
+            top: 12,
+            bottom: 12,
+            right: 0,
+            position: 'fixed',
+            zIndex: 1210,
+            ...(!isFilterView && { right: 12 })
+          }}
+        >
+          <Paper
+            sx={{
+              height: 1,
+              width: '0px',
+              maxWidth: 400,
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: (theme) => theme.customShadows.z24,
+              transition: (theme) => theme.transitions.create('width'),
+              ...(!isFilterView && { width: 'calc(100vw - 24px)' })
+            }}
+          >
+            {
+              filterForm.selectedBtns&&filterForm.selectedBtns.length>0&&
+              <>
+                <Box sx={{ pt: 2, pb: 1, pr: 1, pl: 2.5 }}>
+                  {
+                    filterForm.selectedBtns.map((nameId, index)=>{
+                      const buttonName = [...btnGroup.status][nameId]
+                      return <Button
+                        key={index}
+                        variant="outlined"
+                        color="origin"
+                        endIcon={<CloseIcon />}
+                        onClick={()=>{handleBtnsMobile(nameId)}}
+                        sx={{mr: 1, mb: 1}}
+                      >
+                        {buttonName}
+                      </Button>
+                    })
+                  }
+                  <Button
+                    color="inherit"
+                    onClick={()=>{handleFilterMobile('clear_all', null)}}
+                    sx={{mb: 1}}
+                  >
+                    Clear All
+                  </Button>
                 </Box>
                 <Divider />
-                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>
-                  <Typography variant="subtitle1">Filters</Typography>
-                  <Button
-                    endIcon={<CheckIcon/>}
-                    onClick={applyFilterForm}
-                    color='inherit'
-                  >
-                    Done
-                  </Button>
-                </Stack>
-              </Paper>
+              </>
+            }
+            <Box style={{height: '100%'}}>
+              <Scrollbar>
+                <ActivityFilterPan 
+                  sx={{
+                  }}
+                  filterProps = {filterForm}
+                  handleFilter = {handleFilterMobile}
+                  {...{btnGroup}}
+                />
+              </Scrollbar>
             </Box>
-          </MHidden>
-        </RootStyle>
-      }
-    </ScrollManager>
+            <Divider />
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>
+              <Typography variant="subtitle1">Filters</Typography>
+              <Button
+                endIcon={<CheckIcon/>}
+                onClick={applyFilterForm}
+                color='inherit'
+              >
+                Done
+              </Button>
+            </Stack>
+          </Paper>
+        </Box>
+      </MHidden>
+    </RootStyle>
   );
 }

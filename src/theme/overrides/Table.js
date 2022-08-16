@@ -26,13 +26,13 @@ export default function Table(theme) {
             paddingLeft: theme.spacing(3),
             borderTopLeftRadius: theme.shape.borderRadius,
             borderBottomLeftRadius: theme.shape.borderRadius,
-            boxShadow: `inset 8px 0 0 ${theme.palette.background.paper}`
+            // boxShadow: `inset 8px 0 0 ${theme.palette.background.paper}`
           },
           '&:last-of-type': {
             paddingRight: theme.spacing(3),
             borderTopRightRadius: theme.shape.borderRadius,
             borderBottomRightRadius: theme.shape.borderRadius,
-            boxShadow: `inset -8px 0 0 ${theme.palette.background.paper}`
+            // boxShadow: `inset -8px 0 0 ${theme.palette.background.paper}`
           }
         },
         stickyHeader: {
