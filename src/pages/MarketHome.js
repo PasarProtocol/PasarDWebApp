@@ -151,9 +151,22 @@ export default function MarketHome() {
         <Stack spacing={10}>
           {/* <MotionInView variants={varFadeInUp}> */}
             <Box>
-              <TitleStyle component="h1">
-                Recently Sold <span role="img" aria-label="">🤝</span>
-              </TitleStyle>
+              <Stack direction="row">
+                <TitleStyle component="h1" flexGrow={1}>
+                  Recently Sold <span role="img" aria-label="">🤝</span>
+                </TitleStyle>
+                <Button
+                    to='/activity'
+                    size="small"
+                    color="inherit"
+                    component={RouterLink}
+                    state={{type: 'Sale'}}
+                    endIcon={<Icon icon={arrowIosForwardFill} />}
+                    sx={{minWidth: '100px'}}
+                >
+                  See more
+                </Button>
+              </Stack>
               <FilteredAssetGrid type='recent_sold'/>
             </Box>
           {/* </MotionInView> */}

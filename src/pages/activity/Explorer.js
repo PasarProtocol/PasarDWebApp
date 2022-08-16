@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import InfiniteScroll from "react-infinite-scroll-component";
 import { isMobile } from 'react-device-detect';
 import * as math from 'mathjs';
@@ -112,14 +112,21 @@ const COLUMNS = [
   { id: 'marketTime', label: 'Time', minWidth: 170, align: 'center' },
 ];
 const EventNames = { "BuyOrder": "Sale", "CreateOrderForSale": "Listed", "Mint": "Minted" }
+const btnGroup = { 
+  status: ["Sale", "Listed", "Minted"],
+}
 export default function ActivityExplorer() {
   const sessionDispMode = sessionStorage.getItem("disp-mode")
   const sessionFilterProps = JSON.parse(sessionStorage.getItem("activity-filter-props")) || {}
-  const params = useParams(); // params.key
-  const drawerWidth = 360;
-  const btnGroup = {
-    status: ["Sale", "Listed", "Minted"],
+  // const params = useParams(); // params.key
+  const location = useLocation();
+  const { type='' } = location.state || {}
+  const btnFilterByParam = []
+  const btnId = btnGroup.status.indexOf(type)
+  if(btnId>=0) {
+    btnFilterByParam.push(btnId)
   }
+  const drawerWidth = 360;
   const { openTopAlert } = useSignin()
   const APP_BAR_MOBILE = 72+(openTopAlert?50:0);
   const APP_BAR_DESKTOP = 88+(openTopAlert?50:0);
@@ -132,7 +139,7 @@ export default function ActivityExplorer() {
   const [activities, setActivity] = React.useState([]);
   const [infoByAddress, setInfoByAddress] = React.useState({});
   const [addressGroup, setAddressByGroup] = React.useState([]);
-  const [selectedBtns, setSelectedBtns] = React.useState(sessionFilterProps.selectedBtns || []);
+  const [selectedBtns, setSelectedBtns] = React.useState([...new Set([...(sessionFilterProps.selectedBtns || []), ...btnFilterByParam])]);
   const [dispmode, setDispmode] = React.useState(sessionDispMode!==null?parseInt(sessionDispMode, 10):defaultDispMode);
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({
@@ -270,7 +277,7 @@ export default function ActivityExplorer() {
       });
     sessionStorage.setItem("activity-filter-props", JSON.stringify({selectedBtns}))
     setFilterForm({selectedBtns})
-  }, [page, showCount, selectedBtns, period, params.key]);
+  }, [page, showCount, selectedBtns, period]);
   
   const handleBtns = (num)=>{
     const tempBtns = [...selectedBtns]
@@ -284,22 +291,6 @@ export default function ActivityExplorer() {
   }
   const handleBtnsMobile = (num)=>{
     handleFilterMobile('eventype', num)
-  }
-  const setSelectedByValue = (value, btnId)=>{
-    setSelectedBtns((prevState) => {
-      const tempBtns = [...prevState]
-      if(value){
-        if(!tempBtns.includes(btnId)) {
-          tempBtns.push(btnId)
-          return tempBtns
-        }
-      } else if(tempBtns.includes(btnId)){
-        const findIndex = tempBtns.indexOf(btnId)
-        tempBtns.splice(findIndex, 1)
-        return tempBtns
-      }
-      return tempBtns
-    })
   }
 
   const handleFilter = (key, value)=>{
