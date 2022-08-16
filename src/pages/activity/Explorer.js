@@ -26,6 +26,7 @@ import ActivityFilterPan from '../../components/activity/ActivityFilterPan';
 import TabletImgBox from '../../components/activity/TabletImgBox'
 import ActivitySkeleton from '../../components/activity/ActivitySkeleton'
 import ActivityAccordion from '../../components/activity/ActivityAccordion'
+import ActivityTableRow from '../../components/activity/ActivityTableRow'
 import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager'
@@ -33,7 +34,7 @@ import { queryName, queryKycMe } from '../../components/signin-dlg/HiveAPI'
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSignin from '../../hooks/useSignin';
 
-import { fetchFrom, MethodList, setAllTokenPrice, getTotalCountOfCoinTypes, getCoinTypeFromToken, reduceHexAddress, getDateDistance, getDidInfoFromAddress } from '../../utils/common';
+import { fetchFrom, setAllTokenPrice, getTotalCountOfCoinTypes, getDidInfoFromAddress } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -110,13 +111,8 @@ const COLUMNS = [
   { id: 'sellerAddr', label: 'To', minWidth: 170, align: 'center' },
   { id: 'marketTime', label: 'Time', minWidth: 170, align: 'center' },
 ];
-const EventByType = {
-  "Minted": "Mint",
-  "Listed": "CreateOrderForSale",
-  "Sale": "BuyOrder"
-}
 const EventNames = { "BuyOrder": "Sale", "CreateOrderForSale": "Listed", "Mint": "Minted" }
-export default function MarketExplorer() {
+export default function ActivityExplorer() {
   const sessionDispMode = sessionStorage.getItem("disp-mode")
   const sessionFilterProps = JSON.parse(sessionStorage.getItem("activity-filter-props")) || {}
   const params = useParams(); // params.key
@@ -472,84 +468,12 @@ export default function MarketExplorer() {
 
                       <TableBody>                          
                         {
-                          activities.map((trans, _i) => (
-                            <TableRow hover tabIndex={-1} key={_i}>
-                              {COLUMNS.map((column) => {
-                                let cellcontent = ''
-                                switch(column.id) {
-                                  case "type": {
-                                    const originEvent = EventByType[trans.type]
-                                    let methodItem = MethodList.find((item)=>item.method===originEvent)
-                                    if(!methodItem)
-                                        methodItem = {color: 'grey', icon: 'tag', detail: []}
-                                    // const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
-                                    cellcontent = 
-                                      <Stack direction="row" alignItems="center" spacing={2}>
-                                        <Box
-                                          component="img"
-                                          alt=""
-                                          src={`/static/${methodItem.icon}.svg`}
-                                          sx={{ width: 50, height: 50, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
-                                        />
-                                        <Typography variant="subtitle2">{ trans.type }</Typography>
-                                      </Stack>
-                                  }
-                                    break;
-                                  case "image":
-                                    cellcontent = 
-                                      <Stack direction="row" spacing={2}>
-                                        <Box sx={{width: 50, height: 50}}>
-                                          <TabletImgBox {...trans}/>
-                                        </Box>
-                                        <Stack flexGrow={1} textAlign="left">
-                                          <Typography variant="body2" color="text.secondary">{trans.collectionName}</Typography>
-                                          <Typography variant="subtitle2">{trans.name}</Typography>
-                                        </Stack>
-                                      </Stack>
-                                    break;
-                                  case "price": {
-                                    const priceVal = trans.price ? math.round(trans.price/1e18, 3) : 0
-                                    const coinType = getCoinTypeFromToken(trans)
-                                    const coinUSD = coinPrice[coinType.index]
-                                    cellcontent = 
-                                      <Stack display="inline-flex" textAlign="left">
-                                        <Stack direction='row' spacing={1}>
-                                          <Box component="img" src={`/static/${coinType.icon}`} sx={{ width: 20, display: 'inline', filter: (theme)=>theme.palette.mode==='dark'&&coinType.index===0?'invert(1)':'none' }} />
-                                          <Typography variant="subtitle1" color="origin.main" flexGrow={1} textAlign="left" display='inline-flex'>{priceVal}</Typography>
-                                        </Stack>
-                                        <Typography variant="caption" sx={{color: 'text.secondary', display: 'inline'}}>≈ USD {math.round(coinUSD * priceVal, 2)}</Typography>
-                                      </Stack>
-                                  }
-                                    break;
-                                  case "buyerAddr":
-                                  case "sellerAddr": {
-                                    const addrstr = trans[column.id]
-                                    const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr)
-                                    cellcontent = 
-                                      <Stack direction="row" spacing={1} alignItems="center" display="inline-flex">
-                                        <Typography variant="body2" color="origin.main" display="inline-flex">
-                                          {dispAddress}
-                                        </Typography>
-                                        {
-                                          infoByAddress[addrstr] && infoByAddress[addrstr].kyc && <KYCBadge/>
-                                        }
-                                      </Stack>
-                                  }
-                                    break;
-                                  case "marketTime":
-                                    cellcontent = <Typography variant="body2" color="text.secondary">{getDateDistance(trans.marketTime)}</Typography>
-                                    break;
-                                  default:
-                                    break;
-                                }
-                                return (
-                                  <TableCell key={column.id} align={column.align}>
-                                    {cellcontent}
-                                  </TableCell>
-                                );
-                              })}
-                            </TableRow>
-                        ))}
+                          React.useMemo(() => (
+                            activities.map((trans, _i) => (
+                              <ActivityTableRow trans={trans} coinPrice={coinPrice} infoByAddress={infoByAddress} COLUMNS={COLUMNS} key={_i}/>
+                            ))
+                          ), [activities, coinPrice, infoByAddress])
+                        }
                         {
                           isLoadingActivity &&
                           loadingSkeletons.map((_, _i)=><ActivitySkeleton key={_i}/>)
@@ -565,6 +489,10 @@ export default function MarketExplorer() {
                         <ActivityAccordion trans={trans} coinPrice={coinPrice} infoByAddress={infoByAddress} key={_i}/>
                       ))
                     ), [activities, coinPrice, infoByAddress])
+                  }
+                  {
+                    isLoadingActivity &&
+                    loadingSkeletons.map((_, _i)=><ActivitySkeleton isMobile={Boolean(true)} key={_i}/>)
                   }
                 </MHidden>
               </InfiniteScroll>
