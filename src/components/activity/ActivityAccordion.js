@@ -21,7 +21,7 @@ const ActivityAccordion = (props) => {
     return (
       <Stack direction="row" spacing={1} alignItems="center" display="inline-flex">
         <Typography variant="body2" color="origin.main" display="inline-flex">
-          {dispAddress}
+          {dispAddress || "---"}
         </Typography>
         {
           infoByAddress[addrstr] && infoByAddress[addrstr].kyc && <KYCBadge/>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import * as math from 'mathjs';
 import 'react-loading-skeleton/dist/skeleton.css'
 import { Box, Stack, Typography, TableRow, Link, TableCell } from '@mui/material';
@@ -6,6 +7,7 @@ import { Box, Stack, Typography, TableRow, Link, TableCell } from '@mui/material
 import TabletImgBox from './TabletImgBox'
 import KYCBadge from '../badge/KYCBadge';
 import { getCoinTypeFromToken, getDateDistance, reduceHexAddress, MethodList } from '../../utils/common';
+import { blankAddress } from '../../config';
 // ----------------------------------------------------------------------
 
 const EventByType = {
@@ -29,25 +31,35 @@ const ActivityTableRow = (props) => {
             // const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace)
             cellcontent = 
               <Stack direction="row" alignItems="center" spacing={2}>
-                <Box
-                  component="img"
-                  alt=""
-                  src={`/static/${methodItem.icon}.svg`}
-                  sx={{ width: 50, height: 50, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
-                />
-                <Typography variant="subtitle2">{ trans.type }</Typography>
+                <Link to={`/explorer/collectible/detail/${[trans.tokenId, trans.baseToken].join('&')}`} component={RouterLink}>
+                  <Box
+                    component="img"
+                    alt=""
+                    src={`/static/${methodItem.icon}.svg`}
+                    sx={{ width: 50, height: 50, borderRadius: 1, cursor: 'pointer', background: methodItem.color, p: 2 }}
+                  />
+                </Link>
+                <Link to={`/explorer/collectible/detail/${[trans.tokenId, trans.baseToken].join('&')}`} component={RouterLink}>
+                  <Typography variant="subtitle2">{ trans.type }</Typography>
+                </Link>
               </Stack>
           }
             break;
           case "image":
             cellcontent = 
               <Stack direction="row" spacing={2}>
-                <Box sx={{width: 50, height: 50}}>
-                  <TabletImgBox {...trans}/>
-                </Box>
-                <Stack flexGrow={1} textAlign="left">
-                  <Typography variant="body2" color="text.secondary">{trans.collectionName}</Typography>
-                  <Typography variant="subtitle2">{trans.name}</Typography>
+                <Link to={`/marketplace/detail/${[trans.tokenId, trans.baseToken].join('&')}`} component={RouterLink} sx={{ color: 'inherit' }}>
+                  <Box sx={{width: 50, height: 50}}>
+                    <TabletImgBox {...trans}/>
+                  </Box>
+                </Link>
+                <Stack textAlign="left">
+                  <Link to={`/collections/detail/${trans.marketPlace}${trans.baseToken}`} component={RouterLink} sx={{ color: 'inherit' }}>
+                    <Typography variant="body2" color="text.secondary">{trans.collectionName}</Typography>
+                  </Link>
+                  <Link to={`/marketplace/detail/${[trans.tokenId, trans.baseToken].join('&')}`} component={RouterLink} sx={{ color: 'inherit' }}>
+                    <Typography variant="subtitle2">{trans.name}</Typography>
+                  </Link>
                 </Stack>
               </Stack>
             break;
@@ -71,9 +83,16 @@ const ActivityTableRow = (props) => {
             const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr)
             cellcontent = 
               <Stack direction="row" spacing={1} alignItems="center" display="inline-flex">
-                <Typography variant="body2" color="origin.main" display="inline-flex">
-                  {dispAddress}
-                </Typography>
+                {
+                  dispAddress.length>0 && addrstr!==blankAddress?
+                  <Link to={`/profile/others/${addrstr}`} component={RouterLink} color='inherit'>
+                    <Typography variant="body2" color="origin.main" display="inline-flex">
+                      {dispAddress}
+                    </Typography>
+                  </Link>:
+
+                  <Typography variant="body2" color="origin.main" display="inline-flex">{dispAddress || '---'}</Typography>
+                }
                 {
                   infoByAddress[addrstr] && infoByAddress[addrstr].kyc && <KYCBadge/>
                 }
