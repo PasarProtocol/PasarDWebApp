@@ -91,7 +91,7 @@ const ActivityTableRow = (props) => {
                     </Typography>
                   </Link>:
 
-                  <Typography variant="body2" color="origin.main" display="inline-flex">{dispAddress || '---'}</Typography>
+                  <Typography variant="body2" color="origin.main" display="inline-flex">---</Typography>
                 }
                 {
                   infoByAddress[addrstr] && infoByAddress[addrstr].kyc && <KYCBadge/>
