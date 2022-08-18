@@ -99,11 +99,11 @@ const ActivityAccordion = (props) => {
           </Box>
           <Box flexGrow={1}>
             <Typography variant="body2" color="text.secondary" noWrap>From</Typography>
-            <AddressCell field="buyerAddr"/>
+            <AddressCell field="sellerAddr"/>
           </Box>
           <Box flexGrow={1}>
             <Typography variant="body2" color="text.secondary" noWrap>To</Typography>
-            <AddressCell field="sellerAddr"/>
+            <AddressCell field="buyerAddr"/>
           </Box>
         </Stack>
       </AccordionDetails>

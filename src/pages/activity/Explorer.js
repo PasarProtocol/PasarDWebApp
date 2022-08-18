@@ -107,8 +107,8 @@ const COLUMNS = [
   { id: 'type', label: 'Type', minWidth: 170, align: 'center' },
   { id: 'image', label: 'Item', minWidth: 170, align: 'center' },
   { id: 'price', label: 'Price', minWidth: 170 },
-  { id: 'buyerAddr', label: 'From', minWidth: 170, align: 'center' },
-  { id: 'sellerAddr', label: 'To', minWidth: 170, align: 'center' },
+  { id: 'sellerAddr', label: 'From', minWidth: 170, align: 'center' },
+  { id: 'buyerAddr', label: 'To', minWidth: 170, align: 'center' },
   { id: 'marketTime', label: 'Time', minWidth: 170, align: 'center' },
 ];
 const EventNames = { "BuyOrder": "Sale", "CreateOrderForSale": "Listed", "Mint": "Minted" }
