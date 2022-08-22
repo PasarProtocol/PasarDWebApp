@@ -47,7 +47,6 @@ const RootStyle = styled(Page)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 const credentialItems = [
-  {title: 'Avatar', description: 'avatar', id: 'avatar'},
   {title: 'Name', description: 'name', id: 'name'},
   {title: 'Description', description: 'description', id: 'description'},
   {title: 'Website', description: 'website', id: 'website'},
@@ -81,8 +80,8 @@ export default function EditProfile() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  const updateProfileData = [updateAvatarUrl, updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe]
-  const deleteProfileData = [deleteAvatarUrl, deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe]
+  const updateProfileData = [updateName, updateDescription, updateWebsite, updateTwitter, updateDiscord, updateTelegram, updateMedium, updateKycMe]
+  const deleteProfileData = [deleteName, deleteDescription, deleteWebsite, deleteTwitter, deleteDiscord, deleteTelegram, deleteMedium, deleteKycMe]
   const queryProfileSocials = {
     website: queryWebsite,
     twitter: queryTwitter,
@@ -260,7 +259,7 @@ export default function EditProfile() {
         const birthDateCredential = credentials.find(c => c.getType().indexOf("BirthDateCredential") >= 0);
         const genderCredential = credentials.find(c => c.getType().indexOf("GenderCredential") >= 0);
         const countryCredential = credentials.find(c => c.getType().indexOf("NationalityCredential") >= 0);
-        if (!birthDateCredential && !genderCredential && !countryCredential && checkedItem[8]){
+        if (!birthDateCredential && !genderCredential && !countryCredential && checkedItem[7]){
           stopProvide("Nothing to provide KYC-me credentials")
           return
         }
@@ -279,17 +278,12 @@ export default function EditProfile() {
           return updateFunc("", "private")
         }))
         // console.log(profileData)
-        // updateName(profileData.name)
-        if(checkedItem[8] && profileData){
-          const {BirthDateCredential, GenderCredential, CountryCredential} = profileData
-          const tempKYCdata = { birthdate: BirthDateCredential, gender: GenderCredential, country: CountryCredential }
+        if(checkedItem[7] && profileData){
+          const {BirthDateCredential, GenderCredential, NationalityCredential} = profileData
+          const tempKYCdata = { birthdate: BirthDateCredential, gender: GenderCredential, country: NationalityCredential }
           await updateKycMe(JSON.stringify(tempKYCdata), "public")
-          // const vpBuffer = Buffer.from(kycVerifiablePresentation.serialize())
-          // const encodedPresentation = bs58.encode(vpBuffer)
-          // sessionStorage.setItem('KYCedProof', encodedPresentation)
         } else {
           await updateKycMe("", "private")
-          // deleteKycMe()
         }
       } else {
         const deleteProfileFuncArr = updateProfileData.map(func=>func("", "private"))
