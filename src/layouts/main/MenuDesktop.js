@@ -7,7 +7,7 @@ import arrowIosUpwardFill from '@iconify/icons-eva/arrow-ios-upward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 // material
 import { styled } from '@mui/material/styles';
-import { Box, Link, Grid, List, Stack, Popover, ListItem, ListSubheader, CardActionArea, Tooltip } from '@mui/material';
+import { Box, Link, Grid, List, Stack, Popover, ListItem, ListSubheader, CardActionArea, Tooltip, Badge } from '@mui/material';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import useSingin from '../../hooks/useSignin';
 
@@ -220,6 +220,27 @@ function MenuDesktopItem(props) {
       >
         {title}
       </LinkStyle>
+  }
+
+  if(title === 'Activity') {
+    return (
+      <Box mr={5}>
+        <Badge badgeContent="New" color="error" sx={{ '& .MuiBadge-badge': {top: -5} }}>
+          <LinkStyle
+            to={path}
+            component={RouterLink}
+            sx={{
+              '&.active': {
+                color: 'text.primary'
+              },
+              marginRight: 0
+            }}
+          >
+            {title}
+          </LinkStyle>
+        </Badge>
+      </Box>
+    )
   }
 
   return (
