@@ -256,6 +256,7 @@ export default function EditProfile() {
             props[c.id.fragment] = props[c.id.fragment].data
           return props;
         }, {});
+        console.log("================", credentials, "================")
         const birthDateCredential = credentials.find(c => c.getType().indexOf("BirthDateCredential") >= 0);
         const genderCredential = credentials.find(c => c.getType().indexOf("GenderCredential") >= 0);
         const countryCredential = credentials.find(c => c.getType().indexOf("NationalityCredential") >= 0);
