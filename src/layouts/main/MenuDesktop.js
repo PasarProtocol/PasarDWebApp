@@ -225,7 +225,7 @@ function MenuDesktopItem(props) {
   if(title === 'Activity') {
     return (
       <Box mr={5}>
-        <Badge badgeContent="New" color="error" sx={{ '& .MuiBadge-badge': {top: -5} }}>
+        <Badge badgeContent="New" color="error" sx={{ '& .MuiBadge-badge': {top: -8} }}>
           <LinkStyle
             to={path}
             component={RouterLink}

@@ -256,7 +256,7 @@ export default function EditProfile() {
             props[c.id.fragment] = props[c.id.fragment].data
           return props;
         }, {});
-        console.log("================", credentials, "================")
+        // console.log("================", credentials, "================")
         const birthDateCredential = credentials.find(c => c.getType().indexOf("BirthDateCredential") >= 0);
         const genderCredential = credentials.find(c => c.getType().indexOf("GenderCredential") >= 0);
         const countryCredential = credentials.find(c => c.getType().indexOf("NationalityCredential") >= 0);
@@ -329,7 +329,17 @@ export default function EditProfile() {
                   size={80}
                   outersx={{m: 'auto'}}
                 />
-                <Typography variant='h3' sx={{ pt: 2 }}>{didInfo.name || reduceHexAddress(walletAddress)}</Typography>
+                <Stack direction="row" spacing={1} justifyContent="center" pt={2}>
+                  <Typography variant='h3'>{didInfo.name || reduceHexAddress(walletAddress)}</Typography>
+                  <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
+                    {
+                      badge.kyc&&
+                      <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
+                        <Box><KYCBadge/></Box>
+                      </Tooltip>
+                    }
+                  </Stack>
+                </Stack>
                 {
                   didInfo.name&&
                   <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{reduceHexAddress(walletAddress)}</Typography>
@@ -344,15 +354,9 @@ export default function EditProfile() {
                     <IconLinkButtonGroup {...socials}/>
                   </Box>
                 }
-                <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia>0 || badge.kyc)?2:0}}>
+                <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia>0)?2:0}}>
                   {
                     badge.dia>0 && <DIABadge balance={badge.dia}/>
-                  }
-                  {
-                    badge.kyc&&
-                    <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                      <Box><KYCBadge/></Box>
-                    </Tooltip>
                   }
                 </Stack>
               </Paper>
@@ -404,7 +408,17 @@ export default function EditProfile() {
                   size={110}
                   outersx={{m: 'auto'}}
                 />
-                <Typography variant='h3' sx={{ pt: 2 }}>{didInfo.name || reduceHexAddress(walletAddress)}</Typography>
+                <Stack direction="row" spacing={1} justifyContent="center" pt={2}>
+                  <Typography variant='h3'>{didInfo.name || reduceHexAddress(walletAddress)}</Typography>
+                  <Stack sx={{justifyContent: 'center', alignItems: 'center'}}>
+                    {
+                      badge.kyc&&
+                      <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
+                        <Box><KYCBadge/></Box>
+                      </Tooltip>
+                    }
+                  </Stack>
+                </Stack>
                 {
                   didInfo.name&&
                   <Typography variant='subtitle2' sx={{fontWeight: 'normal', fontSize: '0.925em'}}>{reduceHexAddress(walletAddress)}</Typography>
@@ -419,15 +433,9 @@ export default function EditProfile() {
                     <IconLinkButtonGroup {...socials}/>
                   </Box>
                 }
-                <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia>0 || badge.kyc)?2:0}}>
+                <Stack spacing={.5} direction="row" sx={{justifyContent: 'center', pt: (badge.dia>0)?2:0}}>
                   {
                     badge.dia>0 && <DIABadge balance={badge.dia}/>
-                  }
-                  {
-                    badge.kyc&&
-                    <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                      <Box><KYCBadge/></Box>
-                    </Tooltip>
                   }
                 </Stack>
               </Paper>
