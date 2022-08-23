@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip } from '@mui/material';
+import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Icon } from '@iconify/react';
 
@@ -98,108 +98,27 @@ export default function Rewards() {
         <Typography variant="h2" align="center" sx={{mb: 3}}>
           Rewards
         </Typography>
-        <PaperStyle sx={{position: 'relative', px: {sm: 4, md: 10}}}>
-          <Box>
-            <Typography variant="h2" sx={{verticalAlign: 'middle', display: 'inline-flex'}}>
-              Total Mining Rewards&nbsp;
-            </Typography>
-            <Box
-              component="img"
-              src='/static/logo-icon-white.svg'
-              sx={{
-                width: {xs: 40, sm: 50, md: 55, lg: 62},
-                display: 'inline-flex',
-                backgroundColor: 'origin.main',
-                p: {xs: 1, sm: 1.25, md: 1.3, lg: 1.5},
-                verticalAlign: 'middle',
-                borderRadius: '100%'
-              }}/>
-          </Box>
-          <Typography variant="body2" component='div' sx={{lineHeight: 1.1, py: 2}}>
-            Once a buy transaction is completed, the{' '}<PinkLabel text="PASAR"/>{' '}mining rewards will be distributed accordingly.
-            Mining rewards to earn{' '}<PinkLabel text="PASAR"/>{' '}will last 4 years and will be supported by 30% of platform fees.<br/>
-            <br/>
-            Users can claim rewards every day, or accumulate a one-time claim. Rewards never disappear nor expire.
-          </Typography>
-          <StackStyle sx={{py: 2}}>
-            <Box sx={{flex: 1}}>
-              <Typography variant="h3" component="div"><Typography variant="h3" color='origin.main' sx={{display: 'inline'}}>PASAR</Typography>{' '}earned</Typography>
-              <EarnedValueStyle variant="h2" sx={{display: 'inline-flex'}}>
-                0
-              </EarnedValueStyle>
-              <Typography variant="body2" color='text.secondary'>≈ USD 0</Typography>
-            </Box>
-            <Box sx={{textAlign: 'center', m: 'auto'}}>
-              <Typography variant="body2" align='center' sx={{pb: 2}}>to collect from 4 mining rewards</Typography>
-              <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                <div><StyledButton variant="contained" sx={{minWidth: 150}}>Claim All</StyledButton></div>
-              </Tooltip>
-            </Box>
-          </StackStyle>
-        </PaperStyle>
-        <Typography variant="h2" align="center" sx={{my: 3}}>
-          Mining Rewards
+        <Typography variant="h5" sx={{fontWeight: 'normal', color: 'text.secondary', mb: 2}}>
+          Earn rewards by just trading, staking and listing. Mining and staking rewards will constitute 40% (40,000,000) and 10% (10,000,000) respectively of the total PASAR token supply.
         </Typography>
-        <Grid container spacing={3}>
-          {
-            ClaimTitles.map((item, _i)=>(
-              <Grid item xs={12} sm={6} key={_i}>
-                <ClaimCard item={item}/>
-              </Grid>
-            ))
-          }
-        </Grid>
-        <Typography variant="h2" align="center" sx={{my: 3}}>
-          Staking Rewards
-        </Typography>
-        <PaperStyle sx={{position: 'relative', px: {sm: 4, md: 10}}}>
-          <Typography variant="h2" component="div" sx={{verticalAlign: 'middle', display: 'inline-flex', lineHeight: 0.8, pt: 2, pb: 1}}>
-            Create LP tokens&nbsp;
-            <Typography variant="h5" sx={{display: 'inline-flex', alignItems: 'end', mb: '2px'}}>
-              <Icon icon="eva:info-outline"/>
+        <Stack direction="row" spacing={2}>
+          <Box sx={{width: 200}}>
+            <StyledButton variant='contained' fullWidth sx={{mb: 1}}>Get PASAR</StyledButton>
+            <Typography variant="body2" sx={{fontWeight: 'normal', color: 'text.secondary', mb: 1}} align="center">
+              1 PASAR ≈ USD 0.01
             </Typography>
-          </Typography>
-          <Typography variant="body2" component='div' sx={{lineHeight: 1.1, py: 2}}>
-            In partnership with{' '}<ExternalLink linkURL="https://glidefinance.io" title="Glide Finance"/>, the staking of{' '}<PinkLabel text="PASAR"/>{' '}tokens will take place on Glide.<br/>
-            <br/>
-            In order to stake{' '}<PinkLabel text="PASAR"/>{' '}tokens, you first need to create a LP (Liquidity Pool) token{' '}<PinkLabel text="(PASAR-GLIDE)"/>{' '}on Glide DEX.
-          </Typography>
-          <Box sx={{justifyContent: 'center', display: 'grid'}}>
-            <Box sx={{display: 'inline-flex', py: 2, alignItems: 'center'}}>
-              <Box
-                component="img"
-                src='/static/logo-icon-white.svg'
-                sx={{
-                  width: {xs: 45, sm: 50, md: 60},
-                  height: {xs: 45, sm: 50, md: 60},
-                  display: 'inline-flex',
-                  backgroundColor: 'origin.main',
-                  p: {xs: 1.1, sm: 1.2, md: 1.4},
-                  verticalAlign: 'middle',
-                  borderRadius: '100%'
-                }}/>
-              <Typography variant="h1" sx={{display: 'inline-flex', px: 4}}>X</Typography>
-              <Box
-                component="img"
-                src='/static/glide.png'
-                sx={{
-                  width: {xs: 45, sm: 50, md: 60},
-                  height: {xs: 45, sm: 50, md: 60},
-                  p: {xs: '3px', sm: '5px', md: 1},
-                  display: 'inline-flex',
-                  backgroundColor: 'text.primary',
-                  verticalAlign: 'middle',
-                  borderRadius: '100%'
-                }}/>
-            </Box>
-            <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-              <div style={{minWidth: 150}}>
-                {/* <StyledButton variant="contained" sx={{minWidth: 150}}>Create LP Token</StyledButton> */}
-                <StyledButton variant="contained" sx={{width: '100%'}}>Create LP Token</StyledButton>
-              </div>
-            </Tooltip>
           </Box>
-        </PaperStyle>
+          <Button
+              // to={props.to}
+              // component={RouterLink}
+              // size="small"
+              color="inherit"
+              startIcon={<Icon icon="akar-icons:circle-plus" />}
+              sx={{color: 'origin.main', height: 'max-content'}}
+          >
+            Add to wallet
+          </Button>
+        </Stack>
       </Container>
     </RootStyle>
   );
