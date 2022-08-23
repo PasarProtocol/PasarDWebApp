@@ -1,10 +1,11 @@
 import React from 'react';
-import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button } from '@mui/material';
+import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Icon } from '@iconify/react';
 
 // components
 import Page from '../../components/Page';
+import TabPanel from '../../components/TabPanel';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 // ----------------------------------------------------------------------
 
@@ -89,8 +90,14 @@ const ExternalLink = (props) => {
 }
 const ClaimTitles = [{title: "BUYERS", action: "Buy"}, {title: "SELLERS", action: "Sell"}, {title: "CREATORS", action: "Create"}, {title: "PASAR", action: "Sell"}]
 export default function Rewards() {  
+  const [tabValue, setTabValue] = React.useState(0);
+
   React.useEffect(() => {
   }, []);
+
+  const handleSwitchTab = (event, newValue) => {
+    setTabValue(newValue);
+  };
 
   return (
     <RootStyle title="Rewards | PASAR">
@@ -119,6 +126,74 @@ export default function Rewards() {
             Add to wallet
           </Button>
         </Stack>
+        <Stack alignItems="center">
+          <Tabs 
+            value={tabValue}
+            variant="scrollable"
+            scrollButtons="auto"
+            onChange={handleSwitchTab}
+            TabIndicatorProps={{ 
+              style: { background: '#FF5082' } 
+            }}
+            TabScrollButtonProps={{
+              sx: {
+                '&.MuiTabs-scrollButtons': {
+                  display: 'inherit',
+                  '&.Mui-disabled': {
+                    display: 'none'
+                  }
+                }
+              }
+            }}
+          >
+            <Tab label="Mining/Trading" value={0} />
+            <Tab label="Staking" value={1} />
+          </Tabs>
+        </Stack>
+        <TabPanel value={tabValue} index={0}>
+          <PaperStyle sx={{position: 'relative', px: {sm: 5, md: 12}, py: {sm: 2, md: 5}, mx: {sm: 2, md: 6}}}>
+            <Box>
+              <Typography variant="h2" sx={{verticalAlign: 'middle', display: 'inline-flex'}}>
+                Total Mining Rewards&nbsp;
+              </Typography>
+              <Box
+                component="img"
+                src='/static/logo-icon-white.svg'
+                sx={{
+                  width: {xs: 32, sm: 40, lg: 45},
+                  display: 'inline-flex',
+                  backgroundColor: 'origin.main',
+                  p: {xs: 0.6, sm: 0.9, lg: 1},
+                  verticalAlign: 'middle',
+                  borderRadius: '100%'
+                }}/>
+            </Box>
+            <Typography variant="body2" component='div' sx={{lineHeight: 1.1, py: 2}}>
+              Once a buy transaction is completed, the{' '}<PinkLabel text="PASAR"/>{' '}mining rewards will be distributed accordingly.
+              Mining rewards to earn{' '}<PinkLabel text="PASAR"/>{' '}will last 4 years.<br/>
+              <br/>
+              Users can claim rewards every day, or accumulate a one-time claim. Rewards never disappear nor expire.
+            </Typography>
+            <StackStyle sx={{py: 2}}>
+              <Box sx={{flex: 1}}>
+                <Typography variant="h3" component="div"><Typography variant="h3" color='origin.main' sx={{display: 'inline'}}>PASAR</Typography>{' '}earned</Typography>
+                <EarnedValueStyle variant="h2" sx={{display: 'inline-flex'}}>
+                  52.7593424
+                </EarnedValueStyle>
+                <Typography variant="body2" color='text.secondary'>≈ USD 5.23</Typography>
+              </Box>
+              <Box sx={{textAlign: 'center', m: 'auto'}}>
+                <Typography variant="body2" align='center' color='text.secondary' sx={{pb: 2}}>to collect from 4 mining rewards</Typography>
+                <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+                  <div><StyledButton variant="contained" sx={{minWidth: 150}}>Claim All</StyledButton></div>
+                </Tooltip>
+              </Box>
+            </StackStyle>
+          </PaperStyle>
+        </TabPanel>
+        <TabPanel value={tabValue} index={1}>
+          Staking
+        </TabPanel>
       </Container>
     </RootStyle>
   );
