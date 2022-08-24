@@ -1,5 +1,6 @@
 import React from 'react';
-import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab } from '@mui/material';
+import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
+import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Icon } from '@iconify/react';
 
@@ -30,6 +31,23 @@ const StackStyle = styled(Stack)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     flexDirection: 'column'
   }
+}));
+const AccordionStyle = styled(Accordion)(({ theme }) => ({
+  border: '1px solid',
+  borderColor: theme.palette.action.disabledBackground,
+  boxShadow: theme.customShadows.z1,
+  [theme.breakpoints.up('xl')]: {
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    // paddingTop: theme.spacing(1),
+    // paddingBottom: theme.spacing(1)
+  },
+  [theme.breakpoints.up('sm')]: {
+    paddingLeft: theme.spacing(4),
+    paddingRight: theme.spacing(4),
+    // paddingTop: theme.spacing(2),
+    // paddingBottom: theme.spacing(2)
+  },
 }));
 const EarnedValueStyle = styled(Typography)(({ theme }) => ({
   backgroundImage: 'linear-gradient(90deg, #FF5082, #a951f4)',
@@ -230,7 +248,66 @@ export default function Rewards() {
           </Grid>
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
-          Staking
+          <AccordionStyle>
+            <AccordionDetails>
+              <Stack direction="row" alignItems="center" py={2}>
+                <Stack flexGrow={1}>
+                  <Typography variant="h3">Standard Staking</Typography>
+                  <Typography variant="h5" component="div" sx={{fontWeight: 'normal'}}>
+                    Stake{' '}
+                    <Typography variant="h5" color='origin.main' sx={{display: 'inline', fontWeight: 'normal'}}>
+                      PASAR
+                    </Typography>,
+                    earn{' '}
+                    <Typography variant="h5" color='origin.main' sx={{display: 'inline', fontWeight: 'normal'}}>
+                      PASAR
+                    </Typography>
+                  </Typography>
+                </Stack>
+                <Stack>
+                  <Typography variant="h5">48.48%</Typography>
+                  <Typography variant="h5" sx={{fontWeight: 'normal'}} color="text.secondary">
+                    APY{' '}<Icon icon="eva:info-outline" style={{marginBottom: -3}}/>
+                  </Typography>
+                </Stack>
+              </Stack>
+            </AccordionDetails>
+          </AccordionStyle>
+          <AccordionStyle
+            defaultExpanded={Boolean(true)}
+            sx={{
+              borderTop: 0,
+              '&.Mui-expanded': {
+                borderRadius: 0,
+                margin: 0
+              }
+            }}
+          >
+            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
+              <Typography variant="h4">Your Stake</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              content
+            </AccordionDetails>
+          </AccordionStyle>
+          <AccordionStyle
+            defaultExpanded={Boolean(true)}
+            sx={{
+              borderTop: 0,
+              '&.Mui-expanded': {
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+                margin: 0
+              }
+            }}
+          >
+            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
+              <Typography variant="h4">Rewards</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              content
+            </AccordionDetails>
+          </AccordionStyle>
         </TabPanel>
       </Container>
     </RootStyle>
