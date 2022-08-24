@@ -69,7 +69,7 @@ const ClaimCard = ({item})=>(
         <Typography variant="h3" color='origin.main' sx={{display: 'inline'}}>PASAR</Typography>{' '}earned
       </Typography>
       <EarnedValueStyle variant="h2" sx={{display: 'inline-flex'}}>
-        0
+        0.234223
       </EarnedValueStyle>
       <Typography variant="body2" color='text.secondary'>≈ USD 0</Typography>
       <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
@@ -89,7 +89,7 @@ const ExternalLink = (props) => {
     {title}
   </Link>
 }
-const ClaimTitles = [{title: "BUYERS", action: "Buy"}, {title: "SELLERS", action: "Sell"}, {title: "CREATORS", action: "Create"}, {title: "PASAR", action: "Sell"}]
+const ClaimTitles = [{title: "BUYERS", action: "Buy"}, {title: "SELLERS", action: "Sell"}, {title: "CREATORS", action: "Create"}]
 export default function Rewards() {  
   const [tabValue, setTabValue] = React.useState(0);
 
@@ -200,7 +200,7 @@ export default function Rewards() {
               <Box component="img" src="/static/elastos.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
             </Stack>
             <StatisticPanel/>
-            
+
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">PASAR</Typography>
               <Box component="img" src="/static/logo-icon.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
@@ -216,6 +216,18 @@ export default function Rewards() {
             <Typography variant="h3">Others</Typography>
             <StatisticPanel/>
           </Stack>
+          <Typography variant="h2" textAlign="center" my={3}>
+            Mining Rewards
+          </Typography>
+          <Grid container spacing={3}>
+            {
+              ClaimTitles.map((item, _i)=>(
+                <Grid item xs={12} sm={6} md={4} key={_i}>
+                  <ClaimCard item={item}/>
+                </Grid>
+              ))
+            }
+          </Grid>
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
           Staking
