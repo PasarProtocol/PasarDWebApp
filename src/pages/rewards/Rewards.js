@@ -7,6 +7,7 @@ import { Icon } from '@iconify/react';
 import Page from '../../components/Page';
 import TabPanel from '../../components/TabPanel';
 import StyledButton from '../../components/signin-dlg/StyledButton';
+import StatisticPanel from '../../components/rewards/StatisticPanel'
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -190,6 +191,31 @@ export default function Rewards() {
               </Box>
             </StackStyle>
           </PaperStyle>
+          <Typography variant="h2" textAlign="center" my={3}>
+            Mining Pool Stats
+          </Typography>
+          <Stack spacing={2}>
+            <Stack direction="row" spacing={1}>
+              <Typography variant="h3">ELA ESC</Typography>
+              <Box component="img" src="/static/elastos.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
+            </Stack>
+            <StatisticPanel/>
+            
+            <Stack direction="row" spacing={1}>
+              <Typography variant="h3">PASAR</Typography>
+              <Box component="img" src="/static/logo-icon.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
+            </Stack>
+            <StatisticPanel/>
+
+            <Stack direction="row" spacing={1}>
+              <Typography variant="h3">Ecosystem</Typography>
+              <Box component="img" src="/static/badges/diamond.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
+            </Stack>
+            <StatisticPanel/>
+
+            <Typography variant="h3">Others</Typography>
+            <StatisticPanel/>
+          </Stack>
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
           Staking
