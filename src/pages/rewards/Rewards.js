@@ -1,4 +1,5 @@
 import React from 'react';
+import * as math from 'mathjs';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails, 
   ToggleButtonGroup, ToggleButton, FormGroup, TextField, LinearProgress } from '@mui/material';
@@ -12,6 +13,7 @@ import TabPanel from '../../components/TabPanel';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import StatisticPanel from '../../components/rewards/StatisticPanel'
 import { MHidden } from '../../components/@material-extend';
+import { removeLeadingZero } from '../../utils/common'
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -162,12 +164,16 @@ const ClaimTitles = [{title: "BUYERS", action: "Buy"}, {title: "SELLERS", action
 const AmountProgressType = ['25%', '50%', '75%', 'Max']
 
 export default function Rewards() {  
+  const [balance, setBalance] = React.useState(500.1564);
   const [tabValue, setTabValue] = React.useState(1);
+  const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
-  const [amountProgress, setAmountProgress] = React.useState(50)
+  const [amountProgress, setAmountProgress] = React.useState(0)
 
   React.useEffect(() => {
-  }, []);
+    const tempProgress = math.round(operAmount*100/balance, 1)
+    setAmountProgress(tempProgress)
+  }, [operAmount]);
 
   const handleSwitchTab = (event, newValue) => {
     setTabValue(newValue);
@@ -181,7 +187,18 @@ export default function Rewards() {
   const handleProgressBtn = (event) => {
     const progressType = event.target.value
     setAmountProgress(progressType*25)
+    setOperAmount(math.round(balance*progressType/4, 4))
   }
+
+  const handleChangeAmount = (event) => {
+    let amountValue = event.target.value
+    amountValue = removeLeadingZero(amountValue)
+    if(amountValue<0)
+      return
+    if (amountValue*1 > balance)
+      return;
+    setOperAmount(math.round(amountValue*1, 4).toString())
+  };
   return (
     <RootStyle title="Rewards | PASAR">
       <Container maxWidth="lg">
@@ -379,7 +396,7 @@ export default function Rewards() {
                     <Stack direction="row" alignItems='center'>
                       <Typography variant='body2'>PASAR in wallet:</Typography>&nbsp;
                       <EarnedValueStyle variant="h6" sx={{display: 'inline-flex'}}>
-                        500.1564
+                        {balance}
                       </EarnedValueStyle>&nbsp;
                       <Typography variant='body2' color="text.secondary">≈ USD 201.32</Typography>
                     </Stack>
@@ -391,6 +408,8 @@ export default function Rewards() {
                       type="number"
                       variant="outlined" 
                       placeholder="Amount" 
+                      value={operAmount}
+                      onChange={handleChangeAmount}
                       InputProps={{
                         endAdornment: (
                           <Box
@@ -464,7 +483,39 @@ export default function Rewards() {
               <Typography variant="h4">Rewards</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              content
+              <Box mb={2}>
+                <EarnedValueStyle variant="h2">
+                  0.234223
+                </EarnedValueStyle>
+                <Typography variant="body2" color='text.secondary'>≈ USD 0.23</Typography>
+              </Box>
+              <Grid container spacing={2}>
+                <MHidden width="smUp">
+                  <Grid item xs={12}>
+                    <Stack direction="row" alignItems='center'>
+                      <Typography variant='body2'>Received so far:</Typography>&nbsp;
+                      <EarnedValueStyle variant="h6" sx={{display: 'inline-flex'}}>
+                        100
+                      </EarnedValueStyle>&nbsp;
+                      <Typography variant='body2' color="text.secondary">≈ USD 51.32</Typography>
+                    </Stack>
+                  </Grid>
+                </MHidden>
+                <Grid item xs={12} sm={8} sx={{display: 'flex', alignItems: 'end'}}>
+                  <StyledButton variant="contained" sx={{width: 200}}>Claim</StyledButton>
+                </Grid>
+                <MHidden width="smDown">
+                  <Grid item sm={4}>
+                    <Box textAlign="right">
+                      <Typography variant='body1'>Received so far:</Typography>
+                      <EarnedValueStyle variant="h6" sx={{display: 'inline-flex'}}>
+                        500.1564
+                      </EarnedValueStyle>
+                      <Typography variant='body1' color="text.secondary">≈ USD 201.32</Typography>
+                    </Box>
+                  </Grid>
+                </MHidden>
+              </Grid>
             </AccordionDetails>
           </AccordionStyle>
         </TabPanel>
