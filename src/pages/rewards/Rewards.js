@@ -2,7 +2,7 @@ import React from 'react';
 import * as math from 'mathjs';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails, 
-  ToggleButtonGroup, ToggleButton, FormGroup, TextField, LinearProgress } from '@mui/material';
+  ToggleButtonGroup, ToggleButton, FormGroup, TextField, LinearProgress, Slider } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { Icon } from '@iconify/react';
@@ -100,16 +100,20 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     borderBottomRightRadius: 0
   },
 }));
-const LinearProgressWrapper = styled(LinearProgress)(({ theme }) => ({
-  flexGrow: 1,
-  height: 15,
-  margin: theme.spacing(2, 0, 2),
-  borderRadius: theme.shape.borderRadius,
-  '&.MuiLinearProgress-root': {
-    backgroundColor: theme.palette.mode==='light'?theme.palette.grey[300]:theme.palette.grey[900]
+const StyledSlider = styled(Slider)(({ theme }) => ({
+  // color: 'blue',
+  marginTop: 8,
+  "& .MuiSlider-thumb": {
+    backgroundColor: '#5159ff',
   },
-  '& .MuiLinearProgress-bar': {
-    borderRadius: theme.shape.borderRadius
+  "& .MuiSlider-track": {
+    background: `linear-gradient(90deg, #DB59A0 0%, #6A70FA 100%);`,
+    height: 10,
+    border: 0
+  },
+  "& .MuiSlider-rail": {
+    color: 'grey',
+    height: 10
   }
 }));
 const PinkLabel = ({text})=>(<Typography variant="body2" color='origin.main' sx={{display: 'inline'}}>{text}</Typography>)
@@ -165,7 +169,7 @@ const AmountProgressType = ['25%', '50%', '75%', 'Max']
 
 export default function Rewards() {  
   const [balance, setBalance] = React.useState(500.1564);
-  const [tabValue, setTabValue] = React.useState(1);
+  const [tabValue, setTabValue] = React.useState(0);
   const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
   const [amountProgress, setAmountProgress] = React.useState(0)
@@ -199,6 +203,12 @@ export default function Rewards() {
       return;
     setOperAmount(math.round(amountValue*1, 4).toString())
   };
+
+  const handleChangeSlider = (event, newValue) => {
+    setAmountProgress(newValue);
+    setOperAmount(math.round(balance*newValue/100, 4))
+  };
+
   return (
     <RootStyle title="Rewards | PASAR">
       <Container maxWidth="lg">
@@ -430,16 +440,7 @@ export default function Rewards() {
                     />
                     <StyledButton variant="contained" sx={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}>{stakingType}</StyledButton>
                   </FormGroup>
-                  <LinearProgressWrapper
-                    value={amountProgress}
-                    color="primary"
-                    variant="determinate"
-                    sx={{
-                      '.MuiLinearProgress-bar': {
-                        background: `linear-gradient(90deg, #DB59A0 ${100 - amountProgress}%, #6A70FA 100%);`
-                      }
-                    }}
-                  />
+                  <StyledSlider size='medium' value={amountProgress} step={1} valueLabelDisplay="auto" onChange={handleChangeSlider} />
                   <Typography variant='h6' mb={1}>{amountProgress}%</Typography>
                   <Stack direction="row" spacing={1}>
                     {
