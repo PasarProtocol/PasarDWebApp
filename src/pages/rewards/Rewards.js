@@ -1,7 +1,9 @@
 import React from 'react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
-import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails, 
+  ToggleButtonGroup, ToggleButton, FormGroup, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { withStyles } from '@mui/styles';
 import { Icon } from '@iconify/react';
 
 // components
@@ -9,6 +11,7 @@ import Page from '../../components/Page';
 import TabPanel from '../../components/TabPanel';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import StatisticPanel from '../../components/rewards/StatisticPanel'
+import { MHidden } from '../../components/@material-extend';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -59,6 +62,42 @@ const EarnedValueStyle = styled(Typography)(({ theme }) => ({
   MozTextFillColor: 'transparent',
   display: 'inline'
 }))
+const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  '& .MuiToggleButtonGroup-grouped': {
+    border: 0,
+    '&.Mui-disabled': {
+      border: 0,
+    },
+    '&:not(:first-of-type)': {
+      borderRadius: theme.shape.borderRadius/2,
+    },
+    '&:first-of-type': {
+      borderRadius: theme.shape.borderRadius/2,
+    },
+  },
+  '& .MuiToggleButton-root': {
+    margin: theme.spacing(1), 
+    borderRadius: theme.shape.borderRadius/2
+  },
+  width: '100%'
+}));
+const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
+  '&.Mui-selected': {
+    backgroundColor: theme.palette.origin.main,
+    color: theme.palette.origin.contrastText
+  },
+  flexGrow: 1
+}));
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  '& .Mui-focused fieldset.MuiOutlinedInput-notchedOutline': {
+    borderColor: theme.palette.text.primary,
+    borderWidth: 1
+  },
+  '& fieldset': {
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0
+  },
+}));
 const PinkLabel = ({text})=>(<Typography variant="body2" color='origin.main' sx={{display: 'inline'}}>{text}</Typography>)
 const PaperStyle = (props) => (
   <Paper
@@ -109,13 +148,19 @@ const ExternalLink = (props) => {
 }
 const ClaimTitles = [{title: "BUYERS", action: "Buy"}, {title: "SELLERS", action: "Sell"}, {title: "CREATORS", action: "Create"}]
 export default function Rewards() {  
-  const [tabValue, setTabValue] = React.useState(0);
+  const [tabValue, setTabValue] = React.useState(1);
+  const [stakingType, setStakingType] = React.useState('Stake');
 
   React.useEffect(() => {
   }, []);
 
   const handleSwitchTab = (event, newValue) => {
     setTabValue(newValue);
+  };
+
+  const handleStakingType = (event, type) => {
+    if(type)
+      setStakingType(type);
   };
 
   return (
@@ -267,7 +312,7 @@ export default function Rewards() {
                 <Stack>
                   <Typography variant="h5">48.48%</Typography>
                   <Typography variant="h5" sx={{fontWeight: 'normal'}} color="text.secondary">
-                    APY{' '}<Icon icon="eva:info-outline" style={{marginBottom: -3}}/>
+                    APR{' '}<Icon icon="eva:info-outline" style={{marginBottom: -3}}/>
                   </Typography>
                 </Stack>
               </Stack>
@@ -283,11 +328,83 @@ export default function Rewards() {
               }
             }}
           >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
+            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />} sx={{'& .Mui-expanded': {marginBottom: '0 !important'}}}>
               <Typography variant="h4">Your Stake</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              content
+              <Box mb={2}>
+                <EarnedValueStyle variant="h2">
+                  0.234223
+                </EarnedValueStyle>
+                <Typography variant="body2" color='text.secondary'>≈ USD 0.23</Typography>
+              </Box>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={8}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      display: 'inline-flex',
+                      border: (theme) => `1px solid ${theme.palette.divider}`,
+                      borderRadius: .5,
+                      width: '100%'
+                    }}
+                  >
+                    <StyledToggleButtonGroup size="small" value={stakingType} exclusive onChange={handleStakingType}>
+                      <StyledToggleButton value="Stake">Stake</StyledToggleButton>
+                      <StyledToggleButton value="Unstake">Unstake</StyledToggleButton>
+                    </StyledToggleButtonGroup>
+                  </Paper>
+                </Grid>
+                <MHidden width="mdUp">
+                  <Grid item xs={12}>
+                    <Stack direction="row" alignItems='center'>
+                      <Typography variant='body2'>PASAR in wallet:</Typography>&nbsp;
+                      <EarnedValueStyle variant="h6" sx={{display: 'inline-flex'}}>
+                        500.1564
+                      </EarnedValueStyle>&nbsp;
+                      <Typography variant='body2' color="text.secondary">≈ USD 201.32</Typography>
+                    </Stack>
+                  </Grid>
+                </MHidden>
+                <Grid item xs={12} md={8}>
+                  <FormGroup row sx={{flexWrap: 'nowrap'}}>
+                    <StyledTextField 
+                      type="number"
+                      variant="outlined" 
+                      placeholder="Amount" 
+                      InputProps={{
+                        endAdornment: (
+                          <Box
+                            component="img"
+                            src='/static/logo-icon.svg'
+                            sx={{
+                              width: 24,
+                              display: 'inline-flex',
+                            }}/>
+                        ),
+                        style: {
+                          fontSize: '16pt',
+                          fontWeight: 'bold',
+                          color: '#FF5082'
+                        }
+                      }}
+                      sx={{flexGrow: 1}}
+                    />
+                    <StyledButton variant="contained" sx={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}>{stakingType}</StyledButton>
+                  </FormGroup>
+                </Grid>
+                <MHidden width="mdDown">
+                  <Grid item sm={4}>
+                    <Box textAlign="right">
+                      <Typography variant='body1'>PASAR in wallet:</Typography>
+                      <EarnedValueStyle variant="h6" sx={{display: 'inline-flex'}}>
+                        500.1564
+                      </EarnedValueStyle>
+                      <Typography variant='body1' color="text.secondary">≈ USD 201.32</Typography>
+                    </Box>
+                  </Grid>
+                </MHidden>
+              </Grid>
             </AccordionDetails>
           </AccordionStyle>
           <AccordionStyle
@@ -301,7 +418,7 @@ export default function Rewards() {
               }
             }}
           >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
+            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />} sx={{'& .Mui-expanded': {marginBottom: '0 !important'}}}>
               <Typography variant="h4">Rewards</Typography>
             </AccordionSummary>
             <AccordionDetails>
