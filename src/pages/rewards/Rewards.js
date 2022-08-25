@@ -1,7 +1,7 @@
 import React from 'react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails, 
-  ToggleButtonGroup, ToggleButton, FormGroup, TextField } from '@mui/material';
+  ToggleButtonGroup, ToggleButton, FormGroup, TextField, LinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { Icon } from '@iconify/react';
@@ -98,6 +98,18 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     borderBottomRightRadius: 0
   },
 }));
+const LinearProgressWrapper = styled(LinearProgress)(({ theme }) => ({
+  flexGrow: 1,
+  height: 15,
+  margin: theme.spacing(2, 0, 2),
+  borderRadius: theme.shape.borderRadius,
+  '&.MuiLinearProgress-root': {
+    backgroundColor: theme.palette.mode==='light'?theme.palette.grey[300]:theme.palette.grey[900]
+  },
+  '& .MuiLinearProgress-bar': {
+    borderRadius: theme.shape.borderRadius
+  }
+}));
 const PinkLabel = ({text})=>(<Typography variant="body2" color='origin.main' sx={{display: 'inline'}}>{text}</Typography>)
 const PaperStyle = (props) => (
   <Paper
@@ -147,9 +159,12 @@ const ExternalLink = (props) => {
   </Link>
 }
 const ClaimTitles = [{title: "BUYERS", action: "Buy"}, {title: "SELLERS", action: "Sell"}, {title: "CREATORS", action: "Create"}]
+const AmountProgressType = ['25%', '50%', '75%', 'Max']
+
 export default function Rewards() {  
   const [tabValue, setTabValue] = React.useState(1);
   const [stakingType, setStakingType] = React.useState('Stake');
+  const [amountProgress, setAmountProgress] = React.useState(50)
 
   React.useEffect(() => {
   }, []);
@@ -163,6 +178,10 @@ export default function Rewards() {
       setStakingType(type);
   };
 
+  const handleProgressBtn = (event) => {
+    const progressType = event.target.value
+    setAmountProgress(progressType*25)
+  }
   return (
     <RootStyle title="Rewards | PASAR">
       <Container maxWidth="lg">
@@ -392,6 +411,29 @@ export default function Rewards() {
                     />
                     <StyledButton variant="contained" sx={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}>{stakingType}</StyledButton>
                   </FormGroup>
+                  <LinearProgressWrapper
+                    value={amountProgress}
+                    color="primary"
+                    variant="determinate"
+                    sx={{
+                      '.MuiLinearProgress-bar': {
+                        background: `linear-gradient(90deg, #DB59A0 ${100 - amountProgress}%, #6A70FA 100%);`
+                      }
+                    }}
+                  />
+                  <Typography variant='h6' mb={1}>{amountProgress}%</Typography>
+                  <Stack direction="row" spacing={1}>
+                    {
+                      AmountProgressType.map((progType, _i)=>{
+                        const btnSx = {flexGrow: 1}
+                        if(amountProgress === (_i+1)*25) {
+                          btnSx.background = (theme)=>theme.palette.origin.main
+                          btnSx.color = 'white'
+                        }
+                        return <Button key={_i} variant="contained" color="inherit" sx={btnSx} value={_i+1} onClick={handleProgressBtn}>{progType}</Button>
+                      })
+                    }
+                  </Stack>
                 </Grid>
                 <MHidden width="mdDown">
                   <Grid item sm={4}>
