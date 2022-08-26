@@ -286,19 +286,22 @@ export default function CollectibleDetail() {
             }).catch((e) => {
             });
           })
-        getCollectiblesInCollection4Preview(jsonCollectible.data.baseToken, 5).then(res=>{
-          setCollectiblesInCollection(res.filter(item=>item.tokenId !== tokenId))
-        })
-        getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then(dia=>{
-          if(dia!=='0')
-            setBadgeOfUser('creator', 'dia', dia)
-          else setBadgeOfUser('creator', 'dia', 0)
-        })
-        getDiaTokenInfo(jsonCollectible.data.holder).then(dia=>{
-          if(dia!=='0')
-            setBadgeOfUser('owner', 'dia', dia)
-          else setBadgeOfUser('owner', 'dia', 0)
-        })
+        getCollectiblesInCollection4Preview(jsonCollectible.data.baseToken, jsonCollectible.data.marketPlace, 5)
+          .then(res=>{
+            setCollectiblesInCollection(res.filter(item=>item.tokenId !== tokenId))
+          })
+        getDiaTokenInfo(jsonCollectible.data.royaltyOwner)
+          .then(dia=>{
+            if(dia!=='0')
+              setBadgeOfUser('creator', 'dia', dia)
+            else setBadgeOfUser('creator', 'dia', 0)
+          })
+        getDiaTokenInfo(jsonCollectible.data.holder)
+          .then(dia=>{
+            if(dia!=='0')
+              setBadgeOfUser('owner', 'dia', dia)
+            else setBadgeOfUser('owner', 'dia', 0)
+          })
         if(jsonCollectible.data.royaltyOwner === jsonCollectible.data.holder){
           getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
             .then((info) => {

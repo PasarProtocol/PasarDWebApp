@@ -974,7 +974,7 @@ export const getDidInfoFromAddress = (address) =>
       });
   });
 
-export const getCollectiblesInCollection4Preview = (address, count) =>
+export const getCollectiblesInCollection4Preview = (address, marketPlace, count) =>
   new Promise((resolve, reject) => {
     const bodyParams = {
       baseToken: address,
@@ -982,6 +982,7 @@ export const getCollectiblesInCollection4Preview = (address, count) =>
       itemType: 'All',
       pageNum: 1,
       pageSize: count,
+      marketPlace,
     }
     fetchFrom('api/v2/sticker/getDetailedCollectiblesInCollection', {
       method: 'POST',
