@@ -56,6 +56,10 @@ const addressForProduction = {
   bunnyContract: "0x75740FC7058DA148752ef8a9AdFb73966DEb42a8",
   bnbBusdContract: "0x9f1d0Ed4E041C503BD487E5dc9FC935Ab57F9a57",
   elaOnEthContract: "0xe6fd75ff38Adca4B97FBCD938c86b98772431867",
+  pasarERC20Contract: '',
+  pasarVestingContract: '',
+  pasarStakingContract: '',
+  pasarMiningContract: '',
   blockchain: 'Elastos Smart Chain (ESC)'
 }
 
@@ -88,6 +92,10 @@ const addressForTest = {
   bunnyContract: "0x75740FC7058DA148752ef8a9AdFb73966DEb42a8",
   bnbBusdContract: "0x9f1d0Ed4E041C503BD487E5dc9FC935Ab57F9a57",
   elaOnEthContract: "0x8c947E0fA67e91370587076A4108Df17840e9982",
+  pasarERC20Contract: '0xa7B1a72266ad3a54Ac00071f05453feEeB5680dB ',
+  pasarVestingContract: '0xD883303d400427C298d53e99a3faa7Cb1E9A8727 ',
+  pasarStakingContract: '0x048c96C7dF2d789A515c0c18c9345481c12e664E ',
+  pasarMiningContract: '0x8158FF69C60Eb893e32869180D980853160b8d68 ',
   blockchain: 'Testnet (ESC)'
 }
 
@@ -109,17 +117,17 @@ const NetworkExplorerServer = {
 
 const ApplicationDIDForMain = "did:elastos:iZvAak2SUHaKwBHmPFsgtVVMGtTpi4r2kY"
 // const ApplicationDIDForTest = "did:elastos:ic8pRXyAT3JqEXo4PzHQHv5rsoYyEyDwpB"
-export const DidResolverUrl = 
-'https://api.trinity-tech.io/eid'
-  // process.env.REACT_APP_ENV === 'production' ? 'mainnet' : 'testnet';
+export const DidResolverUrl =
+  'https://api.trinity-tech.io/eid'
+// process.env.REACT_APP_ENV === 'production' ? 'mainnet' : 'testnet';
 
-export const {MAIN_CONTRACT, feedsContract, v1marketContract, diaContract, welaContract, glideContract, 
-  elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, elaOnEthContract, blockchain} = process.env.REACT_APP_ENV==="production"?addressForProduction:addressForTest
+export const { MAIN_CONTRACT, feedsContract, v1marketContract, diaContract, welaContract, glideContract,
+  elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, elaOnEthContract, pasarVestingContract, pasarStakingContract, pasarMiningContract, pasarERC20Contract, blockchain } = process.env.REACT_APP_ENV === "production" ? addressForProduction : addressForTest
 export const mainDiaContract = addressForProduction.diaContract
 
-export const ipfsURL = process.env.REACT_APP_ENV==="production"?process.env.REACT_APP_IPFS_URL_PRODUCTION:process.env.REACT_APP_IPFS_URL_TEST
-export const rpcURL = process.env.REACT_APP_ENV==="production"?rpcUrlForMain:rpcUrlForTest
-export const ExplorerServer = process.env.REACT_APP_ENV==="production" ? NetworkExplorerServer.MainNet : NetworkExplorerServer.TestNet
+export const ipfsURL = process.env.REACT_APP_ENV === "production" ? process.env.REACT_APP_IPFS_URL_PRODUCTION : process.env.REACT_APP_IPFS_URL_TEST
+export const rpcURL = process.env.REACT_APP_ENV === "production" ? rpcUrlForMain : rpcUrlForTest
+export const ExplorerServer = process.env.REACT_APP_ENV === "production" ? NetworkExplorerServer.MainNet : NetworkExplorerServer.TestNet
 export const ApplicationDID = ApplicationDIDForMain
 
 export const trustedProviders = [
@@ -127,4 +135,4 @@ export const trustedProviders = [
 ]
 export const auctionOrderType = '2'
 
-export const tokenConf = {diaDecimals: 18, diaValue: 0.01, nPPM: 1000000, PPM: 1000000}
+export const tokenConf = { diaDecimals: 18, diaValue: 0.01, nPPM: 1000000, PPM: 1000000 }
