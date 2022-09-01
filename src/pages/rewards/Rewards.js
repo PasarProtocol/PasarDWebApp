@@ -1,12 +1,14 @@
 import React from 'react';
 import * as math from 'mathjs';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
-import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails,
-ToggleButtonGroup, ToggleButton, FormGroup, TextField, LinearProgress, Slider } from '@mui/material';
+import {
+  Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails,
+  ToggleButtonGroup, ToggleButton, FormGroup, TextField, Slider
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { withStyles } from '@mui/styles';
 import { Icon } from '@iconify/react';
 import Web3 from 'web3';
+import { useSnackbar } from 'notistack';
 
 // components
 import Page from '../../components/Page';
@@ -14,7 +16,7 @@ import TabPanel from '../../components/TabPanel';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import StatisticPanel from '../../components/rewards/StatisticPanel'
 import { MHidden } from '../../components/@material-extend';
-import { isInAppBrowser, removeLeadingZero } from '../../utils/common'
+import { getFilteredGasPrice, isInAppBrowser, removeLeadingZero } from '../../utils/common'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { TOKEN_ERC20_ABI } from '../../abi/token20ABI';
 import { TOKEN_VESTING_ABI } from '../../abi/tokenVestingABI';
@@ -175,6 +177,7 @@ const ClaimTitles = [{ title: "BUYERS", action: "Buy" }, { title: "SELLERS", act
 const AmountProgressType = ['25%', '50%', '75%', 'Max']
 
 export default function Rewards() {
+  const enqueueSnackbar = useSnackbar();
   const [tabValue, setTabValue] = React.useState(0);
   const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
@@ -185,18 +188,12 @@ export default function Rewards() {
   const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
   const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 
-  React.useEffect(() => {
-    const tempProgress = math.round(operAmount * 100 / pasarBalance, 1)
-    setAmountProgress(tempProgress)
-  }, [operAmount]);
-
   const handleSwitchTab = (event, newValue) => {
     setTabValue(newValue);
   };
 
   const handleStakingType = (event, type) => {
-    if (type)
-      setStakingType(type);
+    if (type) setStakingType(type);
   };
 
   const handleProgressBtn = (event) => {
@@ -220,6 +217,11 @@ export default function Rewards() {
     setOperAmount(math.round(pasarBalance * newValue / 100, 4))
   };
 
+  React.useEffect(() => {
+    const tempProgress = math.round(operAmount * 100 / pasarBalance, 1)
+    setAmountProgress(tempProgress)
+  }, [operAmount]);
+
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -241,6 +243,46 @@ export default function Rewards() {
     };
     fetchData();
   }, [tabValue]);
+
+  const handleStake = (amount) => {
+    if (!amount) return;
+    let accounts = [];
+    const gasPrice = '';
+    const stakingContract = new walletConnectWeb3.eth.Contract(TOKEN_STAKING_ABI, STAKING_CONTRACT_ADDRESS);
+    const handleTxEvent = (hash) => {
+      console.log('transactionHash', hash);
+    };
+    const handleReceiptEvent = (receipt) => {
+      console.log('receipt', receipt);
+      enqueueSnackbar('Stake success', { variant: 'success' });
+    };
+    const handleErrorEvent = (error) => {
+      console.error('error', error);
+      enqueueSnackbar('Stake error', { variant: 'error' });
+    };
+    walletConnectWeb3.eth
+      .getAccounts()
+      .then((_accounts) => {
+        accounts = _accounts;
+        return walletConnectWeb3.eth.getGasPrice();
+      })
+      .then(async (_gasPrice) => getFilteredGasPrice(_gasPrice))
+      .then((_estimatedGas) => {
+        const transactionParams = {
+          from: accounts[0],
+          gasPrice,
+          gas: _estimatedGas,
+          value: 0,
+        };
+        stakingContract.methods.stake(amount).send(transactionParams)
+          .once('transactionHash', handleTxEvent)
+          .once('receipt', handleReceiptEvent)
+          .on('error', handleErrorEvent);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   return (
     <RootStyle title="Rewards | PASAR">
@@ -429,7 +471,7 @@ export default function Rewards() {
                     }}
                   >
                     <StyledToggleButtonGroup size="small" value={stakingType} exclusive onChange={handleStakingType}>
-                      <StyledToggleButton value="Stake">Stake</StyledToggleButton>
+                      <StyledToggleButton value="Stake" onClick={() => handleStake(operAmount)}>Stake</StyledToggleButton>
                       <StyledToggleButton value="Unstake">Unstake</StyledToggleButton>
                     </StyledToggleButtonGroup>
                   </Paper>
