@@ -284,6 +284,45 @@ export default function Rewards() {
       });
   };
 
+  const handleWithdraw = () => {
+    let accounts = [];
+    const gasPrice = '';
+    const stakingContract = new walletConnectWeb3.eth.Contract(TOKEN_STAKING_ABI, STAKING_CONTRACT_ADDRESS);
+    const handleTxEvent = (hash) => {
+      console.log('transactionHash', hash);
+    };
+    const handleReceiptEvent = (receipt) => {
+      console.log('receipt', receipt);
+      enqueueSnackbar('Stake success', { variant: 'success' });
+    };
+    const handleErrorEvent = (error) => {
+      console.error('error', error);
+      enqueueSnackbar('Stake error', { variant: 'error' });
+    };
+    walletConnectWeb3.eth
+      .getAccounts()
+      .then((_accounts) => {
+        accounts = _accounts;
+        return walletConnectWeb3.eth.getGasPrice();
+      })
+      .then(async (_gasPrice) => getFilteredGasPrice(_gasPrice))
+      .then((_estimatedGas) => {
+        const transactionParams = {
+          from: accounts[0],
+          gasPrice,
+          gas: _estimatedGas,
+          value: 0,
+        };
+        stakingContract.methods.withdraw().send(transactionParams)
+          .once('transactionHash', handleTxEvent)
+          .once('receipt', handleReceiptEvent)
+          .on('error', handleErrorEvent);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   return (
     <RootStyle title="Rewards | PASAR">
       <Container maxWidth="lg">
@@ -578,7 +617,7 @@ export default function Rewards() {
                   </Grid>
                 </MHidden>
                 <Grid item xs={12} sm={8} sx={{ display: 'flex', alignItems: 'end' }}>
-                  <StyledButton variant="contained" sx={{ width: 200 }}>Claim</StyledButton>
+                  <StyledButton variant="contained" sx={{ width: 200 }} onClick={handleWithdraw}>Claim</StyledButton>
                 </Grid>
                 <MHidden width="smDown">
                   <Grid item sm={4}>
