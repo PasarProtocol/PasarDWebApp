@@ -245,7 +245,6 @@ export default function Rewards() {
   }, [tabValue]);
 
   const handleStake = (amount) => {
-    if (!amount) return;
     let accounts = [];
     const gasPrice = '';
     const stakingContract = new walletConnectWeb3.eth.Contract(TOKEN_STAKING_ABI, STAKING_CONTRACT_ADDRESS);
@@ -510,8 +509,10 @@ export default function Rewards() {
                     }}
                   >
                     <StyledToggleButtonGroup size="small" value={stakingType} exclusive onChange={handleStakingType}>
-                      <StyledToggleButton value="Stake" onClick={() => handleStake(operAmount)}>Stake</StyledToggleButton>
-                      <StyledToggleButton value="Unstake">Unstake</StyledToggleButton>
+                      <StyledToggleButton value="Stake" onClick={() => {
+                        if (operAmount) handleStake(operAmount);
+                      }}>Stake</StyledToggleButton>
+                      <StyledToggleButton value="Unstake" onClick={() => handleStake(0)}>Unstake</StyledToggleButton>
                     </StyledToggleButtonGroup>
                   </Paper>
                 </Grid>
