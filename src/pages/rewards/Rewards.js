@@ -1,11 +1,12 @@
 import React from 'react';
 import * as math from 'mathjs';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
-import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails, 
-  ToggleButtonGroup, ToggleButton, FormGroup, TextField, LinearProgress, Slider } from '@mui/material';
+import { Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails,
+ToggleButtonGroup, ToggleButton, FormGroup, TextField, LinearProgress, Slider } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { withStyles } from '@mui/styles';
 import { Icon } from '@iconify/react';
+import Web3 from 'web3';
 
 // components
 import Page from '../../components/Page';
@@ -13,7 +14,13 @@ import TabPanel from '../../components/TabPanel';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import StatisticPanel from '../../components/rewards/StatisticPanel'
 import { MHidden } from '../../components/@material-extend';
-import { removeLeadingZero } from '../../utils/common'
+import { isInAppBrowser, removeLeadingZero } from '../../utils/common'
+import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import { TOKEN_ERC20_ABI } from '../../abi/token20ABI';
+import { TOKEN_VESTING_ABI } from '../../abi/tokenVestingABI';
+import { TOKEN_STAKING_ABI } from '../../abi/tokenStakingABI';
+import { TOKEN_MINING_ABI } from '../../abi/tokenMiningABI';
+import { pasarERC20Contract as PASAR_TOKEN_ADDRESS, pasarVestingContract as VESTING_CONTRACT_ADDRESS, pasarStakingContract as STAKING_CONTRACT_ADDRESS, pasarMiningContract as MINING_CONTRACT_ADDRESS } from '../../config'
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -71,15 +78,15 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
       border: 0,
     },
     '&:not(:first-of-type)': {
-      borderRadius: theme.shape.borderRadius/2,
+      borderRadius: theme.shape.borderRadius / 2,
     },
     '&:first-of-type': {
-      borderRadius: theme.shape.borderRadius/2,
+      borderRadius: theme.shape.borderRadius / 2,
     },
   },
   '& .MuiToggleButton-root': {
-    margin: theme.spacing(1), 
-    borderRadius: theme.shape.borderRadius/2
+    margin: theme.spacing(1),
+    borderRadius: theme.shape.borderRadius / 2
   },
   width: '100%'
 }));
@@ -116,45 +123,45 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
     height: 10
   }
 }));
-const PinkLabel = ({text})=>(<Typography variant="body2" color='origin.main' sx={{display: 'inline'}}>{text}</Typography>)
+const PinkLabel = ({ text }) => (<Typography variant="body2" color='origin.main' sx={{ display: 'inline' }}>{text}</Typography>)
 const PaperStyle = (props) => (
   <Paper
     sx={{
-        ...SectionSx,
-        p: '20px',
-        ...props.sx
+      ...SectionSx,
+      p: '20px',
+      ...props.sx
     }}
   >
     {props.children}
   </Paper>
 )
-const ClaimCard = ({item})=>(
+const ClaimCard = ({ item }) => (
   <PaperStyle>
     <Typography variant="h3" align="center">{item.title}</Typography>
-    <Typography variant="h5" component="div" align="center" sx={{pb: 2}}>
+    <Typography variant="h5" component="div" align="center" sx={{ pb: 2 }}>
       {item.action} item, earn{' '}
-      <Typography variant="h5" color='origin.main' sx={{display: 'inline'}}>
+      <Typography variant="h5" color='origin.main' sx={{ display: 'inline' }}>
         PASAR
       </Typography>{' '}
-      <Icon icon="eva:info-outline" style={{marginBottom: -4}}/>
+      <Icon icon="eva:info-outline" style={{ marginBottom: -4 }} />
     </Typography>
-    <Divider sx={{mx: '-20px'}}/>
-    <Box sx={{maxWidth: 300, py: 4, m: 'auto'}}>
+    <Divider sx={{ mx: '-20px' }} />
+    <Box sx={{ maxWidth: 300, py: 4, m: 'auto' }}>
       <Typography variant="h3" component="div">
-        <Typography variant="h3" color='origin.main' sx={{display: 'inline'}}>PASAR</Typography>{' '}earned
+        <Typography variant="h3" color='origin.main' sx={{ display: 'inline' }}>PASAR</Typography>{' '}earned
       </Typography>
-      <EarnedValueStyle variant="h2" sx={{display: 'inline-flex'}}>
+      <EarnedValueStyle variant="h2" sx={{ display: 'inline-flex' }}>
         0.234223
       </EarnedValueStyle>
       <Typography variant="body2" color='text.secondary'>≈ USD 0</Typography>
       <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-        <div><StyledButton variant="contained" sx={{mt: 3, width: '100%'}}>Claim</StyledButton></div>
+        <div><StyledButton variant="contained" sx={{ mt: 3, width: '100%' }}>Claim</StyledButton></div>
       </Tooltip>
     </Box>
   </PaperStyle>
 )
 const ExternalLink = (props) => {
-  const {linkURL, title} = props
+  const { linkURL, title } = props
   return <Link
     underline="always"
     href={linkURL}
@@ -164,18 +171,22 @@ const ExternalLink = (props) => {
     {title}
   </Link>
 }
-const ClaimTitles = [{title: "BUYERS", action: "Buy"}, {title: "SELLERS", action: "Sell"}, {title: "CREATORS", action: "Create"}]
+const ClaimTitles = [{ title: "BUYERS", action: "Buy" }, { title: "SELLERS", action: "Sell" }, { title: "CREATORS", action: "Create" }]
 const AmountProgressType = ['25%', '50%', '75%', 'Max']
 
-export default function Rewards() {  
-  const [balance, setBalance] = React.useState(500.1564);
+export default function Rewards() {
   const [tabValue, setTabValue] = React.useState(0);
   const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
-  const [amountProgress, setAmountProgress] = React.useState(0)
+  const [amountProgress, setAmountProgress] = React.useState(0);
+  const [PASARToUSD, setPASARToUSD] = React.useState(0.1);
+  const [pasarBalance, setPasarBalance] = React.useState(0);
+  const [stakingAPR, setStakingAPR] = React.useState(48.48);
+  const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
+  const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 
   React.useEffect(() => {
-    const tempProgress = math.round(operAmount*100/balance, 1)
+    const tempProgress = math.round(operAmount * 100 / pasarBalance, 1)
     setAmountProgress(tempProgress)
   }, [operAmount]);
 
@@ -184,66 +195,88 @@ export default function Rewards() {
   };
 
   const handleStakingType = (event, type) => {
-    if(type)
+    if (type)
       setStakingType(type);
   };
 
   const handleProgressBtn = (event) => {
     const progressType = event.target.value
-    setAmountProgress(progressType*25)
-    setOperAmount(math.round(balance*progressType/4, 4))
+    setAmountProgress(progressType * 25)
+    setOperAmount(math.round(pasarBalance * progressType / 4, 4))
   }
 
   const handleChangeAmount = (event) => {
     let amountValue = event.target.value
     amountValue = removeLeadingZero(amountValue)
-    if(amountValue<0)
+    if (amountValue < 0)
       return
-    if (amountValue*1 > balance)
+    if (amountValue * 1 > pasarBalance)
       return;
-    setOperAmount(math.round(amountValue*1, 4).toString())
+    setOperAmount(math.round(amountValue * 1, 4).toString())
   };
 
   const handleChangeSlider = (event, newValue) => {
     setAmountProgress(newValue);
-    setOperAmount(math.round(balance*newValue/100, 4))
+    setOperAmount(math.round(pasarBalance * newValue / 100, 4))
   };
+
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const accounts = await walletConnectWeb3.eth.getAccounts();
+      if (!accounts.length) return;
+      const pasarTokenContract = new walletConnectWeb3.eth.Contract(TOKEN_ERC20_ABI, PASAR_TOKEN_ADDRESS);
+      const vestingContract = new walletConnectWeb3.eth.Contract(TOKEN_VESTING_ABI, VESTING_CONTRACT_ADDRESS);
+      const stakingContract = new walletConnectWeb3.eth.Contract(TOKEN_STAKING_ABI, STAKING_CONTRACT_ADDRESS);
+      const miningRewardContract = new walletConnectWeb3.eth.Contract(TOKEN_MINING_ABI, MINING_CONTRACT_ADDRESS);
+      const balance = await pasarTokenContract.methods.balanceOf(accounts[0]).call();
+      setPasarBalance(balance);
+      if (tabValue === 0) { // rewards page
+        const accountRewards = await miningRewardContract.methods.accountRewards(accounts[0]).call();
+      }
+      else { // staking page
+        const stakingInfo = await stakingContract.methods.getUserInfo(accounts[0]).call();
+        setStakingState(stakingInfo);
+      }
+    };
+    fetchData();
+  }, [tabValue]);
 
   return (
     <RootStyle title="Rewards | PASAR">
       <Container maxWidth="lg">
-        <Typography variant="h2" align="center" sx={{mb: 3}}>
+        <Typography variant="h2" align="center" sx={{ mb: 3 }}>
           Rewards
         </Typography>
-        <Typography variant="h5" sx={{fontWeight: 'normal', color: 'text.secondary', mb: 2}}>
+        <Typography variant="h5" sx={{ fontWeight: 'normal', color: 'text.secondary', mb: 2 }}>
           Earn rewards by just trading, staking and listing. Mining and staking rewards will constitute 40% (40,000,000) and 10% (10,000,000) respectively of the total PASAR token supply.
         </Typography>
         <Stack direction="row" spacing={2}>
-          <Box sx={{width: 200}}>
-            <StyledButton variant='contained' fullWidth sx={{mb: 1}}>Get PASAR</StyledButton>
-            <Typography variant="body2" sx={{fontWeight: 'normal', color: 'text.secondary', mb: 1}} align="center">
+          <Box sx={{ width: 200 }}>
+            <StyledButton variant='contained' fullWidth sx={{ mb: 1 }}>Get PASAR</StyledButton>
+            <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'text.secondary', mb: 1 }} align="center">
               1 PASAR ≈ USD 0.01
             </Typography>
           </Box>
           <Button
-              // to={props.to}
-              // component={RouterLink}
-              // size="small"
-              color="inherit"
-              startIcon={<Icon icon="akar-icons:circle-plus" />}
-              sx={{color: 'origin.main', height: 'max-content'}}
+            // to={props.to}
+            // component={RouterLink}
+            // size="small"
+            color="inherit"
+            startIcon={<Icon icon="akar-icons:circle-plus" />}
+            sx={{ color: 'origin.main', height: 'max-content' }}
           >
             Add to wallet
           </Button>
         </Stack>
         <Stack alignItems="center">
-          <Tabs 
+          <Tabs
             value={tabValue}
             variant="scrollable"
             scrollButtons="auto"
             onChange={handleSwitchTab}
-            TabIndicatorProps={{ 
-              style: { background: '#FF5082' } 
+            TabIndicatorProps={{
+              style: { background: '#FF5082' }
             }}
             TabScrollButtonProps={{
               sx: {
@@ -261,41 +294,41 @@ export default function Rewards() {
           </Tabs>
         </Stack>
         <TabPanel value={tabValue} index={0}>
-          <PaperStyle sx={{position: 'relative', px: {sm: 5, md: 12}, py: {sm: 2, md: 5}, mx: {sm: 2, md: 6}}}>
+          <PaperStyle sx={{ position: 'relative', px: { sm: 5, md: 12 }, py: { sm: 2, md: 5 }, mx: { sm: 2, md: 6 } }}>
             <Box>
-              <Typography variant="h2" sx={{verticalAlign: 'middle', display: 'inline-flex'}}>
+              <Typography variant="h2" sx={{ verticalAlign: 'middle', display: 'inline-flex' }}>
                 Total Mining Rewards&nbsp;
               </Typography>
               <Box
                 component="img"
                 src='/static/logo-icon-white.svg'
                 sx={{
-                  width: {xs: 32, sm: 40, lg: 45},
+                  width: { xs: 32, sm: 40, lg: 45 },
                   display: 'inline-flex',
                   backgroundColor: 'origin.main',
-                  p: {xs: 0.6, sm: 0.9, lg: 1},
+                  p: { xs: 0.6, sm: 0.9, lg: 1 },
                   verticalAlign: 'middle',
                   borderRadius: '100%'
-                }}/>
+                }} />
             </Box>
-            <Typography variant="body2" component='div' sx={{lineHeight: 1.1, py: 2}}>
-              Once a buy transaction is completed, the{' '}<PinkLabel text="PASAR"/>{' '}mining rewards will be distributed accordingly.
-              Mining rewards to earn{' '}<PinkLabel text="PASAR"/>{' '}will last 4 years.<br/>
-              <br/>
+            <Typography variant="body2" component='div' sx={{ lineHeight: 1.1, py: 2 }}>
+              Once a buy transaction is completed, the{' '}<PinkLabel text="PASAR" />{' '}mining rewards will be distributed accordingly.
+              Mining rewards to earn{' '}<PinkLabel text="PASAR" />{' '}will last 4 years.<br />
+              <br />
               Users can claim rewards every day, or accumulate a one-time claim. Rewards never disappear nor expire.
             </Typography>
-            <StackStyle sx={{py: 2}}>
-              <Box sx={{flex: 1}}>
-                <Typography variant="h3" component="div"><Typography variant="h3" color='origin.main' sx={{display: 'inline'}}>PASAR</Typography>{' '}earned</Typography>
-                <EarnedValueStyle variant="h2" sx={{display: 'inline-flex'}}>
+            <StackStyle sx={{ py: 2 }}>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="h3" component="div"><Typography variant="h3" color='origin.main' sx={{ display: 'inline' }}>PASAR</Typography>{' '}earned</Typography>
+                <EarnedValueStyle variant="h2" sx={{ display: 'inline-flex' }}>
                   52.7593424
                 </EarnedValueStyle>
                 <Typography variant="body2" color='text.secondary'>≈ USD 5.23</Typography>
               </Box>
-              <Box sx={{textAlign: 'center', m: 'auto'}}>
-                <Typography variant="body2" align='center' color='text.secondary' sx={{pb: 2}}>to collect from 4 mining rewards</Typography>
+              <Box sx={{ textAlign: 'center', m: 'auto' }}>
+                <Typography variant="body2" align='center' color='text.secondary' sx={{ pb: 2 }}>to collect from 4 mining rewards</Typography>
                 <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                  <div><StyledButton variant="contained" sx={{minWidth: 150}}>Claim All</StyledButton></div>
+                  <div><StyledButton variant="contained" sx={{ minWidth: 150 }}>Claim All</StyledButton></div>
                 </Tooltip>
               </Box>
             </StackStyle>
@@ -306,33 +339,33 @@ export default function Rewards() {
           <Stack spacing={2}>
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">ELA ESC</Typography>
-              <Box component="img" src="/static/elastos.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
+              <Box component="img" src="/static/elastos.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel/>
+            <StatisticPanel />
 
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">PASAR</Typography>
-              <Box component="img" src="/static/logo-icon.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
+              <Box component="img" src="/static/logo-icon.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel/>
+            <StatisticPanel />
 
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">Ecosystem</Typography>
-              <Box component="img" src="/static/badges/diamond.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }} />
+              <Box component="img" src="/static/badges/diamond.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel/>
+            <StatisticPanel />
 
             <Typography variant="h3">Others</Typography>
-            <StatisticPanel/>
+            <StatisticPanel />
           </Stack>
           <Typography variant="h2" textAlign="center" my={3}>
             Mining Rewards
           </Typography>
           <Grid container spacing={3}>
             {
-              ClaimTitles.map((item, _i)=>(
+              ClaimTitles.map((item, _i) => (
                 <Grid item xs={12} sm={6} md={4} key={_i}>
-                  <ClaimCard item={item}/>
+                  <ClaimCard item={item} />
                 </Grid>
               ))
             }
@@ -344,21 +377,21 @@ export default function Rewards() {
               <Stack direction="row" alignItems="center" py={2}>
                 <Stack flexGrow={1}>
                   <Typography variant="h3">Standard Staking</Typography>
-                  <Typography variant="h5" component="div" sx={{fontWeight: 'normal'}}>
+                  <Typography variant="h5" component="div" sx={{ fontWeight: 'normal' }}>
                     Stake{' '}
-                    <Typography variant="h5" color='origin.main' sx={{display: 'inline', fontWeight: 'normal'}}>
+                    <Typography variant="h5" color='origin.main' sx={{ display: 'inline', fontWeight: 'normal' }}>
                       PASAR
                     </Typography>,
                     earn{' '}
-                    <Typography variant="h5" color='origin.main' sx={{display: 'inline', fontWeight: 'normal'}}>
+                    <Typography variant="h5" color='origin.main' sx={{ display: 'inline', fontWeight: 'normal' }}>
                       PASAR
                     </Typography>
                   </Typography>
                 </Stack>
                 <Stack>
-                  <Typography variant="h5">48.48%</Typography>
-                  <Typography variant="h5" sx={{fontWeight: 'normal'}} color="text.secondary">
-                    APR{' '}<Icon icon="eva:info-outline" style={{marginBottom: -3}}/>
+                  <Typography variant="h5">{stakingAPR}%</Typography>
+                  <Typography variant="h5" sx={{ fontWeight: 'normal' }} color="text.secondary">
+                    APR{' '}<Icon icon="eva:info-outline" style={{ marginBottom: -3 }} />
                   </Typography>
                 </Stack>
               </Stack>
@@ -374,15 +407,15 @@ export default function Rewards() {
               }
             }}
           >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />} sx={{'& .Mui-expanded': {marginBottom: '0 !important'}}}>
+            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />} sx={{ '& .Mui-expanded': { marginBottom: '0 !important' } }}>
               <Typography variant="h4">Your Stake</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Box mb={2}>
                 <EarnedValueStyle variant="h2">
-                  0.234223
+                  {stakingState.currentStaked}
                 </EarnedValueStyle>
-                <Typography variant="body2" color='text.secondary'>≈ USD 0.23</Typography>
+                <Typography variant="body2" color='text.secondary'>{`≈ USD ${stakingState.currentStaked * PASARToUSD}`}</Typography>
               </Box>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={8}>
@@ -405,19 +438,19 @@ export default function Rewards() {
                   <Grid item xs={12}>
                     <Stack direction="row" alignItems='center'>
                       <Typography variant='body2'>PASAR in wallet:</Typography>&nbsp;
-                      <EarnedValueStyle variant="h6" sx={{display: 'inline-flex'}}>
-                        {balance}
+                      <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
+                        {pasarBalance}
                       </EarnedValueStyle>&nbsp;
-                      <Typography variant='body2' color="text.secondary">≈ USD 201.32</Typography>
+                      <Typography variant='body2' color="text.secondary">{`≈ USD ${pasarBalance * PASARToUSD}`}</Typography>
                     </Stack>
                   </Grid>
                 </MHidden>
                 <Grid item xs={12} md={8}>
-                  <FormGroup row sx={{flexWrap: 'nowrap'}}>
-                    <StyledTextField 
+                  <FormGroup row sx={{ flexWrap: 'nowrap' }}>
+                    <StyledTextField
                       type="number"
-                      variant="outlined" 
-                      placeholder="Amount" 
+                      variant="outlined"
+                      placeholder="Amount"
                       value={operAmount}
                       onChange={handleChangeAmount}
                       InputProps={{
@@ -428,7 +461,7 @@ export default function Rewards() {
                             sx={{
                               width: 24,
                               display: 'inline-flex',
-                            }}/>
+                            }} />
                         ),
                         style: {
                           fontSize: '16pt',
@@ -436,21 +469,21 @@ export default function Rewards() {
                           color: '#FF5082'
                         }
                       }}
-                      sx={{flexGrow: 1}}
+                      sx={{ flexGrow: 1 }}
                     />
-                    <StyledButton variant="contained" sx={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0}}>{stakingType}</StyledButton>
+                    <StyledButton variant="contained" sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}>{stakingType}</StyledButton>
                   </FormGroup>
                   <StyledSlider size='medium' value={amountProgress} step={1} valueLabelDisplay="auto" onChange={handleChangeSlider} />
                   <Typography variant='h6' mb={1}>{amountProgress}%</Typography>
                   <Stack direction="row" spacing={1}>
                     {
-                      AmountProgressType.map((progType, _i)=>{
-                        const btnSx = {flexGrow: 1}
-                        if(amountProgress === (_i+1)*25) {
-                          btnSx.background = (theme)=>theme.palette.origin.main
+                      AmountProgressType.map((progType, _i) => {
+                        const btnSx = { flexGrow: 1 }
+                        if (amountProgress === (_i + 1) * 25) {
+                          btnSx.background = (theme) => theme.palette.origin.main
                           btnSx.color = 'white'
                         }
-                        return <Button key={_i} variant="contained" color="inherit" sx={btnSx} value={_i+1} onClick={handleProgressBtn}>{progType}</Button>
+                        return <Button key={_i} variant="contained" color="inherit" sx={btnSx} value={_i + 1} onClick={handleProgressBtn}>{progType}</Button>
                       })
                     }
                   </Stack>
@@ -459,10 +492,10 @@ export default function Rewards() {
                   <Grid item sm={4}>
                     <Box textAlign="right">
                       <Typography variant='body1'>PASAR in wallet:</Typography>
-                      <EarnedValueStyle variant="h6" sx={{display: 'inline-flex'}}>
-                        500.1564
+                      <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
+                        {pasarBalance}
                       </EarnedValueStyle>
-                      <Typography variant='body1' color="text.secondary">≈ USD 201.32</Typography>
+                      <Typography variant='body1' color="text.secondary">{`≈ USD ${pasarBalance * PASARToUSD}`}</Typography>
                     </Box>
                   </Grid>
                 </MHidden>
@@ -480,39 +513,39 @@ export default function Rewards() {
               }
             }}
           >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />} sx={{'& .Mui-expanded': {marginBottom: '0 !important'}}}>
+            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />} sx={{ '& .Mui-expanded': { marginBottom: '0 !important' } }}>
               <Typography variant="h4">Rewards</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Box mb={2}>
                 <EarnedValueStyle variant="h2">
-                  0.234223
+                  {stakingState.rewardWithdrawable}
                 </EarnedValueStyle>
-                <Typography variant="body2" color='text.secondary'>≈ USD 0.23</Typography>
+                <Typography variant="body2" color='text.secondary'>{`≈ USD ${stakingState.rewardWithdrawable * PASARToUSD}`}</Typography>
               </Box>
               <Grid container spacing={2}>
                 <MHidden width="smUp">
                   <Grid item xs={12}>
                     <Stack direction="row" alignItems='center'>
                       <Typography variant='body2'>Received so far:</Typography>&nbsp;
-                      <EarnedValueStyle variant="h6" sx={{display: 'inline-flex'}}>
-                        100
+                      <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
+                        {stakingState.rewardWithdrawn}
                       </EarnedValueStyle>&nbsp;
-                      <Typography variant='body2' color="text.secondary">≈ USD 51.32</Typography>
+                      <Typography variant='body2' color="text.secondary">{`≈ USD ${stakingState.rewardWithdrawn * PASARToUSD}`}</Typography>
                     </Stack>
                   </Grid>
                 </MHidden>
-                <Grid item xs={12} sm={8} sx={{display: 'flex', alignItems: 'end'}}>
-                  <StyledButton variant="contained" sx={{width: 200}}>Claim</StyledButton>
+                <Grid item xs={12} sm={8} sx={{ display: 'flex', alignItems: 'end' }}>
+                  <StyledButton variant="contained" sx={{ width: 200 }}>Claim</StyledButton>
                 </Grid>
                 <MHidden width="smDown">
                   <Grid item sm={4}>
                     <Box textAlign="right">
                       <Typography variant='body1'>Received so far:</Typography>
-                      <EarnedValueStyle variant="h6" sx={{display: 'inline-flex'}}>
-                        500.1564
+                      <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
+                        {stakingState.rewardWithdrawn}
                       </EarnedValueStyle>
-                      <Typography variant='body1' color="text.secondary">≈ USD 201.32</Typography>
+                      <Typography variant='body1' color="text.secondary">{`≈ USD ${stakingState.rewardWithdrawn * PASARToUSD}`}</Typography>
                     </Box>
                   </Grid>
                 </MHidden>
