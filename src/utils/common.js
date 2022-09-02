@@ -556,25 +556,25 @@ export function callContractMethod(type, coinType, chainId, paramObj) {
 export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise((resolve, reject) => {
   let contractABI;
   let contractAddress;
-  let contractMethod;
+  let contractMethod = null;
   let accounts = [];
   const gasPrice = '';
   switch (param.contractType) {
-    case 1:
+    case 'token':
       contractABI = TOKEN_ERC20_ABI;
       contractAddress = PASAR_TOKEN_ADDRESS;
       break;
-    case 2:
-      contractABI = TOKEN_ERC20_ABI;
-      contractAddress = PASAR_TOKEN_ADDRESS;
+    case 'vesting':
+      contractABI = TOKEN_VESTING_ABI;
+      contractAddress = VESTING_CONTRACT_ADDRESS;
       break;
-    case 3:
-      contractABI = TOKEN_ERC20_ABI;
-      contractAddress = PASAR_TOKEN_ADDRESS;
+    case 'staking':
+      contractABI = TOKEN_STAKING_ABI;
+      contractAddress = STAKING_CONTRACT_ADDRESS;
       break;
-    case 4:
-      contractABI = TOKEN_ERC20_ABI;
-      contractAddress = PASAR_TOKEN_ADDRESS;
+    case 'mining':
+      contractABI = TOKEN_MINING_ABI;
+      contractAddress = MINING_CONTRACT_ADDRESS;
       break;
     default:
       contractABI = undefined;
@@ -584,11 +584,20 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
   if (!contractABI || !contractAddress) return;
   const smartContract = new walletConnectWeb3.eth.Contract(contractABI, contractAddress);
   switch (param.methodName) {
+    case 'balanceOf': 
+      contractMethod = smartContract.methods.balanceOf(param.account);
+      break;
+    case 'getUserInfo':
+      contractMethod = smartContract.methods.getUserInfo(param.account);
+      break;
     case 'stake':
       contractMethod = smartContract.methods.stake(param.amount);
       break;
     case 'withdraw':
       contractMethod = smartContract.methods.withdraw();
+      break;
+    case 'accountRewards':
+      contractMethod = smartContract.methods.accountRewards(param.account);
       break;
     default:
       contractMethod = undefined;
