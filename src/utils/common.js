@@ -9,33 +9,43 @@ import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sd
 import jwtDecode from 'jwt-decode';
 
 import { essentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
-import { 
+import {
   MAIN_CONTRACT,
   v1marketContract as V1_MARKET_CONTRACT_ADDRESS,
-  diaContract as DIA_CONTRACT_ADDRESS, 
+  diaContract as DIA_CONTRACT_ADDRESS,
   mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS,
-  welaContract as WELA_CONTRACT_ADDRESS, 
-  glideContract as GLIDE_CONTRACT_ADDRESS, 
-  elkContract as ELK_CONTRACT_ADDRESS, 
-  ethUsdcContract as EUSDC_CONTRACT_ADDRESS, 
-  bunnyContract as BUNNY_CONTRACT_ADDRESS, 
-  bnbBusdContract as BUSD_CONTRACT_ADDRESS, 
+  welaContract as WELA_CONTRACT_ADDRESS,
+  glideContract as GLIDE_CONTRACT_ADDRESS,
+  elkContract as ELK_CONTRACT_ADDRESS,
+  ethUsdcContract as EUSDC_CONTRACT_ADDRESS,
+  bunnyContract as BUNNY_CONTRACT_ADDRESS,
+  bnbBusdContract as BUSD_CONTRACT_ADDRESS,
   elaOnEthContract as ELA_ON_ETH_CONTRACT_ADDRESS,
-  blankAddress, ipfsURL as PasarIpfs, rpcURL, ExplorerServer } from '../config';
+  pasarERC20Contract as PASAR_TOKEN_ADDRESS,
+  pasarVestingContract as VESTING_CONTRACT_ADDRESS,
+  pasarStakingContract as STAKING_CONTRACT_ADDRESS,
+  pasarMiningContract as MINING_CONTRACT_ADDRESS,
+  blankAddress, ipfsURL as PasarIpfs, rpcURL, ExplorerServer
+} from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { V1_PASAR_CONTRACT_ABI } from '../abi/pasarV1ABI';
 import { ERC20_CONTRACT_ABI } from '../abi/diamondABI';
 import { REGISTER_CONTRACT_ABI } from '../abi/registerABI';
 import { COMMON_CONTRACT_ABI } from '../abi/commonABI';
+import { TOKEN_ERC20_ABI } from '../abi/token20ABI';
+import { TOKEN_VESTING_ABI } from '../abi/tokenVestingABI';
+import { TOKEN_STAKING_ABI } from '../abi/tokenStakingABI';
+import { TOKEN_MINING_ABI } from '../abi/tokenMiningABI';
+
 
 const pricingContract = [blankAddress, DIA_CONTRACT_ADDRESS, WELA_CONTRACT_ADDRESS, GLIDE_CONTRACT_ADDRESS, ELK_CONTRACT_ADDRESS, EUSDC_CONTRACT_ADDRESS, BUNNY_CONTRACT_ADDRESS, BUSD_CONTRACT_ADDRESS]
 const ipfsUrls = [PasarIpfs, 'https://ipfs.ela.city', 'https://gateway.pinata.cloud']
 
 // Get Abbrevation of hex addres //
 export const reduceHexAddress = (strAddress) => {
-  if(!strAddress)
+  if (!strAddress)
     return ''
-  if(strAddress.length<10)
+  if (strAddress.length < 10)
     return strAddress
   return `${strAddress.substring(0, 6)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`;
 }
@@ -65,9 +75,9 @@ export const getTime = (timestamp) => {
   return { date: dateStr, time: timeStr };
 };
 
-export const getDateTimeString = (date) => `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`
+export const getDateTimeString = (date) => `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
 
-export const getDateDistance = (timestamp) => timestamp ? formatDistance(timestamp*1000, new Date(), { addSuffix: true }).replace("about","").trim() : ''
+export const getDateDistance = (timestamp) => timestamp ? formatDistance(timestamp * 1000, new Date(), { addSuffix: true }).replace("about", "").trim() : ''
 
 export const getTimeZone = () => {
   const e = String(-(new Date).getTimezoneOffset() / 60);
@@ -77,10 +87,10 @@ export const getTimeZone = () => {
 export const getIpfsUrl = (uri, ipfsType = 0) => {
   if (!uri) return '';
   const ipfsUrl = ipfsUrls[ipfsType]
-  if((uri.match(/:/g) || []).length !== 2){
+  if ((uri.match(/:/g) || []).length !== 2) {
     // const ipfsStrPos = uri.search('/ipfs/')
     // if(ipfsStrPos<0)
-      return uri
+    return uri
     // return `${ipfsUrl}${uri.substr(ipfsStrPos)}`;
   }
 
@@ -93,18 +103,18 @@ export const getIpfsUrl = (uri, ipfsType = 0) => {
 export const getAssetImage = (metaObj, isThumbnail, ipfsType = 0) => {
   const { asset, thumbnail, data } = metaObj;
 
-  if(!asset && !thumbnail && !data)
+  if (!asset && !thumbnail && !data)
     return ''
 
   let imgUrl = asset
-  if(data && data.thumbnail && data.image)
+  if (data && data.thumbnail && data.image)
     imgUrl = isThumbnail ? data.thumbnail : data.image
-  else if(asset || thumbnail) {
-    const imgUrl = isThumbnail?thumbnail:asset
-    if(!imgUrl)
+  else if (asset || thumbnail) {
+    const imgUrl = isThumbnail ? thumbnail : asset
+    if (!imgUrl)
       return ''
   }
-  if(!imgUrl)
+  if (!imgUrl)
     return ''
   return getIpfsUrl(imgUrl, ipfsType);
 };
@@ -116,10 +126,10 @@ export const getCollectionTypeFromImageUrl = (metaObj) => {
     if (data)
       cid = data.image
   }
-  if(!cid)
+  if (!cid)
     return 1
   const prefix = cid.split(':')[0]
-  if(prefix==='pasar')
+  if (prefix === 'pasar')
     return 0
   return 1
 };
@@ -170,53 +180,53 @@ export const getBalanceByAllCoinTypes = (connectProvider, chainId, balanceHandle
     const startPos = getStartPosOfCoinTypeByChainType(chainType)
     // const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(connectProvider);
-    walletConnectWeb3.eth.getAccounts().then(accounts=>{
-      const getBalanceFuncs = currentCoinTypes.map((coin, _i)=>{
-        if(coin.address === blankAddress) 
-          return walletConnectWeb3.eth.getBalance(accounts[0]).then(balance=>{
-            balanceHandler(_i+startPos, math.round(balance / 1e18, 4))
-          }).catch(err=>{})
+    walletConnectWeb3.eth.getAccounts().then(accounts => {
+      const getBalanceFuncs = currentCoinTypes.map((coin, _i) => {
+        if (coin.address === blankAddress)
+          return walletConnectWeb3.eth.getBalance(accounts[0]).then(balance => {
+            balanceHandler(_i + startPos, math.round(balance / 1e18, 4))
+          }).catch(err => { })
 
-        return getERC20TokenBalance(coin.address, accounts[0], connectProvider).then(balance=>{
-          balanceHandler(_i+startPos, balance*1)
-        }).catch(err=>{})
+        return getERC20TokenBalance(coin.address, accounts[0], connectProvider).then(balance => {
+          balanceHandler(_i + startPos, balance * 1)
+        }).catch(err => { })
       })
-      Promise.all(getBalanceFuncs).then(res=>{
+      Promise.all(getBalanceFuncs).then(res => {
         resolve(true)
-      }).catch(err=>{
+      }).catch(err => {
         reject(err)
       })
-    }).catch(err=>{
+    }).catch(err => {
       reject(err)
     })
   })
 
 export const getDiaBalanceDegree = (balance, chainId) => {
   const chainType = getChainTypeFromId(chainId)
-  const diaBalance = balance*1
-  if(chainType && chainType !== 'ESC')
+  const diaBalance = balance * 1
+  if (chainType && chainType !== 'ESC')
     return 4
-  if(diaBalance >= 1)
+  if (diaBalance >= 1)
     return 3
-  if(diaBalance >= 0.1)
+  if (diaBalance >= 0.1)
     return 2
-  if(diaBalance >= 0.01)
+  if (diaBalance >= 0.01)
     return 1
   return 0
 }
 
 export function dateRangeBeforeDays(days) {
-  if(days>2)
+  if (days > 2)
     return [...Array(days).keys()].map((i) => format(subDays(new Date(), i), 'yyyy-MM-dd'));
 
   const resultArray = []
   let currentIndex = 0
   let currentDate = format(new Date(), 'yyyy-MM-dd HH:00')
-  do{
+  do {
     resultArray.push(currentDate)
     currentIndex += 1
     currentDate = format(subHours(new Date(), currentIndex), 'yyyy-MM-dd HH:00')
-  } while(currentDate>=format(subDays(new Date(), 1), 'yyyy-MM-dd 00:00'))
+  } while (currentDate >= format(subDays(new Date(), 1), 'yyyy-MM-dd 00:00'))
   return resultArray
 }
 
@@ -225,13 +235,13 @@ export function hash(string) {
 }
 
 export async function getCoinUSD() {
-  return new Promise((resolve, reject)=>{
-    getERC20TokenPrice(blankAddress).then(result=>{
-      if(result.bundle.elaPrice)
+  return new Promise((resolve, reject) => {
+    getERC20TokenPrice(blankAddress).then(result => {
+      if (result.bundle.elaPrice)
         resolve(result.bundle.elaPrice)
       else
         resolve(0)
-    }).catch(err=>{
+    }).catch(err => {
       resolve(0)
     })
   })
@@ -287,21 +297,21 @@ export function getERC20TokenPrice(tokenAddress) {
 
 export function getTokenPriceInEthereum() {
   return new Promise((resolve, reject) => {
-  // fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD')
-  // fetch("https://api.coinstats.app/public/v1/coins/ethereum?currency=USD")
+    // fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD')
+    // fetch("https://api.coinstats.app/public/v1/coins/ethereum?currency=USD")
     fetch("https://api.coingecko.com/api/v3/simple/price?ids=elastos,ethereum,fsn&vs_currencies=usd")
-      .then(res=>res.json())
-      .then(resObj=>{
+      .then(res => res.json())
+      .then(resObj => {
         const tempPriceResult = [0, 0]
-        if(resObj && resObj.ethereum)
+        if (resObj && resObj.ethereum)
           tempPriceResult[0] = resObj.ethereum.usd
-        if(resObj && resObj.elastos)
+        if (resObj && resObj.elastos)
           tempPriceResult[1] = resObj.elastos.usd
-        if(resObj && resObj.fsn)
+        if (resObj && resObj.fsn)
           tempPriceResult[2] = resObj.fsn.usd
         resolve(tempPriceResult)
       })
-      .catch(e=>{
+      .catch(e => {
         resolve([0, 0, 0])
       })
   });
@@ -312,21 +322,21 @@ export function setAllTokenPrice(setCoinPriceByType) {
     setCoinPriceByType(0, res)
   });
   getDiaTokenPrice().then((res) => {
-    if(!res || !res.token)
+    if (!res || !res.token)
       return
     setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice)
   })
-  coinTypes.forEach((token, _i)=>{
-    if(_i<2)
+  coinTypes.forEach((token, _i) => {
+    if (_i < 2)
       return
     getERC20TokenPrice(token.address).then((res) => {
-      if(!res || !res.token)
+      if (!res || !res.token)
         return
       setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice)
     })
   })
   getTokenPriceInEthereum().then((res) => {
-    res.forEach((value, _i)=>{setCoinPriceByType(coinTypes.length+_i, value)})
+    res.forEach((value, _i) => { setCoinPriceByType(coinTypes.length + _i, value) })
   })
 }
 export function getDiaTokenInfo(strAddress, connectProvider = null) {
@@ -337,24 +347,24 @@ export function getElaOnEthTokenInfo(strAddress, connectProvider = null) {
 }
 function getERC20TokenBalance(erc20ContractAddress, strAddress, connectProvider = null) {
   return new Promise((resolve, reject) => {
-    try{
+    try {
       let walletConnectWeb3
-      if(connectProvider)
+      if (connectProvider)
         walletConnectWeb3 = new Web3(connectProvider)
-      else if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+      else if (Web3.givenProvider || Web3.currentProvider || window.ethereum)
         walletConnectWeb3 = new Web3(Web3.givenProvider || Web3.currentProvider || window.ethereum)
       else
         walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
-      
+
       // const web3 = new Web3(Web3.givenProvider);
       // const MyContract = new web3.eth.Contract(ERC20_CONTRACT_ABI, DIA_CONTRACT_ADDRESS);
       // MyContract.methods.balanceOf(strAddress).call().then(console.log);
 
       const diamondContract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, erc20ContractAddress)
       diamondContract.methods.balanceOf(strAddress).call()
-        .then(result=>{
+        .then(result => {
           // console.log(result)
-          if(result === '0'){
+          if (result === '0') {
             resolve(result)
             return
           }
@@ -363,38 +373,38 @@ function getERC20TokenBalance(erc20ContractAddress, strAddress, connectProvider 
         }).catch((error) => {
           reject(error);
         })
-    } catch(e) {
+    } catch (e) {
       reject(e)
     }
   })
 }
 
 export async function getERCType(contractAddress, connectProvider = null) {
-  try{
+  try {
     let walletConnectWeb3
-    if(connectProvider)
+    if (connectProvider)
       walletConnectWeb3 = new Web3(connectProvider)
-    else if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+    else if (Web3.givenProvider || Web3.currentProvider || window.ethereum)
       walletConnectWeb3 = new Web3(Web3.givenProvider || Web3.currentProvider || window.ethereum)
     else
       walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
 
     const ercContract = new walletConnectWeb3.eth.Contract(COMMON_CONTRACT_ABI, contractAddress)
     const is721 = await ercContract.methods.supportsInterface('0x80ac58cd').call()
-    if(is721)
+    if (is721)
       return 0
     return 1
-  } catch(e) {
+  } catch (e) {
     return 1
   }
 }
 
 export async function checkWhetherGeneralCollection(chainId, contractAddress, connectProvider = null) {
-  try{
+  try {
     let walletConnectWeb3
-    if(connectProvider)
+    if (connectProvider)
       walletConnectWeb3 = new Web3(connectProvider)
-    else if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+    else if (Web3.givenProvider || Web3.currentProvider || window.ethereum)
       walletConnectWeb3 = new Web3(Web3.givenProvider || Web3.currentProvider || window.ethereum)
     else
       walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
@@ -403,20 +413,20 @@ export async function checkWhetherGeneralCollection(chainId, contractAddress, co
     const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, RegContractAddress)
     const _isGeneralToken = await registerContract.methods.isGeneralToken(contractAddress).call()
     return _isGeneralToken
-  } catch(e) {
+  } catch (e) {
     return false
   }
 }
 
 export function getCredentialInfo(strAddress) {
   return new Promise((resolve, reject) => {
-    fetchFrom(`api/v2/auth/getCredentials/${strAddress}`).then(response=>{
+    fetchFrom(`api/v2/auth/getCredentials/${strAddress}`).then(response => {
       response.json().then(jsonData => {
         resolve(jsonData.data)
-      }).catch((err)=>{
+      }).catch((err) => {
         reject(err)
       })
-    }).catch((err)=>{
+    }).catch((err) => {
       reject(err)
     })
   })
@@ -436,9 +446,9 @@ export function isNumberString(value) {
 
 export function getShortUrl(url) {
   return new Promise((resolve, reject) => {
-    fetch(`${process.env.REACT_APP_SHORTEN_SERVICE_URL}/api/v2/action/shorten?key=d306f2eda6b16d9ecf8a40c74e9e91&url=${url}&is_secret=false`).then(resShorternUrl=>{
+    fetch(`${process.env.REACT_APP_SHORTEN_SERVICE_URL}/api/v2/action/shorten?key=d306f2eda6b16d9ecf8a40c74e9e91&url=${url}&is_secret=false`).then(resShorternUrl => {
       resolve(resShorternUrl.text())
-    }).catch((err)=>{
+    }).catch((err) => {
       resolve(url)
     })
   });
@@ -467,20 +477,20 @@ export function callContractMethod(type, coinType, chainId, paramObj) {
             if (type === 'createOrderForSale') {
               console.log('createOrderForSale');
               const { _id, _amount, _price, _didUri, _baseAddress } = paramObj;
-              console.log(_baseAddress, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri)
-              method = marketContract.methods.createOrderForSale(_baseAddress, _id, _amount, pricingContract[coinType], _price, (new Date().getTime()/1000).toFixed(), _didUri);
+              console.log(_baseAddress, _id, _amount, pricingContract[coinType], _price, (new Date().getTime() / 1000).toFixed(), _didUri)
+              method = marketContract.methods.createOrderForSale(_baseAddress, _id, _amount, pricingContract[coinType], _price, (new Date().getTime() / 1000).toFixed(), _didUri);
             } else if (type === 'createOrderForSaleBatch') {
               console.log('createOrderForSaleBatch');
               const { _ids, _amounts, _price, _didUri, _baseAddress } = paramObj;
               const _prices = Array(_ids.length).fill(_price)
-              const _startTimes = Array(_ids.length).fill((new Date().getTime()/1000).toFixed())
+              const _startTimes = Array(_ids.length).fill((new Date().getTime() / 1000).toFixed())
               console.log(_baseAddress, _ids, _amounts, pricingContract[coinType], _prices, _startTimes, _didUri)
               method = marketContract.methods.createOrderForSaleBatch(_baseAddress, _ids, _amounts, pricingContract[coinType], _prices, _startTimes, _didUri);
             } else if (type === 'createOrderForAuction') {
               console.log('createOrderForAuction');
               const { _id, _amount, _minPrice, _reservePrice, _buyoutPrice, _endTime, _didUri, _baseAddress } = paramObj;
-              console.log(_baseAddress, _id, _amount, pricingContract[coinType], _minPrice, _reservePrice, _buyoutPrice, (new Date().getTime()/1000).toFixed(), _endTime, _didUri)
-              method = marketContract.methods.createOrderForAuction(_baseAddress, _id, _amount, pricingContract[coinType], _minPrice, _reservePrice, _buyoutPrice, (new Date().getTime()/1000).toFixed(), _endTime, _didUri);
+              console.log(_baseAddress, _id, _amount, pricingContract[coinType], _minPrice, _reservePrice, _buyoutPrice, (new Date().getTime() / 1000).toFixed(), _endTime, _didUri)
+              method = marketContract.methods.createOrderForAuction(_baseAddress, _id, _amount, pricingContract[coinType], _minPrice, _reservePrice, _buyoutPrice, (new Date().getTime() / 1000).toFixed(), _endTime, _didUri);
             } else if (type === 'buyOrder') {
               console.log('buyOrder');
               const { _orderId, _didUri } = paramObj;
@@ -495,8 +505,8 @@ export function callContractMethod(type, coinType, chainId, paramObj) {
               method = marketContract.methods.changeAuctionOrderPrice(_orderId, _price, _reservePrice, _buyoutPrice, pricingContract[coinType]);
             } else if (type === 'changeSaleOrderPrice') {
               console.log('changeSaleOrderPrice');
-              const { _orderId, _price, v1State=false } = paramObj;
-              if(!v1State)
+              const { _orderId, _price, v1State = false } = paramObj;
+              if (!v1State)
                 method = marketContract.methods.changeSaleOrderPrice(_orderId, _price, pricingContract[coinType]);
               else {
                 const v1MarketContract = new walletConnectWeb3.eth.Contract(V1_PASAR_CONTRACT_ABI, V1_MARKET_CONTRACT_ADDRESS);
@@ -510,25 +520,25 @@ export function callContractMethod(type, coinType, chainId, paramObj) {
             if (beforeSendFunc) beforeSendFunc();
             // method.estimateGas({ from: accounts[0] }).then(gasLimit=>{
             //   const _gasLimit = Math.min(Math.ceil(gasLimit * 1.5), 8000000).toString()
-              const _gasLimit = 8000000
-              console.log({_gasLimit})
-              const transactionParams = {
-                'from': accounts[0],
-                'gasPrice': gasPrice,
-                'gas': _gasLimit,
-                'value': 0
-              };
-              method
-                .send(transactionParams)
-                .on('receipt', (receipt) => {
-                  if (afterSendFunc) afterSendFunc();
-                  console.log('receipt', receipt);
-                  resolve(true);
-                })
-                .on('error', (error, receipt) => {
-                  console.error('error', error);
-                  reject(error);
-                });
+            const _gasLimit = 8000000
+            console.log({ _gasLimit })
+            const transactionParams = {
+              'from': accounts[0],
+              'gasPrice': gasPrice,
+              'gas': _gasLimit,
+              'value': 0
+            };
+            method
+              .send(transactionParams)
+              .on('receipt', (receipt) => {
+                if (afterSendFunc) afterSendFunc();
+                console.log('receipt', receipt);
+                resolve(true);
+              })
+              .on('error', (error, receipt) => {
+                console.error('error', error);
+                reject(error);
+              });
             // }).catch((error) => {
             //   reject(error);
             // })
@@ -543,25 +553,109 @@ export function callContractMethod(type, coinType, chainId, paramObj) {
   });
 }
 
+export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise((resolve, reject) => {
+  let contractABI;
+  let contractAddress;
+  let contractMethod;
+  let accounts = [];
+  const gasPrice = '';
+  switch (param.contractType) {
+    case 1:
+      contractABI = TOKEN_ERC20_ABI;
+      contractAddress = PASAR_TOKEN_ADDRESS;
+      break;
+    case 2:
+      contractABI = TOKEN_ERC20_ABI;
+      contractAddress = PASAR_TOKEN_ADDRESS;
+      break;
+    case 3:
+      contractABI = TOKEN_ERC20_ABI;
+      contractAddress = PASAR_TOKEN_ADDRESS;
+      break;
+    case 4:
+      contractABI = TOKEN_ERC20_ABI;
+      contractAddress = PASAR_TOKEN_ADDRESS;
+      break;
+    default:
+      contractABI = undefined;
+      contractAddress = undefined;
+      break;
+  }
+  if (!contractABI || !contractAddress) return;
+  const smartContract = new walletConnectWeb3.eth.Contract(contractABI, contractAddress);
+  switch (param.methodName) {
+    case 'stake':
+      contractMethod = smartContract.methods.stake(param.amount);
+      break;
+    case 'withdraw':
+      contractMethod = smartContract.methods.withdraw();
+      break;
+    default:
+      contractMethod = undefined;
+      break;
+  }
+  if (!contractMethod) return;
+
+  const handleTxEvent = (hash) => {
+    console.log('transactionHash', hash);
+  };
+  const handleReceiptEvent = (receipt) => {
+    console.log('receipt', receipt);
+    resolve();
+  };
+  const handleErrorEvent = (error) => {
+    console.error('error', error);
+    reject(error);
+  };
+
+  walletConnectWeb3.eth.getAccounts()
+    .then((_accounts) => {
+      accounts = _accounts;
+      return walletConnectWeb3.eth.getGasPrice();
+    })
+    .then(async (_gasPrice) => getFilteredGasPrice(_gasPrice))
+    .then((_estimatedGas) => {
+      const transactionParams = {
+        from: accounts[0],
+        gasPrice,
+        gas: _estimatedGas,
+        value: 0,
+      };
+      if (param.callType === 'call') {
+        contractMethod.call().then(res => resolve(res));
+      } else {
+        contractMethod.send(transactionParams)
+          .once('transactionHash', handleTxEvent)
+          .once('receipt', handleReceiptEvent)
+          .on('error', handleErrorEvent);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+)
+
+
 export function getContractInfo(connectProvider, strAddress) {
   return new Promise((resolve, reject) => {
-    try{
+    try {
       let walletConnectWeb3
-      if(connectProvider)
+      if (connectProvider)
         walletConnectWeb3 = new Web3(connectProvider)
-      else if(Web3.givenProvider || Web3.currentProvider || window.ethereum)
+      else if (Web3.givenProvider || Web3.currentProvider || window.ethereum)
         walletConnectWeb3 = new Web3(Web3.givenProvider || Web3.currentProvider || window.ethereum)
       else
         walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
-      
+
       const tokenContract = new walletConnectWeb3.eth.Contract(COMMON_CONTRACT_ABI, strAddress)
       tokenContract.methods.name().call()
-        .then(resultName=>{
+        .then(resultName => {
           tokenContract.methods.symbol().call()
-            .then(resultSymbol=>{
+            .then(resultSymbol => {
               tokenContract.methods.owner().call()
-                .then(resultOwner=>{
-                  resolve({name: resultName, symbol: resultSymbol, owner: resultOwner})
+                .then(resultOwner => {
+                  resolve({ name: resultName, symbol: resultSymbol, owner: resultOwner })
                 }).catch((error) => {
                   reject(error)
                 })
@@ -571,7 +665,7 @@ export function getContractInfo(connectProvider, strAddress) {
         }).catch((error) => {
           reject(error)
         })
-    } catch(e) {
+    } catch (e) {
       reject(e)
     }
   })
@@ -668,7 +762,7 @@ export const MethodList = [
       { description: 'By', field: 'from', copyable: true, ellipsis: true },
       { description: 'From initial value of', field: 'data.oldPrice', copyable: false }
     ],
-    verb: {description: 'Updated to', withPrice: true, subject: 'from'}
+    verb: { description: 'Updated to', withPrice: true, subject: 'from' }
   },
   {
     method: 'OrderBid',
@@ -793,7 +887,7 @@ export const chainTypes = [
     name: 'Elastos Smart Chain',
     symbol: 'ESC',
     token: 'ELA',
-    color: (theme)=>theme.palette.origin.main
+    color: (theme) => theme.palette.origin.main
   },
   {
     icon: 'badges/ETH-network.svg',
@@ -812,32 +906,32 @@ export const chainTypes = [
 ]
 export const checkValidChain = (chainId) => {
   if (
-      chainId &&
-      (
-        (process.env.REACT_APP_ENV === 'production' && chainId !== 20 && chainId !== 1 && chainId !== 32659) ||
-        (process.env.REACT_APP_ENV !== 'production' && chainId !== 21 && chainId !== 3 && chainId !== 46688)
-      )
+    chainId &&
+    (
+      (process.env.REACT_APP_ENV === 'production' && chainId !== 20 && chainId !== 1 && chainId !== 32659) ||
+      (process.env.REACT_APP_ENV !== 'production' && chainId !== 21 && chainId !== 3 && chainId !== 46688)
+    )
   )
     return false
   return true
 }
 export const getChainTypeFromId = (chainId) => {
-  if (chainId===20 || chainId===21)
+  if (chainId === 20 || chainId === 21)
     return 'ESC'
-  if (chainId===1 || chainId===3)
+  if (chainId === 1 || chainId === 3)
     return 'ETH'
-  if (chainId===32659 || chainId===46688)
+  if (chainId === 32659 || chainId === 46688)
     return 'FSN'
   return ''
 }
 export const getStartPosOfCoinTypeByChainType = (chainType) => {
   const coinClassIndex = Math.max(Object.keys(coinTypesGroup).indexOf(chainType), 0)
-  return Object.values(coinTypesGroup).splice(0, coinClassIndex).reduce((sum, item)=>sum+item.length, 0)
+  return Object.values(coinTypesGroup).splice(0, coinClassIndex).reduce((sum, item) => sum + item.length, 0)
 }
 export const getExplorerSrvByNetwork = (netType) => {
   let explorerSrvUrl = ""
-  const chainType = chainTypes[netType-1]
-  if(chainType)
+  const chainType = chainTypes[netType - 1]
+  if (chainType)
     explorerSrvUrl = ExplorerServer[chainType.symbol]
   else
     explorerSrvUrl = ExplorerServer.ESC
@@ -846,52 +940,52 @@ export const getExplorerSrvByNetwork = (netType) => {
 export const getContractAddressInCurrentNetwork = (chainId, type) => {
   const currentChain = getChainTypeFromId(chainId)
   let contractObj = MAIN_CONTRACT.ESC
-  if(currentChain)
+  if (currentChain)
     contractObj = MAIN_CONTRACT[currentChain]
   return contractObj[type]
 }
 export const getCoinTypesGroup4Filter = () => {
   const coinTypesArr = [[]]
   Object.entries(coinTypesGroup).forEach((coinTypes, _i) => {
-    const tempCoinTypes = coinTypes[1].map((coinType)=>({...coinType, address: `${_i+1}-${coinType.address}`}))
+    const tempCoinTypes = coinTypes[1].map((coinType) => ({ ...coinType, address: `${_i + 1}-${coinType.address}` }))
     coinTypesArr.push(tempCoinTypes)
     coinTypesArr[0] = [...coinTypesArr[0], ...tempCoinTypes]
   })
   return coinTypesArr
 }
-export const getTotalCountOfCoinTypes = () => Object.entries(coinTypesGroup).reduce((total, item)=>total+item[1].length, 0)
+export const getTotalCountOfCoinTypes = () => Object.entries(coinTypesGroup).reduce((total, item) => total + item[1].length, 0)
 
 export const getCoinTypesInCurrentNetwork = (chainId) => {
   const currentChain = getChainTypeFromId(chainId)
   let tempCoinTypes = coinTypesGroup.ESC
-  if(currentChain)
+  if (currentChain)
     tempCoinTypes = coinTypesGroup[currentChain]
   return tempCoinTypes
 }
 export const getMarketAddressByMarketplaceType = (type) => {
-  const marketAddresses = Object.values(MAIN_CONTRACT).map(item=>item.market)
-  if(type>0 && type<=marketAddresses.length)
-    return marketAddresses[type-1]
+  const marketAddresses = Object.values(MAIN_CONTRACT).map(item => item.market)
+  if (type > 0 && type <= marketAddresses.length)
+    return marketAddresses[type - 1]
   return marketAddresses[0]
 }
 export const getCoinTypeFromToken = (item) => {
   let coinTypeIndex = 0
-  if(item) {
-    const { quoteToken=blankAddress, marketPlace=1 } = item
+  if (item) {
+    const { quoteToken = blankAddress, marketPlace = 1 } = item
     let tempCoinTypes = []
     let tempChainType = ""
-    if(marketPlace>0 && marketPlace<=Object.keys(coinTypesGroup).length) {
-      tempCoinTypes = Object.values(coinTypesGroup)[marketPlace-1]
-      tempChainType = Object.keys(coinTypesGroup)[marketPlace-1]
+    if (marketPlace > 0 && marketPlace <= Object.keys(coinTypesGroup).length) {
+      tempCoinTypes = Object.values(coinTypesGroup)[marketPlace - 1]
+      tempChainType = Object.keys(coinTypesGroup)[marketPlace - 1]
     } else {
       tempCoinTypes = coinTypesGroup.ESC
       tempChainType = "ESC"
     }
     const startPos = getStartPosOfCoinTypeByChainType(tempChainType)
-    coinTypeIndex = Math.max(tempCoinTypes.findIndex(el=>el.address===quoteToken), 0)
-    return {index: coinTypeIndex+startPos, ...tempCoinTypes[coinTypeIndex]}
+    coinTypeIndex = Math.max(tempCoinTypes.findIndex(el => el.address === quoteToken), 0)
+    return { index: coinTypeIndex + startPos, ...tempCoinTypes[coinTypeIndex] }
   }
-  return {index: coinTypeIndex, ...coinTypesGroup.ESC[coinTypeIndex]}
+  return { index: coinTypeIndex, ...coinTypesGroup.ESC[coinTypeIndex] }
 }
 export const sendIpfsDidJson = async () => {
   const client = create(`${PasarIpfs}/`);
@@ -899,15 +993,15 @@ export const sendIpfsDidJson = async () => {
   const did = sessionStorage.getItem('PASAR_DID') || ''
   const token = sessionStorage.getItem("PASAR_TOKEN");
   const user = jwtDecode(token);
-  const {name, bio} = user;
+  const { name, bio } = user;
   const proof = sessionStorage.getItem("KYCedProof") || ''
   const didObj = {
-    "version":"2",
+    "version": "2",
     "did": `did:elastos:${did}`,
     "name": name || '',
     "description": bio || '',
   }
-  if(proof.length) {
+  if (proof.length) {
     didObj.KYCedProof = proof
   }
   const jsonDidObj = JSON.stringify(didObj);
@@ -933,7 +1027,7 @@ export const emptyCache = () => {
 
 export const getInfoFromDID = (did) =>
   new Promise((resolve, reject) => {
-    if(!DIDBackend.isInitialized())
+    if (!DIDBackend.isInitialized())
       DIDBackend.initialize(new DefaultDIDAdapter('https://api.elastos.io/eid'));
     const didObj = new DID(did);
     didObj
@@ -961,7 +1055,7 @@ export const getDidInfoFromAddress = (address) =>
           .then((jsonData) => {
             if (jsonData.data && jsonData.data.did.did)
               getInfoFromDID(jsonData.data.did.did).then((info) => {
-                resolve({...info, did: jsonData.data.did.did});
+                resolve({ ...info, did: jsonData.data.did.did });
               });
             else resolve({})
           })
@@ -996,7 +1090,7 @@ export const getCollectiblesInCollection4Preview = (address, marketPlace, count)
         response
           .json()
           .then(jsonAssets => {
-            if(jsonAssets.data){
+            if (jsonAssets.data) {
               resolve(jsonAssets.data.result);
             }
             else resolve([])
@@ -1010,7 +1104,7 @@ export const getCollectiblesInCollection4Preview = (address, marketPlace, count)
       });
   });
 
-export const getFilteredGasPrice = (_gasPrice) => _gasPrice*1 > 20*1e9 ? (20*1e9).toString() : _gasPrice;
+export const getFilteredGasPrice = (_gasPrice) => _gasPrice * 1 > 20 * 1e9 ? (20 * 1e9).toString() : _gasPrice;
 
 export const getFullUrl = (url) => `${window.location.protocol}//${window.location.host}/${url}`;
 
