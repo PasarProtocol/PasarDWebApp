@@ -231,7 +231,7 @@ export default function Rewards() {
   };
 
   React.useEffect(() => {
-    const tempProgress = math.round(operAmount * 100 / pasarBalance, 1)
+    const tempProgress = math.round(pasarBalance === 0 ? 0 : operAmount * 100 / pasarBalance, 1)
     setAmountProgress(tempProgress)
   }, [operAmount]);
 
