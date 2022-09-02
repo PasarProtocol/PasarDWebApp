@@ -134,7 +134,7 @@ const PaperStyle = (props) => (
   </Paper>
 )
 
-const ClaimCard = ({ item }) => (
+const ClaimCard = ({ item, onClick }) => (
   <PaperStyle>
     <Typography variant="h3" align="center">{item.title}</Typography>
     <Typography variant="h5" component="div" align="center" sx={{ pb: 2 }}>
@@ -154,7 +154,7 @@ const ClaimCard = ({ item }) => (
       </EarnedValueStyle>
       <Typography variant="body2" color='text.secondary'>{`≈ USD ${item.price}`}</Typography>
       <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-        <div><StyledButton variant="contained" sx={{ mt: 3, width: '100%' }}>Claim</StyledButton></div>
+        <div><StyledButton variant="contained" sx={{ mt: 3, width: '100%' }} onClick={onClick}>Claim</StyledButton></div>
       </Tooltip>
     </Box>
   </PaperStyle>
@@ -162,6 +162,7 @@ const ClaimCard = ({ item }) => (
 
 ClaimCard.propTypes = {
   item: PropTypes.object,
+  onClick: PropTypes.func
 }
 
 const ExternalLink = (props) => {
@@ -184,8 +185,17 @@ export default function Rewards() {
   const [stakingType, setStakingType] = React.useState('Stake');
   const [amountProgress, setAmountProgress] = React.useState(0);
   const [PASARToUSD, setPASARToUSD] = React.useState(0.01);
-  const [miningReward, setMiningReward] = React.useState({ all: { total: 0, withdrawable: 0, withdrawn: 0 }, buyer: { total: 0, withdrawable: 0, withdrawn: 0 }, seller: { total: 0, withdrawable: 0, withdrawn: 0 }, creator: { total: 0, withdrawable: 0, withdrawn: 0 } });
-  const [claimItems, setClaimItems] = React.useState([{ title: "BUYERS", action: "Buy", amount: 0, price: 0 }, { title: "SELLERS", action: "Sell", amount: 0, price: 0 }, { title: "CREATORS", action: "Create", amount: 0, price: 0 }]);
+  const [miningReward, setMiningReward] = React.useState({
+    all: { total: 0, withdrawable: 0, withdrawn: 0 },
+    buyer: { total: 0, withdrawable: 0, withdrawn: 0 },
+    seller: { total: 0, withdrawable: 0, withdrawn: 0 },
+    creator: { total: 0, withdrawable: 0, withdrawn: 0 }
+  });
+  const [claimItems, setClaimItems] = React.useState([
+    { title: "BUYERS", action: "Buy", name: 'buyer', amount: 0, price: 0 },
+    { title: "SELLERS", action: "Sell", name: 'seller', amount: 0, price: 0 },
+    { title: "CREATORS", action: "Create", name: 'creator', amount: 0, price: 0 }
+  ]);
   const [pasarBalance, setPasarBalance] = React.useState(0);
   const [stakingAPR, setStakingAPR] = React.useState(48.48);
   const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
@@ -236,9 +246,9 @@ export default function Rewards() {
         const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
         setMiningReward(accountRewards);
         setClaimItems([
-          { title: "BUYERS", action: "Buy", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
-          { title: "SELLERS", action: "Sell", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
-          { title: "CREATORS", action: "Create", amount: accountRewards.creator.withdrawable, price: accountRewards.creator.withdrawable * PASARToUSD }
+          { title: "BUYERS", action: "Buy", name: "buyer", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
+          { title: "SELLERS", action: "Sell", name: "seller", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
+          { title: "CREATORS", action: "Create", name: "creator", amount: accountRewards.creator.withdrawable, price: accountRewards.creator.withdrawable * PASARToUSD }
         ]);
       }
       else { // staking page
@@ -259,13 +269,23 @@ export default function Rewards() {
     }
   };
 
-  const handleStakingWithdraw = async () => {
+  const handleWithdrawStakingReward = async () => {
     try {
-      await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'send', methodName: 'withdraw'});
-      enqueueSnackbar('Stake success', { variant: 'success' });
+      await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'send', methodName: 'withdraw' });
+      enqueueSnackbar('Withdraw success', { variant: 'success' });
     } catch (err) {
       console.error(err);
-      enqueueSnackbar('Stake error', { variant: 'error' });
+      enqueueSnackbar('Withdraw error', { variant: 'error' });
+    }
+  };
+
+  const handleWithdrawMiningReward = async (name) => {
+    try {
+      await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'send', methodName: 'withdrawRewardByName', name });
+      enqueueSnackbar('Withdraw success', { variant: 'success' });
+    } catch (err) {
+      console.error(err);
+      enqueueSnackbar('Withdraw error', { variant: 'error' });
     }
   };
 
@@ -355,7 +375,7 @@ export default function Rewards() {
               <Box sx={{ textAlign: 'center', m: 'auto' }}>
                 <Typography variant="body2" align='center' color='text.secondary' sx={{ pb: 2 }}>to collect from 4 mining rewards</Typography>
                 <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                  <div><StyledButton variant="contained" sx={{ minWidth: 150 }}>Claim All</StyledButton></div>
+                  <div><StyledButton variant="contained" sx={{ minWidth: 150 }} onClick={() => handleWithdrawMiningReward("all")}>Claim All</StyledButton></div>
                 </Tooltip>
               </Box>
             </StackStyle>
@@ -391,7 +411,7 @@ export default function Rewards() {
           <Grid container spacing={3}>
             {claimItems.map((item, _i) => (
               <Grid item xs={12} sm={6} md={4} key={_i}>
-                <ClaimCard item={item} />
+                <ClaimCard item={item} onClick={() => handleWithdrawMiningReward(item.name)} />
               </Grid>
             ))}
           </Grid>
@@ -563,7 +583,7 @@ export default function Rewards() {
                   </Grid>
                 </MHidden>
                 <Grid item xs={12} sm={8} sx={{ display: 'flex', alignItems: 'end' }}>
-                  <StyledButton variant="contained" sx={{ width: 200 }} onClick={handleStakingWithdraw}>Claim</StyledButton>
+                  <StyledButton variant="contained" sx={{ width: 200 }} onClick={handleWithdrawStakingReward}>Claim</StyledButton>
                 </Grid>
                 <MHidden width="smDown">
                   <Grid item sm={4}>
