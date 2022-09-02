@@ -179,7 +179,7 @@ const ExternalLink = (props) => {
 const AmountProgressType = ['25%', '50%', '75%', 'Max']
 
 export default function Rewards() {
-  const enqueueSnackbar = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const [tabValue, setTabValue] = React.useState(0);
   const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
