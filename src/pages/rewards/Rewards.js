@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import * as math from 'mathjs';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import {
@@ -137,6 +138,7 @@ const PaperStyle = (props) => (
     {props.children}
   </Paper>
 )
+
 const ClaimCard = ({ item }) => (
   <PaperStyle>
     <Typography variant="h3" align="center">{item.title}</Typography>
@@ -153,15 +155,20 @@ const ClaimCard = ({ item }) => (
         <Typography variant="h3" color='origin.main' sx={{ display: 'inline' }}>PASAR</Typography>{' '}earned
       </Typography>
       <EarnedValueStyle variant="h2" sx={{ display: 'inline-flex' }}>
-        0.234223
+        {item.amount}
       </EarnedValueStyle>
-      <Typography variant="body2" color='text.secondary'>≈ USD 0</Typography>
+      <Typography variant="body2" color='text.secondary'>{`≈ USD ${item.price}`}</Typography>
       <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
         <div><StyledButton variant="contained" sx={{ mt: 3, width: '100%' }}>Claim</StyledButton></div>
       </Tooltip>
     </Box>
   </PaperStyle>
 )
+
+ClaimCard.propTypes = {
+  item: PropTypes.object,
+}
+
 const ExternalLink = (props) => {
   const { linkURL, title } = props
   return <Link
@@ -173,7 +180,6 @@ const ExternalLink = (props) => {
     {title}
   </Link>
 }
-const ClaimTitles = [{ title: "BUYERS", action: "Buy" }, { title: "SELLERS", action: "Sell" }, { title: "CREATORS", action: "Create" }]
 const AmountProgressType = ['25%', '50%', '75%', 'Max']
 
 export default function Rewards() {
@@ -182,7 +188,9 @@ export default function Rewards() {
   const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
   const [amountProgress, setAmountProgress] = React.useState(0);
-  const [PASARToUSD, setPASARToUSD] = React.useState(0.1);
+  const [PASARToUSD, setPASARToUSD] = React.useState(0.01);
+  const [miningReward, setMiningReward] = React.useState({ all: { total: 0, withdrawable: 0, withdrawn: 0 }, buyer: { total: 0, withdrawable: 0, withdrawn: 0 }, seller: { total: 0, withdrawable: 0, withdrawn: 0 }, creator: { total: 0, withdrawable: 0, withdrawn: 0 } });
+  const [claimItems, setClaimItems] = React.useState([{ title: "BUYERS", action: "Buy", amount: 0, price: 0 }, { title: "SELLERS", action: "Sell", amount: 0, price: 0 }, { title: "CREATORS", action: "Create", amount: 0, price: 0 }]);
   const [pasarBalance, setPasarBalance] = React.useState(0);
   const [stakingAPR, setStakingAPR] = React.useState(48.48);
   const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
@@ -235,6 +243,12 @@ export default function Rewards() {
       setPasarBalance(balance);
       if (tabValue === 0) { // rewards page
         const accountRewards = await miningRewardContract.methods.accountRewards(accounts[0]).call();
+        setMiningReward(accountRewards);
+        setClaimItems([
+          { title: "BUYERS", action: "Buy", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD }, 
+          { title: "SELLERS", action: "Sell", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD }, 
+          { title: "CREATORS", action: "Create", amount: accountRewards.creator.withdrawable, price: accountRewards.creator.withdrawable * PASARToUSD }
+        ]);
       }
       else { // staking page
         const stakingInfo = await stakingContract.methods.getUserInfo(accounts[0]).call();
@@ -335,7 +349,7 @@ export default function Rewards() {
           <Box sx={{ width: 200 }}>
             <StyledButton variant='contained' fullWidth sx={{ mb: 1 }}>Get PASAR</StyledButton>
             <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'text.secondary', mb: 1 }} align="center">
-              1 PASAR ≈ USD 0.01
+              {`1 PASAR ≈ USD ${PASARToUSD}`}
             </Typography>
           </Box>
           <Button
@@ -401,9 +415,9 @@ export default function Rewards() {
               <Box sx={{ flex: 1 }}>
                 <Typography variant="h3" component="div"><Typography variant="h3" color='origin.main' sx={{ display: 'inline' }}>PASAR</Typography>{' '}earned</Typography>
                 <EarnedValueStyle variant="h2" sx={{ display: 'inline-flex' }}>
-                  52.7593424
+                  {miningReward.all.withdrawable}
                 </EarnedValueStyle>
-                <Typography variant="body2" color='text.secondary'>≈ USD 5.23</Typography>
+                <Typography variant="body2" color='text.secondary'>{`≈ USD ${miningReward.all.total * PASARToUSD}`}</Typography>
               </Box>
               <Box sx={{ textAlign: 'center', m: 'auto' }}>
                 <Typography variant="body2" align='center' color='text.secondary' sx={{ pb: 2 }}>to collect from 4 mining rewards</Typography>
@@ -442,13 +456,11 @@ export default function Rewards() {
             Mining Rewards
           </Typography>
           <Grid container spacing={3}>
-            {
-              ClaimTitles.map((item, _i) => (
-                <Grid item xs={12} sm={6} md={4} key={_i}>
-                  <ClaimCard item={item} />
-                </Grid>
-              ))
-            }
+            {claimItems.map((item, _i) => (
+              <Grid item xs={12} sm={6} md={4} key={_i}>
+                <ClaimCard item={item} />
+              </Grid>
+            ))}
           </Grid>
         </TabPanel>
         <TabPanel value={tabValue} index={1}>
