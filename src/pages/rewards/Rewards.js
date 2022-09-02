@@ -17,13 +17,8 @@ import TabPanel from '../../components/TabPanel';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import StatisticPanel from '../../components/rewards/StatisticPanel'
 import { MHidden } from '../../components/@material-extend';
-import { getFilteredGasPrice, isInAppBrowser, removeLeadingZero } from '../../utils/common'
+import { callTokenContractMethod, isInAppBrowser, removeLeadingZero } from '../../utils/common'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
-import { TOKEN_ERC20_ABI } from '../../abi/token20ABI';
-import { TOKEN_VESTING_ABI } from '../../abi/tokenVestingABI';
-import { TOKEN_STAKING_ABI } from '../../abi/tokenStakingABI';
-import { TOKEN_MINING_ABI } from '../../abi/tokenMiningABI';
-import { pasarERC20Contract as PASAR_TOKEN_ADDRESS, pasarVestingContract as VESTING_CONTRACT_ADDRESS, pasarStakingContract as STAKING_CONTRACT_ADDRESS, pasarMiningContract as MINING_CONTRACT_ADDRESS } from '../../config'
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -235,105 +230,43 @@ export default function Rewards() {
     const fetchData = async () => {
       const accounts = await walletConnectWeb3.eth.getAccounts();
       if (!accounts.length) return;
-      const pasarTokenContract = new walletConnectWeb3.eth.Contract(TOKEN_ERC20_ABI, PASAR_TOKEN_ADDRESS);
-      const vestingContract = new walletConnectWeb3.eth.Contract(TOKEN_VESTING_ABI, VESTING_CONTRACT_ADDRESS);
-      const stakingContract = new walletConnectWeb3.eth.Contract(TOKEN_STAKING_ABI, STAKING_CONTRACT_ADDRESS);
-      const miningRewardContract = new walletConnectWeb3.eth.Contract(TOKEN_MINING_ABI, MINING_CONTRACT_ADDRESS);
-      const balance = await pasarTokenContract.methods.balanceOf(accounts[0]).call();
+      const balance = await callTokenContractMethod(walletConnectWeb3, { contractType: 'token', callType: 'call', methodName: 'balanceOf', account: accounts[0] });
       setPasarBalance(balance);
       if (tabValue === 0) { // rewards page
-        const accountRewards = await miningRewardContract.methods.accountRewards(accounts[0]).call();
+        const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
         setMiningReward(accountRewards);
         setClaimItems([
-          { title: "BUYERS", action: "Buy", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD }, 
-          { title: "SELLERS", action: "Sell", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD }, 
+          { title: "BUYERS", action: "Buy", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
+          { title: "SELLERS", action: "Sell", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
           { title: "CREATORS", action: "Create", amount: accountRewards.creator.withdrawable, price: accountRewards.creator.withdrawable * PASARToUSD }
         ]);
       }
       else { // staking page
-        const stakingInfo = await stakingContract.methods.getUserInfo(accounts[0]).call();
+        const stakingInfo = await await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'getUserInfo', account: accounts[0] });
         setStakingState(stakingInfo);
       }
     };
     fetchData();
   }, [tabValue]);
 
-  const handleStake = (amount) => {
-    let accounts = [];
-    const gasPrice = '';
-    const stakingContract = new walletConnectWeb3.eth.Contract(TOKEN_STAKING_ABI, STAKING_CONTRACT_ADDRESS);
-    const handleTxEvent = (hash) => {
-      console.log('transactionHash', hash);
-    };
-    const handleReceiptEvent = (receipt) => {
-      console.log('receipt', receipt);
+  const handleStake = async (amount) => {
+    try {
+      await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'send', methodName: 'stake', amount });
       enqueueSnackbar('Stake success', { variant: 'success' });
-    };
-    const handleErrorEvent = (error) => {
-      console.error('error', error);
+    } catch (err) {
+      console.error(err);
       enqueueSnackbar('Stake error', { variant: 'error' });
-    };
-    walletConnectWeb3.eth
-      .getAccounts()
-      .then((_accounts) => {
-        accounts = _accounts;
-        return walletConnectWeb3.eth.getGasPrice();
-      })
-      .then(async (_gasPrice) => getFilteredGasPrice(_gasPrice))
-      .then((_estimatedGas) => {
-        const transactionParams = {
-          from: accounts[0],
-          gasPrice,
-          gas: _estimatedGas,
-          value: 0,
-        };
-        stakingContract.methods.stake(amount).send(transactionParams)
-          .once('transactionHash', handleTxEvent)
-          .once('receipt', handleReceiptEvent)
-          .on('error', handleErrorEvent);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    }
   };
 
-  const handleWithdraw = () => {
-    let accounts = [];
-    const gasPrice = '';
-    const stakingContract = new walletConnectWeb3.eth.Contract(TOKEN_STAKING_ABI, STAKING_CONTRACT_ADDRESS);
-    const handleTxEvent = (hash) => {
-      console.log('transactionHash', hash);
-    };
-    const handleReceiptEvent = (receipt) => {
-      console.log('receipt', receipt);
+  const handleStakingWithdraw = async () => {
+    try {
+      await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'send', methodName: 'withdraw'});
       enqueueSnackbar('Stake success', { variant: 'success' });
-    };
-    const handleErrorEvent = (error) => {
-      console.error('error', error);
+    } catch (err) {
+      console.error(err);
       enqueueSnackbar('Stake error', { variant: 'error' });
-    };
-    walletConnectWeb3.eth
-      .getAccounts()
-      .then((_accounts) => {
-        accounts = _accounts;
-        return walletConnectWeb3.eth.getGasPrice();
-      })
-      .then(async (_gasPrice) => getFilteredGasPrice(_gasPrice))
-      .then((_estimatedGas) => {
-        const transactionParams = {
-          from: accounts[0],
-          gasPrice,
-          gas: _estimatedGas,
-          value: 0,
-        };
-        stakingContract.methods.withdraw().send(transactionParams)
-          .once('transactionHash', handleTxEvent)
-          .once('receipt', handleReceiptEvent)
-          .on('error', handleErrorEvent);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    }
   };
 
   return (
@@ -630,7 +563,7 @@ export default function Rewards() {
                   </Grid>
                 </MHidden>
                 <Grid item xs={12} sm={8} sx={{ display: 'flex', alignItems: 'end' }}>
-                  <StyledButton variant="contained" sx={{ width: 200 }} onClick={handleWithdraw}>Claim</StyledButton>
+                  <StyledButton variant="contained" sx={{ width: 200 }} onClick={handleStakingWithdraw}>Claim</StyledButton>
                 </Grid>
                 <MHidden width="smDown">
                   <Grid item sm={4}>
