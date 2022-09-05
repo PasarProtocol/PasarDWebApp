@@ -196,6 +196,7 @@ export default function Rewards() {
     { title: "SELLERS", action: "Sell", name: 'seller', amount: 0, price: 0 },
     { title: "CREATORS", action: "Create", name: 'creator', amount: 0, price: 0 }
   ]);
+  const [miningPoolStats, setMiningPoolStats] = React.useState({ ela: 0, pasar: 0, eco: 0, other: 0 });
   const [pasarBalance, setPasarBalance] = React.useState(0);
   const [stakingAPR, setStakingAPR] = React.useState(48.48);
   const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
@@ -244,7 +245,10 @@ export default function Rewards() {
       setPasarBalance(balance);
       if (tabValue === 0) { // rewards page
         const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
+        const currentRatios = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'getCurrentRatios' });
+        console.log('======', currentRatios)
         setMiningReward(accountRewards);
+        setMiningPoolStats(currentRatios);
         setClaimItems([
           { title: "BUYERS", action: "Buy", name: "buyer", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
           { title: "SELLERS", action: "Sell", name: "seller", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
