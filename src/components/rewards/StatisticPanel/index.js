@@ -28,16 +28,16 @@ export default function StatisticPanel({ itemCount, poolRatio, userCount, nextDi
     <RootStyle>
       <Grid container>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="🛒 Items Listed" index={1} data={itemCount} />
+          <StatisticItem title="🛒 Items Listed" index={1} value={itemCount} />
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="🏊 Pool Ratio" index={2} data={poolRatio} />
+          <StatisticItem title="🏊 Pool Ratio" index={2} value={poolRatio} />
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="💰 Users Rewarded" index={3} data={userCount} />
+          <StatisticItem title="💰 Users Rewarded" index={3} value={userCount} />
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="🧱 Next Distribution" index={4} data={nextDistribution} />
+          <StatisticItem title="🧱 Next Distribution" index={4} value={nextDistribution} />
         </Grid>
       </Grid>
     </RootStyle>

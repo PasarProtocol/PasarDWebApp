@@ -196,7 +196,7 @@ export default function Rewards() {
     { title: "SELLERS", action: "Sell", name: 'seller', amount: 0, price: 0 },
     { title: "CREATORS", action: "Create", name: 'creator', amount: 0, price: 0 }
   ]);
-  const [miningPoolStats, setMiningPoolStats] = React.useState({ ela: 0, pasar: 0, eco: 0, other: 0 });
+  const [miningPoolStats, setMiningPoolStats] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
   const [pasarBalance, setPasarBalance] = React.useState(0);
   const [stakingAPR, setStakingAPR] = React.useState(48.48);
   const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
@@ -246,9 +246,8 @@ export default function Rewards() {
       if (tabValue === 0) { // rewards page
         const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
         const currentRatios = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'getCurrentRatios' });
-        console.log('======', currentRatios)
         setMiningReward(accountRewards);
-        setMiningPoolStats(currentRatios);
+        setMiningPoolStats({native: parseInt(currentRatios.native, 10) / 1e4, pasar: parseInt(currentRatios.pasar, 10) / 1e4, eco: parseInt(currentRatios.eco, 10) / 1e4, other: parseInt(currentRatios.other, 10) / 1e4 });
         setClaimItems([
           { title: "BUYERS", action: "Buy", name: "buyer", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
           { title: "SELLERS", action: "Sell", name: "seller", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
@@ -392,22 +391,22 @@ export default function Rewards() {
               <Typography variant="h3">ELA ESC</Typography>
               <Box component="img" src="/static/elastos.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel />
+            <StatisticPanel itemCount={0} poolRatio={miningPoolStats.native} userCount={0} nextDistribution={0} />
 
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">PASAR</Typography>
               <Box component="img" src="/static/logo-icon.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel />
+            <StatisticPanel itemCount={0} poolRatio={miningPoolStats.pasar} userCount={0} nextDistribution={0} />
 
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">Ecosystem</Typography>
               <Box component="img" src="/static/badges/diamond.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel />
+            <StatisticPanel itemCount={0} poolRatio={miningPoolStats.eco} userCount={0} nextDistribution={0} />
 
             <Typography variant="h3">Others</Typography>
-            <StatisticPanel />
+            <StatisticPanel itemCount={0} poolRatio={miningPoolStats.other} userCount={0} nextDistribution={0} />
           </Stack>
           <Typography variant="h2" textAlign="center" my={3}>
             Mining Rewards
