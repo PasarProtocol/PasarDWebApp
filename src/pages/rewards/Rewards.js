@@ -176,6 +176,7 @@ const ExternalLink = (props) => {
     {title}
   </Link>
 }
+
 const AmountProgressType = ['25%', '50%', '75%', 'Max']
 
 export default function Rewards() {
@@ -234,6 +235,7 @@ export default function Rewards() {
   React.useEffect(() => {
     const tempProgress = math.round(pasarBalance === 0 ? 0 : operAmount * 100 / pasarBalance, 1)
     setAmountProgress(tempProgress)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [operAmount]);
 
 
@@ -247,7 +249,7 @@ export default function Rewards() {
         const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
         const currentRatios = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'getCurrentRatios' });
         setMiningReward(accountRewards);
-        setMiningPoolStats({native: parseInt(currentRatios.native, 10) / 1e4, pasar: parseInt(currentRatios.pasar, 10) / 1e4, eco: parseInt(currentRatios.eco, 10) / 1e4, other: parseInt(currentRatios.other, 10) / 1e4 });
+        setMiningPoolStats({ native: parseInt(currentRatios.native, 10) / 1e4, pasar: parseInt(currentRatios.pasar, 10) / 1e4, eco: parseInt(currentRatios.eco, 10) / 1e4, other: parseInt(currentRatios.other, 10) / 1e4 });
         setClaimItems([
           { title: "BUYERS", action: "Buy", name: "buyer", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
           { title: "SELLERS", action: "Sell", name: "seller", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
@@ -260,6 +262,7 @@ export default function Rewards() {
       }
     };
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabValue]);
 
   const handleStake = async (amount) => {
