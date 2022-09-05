@@ -599,6 +599,9 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
     case 'accountRewards':
       contractMethod = smartContract.methods.accountRewards(param.account);
       break;
+    case 'getCurrentRatios':
+      contractMethod = smartContract.methods.getCurrentRatios();
+      break;
     case 'withdrawRewardByName':
         contractMethod = smartContract.methods.withdrawRewardByName(param.name);
         break;
