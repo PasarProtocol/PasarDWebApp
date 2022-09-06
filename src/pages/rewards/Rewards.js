@@ -17,8 +17,9 @@ import TabPanel from '../../components/TabPanel';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import StatisticPanel from '../../components/rewards/StatisticPanel'
 import { MHidden } from '../../components/@material-extend';
-import { callTokenContractMethod, isInAppBrowser, removeLeadingZero } from '../../utils/common'
+import { callTokenContractMethod, fetchFrom, getERC20TokenPrice, isInAppBrowser, removeLeadingZero } from '../../utils/common'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import { blankAddress, pasarERC20Contract as PASAR_TOKEN_ADDRESS } from '../../config';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -241,6 +242,12 @@ export default function Rewards() {
 
   React.useEffect(() => {
     const fetchData = async () => {
+      // const response = await fetchFrom(`api/v2/sticker/getDetailedCollectibles?tokenType=${blankAddress.substr(2)}`);
+      // const json = await response.json();
+      // console.log('======', json)
+      const resPasarPrice = await getERC20TokenPrice(PASAR_TOKEN_ADDRESS);
+      if (!resPasarPrice || !resPasarPrice.token) setPASARToUSD(0);
+      else setPASARToUSD(resPasarPrice.token.derivedELA * resPasarPrice.bundle.elaPrice);
       const accounts = await walletConnectWeb3.eth.getAccounts();
       if (!accounts.length) return;
       const balance = await callTokenContractMethod(walletConnectWeb3, { contractType: 'token', callType: 'call', methodName: 'balanceOf', account: accounts[0] });
