@@ -334,7 +334,7 @@ export default function Rewards() {
             color="inherit"
             startIcon={<Icon icon="akar-icons:circle-plus" />}
             sx={{ color: 'origin.main', height: 'max-content' }}
-            onClick={() => addTokenToMM(PASAR_TOKEN_ADDRESS, 'PASAR', 18, '/static/logo-icon.svg')}
+            onClick={() => addTokenToMM(PASAR_TOKEN_ADDRESS, 'PASAR', 18, 'https://github.com/PasarProtocol/PasarDWebApp/blob/main/public/static/logo-icon.svg?raw=true')}
           >
             Add to wallet
           </Button>
