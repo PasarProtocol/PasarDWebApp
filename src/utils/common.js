@@ -584,7 +584,7 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
   if (!contractABI || !contractAddress) return;
   const smartContract = new walletConnectWeb3.eth.Contract(contractABI, contractAddress);
   switch (param.methodName) {
-    case 'balanceOf': 
+    case 'balanceOf':
       contractMethod = smartContract.methods.balanceOf(param.account);
       break;
     case 'getUserInfo':
@@ -606,8 +606,8 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
       contractMethod = smartContract.methods.getCurrentRatios();
       break;
     case 'withdrawRewardByName':
-        contractMethod = smartContract.methods.withdrawRewardByName(param.name);
-        break;
+      contractMethod = smartContract.methods.withdrawRewardByName(param.name);
+      break;
     default:
       contractMethod = undefined;
       break;
@@ -653,6 +653,34 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
     });
 }
 )
+
+export const addTokenToMM = async (address, symbol, decimals, image) => {
+  if (!address || !symbol || !decimals) return ;
+  try {
+    // wasAdded is a boolean. Like any RPC method, an error may be thrown.
+    const { ethereum } = window;
+    const wasAdded = await ethereum.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20', // Initially only supports ERC20, but eventually more!
+        options: {
+          address, // The address that the token is at.
+          symbol, // A ticker symbol or shorthand, up to 5 chars.
+          decimals, // The number of decimals in the token
+          image, // A string url of the token logo
+        },
+      },
+    });
+
+    if (wasAdded) {
+      console.log('Thanks for your interest!');
+    } else {
+      console.log('Your loss!');
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 
 export function getContractInfo(connectProvider, strAddress) {
