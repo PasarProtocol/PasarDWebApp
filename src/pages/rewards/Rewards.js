@@ -198,7 +198,8 @@ export default function Rewards() {
     { title: "SELLERS", action: "Sell", name: 'seller', amount: 0, price: 0 },
     { title: "CREATORS", action: "Create", name: 'creator', amount: 0, price: 0 }
   ]);
-  const [miningPoolStats, setMiningPoolStats] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
+  const [listedItemCnt, setListedItemCnt] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
+  const [miningPoolRatio, setMiningPoolRatio] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
   const [pasarBalance, setPasarBalance] = React.useState(0);
   const [stakingAPR, setStakingAPR] = React.useState(48.48);
   const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
@@ -239,12 +240,14 @@ export default function Rewards() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [operAmount]);
 
+  const fetchListedItemCount = async (quoteToken) => {
+    const response = await fetchFrom(`api/v2/sticker/getDetailedCollectibles?collectionType=&tokenType=${quoteToken}&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=1&keyword=&pageNum=1&pageSize=1`);
+    const json = await response.json();
+    return json && json.data && json.data.total ? json.data.total : 0;
+  };
 
   React.useEffect(() => {
     const fetchData = async () => {
-      // const response = await fetchFrom(`api/v2/sticker/getDetailedCollectibles?tokenType=${blankAddress.substr(2)}`);
-      // const json = await response.json();
-      // console.log('======', json)
       const resPasarPrice = await getERC20TokenPrice(PASAR_TOKEN_ADDRESS);
       if (!resPasarPrice || !resPasarPrice.token) setPASARToUSD(0);
       else setPASARToUSD(resPasarPrice.token.derivedELA * resPasarPrice.bundle.elaPrice);
@@ -254,9 +257,15 @@ export default function Rewards() {
       setPasarBalance(balance);
       if (tabValue === 0) { // rewards page
         const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
+        const poolConfig = await callTokenContractMethod(walletConnectWeb3, {contractType: 'mining', callType: 'call', methodName: 'config'});
+        const listedNativeCnt = await fetchListedItemCount(blankAddress);
+        const listedPasarCnt = await fetchListedItemCount(PASAR_TOKEN_ADDRESS);
+        const listedEcoCnt = await fetchListedItemCount(poolConfig.ecoToken);
+        const listedOtherCnt = (await fetchListedItemCount('')) - listedNativeCnt - listedPasarCnt - listedEcoCnt;
         const currentRatios = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'getCurrentRatios' });
         setMiningReward(accountRewards);
-        setMiningPoolStats({ native: parseInt(currentRatios.native, 10) / 1e4, pasar: parseInt(currentRatios.pasar, 10) / 1e4, eco: parseInt(currentRatios.eco, 10) / 1e4, other: parseInt(currentRatios.other, 10) / 1e4 });
+        setListedItemCnt({ native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt });
+        setMiningPoolRatio({ native: parseInt(currentRatios.native, 10) / 1e4, pasar: parseInt(currentRatios.pasar, 10) / 1e4, eco: parseInt(currentRatios.eco, 10) / 1e4, other: parseInt(currentRatios.other, 10) / 1e4 });
         setClaimItems([
           { title: "BUYERS", action: "Buy", name: "buyer", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
           { title: "SELLERS", action: "Sell", name: "seller", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
@@ -401,22 +410,22 @@ export default function Rewards() {
               <Typography variant="h3">ELA ESC</Typography>
               <Box component="img" src="/static/elastos.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel itemCount={0} poolRatio={miningPoolStats.native} userCount={0} nextDistribution={0} />
+            <StatisticPanel itemCount={listedItemCnt.native} poolRatio={miningPoolRatio.native} userCount={0} nextDistribution={0} />
 
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">PASAR</Typography>
               <Box component="img" src="/static/logo-icon.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel itemCount={0} poolRatio={miningPoolStats.pasar} userCount={0} nextDistribution={0} />
+            <StatisticPanel itemCount={listedItemCnt.pasar} poolRatio={miningPoolRatio.pasar} userCount={0} nextDistribution={0} />
 
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">Ecosystem</Typography>
               <Box component="img" src="/static/badges/diamond.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel itemCount={0} poolRatio={miningPoolStats.eco} userCount={0} nextDistribution={0} />
+            <StatisticPanel itemCount={listedItemCnt.eco} poolRatio={miningPoolRatio.eco} userCount={0} nextDistribution={0} />
 
             <Typography variant="h3">Others</Typography>
-            <StatisticPanel itemCount={0} poolRatio={miningPoolStats.other} userCount={0} nextDistribution={0} />
+            <StatisticPanel itemCount={listedItemCnt.other} poolRatio={miningPoolRatio.other} userCount={0} nextDistribution={0} />
           </Stack>
           <Typography variant="h2" textAlign="center" my={3}>
             Mining Rewards
