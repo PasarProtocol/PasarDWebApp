@@ -17,7 +17,7 @@ import TabPanel from '../../components/TabPanel';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import StatisticPanel from '../../components/rewards/StatisticPanel'
 import { MHidden } from '../../components/@material-extend';
-import { callTokenContractMethod, fetchFrom, getERC20TokenPrice, isInAppBrowser, removeLeadingZero } from '../../utils/common'
+import { addTokenToMM, callTokenContractMethod, fetchFrom, getERC20TokenPrice, isInAppBrowser, removeLeadingZero } from '../../utils/common'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { blankAddress, pasarERC20Contract as PASAR_TOKEN_ADDRESS } from '../../config';
 // ----------------------------------------------------------------------
@@ -334,6 +334,7 @@ export default function Rewards() {
             color="inherit"
             startIcon={<Icon icon="akar-icons:circle-plus" />}
             sx={{ color: 'origin.main', height: 'max-content' }}
+            onClick={() => addTokenToMM(PASAR_TOKEN_ADDRESS, 'PASAR', 18, '/static/logo-icon.svg')}
           >
             Add to wallet
           </Button>
