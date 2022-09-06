@@ -596,6 +596,9 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
     case 'withdraw':
       contractMethod = smartContract.methods.withdraw();
       break;
+    case 'config':
+      contractMethod = smartContract.methods.config();
+      break;
     case 'accountRewards':
       contractMethod = smartContract.methods.accountRewards(param.account);
       break;
@@ -638,7 +641,7 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
       };
       if (param.callType === 'call') {
         contractMethod.call().then(res => resolve(res));
-      } else {
+      } else if (param.callType === 'send') {
         contractMethod.send(transactionParams)
           .once('transactionHash', handleTxEvent)
           .once('receipt', handleReceiptEvent)
