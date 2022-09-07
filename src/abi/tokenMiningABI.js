@@ -10,6 +10,25 @@ module.exports.TOKEN_MINING_ABI = [
             {
                 "indexed": true,
                 "internalType": "address",
+                "name": "market",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "bool",
+                "name": "state",
+                "type": "bool"
+            }
+        ],
+        "name": "MarketSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
                 "name": "previousOwner",
                 "type": "address"
             },
@@ -41,7 +60,7 @@ module.exports.TOKEN_MINING_ABI = [
         "inputs": [
             {
                 "indexed": true,
-                "internalType": "enum PasarMiningBase.RewardTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.RewardTypes",
                 "name": "rewardType",
                 "type": "uint8"
             },
@@ -66,7 +85,7 @@ module.exports.TOKEN_MINING_ABI = [
         "inputs": [
             {
                 "indexed": true,
-                "internalType": "enum PasarMiningBase.PoolTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.PoolTypes",
                 "name": "pool",
                 "type": "uint8"
             },
@@ -170,6 +189,19 @@ module.exports.TOKEN_MINING_ABI = [
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "VESTING_NAME",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -177,7 +209,7 @@ module.exports.TOKEN_MINING_ABI = [
                 "type": "address"
             },
             {
-                "internalType": "enum PasarMiningBase.RewardTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.RewardTypes",
                 "name": "",
                 "type": "uint8"
             }
@@ -231,7 +263,7 @@ module.exports.TOKEN_MINING_ABI = [
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct PasarMiningBase.AccRewardInfo",
+                "internalType": "struct IPasarMiningDataAndEvents.AccRewardInfo",
                 "name": "all",
                 "type": "tuple"
             },
@@ -253,7 +285,7 @@ module.exports.TOKEN_MINING_ABI = [
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct PasarMiningBase.AccRewardInfo",
+                "internalType": "struct IPasarMiningDataAndEvents.AccRewardInfo",
                 "name": "buyer",
                 "type": "tuple"
             },
@@ -275,7 +307,7 @@ module.exports.TOKEN_MINING_ABI = [
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct PasarMiningBase.AccRewardInfo",
+                "internalType": "struct IPasarMiningDataAndEvents.AccRewardInfo",
                 "name": "seller",
                 "type": "tuple"
             },
@@ -297,7 +329,7 @@ module.exports.TOKEN_MINING_ABI = [
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct PasarMiningBase.AccRewardInfo",
+                "internalType": "struct IPasarMiningDataAndEvents.AccRewardInfo",
                 "name": "creator",
                 "type": "tuple"
             }
@@ -308,7 +340,7 @@ module.exports.TOKEN_MINING_ABI = [
     {
         "inputs": [
             {
-                "internalType": "enum PasarMiningBase.PoolTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.PoolTypes",
                 "name": "",
                 "type": "uint8"
             },
@@ -332,7 +364,7 @@ module.exports.TOKEN_MINING_ABI = [
     {
         "inputs": [
             {
-                "internalType": "enum PasarMiningBase.PoolTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.PoolTypes",
                 "name": "",
                 "type": "uint8"
             },
@@ -559,7 +591,7 @@ module.exports.TOKEN_MINING_ABI = [
     {
         "inputs": [
             {
-                "internalType": "enum PasarMiningBase.PoolTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.PoolTypes",
                 "name": "",
                 "type": "uint8"
             }
@@ -586,7 +618,7 @@ module.exports.TOKEN_MINING_ABI = [
         "name": "names",
         "outputs": [
             {
-                "internalType": "enum PasarMiningBase.RewardTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.RewardTypes",
                 "name": "",
                 "type": "uint8"
             }
@@ -648,12 +680,12 @@ module.exports.TOKEN_MINING_ABI = [
                 "type": "address"
             },
             {
-                "internalType": "enum PasarMiningBase.PoolTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.PoolTypes",
                 "name": "",
                 "type": "uint8"
             },
             {
-                "internalType": "enum PasarMiningBase.RewardTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.RewardTypes",
                 "name": "",
                 "type": "uint8"
             }
@@ -721,8 +753,49 @@ module.exports.TOKEN_MINING_ABI = [
         "outputs": [
             {
                 "internalType": "uint256",
-                "name": "",
+                "name": "count",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "indexes",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "rewardRecords",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "blockNumber",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "enum IPasarMiningDataAndEvents.RewardTypes",
+                        "name": "rewardType",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "rewardAmount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IPasarMiningDataAndEvents.RewardInfo[]",
+                "name": "records",
+                "type": "tuple[]"
             }
         ],
         "stateMutability": "view",
@@ -749,7 +822,7 @@ module.exports.TOKEN_MINING_ABI = [
                 "type": "uint256"
             },
             {
-                "internalType": "enum PasarMiningBase.RewardTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.RewardTypes",
                 "name": "rewardType",
                 "type": "uint8"
             },
@@ -816,7 +889,7 @@ module.exports.TOKEN_MINING_ABI = [
                 "type": "address"
             },
             {
-                "internalType": "enum PasarMiningBase.PoolTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.PoolTypes",
                 "name": "",
                 "type": "uint8"
             },
@@ -826,7 +899,7 @@ module.exports.TOKEN_MINING_ABI = [
                 "type": "uint256"
             },
             {
-                "internalType": "enum PasarMiningBase.RewardTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.RewardTypes",
                 "name": "",
                 "type": "uint8"
             }
@@ -891,7 +964,7 @@ module.exports.TOKEN_MINING_ABI = [
     {
         "inputs": [
             {
-                "internalType": "enum PasarMiningBase.RewardTypes",
+                "internalType": "enum IPasarMiningDataAndEvents.RewardTypes",
                 "name": "rewardType",
                 "type": "uint8"
             }
