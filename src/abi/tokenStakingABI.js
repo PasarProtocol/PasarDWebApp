@@ -133,6 +133,19 @@ module.exports.TOKEN_STAKING_ABI = [
     },
     {
         "inputs": [],
+        "name": "VESTING_NAME",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "config",
         "outputs": [
             {
@@ -404,6 +417,25 @@ module.exports.TOKEN_STAKING_ABI = [
         "name": "stake",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            }
+        ],
+        "name": "totalRewardAtTime",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "totalReward",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
