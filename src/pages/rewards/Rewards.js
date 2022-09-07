@@ -257,7 +257,7 @@ export default function Rewards() {
       setPasarBalance(balance);
       if (tabValue === 0) { // rewards page
         const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
-        const poolConfig = await callTokenContractMethod(walletConnectWeb3, {contractType: 'mining', callType: 'call', methodName: 'config'});
+        const poolConfig = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'config' });
         const listedNativeCnt = await fetchListedItemCount(blankAddress);
         const listedPasarCnt = await fetchListedItemCount(PASAR_TOKEN_ADDRESS);
         const listedEcoCnt = await fetchListedItemCount(poolConfig.ecoToken);
@@ -275,6 +275,27 @@ export default function Rewards() {
       else { // staking page
         const stakingInfo = await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'getUserInfo', account: accounts[0] });
         setStakingState(stakingInfo);
+        // get APR
+        const days = 360;
+        const currentTime = parseInt(await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'getCurrentTime' }), 10);
+        // console.log('============', currentTime);
+        const rewardTime = parseInt(currentTime + days * 3600 * 24, 10);
+        // console.log('============', rewardTime);
+        // console.log('============', await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'totalRewardAtTime', timestamp: rewardTime }));
+        // console.log('============', await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'totalRewardAtTime', timestamp: currentTime }));
+        const rewardTotal = parseInt(await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'totalRewardAtTime', timestamp: rewardTime }), 10) -
+          parseInt(await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'totalRewardAtTime', timestamp: currentTime }), 10);
+        // console.log('============', rewardTotal);
+        const annualReward = (rewardTotal * BigInt(365)) / BigInt(days);
+        // console.log('============', annualReward);
+        let rate = 0n;
+        if (stakingInfo.currentStaked > 0) {
+          rate = (annualReward * 1000000n) / stakingInfo.currentStaked;
+        }
+        // console.log('============', rate);
+        const APR = parseInt(rate, 10) / 1000000;
+        // console.log('============', APR);
+        setStakingAPR((APR * 100).toFixed(3));
       }
     };
     fetchData();
