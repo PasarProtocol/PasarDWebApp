@@ -273,7 +273,7 @@ export default function Rewards() {
         ]);
       }
       else { // staking page
-        const stakingInfo = await await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'getUserInfo', account: accounts[0] });
+        const stakingInfo = await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'getUserInfo', account: accounts[0] });
         setStakingState(stakingInfo);
       }
     };
