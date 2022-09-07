@@ -201,7 +201,7 @@ export default function Rewards() {
   const [listedItemCnt, setListedItemCnt] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
   const [miningPoolRatio, setMiningPoolRatio] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
   const [pasarBalance, setPasarBalance] = React.useState(0);
-  const [stakingAPR, setStakingAPR] = React.useState(48.48);
+  const [stakingAPR, setStakingAPR] = React.useState(0.00);
   const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
   const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
 
@@ -278,24 +278,16 @@ export default function Rewards() {
         // get APR
         const days = 360;
         const currentTime = parseInt(await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'getCurrentTime' }), 10);
-        // console.log('============', currentTime);
         const rewardTime = parseInt(currentTime + days * 3600 * 24, 10);
-        // console.log('============', rewardTime);
-        // console.log('============', await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'totalRewardAtTime', timestamp: rewardTime }));
-        // console.log('============', await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'totalRewardAtTime', timestamp: currentTime }));
         const rewardTotal = parseInt(await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'totalRewardAtTime', timestamp: rewardTime }), 10) -
           parseInt(await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'totalRewardAtTime', timestamp: currentTime }), 10);
-        // console.log('============', rewardTotal);
-        const annualReward = (rewardTotal * BigInt(365)) / BigInt(days);
-        // console.log('============', annualReward);
-        let rate = 0n;
+        const annualReward = (rewardTotal * 365) / days;
+        let rate = 0;
         if (stakingInfo.currentStaked > 0) {
-          rate = (annualReward * 1000000n) / stakingInfo.currentStaked;
+          rate = (annualReward * 1000000) / stakingInfo.currentStaked;
         }
-        // console.log('============', rate);
         const APR = parseInt(rate, 10) / 1000000;
-        // console.log('============', APR);
-        setStakingAPR((APR * 100).toFixed(3));
+        setStakingAPR((APR * 100).toFixed(2));
       }
     };
     fetchData();
