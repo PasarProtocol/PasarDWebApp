@@ -200,6 +200,7 @@ export default function Rewards() {
   ]);
   const [listedItemCnt, setListedItemCnt] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
   const [miningPoolRatio, setMiningPoolRatio] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
+  const [nextDistribution, setNextDistribution] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
   const [pasarBalance, setPasarBalance] = React.useState(0);
   const [stakingAPR, setStakingAPR] = React.useState(0.00);
   const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
@@ -263,9 +264,11 @@ export default function Rewards() {
         const listedEcoCnt = await fetchListedItemCount(poolConfig.ecoToken);
         const listedOtherCnt = (await fetchListedItemCount('')) - listedNativeCnt - listedPasarCnt - listedEcoCnt;
         const currentRatios = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'getCurrentRatios' });
+        const nextMiningReward = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'pendingRewards' });
         setMiningReward(accountRewards);
         setListedItemCnt({ native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt });
         setMiningPoolRatio({ native: parseInt(currentRatios.native, 10) / 1e4, pasar: parseInt(currentRatios.pasar, 10) / 1e4, eco: parseInt(currentRatios.eco, 10) / 1e4, other: parseInt(currentRatios.other, 10) / 1e4 });
+        setNextDistribution({ native: parseInt(nextMiningReward.native, 10) / 1e18, pasar: parseInt(nextMiningReward.pasar, 10) / 1e18, eco: parseInt(nextMiningReward.eco, 10) / 1e18, other: parseInt(nextMiningReward.other, 10) / 1e18 });
         setClaimItems([
           { title: "BUYERS", action: "Buy", name: "buyer", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
           { title: "SELLERS", action: "Sell", name: "seller", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
@@ -424,22 +427,22 @@ export default function Rewards() {
               <Typography variant="h3">ELA ESC</Typography>
               <Box component="img" src="/static/elastos.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel itemCount={listedItemCnt.native} poolRatio={miningPoolRatio.native} userCount={0} nextDistribution={0} />
+            <StatisticPanel itemCount={listedItemCnt.native} poolRatio={miningPoolRatio.native} userCount={0} nextDistribution={nextDistribution.native} />
 
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">PASAR</Typography>
               <Box component="img" src="/static/logo-icon.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel itemCount={listedItemCnt.pasar} poolRatio={miningPoolRatio.pasar} userCount={0} nextDistribution={0} />
+            <StatisticPanel itemCount={listedItemCnt.pasar} poolRatio={miningPoolRatio.pasar} userCount={0} nextDistribution={nextDistribution.pasar} />
 
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">Ecosystem</Typography>
               <Box component="img" src="/static/badges/diamond.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
             </Stack>
-            <StatisticPanel itemCount={listedItemCnt.eco} poolRatio={miningPoolRatio.eco} userCount={0} nextDistribution={0} />
+            <StatisticPanel itemCount={listedItemCnt.eco} poolRatio={miningPoolRatio.eco} userCount={0} nextDistribution={nextDistribution.eco} />
 
             <Typography variant="h3">Others</Typography>
-            <StatisticPanel itemCount={listedItemCnt.other} poolRatio={miningPoolRatio.other} userCount={0} nextDistribution={0} />
+            <StatisticPanel itemCount={listedItemCnt.other} poolRatio={miningPoolRatio.other} userCount={0} nextDistribution={nextDistribution.other} />
           </Stack>
           <Typography variant="h2" textAlign="center" my={3}>
             Mining Rewards
