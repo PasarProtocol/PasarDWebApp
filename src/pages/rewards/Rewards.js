@@ -204,7 +204,10 @@ export default function Rewards() {
   const [pasarBalance, setPasarBalance] = React.useState(0);
   const [stakingAPR, setStakingAPR] = React.useState(0.00);
   const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
-  const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+  let walletConnectProvider = Web3.givenProvider;
+  if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2')
+    walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
+  const walletConnectWeb3 = new Web3(walletConnectProvider);
 
   const handleSwitchTab = (event, newValue) => {
     setTabValue(newValue);
@@ -253,11 +256,11 @@ export default function Rewards() {
       if (!resPasarPrice || !resPasarPrice.token) setPASARToUSD(0);
       else setPASARToUSD(resPasarPrice.token.derivedELA * resPasarPrice.bundle.elaPrice);
       const accounts = await walletConnectWeb3.eth.getAccounts();
-      if (!accounts.length) return;
-      const balance = await callTokenContractMethod(walletConnectWeb3, { contractType: 'token', callType: 'call', methodName: 'balanceOf', account: accounts[0] });
-      setPasarBalance(balance);
+      if (accounts.length) {
+        const balance = await callTokenContractMethod(walletConnectWeb3, { contractType: 'token', callType: 'call', methodName: 'balanceOf', account: accounts[0] });
+        setPasarBalance(balance);
+      }
       if (tabValue === 0) { // rewards page
-        const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
         const poolConfig = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'config' });
         const listedNativeCnt = await fetchListedItemCount(blankAddress);
         const listedPasarCnt = await fetchListedItemCount(PASAR_TOKEN_ADDRESS);
@@ -265,17 +268,20 @@ export default function Rewards() {
         const listedOtherCnt = (await fetchListedItemCount('')) - listedNativeCnt - listedPasarCnt - listedEcoCnt;
         const currentRatios = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'getCurrentRatios' });
         const nextMiningReward = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'pendingRewards' });
-        setMiningReward(accountRewards);
         setListedItemCnt({ native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt });
         setMiningPoolRatio({ native: parseInt(currentRatios.native, 10) / 1e4, pasar: parseInt(currentRatios.pasar, 10) / 1e4, eco: parseInt(currentRatios.eco, 10) / 1e4, other: parseInt(currentRatios.other, 10) / 1e4 });
         setNextDistribution({ native: parseInt(nextMiningReward.native, 10) / 1e18, pasar: parseInt(nextMiningReward.pasar, 10) / 1e18, eco: parseInt(nextMiningReward.eco, 10) / 1e18, other: parseInt(nextMiningReward.other, 10) / 1e18 });
-        setClaimItems([
-          { title: "BUYERS", action: "Buy", name: "buyer", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
-          { title: "SELLERS", action: "Sell", name: "seller", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
-          { title: "CREATORS", action: "Create", name: "creator", amount: accountRewards.creator.withdrawable, price: accountRewards.creator.withdrawable * PASARToUSD }
-        ]);
+        if (accounts.length) {
+          const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
+          setMiningReward(accountRewards);
+          setClaimItems([
+            { title: "BUYERS", action: "Buy", name: "buyer", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
+            { title: "SELLERS", action: "Sell", name: "seller", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
+            { title: "CREATORS", action: "Create", name: "creator", amount: accountRewards.creator.withdrawable, price: accountRewards.creator.withdrawable * PASARToUSD }
+          ]);
+        }
       }
-      else { // staking page
+      else if (tabValue === 1 && accounts.length) { // staking page
         const stakingInfo = await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'getUserInfo', account: accounts[0] });
         setStakingState(stakingInfo);
         // get APR
