@@ -635,36 +635,36 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
     reject(error);
   };
 
-  walletConnectWeb3.eth.getAccounts()
-    .then((_accounts) => {
-      accounts = _accounts;
-      return walletConnectWeb3.eth.getGasPrice();
-    })
-    .then(async (_gasPrice) => getFilteredGasPrice(_gasPrice))
-    .then((_estimatedGas) => {
-      const transactionParams = {
-        from: accounts[0],
-        gasPrice,
-        gas: _estimatedGas,
-        value: 0,
-      };
-      if (param.callType === 'call') {
-        contractMethod.call().then(res => resolve(res));
-      } else if (param.callType === 'send') {
+  if (param.callType === 'call') {
+    contractMethod.call().then(res => resolve(res));
+  } else if (param.callType === 'send') {
+    walletConnectWeb3.eth.getAccounts()
+      .then((_accounts) => {
+        accounts = _accounts;
+        return walletConnectWeb3.eth.getGasPrice();
+      })
+      .then(async (_gasPrice) => getFilteredGasPrice(_gasPrice))
+      .then((_estimatedGas) => {
+        const transactionParams = {
+          from: accounts[0],
+          gasPrice,
+          gas: _estimatedGas,
+          value: 0,
+        };
         contractMethod.send(transactionParams)
           .once('transactionHash', handleTxEvent)
           .once('receipt', handleReceiptEvent)
           .on('error', handleErrorEvent);
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 }
 )
 
 export const addTokenToMM = async (address, symbol, decimals, image) => {
-  if (!address || !symbol || !decimals) return ;
+  if (!address || !symbol || !decimals) return;
   try {
     // wasAdded is a boolean. Like any RPC method, an error may be thrown.
     const { ethereum } = window;
