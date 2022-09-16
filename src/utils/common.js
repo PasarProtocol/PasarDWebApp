@@ -660,8 +660,7 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
         console.error(error);
       });
   }
-}
-)
+})
 
 export const addTokenToMM = async (address, symbol, decimals, image) => {
   if (!address || !symbol || !decimals) return;
