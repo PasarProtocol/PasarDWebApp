@@ -205,7 +205,7 @@ export default function Rewards() {
   const [stakingAPR, setStakingAPR] = React.useState(0.00);
   const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
   let walletConnectProvider = Web3.givenProvider;
-  if(sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2')
+  if (sessionStorage.getItem("PASAR_LINK_ADDRESS") === '2')
     walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
   const walletConnectWeb3 = new Web3(walletConnectProvider);
 
@@ -303,7 +303,11 @@ export default function Rewards() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabValue]);
 
-  const handleStake = async (amount) => {
+  const handleStake = async (type, amount) => {
+    if (type === 'Stake' && amount <= 0) {
+      enqueueSnackbar('Staking amount should be greater than 0', { variant: 'error' });
+      return;
+    }
     try {
       await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'send', methodName: 'stake', amount });
       enqueueSnackbar('Stake success', { variant: 'success' });
@@ -519,10 +523,8 @@ export default function Rewards() {
                     }}
                   >
                     <StyledToggleButtonGroup size="small" value={stakingType} exclusive onChange={handleStakingType}>
-                      <StyledToggleButton value="Stake" onClick={() => {
-                        if (operAmount) handleStake(operAmount);
-                      }}>Stake</StyledToggleButton>
-                      <StyledToggleButton value="Unstake" onClick={() => handleStake(0)}>Unstake</StyledToggleButton>
+                      <StyledToggleButton value="Stake">Stake</StyledToggleButton>
+                      <StyledToggleButton value="Unstake">Unstake</StyledToggleButton>
                     </StyledToggleButtonGroup>
                   </Paper>
                 </Grid>
@@ -563,7 +565,13 @@ export default function Rewards() {
                       }}
                       sx={{ flexGrow: 1 }}
                     />
-                    <StyledButton variant="contained" sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}>{stakingType}</StyledButton>
+                    <StyledButton
+                      variant="contained"
+                      sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+                      onClick={() => handleStake(stakingType, stakingType === 'Stake' ? operAmount : 0)}
+                    >
+                      {stakingType}
+                    </StyledButton>
                   </FormGroup>
                   <StyledSlider size='medium' value={amountProgress} step={1} valueLabelDisplay="auto" onChange={handleChangeSlider} />
                   <Typography variant='h6' mb={1}>{amountProgress}%</Typography>
