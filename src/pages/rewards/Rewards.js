@@ -19,6 +19,7 @@ import StatisticPanel from '../../components/rewards/StatisticPanel'
 import { MHidden } from '../../components/@material-extend';
 import { addTokenToMM, callTokenContractMethod, fetchFrom, getERC20TokenPrice, isInAppBrowser, removeLeadingZero } from '../../utils/common'
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
+import useSignin from '../../hooks/useSignin';
 import { blankAddress, pasarERC20Contract as PASAR_TOKEN_ADDRESS } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -182,6 +183,7 @@ const AmountProgressType = ['25%', '50%', '75%', 'Max']
 
 export default function Rewards() {
   const { enqueueSnackbar } = useSnackbar();
+  const { setOpenSigninEssentialDlg } = useSignin();
   const [tabValue, setTabValue] = React.useState(0);
   const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
@@ -303,7 +305,17 @@ export default function Rewards() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabValue]);
 
+  const checkIfSignedOrNot = async () => {
+    const accounts = await walletConnectWeb3.eth.getAccounts();
+    return accounts && !!accounts.length;
+  };
+
   const handleStake = async (type, amount) => {
+    const isSignedIn = await checkIfSignedOrNot();
+    if (!isSignedIn) {
+      setOpenSigninEssentialDlg(true)
+      return;
+    }
     if (type === 'Stake' && amount <= 0) {
       enqueueSnackbar('Staking amount should be greater than 0', { variant: 'error' });
       return;
@@ -318,6 +330,11 @@ export default function Rewards() {
   };
 
   const handleWithdrawStakingReward = async () => {
+    const isSignedIn = await checkIfSignedOrNot();
+    if (!isSignedIn) {
+      setOpenSigninEssentialDlg(true)
+      return;
+    }
     try {
       await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'send', methodName: 'withdraw' });
       enqueueSnackbar('Withdraw success', { variant: 'success' });
@@ -328,6 +345,11 @@ export default function Rewards() {
   };
 
   const handleWithdrawMiningReward = async (name) => {
+    const isSignedIn = await checkIfSignedOrNot();
+    if (!isSignedIn) {
+      setOpenSigninEssentialDlg(true)
+      return;
+    }
     try {
       await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'send', methodName: 'withdrawRewardByName', name });
       enqueueSnackbar('Withdraw success', { variant: 'success' });
