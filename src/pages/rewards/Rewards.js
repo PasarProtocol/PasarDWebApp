@@ -260,7 +260,7 @@ export default function Rewards() {
       const accounts = await walletConnectWeb3.eth.getAccounts();
       if (accounts.length) {
         const balance = await callTokenContractMethod(walletConnectWeb3, { contractType: 'token', callType: 'call', methodName: 'balanceOf', account: accounts[0] });
-        setPasarBalance(balance);
+        setPasarBalance(balance / 1e18);
       }
       if (tabValue === 0) { // rewards page
         const poolConfig = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'config' });
