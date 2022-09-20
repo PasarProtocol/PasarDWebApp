@@ -648,7 +648,7 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
         const transactionParams = {
           from: accounts[0],
           gasPrice,
-          gas: _estimatedGas,
+          gas: _estimatedGas > 8000000 ? 8000000 : _estimatedGas,
           value: 0,
         };
         contractMethod.send(transactionParams)
