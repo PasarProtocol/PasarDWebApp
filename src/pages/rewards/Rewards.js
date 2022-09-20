@@ -277,9 +277,9 @@ export default function Rewards() {
           const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
           setMiningReward(accountRewards);
           setClaimItems([
-            { title: "BUYERS", action: "Buy", name: "buyer", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
-            { title: "SELLERS", action: "Sell", name: "seller", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
-            { title: "CREATORS", action: "Create", name: "creator", amount: accountRewards.creator.withdrawable, price: accountRewards.creator.withdrawable * PASARToUSD }
+            { title: "BUYERS", action: "Buy", name: "buyer", amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(2), price: (accountRewards.buyer.withdrawable / 1e18).toFixed(2) * PASARToUSD },
+            { title: "SELLERS", action: "Sell", name: "seller", amount: (accountRewards.seller.withdrawable / 1e18).toFixed(2), price: (accountRewards.seller.withdrawable / 1e18).toFixed(2)* PASARToUSD },
+            { title: "CREATORS", action: "Create", name: "creator", amount: (accountRewards.creator.withdrawable / 1e18).toFixed(2), price: (accountRewards.creator.withdrawable / 1e18).toFixed(2)* PASARToUSD }
           ]);
         }
       }
@@ -439,7 +439,7 @@ export default function Rewards() {
               <Box sx={{ flex: 1 }}>
                 <Typography variant="h3" component="div"><Typography variant="h3" color='origin.main' sx={{ display: 'inline' }}>PASAR</Typography>{' '}earned</Typography>
                 <EarnedValueStyle variant="h2" sx={{ display: 'inline-flex' }}>
-                  {miningReward.all.withdrawable}
+                  {(miningReward.all.withdrawable / 1e18).toFixed(3)}
                 </EarnedValueStyle>
                 <Typography variant="body2" color='text.secondary'>{`≈ USD ${miningReward.all.total * PASARToUSD}`}</Typography>
               </Box>
