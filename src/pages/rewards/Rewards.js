@@ -497,11 +497,11 @@ export default function Rewards() {
         methodName: 'stake',
         amount: BigInt(amount * 1e18).toString()
       });
-      enqueueSnackbar('Stake success', { variant: 'success' });
+      enqueueSnackbar(`${type} success`, { variant: 'success' });
       window.location.reload();
     } catch (err) {
       console.error(err);
-      enqueueSnackbar('Stake error', { variant: 'error' });
+      enqueueSnackbar(`${type} error`, { variant: 'error' });
     }
   };
 
@@ -518,6 +518,7 @@ export default function Rewards() {
         methodName: 'withdraw'
       });
       enqueueSnackbar('Withdraw success', { variant: 'success' });
+      window.location.reload();
     } catch (err) {
       console.error(err);
       enqueueSnackbar('Withdraw error', { variant: 'error' });
