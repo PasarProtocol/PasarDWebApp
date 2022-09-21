@@ -587,6 +587,12 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
     case 'balanceOf':
       contractMethod = smartContract.methods.balanceOf(param.account);
       break;
+    case 'allowance':
+      contractMethod = smartContract.methods.allowance(param.owner, param.spender)
+      break;
+    case 'approve':
+      contractMethod = smartContract.methods.approve(param.spender, param.amount);
+      break;
     case 'getUserInfo':
       contractMethod = smartContract.methods.getUserInfo(param.account);
       break;
