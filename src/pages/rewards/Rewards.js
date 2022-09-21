@@ -355,28 +355,49 @@ export default function Rewards() {
             methodName: 'accountRewards',
             account: accounts[0]
           });
-          setMiningReward(accountRewards);
+          setMiningReward({
+            all: {
+              total: accountRewards.all.total / 1e18,
+              withdrawable: accountRewards.all.withdrawable / 1e18,
+              withdrawn: accountRewards.all.withdrawn / 1e18
+            },
+            buyer: {
+              total: accountRewards.buyer.total / 1e18,
+              withdrawable: accountRewards.buyer.withdrawable / 1e18,
+              withdrawn: accountRewards.buyer.withdrawn / 1e18
+            },
+            seller: {
+              total: accountRewards.seller.total / 1e18,
+              withdrawable: accountRewards.seller.withdrawable / 1e18,
+              withdrawn: accountRewards.seller.withdrawn / 1e18
+            },
+            creator: {
+              total: accountRewards.creator.total / 1e18,
+              withdrawable: accountRewards.creator.withdrawable / 1e18,
+              withdrawn: accountRewards.creator.withdrawn / 1e18
+            }
+          });
           setClaimItems([
             {
               title: 'BUYERS',
               action: 'Buy',
               name: 'buyer',
               amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(2),
-              price: (accountRewards.buyer.withdrawable / 1e18).toFixed(2) * PASARToUSD
+              price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(2)
             },
             {
               title: 'SELLERS',
               action: 'Sell',
               name: 'seller',
               amount: (accountRewards.seller.withdrawable / 1e18).toFixed(2),
-              price: (accountRewards.seller.withdrawable / 1e18).toFixed(2) * PASARToUSD
+              price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(2)
             },
             {
               title: 'CREATORS',
               action: 'Create',
               name: 'creator',
               amount: (accountRewards.creator.withdrawable / 1e18).toFixed(2),
-              price: (accountRewards.creator.withdrawable / 1e18).toFixed(2) * PASARToUSD
+              price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(2)
             }
           ]);
         }
@@ -388,7 +409,13 @@ export default function Rewards() {
           methodName: 'getUserInfo',
           account: accounts[0]
         });
-        setStakingState(stakingInfo);
+        setStakingState({
+          currentStaked: stakingInfo.currentStaked / 1e18,
+          rewardWithdrawable: stakingInfo.rewardWithdrawable / 1e18,
+          rewardWithdrawn: stakingInfo.rewardWithdrawn / 1e18,
+          rewardFeePaid: stakingInfo.rewardFeePaid / 1e18,
+          feeEndTime: stakingInfo.feeEndTime
+        });
         // get APR
         const days = 360;
         const currentTime = parseInt(
@@ -533,7 +560,7 @@ export default function Rewards() {
               Get PASAR
             </StyledButton>
             <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'text.secondary', mb: 1 }} align="center">
-              {`1 PASAR ≈ USD ${PASARToUSD}`}
+              {`1 PASAR ≈ USD ${PASARToUSD.toFixed(2)}`}
             </Typography>
           </Box>
           <Button
@@ -614,11 +641,11 @@ export default function Rewards() {
                   earned
                 </Typography>
                 <EarnedValueStyle variant="h2" sx={{ display: 'inline-flex' }}>
-                  {(miningReward.all.withdrawable / 1e18).toFixed(3)}
+                  {miningReward.all.withdrawable.toFixed(2)}
                 </EarnedValueStyle>
-                <Typography variant="body2" color="text.secondary">{`≈ USD ${
+                <Typography variant="body2" color="text.secondary">{`≈ USD ${(
                   miningReward.all.total * PASARToUSD
-                }`}</Typography>
+                ).toFixed(2)}`}</Typography>
               </Box>
               <Box sx={{ textAlign: 'center', m: 'auto' }}>
                 <Typography variant="body2" align="center" color="text.secondary" sx={{ pb: 2 }}>
@@ -766,9 +793,9 @@ export default function Rewards() {
             <AccordionDetails>
               <Box mb={2}>
                 <EarnedValueStyle variant="h2">{stakingState.currentStaked}</EarnedValueStyle>
-                <Typography variant="body2" color="text.secondary">{`≈ USD ${
+                <Typography variant="body2" color="text.secondary">{`≈ USD ${(
                   stakingState.currentStaked * PASARToUSD
-                }`}</Typography>
+                ).toFixed(2)}`}</Typography>
               </Box>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={8}>
@@ -792,12 +819,12 @@ export default function Rewards() {
                     <Stack direction="row" alignItems="center">
                       <Typography variant="body2">PASAR in wallet:</Typography>&nbsp;
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {pasarBalance}
+                        {pasarBalance.toFixed(2)}
                       </EarnedValueStyle>
                       &nbsp;
-                      <Typography variant="body2" color="text.secondary">{`≈ USD ${
-                        pasarBalance * PASARToUSD
-                      }`}</Typography>
+                      <Typography variant="body2" color="text.secondary">{`≈ USD ${(pasarBalance * PASARToUSD).toFixed(
+                        2
+                      )}`}</Typography>
                     </Stack>
                   </Grid>
                 </MHidden>
@@ -873,11 +900,11 @@ export default function Rewards() {
                     <Box textAlign="right">
                       <Typography variant="body1">PASAR in wallet:</Typography>
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {pasarBalance}
+                        {pasarBalance.toFixed(2)}
                       </EarnedValueStyle>
-                      <Typography variant="body1" color="text.secondary">{`≈ USD ${
-                        pasarBalance * PASARToUSD
-                      }`}</Typography>
+                      <Typography variant="body1" color="text.secondary">{`≈ USD ${(pasarBalance * PASARToUSD).toFixed(
+                        2
+                      )}`}</Typography>
                     </Box>
                   </Grid>
                 </MHidden>
@@ -903,10 +930,10 @@ export default function Rewards() {
             </AccordionSummary>
             <AccordionDetails>
               <Box mb={2}>
-                <EarnedValueStyle variant="h2">{stakingState.rewardWithdrawable}</EarnedValueStyle>
-                <Typography variant="body2" color="text.secondary">{`≈ USD ${
+                <EarnedValueStyle variant="h2">{stakingState.rewardWithdrawable.toFixed(2)}</EarnedValueStyle>
+                <Typography variant="body2" color="text.secondary">{`≈ USD ${(
                   stakingState.rewardWithdrawable * PASARToUSD
-                }`}</Typography>
+                ).toFixed(2)}`}</Typography>
               </Box>
               <Grid container spacing={2}>
                 <MHidden width="smUp">
@@ -914,12 +941,12 @@ export default function Rewards() {
                     <Stack direction="row" alignItems="center">
                       <Typography variant="body2">Received so far:</Typography>&nbsp;
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {stakingState.rewardWithdrawn}
+                        {stakingState.rewardWithdrawn.toFixed(2)}
                       </EarnedValueStyle>
                       &nbsp;
-                      <Typography variant="body2" color="text.secondary">{`≈ USD ${
+                      <Typography variant="body2" color="text.secondary">{`≈ USD ${(
                         stakingState.rewardWithdrawn * PASARToUSD
-                      }`}</Typography>
+                      ).toFixed(2)}`}</Typography>
                     </Stack>
                   </Grid>
                 </MHidden>
@@ -933,11 +960,11 @@ export default function Rewards() {
                     <Box textAlign="right">
                       <Typography variant="body1">Received so far:</Typography>
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {stakingState.rewardWithdrawn}
+                        {stakingState.rewardWithdrawn.toFixed(2)}
                       </EarnedValueStyle>
-                      <Typography variant="body1" color="text.secondary">{`≈ USD ${
+                      <Typography variant="body1" color="text.secondary">{`≈ USD ${(
                         stakingState.rewardWithdrawn * PASARToUSD
-                      }`}</Typography>
+                      ).toFixed(2)}`}</Typography>
                     </Box>
                   </Grid>
                 </MHidden>
