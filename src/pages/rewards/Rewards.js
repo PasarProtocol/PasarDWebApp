@@ -321,7 +321,7 @@ export default function Rewards() {
       return;
     }
     try {
-      await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'send', methodName: 'stake', amount });
+      await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'send', methodName: 'stake', amount: BigInt(amount * 1e18).toString() });
       enqueueSnackbar('Stake success', { variant: 'success' });
     } catch (err) {
       console.error(err);

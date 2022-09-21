@@ -2,7 +2,7 @@ import axios from 'axios';
 import Web3 from 'web3';
 import * as math from 'mathjs';
 import { createHash } from 'crypto';
-import { create, urlSource } from 'ipfs-http-client';
+import { create } from 'ipfs-http-client';
 import { format, subDays, subHours, formatDistance } from 'date-fns';
 import Jazzicon from '@metamask/jazzicon';
 import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
