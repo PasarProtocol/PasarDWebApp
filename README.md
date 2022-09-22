@@ -1,4 +1,4 @@
-Pasar - Decentralized NFT Market Web App
+Pasar (PasarProtocol) - Decentralized Data Market Web App
 =============
 
 Pasar is open-sourced, community-centric, and one of the first truly Web3 decentralized marketplaces (DeMKT) for exchanging data and Non-fungible Tokens (NFTs) on Elastos ESC. Meantime, Pasar also is aiming to be the marketplace with reputation system by holding badges of verifiable credentials (Verfiable Credentials, VC) to help users assess the value of trading data. 
