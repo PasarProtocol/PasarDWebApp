@@ -26,7 +26,6 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Icon } from '@iconify/react';
-import Web3 from 'web3';
 import { useSnackbar } from 'notistack';
 
 // components
@@ -40,10 +39,9 @@ import {
   callTokenContractMethod,
   fetchFrom,
   getERC20TokenPrice,
-  isInAppBrowser,
+  getWalletAccounts,
   removeLeadingZero
 } from '../../utils/common';
-import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import useSignin from '../../hooks/useSignin';
 import {
   blankAddress,
@@ -251,12 +249,15 @@ export default function Rewards() {
     rewardFeePaid: 0,
     feeEndTime: 0
   });
-  let walletConnectProvider = Web3.givenProvider;
-  if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
-    walletConnectProvider = isInAppBrowser()
-      ? window.elastos.getWeb3Provider()
-      : essentialsConnector.getWalletConnectProvider();
-  const walletConnectWeb3 = new Web3(walletConnectProvider);
+
+  // let walletConnectProvider;
+  // const connectProvider = isInAppBrowser()
+  //   ? window.elastos.getWeb3Provider()
+  //   : essentialsConnector.getWalletConnectProvider();
+  // if (connectProvider) walletConnectProvider = connectProvider;
+  // else if (Web3.givenProvider || window.ethereum) walletConnectProvider = Web3.givenProvider || window.ethereum;
+  // else walletConnectProvider = new Web3.providers.HttpProvider(rpcURL);
+  // const walletConnectWeb3 = new Web3(walletConnectProvider);
 
   const handleSwitchTab = (event, newValue) => {
     setTabValue(newValue);
@@ -304,9 +305,9 @@ export default function Rewards() {
       const resPasarPrice = await getERC20TokenPrice(PASAR_TOKEN_ADDRESS);
       if (!resPasarPrice || !resPasarPrice.token) setPASARToUSD(0);
       else setPASARToUSD(resPasarPrice.token.derivedELA * resPasarPrice.bundle.elaPrice);
-      const accounts = await walletConnectWeb3.eth.getAccounts();
+      const accounts = await getWalletAccounts();
       if (accounts.length) {
-        const balance = await callTokenContractMethod(walletConnectWeb3, {
+        const balance = await callTokenContractMethod({
           contractType: 'token',
           callType: 'call',
           methodName: 'balanceOf',
@@ -316,7 +317,7 @@ export default function Rewards() {
       }
       if (tabValue === 0) {
         // rewards page
-        const poolConfig = await callTokenContractMethod(walletConnectWeb3, {
+        const poolConfig = await callTokenContractMethod({
           contractType: 'mining',
           callType: 'call',
           methodName: 'config'
@@ -325,12 +326,12 @@ export default function Rewards() {
         const listedPasarCnt = await fetchListedItemCount(PASAR_TOKEN_ADDRESS);
         const listedEcoCnt = await fetchListedItemCount(poolConfig.ecoToken);
         const listedOtherCnt = (await fetchListedItemCount('')) - listedNativeCnt - listedPasarCnt - listedEcoCnt;
-        const currentRatios = await callTokenContractMethod(walletConnectWeb3, {
+        const currentRatios = await callTokenContractMethod({
           contractType: 'mining',
           callType: 'call',
           methodName: 'getCurrentRatios'
         });
-        const nextMiningReward = await callTokenContractMethod(walletConnectWeb3, {
+        const nextMiningReward = await callTokenContractMethod({
           contractType: 'mining',
           callType: 'call',
           methodName: 'pendingRewards'
@@ -349,7 +350,7 @@ export default function Rewards() {
           other: parseInt(nextMiningReward.other, 10) / 1e18
         });
         if (accounts.length) {
-          const accountRewards = await callTokenContractMethod(walletConnectWeb3, {
+          const accountRewards = await callTokenContractMethod({
             contractType: 'mining',
             callType: 'call',
             methodName: 'accountRewards',
@@ -403,7 +404,7 @@ export default function Rewards() {
         }
       } else if (tabValue === 1 && accounts.length) {
         // staking page
-        const stakingInfo = await callTokenContractMethod(walletConnectWeb3, {
+        const stakingInfo = await callTokenContractMethod({
           contractType: 'staking',
           callType: 'call',
           methodName: 'getUserInfo',
@@ -419,7 +420,7 @@ export default function Rewards() {
         // get APR
         const days = 360;
         const currentTime = parseInt(
-          await callTokenContractMethod(walletConnectWeb3, {
+          await callTokenContractMethod({
             contractType: 'staking',
             callType: 'call',
             methodName: 'getCurrentTime'
@@ -429,7 +430,7 @@ export default function Rewards() {
         const rewardTime = parseInt(currentTime + days * 3600 * 24, 10);
         const rewardTotal =
           parseInt(
-            await callTokenContractMethod(walletConnectWeb3, {
+            await callTokenContractMethod({
               contractType: 'staking',
               callType: 'call',
               methodName: 'totalRewardAtTime',
@@ -438,7 +439,7 @@ export default function Rewards() {
             10
           ) -
           parseInt(
-            await callTokenContractMethod(walletConnectWeb3, {
+            await callTokenContractMethod({
               contractType: 'staking',
               callType: 'call',
               methodName: 'totalRewardAtTime',
@@ -460,12 +461,12 @@ export default function Rewards() {
   }, [tabValue]);
 
   const checkIfSignedOrNot = async () => {
-    const accounts = await walletConnectWeb3.eth.getAccounts();
+    const accounts = await getWalletAccounts();
     return accounts && !!accounts.length;
   };
 
   const handleStake = async (type, amount) => {
-    const accounts = await walletConnectWeb3.eth.getAccounts();
+    const accounts = await getWalletAccounts();
     if (!(accounts && accounts.length)) {
       setOpenSigninEssentialDlg(true);
       return;
@@ -475,7 +476,7 @@ export default function Rewards() {
       return;
     }
     try {
-      const allowance = await callTokenContractMethod(walletConnectWeb3, {
+      const allowance = await callTokenContractMethod({
         contractType: 'token',
         callType: 'call',
         methodName: 'allowance',
@@ -483,7 +484,7 @@ export default function Rewards() {
         spender: STAKING_CONTRACT_ADDRESS
       });
       if (allowance / 1e18 < amount) {
-        await callTokenContractMethod(walletConnectWeb3, {
+        await callTokenContractMethod({
           contractType: 'token',
           callType: 'send',
           methodName: 'approve',
@@ -491,7 +492,7 @@ export default function Rewards() {
           amount: BigInt(amount * 1e18).toString()
         });
       }
-      await callTokenContractMethod(walletConnectWeb3, {
+      await callTokenContractMethod({
         contractType: 'staking',
         callType: 'send',
         methodName: 'stake',
@@ -512,7 +513,7 @@ export default function Rewards() {
       return;
     }
     try {
-      await callTokenContractMethod(walletConnectWeb3, {
+      await callTokenContractMethod({
         contractType: 'staking',
         callType: 'send',
         methodName: 'withdraw'
@@ -532,7 +533,7 @@ export default function Rewards() {
       return;
     }
     try {
-      await callTokenContractMethod(walletConnectWeb3, {
+      await callTokenContractMethod({
         contractType: 'mining',
         callType: 'send',
         methodName: 'withdrawRewardByName',
