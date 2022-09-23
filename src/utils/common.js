@@ -553,7 +553,16 @@ export function callContractMethod(type, coinType, chainId, paramObj) {
   });
 }
 
-export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise((resolve, reject) => {
+export const callTokenContractMethod = (param) => new Promise((resolve, reject) => {
+  const linkType = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+  let walletConnectProvider;
+  if (linkType === '2') walletConnectProvider = isInAppBrowser()
+      ? window.elastos.getWeb3Provider()
+      : essentialsConnector.getWalletConnectProvider();
+  else if (Web3.givenProvider || window.ethereum) walletConnectProvider = Web3.givenProvider || window.ethereum;
+  else walletConnectProvider = new Web3.providers.HttpProvider(rpcURL);
+  const walletConnectWeb3 = new Web3(walletConnectProvider);
+
   let contractABI;
   let contractAddress;
   let contractMethod = null;
@@ -667,6 +676,20 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
       });
   }
 })
+
+export const getWalletAccounts = async() => {
+  const linkType = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+  let walletConnectProvider;
+  if (linkType === '2') walletConnectProvider = isInAppBrowser()
+      ? window.elastos.getWeb3Provider()
+      : essentialsConnector.getWalletConnectProvider();
+  else if (Web3.givenProvider || window.ethereum) walletConnectProvider = Web3.givenProvider || window.ethereum;
+  else walletConnectProvider = new Web3.providers.HttpProvider(rpcURL);
+  const walletConnectWeb3 = new Web3(walletConnectProvider);
+
+  const accounts = await walletConnectWeb3.eth.getAccounts();
+  return accounts;
+};
 
 export const addTokenToMM = async (address, symbol, decimals, image) => {
   if (!address || !symbol || !decimals) return;
