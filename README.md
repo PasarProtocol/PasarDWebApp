@@ -17,7 +17,6 @@ Pasar has been evolved from being a side feature in FeedsNetwork into a fully st
 - [x] Pasar V2 DeMKT with dedicated collections and auction supported
 - [x] ERC20-token as pricing tokens
 - [x] KYC-ed credential integrated
-- [x] KYC-ed credential integrated
 - [x] Pasar on Multi-chains, such as Ethereum and FUSION network
 - [ ] Pasar tokenomics (Mining rewards)
 - [ ] Decentralized reporting system
