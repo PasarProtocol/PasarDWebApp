@@ -239,6 +239,7 @@ export default function Rewards() {
   ]);
   const [listedItemCnt, setListedItemCnt] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
   const [miningPoolRatio, setMiningPoolRatio] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
+  const [userRewarded, setUserRewarded] = React.useState({ ecoCount: 0, elaCount: 0, otherCount: 0, pasarCount: 0 });
   const [nextDistribution, setNextDistribution] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
   const [pasarBalance, setPasarBalance] = React.useState(0);
   const [stakingAPR, setStakingAPR] = React.useState(0.0);
@@ -293,11 +294,27 @@ export default function Rewards() {
   }, [operAmount]);
 
   const fetchListedItemCount = async (quoteToken) => {
-    const response = await fetchFrom(
-      `api/v2/sticker/getDetailedCollectibles?collectionType=&tokenType=${quoteToken}&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=1&keyword=&pageNum=1&pageSize=1`
-    );
-    const json = await response.json();
-    return json && json.data && json.data.total ? json.data.total : 0;
+    try {
+      const response = await fetchFrom(
+        `api/v2/sticker/getDetailedCollectibles?collectionType=&tokenType=${quoteToken}&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=1&keyword=&pageNum=1&pageSize=1`
+      );
+      const json = await response.json();
+      return json && json.data && json.data.total ? json.data.total : 0;
+    } catch (err) {
+      console.error(err);
+      return 0;
+    }
+  };
+
+  const fetchRewardedUserCount = async () => {
+    try {
+      const response = await fetchFrom(`api/v2/sticker/rewardusers`);
+      const json = await response.json();
+      return json && json.data ? json.data : { ecoCount: 0, elaCount: 0, otherCount: 0, pasarCount: 0 };
+    } catch (err) {
+      console.error(err);
+      return { ecoCount: 0, elaCount: 0, otherCount: 0, pasarCount: 0 };
+    }
   };
 
   React.useEffect(() => {
@@ -322,6 +339,7 @@ export default function Rewards() {
           callType: 'call',
           methodName: 'config'
         });
+        const rewardedUsers = await fetchRewardedUserCount();
         const listedNativeCnt = await fetchListedItemCount(blankAddress);
         const listedPasarCnt = await fetchListedItemCount(PASAR_TOKEN_ADDRESS);
         const listedEcoCnt = await fetchListedItemCount(poolConfig.ecoToken);
@@ -343,6 +361,7 @@ export default function Rewards() {
           eco: parseInt(currentRatios.eco, 10) / 1e4,
           other: parseInt(currentRatios.other, 10) / 1e4
         });
+        setUserRewarded(rewardedUsers);
         setNextDistribution({
           native: parseInt(nextMiningReward.native, 10) / 1e18,
           pasar: parseInt(nextMiningReward.pasar, 10) / 1e18,
@@ -687,7 +706,7 @@ export default function Rewards() {
             <StatisticPanel
               itemCount={listedItemCnt.native}
               poolRatio={miningPoolRatio.native}
-              userCount={0}
+              userCount={userRewarded.elaCount}
               nextDistribution={nextDistribution.native}
             />
 
@@ -707,7 +726,7 @@ export default function Rewards() {
             <StatisticPanel
               itemCount={listedItemCnt.pasar}
               poolRatio={miningPoolRatio.pasar}
-              userCount={0}
+              userCount={userRewarded.pasarCount}
               nextDistribution={nextDistribution.pasar}
             />
 
@@ -727,7 +746,7 @@ export default function Rewards() {
             <StatisticPanel
               itemCount={listedItemCnt.eco}
               poolRatio={miningPoolRatio.eco}
-              userCount={0}
+              userCount={userRewarded.ecoCount}
               nextDistribution={nextDistribution.eco}
             />
 
@@ -735,7 +754,7 @@ export default function Rewards() {
             <StatisticPanel
               itemCount={listedItemCnt.other}
               poolRatio={miningPoolRatio.other}
-              userCount={0}
+              userCount={userRewarded.otherCount}
               nextDistribution={nextDistribution.other}
             />
           </Stack>
