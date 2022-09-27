@@ -559,7 +559,7 @@ export const callTokenContractMethod = (param) => new Promise((resolve, reject) 
   if (linkType === '2') walletConnectProvider = isInAppBrowser()
       ? window.elastos.getWeb3Provider()
       : essentialsConnector.getWalletConnectProvider();
-  else if (Web3.givenProvider || window.ethereum) walletConnectProvider = Web3.givenProvider || window.ethereum;
+  else if (linkType === '1' && (Web3.givenProvider || window.ethereum)) walletConnectProvider = Web3.givenProvider || window.ethereum;
   else walletConnectProvider = new Web3.providers.HttpProvider(rpcURL);
   const walletConnectWeb3 = new Web3(walletConnectProvider);
 
@@ -683,7 +683,7 @@ export const getWalletAccounts = async() => {
   if (linkType === '2') walletConnectProvider = isInAppBrowser()
       ? window.elastos.getWeb3Provider()
       : essentialsConnector.getWalletConnectProvider();
-  else if (Web3.givenProvider || window.ethereum) walletConnectProvider = Web3.givenProvider || window.ethereum;
+  else if (linkType === '1' && (Web3.givenProvider || window.ethereum)) walletConnectProvider = Web3.givenProvider || window.ethereum;
   else walletConnectProvider = new Web3.providers.HttpProvider(rpcURL);
   const walletConnectWeb3 = new Web3(walletConnectProvider);
 
