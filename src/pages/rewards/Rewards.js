@@ -246,6 +246,7 @@ export default function Rewards() {
     rewardFeePaid: 0,
     feeEndTime: 0
   });
+  const [reloadPage, setReloadPage] = React.useState(false);
 
   // let walletConnectProvider;
   // const connectProvider = isInAppBrowser()
@@ -473,7 +474,7 @@ export default function Rewards() {
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabValue]);
+  }, [tabValue, reloadPage]);
 
   const checkIfSignedOrNot = async () => {
     const accounts = await getWalletAccounts();
@@ -514,7 +515,7 @@ export default function Rewards() {
         amount: BigInt(amount * 1e18).toString()
       });
       enqueueSnackbar(`${type} success`, { variant: 'success' });
-      window.location.reload();
+      setReloadPage(!reloadPage);
     } catch (err) {
       console.error(err);
       enqueueSnackbar(`${type} error`, { variant: 'error' });
@@ -534,7 +535,7 @@ export default function Rewards() {
         methodName: 'withdraw'
       });
       enqueueSnackbar('Withdraw success', { variant: 'success' });
-      window.location.reload();
+      setReloadPage(!reloadPage);
     } catch (err) {
       console.error(err);
       enqueueSnackbar('Withdraw error', { variant: 'error' });
@@ -555,7 +556,7 @@ export default function Rewards() {
         name
       });
       enqueueSnackbar('Withdraw success', { variant: 'success' });
-      window.location.reload();
+      setReloadPage(!reloadPage);
     } catch (err) {
       console.error(err);
       enqueueSnackbar('Withdraw error', { variant: 'error' });
