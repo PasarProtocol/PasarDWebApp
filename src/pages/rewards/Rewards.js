@@ -191,13 +191,9 @@ const ClaimCard = ({ item, onClick }) => (
         {item.amount}
       </EarnedValueStyle>
       <Typography variant="body2" color="text.secondary">{`≈ USD ${item.price}`}</Typography>
-      <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-        <div>
-          <StyledButton variant="contained" sx={{ mt: 3, width: '100%' }} onClick={onClick}>
-            Claim
-          </StyledButton>
-        </div>
-      </Tooltip>
+      <StyledButton variant="contained" sx={{ mt: 3, width: '100%' }} onClick={onClick}>
+        Claim
+      </StyledButton>
     </Box>
   </PaperStyle>
 );
@@ -676,17 +672,13 @@ export default function Rewards() {
                 <Typography variant="body2" align="center" color="text.secondary" sx={{ pb: 2 }}>
                   to collect from 4 mining rewards
                 </Typography>
-                <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                  <div>
-                    <StyledButton
-                      variant="contained"
-                      sx={{ minWidth: 150 }}
-                      onClick={() => handleWithdrawMiningReward('all')}
-                    >
-                      Claim All
-                    </StyledButton>
-                  </div>
-                </Tooltip>
+                <StyledButton
+                  variant="contained"
+                  sx={{ minWidth: 150 }}
+                  onClick={() => handleWithdrawMiningReward('all')}
+                >
+                  Claim All
+                </StyledButton>
               </Box>
             </StackStyle>
           </PaperStyle>
