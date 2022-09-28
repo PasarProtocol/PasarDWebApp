@@ -577,9 +577,13 @@ export default function Rewards() {
         </Typography>
         <Stack direction="row" spacing={2}>
           <Box sx={{ width: 200 }}>
-            <StyledButton variant="contained" fullWidth sx={{ mb: 1 }}>
-              Get PASAR
-            </StyledButton>
+            <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+              <div>
+                <StyledButton variant="contained" fullWidth sx={{ mb: 1 }} disabled>
+                  Get PASAR
+                </StyledButton>
+              </div>
+            </Tooltip>
             <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'text.secondary', mb: 1 }} align="center">
               {`1 PASAR ≈ USD ${PASARToUSD.toFixed(2)}`}
             </Typography>
