@@ -221,31 +221,53 @@ export default function Rewards() {
   const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
   const [amountProgress, setAmountProgress] = React.useState(0);
+  const cachedPool = JSON.parse(localStorage.getItem('reward_pool'));
+  const cachedUser = JSON.parse(localStorage.getItem('reward_user'));
   const [PASARToUSD, setPASARToUSD] = React.useState(0.01);
-  const [miningReward, setMiningReward] = React.useState({
-    all: { total: 0, withdrawable: 0, withdrawn: 0 },
-    buyer: { total: 0, withdrawable: 0, withdrawn: 0 },
-    seller: { total: 0, withdrawable: 0, withdrawn: 0 },
-    creator: { total: 0, withdrawable: 0, withdrawn: 0 }
-  });
-  const [claimItems, setClaimItems] = React.useState([
-    { title: 'BUYERS', action: 'Buy', name: 'buyer', amount: 0, price: 0 },
-    { title: 'SELLERS', action: 'Sell', name: 'seller', amount: 0, price: 0 },
-    { title: 'CREATORS', action: 'Create', name: 'creator', amount: 0, price: 0 }
-  ]);
-  const [listedItemCnt, setListedItemCnt] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
-  const [miningPoolRatio, setMiningPoolRatio] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
-  const [userRewarded, setUserRewarded] = React.useState({ ecoCount: 0, elaCount: 0, otherCount: 0, pasarCount: 0 });
-  const [nextDistribution, setNextDistribution] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
+  const [miningReward, setMiningReward] = React.useState(
+    cachedUser?.mining
+      ? cachedUser.mining
+      : {
+          all: { total: 0, withdrawable: 0, withdrawn: 0 },
+          buyer: { total: 0, withdrawable: 0, withdrawn: 0 },
+          seller: { total: 0, withdrawable: 0, withdrawn: 0 },
+          creator: { total: 0, withdrawable: 0, withdrawn: 0 }
+        }
+  );
+  const [claimItems, setClaimItems] = React.useState(
+    cachedUser?.claim
+      ? cachedUser.claim
+      : [
+          { title: 'BUYERS', action: 'Buy', name: 'buyer', amount: 0, price: 0 },
+          { title: 'SELLERS', action: 'Sell', name: 'seller', amount: 0, price: 0 },
+          { title: 'CREATORS', action: 'Create', name: 'creator', amount: 0, price: 0 }
+        ]
+  );
+  const [listedItemCnt, setListedItemCnt] = React.useState(
+    cachedPool?.item ? cachedPool.item : { native: 0, pasar: 0, eco: 0, other: 0 }
+  );
+  const [miningPoolRatio, setMiningPoolRatio] = React.useState(
+    cachedPool?.pool ? cachedPool.pool : { native: 0, pasar: 0, eco: 0, other: 0 }
+  );
+  const [userRewarded, setUserRewarded] = React.useState(
+    cachedPool?.user ? cachedPool.user : { elaCount: 0, pasarCount: 0, ecoCount: 0, otherCount: 0 }
+  );
+  const [nextDistribution, setNextDistribution] = React.useState(
+    cachedPool?.next ? cachedPool.next : { native: 0, pasar: 0, eco: 0, other: 0 }
+  );
   const [pasarBalance, setPasarBalance] = React.useState(0);
-  const [stakingAPR, setStakingAPR] = React.useState(0.0);
-  const [stakingState, setStakingState] = React.useState({
-    currentStaked: 0,
-    rewardWithdrawable: 0,
-    rewardWithdrawn: 0,
-    rewardFeePaid: 0,
-    feeEndTime: 0
-  });
+  const [stakingAPR, setStakingAPR] = React.useState(cachedUser?.apr ? cachedUser.apr : 0.0);
+  const [stakingState, setStakingState] = React.useState(
+    cachedUser?.staking
+      ? cachedUser.staking
+      : {
+          currentStaked: 0,
+          rewardWithdrawable: 0,
+          rewardWithdrawn: 0,
+          rewardFeePaid: 0,
+          feeEndTime: 0
+        }
+  );
   const [reloadPage, setReloadPage] = React.useState(false);
 
   // let walletConnectProvider;
@@ -329,96 +351,112 @@ export default function Rewards() {
         });
         setPasarBalance(balance / 1e18);
       }
-      if (tabValue === 0) {
-        // rewards page
-        const poolConfig = await callTokenContractMethod({
+      // rewards page
+      const poolConfig = await callTokenContractMethod({
+        contractType: 'mining',
+        callType: 'call',
+        methodName: 'config'
+      });
+      const rewardedUsers = await fetchRewardedUserCount();
+      const listedNativeCnt = await fetchListedItemCount(blankAddress);
+      const listedPasarCnt = await fetchListedItemCount(PASAR_TOKEN_ADDRESS);
+      const listedEcoCnt = await fetchListedItemCount(poolConfig.ecoToken);
+      const listedOtherCnt = (await fetchListedItemCount('')) - listedNativeCnt - listedPasarCnt - listedEcoCnt;
+      const currentRatios = await callTokenContractMethod({
+        contractType: 'mining',
+        callType: 'call',
+        methodName: 'getCurrentRatios'
+      });
+      const nextMiningReward = await callTokenContractMethod({
+        contractType: 'mining',
+        callType: 'call',
+        methodName: 'pendingRewards'
+      });
+      setListedItemCnt({ native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt });
+      setMiningPoolRatio({
+        native: parseInt(currentRatios.native, 10) / 1e4,
+        pasar: parseInt(currentRatios.pasar, 10) / 1e4,
+        eco: parseInt(currentRatios.eco, 10) / 1e4,
+        other: parseInt(currentRatios.other, 10) / 1e4
+      });
+      setUserRewarded(rewardedUsers);
+      setNextDistribution({
+        native: parseInt(nextMiningReward.native, 10) / 1e18,
+        pasar: parseInt(nextMiningReward.pasar, 10) / 1e18,
+        eco: parseInt(nextMiningReward.eco, 10) / 1e18,
+        other: parseInt(nextMiningReward.other, 10) / 1e18
+      });
+      localStorage.setItem(
+        'reward_pool',
+        JSON.stringify({
+          item: { native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt },
+          pool: {
+            native: parseInt(currentRatios.native, 10) / 1e4,
+            pasar: parseInt(currentRatios.pasar, 10) / 1e4,
+            eco: parseInt(currentRatios.eco, 10) / 1e4,
+            other: parseInt(currentRatios.other, 10) / 1e4
+          },
+          user: rewardedUsers,
+          next: {
+            native: parseInt(nextMiningReward.native, 10) / 1e18,
+            pasar: parseInt(nextMiningReward.pasar, 10) / 1e18,
+            eco: parseInt(nextMiningReward.eco, 10) / 1e18,
+            other: parseInt(nextMiningReward.other, 10) / 1e18
+          }
+        })
+      );
+      if (accounts.length) {
+        const accountRewards = await callTokenContractMethod({
           contractType: 'mining',
           callType: 'call',
-          methodName: 'config'
+          methodName: 'accountRewards',
+          account: accounts[0]
         });
-        const rewardedUsers = await fetchRewardedUserCount();
-        const listedNativeCnt = await fetchListedItemCount(blankAddress);
-        const listedPasarCnt = await fetchListedItemCount(PASAR_TOKEN_ADDRESS);
-        const listedEcoCnt = await fetchListedItemCount(poolConfig.ecoToken);
-        const listedOtherCnt = (await fetchListedItemCount('')) - listedNativeCnt - listedPasarCnt - listedEcoCnt;
-        const currentRatios = await callTokenContractMethod({
-          contractType: 'mining',
-          callType: 'call',
-          methodName: 'getCurrentRatios'
+        setMiningReward({
+          all: {
+            total: accountRewards.all.total / 1e18,
+            withdrawable: accountRewards.all.withdrawable / 1e18,
+            withdrawn: accountRewards.all.withdrawn / 1e18
+          },
+          buyer: {
+            total: accountRewards.buyer.total / 1e18,
+            withdrawable: accountRewards.buyer.withdrawable / 1e18,
+            withdrawn: accountRewards.buyer.withdrawn / 1e18
+          },
+          seller: {
+            total: accountRewards.seller.total / 1e18,
+            withdrawable: accountRewards.seller.withdrawable / 1e18,
+            withdrawn: accountRewards.seller.withdrawn / 1e18
+          },
+          creator: {
+            total: accountRewards.creator.total / 1e18,
+            withdrawable: accountRewards.creator.withdrawable / 1e18,
+            withdrawn: accountRewards.creator.withdrawn / 1e18
+          }
         });
-        const nextMiningReward = await callTokenContractMethod({
-          contractType: 'mining',
-          callType: 'call',
-          methodName: 'pendingRewards'
-        });
-        setListedItemCnt({ native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt });
-        setMiningPoolRatio({
-          native: parseInt(currentRatios.native, 10) / 1e4,
-          pasar: parseInt(currentRatios.pasar, 10) / 1e4,
-          eco: parseInt(currentRatios.eco, 10) / 1e4,
-          other: parseInt(currentRatios.other, 10) / 1e4
-        });
-        setUserRewarded(rewardedUsers);
-        setNextDistribution({
-          native: parseInt(nextMiningReward.native, 10) / 1e18,
-          pasar: parseInt(nextMiningReward.pasar, 10) / 1e18,
-          eco: parseInt(nextMiningReward.eco, 10) / 1e18,
-          other: parseInt(nextMiningReward.other, 10) / 1e18
-        });
-        if (accounts.length) {
-          const accountRewards = await callTokenContractMethod({
-            contractType: 'mining',
-            callType: 'call',
-            methodName: 'accountRewards',
-            account: accounts[0]
-          });
-          setMiningReward({
-            all: {
-              total: accountRewards.all.total / 1e18,
-              withdrawable: accountRewards.all.withdrawable / 1e18,
-              withdrawn: accountRewards.all.withdrawn / 1e18
-            },
-            buyer: {
-              total: accountRewards.buyer.total / 1e18,
-              withdrawable: accountRewards.buyer.withdrawable / 1e18,
-              withdrawn: accountRewards.buyer.withdrawn / 1e18
-            },
-            seller: {
-              total: accountRewards.seller.total / 1e18,
-              withdrawable: accountRewards.seller.withdrawable / 1e18,
-              withdrawn: accountRewards.seller.withdrawn / 1e18
-            },
-            creator: {
-              total: accountRewards.creator.total / 1e18,
-              withdrawable: accountRewards.creator.withdrawable / 1e18,
-              withdrawn: accountRewards.creator.withdrawn / 1e18
-            }
-          });
-          setClaimItems([
-            {
-              title: 'BUYERS',
-              action: 'Buy',
-              name: 'buyer',
-              amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(2),
-              price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(2)
-            },
-            {
-              title: 'SELLERS',
-              action: 'Sell',
-              name: 'seller',
-              amount: (accountRewards.seller.withdrawable / 1e18).toFixed(2),
-              price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(2)
-            },
-            {
-              title: 'CREATORS',
-              action: 'Create',
-              name: 'creator',
-              amount: (accountRewards.creator.withdrawable / 1e18).toFixed(2),
-              price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(2)
-            }
-          ]);
-        }
-      } else if (tabValue === 1 && accounts.length) {
+        setClaimItems([
+          {
+            title: 'BUYERS',
+            action: 'Buy',
+            name: 'buyer',
+            amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(2),
+            price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+          },
+          {
+            title: 'SELLERS',
+            action: 'Sell',
+            name: 'seller',
+            amount: (accountRewards.seller.withdrawable / 1e18).toFixed(2),
+            price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+          },
+          {
+            title: 'CREATORS',
+            action: 'Create',
+            name: 'creator',
+            amount: (accountRewards.creator.withdrawable / 1e18).toFixed(2),
+            price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+          }
+        ]);
         // staking page
         const stakingInfo = await callTokenContractMethod({
           contractType: 'staking',
@@ -470,11 +508,70 @@ export default function Rewards() {
         }
         const APR = parseInt(rate, 10) / 1000000;
         setStakingAPR((APR * 100).toFixed(2));
+
+        localStorage.setItem(
+          'reward_user',
+          JSON.stringify({
+            mining: {
+              all: {
+                total: accountRewards.all.total / 1e18,
+                withdrawable: accountRewards.all.withdrawable / 1e18,
+                withdrawn: accountRewards.all.withdrawn / 1e18
+              },
+              buyer: {
+                total: accountRewards.buyer.total / 1e18,
+                withdrawable: accountRewards.buyer.withdrawable / 1e18,
+                withdrawn: accountRewards.buyer.withdrawn / 1e18
+              },
+              seller: {
+                total: accountRewards.seller.total / 1e18,
+                withdrawable: accountRewards.seller.withdrawable / 1e18,
+                withdrawn: accountRewards.seller.withdrawn / 1e18
+              },
+              creator: {
+                total: accountRewards.creator.total / 1e18,
+                withdrawable: accountRewards.creator.withdrawable / 1e18,
+                withdrawn: accountRewards.creator.withdrawn / 1e18
+              }
+            },
+            staking: {
+              currentStaked: stakingInfo.currentStaked / 1e18,
+              rewardWithdrawable: stakingInfo.rewardWithdrawable / 1e18,
+              rewardWithdrawn: stakingInfo.rewardWithdrawn / 1e18,
+              rewardFeePaid: stakingInfo.rewardFeePaid / 1e18,
+              feeEndTime: stakingInfo.feeEndTime
+            },
+            claim: [
+              {
+                title: 'BUYERS',
+                action: 'Buy',
+                name: 'buyer',
+                amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(2),
+                price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+              },
+              {
+                title: 'SELLERS',
+                action: 'Sell',
+                name: 'seller',
+                amount: (accountRewards.seller.withdrawable / 1e18).toFixed(2),
+                price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+              },
+              {
+                title: 'CREATORS',
+                action: 'Create',
+                name: 'creator',
+                amount: (accountRewards.creator.withdrawable / 1e18).toFixed(2),
+                price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+              }
+            ],
+            apr: (APR * 100).toFixed(2)
+          })
+        );
       }
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabValue, reloadPage]);
+  }, [reloadPage]);
 
   const checkIfSignedOrNot = async () => {
     const accounts = await getWalletAccounts();
