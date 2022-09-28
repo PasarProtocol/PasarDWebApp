@@ -515,7 +515,7 @@ export default function Rewards() {
         amount: BigInt(amount * 1e18).toString()
       });
       enqueueSnackbar(`${type} success`, { variant: 'success' });
-      setReloadPage(!reloadPage);
+      window.location.reload();
     } catch (err) {
       console.error(err);
       enqueueSnackbar(`${type} error`, { variant: 'error' });
@@ -811,7 +811,7 @@ export default function Rewards() {
             </AccordionSummary>
             <AccordionDetails>
               <Box mb={2}>
-                <EarnedValueStyle variant="h2">{stakingState.currentStaked}</EarnedValueStyle>
+                <EarnedValueStyle variant="h2">{stakingState.currentStaked.toFixed(2)}</EarnedValueStyle>
                 <Typography variant="body2" color="text.secondary">{`≈ USD ${(
                   stakingState.currentStaked * PASARToUSD
                 ).toFixed(2)}`}</Typography>
