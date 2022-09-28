@@ -910,6 +910,11 @@ const coinTypes = [
     address: DIA_CONTRACT_ADDRESS
   },
   {
+    icon: 'logo-icon.svg',
+    name: 'PASAR',
+    address: PASAR_TOKEN_ADDRESS
+  },
+  {
     icon: 'erc20/WELA.png',
     name: 'WELA',
     address: WELA_CONTRACT_ADDRESS
