@@ -555,6 +555,7 @@ export default function Rewards() {
         name
       });
       enqueueSnackbar('Withdraw success', { variant: 'success' });
+      window.location.reload();
     } catch (err) {
       console.error(err);
       enqueueSnackbar('Withdraw error', { variant: 'error' });
