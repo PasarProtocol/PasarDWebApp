@@ -511,6 +511,7 @@ export default function SignInDialog() {
     sessionStorage.removeItem('PASAR_TOKEN');
     sessionStorage.removeItem('PASAR_DID');
     sessionStorage.removeItem('KYCedProof');
+    sessionStorage.removeItem('REWARD_USER');
     try {
       setSigninEssentialSuccess(false);
       setActivatingConnector(null);
