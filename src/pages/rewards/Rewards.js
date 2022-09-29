@@ -270,15 +270,6 @@ export default function Rewards() {
   );
   const [reloadPage, setReloadPage] = React.useState(false);
 
-  // let walletConnectProvider;
-  // const connectProvider = isInAppBrowser()
-  //   ? window.elastos.getWeb3Provider()
-  //   : essentialsConnector.getWalletConnectProvider();
-  // if (connectProvider) walletConnectProvider = connectProvider;
-  // else if (Web3.givenProvider || window.ethereum) walletConnectProvider = Web3.givenProvider || window.ethereum;
-  // else walletConnectProvider = new Web3.providers.HttpProvider(rpcURL);
-  // const walletConnectWeb3 = new Web3(walletConnectProvider);
-
   const handleSwitchTab = (event, newValue) => {
     setTabValue(newValue);
   };
