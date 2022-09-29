@@ -221,8 +221,8 @@ export default function Rewards() {
   const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
   const [amountProgress, setAmountProgress] = React.useState(0);
-  const cachedPool = JSON.parse(localStorage.getItem('reward_pool'));
-  const cachedUser = JSON.parse(localStorage.getItem('reward_user'));
+  const cachedPool = JSON.parse(sessionStorage.getItem('REWARD_POOL'));
+  const cachedUser = JSON.parse(sessionStorage.getItem('REWARD_USER'));
   const [PASARToUSD, setPASARToUSD] = React.useState(0.01);
   const [miningReward, setMiningReward] = React.useState(
     cachedUser?.mining
@@ -386,8 +386,8 @@ export default function Rewards() {
         eco: parseInt(nextMiningReward.eco, 10) / 1e18,
         other: parseInt(nextMiningReward.other, 10) / 1e18
       });
-      localStorage.setItem(
-        'reward_pool',
+      sessionStorage.setItem(
+        'REWARD_POOL',
         JSON.stringify({
           item: { native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt },
           pool: {
@@ -509,8 +509,8 @@ export default function Rewards() {
         const APR = parseInt(rate, 10) / 1000000;
         setStakingAPR((APR * 100).toFixed(2));
 
-        localStorage.setItem(
-          'reward_user',
+        sessionStorage.setItem(
+          'REWARD_USER',
           JSON.stringify({
             mining: {
               all: {
@@ -567,11 +567,65 @@ export default function Rewards() {
             apr: (APR * 100).toFixed(2)
           })
         );
+      } else {
+        setMiningReward({
+          all: {
+            total: 0,
+            withdrawable: 0,
+            withdrawn: 0
+          },
+          buyer: {
+            total: 0,
+            withdrawable: 0,
+            withdrawn: 0
+          },
+          seller: {
+            total: 0,
+            withdrawable: 0,
+            withdrawn: 0
+          },
+          creator: {
+            total: 0,
+            withdrawable: 0,
+            withdrawn: 0
+          }
+        });
+        setClaimItems([
+          {
+            title: 'BUYERS',
+            action: 'Buy',
+            name: 'buyer',
+            amount: 0,
+            price: 0
+          },
+          {
+            title: 'SELLERS',
+            action: 'Sell',
+            name: 'seller',
+            amount: 0,
+            price: 0
+          },
+          {
+            title: 'CREATORS',
+            action: 'Create',
+            name: 'creator',
+            amount: 0,
+            price: 0
+          }
+        ]);
+        setStakingState({
+          currentStaked: 0,
+          rewardWithdrawable: 0,
+          rewardWithdrawn: 0,
+          rewardFeePaid: 0,
+          feeEndTime: 0
+        });
+        setStakingAPR(0);
       }
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reloadPage]);
+  }, [tabValue, reloadPage, sessionStorage.getItem('PASAR_LINK_ADDRESS')]);
 
   const checkIfSignedOrNot = async () => {
     const accounts = await getWalletAccounts();
