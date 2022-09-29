@@ -615,6 +615,9 @@ export default function Rewards() {
       }
     };
     fetchData();
+    setTimeout(() => {
+      setReloadPage(!reloadPage);
+    }, 10 * 1000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabValue, reloadPage, sessionStorage.getItem('PASAR_LINK_ADDRESS')]);
 
