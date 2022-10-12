@@ -302,7 +302,7 @@ export default function Rewards() {
     const tempProgress = math.round(stakingTotalAmount === 0 ? 0 : (operAmount * 100) / stakingTotalAmount, 1);
     setAmountProgress(tempProgress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [operAmount]);
+  }, [operAmount, stakingType]);
 
   React.useEffect(() => {
     setStakingTotalAmount(stakingType === 'Stake' ? pasarBalance : stakingState?.currentStaked ?? 0);
@@ -637,7 +637,15 @@ export default function Rewards() {
       setOpenSigninEssentialDlg(true);
       return;
     }
-    if (type === 'Stake' && amount <= 0) {
+    const stakingInfo = await callTokenContractMethod({
+      contractType: 'staking',
+      callType: 'call',
+      methodName: 'getUserInfo',
+      account: accounts[0]
+    });
+    const stakingAmount =
+      type === 'Stake' ? stakingInfo.currentStaked / 1e18 - amount : stakingInfo.currentStaked / 1e18 - amount;
+    if (type === 'Stake' && stakingAmount <= 0) {
       enqueueSnackbar('Staking amount should be greater than 0', { variant: 'error' });
       return;
     }
@@ -649,20 +657,20 @@ export default function Rewards() {
         owner: accounts[0],
         spender: STAKING_CONTRACT_ADDRESS
       });
-      if (allowance / 1e18 < amount) {
+      if (allowance / 1e18 < stakingAmount) {
         await callTokenContractMethod({
           contractType: 'token',
           callType: 'send',
           methodName: 'approve',
           spender: STAKING_CONTRACT_ADDRESS,
-          amount: BigInt(amount * 1e18).toString()
+          amount: BigInt(stakingAmount * 1e18).toString()
         });
       }
       await callTokenContractMethod({
         contractType: 'staking',
         callType: 'send',
         methodName: 'stake',
-        amount: BigInt(amount * 1e18).toString()
+        amount: BigInt(stakingAmount * 1e18).toString()
       });
       enqueueSnackbar(`${type} success`, { variant: 'success' });
       window.location.reload();
@@ -1027,7 +1035,7 @@ export default function Rewards() {
                     <StyledButton
                       variant="contained"
                       sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
-                      onClick={() => handleStake(stakingType, stakingType === 'Stake' ? operAmount : 0)}
+                      onClick={() => handleStake(stakingType, operAmount)}
                     >
                       {stakingType}
                     </StyledButton>
