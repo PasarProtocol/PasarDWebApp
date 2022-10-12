@@ -1,10 +1,8 @@
 import { Icon } from '@iconify/react';
-import homeFill from '@iconify/icons-eva/home-fill';
-import fileFill from '@iconify/icons-eva/file-fill';
 import roundGrain from '@iconify/icons-ic/round-grain';
 import bookOpenFill from '@iconify/icons-eva/book-open-fill';
 // routes
-import { PATH_DOCS, PATH_PAGE } from '../../routes/paths';
+import { PATH_PAGE } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
@@ -55,7 +53,7 @@ const menuConfig = [
     icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
     path: PATH_PAGE.rewards,
     disable: false
-  },
+  }
   // {
   //   title: 'Docs',
   //   icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
