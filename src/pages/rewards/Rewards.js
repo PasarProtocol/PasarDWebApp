@@ -643,8 +643,17 @@ export default function Rewards() {
       methodName: 'getUserInfo',
       account: accounts[0]
     });
+    if (type === 'Unstake' && stakingInfo.currentStaked === 0) {
+      enqueueSnackbar('You have not participated in the stake', { variant: 'info' });
+      return;
+    }
+    if (amount === 0) {
+      enqueueSnackbar('The amount you selected is 0, please select bigger than 0', { variant: 'info' });
+      return;
+    }
     const stakingAmount =
       type === 'Stake' ? stakingInfo.currentStaked / 1e18 - amount : stakingInfo.currentStaked / 1e18 - amount;
+    console.log('========', stakingAmount)
     if (type === 'Stake' && stakingAmount <= 0) {
       enqueueSnackbar('Staking amount should be greater than 0', { variant: 'error' });
       return;
