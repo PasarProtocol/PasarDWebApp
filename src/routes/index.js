@@ -51,10 +51,10 @@ export default function Router() {
       element: <MainLayout />,
       children: [
         { path: '/', element: <MarketHome /> },
-        { path: 'explorer', element: <Explorer /> },
         {
           path: 'explorer',
           children: [
+            { path: '', element: <Explorer /> },
             { path: 'collectible', element: <Collectible /> },
             { path: 'collectible/:collection', element: <Collectible /> },
             { path: 'collectible/detail/:args', element: <CollectibleDetail /> },
@@ -62,41 +62,55 @@ export default function Router() {
             { path: 'transaction/:transaction', element: <Transaction /> },
             { path: 'transaction/detail/:address', element: <AddressDetail /> },
             { path: 'search', element: <Navigate to="/explorer/collectible" replace /> },
-            { path: 'search/:key', element: <SearchResult /> },
+            { path: 'search/:key', element: <SearchResult /> }
           ]
         },
-        { path: 'marketplace', element: <MarketExplorer /> },
         {
           path: 'marketplace',
           children: [
-            { path: 'detail/:args', element: <AuctionDlgProvider><MarketCollectibleDetail /></AuctionDlgProvider> },
+            { path: '', element: <MarketExplorer /> },
+            {
+              path: 'detail/:args',
+              element: (
+                <AuctionDlgProvider>
+                  <MarketCollectibleDetail />
+                </AuctionDlgProvider>
+              )
+            },
             { path: 'search', element: <Navigate to="/marketplace" replace /> },
-            { path: 'search/:key', element: <MarketExplorer /> },
+            { path: 'search/:key', element: <MarketExplorer /> }
           ]
         },
-        { path: 'create', element: <MintDlgProvider><CreateItem /></MintDlgProvider> },
-        { path: 'collections', element: <CollectionExplorer /> },
         {
           path: 'collections',
           children: [
+            { path: '', element: <CollectionExplorer /> },
             { path: 'detail/:collection', element: <CollectionDetail /> },
             { path: 'create', element: <CreateCollection /> },
             { path: 'import', element: <ImportCollection /> },
-            { path: 'edit', element: <EditCollection /> },
+            { path: 'edit', element: <EditCollection /> }
           ]
         },
-        { path: 'profile', element: <MyProfile /> },
         {
-          path: 'profile',
-          children: [
-            { path: 'edit', element: <EditProfile /> },
-            { path: 'myitem/:type', element: <MyProfile /> },
-            { path: 'others/:address', element: <MyItems /> },
-          ]
+          path: 'create',
+          element: (
+            <MintDlgProvider>
+              <CreateItem />
+            </MintDlgProvider>
+          )
         },
         { path: 'activity', element: <Activity /> },
         { path: 'features', element: <Features /> },
         { path: 'rewards', element: <Rewards /> },
+        {
+          path: 'profile',
+          children: [
+            { path: '', element: <MyProfile /> },
+            { path: 'edit', element: <EditProfile /> },
+            { path: 'myitem/:type', element: <MyProfile /> },
+            { path: 'others/:address', element: <MyItems /> }
+          ]
+        }
       ]
     },
     { path: '*', element: <Navigate to="/404" replace /> }
