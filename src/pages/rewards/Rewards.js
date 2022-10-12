@@ -218,6 +218,7 @@ export default function Rewards() {
   const { enqueueSnackbar } = useSnackbar();
   const { setOpenSigninEssentialDlg } = useSignin();
   const [tabValue, setTabValue] = React.useState(0);
+  const [stakingTotalAmount, setStakingTotalAmount] = React.useState(0);
   const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
   const [amountProgress, setAmountProgress] = React.useState(0);
@@ -281,27 +282,31 @@ export default function Rewards() {
   const handleProgressBtn = (event) => {
     const progressType = event.target.value;
     setAmountProgress(progressType * 25);
-    setOperAmount(math.round((pasarBalance * progressType) / 4, 4));
+    setOperAmount(math.round((stakingTotalAmount * progressType) / 4, 4));
   };
 
   const handleChangeAmount = (event) => {
     let amountValue = event.target.value;
     amountValue = removeLeadingZero(amountValue);
     if (amountValue < 0) return;
-    if (amountValue * 1 > pasarBalance) return;
+    if (amountValue * 1 > stakingTotalAmount) return;
     setOperAmount(math.round(amountValue * 1, 4).toString());
   };
 
   const handleChangeSlider = (event, newValue) => {
     setAmountProgress(newValue);
-    setOperAmount(math.round((pasarBalance * newValue) / 100, 4));
+    setOperAmount(math.round((stakingTotalAmount * newValue) / 100, 4));
   };
 
   React.useEffect(() => {
-    const tempProgress = math.round(pasarBalance === 0 ? 0 : (operAmount * 100) / pasarBalance, 1);
+    const tempProgress = math.round(stakingTotalAmount === 0 ? 0 : (operAmount * 100) / stakingTotalAmount, 1);
     setAmountProgress(tempProgress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [operAmount]);
+
+  React.useEffect(() => {
+    setStakingTotalAmount(stakingType === 'Stake' ? pasarBalance : stakingState?.currentStaked ?? 0);
+  }, [pasarBalance, stakingType, stakingState]);
 
   const fetchListedItemCount = async (quoteToken) => {
     try {
