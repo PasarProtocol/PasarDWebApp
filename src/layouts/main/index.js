@@ -24,7 +24,7 @@ function ScrollTop(props) {
     threshold: 100,
   });
 
-  const handleClick = (event) => {
+  const handleClick = () => {
     window.scrollTo({
       top: 0, 
       behavior: 'smooth'

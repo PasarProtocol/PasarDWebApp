@@ -1,8 +1,8 @@
-import React from 'react'
+import React from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
-import { Box, Button, AppBar, Toolbar, Container, Tooltip, Alert, IconButton, Collapse, Link } from '@mui/material';
+import { Box, Button, AppBar, Toolbar, Container, Alert, IconButton, Collapse } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import CloseIcon from '@mui/icons-material/Close';
@@ -14,7 +14,7 @@ import useSignin from '../../hooks/useSignin';
 import { MHidden } from '../../components/@material-extend';
 import SearchBox from '../../components/SearchBox';
 import Searchbar from '../../components/Searchbar';
-import NetworkCircle from '../../components/NetworkCircle'
+import NetworkCircle from '../../components/NetworkCircle';
 import SignInDialog from '../../components/signin-dlg/SignInDialog';
 //
 import MenuDesktop from './MenuDesktop';
@@ -53,13 +53,13 @@ const ToolbarShadowStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function MainNavbar() {
-  const {openTopAlert, setOpenTopAlert} = useSignin()
+  const { openTopAlert, setOpenTopAlert } = useSignin();
   const isOffset = useOffSetTop(40);
   const { pathname } = useLocation();
   const { themeMode, changeMode } = useSettings();
   const isLight = themeMode === 'light';
-  const isHome = pathname === '/explorer';
-  const isMarketHome = pathname === '' || pathname === '/';
+  const isExplorer = pathname === '/explorer';
+  const isHome = pathname === '' || pathname === '/';
   const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
 
   return (
@@ -79,9 +79,10 @@ export default function MainNavbar() {
               <CloseIcon fontSize="inherit" />
             </IconButton>
           }
-          sx={{borderRadius: 0}}
+          sx={{ borderRadius: 0 }}
         >
-          If you have any existing NFTs listed on the old marketplace contract (Pasar V1), we encourage you to relist them on the new marketplace contract (Pasar V2).
+          If you have any existing NFTs listed on the old marketplace contract (Pasar V1), we encourage you to relist
+          them on the new marketplace contract (Pasar V2).
         </Alert>
       </Collapse>
       <ToolbarStyle
@@ -101,62 +102,66 @@ export default function MainNavbar() {
             justifyContent: 'space-between'
           }}
         >
-          {
-            !isMarketHome?
+          {isHome ? (
+            <Box draggable={false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
+          ) : (
             <>
               <MHidden width="mdUp">
                 <Searchbar />
               </MHidden>
-              {
-                !isHome&&
+              {!isExplorer && (
                 <MHidden width="mdDown">
                   <RouterLink to="/">
-                    <Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
+                    <Box
+                      draggable={false}
+                      component="img"
+                      src="/static/logo-sm.svg"
+                      sx={{ minWidth: 140, width: 140 }}
+                    />
                   </RouterLink>
-                  <SearchBox sx={{flexGrow: 1, width: '100%'}} needbgcolor={!isOffset && isMarketHome} needAutocomplete={Boolean(true)}/>
+                  <SearchBox
+                    sx={{ flexGrow: 1, width: '100%' }}
+                    needbgcolor={!isOffset && isHome}
+                    needAutocomplete={Boolean(true)}
+                  />
                 </MHidden>
-              }
-            </>:
-            <Box draggable = {false} component="img" src="/static/logo-sm.svg" sx={{ minWidth: 140, width: 140 }} />
-          }
-          {
-            isHome||isMarketHome?
-            <Box sx={{ flexGrow: 1 }} />:
+              )}
+            </>
+          )}
+          {isExplorer || isHome ? (
+            <Box sx={{ flexGrow: 1 }} />
+          ) : (
             <MHidden width="mdUp">
               <Box sx={{ flexGrow: 1 }} />
             </MHidden>
-          }
+          )}
           <MHidden width="mdDown">
-            <MenuDesktop
-              isOffset={isOffset}
-              isHome={isHome}
-              navConfig={navConfig}
-            />
+            <MenuDesktop isOffset={isOffset} isHome={isExplorer} navConfig={navConfig} />
           </MHidden>
-          <SignInDialog/>
-          {
-            !!sessionLinkFlag && <NetworkCircle/>
-          }
+          <SignInDialog />
+          {!!sessionLinkFlag && <NetworkCircle />}
           <MHidden width="mdDown">
             <Button
               variant="outlined"
               value="light"
-              onClick={(e)=>{changeMode(isLight?"dark":"light")}}
-              sx={{ padding: 0, minWidth: 40, height: 40, borderRadius: '100%', ml: 1, color: 'text.primary', borderColor: (theme)=>theme.palette.grey[500_32] }}
+              onClick={() => {
+                changeMode(isLight ? 'dark' : 'light');
+              }}
+              sx={{
+                padding: 0,
+                minWidth: 40,
+                height: 40,
+                borderRadius: '100%',
+                ml: 1,
+                color: 'text.primary',
+                borderColor: (theme) => theme.palette.grey[500_32]
+              }}
             >
-              {
-                isLight?
-                <LightModeIcon/>:
-                <DarkModeIcon/>
-              }
+              {isLight ? <LightModeIcon /> : <DarkModeIcon />}
             </Button>
           </MHidden>
           <MHidden width="mdUp">
-            <MenuMobile
-              isOffset={isOffset}
-              isHome={isHome}
-              navConfig={navConfig}
-            />
+            <MenuMobile isOffset={isOffset} isHome={isExplorer} navConfig={navConfig} />
           </MHidden>
         </Container>
       </ToolbarStyle>
