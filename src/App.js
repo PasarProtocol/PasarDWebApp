@@ -3,25 +3,21 @@ import Router from './routes';
 // theme
 import ThemeConfig from './theme';
 import GlobalStyles from './theme/globalStyles';
-// hooks
-import useAuth from './hooks/useAuth';
 // components
 import NotistackProvider from './components/NotistackProvider';
 import ThemePrimaryColor from './components/ThemePrimaryColor';
 import ThemeLocalization from './components/ThemeLocalization';
-import LoadingScreen, { ProgressBarStyle } from './components/LoadingScreen';
+import { ProgressBarStyle } from './components/LoadingScreen';
 
 // ----------------------------------------------------------------------
 
 export default function App() {
-  // const { isInitialized } = useAuth();
-
   if (document.addEventListener) {
     document.addEventListener('contextmenu', (event) => {
       event.preventDefault();
     });
   } else {
-    document.attachEvent('oncontextmenu', (event) => {
+    document.attachEvent('oncontextmenu', () => {
       window.event.returnValue = false;
     });
   }
@@ -42,11 +38,10 @@ export default function App() {
     // Prevent Ctrl+Shift+I = disabled debugger console using keys open
     if (event.ctrlKey && event.shiftKey && event.keyCode === 73){
       event.preventDefault();
-      return false;
     }
   });
   
-  document.addEventListener("wheel", (event) => {  
+  document.addEventListener("wheel", () => {  
     if (document.activeElement.type === "number") {  
       document.activeElement.blur();  
     }  
@@ -60,7 +55,6 @@ export default function App() {
               <GlobalStyles />
               <ProgressBarStyle />
               <Router />
-              {/* {isInitialized ? <Router /> : <LoadingScreen />} */}
             </NotistackProvider>
         </ThemeLocalization>
       </ThemePrimaryColor>

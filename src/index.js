@@ -1,6 +1,3 @@
-// mock api
-// import './_apis_';
-
 // highlight
 import './utils/highlight';
 
@@ -30,31 +27,11 @@ import 'lazysizes/plugins/parent-fit/ls.parent-fit';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { Provider as ReduxProvider } from 'react-redux';
-import { PersistGate } from 'redux-persist/lib/integration/react';
-import { Web3ReactProvider } from '@web3-react/core'
-import { Web3Provider } from "@ethersproject/providers";
-// material
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-// redux
-import { store, persistor } from './redux/store';
-// contexts
+import { Web3ReactProvider } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
 import { SigninProvider } from './contexts/SigninContext';
 import { SettingsProvider } from './contexts/SettingsContext';
-import { CollapseDrawerProvider } from './contexts/CollapseDrawerContext';
-// components
-import LoadingScreen from './components/LoadingScreen';
-
-import { AuthProvider } from './contexts/JWTContext';
-// import { AuthProvider } from './contexts/FirebaseContext';
-// import { AuthProvider } from './contexts/AwsCognitoContext';
-// import { AuthProvider } from './contexts/Auth0Context';
-
-//
 import App from './App';
-// import * as serviceWorkerRegistration from './serviceWorkerRegistration';
-// import reportWebVitals from './reportWebVitals';
 
 // ----------------------------------------------------------------------
 const getLibrary = (provider) => {
@@ -65,17 +42,15 @@ const getLibrary = (provider) => {
 
 ReactDOM.render(
   <HelmetProvider>
-    {/* <ReduxProvider store={store}> */}
-      <SettingsProvider>
-        <SigninProvider>
-          <BrowserRouter>
-            <Web3ReactProvider getLibrary={getLibrary}>
-              <App />
-            </Web3ReactProvider>
-          </BrowserRouter>
-        </SigninProvider>
-      </SettingsProvider>
-    {/* </ReduxProvider> */}
+    <SettingsProvider>
+      <SigninProvider>
+        <BrowserRouter>
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <App />
+          </Web3ReactProvider>
+        </BrowserRouter>
+      </SigninProvider>
+    </SettingsProvider>
   </HelmetProvider>,
   document.getElementById('root')
 );
