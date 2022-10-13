@@ -3,23 +3,51 @@ import PropTypes from 'prop-types';
 import * as math from 'mathjs';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import {
-  Container, Box, Stack, Grid, Typography, Paper, Divider, Link, Tooltip, Button, Tabs, Tab, Accordion, AccordionSummary, AccordionDetails,
-  ToggleButtonGroup, ToggleButton, FormGroup, TextField, Slider
+  Container,
+  Box,
+  Stack,
+  Grid,
+  Typography,
+  Paper,
+  Divider,
+  Link,
+  Tooltip,
+  Button,
+  Tabs,
+  Tab,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  ToggleButtonGroup,
+  ToggleButton,
+  FormGroup,
+  TextField,
+  Slider
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Icon } from '@iconify/react';
-import Web3 from 'web3';
 import { useSnackbar } from 'notistack';
 
 // components
 import Page from '../../components/Page';
 import TabPanel from '../../components/TabPanel';
 import StyledButton from '../../components/signin-dlg/StyledButton';
-import StatisticPanel from '../../components/rewards/StatisticPanel'
+import StatisticPanel from '../../components/rewards/StatisticPanel';
 import { MHidden } from '../../components/@material-extend';
-import { addTokenToMM, callTokenContractMethod, fetchFrom, getERC20TokenPrice, isInAppBrowser, removeLeadingZero } from '../../utils/common'
-import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
-import { blankAddress, pasarERC20Contract as PASAR_TOKEN_ADDRESS } from '../../config';
+import {
+  addTokenToMM,
+  callTokenContractMethod,
+  fetchFrom,
+  getERC20TokenPrice,
+  getWalletAccounts,
+  removeLeadingZero
+} from '../../utils/common';
+import useSignin from '../../hooks/useSignin';
+import {
+  blankAddress,
+  pasarERC20Contract as PASAR_TOKEN_ADDRESS,
+  pasarStakingContract as STAKING_CONTRACT_ADDRESS
+} from '../../config';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -35,8 +63,8 @@ const RootStyle = styled(Page)(({ theme }) => ({
 const SectionSx = {
   border: '1px solid',
   borderColor: 'action.disabledBackground',
-  boxShadow: (theme) => theme.customShadows.z1,
-}
+  boxShadow: (theme) => theme.customShadows.z1
+};
 const StackStyle = styled(Stack)(({ theme }) => ({
   flexDirection: 'row',
   [theme.breakpoints.down('sm')]: {
@@ -49,16 +77,16 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
   boxShadow: theme.customShadows.z1,
   [theme.breakpoints.up('xl')]: {
     paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
+    paddingRight: theme.spacing(2)
     // paddingTop: theme.spacing(1),
     // paddingBottom: theme.spacing(1)
   },
   [theme.breakpoints.up('sm')]: {
     paddingLeft: theme.spacing(4),
-    paddingRight: theme.spacing(4),
+    paddingRight: theme.spacing(4)
     // paddingTop: theme.spacing(2),
     // paddingBottom: theme.spacing(2)
-  },
+  }
 }));
 const EarnedValueStyle = styled(Typography)(({ theme }) => ({
   backgroundImage: 'linear-gradient(90deg, #FF5082, #a951f4)',
@@ -69,19 +97,19 @@ const EarnedValueStyle = styled(Typography)(({ theme }) => ({
   MozBackgroundClip: 'text',
   MozTextFillColor: 'transparent',
   display: 'inline'
-}))
+}));
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   '& .MuiToggleButtonGroup-grouped': {
     border: 0,
     '&.Mui-disabled': {
-      border: 0,
+      border: 0
     },
     '&:not(:first-of-type)': {
-      borderRadius: theme.shape.borderRadius / 2,
+      borderRadius: theme.shape.borderRadius / 2
     },
     '&:first-of-type': {
-      borderRadius: theme.shape.borderRadius / 2,
-    },
+      borderRadius: theme.shape.borderRadius / 2
+    }
   },
   '& .MuiToggleButton-root': {
     margin: theme.spacing(1),
@@ -104,25 +132,29 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
   '& fieldset': {
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0
-  },
+  }
 }));
 const StyledSlider = styled(Slider)(({ theme }) => ({
   // color: 'blue',
   marginTop: 8,
-  "& .MuiSlider-thumb": {
-    backgroundColor: '#5159ff',
+  '& .MuiSlider-thumb': {
+    backgroundColor: '#5159ff'
   },
-  "& .MuiSlider-track": {
+  '& .MuiSlider-track': {
     background: `linear-gradient(90deg, #DB59A0 0%, #6A70FA 100%);`,
     height: 10,
     border: 0
   },
-  "& .MuiSlider-rail": {
+  '& .MuiSlider-rail': {
     color: 'grey',
     height: 10
   }
 }));
-const PinkLabel = ({ text }) => (<Typography variant="body2" color='origin.main' sx={{ display: 'inline' }}>{text}</Typography>)
+const PinkLabel = ({ text }) => (
+  <Typography variant="body2" color="origin.main" sx={{ display: 'inline' }}>
+    {text}
+  </Typography>
+);
 const PaperStyle = (props) => (
   <Paper
     sx={{
@@ -133,14 +165,16 @@ const PaperStyle = (props) => (
   >
     {props.children}
   </Paper>
-)
+);
 
 const ClaimCard = ({ item, onClick }) => (
   <PaperStyle>
-    <Typography variant="h3" align="center">{item.title}</Typography>
+    <Typography variant="h3" align="center">
+      {item.title}
+    </Typography>
     <Typography variant="h5" component="div" align="center" sx={{ pb: 2 }}>
       {item.action} item, earn{' '}
-      <Typography variant="h5" color='origin.main' sx={{ display: 'inline' }}>
+      <Typography variant="h5" color="origin.main" sx={{ display: 'inline' }}>
         PASAR
       </Typography>{' '}
       <Icon icon="eva:info-outline" style={{ marginBottom: -4 }} />
@@ -148,102 +182,181 @@ const ClaimCard = ({ item, onClick }) => (
     <Divider sx={{ mx: '-20px' }} />
     <Box sx={{ maxWidth: 300, py: 4, m: 'auto' }}>
       <Typography variant="h3" component="div">
-        <Typography variant="h3" color='origin.main' sx={{ display: 'inline' }}>PASAR</Typography>{' '}earned
+        <Typography variant="h3" color="origin.main" sx={{ display: 'inline' }}>
+          PASAR
+        </Typography>{' '}
+        earned
       </Typography>
       <EarnedValueStyle variant="h2" sx={{ display: 'inline-flex' }}>
         {item.amount}
       </EarnedValueStyle>
-      <Typography variant="body2" color='text.secondary'>{`≈ USD ${item.price}`}</Typography>
-      <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-        <div><StyledButton variant="contained" sx={{ mt: 3, width: '100%' }} onClick={onClick}>Claim</StyledButton></div>
-      </Tooltip>
+      <Typography variant="body2" color="text.secondary">{`≈ USD ${item.price}`}</Typography>
+      <StyledButton variant="contained" sx={{ mt: 3, width: '100%' }} onClick={onClick}>
+        Claim
+      </StyledButton>
     </Box>
   </PaperStyle>
-)
+);
 
 ClaimCard.propTypes = {
   item: PropTypes.object,
   onClick: PropTypes.func
-}
+};
 
 const ExternalLink = (props) => {
-  const { linkURL, title } = props
-  return <Link
-    underline="always"
-    href={linkURL}
-    target="_blank"
-    color="text.secondary"
-  >
-    {title}
-  </Link>
-}
+  const { linkURL, title } = props;
+  return (
+    <Link underline="always" href={linkURL} target="_blank" color="text.secondary">
+      {title}
+    </Link>
+  );
+};
 
-const AmountProgressType = ['25%', '50%', '75%', 'Max']
+const AmountProgressType = ['25%', '50%', '75%', 'Max'];
 
 export default function Rewards() {
   const { enqueueSnackbar } = useSnackbar();
+  const { setOpenSigninEssentialDlg } = useSignin();
   const [tabValue, setTabValue] = React.useState(0);
-  const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
+  const [operAmount, setOperAmount] = React.useState(0);
   const [amountProgress, setAmountProgress] = React.useState(0);
+  const [stakingTotalAmount, setStakingTotalAmount] = React.useState(0);
+  const [stakingSettleAmount, setStakingSettleAmount] = React.useState(0);
+  const cachedPool = JSON.parse(sessionStorage.getItem('REWARD_POOL'));
+  const cachedUser = JSON.parse(sessionStorage.getItem('REWARD_USER'));
   const [PASARToUSD, setPASARToUSD] = React.useState(0.01);
-  const [miningReward, setMiningReward] = React.useState({
-    all: { total: 0, withdrawable: 0, withdrawn: 0 },
-    buyer: { total: 0, withdrawable: 0, withdrawn: 0 },
-    seller: { total: 0, withdrawable: 0, withdrawn: 0 },
-    creator: { total: 0, withdrawable: 0, withdrawn: 0 }
-  });
-  const [claimItems, setClaimItems] = React.useState([
-    { title: "BUYERS", action: "Buy", name: 'buyer', amount: 0, price: 0 },
-    { title: "SELLERS", action: "Sell", name: 'seller', amount: 0, price: 0 },
-    { title: "CREATORS", action: "Create", name: 'creator', amount: 0, price: 0 }
-  ]);
-  const [listedItemCnt, setListedItemCnt] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
-  const [miningPoolRatio, setMiningPoolRatio] = React.useState({ native: 0, pasar: 0, eco: 0, other: 0 });
+  const [miningReward, setMiningReward] = React.useState(
+    cachedUser?.mining
+      ? cachedUser.mining
+      : {
+          all: { total: 0, withdrawable: 0, withdrawn: 0 },
+          buyer: { total: 0, withdrawable: 0, withdrawn: 0 },
+          seller: { total: 0, withdrawable: 0, withdrawn: 0 },
+          creator: { total: 0, withdrawable: 0, withdrawn: 0 }
+        }
+  );
+  const [claimItems, setClaimItems] = React.useState(
+    cachedUser?.claim
+      ? cachedUser.claim
+      : [
+          { title: 'BUYERS', action: 'Buy', name: 'buyer', amount: 0, price: 0 },
+          { title: 'SELLERS', action: 'Sell', name: 'seller', amount: 0, price: 0 },
+          { title: 'CREATORS', action: 'Create', name: 'creator', amount: 0, price: 0 }
+        ]
+  );
+  const [listedItemCnt, setListedItemCnt] = React.useState(
+    cachedPool?.item ? cachedPool.item : { native: 0, pasar: 0, eco: 0, other: 0 }
+  );
+  const [miningPoolRatio, setMiningPoolRatio] = React.useState(
+    cachedPool?.pool ? cachedPool.pool : { native: 0, pasar: 0, eco: 0, other: 0 }
+  );
+  const [userRewarded, setUserRewarded] = React.useState(
+    cachedPool?.user ? cachedPool.user : { elaCount: 0, pasarCount: 0, ecoCount: 0, otherCount: 0 }
+  );
+  const [nextDistribution, setNextDistribution] = React.useState(
+    cachedPool?.next ? cachedPool.next : { native: 0, pasar: 0, eco: 0, other: 0 }
+  );
   const [pasarBalance, setPasarBalance] = React.useState(0);
-  const [stakingAPR, setStakingAPR] = React.useState(48.48);
-  const [stakingState, setStakingState] = React.useState({ currentStaked: 0, rewardWithdrawable: 0, rewardWithdrawn: 0, rewardFeePaid: 0, feeEndTime: 0 });
-  const walletConnectWeb3 = new Web3(isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider());
+  const [stakingAPR, setStakingAPR] = React.useState(cachedUser?.apr ? cachedUser.apr : 0.0);
+  const [stakingState, setStakingState] = React.useState(
+    cachedUser?.staking
+      ? cachedUser.staking
+      : {
+          currentStaked: 0,
+          rewardWithdrawable: 0,
+          rewardWithdrawn: 0,
+          rewardFeePaid: 0,
+          feeEndTime: 0
+        }
+  );
+  const [reloadPage, setReloadPage] = React.useState(false);
 
-  const handleSwitchTab = (event, newValue) => {
-    setTabValue(newValue);
-  };
-
-  const handleStakingType = (event, type) => {
+  const handleStakingType = (_, type) => {
     if (type) setStakingType(type);
+    setAmountProgress(0);
+    setOperAmount(0);
   };
 
   const handleProgressBtn = (event) => {
-    const progressType = event.target.value
-    setAmountProgress(progressType * 25)
-    setOperAmount(math.round(pasarBalance * progressType / 4, 4))
-  }
+    const progressType = event.target.value;
+    setAmountProgress(progressType * 25);
+    const offsetAmount = math.round((stakingTotalAmount * progressType) / 4, 4);
+    setOperAmount(offsetAmount);
+    if (progressType === 4) {
+      if (stakingType === 'Stake') setStakingSettleAmount(pasarBalance);
+      else if (stakingType === 'Unstake') setStakingSettleAmount(0);
+    } else {
+      let totalStaked = BigInt(stakingState?.currentStaked ?? 0);
+      if (stakingType === 'Stake') totalStaked = BigInt(totalStaked) + BigInt(offsetAmount);
+      else if (stakingType === 'Unstake') totalStaked = BigInt(totalStaked) - BigInt(offsetAmount);
+      setStakingSettleAmount(totalStaked);
+    }
+  };
 
   const handleChangeAmount = (event) => {
-    let amountValue = event.target.value
-    amountValue = removeLeadingZero(amountValue)
-    if (amountValue < 0)
-      return
-    if (amountValue * 1 > pasarBalance)
-      return;
-    setOperAmount(math.round(amountValue * 1, 4).toString())
+    let amountValue = event.target.value;
+    amountValue = removeLeadingZero(amountValue);
+    if (amountValue < 0) return;
+    if (amountValue * 1 > stakingTotalAmount) return;
+    const offsetAmount = math.round(amountValue * 1, 4).toString();
+    setOperAmount(offsetAmount);
+    let totalStaked = BigInt(stakingState?.currentStaked ?? 0);
+    if (stakingType === 'Stake') totalStaked = BigInt(totalStaked) + BigInt(offsetAmount);
+    else if (stakingType === 'Unstake') totalStaked = BigInt(totalStaked) - BigInt(offsetAmount);
+    setStakingSettleAmount(totalStaked);
   };
 
   const handleChangeSlider = (event, newValue) => {
     setAmountProgress(newValue);
-    setOperAmount(math.round(pasarBalance * newValue / 100, 4))
+    const offsetAmount = math.round((stakingTotalAmount * newValue) / 100, 4);
+    setOperAmount(offsetAmount);
+    if (newValue === 100) {
+      if (stakingType === 'Stake') setStakingSettleAmount(pasarBalance);
+      else if (stakingType === 'Unstake') setStakingSettleAmount(0);
+    } else {
+      let totalStaked = BigInt(stakingState?.currentStaked ?? 0);
+      if (stakingType === 'Stake') totalStaked = BigInt(totalStaked) + BigInt(offsetAmount);
+      else if (stakingType === 'Unstake') totalStaked = BigInt(totalStaked) - BigInt(offsetAmount);
+      setStakingSettleAmount(totalStaked);
+    }
   };
 
   React.useEffect(() => {
-    const tempProgress = math.round(pasarBalance === 0 ? 0 : operAmount * 100 / pasarBalance, 1)
-    setAmountProgress(tempProgress)
+    const tempProgress = math.round(
+      stakingTotalAmount.toString() === '0' ? 0 : (operAmount * 100) / stakingTotalAmount,
+      1
+    );
+    setAmountProgress(tempProgress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [operAmount]);
+  }, [operAmount, stakingType]);
+
+  React.useEffect(() => {
+    setStakingTotalAmount(stakingType === 'Stake' ? pasarBalance : stakingState?.currentStaked ?? 0);
+  }, [pasarBalance, stakingType, stakingState]);
 
   const fetchListedItemCount = async (quoteToken) => {
-    const response = await fetchFrom(`api/v2/sticker/getDetailedCollectibles?collectionType=&tokenType=${quoteToken}&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=1&keyword=&pageNum=1&pageSize=1`);
-    const json = await response.json();
-    return json && json.data && json.data.total ? json.data.total : 0;
+    try {
+      const response = await fetchFrom(
+        `api/v2/sticker/getDetailedCollectibles?collectionType=&tokenType=${quoteToken}&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=1&keyword=&pageNum=1&pageSize=1`
+      );
+      const json = await response.json();
+      return json && json.data && json.data.total ? json.data.total : 0;
+    } catch (err) {
+      console.error(err);
+      return 0;
+    }
+  };
+
+  const fetchRewardedUserCount = async () => {
+    try {
+      const response = await fetchFrom(`api/v2/sticker/rewardusers`);
+      const json = await response.json();
+      return json && json.data ? json.data : { ecoCount: 0, elaCount: 0, otherCount: 0, pasarCount: 0 };
+    } catch (err) {
+      console.error(err);
+      return { ecoCount: 0, elaCount: 0, otherCount: 0, pasarCount: 0 };
+    }
   };
 
   React.useEffect(() => {
@@ -251,50 +364,371 @@ export default function Rewards() {
       const resPasarPrice = await getERC20TokenPrice(PASAR_TOKEN_ADDRESS);
       if (!resPasarPrice || !resPasarPrice.token) setPASARToUSD(0);
       else setPASARToUSD(resPasarPrice.token.derivedELA * resPasarPrice.bundle.elaPrice);
-      const accounts = await walletConnectWeb3.eth.getAccounts();
-      if (!accounts.length) return;
-      const balance = await callTokenContractMethod(walletConnectWeb3, { contractType: 'token', callType: 'call', methodName: 'balanceOf', account: accounts[0] });
-      setPasarBalance(balance);
-      if (tabValue === 0) { // rewards page
-        const accountRewards = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'accountRewards', account: accounts[0] });
-        const poolConfig = await callTokenContractMethod(walletConnectWeb3, {contractType: 'mining', callType: 'call', methodName: 'config'});
-        const listedNativeCnt = await fetchListedItemCount(blankAddress);
-        const listedPasarCnt = await fetchListedItemCount(PASAR_TOKEN_ADDRESS);
-        const listedEcoCnt = await fetchListedItemCount(poolConfig.ecoToken);
-        const listedOtherCnt = (await fetchListedItemCount('')) - listedNativeCnt - listedPasarCnt - listedEcoCnt;
-        const currentRatios = await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'call', methodName: 'getCurrentRatios' });
-        setMiningReward(accountRewards);
-        setListedItemCnt({ native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt });
-        setMiningPoolRatio({ native: parseInt(currentRatios.native, 10) / 1e4, pasar: parseInt(currentRatios.pasar, 10) / 1e4, eco: parseInt(currentRatios.eco, 10) / 1e4, other: parseInt(currentRatios.other, 10) / 1e4 });
-        setClaimItems([
-          { title: "BUYERS", action: "Buy", name: "buyer", amount: accountRewards.buyer.withdrawable, price: accountRewards.buyer.withdrawable * PASARToUSD },
-          { title: "SELLERS", action: "Sell", name: "seller", amount: accountRewards.seller.withdrawable, price: accountRewards.seller.withdrawable * PASARToUSD },
-          { title: "CREATORS", action: "Create", name: "creator", amount: accountRewards.creator.withdrawable, price: accountRewards.creator.withdrawable * PASARToUSD }
-        ]);
+      const accounts = await getWalletAccounts();
+      if (accounts.length) {
+        const balance = await callTokenContractMethod({
+          contractType: 'token',
+          callType: 'call',
+          methodName: 'balanceOf',
+          account: accounts[0]
+        });
+        setPasarBalance(balance);
       }
-      else { // staking page
-        const stakingInfo = await await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'call', methodName: 'getUserInfo', account: accounts[0] });
-        setStakingState(stakingInfo);
+      // rewards page
+      const poolConfig = await callTokenContractMethod({
+        contractType: 'mining',
+        callType: 'call',
+        methodName: 'config'
+      });
+      const rewardedUsers = await fetchRewardedUserCount();
+      const listedNativeCnt = await fetchListedItemCount(blankAddress);
+      const listedPasarCnt = await fetchListedItemCount(PASAR_TOKEN_ADDRESS);
+      const listedEcoCnt = await fetchListedItemCount(poolConfig.ecoToken);
+      const listedOtherCnt = (await fetchListedItemCount('')) - listedNativeCnt - listedPasarCnt - listedEcoCnt;
+      const currentRatios = await callTokenContractMethod({
+        contractType: 'mining',
+        callType: 'call',
+        methodName: 'getCurrentRatios'
+      });
+      const nextMiningReward = await callTokenContractMethod({
+        contractType: 'mining',
+        callType: 'call',
+        methodName: 'pendingRewards'
+      });
+      setListedItemCnt({ native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt });
+      setMiningPoolRatio({
+        native: parseInt(currentRatios.native, 10) / 1e4,
+        pasar: parseInt(currentRatios.pasar, 10) / 1e4,
+        eco: parseInt(currentRatios.eco, 10) / 1e4,
+        other: parseInt(currentRatios.other, 10) / 1e4
+      });
+      setUserRewarded(rewardedUsers);
+      setNextDistribution({
+        native: parseInt(nextMiningReward.native, 10) / 1e18,
+        pasar: parseInt(nextMiningReward.pasar, 10) / 1e18,
+        eco: parseInt(nextMiningReward.eco, 10) / 1e18,
+        other: parseInt(nextMiningReward.other, 10) / 1e18
+      });
+      sessionStorage.setItem(
+        'REWARD_POOL',
+        JSON.stringify({
+          item: { native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt },
+          pool: {
+            native: parseInt(currentRatios.native, 10) / 1e4,
+            pasar: parseInt(currentRatios.pasar, 10) / 1e4,
+            eco: parseInt(currentRatios.eco, 10) / 1e4,
+            other: parseInt(currentRatios.other, 10) / 1e4
+          },
+          user: rewardedUsers,
+          next: {
+            native: parseInt(nextMiningReward.native, 10) / 1e18,
+            pasar: parseInt(nextMiningReward.pasar, 10) / 1e18,
+            eco: parseInt(nextMiningReward.eco, 10) / 1e18,
+            other: parseInt(nextMiningReward.other, 10) / 1e18
+          }
+        })
+      );
+      if (accounts.length) {
+        const accountRewards = await callTokenContractMethod({
+          contractType: 'mining',
+          callType: 'call',
+          methodName: 'accountRewards',
+          account: accounts[0]
+        });
+        setMiningReward({
+          all: {
+            total: accountRewards.all.total / 1e18,
+            withdrawable: accountRewards.all.withdrawable / 1e18,
+            withdrawn: accountRewards.all.withdrawn / 1e18
+          },
+          buyer: {
+            total: accountRewards.buyer.total / 1e18,
+            withdrawable: accountRewards.buyer.withdrawable / 1e18,
+            withdrawn: accountRewards.buyer.withdrawn / 1e18
+          },
+          seller: {
+            total: accountRewards.seller.total / 1e18,
+            withdrawable: accountRewards.seller.withdrawable / 1e18,
+            withdrawn: accountRewards.seller.withdrawn / 1e18
+          },
+          creator: {
+            total: accountRewards.creator.total / 1e18,
+            withdrawable: accountRewards.creator.withdrawable / 1e18,
+            withdrawn: accountRewards.creator.withdrawn / 1e18
+          }
+        });
+        setClaimItems([
+          {
+            title: 'BUYERS',
+            action: 'Buy',
+            name: 'buyer',
+            amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(4),
+            price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(4)
+          },
+          {
+            title: 'SELLERS',
+            action: 'Sell',
+            name: 'seller',
+            amount: (accountRewards.seller.withdrawable / 1e18).toFixed(4),
+            price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(4)
+          },
+          {
+            title: 'CREATORS',
+            action: 'Create',
+            name: 'creator',
+            amount: (accountRewards.creator.withdrawable / 1e18).toFixed(4),
+            price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(4)
+          }
+        ]);
+        // staking page
+        const stakingInfo = await callTokenContractMethod({
+          contractType: 'staking',
+          callType: 'call',
+          methodName: 'getUserInfo',
+          account: accounts[0]
+        });
+        setStakingState({
+          currentStaked: stakingInfo.currentStaked,
+          rewardWithdrawable: stakingInfo.rewardWithdrawable,
+          rewardWithdrawn: stakingInfo.rewardWithdrawn,
+          rewardFeePaid: stakingInfo.rewardFeePaid,
+          feeEndTime: stakingInfo.feeEndTime
+        });
+        // get APR
+        const days = 360;
+        const currentTime = parseInt(
+          await callTokenContractMethod({
+            contractType: 'staking',
+            callType: 'call',
+            methodName: 'getCurrentTime'
+          }),
+          10
+        );
+        const rewardTime = parseInt(currentTime + days * 3600 * 24, 10);
+        const rewardTotal =
+          parseInt(
+            await callTokenContractMethod({
+              contractType: 'staking',
+              callType: 'call',
+              methodName: 'totalRewardAtTime',
+              timestamp: rewardTime
+            }),
+            10
+          ) -
+          parseInt(
+            await callTokenContractMethod({
+              contractType: 'staking',
+              callType: 'call',
+              methodName: 'totalRewardAtTime',
+              timestamp: currentTime
+            }),
+            10
+          );
+        const annualReward = (rewardTotal * 365) / days;
+        let rate = 0;
+        if (stakingInfo.currentStaked > 0) {
+          rate = (annualReward * 1000000) / stakingInfo.currentStaked;
+        }
+        const APR = parseInt(rate, 10) / 1000000;
+        setStakingAPR((APR * 100).toFixed(4));
+
+        sessionStorage.setItem(
+          'REWARD_USER',
+          JSON.stringify({
+            mining: {
+              all: {
+                total: accountRewards.all.total / 1e18,
+                withdrawable: accountRewards.all.withdrawable / 1e18,
+                withdrawn: accountRewards.all.withdrawn / 1e18
+              },
+              buyer: {
+                total: accountRewards.buyer.total / 1e18,
+                withdrawable: accountRewards.buyer.withdrawable / 1e18,
+                withdrawn: accountRewards.buyer.withdrawn / 1e18
+              },
+              seller: {
+                total: accountRewards.seller.total / 1e18,
+                withdrawable: accountRewards.seller.withdrawable / 1e18,
+                withdrawn: accountRewards.seller.withdrawn / 1e18
+              },
+              creator: {
+                total: accountRewards.creator.total / 1e18,
+                withdrawable: accountRewards.creator.withdrawable / 1e18,
+                withdrawn: accountRewards.creator.withdrawn / 1e18
+              }
+            },
+            staking: {
+              currentStaked: stakingInfo.currentStaked / 1e18,
+              rewardWithdrawable: stakingInfo.rewardWithdrawable / 1e18,
+              rewardWithdrawn: stakingInfo.rewardWithdrawn / 1e18,
+              rewardFeePaid: stakingInfo.rewardFeePaid / 1e18,
+              feeEndTime: stakingInfo.feeEndTime
+            },
+            claim: [
+              {
+                title: 'BUYERS',
+                action: 'Buy',
+                name: 'buyer',
+                amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(4),
+                price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(4)
+              },
+              {
+                title: 'SELLERS',
+                action: 'Sell',
+                name: 'seller',
+                amount: (accountRewards.seller.withdrawable / 1e18).toFixed(4),
+                price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(4)
+              },
+              {
+                title: 'CREATORS',
+                action: 'Create',
+                name: 'creator',
+                amount: (accountRewards.creator.withdrawable / 1e18).toFixed(4),
+                price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(4)
+              }
+            ],
+            apr: (APR * 100).toFixed(4)
+          })
+        );
+      } else {
+        setMiningReward({
+          all: {
+            total: 0,
+            withdrawable: 0,
+            withdrawn: 0
+          },
+          buyer: {
+            total: 0,
+            withdrawable: 0,
+            withdrawn: 0
+          },
+          seller: {
+            total: 0,
+            withdrawable: 0,
+            withdrawn: 0
+          },
+          creator: {
+            total: 0,
+            withdrawable: 0,
+            withdrawn: 0
+          }
+        });
+        setClaimItems([
+          {
+            title: 'BUYERS',
+            action: 'Buy',
+            name: 'buyer',
+            amount: 0,
+            price: 0
+          },
+          {
+            title: 'SELLERS',
+            action: 'Sell',
+            name: 'seller',
+            amount: 0,
+            price: 0
+          },
+          {
+            title: 'CREATORS',
+            action: 'Create',
+            name: 'creator',
+            amount: 0,
+            price: 0
+          }
+        ]);
+        setStakingState({
+          currentStaked: 0,
+          rewardWithdrawable: 0,
+          rewardWithdrawn: 0,
+          rewardFeePaid: 0,
+          feeEndTime: 0
+        });
+        setStakingAPR(0);
       }
     };
     fetchData();
+    setTimeout(() => {
+      setReloadPage(!reloadPage);
+    }, 10 * 1000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabValue]);
+  }, [tabValue, reloadPage, sessionStorage.getItem('PASAR_LINK_ADDRESS')]);
 
-  const handleStake = async (amount) => {
+  const checkIfSignedOrNot = async () => {
+    const accounts = await getWalletAccounts();
+    return accounts && !!accounts.length;
+  };
+
+  const handleStake = async (type, amount) => {
+    const accounts = await getWalletAccounts();
+    if (!(accounts && accounts.length)) {
+      setOpenSigninEssentialDlg(true);
+      return;
+    }
+    const stakingInfo = await callTokenContractMethod({
+      contractType: 'staking',
+      callType: 'call',
+      methodName: 'getUserInfo',
+      account: accounts[0]
+    });
+    if (type === 'Unstake' && stakingInfo.currentStaked.toString() === '0') {
+      enqueueSnackbar('You have not participated in the stake', { variant: 'info' });
+      return;
+    }
+    let stakingAmount = stakingSettleAmount < 0 ? 0 : stakingSettleAmount;
+    if (type === 'Stake' && BigInt(pasarBalance) + BigInt(stakingInfo.currentStaked) < BigInt(stakingAmount)) stakingAmount = BigInt(pasarBalance) + BigInt(stakingInfo.currentStaked);
+    if (amount === 0) {
+      enqueueSnackbar('The amount you selected is 0, please select bigger than 0', { variant: 'info' });
+      return;
+    }
+    if (type === 'Stake' && stakingAmount <= 0) {
+      enqueueSnackbar('Staking amount should be greater than 0', { variant: 'error' });
+      return;
+    }
     try {
-      await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'send', methodName: 'stake', amount });
-      enqueueSnackbar('Stake success', { variant: 'success' });
+      const allowance = await callTokenContractMethod({
+        contractType: 'token',
+        callType: 'call',
+        methodName: 'allowance',
+        owner: accounts[0],
+        spender: STAKING_CONTRACT_ADDRESS
+      });
+      if (allowance < stakingAmount) {
+        await callTokenContractMethod({
+          contractType: 'token',
+          callType: 'send',
+          methodName: 'approve',
+          spender: STAKING_CONTRACT_ADDRESS,
+          amount: BigInt(stakingAmount).toString()
+        });
+      }
+      await callTokenContractMethod({
+        contractType: 'staking',
+        callType: 'send',
+        methodName: 'stake',
+        amount: BigInt(stakingAmount).toString()
+      });
+      enqueueSnackbar(`${type} success`, { variant: 'success' });
+      window.location.reload();
     } catch (err) {
       console.error(err);
-      enqueueSnackbar('Stake error', { variant: 'error' });
+      enqueueSnackbar(`${type} error`, { variant: 'error' });
     }
   };
 
   const handleWithdrawStakingReward = async () => {
+    const isSignedIn = await checkIfSignedOrNot();
+    if (!isSignedIn) {
+      setOpenSigninEssentialDlg(true);
+      return;
+    }
     try {
-      await callTokenContractMethod(walletConnectWeb3, { contractType: 'staking', callType: 'send', methodName: 'withdraw' });
+      await callTokenContractMethod({
+        contractType: 'staking',
+        callType: 'send',
+        methodName: 'withdraw'
+      });
       enqueueSnackbar('Withdraw success', { variant: 'success' });
+      setReloadPage(!reloadPage);
     } catch (err) {
       console.error(err);
       enqueueSnackbar('Withdraw error', { variant: 'error' });
@@ -302,9 +736,20 @@ export default function Rewards() {
   };
 
   const handleWithdrawMiningReward = async (name) => {
+    const isSignedIn = await checkIfSignedOrNot();
+    if (!isSignedIn) {
+      setOpenSigninEssentialDlg(true);
+      return;
+    }
     try {
-      await callTokenContractMethod(walletConnectWeb3, { contractType: 'mining', callType: 'send', methodName: 'withdrawRewardByName', name });
+      await callTokenContractMethod({
+        contractType: 'mining',
+        callType: 'send',
+        methodName: 'withdrawRewardByName',
+        name
+      });
       enqueueSnackbar('Withdraw success', { variant: 'success' });
+      setReloadPage(!reloadPage);
     } catch (err) {
       console.error(err);
       enqueueSnackbar('Withdraw error', { variant: 'error' });
@@ -318,13 +763,20 @@ export default function Rewards() {
           Rewards
         </Typography>
         <Typography variant="h5" sx={{ fontWeight: 'normal', color: 'text.secondary', mb: 2 }}>
-          Earn rewards by just trading, staking and listing. Mining and staking rewards will constitute 40% (40,000,000) and 10% (10,000,000) respectively of the total PASAR token supply.
+          Earn rewards by just trading, staking and listing. Mining and staking rewards will constitute 40% (40,000,000)
+          and 10% (10,000,000) respectively of the total PASAR token supply.
         </Typography>
         <Stack direction="row" spacing={2}>
           <Box sx={{ width: 200 }}>
-            <StyledButton variant='contained' fullWidth sx={{ mb: 1 }}>Get PASAR</StyledButton>
+            <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
+              <div>
+                <StyledButton variant="contained" fullWidth sx={{ mb: 1 }} disabled>
+                  Get PASAR
+                </StyledButton>
+              </div>
+            </Tooltip>
             <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'text.secondary', mb: 1 }} align="center">
-              {`1 PASAR ≈ USD ${PASARToUSD}`}
+              {`1 PASAR ≈ USD ${PASARToUSD.toFixed(4)}`}
             </Typography>
           </Box>
           <Button
@@ -334,7 +786,14 @@ export default function Rewards() {
             color="inherit"
             startIcon={<Icon icon="akar-icons:circle-plus" />}
             sx={{ color: 'origin.main', height: 'max-content' }}
-            onClick={() => addTokenToMM(PASAR_TOKEN_ADDRESS, 'PASAR', 18, 'https://github.com/PasarProtocol/PasarDWebApp/blob/main/public/static/logo-icon.svg?raw=true')}
+            onClick={() =>
+              addTokenToMM(
+                PASAR_TOKEN_ADDRESS,
+                'PASAR',
+                18,
+                'https://github.com/PasarProtocol/PasarDWebApp/blob/main/public/static/logo-icon.svg?raw=true'
+              )
+            }
           >
             Add to wallet
           </Button>
@@ -344,7 +803,7 @@ export default function Rewards() {
             value={tabValue}
             variant="scrollable"
             scrollButtons="auto"
-            onChange={handleSwitchTab}
+            onChange={(_, value) => setTabValue(value)}
             TabIndicatorProps={{
               style: { background: '#FF5082' }
             }}
@@ -371,7 +830,7 @@ export default function Rewards() {
               </Typography>
               <Box
                 component="img"
-                src='/static/logo-icon-white.svg'
+                src="/static/logo-icon-white.svg"
                 sx={{
                   width: { xs: 32, sm: 40, lg: 45 },
                   display: 'inline-flex',
@@ -379,27 +838,42 @@ export default function Rewards() {
                   p: { xs: 0.6, sm: 0.9, lg: 1 },
                   verticalAlign: 'middle',
                   borderRadius: '100%'
-                }} />
+                }}
+              />
             </Box>
-            <Typography variant="body2" component='div' sx={{ lineHeight: 1.1, py: 2 }}>
-              Once a buy transaction is completed, the{' '}<PinkLabel text="PASAR" />{' '}mining rewards will be distributed accordingly.
-              Mining rewards to earn{' '}<PinkLabel text="PASAR" />{' '}will last 4 years.<br />
+            <Typography variant="body2" component="div" sx={{ lineHeight: 1.1, py: 2 }}>
+              Once a buy transaction is completed, the <PinkLabel text="PASAR" /> mining rewards will be distributed
+              accordingly. Mining rewards to earn <PinkLabel text="PASAR" /> will last 4 years.
+              <br />
               <br />
               Users can claim rewards every day, or accumulate a one-time claim. Rewards never disappear nor expire.
             </Typography>
             <StackStyle sx={{ py: 2 }}>
               <Box sx={{ flex: 1 }}>
-                <Typography variant="h3" component="div"><Typography variant="h3" color='origin.main' sx={{ display: 'inline' }}>PASAR</Typography>{' '}earned</Typography>
+                <Typography variant="h3" component="div">
+                  <Typography variant="h3" color="origin.main" sx={{ display: 'inline' }}>
+                    PASAR
+                  </Typography>{' '}
+                  earned
+                </Typography>
                 <EarnedValueStyle variant="h2" sx={{ display: 'inline-flex' }}>
-                  {miningReward.all.withdrawable}
+                  {miningReward.all.withdrawable.toFixed(4)}
                 </EarnedValueStyle>
-                <Typography variant="body2" color='text.secondary'>{`≈ USD ${miningReward.all.total * PASARToUSD}`}</Typography>
+                <Typography variant="body2" color="text.secondary">{`≈ USD ${(
+                  miningReward.all.total * PASARToUSD
+                ).toFixed(4)}`}</Typography>
               </Box>
               <Box sx={{ textAlign: 'center', m: 'auto' }}>
-                <Typography variant="body2" align='center' color='text.secondary' sx={{ pb: 2 }}>to collect from 4 mining rewards</Typography>
-                <Tooltip title="Coming Soon" arrow enterTouchDelay={0}>
-                  <div><StyledButton variant="contained" sx={{ minWidth: 150 }} onClick={() => handleWithdrawMiningReward("all")}>Claim All</StyledButton></div>
-                </Tooltip>
+                <Typography variant="body2" align="center" color="text.secondary" sx={{ pb: 2 }}>
+                  to collect from 4 mining rewards
+                </Typography>
+                <StyledButton
+                  variant="contained"
+                  sx={{ minWidth: 150 }}
+                  onClick={() => handleWithdrawMiningReward('all')}
+                >
+                  Claim All
+                </StyledButton>
               </Box>
             </StackStyle>
           </PaperStyle>
@@ -409,24 +883,71 @@ export default function Rewards() {
           <Stack spacing={2}>
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">ELA ESC</Typography>
-              <Box component="img" src="/static/elastos.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
+              <Box
+                component="img"
+                src="/static/elastos.svg"
+                sx={{
+                  width: 20,
+                  display: 'inline',
+                  verticalAlign: 'middle',
+                  filter: (theme) => (theme.palette.mode === 'dark' ? 'invert(1)' : 'none')
+                }}
+              />
             </Stack>
-            <StatisticPanel itemCount={listedItemCnt.native} poolRatio={miningPoolRatio.native} userCount={0} nextDistribution={0} />
+            <StatisticPanel
+              itemCount={listedItemCnt.native}
+              poolRatio={miningPoolRatio.native}
+              userCount={userRewarded.elaCount}
+              nextDistribution={nextDistribution.native}
+            />
 
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">PASAR</Typography>
-              <Box component="img" src="/static/logo-icon.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
+              <Box
+                component="img"
+                src="/static/logo-icon.svg"
+                sx={{
+                  width: 20,
+                  display: 'inline',
+                  verticalAlign: 'middle',
+                  filter: (theme) => (theme.palette.mode === 'dark' ? 'invert(1)' : 'none')
+                }}
+              />
             </Stack>
-            <StatisticPanel itemCount={listedItemCnt.pasar} poolRatio={miningPoolRatio.pasar} userCount={0} nextDistribution={0} />
+            <StatisticPanel
+              itemCount={listedItemCnt.pasar}
+              poolRatio={miningPoolRatio.pasar}
+              userCount={userRewarded.pasarCount}
+              nextDistribution={nextDistribution.pasar}
+            />
 
             <Stack direction="row" spacing={1}>
               <Typography variant="h3">Ecosystem</Typography>
-              <Box component="img" src="/static/badges/diamond.svg" sx={{ width: 20, display: 'inline', verticalAlign: 'middle', filter: (theme) => theme.palette.mode === 'dark' ? 'invert(1)' : 'none' }} />
+              <Box
+                component="img"
+                src="/static/badges/diamond.svg"
+                sx={{
+                  width: 20,
+                  display: 'inline',
+                  verticalAlign: 'middle',
+                  filter: (theme) => (theme.palette.mode === 'dark' ? 'invert(1)' : 'none')
+                }}
+              />
             </Stack>
-            <StatisticPanel itemCount={listedItemCnt.eco} poolRatio={miningPoolRatio.eco} userCount={0} nextDistribution={0} />
+            <StatisticPanel
+              itemCount={listedItemCnt.eco}
+              poolRatio={miningPoolRatio.eco}
+              userCount={userRewarded.ecoCount}
+              nextDistribution={nextDistribution.eco}
+            />
 
             <Typography variant="h3">Others</Typography>
-            <StatisticPanel itemCount={listedItemCnt.other} poolRatio={miningPoolRatio.other} userCount={0} nextDistribution={0} />
+            <StatisticPanel
+              itemCount={listedItemCnt.other}
+              poolRatio={miningPoolRatio.other}
+              userCount={userRewarded.otherCount}
+              nextDistribution={nextDistribution.other}
+            />
           </Stack>
           <Typography variant="h2" textAlign="center" my={3}>
             Mining Rewards
@@ -447,11 +968,11 @@ export default function Rewards() {
                   <Typography variant="h3">Standard Staking</Typography>
                   <Typography variant="h5" component="div" sx={{ fontWeight: 'normal' }}>
                     Stake{' '}
-                    <Typography variant="h5" color='origin.main' sx={{ display: 'inline', fontWeight: 'normal' }}>
+                    <Typography variant="h5" color="origin.main" sx={{ display: 'inline', fontWeight: 'normal' }}>
                       PASAR
-                    </Typography>,
-                    earn{' '}
-                    <Typography variant="h5" color='origin.main' sx={{ display: 'inline', fontWeight: 'normal' }}>
+                    </Typography>
+                    , earn{' '}
+                    <Typography variant="h5" color="origin.main" sx={{ display: 'inline', fontWeight: 'normal' }}>
                       PASAR
                     </Typography>
                   </Typography>
@@ -459,7 +980,7 @@ export default function Rewards() {
                 <Stack>
                   <Typography variant="h5">{stakingAPR}%</Typography>
                   <Typography variant="h5" sx={{ fontWeight: 'normal' }} color="text.secondary">
-                    APR{' '}<Icon icon="eva:info-outline" style={{ marginBottom: -3 }} />
+                    APR <Icon icon="eva:info-outline" style={{ marginBottom: -3 }} />
                   </Typography>
                 </Stack>
               </Stack>
@@ -475,15 +996,19 @@ export default function Rewards() {
               }
             }}
           >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />} sx={{ '& .Mui-expanded': { marginBottom: '0 !important' } }}>
+            <AccordionSummary
+              expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}
+              sx={{ '& .Mui-expanded': { marginBottom: '0 !important' } }}
+            >
               <Typography variant="h4">Your Stake</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Box mb={2}>
-                <EarnedValueStyle variant="h2">
-                  {stakingState.currentStaked}
-                </EarnedValueStyle>
-                <Typography variant="body2" color='text.secondary'>{`≈ USD ${stakingState.currentStaked * PASARToUSD}`}</Typography>
+                <EarnedValueStyle variant="h2">{(stakingState.currentStaked / 1e18).toFixed(4)}</EarnedValueStyle>
+                <Typography variant="body2" color="text.secondary">{`≈ USD ${(
+                  (stakingState.currentStaked * PASARToUSD) /
+                  1e18
+                ).toFixed(4)}`}</Typography>
               </Box>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={8}>
@@ -492,26 +1017,28 @@ export default function Rewards() {
                     sx={{
                       display: 'inline-flex',
                       border: (theme) => `1px solid ${theme.palette.divider}`,
-                      borderRadius: .5,
+                      borderRadius: 0.5,
                       width: '100%'
                     }}
                   >
                     <StyledToggleButtonGroup size="small" value={stakingType} exclusive onChange={handleStakingType}>
-                      <StyledToggleButton value="Stake" onClick={() => {
-                        if (operAmount) handleStake(operAmount);
-                      }}>Stake</StyledToggleButton>
-                      <StyledToggleButton value="Unstake" onClick={() => handleStake(0)}>Unstake</StyledToggleButton>
+                      <StyledToggleButton value="Stake">Stake</StyledToggleButton>
+                      <StyledToggleButton value="Unstake">Unstake</StyledToggleButton>
                     </StyledToggleButtonGroup>
                   </Paper>
                 </Grid>
                 <MHidden width="mdUp">
                   <Grid item xs={12}>
-                    <Stack direction="row" alignItems='center'>
-                      <Typography variant='body2'>PASAR in wallet:</Typography>&nbsp;
+                    <Stack direction="row" alignItems="center">
+                      <Typography variant="body2">PASAR in wallet:</Typography>&nbsp;
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {pasarBalance}
-                      </EarnedValueStyle>&nbsp;
-                      <Typography variant='body2' color="text.secondary">{`≈ USD ${pasarBalance * PASARToUSD}`}</Typography>
+                        {(pasarBalance / 1e18).toFixed(4)}
+                      </EarnedValueStyle>
+                      &nbsp;
+                      <Typography variant="body2" color="text.secondary">{`≈ USD ${(
+                        (pasarBalance * PASARToUSD) /
+                        1e18
+                      ).toFixed(2)}`}</Typography>
                     </Stack>
                   </Grid>
                 </MHidden>
@@ -521,17 +1048,18 @@ export default function Rewards() {
                       type="number"
                       variant="outlined"
                       placeholder="Amount"
-                      value={operAmount}
+                      value={(operAmount / 1e18).toFixed(4)}
                       onChange={handleChangeAmount}
                       InputProps={{
                         endAdornment: (
                           <Box
                             component="img"
-                            src='/static/logo-icon.svg'
+                            src="/static/logo-icon.svg"
                             sx={{
                               width: 24,
-                              display: 'inline-flex',
-                            }} />
+                              display: 'inline-flex'
+                            }}
+                          />
                         ),
                         style: {
                           fontSize: '16pt',
@@ -541,31 +1069,57 @@ export default function Rewards() {
                       }}
                       sx={{ flexGrow: 1 }}
                     />
-                    <StyledButton variant="contained" sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}>{stakingType}</StyledButton>
+                    <StyledButton
+                      variant="contained"
+                      sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+                      onClick={() => handleStake(stakingType, operAmount)}
+                    >
+                      {stakingType}
+                    </StyledButton>
                   </FormGroup>
-                  <StyledSlider size='medium' value={amountProgress} step={1} valueLabelDisplay="auto" onChange={handleChangeSlider} />
-                  <Typography variant='h6' mb={1}>{amountProgress}%</Typography>
+                  <StyledSlider
+                    size="medium"
+                    value={amountProgress}
+                    step={1}
+                    valueLabelDisplay="auto"
+                    onChange={handleChangeSlider}
+                  />
+                  <Typography variant="h6" mb={1}>
+                    {amountProgress}%
+                  </Typography>
                   <Stack direction="row" spacing={1}>
-                    {
-                      AmountProgressType.map((progType, _i) => {
-                        const btnSx = { flexGrow: 1 }
-                        if (amountProgress === (_i + 1) * 25) {
-                          btnSx.background = (theme) => theme.palette.origin.main
-                          btnSx.color = 'white'
-                        }
-                        return <Button key={_i} variant="contained" color="inherit" sx={btnSx} value={_i + 1} onClick={handleProgressBtn}>{progType}</Button>
-                      })
-                    }
+                    {AmountProgressType.map((progType, _i) => {
+                      const btnSx = { flexGrow: 1 };
+                      if (amountProgress === (_i + 1) * 25) {
+                        btnSx.background = (theme) => theme.palette.origin.main;
+                        btnSx.color = 'white';
+                      }
+                      return (
+                        <Button
+                          key={_i}
+                          variant="contained"
+                          color="inherit"
+                          sx={btnSx}
+                          value={_i + 1}
+                          onClick={handleProgressBtn}
+                        >
+                          {progType}
+                        </Button>
+                      );
+                    })}
                   </Stack>
                 </Grid>
                 <MHidden width="mdDown">
                   <Grid item sm={4}>
                     <Box textAlign="right">
-                      <Typography variant='body1'>PASAR in wallet:</Typography>
+                      <Typography variant="body1">PASAR in wallet:</Typography>
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {pasarBalance}
+                        {(pasarBalance / 1e18).toFixed(4)}
                       </EarnedValueStyle>
-                      <Typography variant='body1' color="text.secondary">{`≈ USD ${pasarBalance * PASARToUSD}`}</Typography>
+                      <Typography variant="body1" color="text.secondary">{`≈ USD ${(
+                        (pasarBalance * PASARToUSD) /
+                        1e18
+                      ).toFixed(2)}`}</Typography>
                     </Box>
                   </Grid>
                 </MHidden>
@@ -583,39 +1137,52 @@ export default function Rewards() {
               }
             }}
           >
-            <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />} sx={{ '& .Mui-expanded': { marginBottom: '0 !important' } }}>
+            <AccordionSummary
+              expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}
+              sx={{ '& .Mui-expanded': { marginBottom: '0 !important' } }}
+            >
               <Typography variant="h4">Rewards</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Box mb={2}>
-                <EarnedValueStyle variant="h2">
-                  {stakingState.rewardWithdrawable}
-                </EarnedValueStyle>
-                <Typography variant="body2" color='text.secondary'>{`≈ USD ${stakingState.rewardWithdrawable * PASARToUSD}`}</Typography>
+                <EarnedValueStyle variant="h2">{(stakingState.rewardWithdrawable / 1e18).toFixed(4)}</EarnedValueStyle>
+                <Typography variant="body2" color="text.secondary">{`≈ USD ${(
+                  (stakingState.rewardWithdrawable * PASARToUSD) /
+                  1e18
+                ).toFixed(4)}`}</Typography>
               </Box>
               <Grid container spacing={2}>
                 <MHidden width="smUp">
                   <Grid item xs={12}>
-                    <Stack direction="row" alignItems='center'>
-                      <Typography variant='body2'>Received so far:</Typography>&nbsp;
+                    <Stack direction="row" alignItems="center">
+                      <Typography variant="body2">Received so far:</Typography>&nbsp;
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {stakingState.rewardWithdrawn}
-                      </EarnedValueStyle>&nbsp;
-                      <Typography variant='body2' color="text.secondary">{`≈ USD ${stakingState.rewardWithdrawn * PASARToUSD}`}</Typography>
+                        {(stakingState.rewardWithdrawn / 1e18).toFixed(4)}
+                      </EarnedValueStyle>
+                      &nbsp;
+                      <Typography variant="body2" color="text.secondary">{`≈ USD ${(
+                        (stakingState.rewardWithdrawn * PASARToUSD) /
+                        1e18
+                      ).toFixed(4)}`}</Typography>
                     </Stack>
                   </Grid>
                 </MHidden>
                 <Grid item xs={12} sm={8} sx={{ display: 'flex', alignItems: 'end' }}>
-                  <StyledButton variant="contained" sx={{ width: 200 }} onClick={handleWithdrawStakingReward}>Claim</StyledButton>
+                  <StyledButton variant="contained" sx={{ width: 200 }} onClick={handleWithdrawStakingReward}>
+                    Claim
+                  </StyledButton>
                 </Grid>
                 <MHidden width="smDown">
                   <Grid item sm={4}>
                     <Box textAlign="right">
-                      <Typography variant='body1'>Received so far:</Typography>
+                      <Typography variant="body1">Received so far:</Typography>
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {stakingState.rewardWithdrawn}
+                        {(stakingState.rewardWithdrawn / 1e18).toFixed(4)}
                       </EarnedValueStyle>
-                      <Typography variant='body1' color="text.secondary">{`≈ USD ${stakingState.rewardWithdrawn * PASARToUSD}`}</Typography>
+                      <Typography variant="body1" color="text.secondary">{`≈ USD ${(
+                        (stakingState.rewardWithdrawn * PASARToUSD) /
+                        1e18
+                      ).toFixed(4)}`}</Typography>
                     </Box>
                   </Grid>
                 </MHidden>

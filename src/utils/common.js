@@ -2,7 +2,7 @@ import axios from 'axios';
 import Web3 from 'web3';
 import * as math from 'mathjs';
 import { createHash } from 'crypto';
-import { create, urlSource } from 'ipfs-http-client';
+import { create } from 'ipfs-http-client';
 import { format, subDays, subHours, formatDistance } from 'date-fns';
 import Jazzicon from '@metamask/jazzicon';
 import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
@@ -553,7 +553,16 @@ export function callContractMethod(type, coinType, chainId, paramObj) {
   });
 }
 
-export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise((resolve, reject) => {
+export const callTokenContractMethod = (param) => new Promise((resolve, reject) => {
+  const linkType = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+  let walletConnectProvider;
+  if (linkType === '2') walletConnectProvider = isInAppBrowser()
+      ? window.elastos.getWeb3Provider()
+      : essentialsConnector.getWalletConnectProvider();
+  else if (linkType === '1' && (Web3.givenProvider || window.ethereum)) walletConnectProvider = Web3.givenProvider || window.ethereum;
+  else walletConnectProvider = new Web3.providers.HttpProvider(rpcURL);
+  const walletConnectWeb3 = new Web3(walletConnectProvider);
+
   let contractABI;
   let contractAddress;
   let contractMethod = null;
@@ -587,8 +596,20 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
     case 'balanceOf':
       contractMethod = smartContract.methods.balanceOf(param.account);
       break;
+    case 'allowance':
+      contractMethod = smartContract.methods.allowance(param.owner, param.spender)
+      break;
+    case 'approve':
+      contractMethod = smartContract.methods.approve(param.spender, param.amount);
+      break;
     case 'getUserInfo':
       contractMethod = smartContract.methods.getUserInfo(param.account);
+      break;
+    case 'getCurrentTime':
+      contractMethod = smartContract.methods.getCurrentTime();
+      break;
+    case 'totalRewardAtTime':
+      contractMethod = smartContract.methods.totalRewardAtTime(param.timestamp);
       break;
     case 'stake':
       contractMethod = smartContract.methods.stake(param.amount);
@@ -604,6 +625,9 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
       break;
     case 'getCurrentRatios':
       contractMethod = smartContract.methods.getCurrentRatios();
+      break;
+    case 'pendingRewards':
+      contractMethod = smartContract.methods.pendingRewards();
       break;
     case 'withdrawRewardByName':
       contractMethod = smartContract.methods.withdrawRewardByName(param.name);
@@ -626,36 +650,49 @@ export const callTokenContractMethod = (walletConnectWeb3, param) => new Promise
     reject(error);
   };
 
-  walletConnectWeb3.eth.getAccounts()
-    .then((_accounts) => {
-      accounts = _accounts;
-      return walletConnectWeb3.eth.getGasPrice();
-    })
-    .then(async (_gasPrice) => getFilteredGasPrice(_gasPrice))
-    .then((_estimatedGas) => {
-      const transactionParams = {
-        from: accounts[0],
-        gasPrice,
-        gas: _estimatedGas,
-        value: 0,
-      };
-      if (param.callType === 'call') {
-        contractMethod.call().then(res => resolve(res));
-      } else if (param.callType === 'send') {
+  if (param.callType === 'call') {
+    contractMethod.call().then(res => resolve(res));
+  } else if (param.callType === 'send') {
+    walletConnectWeb3.eth.getAccounts()
+      .then((_accounts) => {
+        accounts = _accounts;
+        return walletConnectWeb3.eth.getGasPrice();
+      })
+      .then(async (_gasPrice) => getFilteredGasPrice(_gasPrice))
+      .then((_estimatedGas) => {
+        const transactionParams = {
+          from: accounts[0],
+          gasPrice,
+          gas: _estimatedGas > 8000000 ? 8000000 : _estimatedGas,
+          value: 0,
+        };
         contractMethod.send(transactionParams)
           .once('transactionHash', handleTxEvent)
           .once('receipt', handleReceiptEvent)
           .on('error', handleErrorEvent);
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-}
-)
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+})
+
+export const getWalletAccounts = async() => {
+  const linkType = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+  let walletConnectProvider;
+  if (linkType === '2') walletConnectProvider = isInAppBrowser()
+      ? window.elastos.getWeb3Provider()
+      : essentialsConnector.getWalletConnectProvider();
+  else if (linkType === '1' && (Web3.givenProvider || window.ethereum)) walletConnectProvider = Web3.givenProvider || window.ethereum;
+  else walletConnectProvider = new Web3.providers.HttpProvider(rpcURL);
+  const walletConnectWeb3 = new Web3(walletConnectProvider);
+
+  const accounts = await walletConnectWeb3.eth.getAccounts();
+  return accounts;
+};
 
 export const addTokenToMM = async (address, symbol, decimals, image) => {
-  if (!address || !symbol || !decimals) return ;
+  if (!address || !symbol || !decimals) return;
   try {
     // wasAdded is a boolean. Like any RPC method, an error may be thrown.
     const { ethereum } = window;
@@ -871,6 +908,11 @@ const coinTypes = [
     icon: 'badges/diamond.svg',
     name: 'DIA',
     address: DIA_CONTRACT_ADDRESS
+  },
+  {
+    icon: 'logo-icon.svg',
+    name: 'PASAR',
+    address: PASAR_TOKEN_ADDRESS
   },
   {
     icon: 'erc20/WELA.png',

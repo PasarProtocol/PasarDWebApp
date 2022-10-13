@@ -66,9 +66,9 @@ const addressForProduction = {
 const addressForTest = {
   MAIN_CONTRACT: {
     ESC: {
-      sticker: "0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0",
-      market: "0x19088c509C390F996802B90bdc4bFe6dc3F5AAA7",
-      register: "0x2b304ffC302b402785294629674A8C2b64cEF897"
+      sticker: "0x3748c352cF8B3e8c6CF6800F315072a2C1fD3F82",
+      market: "0x6a02E1942A6201C47BBd3246fF2b044a2536aB43",
+      register: "0x26CB562A77eB0610D3d1e6Fc5e856B5bcc93Fb8b"
     },
     ETH: {
       sticker: "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961",
@@ -92,10 +92,10 @@ const addressForTest = {
   bunnyContract: "0x75740FC7058DA148752ef8a9AdFb73966DEb42a8",
   bnbBusdContract: "0x9f1d0Ed4E041C503BD487E5dc9FC935Ab57F9a57",
   elaOnEthContract: "0x8c947E0fA67e91370587076A4108Df17840e9982",
-  pasarERC20Contract: '0xa7B1a72266ad3a54Ac00071f05453feEeB5680dB',
-  pasarVestingContract: '0xD883303d400427C298d53e99a3faa7Cb1E9A8727',
-  pasarStakingContract: '0x048c96C7dF2d789A515c0c18c9345481c12e664E',
-  pasarMiningContract: '0x8158FF69C60Eb893e32869180D980853160b8d68',
+  pasarERC20Contract: '0x2E54635bee5F1451A7f138797d96f22e3Cba5453',
+  pasarVestingContract: '0xB2d03B5c9Dc4429EDde239183AaF39D74e29a536',
+  pasarStakingContract: '0xc7a57f6203f9F9b82cafb966c8940cA0527713A2',
+  pasarMiningContract: '0xB27CC87EaF372F78E3Ca4da38b013E154e7247e0',
   blockchain: 'Testnet (ESC)'
 }
 
