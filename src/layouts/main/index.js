@@ -1,13 +1,10 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
-import useScrollTrigger from '@mui/material/useScrollTrigger';
-import Fab from '@mui/material/Fab';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import Zoom from '@mui/material/Zoom';
 import { useLocation, Outlet } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { Box, Fab, Zoom, useScrollTrigger } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 // material
-import { Box } from '@mui/material';
 // components
 import MainNavbar from './MainNavbar';
 import MainFooter from './MainFooter';
