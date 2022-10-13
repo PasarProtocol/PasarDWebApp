@@ -136,7 +136,7 @@ export default function MainNavbar() {
             </MHidden>
           )}
           <MHidden width="mdDown">
-            <MenuDesktop isOffset={isOffset} isHome={isExplorer} navConfig={navConfig} />
+            <MenuDesktop isOffset={isOffset} navConfig={navConfig} />
           </MHidden>
           <SignInDialog />
           {!!sessionLinkFlag && <NetworkCircle />}
@@ -161,7 +161,7 @@ export default function MainNavbar() {
             </Button>
           </MHidden>
           <MHidden width="mdUp">
-            <MenuMobile isOffset={isOffset} isHome={isExplorer} navConfig={navConfig} />
+            <MenuMobile isOffset={isOffset} navConfig={navConfig} />
           </MHidden>
         </Container>
       </ToolbarStyle>

@@ -54,12 +54,6 @@ const menuConfig = [
     path: PATH_PAGE.rewards,
     disable: false
   }
-  // {
-  //   title: 'Docs',
-  //   icon: <Icon icon={bookOpenFill} {...ICON_SIZE} />,
-  //   path: PATH_DOCS,
-  //   disable: true
-  // }
 ];
 
 export default menuConfig;
