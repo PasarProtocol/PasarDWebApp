@@ -283,10 +283,15 @@ export default function Rewards() {
     setAmountProgress(progressType * 25);
     const offsetAmount = math.round((stakingTotalAmount * progressType) / 4, 4);
     setOperAmount(offsetAmount);
-    let totalStaked = stakingState?.currentStaked ?? 0;
-    if (stakingType === 'Stake') totalStaked += offsetAmount;
-    else if (stakingType === 'Unstake') totalStaked -= offsetAmount;
-    setStakingSettleAmount(totalStaked);
+    if (progressType === 4) {
+      if (stakingType === 'Stake') setStakingSettleAmount(pasarBalance);
+      else if (stakingType === 'Unstake') setStakingSettleAmount(0);
+    } else {
+      let totalStaked = BigInt(stakingState?.currentStaked ?? 0);
+      if (stakingType === 'Stake') totalStaked = BigInt(totalStaked) + BigInt(offsetAmount);
+      else if (stakingType === 'Unstake') totalStaked = BigInt(totalStaked) - BigInt(offsetAmount);
+      setStakingSettleAmount(totalStaked);
+    }
   };
 
   const handleChangeAmount = (event) => {
@@ -296,9 +301,9 @@ export default function Rewards() {
     if (amountValue * 1 > stakingTotalAmount) return;
     const offsetAmount = math.round(amountValue * 1, 4).toString();
     setOperAmount(offsetAmount);
-    let totalStaked = stakingState?.currentStaked ?? 0;
-    if (stakingType === 'Stake') totalStaked += offsetAmount;
-    else if (stakingType === 'Unstake') totalStaked -= offsetAmount;
+    let totalStaked = BigInt(stakingState?.currentStaked ?? 0);
+    if (stakingType === 'Stake') totalStaked = BigInt(totalStaked) + BigInt(offsetAmount);
+    else if (stakingType === 'Unstake') totalStaked = BigInt(totalStaked) - BigInt(offsetAmount);
     setStakingSettleAmount(totalStaked);
   };
 
@@ -306,14 +311,22 @@ export default function Rewards() {
     setAmountProgress(newValue);
     const offsetAmount = math.round((stakingTotalAmount * newValue) / 100, 4);
     setOperAmount(offsetAmount);
-    let totalStaked = stakingState?.currentStaked ?? 0;
-    if (stakingType === 'Stake') totalStaked += offsetAmount;
-    else if (stakingType === 'Unstake') totalStaked -= offsetAmount;
-    setStakingSettleAmount(totalStaked);
+    if (newValue === 100) {
+      if (stakingType === 'Stake') setStakingSettleAmount(pasarBalance);
+      else if (stakingType === 'Unstake') setStakingSettleAmount(0);
+    } else {
+      let totalStaked = BigInt(stakingState?.currentStaked ?? 0);
+      if (stakingType === 'Stake') totalStaked = BigInt(totalStaked) + BigInt(offsetAmount);
+      else if (stakingType === 'Unstake') totalStaked = BigInt(totalStaked) - BigInt(offsetAmount);
+      setStakingSettleAmount(totalStaked);
+    }
   };
 
   React.useEffect(() => {
-    const tempProgress = math.round(stakingTotalAmount === 0 ? 0 : (operAmount * 100) / stakingTotalAmount, 1);
+    const tempProgress = math.round(
+      stakingTotalAmount.toString() === '0' ? 0 : (operAmount * 100) / stakingTotalAmount,
+      1
+    );
     setAmountProgress(tempProgress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [operAmount, stakingType]);
@@ -359,7 +372,7 @@ export default function Rewards() {
           methodName: 'balanceOf',
           account: accounts[0]
         });
-        setPasarBalance(balance / 1e18);
+        setPasarBalance(balance);
       }
       // rewards page
       const poolConfig = await callTokenContractMethod({
@@ -475,10 +488,10 @@ export default function Rewards() {
           account: accounts[0]
         });
         setStakingState({
-          currentStaked: stakingInfo.currentStaked / 1e18,
-          rewardWithdrawable: stakingInfo.rewardWithdrawable / 1e18,
-          rewardWithdrawn: stakingInfo.rewardWithdrawn / 1e18,
-          rewardFeePaid: stakingInfo.rewardFeePaid / 1e18,
+          currentStaked: stakingInfo.currentStaked,
+          rewardWithdrawable: stakingInfo.rewardWithdrawable,
+          rewardWithdrawn: stakingInfo.rewardWithdrawn,
+          rewardFeePaid: stakingInfo.rewardFeePaid,
           feeEndTime: stakingInfo.feeEndTime
         });
         // get APR
@@ -657,14 +670,12 @@ export default function Rewards() {
       methodName: 'getUserInfo',
       account: accounts[0]
     });
-    console.log(type, stakingInfo.currentStaked);
     if (type === 'Unstake' && stakingInfo.currentStaked.toString() === '0') {
       enqueueSnackbar('You have not participated in the stake', { variant: 'info' });
       return;
     }
-    let stakingAmount = stakingSettleAmount < 0.0001 ? 0 : stakingSettleAmount;
-    stakingAmount = pasarBalance - stakingAmount < 0.0001 ? pasarBalance : stakingAmount;
-    console.log(stakingAmount, pasarBalance)
+    let stakingAmount = stakingSettleAmount < 0 ? 0 : stakingSettleAmount;
+    if (type === 'Stake' && BigInt(pasarBalance) + BigInt(stakingInfo.currentStaked) < BigInt(stakingAmount)) stakingAmount = BigInt(pasarBalance) + BigInt(stakingInfo.currentStaked);
     if (amount === 0) {
       enqueueSnackbar('The amount you selected is 0, please select bigger than 0', { variant: 'info' });
       return;
@@ -687,14 +698,14 @@ export default function Rewards() {
           callType: 'send',
           methodName: 'approve',
           spender: STAKING_CONTRACT_ADDRESS,
-          amount: BigInt(stakingAmount * 1e18)
+          amount: BigInt(stakingAmount).toString()
         });
       }
       await callTokenContractMethod({
         contractType: 'staking',
         callType: 'send',
         methodName: 'stake',
-        amount: BigInt(stakingAmount * 1e18)
+        amount: BigInt(stakingAmount).toString()
       });
       enqueueSnackbar(`${type} success`, { variant: 'success' });
       window.location.reload();
@@ -993,9 +1004,10 @@ export default function Rewards() {
             </AccordionSummary>
             <AccordionDetails>
               <Box mb={2}>
-                <EarnedValueStyle variant="h2">{stakingState.currentStaked.toFixed(4)}</EarnedValueStyle>
+                <EarnedValueStyle variant="h2">{(stakingState.currentStaked / 1e18).toFixed(4)}</EarnedValueStyle>
                 <Typography variant="body2" color="text.secondary">{`≈ USD ${(
-                  stakingState.currentStaked * PASARToUSD
+                  (stakingState.currentStaked * PASARToUSD) /
+                  1e18
                 ).toFixed(4)}`}</Typography>
               </Box>
               <Grid container spacing={2}>
@@ -1020,12 +1032,13 @@ export default function Rewards() {
                     <Stack direction="row" alignItems="center">
                       <Typography variant="body2">PASAR in wallet:</Typography>&nbsp;
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {pasarBalance.toFixed(4)}
+                        {(pasarBalance / 1e18).toFixed(4)}
                       </EarnedValueStyle>
                       &nbsp;
-                      <Typography variant="body2" color="text.secondary">{`≈ USD ${(pasarBalance * PASARToUSD).toFixed(
-                        2
-                      )}`}</Typography>
+                      <Typography variant="body2" color="text.secondary">{`≈ USD ${(
+                        (pasarBalance * PASARToUSD) /
+                        1e18
+                      ).toFixed(2)}`}</Typography>
                     </Stack>
                   </Grid>
                 </MHidden>
@@ -1035,7 +1048,7 @@ export default function Rewards() {
                       type="number"
                       variant="outlined"
                       placeholder="Amount"
-                      value={operAmount}
+                      value={(operAmount / 1e18).toFixed(4)}
                       onChange={handleChangeAmount}
                       InputProps={{
                         endAdornment: (
@@ -1101,11 +1114,12 @@ export default function Rewards() {
                     <Box textAlign="right">
                       <Typography variant="body1">PASAR in wallet:</Typography>
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {pasarBalance.toFixed(4)}
+                        {(pasarBalance / 1e18).toFixed(4)}
                       </EarnedValueStyle>
-                      <Typography variant="body1" color="text.secondary">{`≈ USD ${(pasarBalance * PASARToUSD).toFixed(
-                        2
-                      )}`}</Typography>
+                      <Typography variant="body1" color="text.secondary">{`≈ USD ${(
+                        (pasarBalance * PASARToUSD) /
+                        1e18
+                      ).toFixed(2)}`}</Typography>
                     </Box>
                   </Grid>
                 </MHidden>
@@ -1131,9 +1145,10 @@ export default function Rewards() {
             </AccordionSummary>
             <AccordionDetails>
               <Box mb={2}>
-                <EarnedValueStyle variant="h2">{stakingState.rewardWithdrawable.toFixed(4)}</EarnedValueStyle>
+                <EarnedValueStyle variant="h2">{(stakingState.rewardWithdrawable / 1e18).toFixed(4)}</EarnedValueStyle>
                 <Typography variant="body2" color="text.secondary">{`≈ USD ${(
-                  stakingState.rewardWithdrawable * PASARToUSD
+                  (stakingState.rewardWithdrawable * PASARToUSD) /
+                  1e18
                 ).toFixed(4)}`}</Typography>
               </Box>
               <Grid container spacing={2}>
@@ -1142,11 +1157,12 @@ export default function Rewards() {
                     <Stack direction="row" alignItems="center">
                       <Typography variant="body2">Received so far:</Typography>&nbsp;
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {stakingState.rewardWithdrawn.toFixed(4)}
+                        {(stakingState.rewardWithdrawn / 1e18).toFixed(4)}
                       </EarnedValueStyle>
                       &nbsp;
                       <Typography variant="body2" color="text.secondary">{`≈ USD ${(
-                        stakingState.rewardWithdrawn * PASARToUSD
+                        (stakingState.rewardWithdrawn * PASARToUSD) /
+                        1e18
                       ).toFixed(4)}`}</Typography>
                     </Stack>
                   </Grid>
@@ -1161,10 +1177,11 @@ export default function Rewards() {
                     <Box textAlign="right">
                       <Typography variant="body1">Received so far:</Typography>
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {stakingState.rewardWithdrawn.toFixed(4)}
+                        {(stakingState.rewardWithdrawn / 1e18).toFixed(4)}
                       </EarnedValueStyle>
                       <Typography variant="body1" color="text.secondary">{`≈ USD ${(
-                        stakingState.rewardWithdrawn * PASARToUSD
+                        (stakingState.rewardWithdrawn * PASARToUSD) /
+                        1e18
                       ).toFixed(4)}`}</Typography>
                     </Box>
                   </Grid>
