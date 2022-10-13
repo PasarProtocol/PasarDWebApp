@@ -218,10 +218,11 @@ export default function Rewards() {
   const { enqueueSnackbar } = useSnackbar();
   const { setOpenSigninEssentialDlg } = useSignin();
   const [tabValue, setTabValue] = React.useState(0);
-  const [stakingTotalAmount, setStakingTotalAmount] = React.useState(0);
-  const [operAmount, setOperAmount] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
+  const [operAmount, setOperAmount] = React.useState(0);
   const [amountProgress, setAmountProgress] = React.useState(0);
+  const [stakingTotalAmount, setStakingTotalAmount] = React.useState(0);
+  const [stakingSettleAmount, setStakingSettleAmount] = React.useState(0);
   const cachedPool = JSON.parse(sessionStorage.getItem('REWARD_POOL'));
   const cachedUser = JSON.parse(sessionStorage.getItem('REWARD_USER'));
   const [PASARToUSD, setPASARToUSD] = React.useState(0.01);
@@ -271,18 +272,21 @@ export default function Rewards() {
   );
   const [reloadPage, setReloadPage] = React.useState(false);
 
-  const handleSwitchTab = (event, newValue) => {
-    setTabValue(newValue);
-  };
-
-  const handleStakingType = (event, type) => {
+  const handleStakingType = (_, type) => {
     if (type) setStakingType(type);
+    setAmountProgress(0);
+    setOperAmount(0);
   };
 
   const handleProgressBtn = (event) => {
     const progressType = event.target.value;
     setAmountProgress(progressType * 25);
-    setOperAmount(math.round((stakingTotalAmount * progressType) / 4, 4));
+    const offsetAmount = math.round((stakingTotalAmount * progressType) / 4, 4);
+    setOperAmount(offsetAmount);
+    let totalStaked = stakingState?.currentStaked ?? 0;
+    if (stakingType === 'Stake') totalStaked += offsetAmount;
+    else if (stakingType === 'Unstake') totalStaked -= offsetAmount;
+    setStakingSettleAmount(totalStaked);
   };
 
   const handleChangeAmount = (event) => {
@@ -290,12 +294,22 @@ export default function Rewards() {
     amountValue = removeLeadingZero(amountValue);
     if (amountValue < 0) return;
     if (amountValue * 1 > stakingTotalAmount) return;
-    setOperAmount(math.round(amountValue * 1, 4).toString());
+    const offsetAmount = math.round(amountValue * 1, 4).toString();
+    setOperAmount(offsetAmount);
+    let totalStaked = stakingState?.currentStaked ?? 0;
+    if (stakingType === 'Stake') totalStaked += offsetAmount;
+    else if (stakingType === 'Unstake') totalStaked -= offsetAmount;
+    setStakingSettleAmount(totalStaked);
   };
 
   const handleChangeSlider = (event, newValue) => {
     setAmountProgress(newValue);
-    setOperAmount(math.round((stakingTotalAmount * newValue) / 100, 4));
+    const offsetAmount = math.round((stakingTotalAmount * newValue) / 100, 4);
+    setOperAmount(offsetAmount);
+    let totalStaked = stakingState?.currentStaked ?? 0;
+    if (stakingType === 'Stake') totalStaked += offsetAmount;
+    else if (stakingType === 'Unstake') totalStaked -= offsetAmount;
+    setStakingSettleAmount(totalStaked);
   };
 
   React.useEffect(() => {
@@ -435,22 +449,22 @@ export default function Rewards() {
             title: 'BUYERS',
             action: 'Buy',
             name: 'buyer',
-            amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(2),
-            price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+            amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(4),
+            price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(4)
           },
           {
             title: 'SELLERS',
             action: 'Sell',
             name: 'seller',
-            amount: (accountRewards.seller.withdrawable / 1e18).toFixed(2),
-            price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+            amount: (accountRewards.seller.withdrawable / 1e18).toFixed(4),
+            price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(4)
           },
           {
             title: 'CREATORS',
             action: 'Create',
             name: 'creator',
-            amount: (accountRewards.creator.withdrawable / 1e18).toFixed(2),
-            price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+            amount: (accountRewards.creator.withdrawable / 1e18).toFixed(4),
+            price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(4)
           }
         ]);
         // staking page
@@ -503,7 +517,7 @@ export default function Rewards() {
           rate = (annualReward * 1000000) / stakingInfo.currentStaked;
         }
         const APR = parseInt(rate, 10) / 1000000;
-        setStakingAPR((APR * 100).toFixed(2));
+        setStakingAPR((APR * 100).toFixed(4));
 
         sessionStorage.setItem(
           'REWARD_USER',
@@ -542,25 +556,25 @@ export default function Rewards() {
                 title: 'BUYERS',
                 action: 'Buy',
                 name: 'buyer',
-                amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(2),
-                price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+                amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(4),
+                price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(4)
               },
               {
                 title: 'SELLERS',
                 action: 'Sell',
                 name: 'seller',
-                amount: (accountRewards.seller.withdrawable / 1e18).toFixed(2),
-                price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+                amount: (accountRewards.seller.withdrawable / 1e18).toFixed(4),
+                price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(4)
               },
               {
                 title: 'CREATORS',
                 action: 'Create',
                 name: 'creator',
-                amount: (accountRewards.creator.withdrawable / 1e18).toFixed(2),
-                price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(2)
+                amount: (accountRewards.creator.withdrawable / 1e18).toFixed(4),
+                price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(4)
               }
             ],
-            apr: (APR * 100).toFixed(2)
+            apr: (APR * 100).toFixed(4)
           })
         );
       } else {
@@ -643,17 +657,18 @@ export default function Rewards() {
       methodName: 'getUserInfo',
       account: accounts[0]
     });
-    if (type === 'Unstake' && stakingInfo.currentStaked === 0) {
+    console.log(type, stakingInfo.currentStaked);
+    if (type === 'Unstake' && stakingInfo.currentStaked.toString() === '0') {
       enqueueSnackbar('You have not participated in the stake', { variant: 'info' });
       return;
     }
+    let stakingAmount = stakingSettleAmount < 0.0001 ? 0 : stakingSettleAmount;
+    stakingAmount = pasarBalance - stakingAmount < 0.0001 ? pasarBalance : stakingAmount;
+    console.log(stakingAmount, pasarBalance)
     if (amount === 0) {
       enqueueSnackbar('The amount you selected is 0, please select bigger than 0', { variant: 'info' });
       return;
     }
-    const stakingAmount =
-      type === 'Stake' ? stakingInfo.currentStaked / 1e18 - amount : stakingInfo.currentStaked / 1e18 - amount;
-    console.log('========', stakingAmount)
     if (type === 'Stake' && stakingAmount <= 0) {
       enqueueSnackbar('Staking amount should be greater than 0', { variant: 'error' });
       return;
@@ -666,20 +681,20 @@ export default function Rewards() {
         owner: accounts[0],
         spender: STAKING_CONTRACT_ADDRESS
       });
-      if (allowance / 1e18 < stakingAmount) {
+      if (allowance < stakingAmount) {
         await callTokenContractMethod({
           contractType: 'token',
           callType: 'send',
           methodName: 'approve',
           spender: STAKING_CONTRACT_ADDRESS,
-          amount: BigInt(stakingAmount * 1e18).toString()
+          amount: BigInt(stakingAmount * 1e18)
         });
       }
       await callTokenContractMethod({
         contractType: 'staking',
         callType: 'send',
         methodName: 'stake',
-        amount: BigInt(stakingAmount * 1e18).toString()
+        amount: BigInt(stakingAmount * 1e18)
       });
       enqueueSnackbar(`${type} success`, { variant: 'success' });
       window.location.reload();
@@ -750,7 +765,7 @@ export default function Rewards() {
               </div>
             </Tooltip>
             <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'text.secondary', mb: 1 }} align="center">
-              {`1 PASAR ≈ USD ${PASARToUSD.toFixed(2)}`}
+              {`1 PASAR ≈ USD ${PASARToUSD.toFixed(4)}`}
             </Typography>
           </Box>
           <Button
@@ -777,7 +792,7 @@ export default function Rewards() {
             value={tabValue}
             variant="scrollable"
             scrollButtons="auto"
-            onChange={handleSwitchTab}
+            onChange={(_, value) => setTabValue(value)}
             TabIndicatorProps={{
               style: { background: '#FF5082' }
             }}
@@ -831,11 +846,11 @@ export default function Rewards() {
                   earned
                 </Typography>
                 <EarnedValueStyle variant="h2" sx={{ display: 'inline-flex' }}>
-                  {miningReward.all.withdrawable.toFixed(2)}
+                  {miningReward.all.withdrawable.toFixed(4)}
                 </EarnedValueStyle>
                 <Typography variant="body2" color="text.secondary">{`≈ USD ${(
                   miningReward.all.total * PASARToUSD
-                ).toFixed(2)}`}</Typography>
+                ).toFixed(4)}`}</Typography>
               </Box>
               <Box sx={{ textAlign: 'center', m: 'auto' }}>
                 <Typography variant="body2" align="center" color="text.secondary" sx={{ pb: 2 }}>
@@ -978,10 +993,10 @@ export default function Rewards() {
             </AccordionSummary>
             <AccordionDetails>
               <Box mb={2}>
-                <EarnedValueStyle variant="h2">{stakingState.currentStaked.toFixed(2)}</EarnedValueStyle>
+                <EarnedValueStyle variant="h2">{stakingState.currentStaked.toFixed(4)}</EarnedValueStyle>
                 <Typography variant="body2" color="text.secondary">{`≈ USD ${(
                   stakingState.currentStaked * PASARToUSD
-                ).toFixed(2)}`}</Typography>
+                ).toFixed(4)}`}</Typography>
               </Box>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={8}>
@@ -1005,7 +1020,7 @@ export default function Rewards() {
                     <Stack direction="row" alignItems="center">
                       <Typography variant="body2">PASAR in wallet:</Typography>&nbsp;
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {pasarBalance.toFixed(2)}
+                        {pasarBalance.toFixed(4)}
                       </EarnedValueStyle>
                       &nbsp;
                       <Typography variant="body2" color="text.secondary">{`≈ USD ${(pasarBalance * PASARToUSD).toFixed(
@@ -1086,7 +1101,7 @@ export default function Rewards() {
                     <Box textAlign="right">
                       <Typography variant="body1">PASAR in wallet:</Typography>
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {pasarBalance.toFixed(2)}
+                        {pasarBalance.toFixed(4)}
                       </EarnedValueStyle>
                       <Typography variant="body1" color="text.secondary">{`≈ USD ${(pasarBalance * PASARToUSD).toFixed(
                         2
@@ -1116,10 +1131,10 @@ export default function Rewards() {
             </AccordionSummary>
             <AccordionDetails>
               <Box mb={2}>
-                <EarnedValueStyle variant="h2">{stakingState.rewardWithdrawable.toFixed(2)}</EarnedValueStyle>
+                <EarnedValueStyle variant="h2">{stakingState.rewardWithdrawable.toFixed(4)}</EarnedValueStyle>
                 <Typography variant="body2" color="text.secondary">{`≈ USD ${(
                   stakingState.rewardWithdrawable * PASARToUSD
-                ).toFixed(2)}`}</Typography>
+                ).toFixed(4)}`}</Typography>
               </Box>
               <Grid container spacing={2}>
                 <MHidden width="smUp">
@@ -1127,12 +1142,12 @@ export default function Rewards() {
                     <Stack direction="row" alignItems="center">
                       <Typography variant="body2">Received so far:</Typography>&nbsp;
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {stakingState.rewardWithdrawn.toFixed(2)}
+                        {stakingState.rewardWithdrawn.toFixed(4)}
                       </EarnedValueStyle>
                       &nbsp;
                       <Typography variant="body2" color="text.secondary">{`≈ USD ${(
                         stakingState.rewardWithdrawn * PASARToUSD
-                      ).toFixed(2)}`}</Typography>
+                      ).toFixed(4)}`}</Typography>
                     </Stack>
                   </Grid>
                 </MHidden>
@@ -1146,11 +1161,11 @@ export default function Rewards() {
                     <Box textAlign="right">
                       <Typography variant="body1">Received so far:</Typography>
                       <EarnedValueStyle variant="h6" sx={{ display: 'inline-flex' }}>
-                        {stakingState.rewardWithdrawn.toFixed(2)}
+                        {stakingState.rewardWithdrawn.toFixed(4)}
                       </EarnedValueStyle>
                       <Typography variant="body1" color="text.secondary">{`≈ USD ${(
                         stakingState.rewardWithdrawn * PASARToUSD
-                      ).toFixed(2)}`}</Typography>
+                      ).toFixed(4)}`}</Typography>
                     </Box>
                   </Grid>
                 </MHidden>
