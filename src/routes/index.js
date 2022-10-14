@@ -117,6 +117,7 @@ export default function Router() {
   ]);
 }
 
+const MarketHome = Loadable(lazy(() => import('../pages/MarketHome')));
 // Explorer
 const Explorer = Loadable(lazy(() => import('../pages/explorer/Explorer')));
 const Collectible = Loadable(lazy(() => import('../pages/explorer/Collectible')));
@@ -125,7 +126,6 @@ const Transaction = Loadable(lazy(() => import('../pages/explorer/Transaction'))
 const AddressDetail = Loadable(lazy(() => import('../pages/explorer/AddressDetail')));
 const SearchResult = Loadable(lazy(() => import('../pages/explorer/SearchResult')));
 // Marketplace
-const MarketHome = Loadable(lazy(() => import('../pages/MarketHome')));
 const MarketExplorer = Loadable(lazy(() => import('../pages/marketplace/Explorer')));
 const CreateItem = Loadable(lazy(() => import('../pages/marketplace/CreateItem')));
 const MyItems = Loadable(lazy(() => import('../pages/marketplace/MyItems')));
