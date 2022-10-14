@@ -202,7 +202,6 @@ export default function Features() {
                       flex: 1,
                       backgroundColor: 'origin.main',
                       color: 'white',
-                      // border: '1px solid black',
                       p: 2,
                       borderTopLeftRadius: _i===0?16:0,
                       borderBottomLeftRadius: isLastItem?16:0

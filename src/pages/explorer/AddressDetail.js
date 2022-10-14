@@ -75,6 +75,7 @@ export default function AddressDetail() {
   const [keyword, setKeyword] = React.useState('');
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
+  
   React.useEffect(() => {
     const fetchData = async () => {
       controller.abort(); // cancel the previous request
@@ -139,6 +140,7 @@ export default function AddressDetail() {
     setPage(1);
     setByTo(selected);
   };
+
   return (
     <RootStyle title="Transaction | PASAR">
       <Container maxWidth="lg">
