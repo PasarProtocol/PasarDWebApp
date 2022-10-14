@@ -3,13 +3,21 @@ import React from 'react';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Grid, Paper, Typography, Accordion, AccordionSummary, AccordionDetails, FormControlLabel } from '@mui/material';
+import {
+  Container,
+  Stack,
+  Grid,
+  Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  FormControlLabel
+} from '@mui/material';
 // components
 import Page from '../../components/Page';
 import LoadingScreen from '../../components/LoadingScreen';
-import TransactionListItem from '../../components/explorer/TransactionList/TransactionListItem'
-import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail'
-import TransactionCollectibleDetail from '../../components/explorer/TransactionList/TransactionCollectibleDetail'
+import TransactionListItem from '../../components/explorer/TransactionList/TransactionListItem';
+import TransactionOrderDetail from '../../components/explorer/TransactionList/TransactionOrderDetail';
 import ShowSelect from '../../components/pagination/ShowSelect';
 import Pagination from '../../components/pagination';
 import LoadingWrapper from '../../components/LoadingWrapper';
@@ -50,127 +58,132 @@ export default function Transaction() {
   const [pages, setPages] = React.useState(0);
   const [totalCount, setTotalCount] = React.useState(0);
   const [showCount, setShowCount] = React.useState(10);
-  const [methods, setMethods] = React.useState("");
+  const [methods, setMethods] = React.useState('');
   const [timeOrder, setTimeOrder] = React.useState(-1);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
   React.useEffect(() => {
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
-    const {signal} = newController;
+    const { signal } = newController;
     setAbortController(newController);
 
     setLoadingTransactions(true);
-    fetchFrom(`api/v2/sticker/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`, { signal }).then(response => {
-      response.json().then(jsonTransactions => {
-        if(jsonTransactions.data) {
-          setTotalCount(jsonTransactions.data.total)
-          setPages(Math.ceil(jsonTransactions.data.total/showCount));
-          setTransactions(jsonTransactions.data.results);
-        }
-        setLoadingTransactions(false);
+    fetchFrom(
+      `api/v2/sticker/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`,
+      { signal }
+    )
+      .then((response) => {
+        response.json().then((jsonTransactions) => {
+          if (jsonTransactions.data) {
+            setTotalCount(jsonTransactions.data.total);
+            setPages(Math.ceil(jsonTransactions.data.total / showCount));
+            setTransactions(jsonTransactions.data.results);
+          }
+          setLoadingTransactions(false);
+        });
       })
-    }).catch(e => {
-      if(e.code !== e.ABORT_ERR)
-        setLoadingTransactions(false);
-    });
+      .catch((e) => {
+        if (e.code !== e.ABORT_ERR) setLoadingTransactions(false);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, showCount, methods, timeOrder]);
 
   React.useEffect(() => {
     expandAllIf(isExpanded);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transactions]);
 
-  const changeShowCount = (event) => {setShowCount(event.target.value)};
+  const changeShowCount = (event) => {
+    setShowCount(event.target.value);
+  };
 
   const handleChange = (event) => {
     setExpandFlag(event.target.checked);
     expandAllIf(event.target.checked);
   };
   const expandAllIf = (flag) => {
-    if(flag)
-      setExpandedList([...Array(transactions.length).keys()]);
-    else
-      setExpandedList([]);
-  }
+    if (flag) setExpandedList([...Array(transactions.length).keys()]);
+    else setExpandedList([]);
+  };
   const handleAccordClick = (key) => {
-    const temp = [...expanded]
-    if(temp.includes(key))
-      temp.splice(temp.indexOf(key),1)
-    else
-      temp.push(key)
-    setExpandedList(temp)
-  }
-  const handleMethod = (selected)=>{
-    setPage(1)
-    setMethods(selected)
-  }
-  const handleDateOrder = (selected)=>{
-    setPage(1)
-    setTimeOrder(selected)
-  }
+    const temp = [...expanded];
+    if (temp.includes(key)) temp.splice(temp.indexOf(key), 1);
+    else temp.push(key);
+    setExpandedList(temp);
+  };
+  const handleMethod = (selected) => {
+    setPage(1);
+    setMethods(selected);
+  };
+  const handleDateOrder = (selected) => {
+    setPage(1);
+    setTimeOrder(selected);
+  };
   return (
     <RootStyle title="Transaction | PASAR">
       <Container maxWidth="lg">
         <StackStyle sx={{ mb: 2 }}>
-            <Typography component="div" sx={{flex:1}}>
-                <Typography variant="h4" sx={{pb: 1, pr:1, display: 'inline-block'}}>
-                  All Transactions
-                </Typography>
-                <InlineBox>
-                  <MethodSelect onChange={handleMethod}/>
-                  <DateOrderSelect onChange={handleDateOrder}/>
-                </InlineBox>
-                <FormControlLabel
-                  control={<CustomSwitch onChange={handleChange}/>}
-                  label="Show Details"
-                  labelPlacement="start"
-                  sx={{ml:0, pr:2}}
-                />
-                <Typography variant="body2" sx={{ display: 'inline-block' }}>{totalCount.toLocaleString('en')} transactions</Typography>
+          <Typography component="div" sx={{ flex: 1 }}>
+            <Typography variant="h4" sx={{ pb: 1, pr: 1, display: 'inline-block' }}>
+              All Transactions
             </Typography>
-            <div className="top-pagination">
-              <Pagination page={page} pages={pages} onChange={setPage} />
-            </div>
+            <InlineBox>
+              <MethodSelect onChange={handleMethod} />
+              <DateOrderSelect onChange={handleDateOrder} />
+            </InlineBox>
+            <FormControlLabel
+              control={<CustomSwitch onChange={handleChange} />}
+              label="Show Details"
+              labelPlacement="start"
+              sx={{ ml: 0, pr: 2 }}
+            />
+            <Typography variant="body2" sx={{ display: 'inline-block' }}>
+              {totalCount.toLocaleString('en')} transactions
+            </Typography>
+          </Typography>
+          <div className="top-pagination">
+            <Pagination page={page} pages={pages} onChange={setPage} />
+          </div>
         </StackStyle>
-        {isLoadingTransactions && <LoadingWrapper><LoadingScreen sx={{background: 'transparent'}}/></LoadingWrapper>}
+        {isLoadingTransactions && (
+          <LoadingWrapper>
+            <LoadingScreen sx={{ background: 'transparent' }} />
+          </LoadingWrapper>
+        )}
         <Grid container spacing={2}>
           {transactions.map((item, key) => (
-              <Grid key={key} item xs={12}>
-                <Accordion 
-                  expanded={expanded.includes(key)}
-                  onClick={(e) => handleAccordClick(key)}
-                  sx={{
-                    border: '1px solid',
-                    borderColor: 'action.disabledBackground',
-                    boxShadow: (theme) => theme.customShadows.z1
-                  }}
-                >
-                  <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
-                    <TransactionListItem
-                        item={item}
-                    />
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <TransactionOrderDetail
-                        isAlone={false}
-                        item={item}
-                    />
-                    </AccordionDetails>
-                </Accordion>
-              </Grid>
+            <Grid key={key} item xs={12}>
+              <Accordion
+                expanded={expanded.includes(key)}
+                onClick={() => handleAccordClick(key)}
+                sx={{
+                  border: '1px solid',
+                  borderColor: 'action.disabledBackground',
+                  boxShadow: (theme) => theme.customShadows.z1
+                }}
+              >
+                <AccordionSummary expandIcon={<Icon icon={arrowIosDownwardFill} width={20} height={20} />}>
+                  <TransactionListItem item={item} />
+                </AccordionSummary>
+                <AccordionDetails>
+                  <TransactionOrderDetail isAlone={false} item={item} />
+                </AccordionDetails>
+              </Accordion>
+            </Grid>
           ))}
         </Grid>
-        {
-            transactions.length>0 &&
-            <StackStyle  sx={{ mt: 2, display: 'block' }}>
-                <Pagination page={page} pages={pages} onChange={setPage}/>
-                <ShowSelect count={showCount} onChange={changeShowCount}/>
-            </StackStyle>
-        }
-        {
-            !isLoadingTransactions && !transactions.length &&
-            <Typography variant="h4" align='center' sx={{mt: 2}}>No transaction found!</Typography>
-        }
+        {transactions.length > 0 && (
+          <StackStyle sx={{ mt: 2, display: 'block' }}>
+            <Pagination page={page} pages={pages} onChange={setPage} />
+            <ShowSelect count={showCount} onChange={changeShowCount} />
+          </StackStyle>
+        )}
+        {!isLoadingTransactions && !transactions.length && (
+          <Typography variant="h4" align="center" sx={{ mt: 2 }}>
+            No transaction found!
+          </Typography>
+        )}
       </Container>
     </RootStyle>
   );
