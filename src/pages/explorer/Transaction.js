@@ -62,6 +62,7 @@ export default function Transaction() {
   const [timeOrder, setTimeOrder] = React.useState(-1);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
+
   React.useEffect(() => {
     controller.abort(); // cancel the previous request
     const newController = new AbortController();
@@ -120,6 +121,7 @@ export default function Transaction() {
     setPage(1);
     setTimeOrder(selected);
   };
+  
   return (
     <RootStyle title="Transaction | PASAR">
       <Container maxWidth="lg">

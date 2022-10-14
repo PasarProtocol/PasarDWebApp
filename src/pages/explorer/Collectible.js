@@ -80,6 +80,7 @@ export default function Collectible() {
   const link2Detail = (tokenId, baseToken) => {
     navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   };
+  
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">

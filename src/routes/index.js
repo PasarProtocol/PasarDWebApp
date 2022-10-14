@@ -124,7 +124,6 @@ const CollectibleDetail = Loadable(lazy(() => import('../pages/explorer/Collecti
 const Transaction = Loadable(lazy(() => import('../pages/explorer/Transaction')));
 const AddressDetail = Loadable(lazy(() => import('../pages/explorer/AddressDetail')));
 const SearchResult = Loadable(lazy(() => import('../pages/explorer/SearchResult')));
-const MarketCollectibleDetail = Loadable(lazy(() => import('../pages/marketplace/CollectibleDetail')));
 // Marketplace
 const MarketHome = Loadable(lazy(() => import('../pages/MarketHome')));
 const MarketExplorer = Loadable(lazy(() => import('../pages/marketplace/Explorer')));
@@ -132,6 +131,7 @@ const CreateItem = Loadable(lazy(() => import('../pages/marketplace/CreateItem')
 const MyItems = Loadable(lazy(() => import('../pages/marketplace/MyItems')));
 const MyProfile = Loadable(lazy(() => import('../pages/marketplace/MyProfile')));
 const EditProfile = Loadable(lazy(() => import('../pages/marketplace/EditProfile')));
+const MarketCollectibleDetail = Loadable(lazy(() => import('../pages/marketplace/CollectibleDetail')));
 // Collection
 const CollectionExplorer = Loadable(lazy(() => import('../pages/collection/Explorer')));
 const CollectionDetail = Loadable(lazy(() => import('../pages/collection/CollectionDetail')));

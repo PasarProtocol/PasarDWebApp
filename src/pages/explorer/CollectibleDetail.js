@@ -70,6 +70,7 @@ export default function CollectibleDetail() {
   const [isVideo, setIsVideo] = React.useState(false);
   const [videoIsLoaded, setVideoIsLoaded] = React.useState(false);
   const imageRef = React.useRef();
+  
   React.useEffect(() => {
     const fetchData = async () => {
       fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`)
@@ -199,6 +200,7 @@ export default function CollectibleDetail() {
   };
 
   const imageUrl = getAssetImage(collectible, false);
+
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">
