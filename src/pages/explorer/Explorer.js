@@ -3,14 +3,14 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Container, Stack, Grid } from '@mui/material';
 // components
-import Page from '../components/Page';
-import { MHidden } from '../components/@material-extend';
-import MainLogo from '../components/main-logo';
-import SearchBox from '../components/SearchBox';
-import StatisticPanel from '../components/explorer/StatisticPanel';
-import NewestCollectibles from '../components/explorer/CollectionView/NewestCollectibles';
-import LatestTransactions from '../components/explorer/CollectionView/LatestTransactions';
-import { fetchFrom } from '../utils/common';
+import Page from '../../components/Page';
+import { MHidden } from '../../components/@material-extend';
+import MainLogo from '../../components/main-logo';
+import SearchBox from '../../components/SearchBox';
+import StatisticPanel from '../../components/explorer/StatisticPanel';
+import NewestCollectibles from '../../components/explorer/CollectionView/NewestCollectibles';
+import LatestTransactions from '../../components/explorer/CollectionView/LatestTransactions';
+import { fetchFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({

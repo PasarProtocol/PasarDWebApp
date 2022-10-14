@@ -118,13 +118,13 @@ export default function Router() {
 }
 
 // Explorer
-const Explorer = Loadable(lazy(() => import('../pages/Explorer')));
+const Explorer = Loadable(lazy(() => import('../pages/explorer/Explorer')));
 const Collectible = Loadable(lazy(() => import('../pages/explorer/Collectible')));
-const SearchResult = Loadable(lazy(() => import('../pages/explorer/SearchResult')));
 const CollectibleDetail = Loadable(lazy(() => import('../pages/explorer/CollectibleDetail')));
-const MarketCollectibleDetail = Loadable(lazy(() => import('../pages/marketplace/CollectibleDetail')));
 const Transaction = Loadable(lazy(() => import('../pages/explorer/Transaction')));
 const AddressDetail = Loadable(lazy(() => import('../pages/explorer/AddressDetail')));
+const SearchResult = Loadable(lazy(() => import('../pages/explorer/SearchResult')));
+const MarketCollectibleDetail = Loadable(lazy(() => import('../pages/marketplace/CollectibleDetail')));
 // Marketplace
 const MarketHome = Loadable(lazy(() => import('../pages/MarketHome')));
 const MarketExplorer = Loadable(lazy(() => import('../pages/marketplace/Explorer')));
