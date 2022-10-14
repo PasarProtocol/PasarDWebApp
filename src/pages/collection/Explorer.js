@@ -74,6 +74,7 @@ export default function Explorer() {
             setLoadingCollections(false);
           })
           .catch((e) => {
+            console.error(e);
             setLoadingCollections(false);
           });
       })
