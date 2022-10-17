@@ -10,7 +10,6 @@ import {
   Typography,
   Paper,
   Divider,
-  Link,
   Tooltip,
   Button,
   Tabs,
@@ -78,17 +77,13 @@ const AccordionStyle = styled(Accordion)(({ theme }) => ({
   [theme.breakpoints.up('xl')]: {
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2)
-    // paddingTop: theme.spacing(1),
-    // paddingBottom: theme.spacing(1)
   },
   [theme.breakpoints.up('sm')]: {
     paddingLeft: theme.spacing(4),
     paddingRight: theme.spacing(4)
-    // paddingTop: theme.spacing(2),
-    // paddingBottom: theme.spacing(2)
   }
 }));
-const EarnedValueStyle = styled(Typography)(({ theme }) => ({
+const EarnedValueStyle = styled(Typography)({
   backgroundImage: 'linear-gradient(90deg, #FF5082, #a951f4)',
   backgroundSize: '100%',
   backgroundRepeat: 'repeat',
@@ -97,7 +92,7 @@ const EarnedValueStyle = styled(Typography)(({ theme }) => ({
   MozBackgroundClip: 'text',
   MozTextFillColor: 'transparent',
   display: 'inline'
-}));
+});
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   '& .MuiToggleButtonGroup-grouped': {
     border: 0,
@@ -134,8 +129,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     borderBottomRightRadius: 0
   }
 }));
-const StyledSlider = styled(Slider)(({ theme }) => ({
-  // color: 'blue',
+const StyledSlider = styled(Slider)({
   marginTop: 8,
   '& .MuiSlider-thumb': {
     backgroundColor: '#5159ff'
@@ -149,12 +143,15 @@ const StyledSlider = styled(Slider)(({ theme }) => ({
     color: 'grey',
     height: 10
   }
-}));
+});
 const PinkLabel = ({ text }) => (
   <Typography variant="body2" color="origin.main" sx={{ display: 'inline' }}>
     {text}
   </Typography>
 );
+PinkLabel.propTypes = {
+  text: PropTypes.string
+};
 const PaperStyle = (props) => (
   <Paper
     sx={{
@@ -166,6 +163,10 @@ const PaperStyle = (props) => (
     {props.children}
   </Paper>
 );
+PaperStyle.propTypes = {
+  sx: PropTypes.any,
+  children: PropTypes.node
+};
 
 const ClaimCard = ({ item, onClick }) => (
   <PaperStyle>
@@ -201,15 +202,6 @@ const ClaimCard = ({ item, onClick }) => (
 ClaimCard.propTypes = {
   item: PropTypes.object,
   onClick: PropTypes.func
-};
-
-const ExternalLink = (props) => {
-  const { linkURL, title } = props;
-  return (
-    <Link underline="always" href={linkURL} target="_blank" color="text.secondary">
-      {title}
-    </Link>
-  );
 };
 
 const AmountProgressType = ['25%', '50%', '75%', 'Max'];
@@ -675,7 +667,8 @@ export default function Rewards() {
       return;
     }
     let stakingAmount = stakingSettleAmount < 0 ? 0 : stakingSettleAmount;
-    if (type === 'Stake' && BigInt(pasarBalance) + BigInt(stakingInfo.currentStaked) < BigInt(stakingAmount)) stakingAmount = BigInt(pasarBalance) + BigInt(stakingInfo.currentStaked);
+    if (type === 'Stake' && BigInt(pasarBalance) + BigInt(stakingInfo.currentStaked) < BigInt(stakingAmount))
+      stakingAmount = BigInt(pasarBalance) + BigInt(stakingInfo.currentStaked);
     if (amount === 0) {
       enqueueSnackbar('The amount you selected is 0, please select bigger than 0', { variant: 'info' });
       return;
