@@ -5,34 +5,21 @@ import SwipeableViews from 'react-swipeable-views';
 import { isMobile } from 'react-device-detect';
 
 import { styled } from '@mui/material/styles';
-import { Container, Stack, Typography, Tab, Tabs, Link, Button, Grid, Box, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material';
-// import { TabContext, TabList, TabPanel } from '@mui/lab';
-import SquareIcon from '@mui/icons-material/Square';
-import AppsIcon from '@mui/icons-material/Apps';
-import GridViewSharpIcon from '@mui/icons-material/GridViewSharp';
-import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
-import { Icon } from '@iconify/react';
+import { Container, Stack, Typography, Tab, Tabs, Link, Grid, Box, Tooltip } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
 import jwtDecode from 'jwt-decode';
 // components
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
-import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
-import LoadingScreen from '../../components/LoadingScreen';
-import MyItemsSortSelect from '../../components/MyItemsSortSelect';
 import AssetGrid from '../../components/marketplace/AssetGrid';
-import { useEagerConnect } from '../../components/signin-dlg/hook';
 import RingAvatar from '../../components/RingAvatar';
-import Badge from '../../components/badge/Badge';
 import KYCBadge from '../../components/badge/KYCBadge';
 import DIABadge from '../../components/badge/DIABadge';
-import AddressCopyButton from '../../components/AddressCopyButton';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup';
 import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import {
-  queryAvatarUrl,
   queryName,
   queryDescription,
   queryWebsite,
@@ -43,10 +30,13 @@ import {
   queryKycMe,
   downloadAvatar
 } from '../../components/signin-dlg/HiveAPI';
-import { downloadFromUrl } from '../../components/signin-dlg/HiveService';
-import { reduceHexAddress, getDiaTokenInfo, fetchFrom, getInfoFromDID, getDidInfoFromAddress, isInAppBrowser, getCredentialInfo } from '../../utils/common';
-
-import { getUserCredentials } from '../../components/signin-dlg/LoadCredentials';
+import {
+  reduceHexAddress,
+  getDiaTokenInfo,
+  fetchFrom,
+  getDidInfoFromAddress,
+  isInAppBrowser
+} from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -61,25 +51,6 @@ const RootStyle = styled(Page)(({ theme }) => ({
   }
 }));
 
-const StackStyle = styled(Stack)(({ theme }) => ({
-  flexDirection: 'row',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column'
-  }
-}));
-
-const ToolGroupStyle = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  [theme.breakpoints.up('sm')]: {
-    position: 'absolute',
-    right: 0,
-    bottom: 0
-  },
-  [theme.breakpoints.down('sm')]: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1)
-  }
-}));
 // ----------------------------------------------------------------------
 export default function MyItems() {
   const defaultDispMode = isMobile ? 1 : 0;
@@ -90,10 +61,8 @@ export default function MyItems() {
   const [collections, setCollections] = React.useState([]);
   const [isLoadingCollection, setLoadingCollection] = React.useState(false);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
-  const [dispmode, setDispmode] = React.useState(
-    sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode
-  );
-  const [orderType, setOrderType] = React.useState(0);
+  const [dispmode] = React.useState(sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode);
+  const [orderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(params.type !== undefined ? parseInt(params.type, 10) : 0);
   const [walletAddress, setWalletAddress] = React.useState(null);
@@ -114,7 +83,6 @@ export default function MyItems() {
     telegram: queryTelegram,
     medium: queryMedium
   };
-  // const socialTypes = [ 'website', 'twitter', 'discord', 'telegram', 'medium' ]
   React.useEffect(() => {
     if (params.address && params.address !== myAddress) {
       setWalletAddress(params.address);
@@ -124,7 +92,9 @@ export default function MyItems() {
           if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
             fetchProfileData(info.did, { name: info.name || '', bio: info.description || '' });
         })
-        .catch((e) => {});
+        .catch((e) => {
+          console.error(e);
+        });
     } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
       setWalletAddress(myAddress);
       const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`;
@@ -135,63 +105,32 @@ export default function MyItems() {
       setWalletAddress(myAddress);
       setDidInfo({ name: '', description: '' });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myAddress, params.address]);
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  // const triedEager = useEagerConnect();
-  React.useEffect(async () => {
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1') {
-      setMyAddress(account);
-      // setWalletAddress(account);
-    } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
-      const strWalletAddress = isInAppBrowser()
-        ? await window.elastos.getWeb3Provider().address
-        : essentialsConnector.getWalletConnectProvider().wc.accounts[0];
-      setMyAddress(strWalletAddress);
-      // setWalletAddress(strWalletAddress);
-    } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
-      const strWalletAddress = await walletconnect.getAccount();
-      setMyAddress(strWalletAddress);
-      // setWalletAddress(strWalletAddress);
-    } else if (!params.address) {
-      navigate('/marketplace');
-    }
-    // ----------------------------------------------------------
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1') {
+        setMyAddress(account);
+      } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+        const strWalletAddress = isInAppBrowser()
+          ? await window.elastos.getWeb3Provider().address
+          : essentialsConnector.getWalletConnectProvider().wc.accounts[0];
+        setMyAddress(strWalletAddress);
+      } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
+        const strWalletAddress = await walletconnect.getAccount();
+        setMyAddress(strWalletAddress);
+      } else if (!params.address) {
+        navigate('/marketplace');
+      }
+      // ----------------------------------------------------------
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, params.address]);
 
   const fetchProfileData = (targetDid, didInfo) => {
-    // getUserCredentials(targetDid)
-    //   .then(credentials => {
-    //     if(!credentials)
-    //       return
-
-    //     if(credentials.name)
-    //       setDidInfoValue('name', credentials.name);
-    //     else setDidInfoValue('name', didInfo.name);
-
-    //     if(credentials.description)
-    //       setDidInfoValue('description', credentials.description);
-    //     else setDidInfoValue('description', didInfo.bio);
-
-    //     if(credentials.avatarUrl) {
-    //       setAvatarUrl(credentials.avatarUrl)
-    //     }
-
-    //     if(credentials.kycMe)
-    //       setBadgeFlag('kyc', true)
-    //     else
-    //       setBadgeFlag('kyc', false)
-
-    //     socialTypes.forEach((type) => {
-    //       if (credentials[type])
-    //         setSocials((prevState) => {
-    //           const tempState = { ...prevState };
-    //           tempState[type] = credentials[type];
-    //           return tempState;
-    //         });
-    //     });
-    //   })
-
     queryName(targetDid)
       .then((res) => {
         if (res.find_message && res.find_message.items.length)
@@ -203,36 +142,22 @@ export default function MyItems() {
             setDidInfoValue('description', res.find_message.items[0].display_name);
           else setDidInfoValue('description', didInfo.bio);
         });
-        // queryAvatarUrl(targetDid).then((res) => {
-        //   if (res.find_message && res.find_message.items.length) {
-        //     const avatarUrl = res.find_message.items[0].display_name;
-        //     downloadFromUrl(avatarUrl).then((avatarData) => {
-        //       if (avatarData && avatarData.length) {
-        //         const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`;
-        //         setAvatarUrl(base64Content);
-        //       }
-        //     });
-        //   }
-        // });
         downloadAvatar(targetDid).then((res) => {
           if (res && res.length) {
             const base64Content = res.reduce((content, code) => {
               content = `${content}${String.fromCharCode(code)}`;
-              return content
-            }, '')
+              return content;
+            }, '');
             setAvatarUrl((prevState) => {
-              if(!prevState)
-                return `data:image/png;base64,${base64Content}`
-              return prevState
-            })
+              if (!prevState) return `data:image/png;base64,${base64Content}`;
+              return prevState;
+            });
           }
         });
         queryKycMe(targetDid).then((res) => {
-          if(res.find_message && res.find_message.items.length)
-            setBadgeFlag('kyc', true)
-          else
-            setBadgeFlag('kyc', false)
-        })
+          if (res.find_message && res.find_message.items.length) setBadgeFlag('kyc', true);
+          else setBadgeFlag('kyc', false);
+        });
         Object.keys(queryProfileSocials).forEach((field) => {
           queryProfileSocials[field](targetDid).then((res) => {
             if (res.find_message && res.find_message.items.length)
@@ -257,7 +182,7 @@ export default function MyItems() {
     });
   };
 
-  const handleSwitchTab = (event, newValue) => {
+  const handleSwitchTab = (_, newValue) => {
     setTabValue(newValue);
   };
 
@@ -291,71 +216,71 @@ export default function MyItems() {
   };
   const apiNames = ['getListedCollectiblesByAddress', 'getOwnCollectiblesByAddress', 'getCreatedCollectiblesByAddress'];
   const typeNames = ['listed', 'owned', 'minted'];
-  React.useEffect(async () => {
-    if (walletAddress) {
-      getDiaTokenInfo(walletAddress).then((dia) => {
-        if(dia!=='0')
-          setBadgeFlag('dia', dia)
-        else setBadgeFlag('dia', 0)
-      })
-    }
-    controller.abort(); // cancel the previous request
-    const newController = new AbortController();
-    const { signal } = newController;
-    setAbortController(newController);
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (walletAddress) {
+        getDiaTokenInfo(walletAddress).then((dia) => {
+          if (dia !== '0') setBadgeFlag('dia', dia);
+          else setBadgeFlag('dia', 0);
+        });
+      }
+      controller.abort(); // cancel the previous request
+      const newController = new AbortController();
+      const { signal } = newController;
+      setAbortController(newController);
 
-    Array(3)
-      .fill(0)
-      .forEach((_, i) => {
-        setLoadingAssetsOfType(i, true);
-        fetchFrom(`api/v2/sticker/${apiNames[i]}/${walletAddress}?orderType=${orderType}`, { signal })
+      Array(3)
+        .fill(0)
+        .forEach((_, i) => {
+          setLoadingAssetsOfType(i, true);
+          fetchFrom(`api/v2/sticker/${apiNames[i]}/${walletAddress}?orderType=${orderType}`, { signal })
+            .then((response) => {
+              response
+                .json()
+                .then((jsonAssets) => {
+                  setAssetsOfType(i, jsonAssets.data);
+                  setLoadingAssetsOfType(i, false);
+                })
+                .catch((e) => {
+                  console.error(e);
+                  setLoadingAssetsOfType(i, false);
+                });
+            })
+            .catch((e) => {
+              console.error(e);
+              if (e.code !== e.ABORT_ERR) setLoadingAssetsOfType(i, false);
+            });
+        });
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletAddress, orderType, updateCount]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (walletAddress) {
+        setLoadingCollection(true);
+        fetchFrom(`api/v2/sticker/getCollectionByOwner/${walletAddress}`)
           .then((response) => {
             response
               .json()
               .then((jsonAssets) => {
-                setAssetsOfType(i, jsonAssets.data);
-                setLoadingAssetsOfType(i, false);
+                setCollections(jsonAssets.data);
+                setLoadingCollection(false);
               })
               .catch((e) => {
-                setLoadingAssetsOfType(i, false);
+                console.error(e);
+                setLoadingCollection(false);
               });
           })
           .catch((e) => {
-            if (e.code !== e.ABORT_ERR) setLoadingAssetsOfType(i, false);
+            if (e.code !== e.ABORT_ERR) setLoadingCollection(false);
           });
-      });
-  }, [walletAddress, orderType, updateCount]);
-
-  React.useEffect(async () => {
-    if (walletAddress) {
-      setLoadingCollection(true);
-      fetchFrom(`api/v2/sticker/getCollectionByOwner/${walletAddress}`)
-        .then((response) => {
-          response
-            .json()
-            .then((jsonAssets) => {
-              setCollections(jsonAssets.data);
-              setLoadingCollection(false);
-            })
-            .catch((e) => {
-              setLoadingCollection(false);
-            });
-        })
-        .catch((e) => {
-          if (e.code !== e.ABORT_ERR) setLoadingCollection(false);
-        });
-    }
+      }
+    };
+    fetchData();
   }, [walletAddress]);
 
-  const handleDispmode = (event, mode) => {
-    if (mode === null)
-      return
-    sessionStorage.setItem('disp-mode', mode);
-    setDispmode(mode);
-  };
-  const link2Detail = (tokenId, baseToken) => {
-    navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
-  };
   const loadingSkeletons = Array(10).fill(null);
 
   return (
@@ -373,12 +298,13 @@ export default function MyItems() {
                 </span>
               </Link>
               <Stack sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                {
-                  badge.kyc&&
+                {badge.kyc && (
                   <Tooltip title="KYC-ed via kyc-me.io" arrow enterTouchDelay={0}>
-                    <Box sx={{display: 'inline-flex'}} ml={2}><KYCBadge size="large"/></Box>
+                    <Box sx={{ display: 'inline-flex' }} ml={2}>
+                      <KYCBadge size="large" />
+                    </Box>
                   </Tooltip>
-                }
+                )}
               </Stack>
             </Stack>
             {didInfo.name.length > 0 && (
@@ -392,30 +318,14 @@ export default function MyItems() {
               </Typography>
             )}
           </Typography>
-          {
-            Object.keys(socials).length>0 && 
+          {Object.keys(socials).length > 0 && (
             <Box sx={{ py: 1.5 }}>
-              <IconLinkButtonGroup {...socials}/>
+              <IconLinkButtonGroup {...socials} />
             </Box>
-          }
+          )}
           <Stack sx={{ justifyContent: 'center', pt: 1 }} spacing={1} direction="row">
-            {
-              badge.dia>0 && <DIABadge balance={badge.dia}/>
-            }
+            {badge.dia > 0 && <DIABadge balance={badge.dia} />}
           </Stack>
-          {/* <MHidden width="smUp">
-            <ToolGroupStyle>
-              <MyItemsSortSelect onChange={setOrderType} sx={{ flex: 1 }} />
-              <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-                <ToggleButton value={0}>
-                  <SquareIcon />
-                </ToggleButton>
-                <ToggleButton value={1}>
-                  <GridViewSharpIcon />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </ToolGroupStyle>
-          </MHidden> */}
         </Box>
         <Box sx={{ display: 'flex', position: 'relative', mb: 2, justifyContent: 'center' }} align="center">
           <Tabs value={tabValue} onChange={handleSwitchTab} TabIndicatorProps={{ style: { background: '#FF5082' } }}>
@@ -424,19 +334,6 @@ export default function MyItems() {
             <Tab label={`Minted (${assets[2].length})`} value={2} />
             <Tab label={`Collections (${collections.length})`} value={3} />
           </Tabs>
-          {/* <MHidden width="smDown">
-            <ToolGroupStyle>
-              <MyItemsSortSelect onChange={setOrderType} />
-              <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
-                <ToggleButton value={0}>
-                  <GridViewSharpIcon />
-                </ToggleButton>
-                <ToggleButton value={1}>
-                  <AppsIcon />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </ToolGroupStyle>
-          </MHidden> */}
         </Box>
         <Box
           sx={{
@@ -453,7 +350,6 @@ export default function MyItems() {
           >
             {assets.map((group, i) => (
               <Box key={i} sx={{ minHeight: 200, p: '10px' }}>
-                {/* {isLoadingAssets[i] && <LoadingScreen sx={{ background: 'transparent' }} />} */}
                 {!isLoadingAssets[i] ? (
                   <Box component="main">
                     {group.length > 0 ? (
@@ -492,13 +388,16 @@ export default function MyItems() {
                     <Grid container spacing={2}>
                       {collections.map((info, index) => (
                         <Grid item key={index} xs={12} sm={6} md={4}>
-                          <CollectionCard info={info} isOwned={myAddress===info.owner} />
+                          <CollectionCard info={info} isOwned={myAddress === info.owner} />
                         </Grid>
                       ))}
                     </Grid>
                   ) : (
                     <Stack sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                      <Typography variant="h3" align="center"> No Collections Found </Typography>
+                      <Typography variant="h3" align="center">
+                        {' '}
+                        No Collections Found{' '}
+                      </Typography>
                       <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>
                         We could not find any of your collections
                       </Typography>
@@ -507,13 +406,13 @@ export default function MyItems() {
                 </Box>
               ) : (
                 <Grid container spacing={2}>
-                  {
-                    Array(3).fill(0).map((item, index)=>(
+                  {Array(3)
+                    .fill(0)
+                    .map((_, index) => (
                       <Grid item key={index} xs={12} sm={6} md={4}>
-                        <CollectionCardSkeleton key={index}/>
+                        <CollectionCardSkeleton key={index} />
                       </Grid>
-                    ))
-                  }
+                    ))}
                 </Grid>
               )}
             </Box>
