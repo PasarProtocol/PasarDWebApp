@@ -254,10 +254,7 @@ export default function ActivityExplorer() {
               setTotalCount(jsonAssets.data.total);
               setPages(Math.ceil(jsonAssets.data.total / showCount));
               if (loadNext) setActivity([...activities, ...jsonAssets.data.data]);
-              else {
-                setActivity(jsonAssets.data.data);
-                // window.scrollTo(0,0)
-              }
+              else setActivity(jsonAssets.data.data);
               const tempAddressGroup = [...addressGroup];
               jsonAssets.data.data.forEach((trans) => {
                 tempAddressGroup.push(trans.buyerAddr);
