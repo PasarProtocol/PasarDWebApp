@@ -1,46 +1,59 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { isMobile } from 'react-device-detect';
-import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Dialog, Stack, DialogTitle, DialogContent, DialogActions, Snackbar, Alert, DialogContentText, IconButton, Typography, Grid, Avatar, Box, Link, Menu, MenuItem } from '@mui/material';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import {
+  Button,
+  Dialog,
+  Stack,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Typography,
+  Grid,
+  Avatar,
+  Box,
+  Link,
+  Menu,
+  MenuItem
+} from '@mui/material';
 import * as math from 'mathjs';
 import { Icon } from '@iconify/react';
-import { styled } from '@mui/material/styles';
-import { makeStyles } from '@mui/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import AdbIcon from '@mui/icons-material/Adb';
 import AppleIcon from '@mui/icons-material/Apple';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import arrowIosBackFill from '@iconify/icons-eva/arrow-ios-back-fill';
-import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import PropTypes from 'prop-types';
 import { useWeb3React } from '@web3-react/core';
-import { ethers } from 'ethers';
-import jwtDecode from 'jwt-decode';
-import { isUndefined, update } from 'lodash';
-import firebase from "firebase/app"
+import { isUndefined } from 'lodash';
+import firebase from 'firebase/app';
 
 import { DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
 import jwt from 'jsonwebtoken';
-import WalletConnectProvider from '@walletconnect/web3-provider';
 import { essentialsConnector, initConnectivitySDK, isUsingEssentialsConnector } from './EssentialConnectivity';
-// import CredentialsDlg from '../dialog/Credentials'
-import { MIconButton, MFab } from '../@material-extend';
+import { MFab } from '../@material-extend';
 import { injected, walletconnect, resetWalletConnector } from './connectors';
 import StyledButton from './StyledButton';
-import { useEagerConnect, useInactiveListener } from './hook';
 import CopyButton from '../CopyButton';
 import SnackbarCustom from '../SnackbarCustom';
 import PaperRecord from '../PaperRecord';
 import RingAvatar from '../RingAvatar';
-import { getUserCredentials } from './LoadCredentials';
-import { reduceHexAddress, getBalance, getCoinUSD, getDiaTokenInfo, getElaOnEthTokenInfo, getDiaTokenPrice, fetchFrom, getTokenPriceInEthereum, isInAppBrowser,
-  getCredentialInfo, checkValidChain, getChainTypeFromId } from '../../utils/common';
+import {
+  reduceHexAddress,
+  getBalance,
+  getCoinUSD,
+  getDiaTokenInfo,
+  getElaOnEthTokenInfo,
+  getDiaTokenPrice,
+  fetchFrom,
+  getTokenPriceInEthereum,
+  isInAppBrowser,
+  checkValidChain,
+  getChainTypeFromId
+} from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
-import { creatAndRegister, prepareConnectToHive, queryAvatarUrl, downloadAvatar } from './HiveAPI';
-import { downloadFromUrl } from './HiveService'
+import { creatAndRegister, prepareConnectToHive, downloadAvatar } from './HiveAPI';
 import { DidResolverUrl, firebaseConfig } from '../../config';
 
 // Initialize Firebase
@@ -51,7 +64,6 @@ if (firebaseConfig.apiKey) {
 
 export default function SignInDialog() {
   const {
-    openTopAlert,
     openSigninEssential,
     openDownloadEssential,
     afterSigninPath,
@@ -70,7 +82,7 @@ export default function SignInDialog() {
 
   let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
   const context = useWeb3React();
-  const { connector, activate, deactivate, active, error, library, chainId, account } = context;
+  const { activate, active, library, chainId, account } = context;
   const [isOpenSnackbar, setSnackbarOpen] = useState(false);
   const [openSignin, setOpenSigninDlg] = useState(false);
   const [openDownload, setOpenDownloadDlg] = useState(false);
@@ -83,7 +95,7 @@ export default function SignInDialog() {
   const [diaUSD, setDiaUSD] = React.useState(0);
   const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [tokenPricesInETH, setTokenPricesInETH] = React.useState([0, 0]);
-  
+
   const [chainType, setChainType] = React.useState('ESC');
   const walletConnectProvider = essentialsConnector.getWalletConnectProvider();
   const navigate = useNavigate();
@@ -100,307 +112,346 @@ export default function SignInDialog() {
             ? await window.elastos.getWeb3Provider().address
             : essentialsConnector.getWalletConnectProvider().wc.accounts[0]
         );
-        const mydid = sessionStorage.getItem('PASAR_DID')
-        getAvatarUrl(mydid)
+        const mydid = sessionStorage.getItem('PASAR_DID');
+        getAvatarUrl(mydid);
         setActivatingConnector(essentialsConnector);
       } else if (sessionLinkFlag === '3') {
         setActivatingConnector(walletconnect);
         await activate(walletconnect);
-        // await walletconnect.activate();
         setWalletAddress(await walletconnect.getAccount());
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionLinkFlag, activatingConnector, account, chainId]);
 
   const getAvatarUrl = (did) => {
-    const targetDid = `did:elastos:${did}`
-    // queryAvatarUrl(targetDid).then((res) => {
-    //   if (res.find_message && res.find_message.items.length) {
-    //     const avatarUrl = res.find_message.items[0].display_name;
-    //     downloadFromUrl(avatarUrl).then((avatarData) => {
-    //       if (avatarData && avatarData.length) {
-    //         const base64Content = `data:image/png;base64,${avatarData.toString('base64')}`;
-    //         setAvatarUrl(base64Content);
-    //       }
-    //     });
-    //   }
-    // });
+    const targetDid = `did:elastos:${did}`;
     downloadAvatar(targetDid).then((res) => {
       if (res && res.length) {
         const base64Content = res.reduce((content, code) => {
           content = `${content}${String.fromCharCode(code)}`;
-          return content
-        }, '')
+          return content;
+        }, '');
         setAvatarUrl((prevState) => {
-          if(!prevState)
-            return `data:image/png;base64,${base64Content}`
-          return prevState
-        })
-      }
-    });
-  }
-
-  React.useEffect(() => {
-    const currentChainType = getChainTypeFromId(pasarLinkChain)
-    if(pasarLinkChain)
-      setChainType(currentChainType)
-  }, [pasarLinkChain])
-
-  React.useEffect(() => {
-    if(walletAddress)
-      fetchFrom(`api/v2/sticker/checkV1NFTByWallet/${walletAddress}`, {})
-        .then(response => {
-          response.json().then(jsonResult => {
-            if(jsonResult.data){
-              setOpenTopAlert(true)
-            } else {
-              setOpenTopAlert(false)
-            }
-          })
-        }).catch(e => {
+          if (!prevState) return `data:image/png;base64,${base64Content}`;
+          return prevState;
         });
-  }, [walletAddress])
+      }
+    });
+  };
 
   React.useEffect(() => {
-      // EE
-      const handleEEAccountsChanged = (accounts) => {
-        // console.log(accounts)
-        if(accounts.length && walletAddress) {
-          setWalletAddress(accounts[0])
-          getDiaTokenInfo(accounts[0], walletConnectProvider)
-            .then((dia) => { setDiaBalance(dia) })
-            .catch((e) => { setDiaBalance(0) })
-          getElaOnEthTokenInfo(accounts[0], walletConnectProvider)
-            .then((ela) => { setElaOnEthBalance(ela) })
-            .catch((e) => { setElaOnEthBalance(0) })
-          getBalance(walletConnectProvider).then((res) => {
-            setBalance(math.round(res / 1e18, 4));
+    const currentChainType = getChainTypeFromId(pasarLinkChain);
+    if (pasarLinkChain) setChainType(currentChainType);
+  }, [pasarLinkChain]);
+
+  React.useEffect(() => {
+    if (walletAddress)
+      fetchFrom(`api/v2/sticker/checkV1NFTByWallet/${walletAddress}`, {})
+        .then((response) => {
+          response.json().then((jsonResult) => {
+            if (jsonResult.data) {
+              setOpenTopAlert(true);
+            } else {
+              setOpenTopAlert(false);
+            }
           });
-        }
-      };
-      const handleEEChainChanged = (chainId) => {
-        // alert(chainId)
-        setPasarLinkChain(chainId)
-        if (!checkValidChain(chainId))
-          setSnackbarOpen(true);
-      };
-      const handleEEDisconnect = (code, reason) => {
-        console.log('Disconnect code: ', code, ', reason: ', reason);
-        signOutWithEssentials();
-      };
-      const handleEEError = (code, reason) => {
-        console.error(code, reason);
-      };
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletAddress]);
 
-      // Subscribe to accounts change
-      walletConnectProvider.on('accountsChanged', handleEEAccountsChanged);
-      // Subscribe to chainId change
-      walletConnectProvider.on('chainChanged', handleEEChainChanged);
-      // walletConnectProvider.on('networkChanged', (chainId)=>{alert(2); alert(chainId)});
-      // Subscribe to session disconnection
-      walletConnectProvider.on('disconnect', handleEEDisconnect);
-      // Subscribe to session disconnection
-      walletConnectProvider.on('error', handleEEError);
-  }, [])
-
-  React.useEffect(async () => {
-    initializeWalletConnection();
-    getCoinUSD().then((res) => {
-      setCoinUSD(res);
-    });
-    getTokenPriceInEthereum().then((res)=>{ setTokenPricesInETH(res) })
-    sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-    if (sessionLinkFlag) {
-      // when connected
-      if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
-        getDiaTokenPrice()
-          .then((res) => {
-            if(!res || !res.token)
-              return
-            setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
+  React.useEffect(() => {
+    // EE
+    const handleEEAccountsChanged = (accounts) => {
+      if (accounts.length && walletAddress) {
+        setWalletAddress(accounts[0]);
+        getDiaTokenInfo(accounts[0], walletConnectProvider)
+          .then((dia) => {
+            setDiaBalance(dia);
           })
-          .catch((error) => {
-            setDiaUSD(0);
+          .catch((e) => {
+            console.error(e);
+            setDiaBalance(0);
           });
-      } else if (sessionLinkFlag === '2') {
-        if (isInAppBrowser()) {
-          getDiaTokenPrice()
-            .then((res) => {
-              if(!res || !res.token)
-                return
-              setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
-            })
-            .catch((error) => {
-              setDiaUSD(0);
-            });
-          // setWalletAddress(await window.elastos.getWeb3Provider().address);
-        } else if (essentialsConnector.getWalletConnectProvider()) {
-          getDiaTokenPrice()
-            .then((res) => {
-              if(!res || !res.token)
-                return
-              setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
-            })
-            .catch((error) => {
-              setDiaUSD(0);
-            });
-          // setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
-        }
-      }
-    }
-  }, [sessionLinkFlag]);
-
-  React.useEffect(async () => {
-    if(chainId) {
-      setPasarLinkChain(chainId)
-      if (!checkValidChain(chainId))
-        setSnackbarOpen(true);
-    }
-    sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-    if (sessionLinkFlag) {
-      // when connected
-      if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
-        getDiaTokenInfo(account, library.provider)
-          .then((dia) => { setDiaBalance(dia) })
-          .catch((e) => { setDiaBalance(0) })
-        getElaOnEthTokenInfo(account, library.provider)
-          .then((ela) => { setElaOnEthBalance(ela) })
-          .catch((e) => { setElaOnEthBalance(0) })
-        getBalance(library.provider).then((res) => {
+        getElaOnEthTokenInfo(accounts[0], walletConnectProvider)
+          .then((ela) => {
+            setElaOnEthBalance(ela);
+          })
+          .catch((e) => {
+            console.error(e);
+            setElaOnEthBalance(0);
+          });
+        getBalance(walletConnectProvider).then((res) => {
           setBalance(math.round(res / 1e18, 4));
         });
-      } else if (sessionLinkFlag === '2') {
-        if (isInAppBrowser()) {
-          const elastosWeb3Provider = await window.elastos.getWeb3Provider();
-          getDiaTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
-            .then((dia) => { setDiaBalance(dia) })
-            .catch((e) => { setDiaBalance(0) })
-          getElaOnEthTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
-            .then((ela) => { setElaOnEthBalance(ela) })
-            .catch((e) => { setElaOnEthBalance(0) })
-          getBalance(elastosWeb3Provider).then((res) => {
-            setBalance(math.round(res / 1e18, 4));
-          });
-          // setWalletAddress(await window.elastos.getWeb3Provider().address);
-        } else if (essentialsConnector.getWalletConnectProvider()) {
-          const essentialProvider = essentialsConnector.getWalletConnectProvider();
-          getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-            .then((dia) => { setDiaBalance(dia) })
-            .catch((e) => { setDiaBalance(0) })
-          getElaOnEthTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-            .then((ela) => { setElaOnEthBalance(ela) })
-            .catch((e) => { setElaOnEthBalance(0) })
-          getBalance(essentialProvider).then((res) => {
-            setBalance(math.round(res / 1e18, 4));
-          });
-          // setWalletAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+      }
+    };
+    const handleEEChainChanged = (chainId) => {
+      setPasarLinkChain(chainId);
+      if (!checkValidChain(chainId)) setSnackbarOpen(true);
+    };
+    const handleEEDisconnect = (code, reason) => {
+      console.log('Disconnect code: ', code, ', reason: ', reason);
+      signOutWithEssentials();
+    };
+    const handleEEError = (code, reason) => {
+      console.error(code, reason);
+    };
+
+    // Subscribe to accounts change
+    walletConnectProvider.on('accountsChanged', handleEEAccountsChanged);
+    // Subscribe to chainId change
+    walletConnectProvider.on('chainChanged', handleEEChainChanged);
+    // Subscribe to session disconnection
+    walletConnectProvider.on('disconnect', handleEEDisconnect);
+    // Subscribe to session disconnection
+    walletConnectProvider.on('error', handleEEError);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      initializeWalletConnection();
+      getCoinUSD().then((res) => {
+        setCoinUSD(res);
+      });
+      getTokenPriceInEthereum().then((res) => {
+        setTokenPricesInETH(res);
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+      if (sessionLinkFlag) {
+        // when connected
+        if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
+          getDiaTokenPrice()
+            .then((res) => {
+              if (!res || !res.token) return;
+              setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
+            })
+            .catch((e) => {
+              console.error(e);
+              setDiaUSD(0);
+            });
+        } else if (sessionLinkFlag === '2') {
+          if (isInAppBrowser()) {
+            getDiaTokenPrice()
+              .then((res) => {
+                if (!res || !res.token) return;
+                setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
+              })
+              .catch((e) => {
+                console.error(e);
+                setDiaUSD(0);
+              });
+          } else if (essentialsConnector.getWalletConnectProvider()) {
+            getDiaTokenPrice()
+              .then((res) => {
+                if (!res || !res.token) return;
+                setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
+              })
+              .catch((e) => {
+                console.error(e);
+                setDiaUSD(0);
+              });
+          }
         }
       }
-    }
+    };
+    fetchData();
+  }, [sessionLinkFlag]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (chainId) {
+        setPasarLinkChain(chainId);
+        if (!checkValidChain(chainId)) setSnackbarOpen(true);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+      if (sessionLinkFlag) {
+        // when connected
+        if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
+          getDiaTokenInfo(account, library.provider)
+            .then((dia) => {
+              setDiaBalance(dia);
+            })
+            .catch((e) => {
+              console.error(e);
+              setDiaBalance(0);
+            });
+          getElaOnEthTokenInfo(account, library.provider)
+            .then((ela) => {
+              setElaOnEthBalance(ela);
+            })
+            .catch((e) => {
+              console.error(e);
+              setElaOnEthBalance(0);
+            });
+          getBalance(library.provider).then((res) => {
+            setBalance(math.round(res / 1e18, 4));
+          });
+        } else if (sessionLinkFlag === '2') {
+          if (isInAppBrowser()) {
+            const elastosWeb3Provider = await window.elastos.getWeb3Provider();
+            getDiaTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
+              .then((dia) => {
+                setDiaBalance(dia);
+              })
+              .catch((e) => {
+                console.error(e);
+                setDiaBalance(0);
+              });
+            getElaOnEthTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
+              .then((ela) => {
+                setElaOnEthBalance(ela);
+              })
+              .catch((e) => {
+                console.error(e);
+                setElaOnEthBalance(0);
+              });
+            getBalance(elastosWeb3Provider).then((res) => {
+              setBalance(math.round(res / 1e18, 4));
+            });
+          } else if (essentialsConnector.getWalletConnectProvider()) {
+            const essentialProvider = essentialsConnector.getWalletConnectProvider();
+            getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
+              .then((dia) => {
+                setDiaBalance(dia);
+              })
+              .catch((e) => {
+                console.error(e);
+                setDiaBalance(0);
+              });
+            getElaOnEthTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
+              .then((ela) => {
+                setElaOnEthBalance(ela);
+              })
+              .catch((e) => {
+                console.error(e);
+                setElaOnEthBalance(0);
+              });
+            getBalance(essentialProvider).then((res) => {
+              setBalance(math.round(res / 1e18, 4));
+            });
+          }
+        }
+      }
+    };
+    fetchData();
   }, [sessionLinkFlag, account, active, chainId, activatingConnector, chainType]);
 
   // listen for disconnect from essentials / wallet connect
-  React.useEffect(async () => {
-    if (sessionLinkFlag === '1' && activatingConnector === injected && !active) {
-      setOpenAccountPopup(null);
-      await activate(null);
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1') {
-        try {
-          await activatingConnector.deactivate();
-        } catch (e) {
-          console.log('injected connector deactive error: ', e);
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (sessionLinkFlag === '1' && activatingConnector === injected && !active) {
+        setOpenAccountPopup(null);
+        await activate(null);
+        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1') {
+          try {
+            await activatingConnector.deactivate();
+          } catch (e) {
+            console.log('injected connector deactive error: ', e);
+          }
         }
-      }
-      sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-      setPasarLinkChain(1)
-      setActivatingConnector(null);
-      setWalletAddress(null);
-      navigate('/marketplace');
-      window.location.reload();
-    } else if (sessionLinkFlag === '2' && activatingConnector === essentialsConnector) {
-      if (isInAppBrowser()) {
-        if (!(await window.elastos.getWeb3Provider().isConnected())) {
+        sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+        setPasarLinkChain(1);
+        setActivatingConnector(null);
+        setWalletAddress(null);
+        navigate('/marketplace');
+        window.location.reload();
+      } else if (sessionLinkFlag === '2' && activatingConnector === essentialsConnector) {
+        if (isInAppBrowser()) {
+          if (!(await window.elastos.getWeb3Provider().isConnected())) {
+            setOpenAccountPopup(null);
+            await activate(null);
+            window.elastos
+              .getWeb3Provider()
+              .disconnect()
+              .then((res) => {
+                console.log(res);
+              })
+              .catch((e) => {
+                console.log(e);
+              });
+            sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+            sessionStorage.removeItem('PASAR_TOKEN');
+            sessionStorage.removeItem('PASAR_DID');
+            sessionStorage.removeItem('KYCedProof');
+            setPasarLinkChain(1);
+            setActivatingConnector(null);
+            setWalletAddress(null);
+            navigate('/marketplace');
+            window.location.reload();
+          }
+        } else if (!essentialsConnector.hasWalletConnectSession()) {
           setOpenAccountPopup(null);
           await activate(null);
-          window.elastos
-            .getWeb3Provider()
-            .disconnect()
-            .then((res) => {})
+          essentialsConnector
+            .disconnectWalletConnect()
+            .then((res) => {
+              console.log(res);
+            })
             .catch((e) => {
               console.log(e);
             });
           sessionStorage.removeItem('PASAR_LINK_ADDRESS');
           sessionStorage.removeItem('PASAR_TOKEN');
           sessionStorage.removeItem('PASAR_DID');
-          sessionStorage.removeItem('KYCedProof');
-          setPasarLinkChain(1)
+          setPasarLinkChain(1);
           setActivatingConnector(null);
           setWalletAddress(null);
           navigate('/marketplace');
           window.location.reload();
         }
-      } else if (!essentialsConnector.hasWalletConnectSession()) {
-        setOpenAccountPopup(null);
-        await activate(null);
-        essentialsConnector
-          .disconnectWalletConnect()
-          .then((res) => {})
-          .catch((e) => {
-            console.log(e);
-          });
-        sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-        sessionStorage.removeItem('PASAR_TOKEN');
-        sessionStorage.removeItem('PASAR_DID');
-        setPasarLinkChain(1)
-        setActivatingConnector(null);
-        setWalletAddress(null);
-        navigate('/marketplace');
-        window.location.reload();
-      }
-    } else if (sessionLinkFlag === '3') {
-      if (activatingConnector === walletconnect && !walletconnect.walletConnectProvider.connected) {
-        setOpenAccountPopup(null);
-        await activate(null);
-        if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
-          try {
-            await activatingConnector.deactivate();
-          } catch (e) {
-            console.log('walletconnect deactive error: ', e);
+      } else if (sessionLinkFlag === '3') {
+        if (activatingConnector === walletconnect && !walletconnect.walletConnectProvider.connected) {
+          setOpenAccountPopup(null);
+          await activate(null);
+          if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
+            try {
+              await activatingConnector.deactivate();
+            } catch (e) {
+              console.log('walletconnect deactive error: ', e);
+            }
           }
+          sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+          setPasarLinkChain(1);
+          setActivatingConnector(null);
+          setWalletAddress(null);
+          navigate('/marketplace');
+          window.location.reload();
         }
-        sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-        setPasarLinkChain(1)
-        setActivatingConnector(null);
-        setWalletAddress(null);
-        navigate('/marketplace');
-        window.location.reload();
       }
-    }
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [essentialsConnector.hasWalletConnectSession(), active]);
-  
+
   // ------------ MM, WC Connect ------------ //
   const handleChooseWallet = async (wallet) => {
     let currentConnector = null;
     if (wallet === 'metamask') {
       currentConnector = injected;
       await activate(currentConnector);
-    }
-    else if (wallet === 'walletconnect') {
+    } else if (wallet === 'walletconnect') {
       currentConnector = walletconnect;
       await resetWalletConnector(currentConnector);
       await activate(currentConnector);
     }
     const retAddress = await currentConnector.getAccount();
-    if(!isUndefined(retAddress)) {
+    if (!isUndefined(retAddress)) {
       console.log('loged in');
       if (currentConnector === injected) {
         sessionLinkFlag = '1';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
-        setPasarLinkAddress(1)
+        setPasarLinkAddress(1);
       } else if (currentConnector === walletconnect) {
         sessionLinkFlag = '3';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 3);
-        setPasarLinkAddress(3)
+        setPasarLinkAddress(3);
       }
       setActivatingConnector(currentConnector);
       setWalletAddress(await currentConnector.getAccount());
@@ -415,22 +466,19 @@ export default function SignInDialog() {
   const signInWithEssentials = async () => {
     initConnectivitySDK();
     const didAccess = new DID.DIDAccess();
-    // let presentation;
     try {
       const presentation = await didAccess.requestCredentials({
-        claims: [DID.simpleIdClaim('Your avatar', 'avatar', false), DID.simpleIdClaim('Your name', 'name', false), DID.simpleIdClaim('Your description', 'description', false)]
+        claims: [
+          DID.simpleIdClaim('Your avatar', 'avatar', false),
+          DID.simpleIdClaim('Your name', 'name', false),
+          DID.simpleIdClaim('Your description', 'description', false)
+        ]
       });
       if (presentation) {
         const did = presentation.getHolder().getMethodSpecificId() || '';
-
         DIDBackend.initialize(new DefaultDIDAdapter(DidResolverUrl));
         // verify
         const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
-        // const valid = await vp.isValid();
-        // if (!valid) {
-        //   console.log('Invalid presentation');
-        //   return;
-        // }
         const sDid = vp.getHolder().toString();
         if (!sDid) {
           console.log('Unable to extract owner DID from the presentation');
@@ -442,16 +490,11 @@ export default function SignInDialog() {
         // Optional bio
         const bioCredential = vp.getCredential(`description`);
         const bio = bioCredential ? bioCredential.getSubject().getProperty('description') : '';
-
-        // Optional email
-        // const emailCredential = vp.getCredential(`email`);
-        // const email = emailCredential ? emailCredential.getSubject().getProperty('email') : '';
         const user = {
           sDid,
           type: 'user',
           bio,
           name,
-          // email,
           canManageAdmins: false
         };
         // succeed
@@ -460,34 +503,26 @@ export default function SignInDialog() {
         sessionStorage.setItem('PASAR_DID', did);
         sessionLinkFlag = '2';
         sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
-        setPasarLinkAddress(2)
+        setPasarLinkAddress(2);
         setOpenSigninDlg(false);
 
         // HIVE START
         // TODO: IMPROVE HIVE LOGIN
         prepareConnectToHive()
-          .then(res=>(
-            creatAndRegister(true)
-          ))
-          // .then(result=>{
-          //   // createProfileCollection()
-          // })
-          .catch(error=>{
-            console.log("Register scripting error: ", error)
+          .then((res) => {
+            creatAndRegister(true);
+            console.log(res);
           })
+          .catch((error) => {
+            console.log('Register scripting error: ', error);
+          });
         // HIVE END
-
-        let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0]
-        if (isInAppBrowser())
-          essentialAddress = await window.elastos.getWeb3Provider().address
+        let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0];
+        if (isInAppBrowser()) essentialAddress = await window.elastos.getWeb3Provider().address;
         setWalletAddress(essentialAddress);
-        // getCredentialInfo(essentialAddress).then(proofData=>{
-        //   if(proofData)
-        //     sessionStorage.setItem('KYCedProof', proofData)
-        // })
         setActivatingConnector(essentialsConnector);
         setSigninEssentialSuccess(true);
-        getAvatarUrl(did)
+        getAvatarUrl(did);
 
         if (afterSigninPath) {
           setOpenSigninEssentialDlg(false);
@@ -525,17 +560,15 @@ export default function SignInDialog() {
   };
   // ----------------------------------- //
 
-  const handleClickOpenSinginDlg = async() => {
-    if(isInAppBrowser()){
+  const handleClickOpenSinginDlg = async () => {
+    if (isInAppBrowser()) {
       if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
         await signOutWithEssentials();
         await signInWithEssentials();
       } else {
         await signInWithEssentials();
       }
-    }
-    else
-      setOpenSigninDlg(true);
+    } else setOpenSigninDlg(true);
   };
   const handleClickOpenDownloadDlg = () => {
     setOpenSigninDlg(false);
@@ -572,9 +605,8 @@ export default function SignInDialog() {
   const closeAccountMenu = async (e) => {
     setOpenAccountPopup(null);
     if (e.target.getAttribute('value') === 'credentials') {
-      setOpenCredentials(true)
-    }
-    else if (e.target.getAttribute('value') === 'signout') {
+      setOpenCredentials(true);
+    } else if (e.target.getAttribute('value') === 'signout') {
       await activate(null);
       if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
         try {
@@ -597,33 +629,52 @@ export default function SignInDialog() {
     }
   };
 
-  let totalBalance = 0
-  if(chainType==='ESC')
-    totalBalance = math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2)
-  else if(chainType==='ETH')
-    totalBalance = math.round(math.round(tokenPricesInETH[0] * balance, 2) + math.round(tokenPricesInETH[1] * elaOnEthBalance, 2), 2)
-  else if(chainType==='FSN')
-    totalBalance = math.round(tokenPricesInETH[2] * balance, 2)
+  let totalBalance = 0;
+  if (chainType === 'ESC')
+    totalBalance = math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2);
+  else if (chainType === 'ETH')
+    totalBalance = math.round(
+      math.round(tokenPricesInETH[0] * balance, 2) + math.round(tokenPricesInETH[1] * elaOnEthBalance, 2),
+      2
+    );
+  else if (chainType === 'FSN') totalBalance = math.round(tokenPricesInETH[2] * balance, 2);
 
   const balanceListByNetwork = {
     ESC: [
       { icon: 'elastos.svg', symbol: 'ELA', name: 'Elastos (ESC)', balance, balanceUSD: coinUSD * balance },
-      { icon: 'badges/diamond.svg', symbol: 'DIA', name: 'Diamond (ESC)', balance: diaBalance, balanceUSD: diaUSD * diaBalance },
+      {
+        icon: 'badges/diamond.svg',
+        symbol: 'DIA',
+        name: 'Diamond (ESC)',
+        balance: diaBalance,
+        balanceUSD: diaUSD * diaBalance
+      }
     ],
     ETH: [
-      { icon: 'erc20/ETH.svg', symbol: 'ETH', name: 'Ether (Ethereum)', balance, balanceUSD: tokenPricesInETH[0] * balance },
-      { icon: 'erc20/ELAonETH.svg', symbol: 'ELA on ETH', name: 'Elastos (Ethereum)', balance: elaOnEthBalance, balanceUSD: tokenPricesInETH[1] * elaOnEthBalance },
+      {
+        icon: 'erc20/ETH.svg',
+        symbol: 'ETH',
+        name: 'Ether (Ethereum)',
+        balance,
+        balanceUSD: tokenPricesInETH[0] * balance
+      },
+      {
+        icon: 'erc20/ELAonETH.svg',
+        symbol: 'ELA on ETH',
+        name: 'Elastos (Ethereum)',
+        balance: elaOnEthBalance,
+        balanceUSD: tokenPricesInETH[1] * elaOnEthBalance
+      }
     ],
     FSN: [
-      { icon: 'erc20/FSN.svg', symbol: 'FSN', name: 'Fusion (FSN)', balance, balanceUSD: tokenPricesInETH[2] * balance },
+      { icon: 'erc20/FSN.svg', symbol: 'FSN', name: 'Fusion (FSN)', balance, balanceUSD: tokenPricesInETH[2] * balance }
     ]
-  }
+  };
   return (
     <>
       {walletAddress ? (
         <>
           <MFab id="signin" size="small" onClick={openAccountMenu} onMouseEnter={openAccountMenu}>
-            {/* <AccountCircleOutlinedIcon /> */}
             <RingAvatar
               avatar={avatarUrl}
               isImage={!!avatarUrl}
@@ -690,9 +741,8 @@ export default function SignInDialog() {
                     Add funds
                   </Button>
                 </PaperRecord>
-                {
-                  !!chainType &&
-                  balanceListByNetwork[chainType].map((item, _i)=>(
+                {!!chainType &&
+                  balanceListByNetwork[chainType].map((item, _i) => (
                     <PaperRecord sx={{ p: 1.5 }} key={_i}>
                       <Stack direction="row" alignItems="center" spacing={2}>
                         <Box
@@ -700,40 +750,41 @@ export default function SignInDialog() {
                           component="img"
                           alt=""
                           src={`/static/${item.icon}`}
-                          sx={{ width: 24, height: 24, filter: item.symbol==="ELA" ? (theme)=>(theme.palette.mode==='dark'?'invert(1)':'none') : 'unset' }}
+                          sx={{
+                            width: 24,
+                            height: 24,
+                            filter:
+                              item.symbol === 'ELA'
+                                ? (theme) => (theme.palette.mode === 'dark' ? 'invert(1)' : 'none')
+                                : 'unset'
+                          }}
                         />
                         <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                           <Typography variant="body2"> {item.symbol} </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {' '}{item.name}{' '}
+                            {' '}
+                            {item.name}{' '}
                           </Typography>
                         </Box>
                         <Box>
                           <Typography variant="body2" align="right">
-                            {' '}{item.balance}{' '}
+                            {' '}
+                            {item.balance}{' '}
                           </Typography>
                           <Typography variant="body2" align="right" color="text.secondary">
-                            {' '}USD {math.round(item.balanceUSD, 2)}{' '}
+                            {' '}
+                            USD {math.round(item.balanceUSD, 2)}{' '}
                           </Typography>
                         </Box>
                       </Stack>
                     </PaperRecord>
-                  ))
-                }
+                  ))}
               </Stack>
             </Box>
             <MenuItem to="/profile" onClick={closeAccountMenu} component={RouterLink}>
               <AccountCircleOutlinedIcon />
               &nbsp;Profile
             </MenuItem>
-            {/* <MenuItem onClick={closeAccountMenu}>
-              <SettingsOutlinedIcon />
-              &nbsp;Settings
-            </MenuItem> */}
-            {/* <MenuItem value="credentials" onClick={closeAccountMenu}>
-              <Box component="img" alt="ico" src='/static/carbon_credentials.svg' sx={{ width: 24, filter: (theme)=>theme.palette.mode==='dark'?'invert(1)':'none' }}/>
-              &nbsp;Credentials
-            </MenuItem> */}
             <MenuItem value="signout" onClick={closeAccountMenu} id="signout">
               <LogoutOutlinedIcon />
               &nbsp;Sign Out
@@ -799,7 +850,6 @@ export default function SignInDialog() {
                       fullWidth
                       onClick={async () => {
                         // check if is already connected
-                        // await signInWithEssentials();
                         if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
                           await signOutWithEssentials();
                         } else if (essentialsConnector.hasWalletConnectSession()) {
@@ -834,24 +884,6 @@ export default function SignInDialog() {
                       MetaMask
                     </StyledButton>
                   </Grid>
-                  {/* <Grid item xs={12}>
-                    <StyledButton
-                      variant="contained"
-                      startIcon={
-                        <Avatar
-                          alt="walletconnect"
-                          src="/static/walletconnect.svg"
-                          sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
-                        />
-                      }
-                      fullWidth
-                      onClick={() => {
-                        handleChooseWallet('walletconnect');
-                      }}
-                    >
-                      WalletConnect
-                    </StyledButton>
-                  </Grid> */}
                   <Grid item xs={12}>
                     <StyledButton variant="outlined" fullWidth onClick={handleClickOpenDownloadDlg}>
                       I don’t have a wallet
@@ -988,7 +1020,6 @@ export default function SignInDialog() {
                   fullWidth
                   onClick={async () => {
                     // check if is already connected
-                    // await signInWithEssentials();
                     if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
                       await signOutWithEssentials();
                       await signInWithEssentials();
@@ -1032,8 +1063,9 @@ export default function SignInDialog() {
             Download Essentials
           </Typography>
           <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
-            A DID is required in order to create or {openDownloadEssential===true?'sell items':'import collections'} on Pasar. Get your own DID by downloading the Elastos
-            Essentials mobile app now!
+            A DID is required in order to create or{' '}
+            {openDownloadEssential === true ? 'sell items' : 'import collections'} on Pasar. Get your own DID by
+            downloading the Elastos Essentials mobile app now!
           </Typography>
           <Typography variant="body2" display="block" gutterBottom align="center" sx={{ mt: 4 }}>
             Web3.0 super wallet with Decentralized Identifier (DID)
@@ -1074,7 +1106,6 @@ export default function SignInDialog() {
           </Typography>
         </DialogContent>
       </Dialog>
-      {/* <CredentialsDlg/> */}
       <SnackbarCustom isOpen={isOpenSnackbar} setOpen={setSnackbarOpen}>
         Wrong network, only Elastos Smart Chain, Ethereum and Fusion is supported
       </SnackbarCustom>
