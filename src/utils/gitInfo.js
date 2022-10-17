@@ -13,8 +13,8 @@ const execSyncWrapper = (command) => {
 };
 
 const main = () => {
-  let gitBranch = execSyncWrapper('git rev-parse --abbrev-ref HEAD');
-  let gitCommitHash = execSyncWrapper('git rev-parse --short=7 HEAD');
+  const gitBranch = execSyncWrapper('git rev-parse --abbrev-ref HEAD');
+  const gitCommitHash = execSyncWrapper('git rev-parse --short=7 HEAD');
 
   const obj = {
     gitBranch,
