@@ -1,11 +1,5 @@
-// import {
-//   Claim,
-//   CredentialDisclosureRequest,
-//   DIDAccess
-// } from "@elastosfoundation/elastos-connectivity-sdk-js/typings/did";
-import { connectivity, DID as ConnDID, DID } from "@elastosfoundation/elastos-connectivity-sdk-js";
-import { VerifiablePresentation } from "@elastosfoundation/did-js-sdk";
-import { EssentialsConnector } from "@elastosfoundation/essentials-connector-client-browser";
+import { connectivity, DID as ConnDID } from '@elastosfoundation/elastos-connectivity-sdk-js';
+import { EssentialsConnector } from '@elastosfoundation/essentials-connector-client-browser';
 
 /**
  * Elastos Connectivity Service
@@ -26,39 +20,31 @@ import { EssentialsConnector } from "@elastosfoundation/essentials-connector-cli
  *
  * @see https://github.com/elastos/Elastos.Connectivity.Client.JS.SDK/
  */
-const sTrustedProvider = Symbol("TrustedKYCProviders");
-
-const getVerifiablePresentation = async () => {
-  const didAccess = new DID.DIDAccess();
-  const nameClaim = DID.simpleIdClaim("Your name", "name", false)
-  const credentialRequest = { claims: [nameClaim] }
-  return didAccess.requestCredentials(credentialRequest);
-}
+const sTrustedProvider = Symbol('TrustedKYCProviders');
 
 /**
  * Request the signdata on tokenID
  */
 export async function requestSigndataOnTokenID(tokenId) {
   const didAccess = new ConnDID.DIDAccess();
-  const signedData = await didAccess.signData(tokenId, { extraField: 0 }, "signature");
-  console.log(signedData)
-  return signedData
+  const signedData = await didAccess.signData(tokenId, { extraField: 0 }, 'signature');
+  console.log(signedData);
+  return signedData;
 }
 
 export default class ElastosConnectivityService {
   // TrustedKYCProviders = ["did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK"] // Trinity. Tech KYC DID
   constructor() {
-    this._connector = new EssentialsConnector()
-    this[sTrustedProvider] = ["did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK"] // Trinity. Tech KYC DID
-    
+    this._connector = new EssentialsConnector();
+    this[sTrustedProvider] = ['did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK']; // Trinity. Tech KYC DID
+
     // unregistear if already registerd
     const arrIConnectors = connectivity.getAvailableConnectors();
     if (arrIConnectors.findIndex((option) => option.name === this._connector.name) !== -1) {
       connectivity.unregisterConnector(this._connector.name);
-      // console.log('unregister connector succeed.');
     }
 
-    this.registerConnector().then(() => console.debug("Elastos Connectivity SDK connector is initialized"))
+    this.registerConnector().then(() => console.debug('Elastos Connectivity SDK connector is initialized'));
   }
 
   /**
@@ -66,36 +52,38 @@ export default class ElastosConnectivityService {
    * Register the essential connector
    */
   async registerConnector() {
-    await connectivity.registerConnector(this._connector)
+    await connectivity.registerConnector(this._connector);
   }
 
   /**
    * Disconnect the wallet session
    */
   async disconnect() {
+    // eslint-disable-next-line consistent-return
     return new Promise((resolve, reject) => {
       try {
         return this.isAlreadyConnected() ? this._connector.disconnectWalletConnect() : resolve();
       } catch (error) {
-        console.error("Error while disconnecting the wallet", error);
+        console.error('Error while disconnecting the wallet', error);
         reject();
       }
-    })
+    });
   }
 
   /**
    * Check if the user is already connected via essentials
    */
   isAlreadyConnected() {
-    const isUsingEssentialsConnector = connectivity.getActiveConnector() && connectivity.getActiveConnector()?.name === this._connector.name;
-    return isUsingEssentialsConnector && this._connector.hasWalletConnectSession()
+    const isUsingEssentialsConnector =
+      connectivity.getActiveConnector() && connectivity.getActiveConnector()?.name === this._connector.name;
+    return isUsingEssentialsConnector && this._connector.hasWalletConnectSession();
   }
 
   /**
    * Restore the wallet connect session - TODO: should be done by the connector itself?
    */
   async restoreWalletSession() {
-    return this._connector.getWalletConnectProvider().enable()
+    return this._connector.getWalletConnectProvider().enable();
   }
 
   /**
@@ -107,7 +95,7 @@ export default class ElastosConnectivityService {
    * Get the connector
    */
   get connector() {
-    return this._connector
+    return this._connector;
   }
 
   /**
@@ -117,64 +105,50 @@ export default class ElastosConnectivityService {
     const didAccess = new ConnDID.DIDAccess();
     const presentation = await didAccess.requestCredentials({
       claims: [
-        ConnDID.simpleTypeClaim("Your name", "NameCredential", false)
+        ConnDID.simpleTypeClaim('Your name', 'NameCredential', false)
           .withIssuers(this[sTrustedProvider])
-          .withNoMatchRecommendations([
-            { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
-          ]),
-        ConnDID.simpleTypeClaim("Your birth date", "BirthDateCredential", false)
+          .withNoMatchRecommendations([{ title: 'KYC-me.io', url: 'https://kyc-me.io', urlTarget: 'internal' }]),
+        ConnDID.simpleTypeClaim('Your birth date', 'BirthDateCredential', false)
           .withIssuers(this[sTrustedProvider])
-          .withNoMatchRecommendations([
-            { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
-          ]),
-        ConnDID.simpleTypeClaim("Your gender", "GenderCredential", false)
+          .withNoMatchRecommendations([{ title: 'KYC-me.io', url: 'https://kyc-me.io', urlTarget: 'internal' }]),
+        ConnDID.simpleTypeClaim('Your gender', 'GenderCredential', false)
           .withIssuers(this[sTrustedProvider])
-          .withNoMatchRecommendations([
-            { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
-          ]),
-        ConnDID.simpleTypeClaim("Your country", "NationalityCredential", false)
+          .withNoMatchRecommendations([{ title: 'KYC-me.io', url: 'https://kyc-me.io', urlTarget: 'internal' }]),
+        ConnDID.simpleTypeClaim('Your country', 'NationalityCredential', false)
           .withIssuers(this[sTrustedProvider])
-          .withNoMatchRecommendations([
-            { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
-          ]),
+          .withNoMatchRecommendations([{ title: 'KYC-me.io', url: 'https://kyc-me.io', urlTarget: 'internal' }])
       ]
     });
-    return presentation
+    return presentation;
   }
-  
+
   /**
    * Request the Custom credentials
    */
   async requestCustomCredentials(claimItems) {
     const didAccess = new ConnDID.DIDAccess();
-    const claimArray = claimItems.reduce((arr, item)=>{
-      if(item.title==='KYC-me') {
-        arr=[
+    const claimArray = claimItems.reduce((arr, item) => {
+      if (item.title === 'KYC-me') {
+        arr = [
           ...arr,
-          ConnDID.simpleTypeClaim("Your birth date", "BirthDateCredential", false)
+          ConnDID.simpleTypeClaim('Your birth date', 'BirthDateCredential', false)
             .withIssuers(this[sTrustedProvider])
-            .withNoMatchRecommendations([
-              { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
-            ]),
-          ConnDID.simpleTypeClaim("Your gender", "GenderCredential", false)
+            .withNoMatchRecommendations([{ title: 'KYC-me.io', url: 'https://kyc-me.io', urlTarget: 'internal' }]),
+          ConnDID.simpleTypeClaim('Your gender', 'GenderCredential', false)
             .withIssuers(this[sTrustedProvider])
-            .withNoMatchRecommendations([
-              { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
-            ]),
-          ConnDID.simpleTypeClaim("Your country", "NationalityCredential", false)
+            .withNoMatchRecommendations([{ title: 'KYC-me.io', url: 'https://kyc-me.io', urlTarget: 'internal' }]),
+          ConnDID.simpleTypeClaim('Your country', 'NationalityCredential', false)
             .withIssuers(this[sTrustedProvider])
-            .withNoMatchRecommendations([
-              { title: "KYC-me.io", url: "https://kyc-me.io", urlTarget: "internal" }
-            ])
+            .withNoMatchRecommendations([{ title: 'KYC-me.io', url: 'https://kyc-me.io', urlTarget: 'internal' }])
         ];
-        return arr
+        return arr;
       }
       arr.push(ConnDID.simpleIdClaim(`Your ${item.title}`, item.id, true));
-      return arr
-    }, [])
+      return arr;
+    }, []);
     const presentation = await didAccess.requestCredentials({
       claims: claimArray
     });
-    return presentation
+    return presentation;
   }
 }

@@ -20,7 +20,6 @@ import { ethers } from 'ethers';
 import jwtDecode from 'jwt-decode';
 import { isUndefined, update } from 'lodash';
 import firebase from "firebase/app"
-import { registerAnalytics } from "@firebase/analytics";
 
 import { DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
