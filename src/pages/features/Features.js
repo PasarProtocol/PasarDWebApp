@@ -72,7 +72,7 @@ const CheckIcon = ({ isSupported, selected = false }) => {
   );
 };
 CheckIcon.propTypes = {
-  isSupported: PropTypes.bool,
+  isSupported: PropTypes.any,
   selected: PropTypes.bool
 };
 const CellBoxStyle = styled(Box)((props) => {
