@@ -16,7 +16,7 @@ function zoomImgSize(imgWidth, imgHeight, maxWidth, maxHeight) {
   return [newWidth, newHeight];
 }
 
-export default function (file, maxWidth, maxHeight, quality = 1) {
+export default function convert(file, maxWidth, maxHeight, quality = 1) {
   return new Promise((resolve, reject) => {
     if (!file.name) {
       resolve({ success: 1 });
