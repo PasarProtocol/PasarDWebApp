@@ -130,9 +130,6 @@ const MarketExplorer = Loadable(lazy(() => import('../pages/marketplace/Explorer
 const MarketCollectibleDetail = Loadable(lazy(() => import('../pages/marketplace/CollectibleDetail')));
 // Create
 const CreateItem = Loadable(lazy(() => import('../pages/marketplace/CreateItem')));
-const MyItems = Loadable(lazy(() => import('../pages/marketplace/MyItems')));
-const MyProfile = Loadable(lazy(() => import('../pages/marketplace/MyProfile')));
-const EditProfile = Loadable(lazy(() => import('../pages/marketplace/EditProfile')));
 // Collection
 const CollectionExplorer = Loadable(lazy(() => import('../pages/collection/Explorer')));
 const CollectionDetail = Loadable(lazy(() => import('../pages/collection/CollectionDetail')));
@@ -145,5 +142,9 @@ const Activity = Loadable(lazy(() => import('../pages/activity/Explorer')));
 const Features = Loadable(lazy(() => import('../pages/features/Features')));
 // Rewards
 const Rewards = Loadable(lazy(() => import('../pages/rewards/Rewards')));
+// Profile
+const MyProfile = Loadable(lazy(() => import('../pages/profile/MyProfile')));
+const MyItems = Loadable(lazy(() => import('../pages/profile/MyItems')));
+const EditProfile = Loadable(lazy(() => import('../pages/profile/EditProfile')));
 
 const NotFound = Loadable(lazy(() => import('../pages/Page404')));
