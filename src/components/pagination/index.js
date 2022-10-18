@@ -5,11 +5,11 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Button from '@mui/material/Button';
 
-const ArrowButton = styled(Button)(({ theme }) => ({
+const ArrowButton = styled(Button)({
   minWidth: 20,
   padding: '6px 8px',
   margin: '1.5px 6px'
-}));
+});
 const DivStyle = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('md')]: {
     float: 'right'
@@ -24,7 +24,7 @@ export default function Pagination({ pages, page, onChange, sx }) {
     <DivStyle sx={sx}>
       <Button
         variant="contained"
-        style={{textTransform: 'none'}}
+        style={{ textTransform: 'none' }}
         onClick={() => {
           onChange(1);
         }}
@@ -39,13 +39,9 @@ export default function Pagination({ pages, page, onChange, sx }) {
         }}
         disabled={page === 1}
       >
-        <ArrowBackIosNewIcon/>
+        <ArrowBackIosNewIcon />
       </ArrowButton>
-      <Button
-        variant="contained"
-        style={{textTransform: 'none'}}
-        disabled
-      >
+      <Button variant="contained" style={{ textTransform: 'none' }} disabled>
         Page {page} of {pages}
       </Button>
       <ArrowButton
@@ -55,11 +51,11 @@ export default function Pagination({ pages, page, onChange, sx }) {
         }}
         disabled={page === pages}
       >
-        <ArrowForwardIosIcon/>
+        <ArrowForwardIosIcon />
       </ArrowButton>
       <Button
         variant="contained"
-        style={{textTransform: 'none'}}
+        style={{ textTransform: 'none' }}
         onClick={() => {
           onChange(pages);
         }}
@@ -75,5 +71,5 @@ Pagination.propTypes = {
   pages: PropTypes.number,
   page: PropTypes.number,
   onChange: PropTypes.func,
-  sx: PropTypes.object,
+  sx: PropTypes.object
 };
