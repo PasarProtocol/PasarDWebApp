@@ -37,7 +37,7 @@ const ColorSet = [
 ];
 
 DIABadge.propTypes = {
-  balance: PropTypes.number,
+  balance: PropTypes.any,
   sx: PropTypes.any,
   isRequire: PropTypes.bool,
   disableTooltip: PropTypes.bool,
