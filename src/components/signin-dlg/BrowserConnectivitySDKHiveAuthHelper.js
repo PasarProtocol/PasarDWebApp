@@ -1,22 +1,14 @@
 import {
-  Claims,
-  DIDDocument,
   DIDBackend,
   DefaultDIDAdapter,
   JWTHeader,
   JWTParserBuilder,
-  VerifiableCredential,
   VerifiablePresentation
 } from '@elastosfoundation/did-js-sdk';
 import { DID as ConnDID, DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
-import {
-  AppContext,
-  AppContextProvider,
-  DIDResolverAlreadySetupException,
-  Vault
-} from '@elastosfoundation/hive-js-sdk';
+import { AppContext, DIDResolverAlreadySetupException, Vault } from '@elastosfoundation/hive-js-sdk';
 import dayjs from 'dayjs';
-import { ApplicationDID } from '../../config'
+import { ApplicationDID } from '../../config';
 
 /**
  * This is a sample hive auth helper that makes everything automatic for apps using hive to
@@ -45,14 +37,8 @@ export class BrowserConnectivitySDKHiveAuthHelper {
     const appInstanceDIDInfo = await this.didAccess.getOrCreateAppInstanceDID();
 
     console.log('hiveauthhelper', 'Getting app instance DID document');
-    const didDocument = await appInstanceDIDInfo.didStore.loadDid(
-      appInstanceDIDInfo.did.toString()
-    );
-    console.log(
-      'hiveauthhelper',
-      'Got app instance DID document. Now creating the Hive client',
-      didDocument.toJSON()
-    );
+    const didDocument = await appInstanceDIDInfo.didStore.loadDid(appInstanceDIDInfo.did.toString());
+    console.log('hiveauthhelper', 'Got app instance DID document. Now creating the Hive client', didDocument.toJSON());
 
     const appContextProvider = {
       getLocalDataDir: () => '/',
@@ -134,10 +120,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
     // Parse, but verify on chain that this JWT is valid first
     try {
       const claims = (
-        await new JWTParserBuilder()
-          .setAllowedClockSkewSeconds(300)
-          .build()
-          .parse(authChallengeJwttoken)
+        await new JWTParserBuilder().setAllowedClockSkewSeconds(300).build().parse(authChallengeJwttoken)
       ).getBody();
       if (claims == null) throw new Error('Invalid jwt token as authorization.');
 
@@ -170,10 +153,7 @@ export class BrowserConnectivitySDKHiveAuthHelper {
       }
 
       // Create the presentation that includes hive back end challenge (nonce) and the app id credential.
-      console.log(
-        'hiveauthhelper',
-        'Creating DID presentation response for Hive authentication challenge'
-      );
+      console.log('hiveauthhelper', 'Creating DID presentation response for Hive authentication challenge');
       const builder = await VerifiablePresentation.createFor(
         appInstanceDID.toString(),
         null,
@@ -187,23 +167,17 @@ export class BrowserConnectivitySDKHiveAuthHelper {
 
       if (presentation) {
         // Generate the hive back end authentication JWT
-        console.log(
-          'hiveauthhelper',
-          'Opening DID store to create a JWT for presentation:',
-          presentation.toJSON()
-        );
+        console.log('hiveauthhelper', 'Opening DID store to create a JWT for presentation:', presentation.toJSON());
         const didStore = await DID.DIDHelper.openDidStore(appInstanceDIDInfo.storeId);
 
         console.log('hiveauthhelper', 'Loading DID document');
         try {
           const didDocument = await didStore.loadDid(appInstanceDIDInfo.didString);
-          const validityDays = 2;
           console.log('hiveauthhelper', 'App instance DID document', didDocument.toJSON());
           console.log('hiveauthhelper', 'Creating JWT');
 
           try {
             // Create JWT token with presentation.
-            // const info = await new ConDID.DIDAccess().getExistingAppInstanceDIDInfo();
             const jwtToken = await didDocument
               .jwtBuilder()
               .addHeader(JWTHeader.TYPE, JWTHeader.JWT_TYPE)
