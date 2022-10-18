@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
@@ -31,11 +31,7 @@ const useStyles = makeStyles({
 });
 
 export default function StyledButton(props) {
-  const { pathname } = useLocation();
-  const isHome = pathname === '/';
-  
   const { themeMode } = useSettings();
-  // const isLight = !isHome && themeMode === 'light';
   const isLight = themeMode === 'light';
   const classes = useStyles();
 
@@ -49,7 +45,7 @@ export default function StyledButton(props) {
         }
       }
   );
-  
+
   const ButtonOutlinedStyle = styled(Button)(
     ({ theme }) =>
       !isLight && {
@@ -61,12 +57,25 @@ export default function StyledButton(props) {
         }
       }
   );
-  const additionProps = {}
-  if(props.startIcon&&props.endIcon)
-    additionProps.className = classes.iconAbsolute1
-  else if(props.startIcon)
-    additionProps.className = classes.iconAbsolute2
-  if(props.variant==="contained")
-      return <ButtonStyle {...props} {...additionProps}>{props.children}</ButtonStyle>
-  return <ButtonOutlinedStyle {...props} {...additionProps}>{props.children}</ButtonOutlinedStyle>
+  const additionProps = {};
+  if (props.startIcon && props.endIcon) additionProps.className = classes.iconAbsolute1;
+  else if (props.startIcon) additionProps.className = classes.iconAbsolute2;
+  if (props.variant === 'contained')
+    return (
+      <ButtonStyle {...props} {...additionProps}>
+        {props.children}
+      </ButtonStyle>
+    );
+  return (
+    <ButtonOutlinedStyle {...props} {...additionProps}>
+      {props.children}
+    </ButtonOutlinedStyle>
+  );
 }
+
+StyledButton.propTypes = {
+  startIcon: PropTypes.any,
+  endIcon: PropTypes.any,
+  variant: PropTypes.string,
+  children: PropTypes.node
+};

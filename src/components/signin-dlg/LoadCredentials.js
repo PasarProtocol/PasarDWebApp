@@ -137,13 +137,13 @@ export const getCredentialsFromPasar = async (did) => {
       const avatarData = await downloadFromUrl(dataQueryAvatarUrl);
       if (avatarData && avatarData.length) avatarUrl = `data:image/png;base64,${avatarData.toString('base64')}`;
     } else {
-      const resDownloadAvatarUrl = await downloadAvatar(did)
+      const resDownloadAvatarUrl = await downloadAvatar(did);
       if (resDownloadAvatarUrl && resDownloadAvatarUrl.length) {
         const base64Content = resDownloadAvatarUrl.reduce((content, code) => {
           content = `${content}${String.fromCharCode(code)}`;
-          return content
-        }, '')
-        avatarUrl = `data:image/png;base64,${base64Content}`
+          return content;
+        }, '');
+        avatarUrl = `data:image/png;base64,${base64Content}`;
       }
     }
     const name = getQueryDataFromObject(await queryName(did));
