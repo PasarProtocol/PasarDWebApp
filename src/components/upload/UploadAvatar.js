@@ -18,7 +18,7 @@ const RootStyle = styled('div')(({ theme }) => ({
   // padding: theme.spacing(1),
   padding: '5px',
   background: `linear-gradient(${theme.palette.background.paper}, ${theme.palette.background.paper}) padding-box, linear-gradient(180deg, #a951f4, #FF5082) border-box`,
-  border: '4px solid transparent',
+  border: '4px solid transparent'
 }));
 
 const DropZoneStyle = styled('div')({
@@ -62,7 +62,9 @@ UploadAvatar.propTypes = {
   error: PropTypes.bool,
   file: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   caption: PropTypes.node,
-  sx: PropTypes.object
+  sx: PropTypes.object,
+  address: PropTypes.string,
+  size: PropTypes.number
 };
 
 export default function UploadAvatar({ error, file, caption, address, size, sx, ...other }) {
@@ -102,11 +104,13 @@ export default function UploadAvatar({ error, file, caption, address, size, sx, 
 
   return (
     <>
-      <RootStyle sx={{
-        width: size+18,
-        height: size+18,
-        ...sx
-      }}>
+      <RootStyle
+        sx={{
+          width: size + 18,
+          height: size + 18,
+          ...sx
+        }}
+      >
         <DropZoneStyle
           {...getRootProps()}
           sx={{
@@ -129,7 +133,7 @@ export default function UploadAvatar({ error, file, caption, address, size, sx, 
             />
           )}
 
-          {!file && <Jazzicon address={address} size={size} sx={{mr: 0}}/>}
+          {!file && <Jazzicon address={address} size={size} sx={{ mr: 0 }} />}
 
           <PlaceholderStyle
             className="placeholder"
