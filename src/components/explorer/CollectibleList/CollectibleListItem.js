@@ -14,7 +14,7 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
     }
 }));
 export default function CollectibleListItem({ item }) {
-    const { thumbnail, name, createTime, royaltyOwner, tokenIdHex } = item;
+    const { name, createTime, royaltyOwner, tokenIdHex } = item;
     
     const handleErrorImage = (e) => {
         if(e.target.src.indexOf("pasarprotocol.io") >= 0) {
