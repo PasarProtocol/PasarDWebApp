@@ -27,11 +27,6 @@ const DropZoneStyle = styled('div')(({ theme }) => ({
   transition: theme.transitions.create('padding'),
   border: `2px dashed ${theme.palette.grey[500_32]}`,
   [theme.breakpoints.up('md')]: { textAlign: 'left', flexDirection: 'row' }
-  // backgroundColor: theme.palette.background.neutral,
-  // '&:hover': {
-  //   opacity: 0.72,
-  //   cursor: 'pointer'
-  // },
 }));
 
 // ----------------------------------------------------------------------
@@ -40,7 +35,9 @@ UploadSingleFile.propTypes = {
   error: PropTypes.bool,
   onRemove: PropTypes.func,
   file: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  sx: PropTypes.object
+  sx: PropTypes.object,
+  isAvatar: PropTypes.bool,
+  disabled: PropTypes.bool
 };
 
 export default function UploadSingleFile({ error, file, onRemove, isAvatar, disabled, sx, ...other }) {
@@ -56,7 +53,7 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, disa
         py: 1,
         px: 2,
         mt: 3,
-        borderColor: (theme)=>`error.${theme.palette.mode}`,
+        borderColor: (theme) => `error.${theme.palette.mode}`,
         bgcolor: (theme) => alpha(theme.palette.error.main, 0.08)
       }}
     >
@@ -86,46 +83,46 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, disa
           ...(isDragActive && { opacity: 0.72 }),
           ...((isDragReject || error) && {
             color: 'error.main',
-            borderColor: (theme)=>`error.${theme.palette.mode}`,
-            bgcolor: (theme)=>`error.${theme.palette.mode}er`
+            borderColor: (theme) => `error.${theme.palette.mode}`,
+            bgcolor: (theme) => `error.${theme.palette.mode}er`
           }),
           ...(file && { p: 8 })
         }}
-        onClick={(e)=>e.preventDefault()}
+        onClick={(e) => e.preventDefault()}
       >
         <input {...getInputProps()} />
 
-        {
-          !file && <Box sx={{ p: 3 }}>
+        {!file && (
+          <Box sx={{ p: 3 }}>
             <Typography variant="body2" align="center">
               File types supported:PNG, JPEG, JPG, GIF
-              {isAvatar&&(
+              {isAvatar && (
                 <>
-                  <br/>Canvas size must be 600x600 pixels<br/>Max. size:5 MB<br/>Recommended GIF animation length: Less than 10 seconds
+                  <br />
+                  Canvas size must be 600x600 pixels
+                  <br />
+                  Max. size:5 MB
+                  <br />
+                  Recommended GIF animation length: Less than 10 seconds
                 </>
-                )
-              }
+              )}
             </Typography>
-            <Stack sx={{p: 3}} spacing={1} align="center">
+            <Stack sx={{ p: 3 }} spacing={1} align="center">
               <Typography variant="body2">
-                <Box draggable = {false} component="img" src="/static/upload.svg" sx={{width: 60}}/>
+                <Box draggable={false} component="img" src="/static/upload.svg" sx={{ width: 60 }} />
               </Typography>
-              <Typography variant="body2">
-                Drag and drop your file here
-              </Typography>
-              <Typography variant="body2">
-                or
-              </Typography>
+              <Typography variant="body2">Drag and drop your file here</Typography>
+              <Typography variant="body2">or</Typography>
               <Button variant="contained" {...getRootProps()} disabled={disabled}>
                 Choose File
               </Button>
             </Stack>
           </Box>
-        }
+        )}
         {file && (
           <>
             <Box
-              draggable = {false}
+              draggable={false}
               component="img"
               alt="file preview"
               src={isString(file) ? file : file.preview}
@@ -136,7 +133,8 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, disa
                 maxHeight: 500
               }}
             />
-            <Box sx={{
+            <Box
+              sx={{
                 top: 64,
                 left: 64,
                 width: 'calc(100% - 128px)',
@@ -157,7 +155,7 @@ export default function UploadSingleFile({ error, file, onRemove, isAvatar, disa
               }}
               {...getRootProps()}
             >
-              <Box draggable = {false} component="img" src="/static/upload.svg" sx={{width: 60}}/>
+              <Box draggable={false} component="img" src="/static/upload.svg" sx={{ width: 60 }} />
             </Box>
             <Box sx={{ top: 16, right: 16, position: 'absolute' }}>
               <MIconButton
