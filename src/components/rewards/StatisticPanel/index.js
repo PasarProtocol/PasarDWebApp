@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 // material
 import { styled } from '@mui/material/styles';
-import { Grid, Card, Box } from '@mui/material';
-import StatisticItem from './StatisticItem'
+import { Grid, Card } from '@mui/material';
+import StatisticItem from './StatisticItem';
 // ----------------------------------------------------------------------
 const RootStyle = styled(Card)(({ theme }) => ({
   margin: 'auto',
@@ -21,7 +21,7 @@ StatisticPanel.propTypes = {
   poolRatio: PropTypes.number,
   userCount: PropTypes.number,
   nextDistribution: PropTypes.number
-}
+};
 
 export default function StatisticPanel({ itemCount, poolRatio, userCount, nextDistribution }) {
   return (

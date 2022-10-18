@@ -2,8 +2,6 @@ import React from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { Box, Stack, Divider } from '@mui/material';
-
-import PaperRecord from '../PaperRecord';
 import useSettings from '../../hooks/useSettings';
 // ----------------------------------------------------------------------
 
