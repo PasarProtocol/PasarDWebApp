@@ -1,19 +1,33 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import Web3 from 'web3';
-import * as math from 'mathjs';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Link, Button, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Link, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
-
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { blankAddress } from '../../config';
-import { reduceHexAddress, isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
+import {
+  reduceHexAddress,
+  isInAppBrowser,
+  getFilteredGasPrice,
+  getContractAddressInCurrentNetwork
+} from '../../utils/common';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import useSingin from '../../hooks/useSignin';
 
+DeleteItem.propTypes = {
+  isOpen: PropTypes.bool,
+  setOpen: PropTypes.func,
+  name: PropTypes.string,
+  tokenId: PropTypes.string,
+  baseToken: PropTypes.string,
+  updateCount: PropTypes.number,
+  handleUpdate: PropTypes.func
+};
+
 export default function DeleteItem(props) {
-  const { isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate, v1State=false } = props;
+  const { isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate } = props;
   const [onProgress, setOnProgress] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const { pasarLinkChain } = useSingin();
@@ -23,24 +37,26 @@ export default function DeleteItem(props) {
   };
 
   const callBurn = async (_id, _value) => {
-    const walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
+    const walletConnectProvider = isInAppBrowser()
+      ? window.elastos.getWeb3Provider()
+      : essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
-    const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker')
+    const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker');
     const contractAbi = STICKER_CONTRACT_ABI;
     const contractAddress = baseToken || PasarContractAddress;
     const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
     const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
-    const gasPrice = getFilteredGasPrice(_gasPrice)
+    const gasPrice = getFilteredGasPrice(_gasPrice);
 
     console.log('Sending transaction with account address:', accounts[0]);
     const transactionParams = {
-      'from': accounts[0],
-      'gasPrice': gasPrice,
-      'gas': 5000000,
-      'value': 0
+      from: accounts[0],
+      gasPrice,
+      gas: 5000000,
+      value: 0
     };
 
     stickerContract.methods
@@ -51,14 +67,16 @@ export default function DeleteItem(props) {
       })
       .on('receipt', (receipt) => {
         console.log('receipt', receipt);
-        setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
+        setTimeout(() => {
+          handleUpdate(updateCount + 1);
+        }, 3000);
         enqueueSnackbar('Burn NFT success!', { variant: 'success' });
         setOpen(false);
       })
       .on('confirmation', (confirmationNumber, receipt) => {
         console.log('confirmation', confirmationNumber, receipt);
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error) => {
         console.error('error', error);
         enqueueSnackbar('Burn NFT error!', { variant: 'error' });
         setOnProgress(false);

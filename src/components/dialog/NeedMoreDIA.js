@@ -1,24 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
-import { useWeb3React } from '@web3-react/core';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, Link } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box, Link } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import StyledButton from '../signin-dlg/StyledButton';
 import { getDiaBalanceDegree } from '../../utils/common';
 import { PATH_PAGE } from '../../routes/paths';
 
-export default function NeedMoreDIA(props) {
-  const context = useWeb3React();
-  const { library, chainId, account } = context;
+NeedMoreDIA.propTypes = {
+  isOpen: PropTypes.bool,
+  setOpen: PropTypes.func,
+  balance: PropTypes.number,
+  actionText: PropTypes.string
+};
 
-  const { isOpen, setOpen, balance, actionText="transfer items" } = props;
-  const degree = getDiaBalanceDegree(balance, 0)
+export default function NeedMoreDIA(props) {
+  const { isOpen, setOpen, balance, actionText = 'transfer items' } = props;
+  const degree = getDiaBalanceDegree(balance, 0);
   const handleClose = () => {
     setOpen(false);
   };
-
-  React.useEffect(async () => {
-  }, [account, chainId]);
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -41,34 +42,19 @@ export default function NeedMoreDIA(props) {
           Insufficient Funds
         </Typography>
         <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }} align="center">
-          Sorry, you need to hold a minimum value of<br/>
+          Sorry, you need to hold a minimum value of
+          <br />
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-            {0.01*(10**degree)} DIA
-          </Typography>
-          {' '}in order to {actionText}<br/>
+            {0.01 * 10 ** degree} DIA
+          </Typography>{' '}
+          in order to {actionText}
+          <br />
           Click{' '}
-          <Link underline="always" component={RouterLink} to={PATH_PAGE.features}>here</Link>{' '}
+          <Link underline="always" component={RouterLink} to={PATH_PAGE.features}>
+            here
+          </Link>{' '}
           to view the features available for DIA holders based on number of holdings
         </Typography>
-        {/* <Grid container sx={{ mt: 2, display: 'block' }}>
-          <Grid item xs={12}>
-            <Stack direction="row">
-              <Typography variant="body2" display="block" sx={{ flex: 1, mb: 0.5 }}>
-                Wallet Balance
-              </Typography>
-              <Typography
-                variant="body2"
-                display="block"
-                gutterBottom
-                align="right"
-                sx={{ color: 'text.secondary', mb: 0.5 }}
-              >
-                {balance} DIA
-              </Typography>
-            </Stack>
-            <Divider sx={{ mb: 0.5 }} />
-          </Grid>
-        </Grid> */}
         <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
           <StyledButton
             variant="contained"

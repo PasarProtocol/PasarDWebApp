@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import * as math from 'mathjs';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Link, Stack, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Stack } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import StyledButton from '../signin-dlg/StyledButton';
+
+CreateItem.propTypes = {
+  isOpen: PropTypes.bool,
+  setOpen: PropTypes.func,
+  token: PropTypes.string,
+};
 
 export default function CreateItem(props) {
   const { isOpen, setOpen, token } = props;
@@ -33,16 +39,23 @@ export default function CreateItem(props) {
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
           Create Item
         </Typography>
-        <Typography variant="h5" sx={{ color: 'text.secondary', py: 1 }} align='center'>
-          You have successfully created a collection!<br/>
-          Do you want to proceed to the next step and<br/>
+        <Typography variant="h5" sx={{ color: 'text.secondary', py: 1 }} align="center">
+          You have successfully created a collection!
+          <br />
+          Do you want to proceed to the next step and
+          <br />
           create/mint new item(s) onto your collections?
         </Typography>
-        <Stack direction='column' spacing={1.5} sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-          <StyledButton variant='contained' onClick={()=>{ navigate('/create', {state: {token}}) }}>
+        <Stack direction="column" spacing={1.5} sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
+          <StyledButton
+            variant="contained"
+            onClick={() => {
+              navigate('/create', { state: { token } });
+            }}
+          >
             Yes
           </StyledButton>
-          <StyledButton variant='outlined' to="/marketplace" component={RouterLink}>
+          <StyledButton variant="outlined" to="/marketplace" component={RouterLink}>
             No, I will do it later
           </StyledButton>
         </Stack>
