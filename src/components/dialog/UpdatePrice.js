@@ -46,7 +46,7 @@ UpdatePrice.propTypes = {
   updateCount: PropTypes.number,
   handleUpdate: PropTypes.func,
   v1State: PropTypes.bool,
-  royalties: PropTypes.number
+  royalties: PropTypes.string
 };
 
 export default function UpdatePrice(props) {

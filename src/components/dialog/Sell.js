@@ -45,7 +45,7 @@ Sell.propTypes = {
   updateCount: PropTypes.number,
   handleUpdate: PropTypes.func,
   isMinter: PropTypes.bool,
-  royalties: PropTypes.number
+  royalties: PropTypes.string
 };
 
 export default function Sell(props) {
