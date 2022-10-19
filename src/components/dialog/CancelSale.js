@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import Web3 from 'web3';
-import * as math from 'mathjs';
 import { useSnackbar } from 'notistack';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { v1marketContract as V1_MARKET_CONTRACT_ADDRESS } from '../../config';
@@ -12,36 +12,49 @@ import { isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import useSignin from '../../hooks/useSignin';
 
+CancelSale.propTypes = {
+  isOpen: PropTypes.bool,
+  setOpen: PropTypes.func,
+  name: PropTypes.string,
+  orderId: PropTypes.string,
+  OrderId: PropTypes.string,
+  updateCount: PropTypes.number,
+  handleUpdate: PropTypes.func,
+  v1State: PropTypes.bool
+};
+
 export default function CancelSale(props) {
-  const { isOpen, setOpen, name, orderId, OrderId, updateCount, handleUpdate, v1State=false } = props;
+  const { isOpen, setOpen, name, orderId, OrderId, updateCount, handleUpdate, v1State = false } = props;
   const [onProgress, setOnProgress] = React.useState(false);
-  const { updateCount: updateCount2, setUpdateCount } = useAuctionDlg()
+  const { updateCount: updateCount2, setUpdateCount } = useAuctionDlg();
   const { enqueueSnackbar } = useSnackbar();
-  const { pasarLinkChain } = useSignin()
+  const { pasarLinkChain } = useSignin();
 
   const handleClose = () => {
     setOpen(false);
   };
 
   const callCancelOrder = async (_orderId) => {
-    const walletConnectProvider = isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider();
+    const walletConnectProvider = isInAppBrowser()
+      ? window.elastos.getWeb3Provider()
+      : essentialsConnector.getWalletConnectProvider();
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
-    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market')
+    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
     const contractAbi = PASAR_CONTRACT_ABI;
-    const contractAddress = !v1State ? MarketContractAddress: V1_MARKET_CONTRACT_ADDRESS;
+    const contractAddress = !v1State ? MarketContractAddress : V1_MARKET_CONTRACT_ADDRESS;
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
     const _gasPrice = await walletConnectWeb3.eth.getGasPrice();
-    const gasPrice = getFilteredGasPrice(_gasPrice)
+    const gasPrice = getFilteredGasPrice(_gasPrice);
 
     console.log('Sending transaction with account address:', accounts[0]);
     const transactionParams = {
-      'from': accounts[0],
-      'gasPrice': gasPrice,
-      'gas': 5000000,
-      'value': 0
+      from: accounts[0],
+      gasPrice,
+      gas: 5000000,
+      value: 0
     };
 
     pasarContract.methods
@@ -52,19 +65,21 @@ export default function CancelSale(props) {
       })
       .on('receipt', (receipt) => {
         console.log('receipt', receipt);
-        if(handleUpdate)
-          setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
+        if (handleUpdate)
+          setTimeout(() => {
+            handleUpdate(updateCount + 1);
+          }, 3000);
         else
-          setTimeout(()=>{
-            setUpdateCount(updateCount2+1)
-          }, 1000)
+          setTimeout(() => {
+            setUpdateCount(updateCount2 + 1);
+          }, 1000);
         enqueueSnackbar('Cancel sale Success!', { variant: 'success' });
         setOpen(false);
       })
       .on('confirmation', (confirmationNumber, receipt) => {
         console.log('confirmation', confirmationNumber, receipt);
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error) => {
         console.error('error', error);
         enqueueSnackbar('Cancel sale Error!', { variant: 'error' });
         setOnProgress(false);
@@ -73,7 +88,7 @@ export default function CancelSale(props) {
 
   const cancelSale = async () => {
     setOnProgress(true);
-    const _orderId = orderId!==undefined?orderId:OrderId
+    const _orderId = orderId !== undefined ? orderId : OrderId;
     console.log('orderId:', _orderId);
     await callCancelOrder(_orderId);
   };
@@ -101,7 +116,8 @@ export default function CancelSale(props) {
           You are about to remove{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
             {name}
-          </Typography><br/>
+          </Typography>
+          <br />
           from the marketplace
         </Typography>
         <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>

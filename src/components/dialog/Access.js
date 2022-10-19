@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, Divider} from '@mui/material';
+import React from 'react';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import TransLoadingButton from '../TransLoadingButton';
 import useMintDlg from '../../hooks/useMintDlg';
 
-export default function Access(props) {
-  const {isOpenAccess, setOpenAccessDlg, setReadySignForAccess, isReadySignForAccess, approvalFunction} = useMintDlg()
+export default function Access() {
+  const { isOpenAccess, setOpenAccessDlg, setReadySignForAccess, isReadySignForAccess, approvalFunction } =
+    useMintDlg();
 
-  const handleEnable = (e) => {
-    setReadySignForAccess(true)
-    approvalFunction()
-  }
+  const handleEnable = () => {
+    setReadySignForAccess(true);
+    approvalFunction();
+  };
   const handleClose = () => {
-    setOpenAccessDlg(false)
-  }
+    setOpenAccessDlg(false);
+  };
 
   return (
     <Dialog open={isOpenAccess} onClose={handleClose}>
@@ -36,15 +37,11 @@ export default function Access(props) {
           Enable Access
         </Typography>
         <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }}>
-          Pasar requires your authorization
-          to transfer all sold items from your
-          wallet to the buyer’s address when a
+          Pasar requires your authorization to transfer all sold items from your wallet to the buyer’s address when a
           buy order is complete
         </Typography>
         <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
-          <TransLoadingButton
-            loading={isReadySignForAccess}
-            onClick={handleEnable}>
+          <TransLoadingButton loading={isReadySignForAccess} onClick={handleEnable}>
             Enable
           </TransLoadingButton>
         </Box>

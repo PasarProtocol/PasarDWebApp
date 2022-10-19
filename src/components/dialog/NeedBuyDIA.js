@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Button, Box, Grid, Stack, Divider } from '@mui/material';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box, Grid, Stack, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import StyledButton from '../signin-dlg/StyledButton';
 
-export default function NeedBuyDIA(props) {
-  const context = useWeb3React();
-  const { library, chainId, account } = context;
+NeedBuyDIA.propTypes = {
+  isOpen: PropTypes.bool,
+  setOpen: PropTypes.func,
+  balance: PropTypes.number,
+  actionText: PropTypes.string
+};
 
-  const { isOpen, setOpen, balance, actionText="transfer items" } = props;
+export default function NeedBuyDIA(props) {
+  const { isOpen, setOpen, balance, actionText = 'transfer items' } = props;
   const handleClose = () => {
     setOpen(false);
   };
-
-  React.useEffect(async () => {
-  }, [account, chainId]);
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -37,11 +38,12 @@ export default function NeedBuyDIA(props) {
           Insufficient Funds
         </Typography>
         <Typography variant="h5" component="div" sx={{ color: 'text.secondary' }} align="center">
-          You need to hold a minimum value of<br/>
+          You need to hold a minimum value of
+          <br />
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
             0.01 DIA
-          </Typography>
-          {' '}in order to {actionText}
+          </Typography>{' '}
+          in order to {actionText}
         </Typography>
         <Grid container sx={{ mt: 2, display: 'block' }}>
           <Grid item xs={12}>
@@ -63,12 +65,7 @@ export default function NeedBuyDIA(props) {
           </Grid>
         </Grid>
         <Box component="div" sx={{ maxWidth: 200, m: 'auto', py: 2 }}>
-          <StyledButton
-            variant="contained"
-            href="https://glidefinance.io/swap"
-            target="_blank"
-            fullWidth
-          >
+          <StyledButton variant="contained" href="https://glidefinance.io/swap" target="_blank" fullWidth>
             Buy DIA
           </StyledButton>
         </Box>

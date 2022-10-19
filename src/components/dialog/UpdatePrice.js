@@ -1,28 +1,67 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link as RouterLink } from 'react-router-dom';
-import Web3 from 'web3';
 import * as math from 'mathjs';
-import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Stack, Input, FormControl, InputLabel, Divider, 
-  Grid, Tooltip, Button, Box, FormHelperText, Link } from '@mui/material';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Typography,
+  Stack,
+  FormControl,
+  Divider,
+  Grid,
+  Tooltip,
+  Box,
+  FormHelperText,
+  Link
+} from '@mui/material';
 import { Icon } from '@iconify/react';
 import CloseIcon from '@mui/icons-material/Close';
-import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
-
-import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
-import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import CoinSelect from '../marketplace/CoinSelect';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
 import DIABadge from '../badge/DIABadge';
-import { removeLeadingZero, isInAppBrowser, getCoinTypesInCurrentNetwork, callContractMethod, isValidLimitPrice, getDiaBalanceDegree } from '../../utils/common';
+import {
+  removeLeadingZero,
+  getCoinTypesInCurrentNetwork,
+  callContractMethod,
+  isValidLimitPrice,
+  getDiaBalanceDegree
+} from '../../utils/common';
 import { auctionOrderType } from '../../config';
 import useSignin from '../../hooks/useSignin';
 import { PATH_PAGE } from '../../routes/paths';
 
+UpdatePrice.propTypes = {
+  isOpen: PropTypes.bool,
+  setOpen: PropTypes.func,
+  name: PropTypes.string,
+  orderId: PropTypes.string,
+  saleType: PropTypes.string,
+  orderType: PropTypes.string,
+  updateCount: PropTypes.number,
+  handleUpdate: PropTypes.func,
+  v1State: PropTypes.bool,
+  royalties: PropTypes.number
+};
+
 export default function UpdatePrice(props) {
-  const { isOpen, setOpen, name, orderId, saleType, orderType, updateCount, handleUpdate, v1State=false, royalties } = props;
+  const {
+    isOpen,
+    setOpen,
+    name,
+    orderId,
+    saleType,
+    orderType,
+    updateCount,
+    handleUpdate,
+    v1State = false,
+    royalties
+  } = props;
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [price, setPrice] = React.useState('');
@@ -31,18 +70,18 @@ export default function UpdatePrice(props) {
   const [rcvprice, setRcvPrice] = React.useState(0);
   const [coinType, setCoinType] = React.useState(0);
   const [isOnValidation, setOnValidation] = React.useState(false);
-  
-  const { diaBalance, pasarLinkChain } = useSignin()
+
+  const { diaBalance, pasarLinkChain } = useSignin();
 
   const handleClose = () => {
     setOpen(false);
-    setOnProgress(false)
-    setPrice('')
-    setReservePrice('')
-    setBuyoutPrice('')
-    setRcvPrice(0)
-    setCoinType(0)
-    setOnValidation(false)
+    setOnProgress(false);
+    setPrice('');
+    setReservePrice('');
+    setBuyoutPrice('');
+    setRcvPrice(0);
+    setCoinType(0);
+    setOnValidation(false);
   };
 
   const handleChangePrice = (event) => {
@@ -51,7 +90,7 @@ export default function UpdatePrice(props) {
     priceValue = removeLeadingZero(priceValue);
     if (!isValidLimitPrice(priceValue)) return;
     setPrice(priceValue);
-    const royaltyFee = saleType==='Primary Sale' ? 0 : math.round((priceValue * royalties) / 10 ** 6, 4);
+    const royaltyFee = saleType === 'Primary Sale' ? 0 : math.round((priceValue * royalties) / 10 ** 6, 4);
     setRcvPrice(math.round((priceValue * 98) / 100 - royaltyFee, 3));
   };
 
@@ -72,35 +111,47 @@ export default function UpdatePrice(props) {
   };
 
   const callChangeOrderPrice = async (_orderId, _price, _reservePrice, _buyoutPrice) => {
-    callContractMethod(orderType===auctionOrderType?'changeAuctionOrderPrice':'changeSaleOrderPrice', coinType, pasarLinkChain, {
-      _orderId, _price, _reservePrice, _buyoutPrice, v1State
-    }).then((success) => {
-        setTimeout(()=>{handleUpdate(updateCount+1)}, 3000)
+    callContractMethod(
+      orderType === auctionOrderType ? 'changeAuctionOrderPrice' : 'changeSaleOrderPrice',
+      coinType,
+      pasarLinkChain,
+      {
+        _orderId,
+        _price,
+        _reservePrice,
+        _buyoutPrice,
+        v1State
+      }
+    )
+      .then((success) => {
+        console.log(success);
+        setTimeout(() => {
+          handleUpdate(updateCount + 1);
+        }, 3000);
         enqueueSnackbar('Update price success!', { variant: 'success' });
         setOpen(false);
       })
-      .catch(error=>{
+      .catch((e) => {
+        console.error(e);
         enqueueSnackbar('Update price error!', { variant: 'error' });
         setOnProgress(false);
-      })
+      });
   };
 
   const changePrice = async () => {
-    setOnValidation(true)
-    if(!(price*1))
-      return
+    setOnValidation(true);
+    if (!(price * 1)) return;
 
     setOnProgress(true);
-    console.log('orderId:', orderId);
-    const _updatedPrice = BigInt(price*1e18).toString();
-    const _reservePrice = BigInt(reservePrice*1e18).toString();
-    const _buyoutPrice = BigInt(buyoutPrice*1e18).toString();
+    const _updatedPrice = BigInt(price * 1e18).toString();
+    const _reservePrice = BigInt(reservePrice * 1e18).toString();
+    const _buyoutPrice = BigInt(buyoutPrice * 1e18).toString();
     console.log(_updatedPrice);
     callChangeOrderPrice(orderId, _updatedPrice, _reservePrice, _buyoutPrice);
   };
 
-  const DiaDegree = getDiaBalanceDegree(diaBalance, pasarLinkChain)
-  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain)
+  const DiaDegree = getDiaBalanceDegree(diaBalance, pasarLinkChain);
+  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain);
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -131,25 +182,29 @@ export default function UpdatePrice(props) {
         <Grid container>
           <Grid item xs={12}>
             <Typography variant="h4" sx={{ fontWeight: 'normal' }}>
-              {orderType===auctionOrderType?'Starting Price':'Price'}
+              {orderType === auctionOrderType ? 'Starting Price' : 'Price'}
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <FormControl error={isOnValidation && !(price*1)} variant="standard" sx={{ width: '100%' }}>
-              <InputLabelStyle htmlFor="input-with-price">Enter a {orderType===auctionOrderType?'starting':'fixed'} price of each item</InputLabelStyle>
+            <FormControl error={isOnValidation && !(price * 1)} variant="standard" sx={{ width: '100%' }}>
+              <InputLabelStyle htmlFor="input-with-price">
+                Enter a {orderType === auctionOrderType ? 'starting' : 'fixed'} price of each item
+              </InputLabelStyle>
               <InputStyle
                 type="number"
                 id="input-with-price"
                 value={price}
                 onChange={handleChangePrice}
                 startAdornment={' '}
-                endAdornment={<CoinSelect selected={coinType} onChange={setCoinType}/>}
+                endAdornment={<CoinSelect selected={coinType} onChange={setCoinType} />}
                 aria-describedby="price-error-text"
                 inputProps={{
-                  sx: {flexGrow: 1, width: 'auto'}
+                  sx: { flexGrow: 1, width: 'auto' }
                 }}
               />
-              <FormHelperText id="price-error-text" hidden={!isOnValidation || (isOnValidation && (price*1))}>Price is required</FormHelperText>
+              <FormHelperText id="price-error-text" hidden={!isOnValidation || (isOnValidation && price * 1)}>
+                Price is required
+              </FormHelperText>
             </FormControl>
             <Divider />
             <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main' }}>
@@ -162,48 +217,45 @@ export default function UpdatePrice(props) {
               >
                 <Icon icon="eva:info-outline" style={{ marginBottom: -4, fontSize: 18 }} />
               </Tooltip>
-              {
-                saleType!=="Primary Sale" && (royalties*1)>0 &&
-                <>,&nbsp;Royalty fee {math.round(royalties/1e4, 2)}%</>
-              }
+              {saleType !== 'Primary Sale' && royalties * 1 > 0 && (
+                <>,&nbsp;Royalty fee {math.round(royalties / 1e4, 2)}%</>
+              )}
             </Typography>
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive
               <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main', display: 'inline' }}>
-                {' '}{rcvprice} {coinTypes[coinType].name}{' '}
+                {' '}
+                {rcvprice} {coinTypes[coinType].name}{' '}
               </Typography>
               per item
             </Typography>
           </Grid>
         </Grid>
-        {
-          orderType===auctionOrderType &&
+        {orderType === auctionOrderType && (
           <Grid container>
             <Grid item xs={12}>
               <Typography variant="h4" sx={{ fontWeight: 'normal' }}>
                 Reserve Price
-                {
-                  DiaDegree===0 &&
-                  <Stack direction="row" spacing={1} sx={{display: 'inline-flex', pl: 2}}>
-                    <DIABadge degree={1} isRequire={Boolean(true)}/>
-                    <DIABadge degree={2} isRequire={Boolean(true)}/>
-                    <DIABadge degree={3} isRequire={Boolean(true)}/>
+                {DiaDegree === 0 && (
+                  <Stack direction="row" spacing={1} sx={{ display: 'inline-flex', pl: 2 }}>
+                    <DIABadge degree={1} isRequire={Boolean(true)} />
+                    <DIABadge degree={2} isRequire={Boolean(true)} />
+                    <DIABadge degree={3} isRequire={Boolean(true)} />
                   </Stack>
-                }
+                )}
               </Typography>
             </Grid>
-            {
-              DiaDegree===0?
-              <Grid item xs={12} sx={{mb: 1}}>
-                <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
+            {DiaDegree === 0 ? (
+              <Grid item xs={12} sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main' }}>
                   Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info{' '}
-                  <Link underline="always" component={RouterLink} to={PATH_PAGE.features} color='origin.main'>
+                  <Link underline="always" component={RouterLink} to={PATH_PAGE.features} color="origin.main">
                     here
                   </Link>
                 </Typography>
                 <Divider />
-              </Grid>: 
-
+              </Grid>
+            ) : (
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{ width: '100%' }}>
                   <InputLabelStyle htmlFor="input-with-price">Enter a reserve price</InputLabelStyle>
@@ -213,40 +265,38 @@ export default function UpdatePrice(props) {
                     value={reservePrice}
                     onChange={handleChangeReservePrice}
                     startAdornment={' '}
-                    endAdornment={<CoinTypeLabel type={coinTypes[coinType]}/>}
+                    endAdornment={<CoinTypeLabel type={coinTypes[coinType]} />}
                     inputProps={{
-                      sx: {flexGrow: 1, width: 'auto'}
+                      sx: { flexGrow: 1, width: 'auto' }
                     }}
                   />
                 </FormControl>
                 <Divider />
               </Grid>
-            }
+            )}
             <Grid item xs={12}>
               <Typography variant="h4" sx={{ fontWeight: 'normal' }}>
                 Buy Now Price
-                {
-                  DiaDegree===0 &&
-                  <Stack direction="row" spacing={1} sx={{display: 'inline-flex', pl: 2}}>
-                    <DIABadge degree={1} isRequire={Boolean(true)}/>
-                    <DIABadge degree={2} isRequire={Boolean(true)}/>
-                    <DIABadge degree={3} isRequire={Boolean(true)}/>
+                {DiaDegree === 0 && (
+                  <Stack direction="row" spacing={1} sx={{ display: 'inline-flex', pl: 2 }}>
+                    <DIABadge degree={1} isRequire={Boolean(true)} />
+                    <DIABadge degree={2} isRequire={Boolean(true)} />
+                    <DIABadge degree={3} isRequire={Boolean(true)} />
                   </Stack>
-                }
+                )}
               </Typography>
             </Grid>
-            {
-              DiaDegree===0?
+            {DiaDegree === 0 ? (
               <Grid item xs={12}>
-                <Typography variant="body2" sx={{fontWeight: 'normal', color: 'origin.main'}}>
+                <Typography variant="body2" sx={{ fontWeight: 'normal', color: 'origin.main' }}>
                   Only available for Bronze, Silver and Gold DIA (Diamond) token holders. More info{' '}
-                  <Link underline="always" component={RouterLink} to={PATH_PAGE.features} color='origin.main'>
+                  <Link underline="always" component={RouterLink} to={PATH_PAGE.features} color="origin.main">
                     here
                   </Link>
                 </Typography>
                 <Divider />
-              </Grid>: 
-
+              </Grid>
+            ) : (
               <Grid item xs={12}>
                 <FormControl variant="standard" sx={{ width: '100%' }}>
                   <InputLabelStyle htmlFor="input-with-price">Enter a buy now price</InputLabelStyle>
@@ -256,17 +306,17 @@ export default function UpdatePrice(props) {
                     value={buyoutPrice}
                     onChange={handleChangeBuyoutPrice}
                     startAdornment={' '}
-                    endAdornment={<CoinTypeLabel type={coinTypes[coinType]}/>}
+                    endAdornment={<CoinTypeLabel type={coinTypes[coinType]} />}
                     inputProps={{
-                      sx: {flexGrow: 1, width: 'auto'}
+                      sx: { flexGrow: 1, width: 'auto' }
                     }}
                   />
                 </FormControl>
                 <Divider />
               </Grid>
-            }
+            )}
           </Grid>
-        }
+        )}
         <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
           <TransLoadingButton loading={onProgress} onClick={changePrice}>
             Update
