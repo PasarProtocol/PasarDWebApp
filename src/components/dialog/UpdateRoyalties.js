@@ -21,7 +21,7 @@ UpdateRoyalties.propTypes = {
   isOpen: PropTypes.bool,
   setOpen: PropTypes.func,
   name: PropTypes.string,
-  token: PropTypes.string,
+  token: PropTypes.any,
   owners: PropTypes.array,
   feeRates: PropTypes.array
 };
