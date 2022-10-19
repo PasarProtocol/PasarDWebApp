@@ -1,29 +1,28 @@
-import React, { useState } from "react";
+import React from 'react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import PropTypes from 'prop-types';
 
 const MenuProps = {
   anchorOrigin: {
-    vertical: "bottom",
-    horizontal: "left"
+    vertical: 'bottom',
+    horizontal: 'left'
   },
   transformOrigin: {
-    vertical: "top",
-    horizontal: "left"
+    vertical: 'top',
+    horizontal: 'left'
   },
-  variant: "menu"
-}
-const menuItems = ['Right after listing']
+  variant: 'menu'
+};
+const menuItems = ['Right after listing'];
 
 export default function StartingDateSelect({ selected, onChange }) {
   const handleChange = (event) => {
     onChange(event.target.value);
-  }
+  };
   return (
     <Select
-      // defaultValue={0}
-      variant='standard'
+      variant="standard"
       value={selected}
       onChange={handleChange}
       inputProps={{ 'aria-label': 'Without label' }}
@@ -38,13 +37,16 @@ export default function StartingDateSelect({ selected, onChange }) {
       }}
       MenuProps={MenuProps}
     >
-      {
-        menuItems.map((type, i)=><MenuItem key={i} value={i} autoFocus={selected===i}>{type}</MenuItem>)
-      }
+      {menuItems.map((type, i) => (
+        <MenuItem key={i} value={i} autoFocus={selected === i}>
+          {type}
+        </MenuItem>
+      ))}
     </Select>
-  )
+  );
 }
 
 StartingDateSelect.propTypes = {
   onChange: PropTypes.func,
-}
+  selected: PropTypes.number
+};
