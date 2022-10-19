@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import PropTypes from 'prop-types';
@@ -16,7 +16,7 @@ export default function DateOrderSelect({ onChange }) {
       onChange={handleChange}
       inputProps={{ 'aria-label': 'Without label' }}
       size="small"
-      sx={{mx: 1}}
+      sx={{ mx: 1 }}
     >
       <MenuItem value={-1}>Latest</MenuItem>
       <MenuItem value={1}>Oldest</MenuItem>
@@ -25,6 +25,5 @@ export default function DateOrderSelect({ onChange }) {
 }
 
 DateOrderSelect.propTypes = {
-  order: PropTypes.number,
-  onChange: PropTypes.func,
+  onChange: PropTypes.func
 };

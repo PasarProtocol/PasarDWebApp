@@ -1,10 +1,8 @@
 import NProgress from 'nprogress';
 import { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-// material
 import { alpha, styled, useTheme } from '@mui/material/styles';
 import { Box, GlobalStyles } from '@mui/material';
-//
 import Logo from './Logo';
 
 // ----------------------------------------------------------------------
@@ -103,7 +101,7 @@ export default function LoadingScreen({ ...other }) {
             height: 100,
             borderRadius: '25%',
             position: 'absolute',
-            border: (theme) => `solid 3px ${alpha("#ff5082", 0.24)}`
+            border: () => `solid 3px ${alpha('#ff5082', 0.24)}`
           }}
         />
 
@@ -125,7 +123,7 @@ export default function LoadingScreen({ ...other }) {
             height: 120,
             borderRadius: '25%',
             position: 'absolute',
-            border: (theme) => `solid 8px ${alpha("#ff5082", 0.24)}`
+            border: () => `solid 8px ${alpha('#ff5082', 0.24)}`
           }}
         />
       </RootStyle>

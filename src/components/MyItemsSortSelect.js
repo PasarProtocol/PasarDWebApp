@@ -1,20 +1,20 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import PropTypes from 'prop-types';
 
 const MenuProps = {
   anchorOrigin: {
-    vertical: "bottom",
-    horizontal: "left"
+    vertical: 'bottom',
+    horizontal: 'left'
   },
   transformOrigin: {
-    vertical: "top",
-    horizontal: "left"
+    vertical: 'top',
+    horizontal: 'left'
   },
-  variant: "menu"
+  variant: 'menu'
 };
-export default function MyItemsSortSelect({ onChange, sx={} }) {
+export default function MyItemsSortSelect({ onChange, sx = {} }) {
   const [selected, setSelected] = useState(0);
   const handleChange = (event) => {
     setSelected(event.target.value);
@@ -27,7 +27,7 @@ export default function MyItemsSortSelect({ onChange, sx={} }) {
       onChange={handleChange}
       inputProps={{ 'aria-label': 'Without label' }}
       size="small"
-      sx={{mr: 1, ...sx}}
+      sx={{ mr: 1, ...sx }}
       MenuProps={MenuProps}
     >
       <MenuItem value={0}>Latest</MenuItem>
@@ -40,4 +40,5 @@ export default function MyItemsSortSelect({ onChange, sx={} }) {
 
 MyItemsSortSelect.propTypes = {
   onChange: PropTypes.func,
+  sx: PropTypes.any
 };
