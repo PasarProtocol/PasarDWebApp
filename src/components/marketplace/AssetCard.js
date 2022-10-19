@@ -73,8 +73,8 @@ AssetCard.propTypes = {
   coinUSD: PropTypes.any,
   defaultCollectionType: PropTypes.number,
   isDragging: PropTypes.bool,
-  reservePrice: PropTypes.number,
-  buyoutPrice: PropTypes.number,
+  reservePrice: PropTypes.any,
+  buyoutPrice: PropTypes.any,
   v1State: PropTypes.bool,
   marketPlace: PropTypes.number
 };
