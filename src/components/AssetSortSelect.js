@@ -30,7 +30,6 @@ export default function AssetSortSelect({ selected, onChange, sx = {} }) {
   };
   return (
     <Select
-      // defaultValue={0}
       value={selected}
       onChange={handleChange}
       inputProps={{ 'aria-label': 'Without label' }}

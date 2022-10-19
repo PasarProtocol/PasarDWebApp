@@ -1,20 +1,20 @@
-import React, { useState } from "react";
+import React from 'react';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import PropTypes from 'prop-types';
 
 const MenuProps = {
   anchorOrigin: {
-    vertical: "bottom",
-    horizontal: "left"
+    vertical: 'bottom',
+    horizontal: 'left'
   },
   transformOrigin: {
-    vertical: "top",
-    horizontal: "left"
+    vertical: 'top',
+    horizontal: 'left'
   },
-  variant: "menu"
+  variant: 'menu'
 };
-export default function CollectionSortSelect({ onChange, orderType, sortOptions, sx={} }) {
+export default function CollectionSortSelect({ onChange, orderType, sortOptions, sx = {} }) {
   const handleChange = (event) => {
     onChange(event.target.value);
   };
@@ -25,18 +25,21 @@ export default function CollectionSortSelect({ onChange, orderType, sortOptions,
       onChange={handleChange}
       inputProps={{ 'aria-label': 'Without label' }}
       size="small"
-      sx={{...sx}}
+      sx={{ ...sx }}
       MenuProps={MenuProps}
     >
-      {
-        sortOptions.map((option, _i)=>(
-          <MenuItem key={_i} value={_i}>{option}</MenuItem>
-        ))
-      }
+      {sortOptions.map((option, _i) => (
+        <MenuItem key={_i} value={_i}>
+          {option}
+        </MenuItem>
+      ))}
     </Select>
   );
 }
 
 CollectionSortSelect.propTypes = {
   onChange: PropTypes.func,
+  orderType: PropTypes.any,
+  sortOptions: PropTypes.any,
+  sx: PropTypes.any
 };
