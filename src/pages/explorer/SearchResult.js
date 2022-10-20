@@ -43,9 +43,9 @@ export default function SearchResult() {
       setLoadingCollectibles(true);
       fetchFrom(`api/v2/sticker/search/${params.key}`)
         .then((response) => {
-          response.json().then((jsonCollectibles) => {
-            setTotalCount(jsonCollectibles.data.result.length);
-            setCollectibles(jsonCollectibles.data.result);
+          response.json().then((json) => {
+            setTotalCount(json?.data?.result.length ?? 0);
+            setCollectibles(json?.data ? json?.data?.result : []);
             setLoadingCollectibles(false);
           });
         })
@@ -59,7 +59,7 @@ export default function SearchResult() {
   const link2Detail = (tokenId, baseToken) => {
     navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   };
-  
+
   return (
     <RootStyle title="Search | PASAR">
       <Container maxWidth="lg">
