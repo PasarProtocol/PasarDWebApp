@@ -65,13 +65,6 @@ const RootStyle = styled('div')({
 });
 
 // ----------------------------------------------------------------------
-DetailItem.propTypes = {
-  item: PropTypes.array,
-  isLast: PropTypes.bool,
-  value: PropTypes.string,
-  detail: PropTypes.any
-};
-
 const DetailItem = (props) => {
   const { item, isLast, value, detail } = props;
   const { icon, title, copyable } = item;
@@ -125,8 +118,10 @@ const DetailItem = (props) => {
   );
 };
 
-CarouselItem.propTypes = {
-  page: PropTypes.array,
+DetailItem.propTypes = {
+  item: PropTypes.object,
+  isLast: PropTypes.bool,
+  value: PropTypes.any,
   detail: PropTypes.any
 };
 
@@ -141,8 +136,8 @@ function CarouselItem({ page, detail }) {
   );
 }
 
-CarouselCustom.propTypes = {
-  pgsize: PropTypes.number,
+CarouselItem.propTypes = {
+  page: PropTypes.array,
   detail: PropTypes.any
 };
 
@@ -200,3 +195,8 @@ export default function CarouselCustom({ pgsize, detail }) {
     </RootStyle>
   );
 }
+
+CarouselCustom.propTypes = {
+  pgsize: PropTypes.number,
+  detail: PropTypes.any
+};
