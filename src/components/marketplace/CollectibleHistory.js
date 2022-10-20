@@ -85,7 +85,7 @@ function TransItem(props) {
 CollectibleHistory.propTypes = {
   dataList: PropTypes.any,
   isLoading: PropTypes.bool,
-  creator: PropTypes.string
+  creator: PropTypes.object 
 };
 
 export default function CollectibleHistory(props) {
