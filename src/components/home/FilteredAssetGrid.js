@@ -67,6 +67,7 @@ const AssetGroupSlider = (props) => {
   }, []);
 
   const loadingSkeletons = Array(10).fill(0);
+
   return (
     <Box sx={{ mx: 0 }}>
       {isLoading ? (
@@ -120,8 +121,12 @@ const AssetGroupSlider = (props) => {
 
 AssetGroupSlider.propTypes = {
   isLoading: PropTypes.bool,
-  assets: PropTypes.any,
-  type: PropTypes.any
+  assets: PropTypes.array,
+  type: PropTypes.string
+};
+
+FilteredAssetGrid.propTypes = {
+  type: PropTypes.string
 };
 
 export default function FilteredAssetGrid(props) {
@@ -156,6 +161,7 @@ export default function FilteredAssetGrid(props) {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return type === 'all' ? (
     <>
       <AssetGroupSlider isLoading={isLoadingCollectibles} assets={filteredCollectibles.slice(0, 10)} />
@@ -169,7 +175,3 @@ export default function FilteredAssetGrid(props) {
     <AssetGroupSlider isLoading={isLoadingCollectibles} assets={filteredCollectibles.slice(0, 10)} type={type} />
   );
 }
-
-FilteredAssetGrid.propTypes = {
-  type: PropTypes.string
-};
