@@ -62,7 +62,6 @@ export default function PlaceBid(props) {
   const { library, chainId, account } = context;
   const { isOpen, setOpen, info, coinType = {} } = props;
   const coinBalance = balanceArray[coinType.index];
-  console.log(balanceArray, coinType.index);
   const coinName = coinType.name;
   const targetPrice = isBuynow ? math.round(info.buyoutPrice / 1e18, 3) : bidPrice;
   const actionText = isBuynow ? 'Buy NFT' : 'Bid NFT';
