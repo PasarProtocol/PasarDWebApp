@@ -302,16 +302,19 @@ export function getERC20TokenPrice(tokenAddress) {
 
 export function getTokenPriceInEthereum() {
   return new Promise((resolve) => {
-    // fetch('https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD')
-    // fetch("https://api.coinstats.app/public/v1/coins/ethereum?currency=USD")
-    fetch('https://api.coingecko.com/api/v3/simple/price?ids=elastos,ethereum,fsn&vs_currencies=usd')
-      .then((res) => res.json())
-      .then((resObj) => {
-        const tempPriceResult = [0, 0];
-        if (resObj && resObj.ethereum) tempPriceResult[0] = resObj.ethereum.usd;
-        if (resObj && resObj.elastos) tempPriceResult[1] = resObj.elastos.usd;
-        if (resObj && resObj.fsn) tempPriceResult[2] = resObj.fsn.usd;
-        resolve(tempPriceResult);
+    const url =
+      // 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=elastos,ethereum,fsn&order=market_cap_desc&per_page=6&page=1&sparkline=false';
+      'https://api.coingecko.com/api/v3/simple/price?ids=elastos,ethereum,fsn&vs_currencies=usd';
+    // 'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD';
+    // 'https://api.coinstats.app/public/v1/coins/ethereum?currency=USD';
+    axios
+      .get(url)
+      .then((res) => {
+        const ret = [0, 0, 0];
+        if (res?.data?.ethereum?.usd) ret[0] = res.data.ethereum.usd;
+        if (res?.data?.elastos?.usd) ret[1] = res.data.elastos.usd;
+        if (res?.data?.fsn?.usd) ret[2] = res.data.fsn.usd;
+        resolve(ret);
       })
       .catch((e) => {
         console.error(e);
