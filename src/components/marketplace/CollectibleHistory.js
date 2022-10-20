@@ -13,7 +13,7 @@ import {
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired,
-  creator: PropTypes.string
+  creator: PropTypes.object
 };
 function TransItem(props) {
   const { trans, creator } = props;
@@ -85,7 +85,7 @@ function TransItem(props) {
 CollectibleHistory.propTypes = {
   dataList: PropTypes.any,
   isLoading: PropTypes.bool,
-  creator: PropTypes.object 
+  creator: PropTypes.object
 };
 
 export default function CollectibleHistory(props) {

@@ -153,7 +153,7 @@ const Property = ({ type, name, percentage }) => (
 Property.propTypes = {
   type: PropTypes.string,
   name: PropTypes.string,
-  percentage: PropTypes.string
+  percentage: PropTypes.number
 };
 
 const BackdropStyle = styled(Backdrop)({
