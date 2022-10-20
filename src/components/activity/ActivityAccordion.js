@@ -10,12 +10,6 @@ import KYCBadge from '../badge/KYCBadge';
 import { getCoinTypeFromToken, getDateDistance, reduceHexAddress } from '../../utils/common';
 import { blankAddress } from '../../config';
 // ----------------------------------------------------------------------
-ActivityAccordion.propTypes = {
-  trans: PropTypes.any,
-  coinPrice: PropTypes.any,
-  infoByAddress: PropTypes.any
-};
-
 const ActivityAccordion = (props) => {
   const { trans, coinPrice, infoByAddress } = props;
   const [isMoreOpen, setMoreOpen] = React.useState(false);
@@ -166,4 +160,11 @@ const ActivityAccordion = (props) => {
     </Accordion>
   );
 };
+
+ActivityAccordion.propTypes = {
+  trans: PropTypes.any,
+  coinPrice: PropTypes.any,
+  infoByAddress: PropTypes.any
+};
+
 export default React.memo(ActivityAccordion);
