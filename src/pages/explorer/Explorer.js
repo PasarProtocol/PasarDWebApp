@@ -31,7 +31,7 @@ export default function Explorer() {
   const [latestTransactions, setLatestTransactions] = React.useState([]);
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
-  
+
   React.useEffect(() => {
     const fetchData = async () => {
       setLoadingCollectibles(true);
@@ -40,8 +40,8 @@ export default function Explorer() {
         .then((response) => {
           response
             .json()
-            .then((jsonAssets) => {
-              setNewestCollectibles(jsonAssets.data.result);
+            .then((json) => {
+              setNewestCollectibles(json?.data ? json.data.result : []);
               setLoadingCollectibles(false);
             })
             .catch((e) => {
@@ -58,8 +58,8 @@ export default function Explorer() {
         .then((response) => {
           response
             .json()
-            .then((jsonAssets) => {
-              setLatestTransactions(jsonAssets.data.results);
+            .then((json) => {
+              setLatestTransactions(json?.data ? json.data.results : []);
               setLoadingTransactions(false);
             })
             .catch((e) => {
