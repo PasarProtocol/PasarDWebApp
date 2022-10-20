@@ -10,8 +10,8 @@ import { Icon } from '@iconify/react';
 import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 // components
 import Page from '../components/Page';
-import HomeAssetCarousel from '../components/home/HomeAssetCarousel';
 import StyledButton from '../components/signin-dlg/StyledButton';
+import HomeAssetCarousel from '../components/home/HomeAssetCarousel';
 import FilteredAssetGrid from '../components/home/FilteredAssetGrid';
 import FilteredTransGrid from '../components/home/FilteredTransGrid';
 import FilteredCollectionGrid from '../components/home/FilteredCollectionGrid';
@@ -173,7 +173,6 @@ export default function MarketHome() {
             </Stack>
             <FilteredAssetGrid type="recent_sold" />
           </Box>
-          {/* </MotionInView> */}
           <CardStyle>
             <Box component="div">
               <TitleStyle component="h1">Get Started with Essentials</TitleStyle>
