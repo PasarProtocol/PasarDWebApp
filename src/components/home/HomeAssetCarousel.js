@@ -8,7 +8,6 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-slideshow-image/dist/styles.css';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-
 import LoadingScreen from '../LoadingScreen';
 import { fetchFrom, getAssetImage } from '../../utils/common';
 

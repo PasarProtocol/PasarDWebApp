@@ -35,6 +35,7 @@ export default function FilteredTransGrid() {
     fetchData();
   }, []);
   const loadingSkeletons = Array(5).fill(null);
+  
   return (
     <Stack direction="row" spacing={2}>
       <Card sx={{ flexGrow: 1 }}>
