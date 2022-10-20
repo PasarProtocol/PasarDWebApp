@@ -17,13 +17,6 @@ const EventByType = {
   Sale: 'BuyOrder'
 };
 
-ActivityTableRow.propTypes = {
-  trans: PropTypes.any,
-  coinPrice: PropTypes.any,
-  infoByAddress: PropTypes.any,
-  COLUMNS: PropTypes.any
-};
-
 const ActivityTableRow = (props) => {
   const { trans, coinPrice, infoByAddress, COLUMNS } = props;
   return (
@@ -176,4 +169,12 @@ const ActivityTableRow = (props) => {
     </TableRow>
   );
 };
+
+ActivityTableRow.propTypes = {
+  trans: PropTypes.any,
+  coinPrice: PropTypes.any,
+  infoByAddress: PropTypes.any,
+  COLUMNS: PropTypes.any
+};
+
 export default React.memo(ActivityTableRow);
