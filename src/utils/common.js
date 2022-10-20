@@ -207,8 +207,7 @@ export const getBalanceByAllCoinTypes = (connectProvider, chainId, balanceHandle
             });
         });
         Promise.all(getBalanceFuncs)
-          .then((res) => {
-            console.log(res);
+          .then(() => {
             resolve(true);
           })
           .catch((err) => {
