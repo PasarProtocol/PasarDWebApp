@@ -7,7 +7,7 @@ import StyledButton from '../signin-dlg/StyledButton';
 NeedBuyDIA.propTypes = {
   isOpen: PropTypes.bool,
   setOpen: PropTypes.func,
-  balance: PropTypes.number,
+  balance: PropTypes.string,
   actionText: PropTypes.string
 };
 

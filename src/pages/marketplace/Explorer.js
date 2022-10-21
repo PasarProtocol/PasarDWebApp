@@ -52,7 +52,6 @@ const RootStyle = styled(Page)(({ theme }) => ({
     paddingBottom: theme.spacing(8)
   }
 }));
-
 const AppBarStyle = styled(AppBar)(({ theme }) => ({
   color: 'inherit',
   transition: theme.transitions.create(['top'], {
@@ -157,6 +156,7 @@ export default function MarketExplorer() {
     if (dispmode !== tempDefaultDispMode) setDispmode(tempDefaultDispMode);
   };
   window.addEventListener('resize', handleDispInLaptopSize);
+
   React.useEffect(() => {
     handleDispInLaptopSize();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,11 +167,11 @@ export default function MarketExplorer() {
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
-      let statusFilter = btnGroup.status.filter((name, index) => selectedBtns.indexOf(index) >= 0);
+      let statusFilter = btnGroup.status.filter((_, index) => selectedBtns.indexOf(index) >= 0);
       statusFilter =
         statusFilter.length === btnGroup.status.length || statusFilter.length === 0 ? 'All' : statusFilter.join(',');
       let itemTypeFilter = btnGroup.type.filter(
-        (name, index) => selectedBtns.indexOf(index + btnGroup.status.length) >= 0
+        (_, index) => selectedBtns.indexOf(index + btnGroup.status.length) >= 0
       );
       itemTypeFilter =
         itemTypeFilter.length === btnGroup.type.length || itemTypeFilter.length === 0
@@ -215,12 +215,13 @@ export default function MarketExplorer() {
         { signal }
       )
         .then((response) => {
-          response.json().then((jsonAssets) => {
-            if (jsonAssets.data) {
-              setTotalCount(jsonAssets.data.total);
-              setPages(Math.ceil(jsonAssets.data.total / showCount));
-              if (loadNext) setAssets([...assets, ...jsonAssets.data.result]);
-              else setAssets(jsonAssets.data.result);
+          response.json().then((json) => {
+            if (json?.data) {
+              const totalCnt = json.data.total ?? 0; 
+              setTotalCount(totalCnt);
+              setPages(Math.ceil(totalCnt / showCount));
+              if (loadNext) setAssets([...assets, ...json.data.result]);
+              else setAssets(json.data.result);
             }
             setAlreadyMounted(false);
             setLoadNext(false);
@@ -388,7 +389,7 @@ export default function MarketExplorer() {
     tempForm.selectedBtns = tempBtns;
     setFilterForm(tempForm);
   };
-  const applyFilterForm = (e) => {
+  const applyFilterForm = () => {
     const tempForm = { ...filterForm };
     delete tempForm.statype;
     delete tempForm.clear_all;
@@ -396,7 +397,7 @@ export default function MarketExplorer() {
     delete tempForm.token;
     Object.keys(tempForm).forEach((key) => handleFilter(key, tempForm[key]));
     setFilterForm(tempForm);
-    closeFilter(e);
+    closeFilter();
   };
   const handleClearAll = () => {
     setSelectedBtns([]);
