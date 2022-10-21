@@ -196,7 +196,6 @@ export default function MarketExplorer() {
           chainTypeForToken += tokenAddr.charAt(0) * 1;
       });
       chainTypeForToken %= 3;
-      console.log(chainTypeForToken, tokenTypeStr);
       if (!loadNext) setAssets([]);
       fetchFrom(
         `api/v2/sticker/getDetailedCollectibles?` +
@@ -217,7 +216,7 @@ export default function MarketExplorer() {
         .then((response) => {
           response.json().then((json) => {
             if (json?.data) {
-              const totalCnt = json.data.total ?? 0; 
+              const totalCnt = json.data.total ?? 0;
               setTotalCount(totalCnt);
               setPages(Math.ceil(totalCnt / showCount));
               if (loadNext) setAssets([...assets, ...json.data.result]);
