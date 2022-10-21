@@ -10,7 +10,7 @@ import { PATH_PAGE } from '../../routes/paths';
 NeedMoreDIA.propTypes = {
   isOpen: PropTypes.bool,
   setOpen: PropTypes.func,
-  balance: PropTypes.number,
+  balance: PropTypes.any,
   actionText: PropTypes.string
 };
 

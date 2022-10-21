@@ -16,16 +16,6 @@ const SvgStyle = styled('svg')(({ theme }) => ({
   }
 }));
 
-MintingTypeButton.propTypes = {
-  type: PropTypes.string,
-  description: PropTypes.string,
-  current: PropTypes.string,
-  disabled: PropTypes.bool,
-  selectedCollection: PropTypes.any,
-  sx: PropTypes.any,
-  onClick: PropTypes.func
-};
-
 const MintingTypeButton = (props) => {
   const { type, description, current, disabled = false, selectedCollection } = props;
   const { themeMode } = useSettings();
@@ -178,4 +168,15 @@ const MintingTypeButton = (props) => {
     </Paper>
   );
 };
+
+MintingTypeButton.propTypes = {
+  type: PropTypes.string,
+  description: PropTypes.string,
+  current: PropTypes.string,
+  disabled: PropTypes.bool,
+  selectedCollection: PropTypes.any,
+  sx: PropTypes.any,
+  onClick: PropTypes.func
+};
+
 export default MintingTypeButton;
