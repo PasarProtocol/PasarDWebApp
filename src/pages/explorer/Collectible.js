@@ -45,7 +45,7 @@ export default function Collectible() {
   const [timeOrder, setTimeOrder] = React.useState(-1);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
-  
+
   React.useEffect(() => {
     const fetchData = async () => {
       controller.abort(); // cancel the previous request
@@ -56,10 +56,11 @@ export default function Collectible() {
       setLoadingCollectibles(true);
       fetchFrom(`api/v2/sticker/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal })
         .then((response) => {
-          response.json().then((jsonCollectibles) => {
-            setTotalCount(jsonCollectibles.data.total);
-            setPages(Math.ceil(jsonCollectibles.data.total / showCount));
-            setCollectibles(jsonCollectibles.data.result);
+          response.json().then((json) => {
+            const totalCnt = json?.data?.total ?? 0;
+            setTotalCount(totalCnt);
+            setPages(Math.ceil(totalCnt / showCount));
+            setCollectibles(json?.data ? json?.data?.result : []);
             setLoadingCollectibles(false);
           });
         })
@@ -80,7 +81,7 @@ export default function Collectible() {
   const link2Detail = (tokenId, baseToken) => {
     navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
   };
-  
+
   return (
     <RootStyle title="Collectible | PASAR">
       <Container maxWidth="lg">

@@ -105,7 +105,7 @@ export const getTimeZone = () => {
 export const getIpfsUrl = (uri, ipfsType = 0) => {
   if (!uri) return '';
   const ipfsUrl = ipfsUrls[ipfsType];
-  if ((uri.match(/:/g) || []).length !== 2) return uri;
+  if ((uri.match(/:/g) || []).length !== 2) return '';
 
   const prefixLen = uri.split(':', 2).join(':').length;
   if (prefixLen >= uri.length) return '';
