@@ -2,15 +2,6 @@ import PropTypes from 'prop-types';
 import { Paper, Typography, ButtonBase, Box } from '@mui/material';
 import useSettings from '../../hooks/useSettings';
 
-StandardTypeButton.propTypes = {
-  type: PropTypes.string,
-  description: PropTypes.string,
-  current: PropTypes.string,
-  disabled: PropTypes.bool,
-  sx: PropTypes.any,
-  onClick: PropTypes.func
-};
-
 const StandardTypeButton = (props) => {
   const { type, description, current, disabled = false } = props;
   const { themeMode } = useSettings();
@@ -64,4 +55,14 @@ const StandardTypeButton = (props) => {
     </Paper>
   );
 };
+
+StandardTypeButton.propTypes = {
+  type: PropTypes.string,
+  description: PropTypes.string,
+  current: PropTypes.string,
+  disabled: PropTypes.bool,
+  sx: PropTypes.any,
+  onClick: PropTypes.func
+};
+
 export default StandardTypeButton;
