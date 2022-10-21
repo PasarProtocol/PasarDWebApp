@@ -55,7 +55,7 @@ const AccordionStyle = styled(Accordion)({
 
 AssetFilterPan.propTypes = {
   sx: PropTypes.any,
-  scrollMaxHeight: PropTypes.number,
+  scrollMaxHeight: PropTypes.string,
   btnGroup: PropTypes.any,
   filterProps: PropTypes.any,
   handleFilter: PropTypes.func
