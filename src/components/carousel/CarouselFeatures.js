@@ -19,10 +19,6 @@ const RootStyle = styled('div')({
   '& .slick-list': {}
 });
 
-CheckIcon.propTypes = {
-  isSupported: PropTypes.bool,
-  selected: PropTypes.bool
-};
 const CheckIcon = ({ isSupported, selected = false }) => {
   if (typeof isSupported === 'string') {
     return (
@@ -43,6 +39,12 @@ const CheckIcon = ({ isSupported, selected = false }) => {
     </Box>
   );
 };
+
+CheckIcon.propTypes = {
+  isSupported: PropTypes.any,
+  selected: PropTypes.bool
+};
+
 const SelectedTitleStyle = styled(Typography)(({ theme }) => ({
   backgroundImage: 'linear-gradient(90deg, #FF5082, #a951f4)',
   backgroundSize: '100%',
@@ -105,13 +107,6 @@ const styles = {
   }
 };
 
-CarouselItem.propTypes = {
-  index: PropTypes.number,
-  headerRef: PropTypes.any,
-  body: PropTypes.any,
-  selected: PropTypes.bool
-};
-
 function CarouselItem({ index, headerRef, body, selected = false }) {
   const { name, range } = DiaBadgeTypes[index];
   return (
@@ -150,9 +145,11 @@ function CarouselItem({ index, headerRef, body, selected = false }) {
   );
 }
 
-CarouselFeatures.propTypes = {
-  featureArray: PropTypes.array,
-  degree: PropTypes.number
+CarouselItem.propTypes = {
+  index: PropTypes.number,
+  headerRef: PropTypes.any,
+  body: PropTypes.any,
+  selected: PropTypes.bool
 };
 
 export default function CarouselFeatures(props) {
@@ -297,3 +294,8 @@ export default function CarouselFeatures(props) {
     </RootStyle>
   );
 }
+
+CarouselFeatures.propTypes = {
+  featureArray: PropTypes.array,
+  degree: PropTypes.number
+};

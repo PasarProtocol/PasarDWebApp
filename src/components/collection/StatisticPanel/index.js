@@ -18,14 +18,6 @@ const RootStyle = styled(Card)(({ theme }) => ({
   }
 }));
 
-StatisticPanel.propTypes = {
-  floorPrice: PropTypes.number,
-  totalCount: PropTypes.number,
-  totalOwner: PropTypes.number,
-  totalPrice: PropTypes.number,
-  marketPlace: PropTypes.number
-};
-
 const StatisticPanel = (props) => {
   const { floorPrice = 0, totalCount = 0, totalOwner = 0, totalPrice = 0, marketPlace } = props;
   return (
@@ -46,6 +38,14 @@ const StatisticPanel = (props) => {
       </Grid>
     </RootStyle>
   );
+};
+
+StatisticPanel.propTypes = {
+  floorPrice: PropTypes.number,
+  totalCount: PropTypes.number,
+  totalOwner: PropTypes.number,
+  totalPrice: PropTypes.number,
+  marketPlace: PropTypes.number
 };
 
 export default memo(StatisticPanel);

@@ -144,13 +144,11 @@ export default function CollectionDetail() {
     tempParam.marketPlace = params.collection.charAt(0) * 1;
     tempParam.address = params.collection.substr(1);
     setCollectionParam(tempParam);
-    // setLoadingCollection(true);
     fetchFrom(`api/v2/sticker/getCollection/${tempParam.address}?marketPlace=${tempParam.marketPlace}`)
       .then((response) => {
         response
           .json()
           .then((jsonAssets) => {
-            console.log(jsonAssets, '====');
             setCollection(jsonAssets.data);
             const { creatorDid = '', creatorName = '' } = jsonAssets.data;
             if (creatorName) setDidName(creatorName);
@@ -171,16 +169,13 @@ export default function CollectionDetail() {
                 })
                 .catch(console.log);
             }
-            // setLoadingCollection(false);
           })
           .catch((e) => {
             console.error(e);
-            // setLoadingCollection(false);
           });
       })
       .catch((e) => {
         console.error(e);
-        // if (e.code !== e.ABORT_ERR) setLoadingCollection(false);
       });
   }, [params.collection]);
 
@@ -453,7 +448,6 @@ export default function CollectionDetail() {
   };
   const loadingSkeletons = Array(25).fill(null);
 
-  console.log('=======', collection);
   return (
     <RootStyle title="CollectionDetail | PASAR">
       <Stack direction="row">
