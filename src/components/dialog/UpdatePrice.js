@@ -40,7 +40,7 @@ UpdatePrice.propTypes = {
   isOpen: PropTypes.bool,
   setOpen: PropTypes.func,
   name: PropTypes.string,
-  orderId: PropTypes.string,
+  orderId: PropTypes.number,
   saleType: PropTypes.string,
   orderType: PropTypes.any,
   updateCount: PropTypes.number,
