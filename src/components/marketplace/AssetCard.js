@@ -59,7 +59,7 @@ AssetCard.propTypes = {
   orderId: PropTypes.string,
   orderType: PropTypes.any,
   status: PropTypes.string,
-  endTime: PropTypes.number,
+  endTime: PropTypes.any,
   currentBid: PropTypes.any,
   baseToken: PropTypes.string,
   saleType: PropTypes.string,
