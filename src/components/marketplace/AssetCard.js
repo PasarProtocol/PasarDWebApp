@@ -56,7 +56,7 @@ AssetCard.propTypes = {
   isMoreLink: PropTypes.bool,
   tokenId: PropTypes.string,
   type: PropTypes.number,
-  orderId: PropTypes.string,
+  orderId: PropTypes.number,
   orderType: PropTypes.any,
   status: PropTypes.string,
   endTime: PropTypes.any,

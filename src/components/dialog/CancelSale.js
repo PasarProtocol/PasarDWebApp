@@ -16,7 +16,7 @@ CancelSale.propTypes = {
   isOpen: PropTypes.bool,
   setOpen: PropTypes.func,
   name: PropTypes.string,
-  orderId: PropTypes.string,
+  orderId: PropTypes.number,
   OrderId: PropTypes.string,
   updateCount: PropTypes.number,
   handleUpdate: PropTypes.func,
