@@ -9,30 +9,29 @@ import LoadingScreen from '../../LoadingScreen';
 import {
   MethodList,
   reduceHexAddress,
-  getExplorerSrvByNetwork,
   chainTypes,
-  getDateDistance
+  getDateDistance,
+  getChainIndexFromSymbol,
+  convertMethodName,
+  getExplorerSrvByNetwork
 } from '../../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired
   // event: Mint, SafeTransferFromWithMemo, SafeTransferFrom, SetApprovalForAll, Burn, CreateOrderForSale, BuyOrder, CancelOrder, ChangeOrderPrice, OrderBid, OrderForAuction
-  // marketPlace:
-  // tokenId:
   // baseToken,
-  // transactionHash,
-  // gasFee,
-  // timestamp
 };
 export function TransItem({ trans }) {
   // console.log('=======++++++Tx', trans);
-  let methodItem = MethodList.find((item) => item.method === trans.event);
+  // avatar
+  let methodItem = MethodList.find((item) => convertMethodName(item.method) === trans.event);
   if (!methodItem) methodItem = { color: 'grey', icon: 'tag', detail: [] };
-  const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace);
-
-  const tempChainType = chainTypes[trans.marketPlace - 1];
-  let feeTokenName = 'ELA';
-  if (tempChainType) feeTokenName = tempChainType.token;
+  // scan url
+  const chainIndex = getChainIndexFromSymbol(trans.chain);
+  const explorerSrvUrl = getExplorerSrvByNetwork(chainIndex);
+  // quote token
+  let quoteTokenName = 'ELA';
+  if (chainIndex) quoteTokenName = chainTypes[chainIndex - 1].token;
 
   return (
     <Stack direction="row" spacing={2}>
@@ -58,7 +57,7 @@ export function TransItem({ trans }) {
           </Link>
         </Typography>
         <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
-          Tx Fee : {trans.gasFee / 1e9 || 0} {feeTokenName}
+          Tx Fee : {trans.gasFee / 1e9 || 0} {quoteTokenName}
         </Typography>
       </Box>
       <Box>
