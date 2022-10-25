@@ -947,6 +947,12 @@ export const MethodList = [
     verb: { description: 'Put up for auction for a starting price of', withPrice: true, subject: 'from' }
   }
 ];
+// new
+export const convertMethodName = (name) => {
+  if (name === 'OrderBid') return 'BidForOrder';
+  if (name === 'OrderForAuction') return 'CreateOrderForAuction';
+  return name;
+};
 export const collectionTypes = [
   {
     symbol: 'PSRC',
@@ -1069,6 +1075,13 @@ export const chainTypes = [
     color: '#1e9ada'
   }
 ];
+// new
+export const getChainIndexFromSymbol = (sym) => {
+  if (sym === 'ela') return 1;
+  if (sym === 'eth') return 2;
+  if (sym === 'fsn') return 3;
+  return 0;
+};
 export const checkValidChain = (chainId) => {
   if (
     chainId &&
@@ -1090,12 +1103,12 @@ export const getStartPosOfCoinTypeByChainType = (chainType) => {
     .splice(0, coinClassIndex)
     .reduce((sum, item) => sum + item.length, 0);
 };
-export const getExplorerSrvByNetwork = (netType) => {
-  let explorerSrvUrl = '';
-  const chainType = chainTypes[netType - 1];
-  if (chainType) explorerSrvUrl = ExplorerServer[chainType.symbol];
-  else explorerSrvUrl = ExplorerServer.ESC;
-  return explorerSrvUrl;
+
+// deprecated
+export const getExplorerSrvByNetwork = (chainIndex) => {
+  const chainType = chainTypes[chainIndex - 1];
+  if (chainType) return ExplorerServer[chainType.symbol];
+  return ExplorerServer.ESC;
 };
 export const getContractAddressInCurrentNetwork = (chainId, type) => {
   const currentChain = getChainTypeFromId(chainId);
