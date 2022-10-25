@@ -67,6 +67,14 @@ export const fetchFrom = (uri, props = {}) => {
   return fetch(`${backendURL}/${uri}`, props);
 };
 
+export const fetchAPIFrom = (uri, props = {}) => {
+  const backendURL =
+    process.env.REACT_APP_ENV === 'production'
+      ? 'https://assist-new.pasarprotocol.io'
+      : 'https://assist-new.pasarprotocol.io';
+  return fetch(`${backendURL}/${uri}`, props);
+};
+
 // Get time from timestamp //
 export const getTime = (timestamp) => {
   const date = new Date(timestamp * 1000);
