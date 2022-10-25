@@ -16,8 +16,16 @@ import {
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired
+  // event: Mint, SafeTransferFromWithMemo, SafeTransferFrom, SetApprovalForAll, Burn, CreateOrderForSale, BuyOrder, CancelOrder, ChangeOrderPrice, OrderBid, OrderForAuction
+  // marketPlace:
+  // tokenId:
+  // baseToken,
+  // transactionHash,
+  // gasFee,
+  // timestamp
 };
 export function TransItem({ trans }) {
+  // console.log('=======++++++Tx', trans);
   let methodItem = MethodList.find((item) => item.method === trans.event);
   if (!methodItem) methodItem = { color: 'grey', icon: 'tag', detail: [] };
   const explorerSrvUrl = getExplorerSrvByNetwork(trans.marketPlace);
@@ -42,15 +50,15 @@ export function TransItem({ trans }) {
       </Link>
       <Box sx={{ minWidth: 0, flexGrow: 1 }}>
         <Typography variant="body2" noWrap>
-          <Link href={`${explorerSrvUrl}/tx/${trans.tHash}`} target="_blank" color="text.secondary">
-            Tx Hash : {reduceHexAddress(trans.tHash)}
+          <Link href={`${explorerSrvUrl}/tx/${trans.transactionHash}`} target="_blank" color="text.secondary">
+            Tx Hash : {reduceHexAddress(trans.transactionHash)}
             <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
               <Icon icon={externalLinkFill} width="17px" />
             </IconButton>
           </Link>
         </Typography>
         <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
-          Tx Fee : {trans.gasFee || 0} {feeTokenName}
+          Tx Fee : {trans.gasFee / 1e9 || 0} {feeTokenName}
         </Typography>
       </Box>
       <Box>
