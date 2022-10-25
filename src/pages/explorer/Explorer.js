@@ -10,7 +10,7 @@ import SearchBox from '../../components/SearchBox';
 import StatisticPanel from '../../components/explorer/StatisticPanel';
 import NewestCollectibles from '../../components/explorer/CollectionView/NewestCollectibles';
 import LatestTransactions from '../../components/explorer/CollectionView/LatestTransactions';
-import { fetchFrom } from '../../utils/common';
+import { fetchAPIFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -33,46 +33,35 @@ export default function Explorer() {
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
 
   React.useEffect(() => {
-    const fetchData = async () => {
+    const fetchItems = async () => {
       setLoadingCollectibles(true);
-      setLoadingTransactions(true);
-      fetchFrom('api/v2/sticker/listStickers?pageNum=1&pageSize=10')
-        .then((response) => {
-          response
-            .json()
-            .then((json) => {
-              setNewestCollectibles(json?.data ? json.data.result : []);
-              setLoadingCollectibles(false);
-            })
-            .catch((e) => {
-              console.error(e);
-              setLoadingCollectibles(false);
-            });
-        })
-        .catch((e) => {
-          console.error(e);
-          setLoadingCollectibles(false);
-        });
-
-      fetchFrom('api/v2/sticker/listTrans?pageNum=1&pageSize=10')
-        .then((response) => {
-          response
-            .json()
-            .then((json) => {
-              setLatestTransactions(json?.data ? json.data.results : []);
-              setLoadingTransactions(false);
-            })
-            .catch((e) => {
-              console.error(e);
-              setLoadingTransactions(false);
-            });
-        })
-        .catch((e) => {
-          console.error(e);
-          setLoadingTransactions(false);
-        });
+      try {
+        const res = await fetchAPIFrom('api/v1/listNFTs?pageNum=1&pageSize=10', {});
+        const json = await res.json();
+        setNewestCollectibles(json?.data ? json.data.data : []);
+      } catch (e) {
+        console.error(e);
+        setNewestCollectibles([]);
+      }
+      setLoadingCollectibles(false);
     };
-    fetchData();
+    const fetchTransactions = async () => {
+      setLoadingTransactions(true);
+      try {
+        const res = await fetchAPIFrom(
+          'api/v1/listTransactions?pageNum=1&pageSize=10&eventType=BuyOrder,CancelOrder,ChangeOrderPrice,CreateOrderForSale,CreateOrderForAuction,BidForOrder,Mint,Burn,SafeTransferFromWithMemo,SafeTransferFrom,SetApprovalForAll',
+          {}
+        );
+        const json = await res.json();
+        setLatestTransactions(json?.data ? json.data.data : []);
+      } catch (e) {
+        console.error(e);
+        setLatestTransactions([]);
+      }
+      setLoadingTransactions(false);
+    };
+    fetchItems();
+    fetchTransactions();
   }, []);
 
   return (
