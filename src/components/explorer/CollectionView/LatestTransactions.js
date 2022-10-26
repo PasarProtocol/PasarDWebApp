@@ -19,7 +19,6 @@ import {
 TransItem.propTypes = {
   trans: PropTypes.object.isRequired
   // event: Mint, SafeTransferFromWithMemo, SafeTransferFrom, SetApprovalForAll, Burn, CreateOrderForSale, BuyOrder, CancelOrder, ChangeOrderPrice, OrderBid, OrderForAuction
-  // baseToken,
 };
 export function TransItem({ trans }) {
   // console.log('=======++++++Tx', trans);
@@ -36,7 +35,7 @@ export function TransItem({ trans }) {
   return (
     <Stack direction="row" spacing={2}>
       <Link
-        href={`/explorer/collectible/detail/${[trans.tokenId, trans.baseToken].join('&')}`}
+        href={`/explorer/collectible/detail/${[trans.tokenId, trans.contract].join('&')}`}
         underline="none"
         sx={{ borderRadius: 1 }}
       >
