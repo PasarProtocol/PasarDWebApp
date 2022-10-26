@@ -13,8 +13,8 @@ CollectibleItem.propTypes = {
 };
 
 function CollectibleItem({ collectible }) {
-  const { name, tokenId, baseToken, tokenIdHex, createTime, royaltyOwner: creator } = collectible;
-  const imageUrl = getAssetImage(collectible, true);
+  // console.log('=========+++++++++++++', collectible);
+  const { name, tokenId, contract, tokenIdHex, createTime, image, royaltyOwner } = collectible;
 
   const handleErrorImage = (e) => {
     if (e.target.src.indexOf('pasarprotocol.io') >= 0) {
@@ -29,7 +29,7 @@ function CollectibleItem({ collectible }) {
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
       <Link
-        to={`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`}
+        to={`/explorer/collectible/detail/${[tokenId, contract].join('&')}`}
         component={RouterLink}
         sx={{ borderRadius: 1 }}
       >
@@ -37,14 +37,14 @@ function CollectibleItem({ collectible }) {
           draggable={false}
           component="img"
           alt={name}
-          src={imageUrl}
+          src={image}
           onError={handleErrorImage}
           sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer' }}
         />
       </Link>
       <Box sx={{ minWidth: 0, flexGrow: 1 }}>
         <Link
-          to={`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`}
+          to={`/explorer/collectible/detail/${[tokenId, contract].join('&')}`}
           component={RouterLink}
           color="text.primary"
         >
@@ -53,10 +53,10 @@ function CollectibleItem({ collectible }) {
           </Typography>
         </Link>
         <Typography variant="body2" noWrap>
-          <Link to={`/explorer/transaction/detail/${creator}`} component={RouterLink} color="text.secondary">
-            Minted By : {reduceHexAddress(creator)}
+          <Link to={`/explorer/transaction/detail/${royaltyOwner}`} component={RouterLink} color="text.secondary">
+            Minted By : {reduceHexAddress(royaltyOwner)}
           </Link>
-          <CopyButton text={creator} />
+          <CopyButton text={royaltyOwner} />
         </Typography>
       </Box>
       <Box>
