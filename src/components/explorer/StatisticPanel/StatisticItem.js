@@ -5,10 +5,9 @@ import AnimatedNumber from 'react-animated-number';
 import PropTypes from 'prop-types';
 import { Typography, Tooltip, Box, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
-
-import { fetchFrom } from '../../../utils/common';
+import { fetchAPIFrom } from '../../../utils/common';
 // ----------------------------------------------------------------------
-const apikey = ['gettv', 'nftnumber', 'relatednftnum', 'owneraddressnum'];
+const apiName = ['getTradingVolume', 'getItems', 'getTransactions', 'getOwners'];
 const tooltipText = [
   'Total trading volume',
   'Total amount of minted items',
@@ -33,16 +32,23 @@ const RootStyle = styled('div')(({ theme, index }) => {
 export default function StatisticItem(props) {
   const { index, forAddress } = props;
   const [realData, setRealData] = React.useState(0);
-  const api = apikey[index - 1];
+  const api = apiName[index - 1];
 
   React.useEffect(() => {
     const fetchData = async () => {
       if (forAddress) return;
-      const resRealData = await fetchFrom(`api/v2/sticker/${api}`);
-      const jsonData = await resRealData.json();
-      setTimeout(() => {
-        setRealData(jsonData.data || 0);
-      }, 100);
+      try {
+        const res = await fetchAPIFrom(`api/v1/${api}`);
+        const json = await res.json();
+        setTimeout(() => {
+          setRealData(json.data ?? 0);
+        }, 100);
+      } catch (e) {
+        console.error(e);
+        setTimeout(() => {
+          setRealData(0);
+        }, 100);
+      }
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
