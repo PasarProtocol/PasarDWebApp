@@ -53,19 +53,19 @@ export default function Collectible() {
       const { signal } = newController;
       setAbortController(newController);
       setLoadingCollectibles(true);
-      fetchAPIFrom(`api/v1/listNFTs?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal })
-        .then((response) => {
-          response.json().then((json) => {
-            const totalCnt = json?.data?.total ?? 0;
-            setTotalCount(totalCnt);
-            setPages(Math.ceil(totalCnt / showCount));
-            setCollectibles(json?.data ? json?.data?.data : []);
-            setLoadingCollectibles(false);
-          });
-        })
-        .catch((e) => {
-          if (e.code !== e.ABORT_ERR) setLoadingCollectibles(false);
+      try {
+        const res = await fetchAPIFrom(`api/v1/listNFTs?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, {
+          signal
         });
+        const json = await res.json();
+        const totalCnt = json?.data?.total ?? 0;
+        setTotalCount(totalCnt);
+        setPages(Math.ceil(totalCnt / showCount));
+        setCollectibles(json?.data ? json.data.data : []);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingCollectibles(false);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
