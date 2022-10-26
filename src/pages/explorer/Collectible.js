@@ -52,7 +52,6 @@ export default function Collectible() {
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
-
       setLoadingCollectibles(true);
       fetchAPIFrom(`api/v1/listNFTs?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal })
         .then((response) => {
@@ -109,7 +108,7 @@ export default function Collectible() {
                     textAlign: 'center',
                     cursor: 'pointer'
                   }}
-                  onClick={() => link2Detail(item.tokenId, item.baseToken)}
+                  onClick={() => link2Detail(item.tokenId, item.contract)}
                 >
                   <CollectibleListItem item={item} />
                 </PaperRecord>

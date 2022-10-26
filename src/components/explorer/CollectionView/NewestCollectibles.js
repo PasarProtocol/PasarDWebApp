@@ -5,7 +5,7 @@ import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import CollectionView from './Template';
 import LoadingScreen from '../../LoadingScreen';
 import CopyButton from '../../CopyButton';
-import { reduceHexAddress, getAssetImage, getDateDistance } from '../../../utils/common';
+import { reduceHexAddress, getDateDistance } from '../../../utils/common';
 // ----------------------------------------------------------------------
 
 CollectibleItem.propTypes = {
@@ -16,15 +16,15 @@ function CollectibleItem({ collectible }) {
   // console.log('=========+++++++++++++', collectible);
   const { name, tokenId, contract, tokenIdHex, createTime, image, royaltyOwner } = collectible;
 
-  const handleErrorImage = (e) => {
-    if (e.target.src.indexOf('pasarprotocol.io') >= 0) {
-      e.target.src = getAssetImage(collectible, true, 1);
-    } else if (e.target.src.indexOf('ipfs.ela') >= 0) {
-      e.target.src = getAssetImage(collectible, true, 2);
-    } else {
-      e.target.src = '/static/broken-image.svg';
-    }
-  };
+  // const handleErrorImage = (e) => {
+  //   if (e.target.src.indexOf('pasarprotocol.io') >= 0) {
+  //     e.target.src = getAssetImage(collectible, true, 1);
+  //   } else if (e.target.src.indexOf('ipfs.ela') >= 0) {
+  //     e.target.src = getAssetImage(collectible, true, 2);
+  //   } else {
+  //     e.target.src = '/static/broken-image.svg';
+  //   }
+  // };
 
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
@@ -38,7 +38,7 @@ function CollectibleItem({ collectible }) {
           component="img"
           alt={name}
           src={image}
-          onError={handleErrorImage}
+          // onError={handleErrorImage}
           sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer' }}
         />
       </Link>
