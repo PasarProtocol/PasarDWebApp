@@ -13,7 +13,7 @@ import Pagination from '../../components/pagination';
 import PaperRecord from '../../components/PaperRecord';
 import LoadingWrapper from '../../components/LoadingWrapper';
 import DateOrderSelect from '../../components/DateOrderSelect';
-import { fetchFrom } from '../../utils/common';
+import { fetchAPIFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -54,13 +54,13 @@ export default function Collectible() {
       setAbortController(newController);
 
       setLoadingCollectibles(true);
-      fetchFrom(`api/v2/sticker/listStickers?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal })
+      fetchAPIFrom(`api/v1/listNFTs?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, { signal })
         .then((response) => {
           response.json().then((json) => {
             const totalCnt = json?.data?.total ?? 0;
             setTotalCount(totalCnt);
             setPages(Math.ceil(totalCnt / showCount));
-            setCollectibles(json?.data ? json?.data?.result : []);
+            setCollectibles(json?.data ? json?.data?.data : []);
             setLoadingCollectibles(false);
           });
         })
