@@ -1104,7 +1104,6 @@ export const getStartPosOfCoinTypeByChainType = (chainType) => {
     .reduce((sum, item) => sum + item.length, 0);
 };
 
-// deprecated
 export const getExplorerSrvByNetwork = (chainIndex) => {
   const chainType = chainTypes[chainIndex - 1];
   if (chainType) return ExplorerServer[chainType.symbol];
