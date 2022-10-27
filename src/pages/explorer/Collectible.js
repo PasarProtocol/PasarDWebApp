@@ -77,8 +77,8 @@ export default function Collectible() {
   const handleDateOrder = (selected) => {
     setTimeOrder(selected);
   };
-  const link2Detail = (tokenId, baseToken) => {
-    navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
+  const link2Detail = (contract, chain, tokenId) => {
+    navigate(`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`);
   };
 
   return (
@@ -108,7 +108,7 @@ export default function Collectible() {
                     textAlign: 'center',
                     cursor: 'pointer'
                   }}
-                  onClick={() => link2Detail(item.tokenId, item.contract)}
+                  onClick={() => link2Detail(item.contract, item.chain, item.tokenId)}
                 >
                   <CollectibleListItem item={item} />
                 </PaperRecord>
