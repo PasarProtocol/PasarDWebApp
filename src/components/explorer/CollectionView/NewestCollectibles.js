@@ -14,7 +14,7 @@ CollectibleItem.propTypes = {
 
 function CollectibleItem({ collectible }) {
   // console.log('=========+++++++++++++', collectible);
-  const { name, tokenId, contract, tokenIdHex, createTime, image, royaltyOwner } = collectible;
+  const { tokenId, contract, chain, name, tokenIdHex, createTime, image, royaltyOwner } = collectible;
 
   // const handleErrorImage = (e) => {
   //   if (e.target.src.indexOf('pasarprotocol.io') >= 0) {
@@ -29,7 +29,7 @@ function CollectibleItem({ collectible }) {
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
       <Link
-        to={`/explorer/collectible/detail/${[tokenId, contract].join('&')}`}
+        to={`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`}
         component={RouterLink}
         sx={{ borderRadius: 1 }}
       >
@@ -44,7 +44,7 @@ function CollectibleItem({ collectible }) {
       </Link>
       <Box sx={{ minWidth: 0, flexGrow: 1 }}>
         <Link
-          to={`/explorer/collectible/detail/${[tokenId, contract].join('&')}`}
+          to={`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`}
           component={RouterLink}
           color="text.primary"
         >
