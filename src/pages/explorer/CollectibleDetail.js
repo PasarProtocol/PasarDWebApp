@@ -18,7 +18,13 @@ import TransactionOrderDetail from '../../components/explorer/TransactionList/Tr
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { getAssetImage, fetchFrom, getCollectionTypeFromImageUrl, collectionTypes } from '../../utils/common';
+import {
+  getAssetImage,
+  fetchFrom,
+  getCollectionTypeFromImageUrl,
+  collectionTypes,
+  fetchAPIFrom
+} from '../../utils/common';
 import { MAIN_CONTRACT } from '../../config';
 
 // ----------------------------------------------------------------------
@@ -56,7 +62,7 @@ PaperStyle.propTypes = {
 const DefaultPageSize = 5;
 export default function CollectibleDetail() {
   const params = useParams();
-  const [tokenId, baseToken] = params.args.split('&');
+  const [contract, chain, tokenId] = params.args.split('&');
   const [collectible, setCollectible] = React.useState({});
   const [transRecord, setTransRecord] = React.useState([]);
   const [detailPageSize, setDetailPageSize] = React.useState(DefaultPageSize);
@@ -70,109 +76,139 @@ export default function CollectibleDetail() {
   const [isVideo, setIsVideo] = React.useState(false);
   const [videoIsLoaded, setVideoIsLoaded] = React.useState(false);
   const imageRef = React.useRef();
-  
-  React.useEffect(() => {
-    const fetchData = async () => {
-      fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`)
-        .then((response) => {
-          response.json().then((jsonCollectible) => {
-            if (!jsonCollectible.data) {
-              setLoadingCollectible(false);
-              return;
-            }
-            const jsonData = jsonCollectible.data;
-            if (jsonData.baseToken) {
-              if (jsonData.baseToken === MAIN_CONTRACT.ESC.sticker) {
-                const defaultCollection = getCollectionTypeFromImageUrl(jsonData);
-                jsonData.collection = collectionTypes[defaultCollection].name;
-                jsonData.is721 = false;
-              } else {
-                jsonData.collection = '';
-                jsonData.is721 = false;
-                fetchFrom(
-                  `api/v2/sticker/getCollection/${jsonData.baseToken}?marketPlace=${jsonData.marketPlace}`
-                ).then((response) => {
-                  response
-                    .json()
-                    .then((jsonAssets) => {
-                      if (!jsonAssets.data) return;
-                      setCollectible((prevState) => {
-                        const tempCollectible = { ...prevState };
-                        tempCollectible.collection = jsonAssets.data.name;
-                        tempCollectible.is721 = jsonAssets.data.is721;
-                        return tempCollectible;
-                      });
-                    })
-                    .catch((e) => {
-                      console.error(e);
-                    });
-                });
-              }
-            }
-            setCollectible(jsonData);
-            setLoadingCollectible(false);
-            const assetImageUrl = getAssetImage(jsonData, false);
-            fetch(assetImageUrl)
-              .then((response) => {
-                const contentype = response.headers.get('content-type');
-                if (contentype.startsWith('video')) {
-                  setIsVideo(true);
-                }
-              })
-              .catch(console.log);
-          });
-        })
-        .catch((e) => {
-          console.error(e);
-          setLoadingCollectible(false);
-        });
 
-      function handleResize() {
-        const { innerWidth: width } = window;
-        if (width < 600 || !imageRef.current)
-          // in case of xs
-          setDetailPageSize(DefaultPageSize);
-        else {
-          const pgsize = Math.floor((imageRef.current.clientHeight - 42 - 48) / 81);
-          if (pgsize < 1) setDetailPageSize(DefaultPageSize);
-          else setDetailPageSize(pgsize);
-        }
+  React.useEffect(() => {
+    // fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${contract}`)
+    //   .then((response) => {
+    //     response.json().then((jsonCollectible) => {
+    //       if (!jsonCollectible.data) {
+    //         setLoadingCollectible(false);
+    //         return;
+    //       }
+    //       const jsonData = jsonCollectible.data;
+    //       if (jsonData.baseToken) {
+    //         if (jsonData.baseToken === MAIN_CONTRACT.ESC.sticker) {
+    //           const defaultCollection = getCollectionTypeFromImageUrl(jsonData);
+    //           jsonData.collection = collectionTypes[defaultCollection].name;
+    //           jsonData.is721 = false;
+    //         } else {
+    //           jsonData.collection = '';
+    //           jsonData.is721 = false;
+    //           fetchFrom(`api/v2/sticker/getCollection/${jsonData.baseToken}?marketPlace=${jsonData.marketPlace}`).then(
+    //             (response) => {
+    //               response
+    //                 .json()
+    //                 .then((jsonAssets) => {
+    //                   if (!jsonAssets.data) return;
+    //                   setCollectible((prevState) => {
+    //                     const tempCollectible = { ...prevState };
+    //                     tempCollectible.collection = jsonAssets.data.name;
+    //                     tempCollectible.is721 = jsonAssets.data.is721;
+    //                     return tempCollectible;
+    //                   });
+    //                 })
+    //                 .catch((e) => {
+    //                   console.error(e);
+    //                 });
+    //             }
+    //           );
+    //         }
+    //       }
+    //       setCollectible(jsonData);
+    //       setLoadingCollectible(false);
+    //       const assetImageUrl = getAssetImage(jsonData, false);
+    //       fetch(assetImageUrl)
+    //         .then((response) => {
+    //           const contentype = response.headers.get('content-type');
+    //           if (contentype.startsWith('video')) {
+    //             setIsVideo(true);
+    //           }
+    //         })
+    //         .catch(console.log);
+    //     });
+    //   })
+    //   .catch((e) => {
+    //     console.error(e);
+    //     setLoadingCollectible(false);
+    //   });
+    const fetchData = async () => {
+      setLoadingCollectible(true);
+      try {
+        const res = await fetchAPIFrom(
+          `api/v1/getCollectibleInfo?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}`,
+          {}
+        );
+        const json = await res.json();
+        // setCollectible(json.data);
+        console.log('====== collectible detail', json);
+      } catch (e) {
+        console.error(e);
       }
-      window.addEventListener('resize', handleResize);
+      setLoadingCollectible(false);
     };
     fetchData();
+
+    function handleResize() {
+      const { innerWidth: width } = window;
+      if (width < 600 || !imageRef.current)
+        // in case of xs
+        setDetailPageSize(DefaultPageSize);
+      else {
+        const pgsize = Math.floor((imageRef.current.clientHeight - 42 - 48) / 81);
+        if (pgsize < 1) setDetailPageSize(DefaultPageSize);
+        else setDetailPageSize(pgsize);
+      }
+    }
+    window.addEventListener('resize', handleResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
+    // controller.abort(); // cancel the previous request
+    // const newController = new AbortController();
+    // const { signal } = newController;
+    // setAbortController(newController);
+    // setLoadingTransRecord(true);
+    // console.log('====', signal);
+    // fetchFrom(
+    //   `api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${contract}&method=${methods}&timeOrder=${timeOrder}`,
+    //   { signal }
+    // )
+    //   .then((response) => {
+    //     response.json().then((jsonTransactions) => {
+    //       setTotalCount(jsonTransactions.data.length);
+    //       const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {
+    //         if (id > 0 && item.tHash === arr[id - 1].tHash) {
+    //           res[res.length - 1].push(item);
+    //         } else {
+    //           res.push(id < arr.length - 1 && item.tHash === arr[id + 1].tHash ? [item] : item);
+    //         }
+    //         return res;
+    //       }, []);
+    //       setTransRecord(grouped);
+    //       setLoadingTransRecord(false);
+    //     });
+    //   })
+    //   .catch((e) => {
+    //     if (e.code !== e.ABORT_ERR) setLoadingTransRecord(false);
+    //   });
     const fetchData = async () => {
       controller.abort(); // cancel the previous request
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
       setLoadingTransRecord(true);
-      fetchFrom(
-        `api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${baseToken}&method=${methods}&timeOrder=${timeOrder}`,
-        { signal }
-      )
-        .then((response) => {
-          response.json().then((jsonTransactions) => {
-            setTotalCount(jsonTransactions.data.length);
-            const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {
-              if (id > 0 && item.tHash === arr[id - 1].tHash) {
-                res[res.length - 1].push(item);
-              } else {
-                res.push(id < arr.length - 1 && item.tHash === arr[id + 1].tHash ? [item] : item);
-              }
-              return res;
-            }, []);
-            setTransRecord(grouped);
-            setLoadingTransRecord(false);
-          });
-        })
-        .catch((e) => {
-          if (e.code !== e.ABORT_ERR) setLoadingTransRecord(false);
-        });
+      try {
+        const res = await fetchAPIFrom(
+          `api/v1/getTransactionsByToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}&eventType=${methods}&timeOrder=${timeOrder}`,
+          { signal }
+        );
+        const json = await res.json();
+        console.log('======= TX details', json);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingTransRecord(false);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
