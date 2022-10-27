@@ -5,7 +5,13 @@ import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import CollectionView from './Template';
 import LoadingScreen from '../../LoadingScreen';
 import CopyButton from '../../CopyButton';
-import { reduceHexAddress, getDateDistance } from '../../../utils/common';
+import {
+  reduceHexAddress,
+  getDateDistance,
+  isPasarOrFeeds,
+  getIpfsUrl,
+  getIPFSTypeFromUrl
+} from '../../../utils/common';
 // ----------------------------------------------------------------------
 
 CollectibleItem.propTypes = {
@@ -13,18 +19,8 @@ CollectibleItem.propTypes = {
 };
 
 function CollectibleItem({ collectible }) {
-  // console.log('=========+++++++++++++', collectible);
-  const { tokenId, contract, chain, name, tokenIdHex, createTime, image, royaltyOwner } = collectible;
-
-  // const handleErrorImage = (e) => {
-  //   if (e.target.src.indexOf('pasarprotocol.io') >= 0) {
-  //     e.target.src = getAssetImage(collectible, true, 1);
-  //   } else if (e.target.src.indexOf('ipfs.ela') >= 0) {
-  //     e.target.src = getAssetImage(collectible, true, 2);
-  //   } else {
-  //     e.target.src = '/static/broken-image.svg';
-  //   }
-  // };
+  const { tokenId, contract, chain, name, tokenIdHex, createTime, royaltyOwner, image, data } = collectible;
+  const imgSrc = isPasarOrFeeds(contract) ? getIpfsUrl(data.thumbnail, getIPFSTypeFromUrl(data.thumbnail)) : image;
 
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
@@ -37,8 +33,7 @@ function CollectibleItem({ collectible }) {
           draggable={false}
           component="img"
           alt={name}
-          src={image}
-          // onError={handleErrorImage}
+          src={imgSrc || '/static/broken-image.svg'}
           sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer' }}
         />
       </Link>
