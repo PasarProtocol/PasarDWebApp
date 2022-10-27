@@ -54,7 +54,7 @@ export default function Collectible() {
       setAbortController(newController);
       setLoadingCollectibles(true);
       try {
-        const res = await fetchAPIFrom(`api/v1/listNFTs?pageNum=${page}&pageSize=${showCount}&timeOrder=${timeOrder}`, {
+        const res = await fetchAPIFrom(`api/v1/listNFTs?pageNum=${page}&pageSize=${showCount}&sort=${timeOrder}`, {
           signal
         });
         const json = await res.json();

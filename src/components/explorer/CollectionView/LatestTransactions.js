@@ -21,7 +21,6 @@ TransItem.propTypes = {
   // event: Mint, SafeTransferFromWithMemo, SafeTransferFrom, SetApprovalForAll, Burn, CreateOrderForSale, BuyOrder, CancelOrder, ChangeOrderPrice, OrderBid, OrderForAuction
 };
 export function TransItem({ trans }) {
-  // console.log('=======++++++Tx', trans);
   // avatar
   let methodItem = MethodList.find((item) => convertMethodName(item.method) === trans.eventTypeName);
   if (!methodItem) methodItem = { color: 'grey', icon: 'tag', detail: [] };
