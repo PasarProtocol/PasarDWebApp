@@ -25,7 +25,7 @@ import CustomSwitch from '../../components/custom-switch';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { fetchFrom } from '../../utils/common';
+import { fetchAPIFrom, fetchFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -69,24 +69,40 @@ export default function Transaction() {
     const { signal } = newController;
     setAbortController(newController);
 
-    setLoadingTransactions(true);
-    fetchFrom(
-      `api/v2/sticker/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`,
-      { signal }
-    )
-      .then((response) => {
-        response.json().then((jsonTransactions) => {
-          if (jsonTransactions.data) {
-            setTotalCount(jsonTransactions.data.total);
-            setPages(Math.ceil(jsonTransactions.data.total / showCount));
-            setTransactions(jsonTransactions.data.results);
-          }
-          setLoadingTransactions(false);
-        });
-      })
-      .catch((e) => {
-        if (e.code !== e.ABORT_ERR) setLoadingTransactions(false);
-      });
+    // setLoadingTransactions(true);
+    // fetchFrom(
+    //   `api/v2/sticker/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`,
+    //   { signal }
+    // )
+    //   .then((response) => {
+    //     response.json().then((jsonTransactions) => {
+    //       if (jsonTransactions.data) {
+    //         setTotalCount(jsonTransactions.data.total);
+    //         setPages(Math.ceil(jsonTransactions.data.total / showCount));
+    //         setTransactions(jsonTransactions.data.results);
+    //       }
+    //       setLoadingTransactions(false);
+    //     });
+    //   })
+    //   .catch((e) => {
+    //     if (e.code !== e.ABORT_ERR) setLoadingTransactions(false);
+    //   });
+    const fetchData = async () => {
+      setLoadingTransactions(true);
+      try {
+        const res = await fetchAPIFrom(
+          `api/v1/listTransactions?pageNum=${page}&pageSize=${showCount}&eventType=${methods}&timeOrder=${timeOrder}`,
+          { signal }
+        );
+        const json = await res.json();
+        console.log('========= TX List', json);
+        setTransactions(json?.data ? json.data.data : []);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingTransactions(false);
+    };
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, showCount, methods, timeOrder]);
 
@@ -121,7 +137,7 @@ export default function Transaction() {
     setPage(1);
     setTimeOrder(selected);
   };
-  
+
   return (
     <RootStyle title="Transaction | PASAR">
       <Container maxWidth="lg">
