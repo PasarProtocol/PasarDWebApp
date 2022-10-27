@@ -23,7 +23,7 @@ TransItem.propTypes = {
 export function TransItem({ trans }) {
   // console.log('=======++++++Tx', trans);
   // avatar
-  let methodItem = MethodList.find((item) => convertMethodName(item.method) === trans.event);
+  let methodItem = MethodList.find((item) => convertMethodName(item.method) === trans.eventTypeName);
   if (!methodItem) methodItem = { color: 'grey', icon: 'tag', detail: [] };
   // scan url
   const chainIndex = getChainIndexFromSymbol(trans.chain);
