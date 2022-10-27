@@ -36,7 +36,7 @@ export default function Explorer() {
     const fetchItems = async () => {
       setLoadingCollectibles(true);
       try {
-        const res = await fetchAPIFrom('api/v1/listNFTs?pageNum=1&pageSize=10', {});
+        const res = await fetchAPIFrom('api/v1/listNFTs?pageNum=1&pageSize=10&sort=-1', {});
         const json = await res.json();
         setNewestCollectibles(json?.data ? json.data.data : []);
       } catch (e) {

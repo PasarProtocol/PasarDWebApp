@@ -28,7 +28,8 @@ import {
   blankAddress,
   ipfsURL as PasarIpfs,
   rpcURL,
-  ExplorerServer
+  ExplorerServer,
+  feedsContract
 } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { V1_PASAR_CONTRACT_ABI } from '../abi/pasarV1ABI';
@@ -121,6 +122,22 @@ export const getIpfsUrl = (uri, ipfsType = 0) => {
   return `${ipfsUrl}/ipfs/${tempUri}`;
 };
 
+export const getIPFSTypeFromUrl = (url) => {
+  const temp = url.split(':').filter((item) => item);
+  if (temp.length === 3 && (temp[0] === 'pasar' || temp[0] === 'feeds')) return 0;
+  if (url.includes('ipfs.ela')) return 1;
+  return 2;
+};
+// new
+export const getAssetFromObj = (metaObj, isThumbnail, ipfsType = 0) => {
+  const { image, data, contract } = metaObj;
+  if (!image && !data) return '';
+  const originalUrl = (isThumbnail ? data?.thumbnail : data?.image) || '';
+  const imgUrl = isPasarOrFeeds(contract) ? originalUrl : image;
+  if (!imgUrl) return '';
+  return getIpfsUrl(imgUrl, ipfsType);
+};
+// deprecated
 export const getAssetImage = (metaObj, isThumbnail, ipfsType = 0) => {
   const { asset, thumbnail, data } = metaObj;
 
@@ -830,6 +847,12 @@ export function getContractInfo(connectProvider, strAddress) {
     }
   });
 }
+
+export const isPasarOrFeeds = (contract) =>
+  MAIN_CONTRACT.ESC.sticker === contract ||
+  MAIN_CONTRACT.ETH.sticker === contract ||
+  MAIN_CONTRACT.FSN.sticker === contract ||
+  feedsContract === contract;
 
 export const MethodList = [
   {
