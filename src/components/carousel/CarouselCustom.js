@@ -2,16 +2,13 @@ import Slider from 'react-slick';
 import PropTypes from 'prop-types';
 import { useRef } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-// material
 import { useTheme, styled } from '@mui/material/styles';
 import { Box, Stack, Typography, Link } from '@mui/material';
 import { Icon } from '@iconify/react';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
-//
 import { CarouselControlsPaging2 } from './controls';
 import CopyButton from '../CopyButton';
 import { getTime, reduceHexAddress, chainTypes, getChainIndexFromSymbol } from '../../utils/common';
-import { MAIN_CONTRACT } from '../../config';
 
 // ----------------------------------------------------------------------
 
@@ -180,9 +177,10 @@ export default function CarouselCustom({ pgsize, detail }) {
     royalties: `${(detail.royaltyFee * 100) / 10 ** 6} %`,
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
     holder: detail.tokenOwner,
-    tokenStandard: detail.is721 ? 'ERC-721' : 'ERC-1155',
+    tokenStandard: detail?.is721 ? 'ERC-721' : 'ERC-1155',
     blockchain: network,
-    status: detail.DateOnMarket && detail.DateOnMarket.startsWith('Not') ? 0 : 1
+    status: detail?.listed ? 1 : 0,
+    quantity: detail?.tokenSupply ?? 0
   };
   return (
     <RootStyle>
