@@ -123,6 +123,7 @@ export const getIpfsUrl = (uri, ipfsType = 0) => {
 };
 
 export const getIPFSTypeFromUrl = (url) => {
+  if (!url) return '';
   const temp = url.split(':').filter((item) => item);
   if (temp.length === 3 && (temp[0] === 'pasar' || temp[0] === 'feeds')) return 0;
   if (url.includes('ipfs.ela')) return 1;
