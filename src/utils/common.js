@@ -1101,6 +1101,7 @@ export const chainTypes = [
 ];
 // new
 export const getChainIndexFromSymbol = (sym) => {
+  if (sym === 'v1') return 1;
   if (sym === 'ela') return 1;
   if (sym === 'eth') return 2;
   if (sym === 'fsn') return 3;

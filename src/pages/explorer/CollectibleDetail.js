@@ -133,56 +133,66 @@ export default function CollectibleDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // React.useEffect(() => {
-  //   // controller.abort(); // cancel the previous request
-  //   // const newController = new AbortController();
-  //   // const { signal } = newController;
-  //   // setAbortController(newController);
-  //   // setLoadingTransRecord(true);
-  //   // console.log('====', signal);
-  //   // fetchFrom(
-  //   //   `api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${contract}&method=${methods}&timeOrder=${timeOrder}`,
-  //   //   { signal }
-  //   // )
-  //   //   .then((response) => {
-  //   //     response.json().then((jsonTransactions) => {
-  //   //       setTotalCount(jsonTransactions.data.length);
-  //   //       const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {
-  //   //         if (id > 0 && item.tHash === arr[id - 1].tHash) {
-  //   //           res[res.length - 1].push(item);
-  //   //         } else {
-  //   //           res.push(id < arr.length - 1 && item.tHash === arr[id + 1].tHash ? [item] : item);
-  //   //         }
-  //   //         return res;
-  //   //       }, []);
-  //   //       setTransRecord(grouped);
-  //   //       setLoadingTransRecord(false);
-  //   //     });
-  //   //   })
-  //   //   .catch((e) => {
-  //   //     if (e.code !== e.ABORT_ERR) setLoadingTransRecord(false);
-  //   //   });
-  //   const fetchData = async () => {
-  //     controller.abort(); // cancel the previous request
-  //     const newController = new AbortController();
-  //     const { signal } = newController;
-  //     setAbortController(newController);
-  //     setLoadingTransRecord(true);
-  //     try {
-  //       const res = await fetchAPIFrom(
-  //         `api/v1/getTransactionsByToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}&eventType=${methods}&timeOrder=${timeOrder}`,
-  //         { signal }
-  //       );
-  //       const json = await res.json();
-  //       console.log('======= TX details', json);
-  //     } catch (e) {
-  //       console.error(e);
-  //     }
-  //     setLoadingTransRecord(false);
-  //   };
-  //   fetchData();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [methods, timeOrder]);
+  React.useEffect(() => {
+    // controller.abort(); // cancel the previous request
+    // const newController = new AbortController();
+    // const { signal } = newController;
+    // setAbortController(newController);
+    // setLoadingTransRecord(true);
+    // console.log('====', signal);
+    // fetchFrom(
+    //   `api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${contract}&method=${methods}&timeOrder=${timeOrder}`,
+    //   { signal }
+    // )
+    //   .then((response) => {
+    //     response.json().then((jsonTransactions) => {
+    //       setTotalCount(jsonTransactions.data.length);
+    //       const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {
+    //         if (id > 0 && item.tHash === arr[id - 1].tHash) {
+    //           res[res.length - 1].push(item);
+    //         } else {
+    //           res.push(id < arr.length - 1 && item.tHash === arr[id + 1].tHash ? [item] : item);
+    //         }
+    //         return res;
+    //       }, []);
+    //       setTransRecord(grouped);
+    //       setLoadingTransRecord(false);
+    //     });
+    //   })
+    //   .catch((e) => {
+    //     if (e.code !== e.ABORT_ERR) setLoadingTransRecord(false);
+    //   });
+    const fetchData = async () => {
+      controller.abort(); // cancel the previous request
+      const newController = new AbortController();
+      const { signal } = newController;
+      setAbortController(newController);
+      setLoadingTransRecord(true);
+      try {
+        const res = await fetchAPIFrom(
+          `api/v1/getTransactionsOfToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}&eventType=${methods}`,
+          { signal }
+        );
+        const json = await res.json();
+        setTotalCount(json?.data?.total ?? 0);
+        const grouped =
+          json?.data?.data.reduce((res, item, id, arr) => {
+            if (id > 0 && item.transactionHash === arr[id - 1].transactionHash) {
+              res[res.length - 1].push(item);
+            } else {
+              res.push(id < arr.length - 1 && item.transactionHash === arr[id + 1].transactionHash ? [item] : item);
+            }
+            return res;
+          }, []) || [];
+        setTransRecord(grouped);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingTransRecord(false);
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [methods, timeOrder]);
 
   const onImgLoad = ({ target: img }) => {
     if (img.alt) setLoadedImage(true);
