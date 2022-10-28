@@ -23,7 +23,10 @@ import {
   fetchFrom,
   getCollectionTypeFromImageUrl,
   collectionTypes,
-  fetchAPIFrom
+  fetchAPIFrom,
+  isPasarOrFeeds,
+  getIpfsUrl,
+  getIPFSTypeFromUrl
 } from '../../utils/common';
 import { MAIN_CONTRACT } from '../../config';
 
@@ -78,59 +81,6 @@ export default function CollectibleDetail() {
   const imageRef = React.useRef();
 
   React.useEffect(() => {
-    // fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${contract}`)
-    //   .then((response) => {
-    //     response.json().then((jsonCollectible) => {
-    //       if (!jsonCollectible.data) {
-    //         setLoadingCollectible(false);
-    //         return;
-    //       }
-    //       const jsonData = jsonCollectible.data;
-    //       if (jsonData.baseToken) {
-    //         if (jsonData.baseToken === MAIN_CONTRACT.ESC.sticker) {
-    //           const defaultCollection = getCollectionTypeFromImageUrl(jsonData);
-    //           jsonData.collection = collectionTypes[defaultCollection].name;
-    //           jsonData.is721 = false;
-    //         } else {
-    //           jsonData.collection = '';
-    //           jsonData.is721 = false;
-    //           fetchFrom(`api/v2/sticker/getCollection/${jsonData.baseToken}?marketPlace=${jsonData.marketPlace}`).then(
-    //             (response) => {
-    //               response
-    //                 .json()
-    //                 .then((jsonAssets) => {
-    //                   if (!jsonAssets.data) return;
-    //                   setCollectible((prevState) => {
-    //                     const tempCollectible = { ...prevState };
-    //                     tempCollectible.collection = jsonAssets.data.name;
-    //                     tempCollectible.is721 = jsonAssets.data.is721;
-    //                     return tempCollectible;
-    //                   });
-    //                 })
-    //                 .catch((e) => {
-    //                   console.error(e);
-    //                 });
-    //             }
-    //           );
-    //         }
-    //       }
-    //       setCollectible(jsonData);
-    //       setLoadingCollectible(false);
-    //       const assetImageUrl = getAssetImage(jsonData, false);
-    //       fetch(assetImageUrl)
-    //         .then((response) => {
-    //           const contentype = response.headers.get('content-type');
-    //           if (contentype.startsWith('video')) {
-    //             setIsVideo(true);
-    //           }
-    //         })
-    //         .catch(console.log);
-    //     });
-    //   })
-    //   .catch((e) => {
-    //     console.error(e);
-    //     setLoadingCollectible(false);
-    //   });
     const fetchData = async () => {
       setLoadingCollectible(true);
       try {
@@ -139,8 +89,28 @@ export default function CollectibleDetail() {
           {}
         );
         const json = await res.json();
-        // setCollectible(json.data);
-        console.log('====== collectible detail', json);
+        const collectibleDetail = { ...json.data };
+        if (collectibleDetail?.contract && collectibleDetail?.chain) {
+          const resCol = await fetchAPIFrom(
+            `api/v1/getCollectionInfo?collection=${collectibleDetail.contract}&chain=${collectibleDetail.chain}`,
+            {}
+          );
+          const jsonCol = await resCol.json();
+          if (jsonCol) {
+            collectibleDetail.is721 = jsonCol?.data?.is721 || false;
+            collectibleDetail.collection = jsonCol?.data?.name || '';
+          }
+        }
+        setCollectible(collectibleDetail);
+        // check if asset is video or not
+        const imgUrl = isPasarOrFeeds(contract)
+          ? getIpfsUrl(collectibleDetail?.data?.image, getIPFSTypeFromUrl(collectibleDetail?.data?.image))
+          : collectibleDetail?.image;
+        const resImg = await fetch(imgUrl);
+        const contentype = resImg.headers.get('content-type');
+        if (contentype.startsWith('video')) {
+          setIsVideo(true);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -163,56 +133,56 @@ export default function CollectibleDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  React.useEffect(() => {
-    // controller.abort(); // cancel the previous request
-    // const newController = new AbortController();
-    // const { signal } = newController;
-    // setAbortController(newController);
-    // setLoadingTransRecord(true);
-    // console.log('====', signal);
-    // fetchFrom(
-    //   `api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${contract}&method=${methods}&timeOrder=${timeOrder}`,
-    //   { signal }
-    // )
-    //   .then((response) => {
-    //     response.json().then((jsonTransactions) => {
-    //       setTotalCount(jsonTransactions.data.length);
-    //       const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {
-    //         if (id > 0 && item.tHash === arr[id - 1].tHash) {
-    //           res[res.length - 1].push(item);
-    //         } else {
-    //           res.push(id < arr.length - 1 && item.tHash === arr[id + 1].tHash ? [item] : item);
-    //         }
-    //         return res;
-    //       }, []);
-    //       setTransRecord(grouped);
-    //       setLoadingTransRecord(false);
-    //     });
-    //   })
-    //   .catch((e) => {
-    //     if (e.code !== e.ABORT_ERR) setLoadingTransRecord(false);
-    //   });
-    const fetchData = async () => {
-      controller.abort(); // cancel the previous request
-      const newController = new AbortController();
-      const { signal } = newController;
-      setAbortController(newController);
-      setLoadingTransRecord(true);
-      try {
-        const res = await fetchAPIFrom(
-          `api/v1/getTransactionsByToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}&eventType=${methods}&timeOrder=${timeOrder}`,
-          { signal }
-        );
-        const json = await res.json();
-        console.log('======= TX details', json);
-      } catch (e) {
-        console.error(e);
-      }
-      setLoadingTransRecord(false);
-    };
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [methods, timeOrder]);
+  // React.useEffect(() => {
+  //   // controller.abort(); // cancel the previous request
+  //   // const newController = new AbortController();
+  //   // const { signal } = newController;
+  //   // setAbortController(newController);
+  //   // setLoadingTransRecord(true);
+  //   // console.log('====', signal);
+  //   // fetchFrom(
+  //   //   `api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${contract}&method=${methods}&timeOrder=${timeOrder}`,
+  //   //   { signal }
+  //   // )
+  //   //   .then((response) => {
+  //   //     response.json().then((jsonTransactions) => {
+  //   //       setTotalCount(jsonTransactions.data.length);
+  //   //       const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {
+  //   //         if (id > 0 && item.tHash === arr[id - 1].tHash) {
+  //   //           res[res.length - 1].push(item);
+  //   //         } else {
+  //   //           res.push(id < arr.length - 1 && item.tHash === arr[id + 1].tHash ? [item] : item);
+  //   //         }
+  //   //         return res;
+  //   //       }, []);
+  //   //       setTransRecord(grouped);
+  //   //       setLoadingTransRecord(false);
+  //   //     });
+  //   //   })
+  //   //   .catch((e) => {
+  //   //     if (e.code !== e.ABORT_ERR) setLoadingTransRecord(false);
+  //   //   });
+  //   const fetchData = async () => {
+  //     controller.abort(); // cancel the previous request
+  //     const newController = new AbortController();
+  //     const { signal } = newController;
+  //     setAbortController(newController);
+  //     setLoadingTransRecord(true);
+  //     try {
+  //       const res = await fetchAPIFrom(
+  //         `api/v1/getTransactionsByToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}&eventType=${methods}&timeOrder=${timeOrder}`,
+  //         { signal }
+  //       );
+  //       const json = await res.json();
+  //       console.log('======= TX details', json);
+  //     } catch (e) {
+  //       console.error(e);
+  //     }
+  //     setLoadingTransRecord(false);
+  //   };
+  //   fetchData();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [methods, timeOrder]);
 
   const onImgLoad = ({ target: img }) => {
     if (img.alt) setLoadedImage(true);
@@ -225,17 +195,10 @@ export default function CollectibleDetail() {
     else setDetailPageSize(pgsize);
   };
 
-  const handleErrorImage = (e) => {
-    if (e.target.src.indexOf('pasarprotocol.io') >= 0) {
-      e.target.src = getAssetImage(collectible, false, 1);
-    } else if (e.target.src.indexOf('ipfs.ela') >= 0) {
-      e.target.src = getAssetImage(collectible, false, 2);
-    } else {
-      e.target.src = '/static/broken-image.svg';
-    }
-  };
-
-  const imageUrl = getAssetImage(collectible, false);
+  const imageSrc =
+    (isPasarOrFeeds(contract)
+      ? getIpfsUrl(collectible?.data?.image, getIPFSTypeFromUrl(collectible?.data?.image))
+      : collectible?.image) || '/static/broken-image.svg';
 
   return (
     <RootStyle title="Collectible | PASAR">
@@ -265,9 +228,8 @@ export default function CollectibleDetail() {
                   draggable={false}
                   component="img"
                   alt={collectible.name}
-                  src={imageUrl}
+                  src={imageSrc}
                   onLoad={onImgLoad}
-                  onError={handleErrorImage}
                   sx={{ width: '100%', borderRadius: 1, mr: 2, display: isLoadedImage ? 'block' : 'none' }}
                   ref={imageRef}
                 />
@@ -276,7 +238,7 @@ export default function CollectibleDetail() {
                   playing
                   loop={Boolean(true)}
                   muted={Boolean(true)}
-                  url={imageUrl}
+                  url={imageSrc}
                   onReady={() => {
                     setVideoIsLoaded(true);
                   }}
@@ -285,7 +247,7 @@ export default function CollectibleDetail() {
                 />
               )}
               {((!isVideo && isLoadedImage) || (isVideo && videoIsLoaded)) &&
-                !imageUrl.endsWith('broken-image.svg') && (
+                !imageSrc.endsWith('broken-image.svg') && (
                   <Box
                     draggable={false}
                     component="img"
