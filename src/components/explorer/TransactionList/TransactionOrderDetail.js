@@ -14,7 +14,8 @@ import {
   getCoinTypeFromToken,
   getMarketAddressByMarketplaceType,
   getExplorerSrvByNetwork,
-  chainTypes
+  chainTypes,
+  getChainIndexFromSymbol
 } from '../../../utils/common';
 import { v1marketContract } from '../../../config';
 
@@ -63,14 +64,31 @@ const StackColStyle = styled(Stack)(({ theme }) => ({
     flexDirection: 'row'
   }
 }));
+
+// item
+// event, v1Event, marketPlace, price, platformfee, royaltyFee, method, data
+// transactionHash, timestamp, gasFee
 export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
-  const { event, tHash, v1Event = false, marketPlace = 1 } = item;
+  const {
+    contract,
+    chain,
+    tokenId,
+    event,
+    transactionHash,
+    v1Event = false,
+    timestamp,
+    price,
+    gasFee,
+    platformFee,
+    royaltyFee
+  } = item;
   const method = event !== undefined ? event : item.method;
-  const timestamp = getTime(item.timestamp);
-  const price = parseFloat((item.price / 10 ** 18).toFixed(3));
-  const gasFee = item.gasFee ? item.gasFee : 0;
-  const platformFee = item.platformfee !== undefined ? parseFloat((item.platformfee / 10 ** 18).toFixed(7)) : 0;
-  const royaltyFee = item.royaltyFee ? parseFloat((item.royaltyFee / 10 ** 18).toFixed(7)) : 0;
+  const eTimestamp = getTime(timestamp);
+  const ePrice = price ? parseFloat((price / 10 ** 18).toFixed(3)) : '0';
+  const eGasFee = (gasFee ?? 0) / 1e9;
+  const ePlatformFee = platformFee ? parseFloat((platformFee / 10 ** 18).toFixed(7)) : '0';
+  const eRoyaltyFee = royaltyFee ? parseFloat((royaltyFee / 10 ** 18).toFixed(7)) : '0';
+
   const coinType = getCoinTypeFromToken(item);
   const coinName = coinType.name;
   let methodItem = MethodList.find((item) => item.method === method);
@@ -78,17 +96,19 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
   const eventBorderStyle = event === 'Burn' ? { borderColor: '#e45f14' } : { borderColor: 'text.secondary' };
   if (!methodItem) methodItem = { color: 'grey', icon: 'tag', detail: [] };
 
-  const tempChainType = chainTypes[marketPlace - 1];
-  let feeTokenName = 'ELA';
-  if (tempChainType) feeTokenName = tempChainType.token;
+  // quote token
+  const chainIndex = getChainIndexFromSymbol(chain);
+  let quoteTokenName = 'ELA';
+  if (chainIndex) quoteTokenName = chainTypes[chainIndex - 1].token;
 
-  let totalSum = `${gasFee} ${feeTokenName}`;
+  let totalSum = `${eGasFee} ${quoteTokenName}`;
   if (method === 'BuyOrder') {
-    if (coinName === feeTokenName) totalSum = `${price + gasFee} ${feeTokenName}`;
-    else totalSum = `${price} ${coinName} + ${gasFee} ${feeTokenName}`;
+    if (coinName === quoteTokenName) totalSum = `${ePrice + eGasFee} ${quoteTokenName}`;
+    else totalSum = `${ePrice} ${coinName} + ${eGasFee} ${quoteTokenName}`;
   }
-  const marketContractAddress = getMarketAddressByMarketplaceType(marketPlace);
-  const explorerSrvUrl = getExplorerSrvByNetwork(marketPlace);
+  const marketContractAddress = getMarketAddressByMarketplaceType(chainIndex);
+  const explorerSrvUrl = getExplorerSrvByNetwork(chainIndex);
+
   return (
     <RootStyle>
       <Box
@@ -141,7 +161,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                   On &nbsp;
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ flex: 1, ...eventStyle }}>
-                  {timestamp.date} {timestamp.time}
+                  {eTimestamp.date} {eTimestamp.time}
                 </Typography>
               </StackRowStyle>
             </Grid>
@@ -174,12 +194,12 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                   </TypographyStyle>
                   <TypographyStyle variant="body2" sx={{ flex: 1 }} noWrap align="right" alignsm="left">
                     <Link
-                      href={`${explorerSrvUrl}/tx/${tHash}`}
+                      href={`${explorerSrvUrl}/tx/${transactionHash}`}
                       color="text.secondary"
                       sx={{ borderRadius: 1, ...eventStyle }}
                       target="_blank"
                     >
-                      {reduceHexAddress(tHash)}
+                      {reduceHexAddress(transactionHash)}
                       <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                         <Icon icon={externalLinkFill} width="17px" {...eventStyle} />
                       </IconButton>
@@ -207,7 +227,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                       </td>
                       <td align="right">
                         <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                          {parseFloat((price - platformFee - royaltyFee).toFixed(7))} {coinName}
+                          {parseFloat((ePrice - ePlatformFee - eRoyaltyFee).toFixed(7))} {coinName}
                         </Typography>
                       </td>
                     </tr>
@@ -219,7 +239,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                       </td>
                       <td align="right">
                         <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                          {platformFee} {coinName}
+                          {ePlatformFee} {coinName}
                         </Typography>
                       </td>
                     </tr>
@@ -231,7 +251,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                       </td>
                       <td align="right">
                         <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                          {royaltyFee} {coinName}
+                          {eRoyaltyFee} {coinName}
                         </Typography>
                       </td>
                     </tr>
@@ -243,7 +263,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                       </td>
                       <td align="right">
                         <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-                          {gasFee} {feeTokenName}
+                          {eGasFee} {quoteTokenName}
                         </Typography>
                       </td>
                     </tr>
@@ -257,7 +277,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                     </td>
                     <td align="right">
                       <Typography variant="body2" color="text.secondary" sx={eventStyle} noWrap>
-                        {gasFee} {feeTokenName}
+                        {eGasFee} {quoteTokenName}
                       </Typography>
                     </td>
                   </tr>
