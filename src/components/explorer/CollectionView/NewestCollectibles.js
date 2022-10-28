@@ -20,7 +20,9 @@ CollectibleItem.propTypes = {
 
 function CollectibleItem({ collectible }) {
   const { tokenId, contract, chain, name, tokenIdHex, createTime, royaltyOwner, image, data } = collectible;
-  const imgSrc = isPasarOrFeeds(contract) ? getIpfsUrl(data.thumbnail, getIPFSTypeFromUrl(data.thumbnail)) : image;
+  const imgSrc =
+    (isPasarOrFeeds(contract) ? getIpfsUrl(data.thumbnail, getIPFSTypeFromUrl(data.thumbnail)) : image) ||
+    '/static/broken-image.svg';
 
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
@@ -33,7 +35,7 @@ function CollectibleItem({ collectible }) {
           draggable={false}
           component="img"
           alt={name}
-          src={imgSrc || '/static/broken-image.svg'}
+          src={imgSrc}
           sx={{ width: 48, height: 48, borderRadius: 1, cursor: 'pointer' }}
         />
       </Link>
