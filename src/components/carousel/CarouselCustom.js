@@ -10,7 +10,7 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 //
 import { CarouselControlsPaging2 } from './controls';
 import CopyButton from '../CopyButton';
-import { getTime, reduceHexAddress, chainTypes } from '../../utils/common';
+import { getTime, reduceHexAddress, chainTypes, getChainIndexFromSymbol } from '../../utils/common';
 import { MAIN_CONTRACT } from '../../config';
 
 // ----------------------------------------------------------------------
@@ -52,7 +52,7 @@ const CAROUSEL_KEYS = [
   'royalties',
   'quantity',
   'collection',
-  'baseToken',
+  'contract',
   'createTime',
   'tokenStandard',
   'blockchain'
@@ -93,7 +93,7 @@ const DetailItem = (props) => {
                 'Not on sale'
               ) : (
                 <Link
-                  to={`/marketplace/detail/${[detail.tokenId, detail.baseToken].join('&')}`}
+                  to={`/marketplace/detail/${[detail.contract, detail.chain, detail.tokenId].join('&')}`}
                   component={RouterLink}
                   color="text.secondary"
                   sx={{ display: 'flex', alignItems: 'center' }}
@@ -168,19 +168,18 @@ export default function CarouselCustom({ pgsize, detail }) {
     })
   };
 
-  const tempChainTypes = [...chainTypes];
-  tempChainTypes[0].name = 'Elastos Smart Chain (ESC)';
-  let chainType = 0;
-  if (detail.marketPlace && detail.marketPlace <= chainTypes.length) chainType = detail.marketPlace - 1;
-  const network = tempChainTypes[chainType].name;
+  const showChainTypes = [...chainTypes];
+  showChainTypes[0].name = 'Elastos Smart Chain (ESC)';
+  const chainIndex = getChainIndexFromSymbol(detail.chain);
+  const network =
+    chainIndex <= showChainTypes.length && chainIndex ? showChainTypes[chainIndex - 1].name : showChainTypes[0].name;
 
   const creatimestamp = getTime(detail.createTime);
-  const checkIfHolderIsMarket = Object.values(MAIN_CONTRACT).findIndex((item) => item.market === detail.holder);
   const detailInfo = {
     ...detail,
-    royalties: `${(detail.royalties * 100) / 10 ** 6} %`,
+    royalties: `${(detail.royaltyFee * 100) / 10 ** 6} %`,
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
-    holder: checkIfHolderIsMarket < 0 ? detail.holder : detail.royaltyOwner,
+    holder: detail.tokenOwner,
     tokenStandard: detail.is721 ? 'ERC-721' : 'ERC-1155',
     blockchain: network,
     status: detail.DateOnMarket && detail.DateOnMarket.startsWith('Not') ? 0 : 1
