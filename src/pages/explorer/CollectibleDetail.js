@@ -18,17 +18,7 @@ import TransactionOrderDetail from '../../components/explorer/TransactionList/Tr
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import {
-  getAssetImage,
-  fetchFrom,
-  getCollectionTypeFromImageUrl,
-  collectionTypes,
-  fetchAPIFrom,
-  isPasarOrFeeds,
-  getIpfsUrl,
-  getIPFSTypeFromUrl
-} from '../../utils/common';
-import { MAIN_CONTRACT } from '../../config';
+import { fetchAPIFrom, isPasarOrFeeds, getIpfsUrl, getIPFSTypeFromUrl } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
