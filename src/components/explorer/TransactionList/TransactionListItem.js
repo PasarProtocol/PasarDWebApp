@@ -7,39 +7,44 @@ import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import MethodLabel from '../../MethodLabel';
 import {
   reduceHexAddress,
-  getAssetImage,
   MethodList,
   getExplorerSrvByNetwork,
-  getDateDistance
+  getDateDistance,
+  getChainIndexFromSymbol,
+  isPasarOrFeeds,
+  getIpfsUrl,
+  getIPFSTypeFromUrl
 } from '../../../utils/common';
 
-TransactionListItem.propTypes = {
-  item: PropTypes.object.isRequired
-};
 const RootStyle = styled('div')(({ theme }) => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'row',
   padding: theme.spacing(2)
 }));
+
 const TypographyStyle = styled(Typography)(({ theme, alignsm }) => ({
   [theme.breakpoints.down('sm')]: {
     textAlign: alignsm
   }
 }));
-export default function TransactionListItem({ item }) {
-  const handleErrorImage = (e) => {
-    if (e.target.src.indexOf('pasarprotocol.io') >= 0) {
-      e.target.src = getAssetImage(item, true, 1);
-    } else if (e.target.src.indexOf('ipfs.ela') >= 0) {
-      e.target.src = getAssetImage(item, true, 2);
-    } else {
-      e.target.src = '/static/broken-image.svg';
-    }
-  };
 
-  const methodItem = MethodList.find((el) => el.method === item.event);
-  const explorerSrvUrl = getExplorerSrvByNetwork(item.marketPlace);
+TransactionListItem.propTypes = {
+  item: PropTypes.object.isRequired
+};
+
+export default function TransactionListItem({ item }) {
+  const { contract, chain, tokenId, eventTypeName, transactionHash, timestamp, token } = item;
+  const chainIndex = getChainIndexFromSymbol(chain);
+  const explorerSrvUrl = getExplorerSrvByNetwork(chainIndex);
+  const methodItem = MethodList.find((el) => el.method === eventTypeName);
+  const itemName = token?.name || '';
+  const itemThumbnail = token?.data?.thumbnail || '';
+  const itemImage = token?.image || '';
+
+  const imgSrc =
+    (isPasarOrFeeds(item.contract) ? getIpfsUrl(itemThumbnail, getIPFSTypeFromUrl(itemThumbnail)) : itemImage) ||
+    '/static/broken-image.svg';
   return (
     <RootStyle>
       {item.event === 'SetApprovalForAll' ? (
@@ -51,16 +56,15 @@ export default function TransactionListItem({ item }) {
         />
       ) : (
         <Link
-          to={`/explorer/collectible/detail/${[item.tokenId, item.baseToken].join('&')}`}
+          to={`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`}
           component={RouterLink}
           sx={{ borderRadius: 1 }}
         >
           <Box
             draggable={false}
             component="img"
-            alt={item.name}
-            src={getAssetImage(item, true)}
-            onError={handleErrorImage}
+            alt={itemName}
+            src={imgSrc}
             sx={{ width: 48, height: 48, borderRadius: 1, mr: 2 }}
           />
         </Link>
@@ -71,11 +75,11 @@ export default function TransactionListItem({ item }) {
             Name
           </Typography>
           <Link
-            to={`/explorer/collectible/detail/${[item.tokenId, item.baseToken].join('&')}`}
+            to={`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`}
             component={RouterLink}
             color="text.secondary"
           >
-            <Typography variant="body2">{item.name}</Typography>
+            <Typography variant="body2">{itemName}</Typography>
           </Link>
         </Grid>
         <Grid item xs={7} sm={3}>
@@ -83,7 +87,7 @@ export default function TransactionListItem({ item }) {
             Method
           </TypographyStyle>
           <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="right">
-            <MethodLabel methodName={item.event} />
+            <MethodLabel methodName={eventTypeName} />
           </TypographyStyle>
         </Grid>
         <Grid item xs={6} sm={3}>
@@ -91,8 +95,8 @@ export default function TransactionListItem({ item }) {
             Tx Hash
           </TypographyStyle>
           <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="left">
-            <Link href={`${explorerSrvUrl}/tx/${item.tHash}`} color="text.secondary" target="_blank">
-              {reduceHexAddress(item.tHash)}
+            <Link href={`${explorerSrvUrl}/tx/${transactionHash}`} color="text.secondary" target="_blank">
+              {reduceHexAddress(transactionHash)}
               <IconButton type="button" sx={{ p: '5px' }} aria-label="link">
                 <Icon icon={externalLinkFill} width="17px" />
               </IconButton>
@@ -104,7 +108,7 @@ export default function TransactionListItem({ item }) {
             Date
           </TypographyStyle>
           <TypographyStyle variant="body2" sx={{ color: 'text.secondary' }} noWrap align="center" alignsm="right">
-            {getDateDistance(item.timestamp)}
+            {getDateDistance(timestamp)}
           </TypographyStyle>
         </Grid>
       </Grid>

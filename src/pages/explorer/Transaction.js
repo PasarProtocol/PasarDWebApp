@@ -25,7 +25,7 @@ import CustomSwitch from '../../components/custom-switch';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { fetchAPIFrom, fetchFrom } from '../../utils/common';
+import { fetchAPIFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -69,24 +69,6 @@ export default function Transaction() {
     const { signal } = newController;
     setAbortController(newController);
 
-    // setLoadingTransactions(true);
-    // fetchFrom(
-    //   `api/v2/sticker/listTrans?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}`,
-    //   { signal }
-    // )
-    //   .then((response) => {
-    //     response.json().then((jsonTransactions) => {
-    //       if (jsonTransactions.data) {
-    //         setTotalCount(jsonTransactions.data.total);
-    //         setPages(Math.ceil(jsonTransactions.data.total / showCount));
-    //         setTransactions(jsonTransactions.data.results);
-    //       }
-    //       setLoadingTransactions(false);
-    //     });
-    //   })
-    //   .catch((e) => {
-    //     if (e.code !== e.ABORT_ERR) setLoadingTransactions(false);
-    //   });
     const fetchData = async () => {
       setLoadingTransactions(true);
       try {
@@ -95,7 +77,9 @@ export default function Transaction() {
           { signal }
         );
         const json = await res.json();
-        console.log('========= TX List', json);
+        const totalCnt = json?.data?.total ?? 0;
+        setTotalCount(totalCnt);
+        setPages(Math.ceil(totalCnt / showCount));
         setTransactions(json?.data ? json.data.data : []);
       } catch (e) {
         console.error(e);
