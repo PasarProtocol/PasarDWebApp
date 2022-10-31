@@ -134,34 +134,6 @@ export default function CollectibleDetail() {
   }, []);
 
   React.useEffect(() => {
-    // controller.abort(); // cancel the previous request
-    // const newController = new AbortController();
-    // const { signal } = newController;
-    // setAbortController(newController);
-    // setLoadingTransRecord(true);
-    // console.log('====', signal);
-    // fetchFrom(
-    //   `api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${contract}&method=${methods}&timeOrder=${timeOrder}`,
-    //   { signal }
-    // )
-    //   .then((response) => {
-    //     response.json().then((jsonTransactions) => {
-    //       setTotalCount(jsonTransactions.data.length);
-    //       const grouped = jsonTransactions.data.reduce((res, item, id, arr) => {
-    //         if (id > 0 && item.tHash === arr[id - 1].tHash) {
-    //           res[res.length - 1].push(item);
-    //         } else {
-    //           res.push(id < arr.length - 1 && item.tHash === arr[id + 1].tHash ? [item] : item);
-    //         }
-    //         return res;
-    //       }, []);
-    //       setTransRecord(grouped);
-    //       setLoadingTransRecord(false);
-    //     });
-    //   })
-    //   .catch((e) => {
-    //     if (e.code !== e.ABORT_ERR) setLoadingTransRecord(false);
-    //   });
     const fetchData = async () => {
       controller.abort(); // cancel the previous request
       const newController = new AbortController();

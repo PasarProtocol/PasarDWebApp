@@ -66,14 +66,16 @@ const StackColStyle = styled(Stack)(({ theme }) => ({
 }));
 
 // item
-// event, v1Event, marketPlace, price, platformFee, royaltyFee, method, data
-// transactionHash, timestamp, gasFee
+// price, platformFee, royaltyFee, method, data
 export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
-  const { chain, eventTypeName, transactionHash, v1Event = false, timestamp, price, gasFee, royaltyFee } = item;
+  const { chain, eventTypeName, transactionHash, timestamp, gasFee } = item;
+  const platformFee = item?.platformFee ?? item?.order?.platformFee ?? 0;
+  const price = (item?.price ?? item?.order?.price ?? 0) / 1e18;
+  const royaltyFee = item?.royaltyFee ?? item?.order?.royaltyFeeTotal ?? 0;
+
   const eTimestamp = getTime(timestamp);
   const ePrice = price ? parseFloat((price / 10 ** 18).toFixed(3)) : '0';
   const eGasFee = (gasFee ?? 0) / 1e9;
-  const platformFee = item.platformFee ?? item?.order?.platformFee ?? 0;
   const ePlatformFee = platformFee ? parseFloat((platformFee / 10 ** 18).toFixed(7)) : '0';
   const eRoyaltyFee = royaltyFee ? parseFloat((royaltyFee / 10 ** 18).toFixed(7)) : '0';
 
@@ -111,9 +113,9 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
             <Grid item xs={12} sm={isAlone ? 8 : 12}>
               {methodItem.detail.map((el, index) => {
                 let value = item[el.field];
-                if (el.field && el.field.startsWith('data.') && item.data) value = item.data[el.field.substring(5)];
+                // if (el.field && el.field.startsWith('data.') && item.data) value = item.data[el.field.substring(5)];
                 if (el.field && !el.copyable) value = parseFloat((value / 10 ** 18).toFixed(7));
-                if (el.field === 'marketplace') value = !v1Event ? marketContractAddress : v1marketContract;
+                if (el.field === 'marketplace') value = chain === 'v1' ? v1marketContract : marketContractAddress;
                 const displayValue = el.ellipsis ? reduceHexAddress(value) : value;
                 return (
                   <StackRowStyle key={index}>

@@ -911,7 +911,7 @@ export const MethodList = [
     icon: 'marketplace',
     detail: [
       { description: 'Collectible listed on marketplace →', field: 'marketplace', copyable: true, ellipsis: true },
-      { description: 'By', field: 'from', copyable: true, ellipsis: true },
+      { description: 'By', field: 'seller', copyable: true, ellipsis: true },
       { description: 'For a value of', field: 'price', copyable: false }
     ],
     verb: { description: 'Listed for', withPrice: true, subject: 'from' }
@@ -933,7 +933,7 @@ export const MethodList = [
     icon: 'remove',
     detail: [
       { description: 'Collectible removed from marketplace →', field: 'marketplace', copyable: true, ellipsis: true },
-      { description: 'By', field: 'from', copyable: true, ellipsis: true }
+      { description: 'By', field: 'seller', copyable: true, ellipsis: true }
     ],
     verb: { description: 'Removed', withPrice: false, subject: 'from' }
   },
