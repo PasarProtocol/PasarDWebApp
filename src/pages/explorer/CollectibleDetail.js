@@ -170,7 +170,7 @@ export default function CollectibleDetail() {
       setLoadingTransRecord(true);
       try {
         const res = await fetchAPIFrom(
-          `api/v1/getTransactionsOfToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}&eventType=${methods}`,
+          `api/v1/getTransactionsOfToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}&eventType=${methods}&sort=${timeOrder}`,
           { signal }
         );
         const json = await res.json();

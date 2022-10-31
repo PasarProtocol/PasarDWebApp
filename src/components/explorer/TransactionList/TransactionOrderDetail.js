@@ -66,34 +66,22 @@ const StackColStyle = styled(Stack)(({ theme }) => ({
 }));
 
 // item
-// event, v1Event, marketPlace, price, platformfee, royaltyFee, method, data
+// event, v1Event, marketPlace, price, platformFee, royaltyFee, method, data
 // transactionHash, timestamp, gasFee
 export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
-  const {
-    contract,
-    chain,
-    tokenId,
-    event,
-    transactionHash,
-    v1Event = false,
-    timestamp,
-    price,
-    gasFee,
-    platformFee,
-    royaltyFee
-  } = item;
-  const method = event !== undefined ? event : item.method;
+  const { chain, eventTypeName, transactionHash, v1Event = false, timestamp, price, gasFee, royaltyFee } = item;
   const eTimestamp = getTime(timestamp);
   const ePrice = price ? parseFloat((price / 10 ** 18).toFixed(3)) : '0';
   const eGasFee = (gasFee ?? 0) / 1e9;
+  const platformFee = item.platformFee ?? item?.order?.platformFee ?? 0;
   const ePlatformFee = platformFee ? parseFloat((platformFee / 10 ** 18).toFixed(7)) : '0';
   const eRoyaltyFee = royaltyFee ? parseFloat((royaltyFee / 10 ** 18).toFixed(7)) : '0';
 
   const coinType = getCoinTypeFromToken(item);
   const coinName = coinType.name;
-  let methodItem = MethodList.find((item) => item.method === method);
-  const eventStyle = event === 'Burn' ? { color: '#e45f14' } : { color: 'inherit' };
-  const eventBorderStyle = event === 'Burn' ? { borderColor: '#e45f14' } : { borderColor: 'text.secondary' };
+  let methodItem = MethodList.find((item) => item.method === eventTypeName);
+  const eventStyle = eventTypeName === 'Burn' ? { color: '#e45f14' } : { color: 'inherit' };
+  const eventBorderStyle = eventTypeName === 'Burn' ? { borderColor: '#e45f14' } : { borderColor: 'text.secondary' };
   if (!methodItem) methodItem = { color: 'grey', icon: 'tag', detail: [] };
 
   // quote token
@@ -102,7 +90,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
   if (chainIndex) quoteTokenName = chainTypes[chainIndex - 1].token;
 
   let totalSum = `${eGasFee} ${quoteTokenName}`;
-  if (method === 'BuyOrder') {
+  if (eventTypeName === 'BuyOrder') {
     if (coinName === quoteTokenName) totalSum = `${ePrice + eGasFee} ${quoteTokenName}`;
     else totalSum = `${ePrice} ${coinName} + ${eGasFee} ${quoteTokenName}`;
   }
@@ -185,7 +173,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
                     align="right"
                     alignsm="left"
                   >
-                    <MethodLabel methodName={method} />
+                    <MethodLabel methodName={eventTypeName} />
                   </TypographyStyle>
                 </StackColStyle>
                 <StackColStyle>
@@ -217,7 +205,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
             </Typography>
             <table style={{ marginTop: 10, width: '100%' }}>
               <tbody>
-                {method === 'BuyOrder' ? (
+                {eventTypeName === 'BuyOrder' ? (
                   <>
                     <tr>
                       <td>
