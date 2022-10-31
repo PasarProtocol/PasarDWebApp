@@ -135,19 +135,8 @@ export default function ChartArea({ by, is4Address }) {
         let suburl = '';
         if (by === 'collectible')
           suburl = `getPriceHistoryOfToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}`;
-        // if (by === 'collectible') suburl = `getNftPriceByTokenId/${tokenId}/${contract}`;
         // else if (by === 'address')
         //   suburl = `getTotalRoyaltyandTotalSaleByWalletAddr/${params.address}?type=${volumeType}`;
-        // fetchFrom(`api/v2/sticker/${suburl}`, { signal })
-        //   .then((response) => {
-        //     response.json().then((jsonVolume) => {
-        //       if (jsonVolume.data) setVolumeList(jsonVolume.data);
-        //       setLoadingVolumeChart(false);
-        //     });
-        //   })
-        //   .catch((e) => {
-        //     if (e.code !== e.ABORT_ERR) setLoadingVolumeChart(false);
-        //   });
         const res = await fetchAPIFrom(`api/v1/${suburl}`, { signal });
         const json = await res.json();
         setVolumeList(json?.data || []);
@@ -166,9 +155,12 @@ export default function ChartArea({ by, is4Address }) {
   }, [isLoadingVolumeChart, volumeList, coinPrice]);
 
   const updateChart = (period, volumeList) => {
+    const minLimit = Math.min(...volumeList.map((el) => el?.createTime ?? 0));
     let days = 0;
     switch (period) {
       case 'a':
+        days = Math.ceil((new Date().getTime() - minLimit * 1000) / 1000 / 3600 / 24);
+        break;
       case 'y':
         days = 365;
         break;
@@ -189,10 +181,10 @@ export default function ChartArea({ by, is4Address }) {
     const tempValueArray = Array(dates.length).fill(0);
     volumeList.forEach((item) => {
       const coinType = getCoinTypeFromToken(item);
-      let seekDate = format(item.onlyDate * 1000, 'yyyy-MM-dd');
-      if (period === 'd' || period === null) seekDate = format(item.onlyDate * 1000, 'yyyy-MM-dd HH:00');
+      let seekDate = format(item.updateTime * 1000, 'yyyy-MM-dd');
+      if (period === 'd' || period === null) seekDate = format(item.updateTime * 1000, 'yyyy-MM-dd HH:00');
       const indexOfDate = dates.indexOf(seekDate);
-      const value = item.price !== undefined ? item.price : item.value;
+      const value = item.price ?? 0;
       if (indexOfDate >= 0)
         tempValueArray[indexOfDate] = math.round(
           tempValueArray[indexOfDate] + math.round(value / 10 ** 18, 4) * coinPrice[coinType.index],
@@ -204,7 +196,7 @@ export default function ChartArea({ by, is4Address }) {
     setDataPoint([tempValueArray[0], getUTCdate(dates[0])]);
   };
 
-  const handlePeriod = (event, newPeriod) => {
+  const handlePeriod = (_, newPeriod) => {
     setPeriod(newPeriod);
     updateChart(newPeriod, volumeList);
   };
