@@ -70,7 +70,7 @@ const StackColStyle = styled(Stack)(({ theme }) => ({
 export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
   const { chain, eventTypeName, transactionHash, timestamp, gasFee } = item;
   const platformFee = item?.platformFee ?? item?.order?.platformFee ?? 0;
-  const price = (item?.price ?? item?.order?.price ?? 0) / 1e18;
+  const price = item?.price ?? item?.order?.price ?? 0;
   const royaltyFee = item?.royaltyFee ?? item?.order?.royaltyFeeTotal ?? 0;
 
   const eTimestamp = getTime(timestamp);
