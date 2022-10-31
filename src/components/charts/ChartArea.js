@@ -7,17 +7,16 @@ import * as math from 'mathjs';
 import { styled } from '@mui/material/styles';
 import { CardHeader, Stack, Grid, ToggleButton, ToggleButtonGroup, Select, MenuItem } from '@mui/material';
 import ReactApexChart from 'react-apexcharts';
-//
 import BaseOptionChart from './BaseOptionChart';
 import LoadingScreen from '../LoadingScreen';
 import StatisticItem from '../explorer/StatisticPanel/StatisticItem';
 import useSettings from '../../hooks/useSettings';
 import {
   dateRangeBeforeDays,
-  fetchFrom,
   getCoinTypeFromToken,
   setAllTokenPrice,
-  getTotalCountOfCoinTypes
+  getTotalCountOfCoinTypes,
+  fetchAPIFrom
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -43,7 +42,7 @@ const getUTCdate = (date) => {
 };
 export default function ChartArea({ by, is4Address }) {
   const params = useParams(); // params.address
-  const [tokenId, baseToken] = params.args ? params.args.split('&') : ['', ''];
+  const [contract, chain, tokenId] = params.args ? params.args.split('&') : ['', ''];
   const { themeMode } = useSettings();
   const [period, setPeriod] = useState('a');
   const [volumeType, setType] = useState(by === 'address' ? 1 : 0);
@@ -98,21 +97,29 @@ export default function ChartArea({ by, is4Address }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (by !== 'address') return;
       setLoadingStatisData(true);
-
-      const resRealData = await fetchFrom(`api/v2/sticker/getStastisDataByWalletAddr/${params.address}`);
-      const jsonData = await resRealData.json();
-      const statisData = [
-        jsonData.data.assets,
-        jsonData.data.sold,
-        jsonData.data.purchased,
-        jsonData.data.transactions
-      ];
-      setStatisData(statisData);
+      try {
+        const res = await fetchAPIFrom(`api/v1/getStatisticsByWalletAddr?walletAddr=${params.address}`);
+        const json = await res.json();
+        const statisData = [
+          // json.data.assets,
+          // json.data.sold,
+          // json.data.purchased,
+          // json.data.transactions
+          json?.data?.listed ?? 0,
+          json?.data?.owned ?? 0,
+          json?.data?.sold ?? 0,
+          json?.data?.minted ?? 0,
+          json?.data?.bids ?? 0,
+          json?.data?.collections ?? 0
+        ];
+        setStatisData(statisData);
+      } catch (e) {
+        console.error(e);
+      }
       setLoadingStatisData(false);
     };
-    fetchData();
+    if (by === 'address') fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.address]);
 
@@ -124,20 +131,30 @@ export default function ChartArea({ by, is4Address }) {
       setAbortController(newController);
 
       setLoadingVolumeChart(true);
-      let suburl = '';
-      if (by === 'collectible') suburl = `getNftPriceByTokenId/${tokenId}/${baseToken}`;
-      else if (by === 'address')
-        suburl = `getTotalRoyaltyandTotalSaleByWalletAddr/${params.address}?type=${volumeType}`;
-      fetchFrom(`api/v2/sticker/${suburl}`, { signal })
-        .then((response) => {
-          response.json().then((jsonVolume) => {
-            if (jsonVolume.data) setVolumeList(jsonVolume.data);
-            setLoadingVolumeChart(false);
-          });
-        })
-        .catch((e) => {
-          if (e.code !== e.ABORT_ERR) setLoadingVolumeChart(false);
-        });
+      try {
+        let suburl = '';
+        if (by === 'collectible')
+          suburl = `getPriceHistoryOfToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}`;
+        // if (by === 'collectible') suburl = `getNftPriceByTokenId/${tokenId}/${contract}`;
+        // else if (by === 'address')
+        //   suburl = `getTotalRoyaltyandTotalSaleByWalletAddr/${params.address}?type=${volumeType}`;
+        // fetchFrom(`api/v2/sticker/${suburl}`, { signal })
+        //   .then((response) => {
+        //     response.json().then((jsonVolume) => {
+        //       if (jsonVolume.data) setVolumeList(jsonVolume.data);
+        //       setLoadingVolumeChart(false);
+        //     });
+        //   })
+        //   .catch((e) => {
+        //     if (e.code !== e.ABORT_ERR) setLoadingVolumeChart(false);
+        //   });
+        const res = await fetchAPIFrom(`api/v1/${suburl}`, { signal });
+        const json = await res.json();
+        setVolumeList(json?.data || []);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingVolumeChart(false);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
