@@ -21,14 +21,11 @@ import {
   Avatar,
   Paper
 } from '@mui/material';
-//
 import { customShadows } from '../../theme/shadows';
 import Jazzicon from '../Jazzicon';
 import {
-  fetchFrom,
   getIpfsUrl,
   reduceHexAddress,
-  getAssetImage,
   fetchAPIFrom,
   isPasarOrFeeds,
   getIPFSTypeFromUrl,
