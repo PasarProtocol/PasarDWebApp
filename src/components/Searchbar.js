@@ -25,7 +25,14 @@ import {
 
 import { customShadows } from '../theme/shadows';
 import Jazzicon from './Jazzicon';
-import { fetchFrom, getIpfsUrl, reduceHexAddress, getAssetImage } from '../utils/common';
+import {
+  getIpfsUrl,
+  reduceHexAddress,
+  fetchAPIFrom,
+  isPasarOrFeeds,
+  getIPFSTypeFromUrl,
+  getChainIndexFromChain
+} from '../utils/common';
 // ----------------------------------------------------------------------
 
 const APPBAR_MOBILE = 64;
@@ -144,40 +151,30 @@ export default function Searchbar({ placeholder }) {
     });
   }, [instanceSearchResult]);
 
-  const determineClose = (e) => {
+  const determineClose = async (e) => {
     if (e.target.value.length) {
       controller.abort(); // cancel the previous request
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
       setLoadingInstanceSearch(true);
-
-      fetchFrom(`api/v2/sticker/getInstanceSearchResult?search=${e.target.value}`, { signal })
-        .then((response) => {
-          response
-            .json()
-            .then((jsonAssets) => {
-              setLoadingInstanceSearch(false);
-              if (!jsonAssets.data) {
-                setInstanceSearchResult(null);
-                return;
-              }
-              const tempResult = { ...jsonAssets.data };
-              tempResult.items = tempResult.items.map((item) => {
-                const tempItem = { ...item, avatar: getAssetImage(item, true) };
-                return tempItem;
-              });
-              setInstanceSearchResult(tempResult);
-            })
-            .catch((e) => {
-              console.error(e);
-              setLoadingInstanceSearch(false);
-            });
-        })
-        .catch((e) => {
-          console.error(e);
-          setLoadingInstanceSearch(false);
+      try {
+        const res = await fetchAPIFrom(`api/v2/sticker/quickSearch?keyword=${e.target.value}`, { signal });
+        const json = await res.json();
+        const rlt = { ...json.data };
+        rlt.items = rlt.items.map((item) => {
+          const avatar =
+            (isPasarOrFeeds(item.contract)
+              ? getIpfsUrl(item?.data?.thumbnail, getIPFSTypeFromUrl(item?.data?.thumbnail))
+              : item?.image) || '/static/broken-image.svg';
+          const objItem = { ...item, avatar };
+          return objItem;
         });
+        setInstanceSearchResult(rlt);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingInstanceSearch(false);
       setShowAutocomplete(true);
     } else {
       setInstanceSearchResult(null);
@@ -278,12 +275,14 @@ export default function Searchbar({ placeholder }) {
                           </ListItem>
                           <Divider />
                           {instanceSearchResult.collections.map((item, _i) => {
-                            const { token, marketPlace = 1 } = item;
+                            const { token, chain } = item;
+                            const chainIndex = getChainIndexFromChain(chain);
+
                             return (
                               <ListItemButton
                                 key={_i}
                                 component={RouterLink}
-                                to={`/collections/detail/${marketPlace}${token}`}
+                                to={`/collections/detail/${chainIndex}${token}`}
                                 onClick={handleLinkClick}
                               >
                                 <ListItemAvatar>
