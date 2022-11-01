@@ -99,19 +99,13 @@ export default function ChartArea({ by, is4Address }) {
     const fetchData = async () => {
       setLoadingStatisData(true);
       try {
-        const res = await fetchAPIFrom(`api/v1/getStatisticsByWalletAddr?walletAddr=${params.address}`);
+        const res = await fetchAPIFrom(`api/v1/getStatisticsOfUser?walletAddr=${params.address}`);
         const json = await res.json();
         const statisData = [
-          // json.data.assets,
-          // json.data.sold,
-          // json.data.purchased,
-          // json.data.transactions
-          json?.data?.listed ?? 0,
-          json?.data?.owned ?? 0,
+          json?.data?.created ?? 0,
           json?.data?.sold ?? 0,
-          json?.data?.minted ?? 0,
-          json?.data?.bids ?? 0,
-          json?.data?.collections ?? 0
+          json?.data?.purchased ?? 0,
+          json?.data?.transactions ?? 0
         ];
         setStatisData(statisData);
       } catch (e) {
