@@ -15,7 +15,7 @@ import {
   getMarketAddressByMarketplaceType,
   getExplorerSrvByNetwork,
   chainTypes,
-  getChainIndexFromSymbol
+  getChainIndexFromChain
 } from '../../../utils/common';
 import { v1marketContract } from '../../../config';
 
@@ -87,7 +87,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
   if (!methodItem) methodItem = { color: 'grey', icon: 'tag', detail: [] };
 
   // quote token
-  const chainIndex = getChainIndexFromSymbol(chain);
+  const chainIndex = getChainIndexFromChain(chain);
   let quoteTokenName = 'ELA';
   if (chainIndex) quoteTokenName = chainTypes[chainIndex - 1].token;
 

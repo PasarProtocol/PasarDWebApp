@@ -1100,7 +1100,7 @@ export const chainTypes = [
   }
 ];
 // new
-export const getChainIndexFromSymbol = (sym) => {
+export const getChainIndexFromChain = (sym) => {
   if (sym === 'v1') return 1;
   if (sym === 'ela') return 1;
   if (sym === 'eth') return 2;

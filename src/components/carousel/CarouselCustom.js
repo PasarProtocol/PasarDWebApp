@@ -8,7 +8,7 @@ import { Icon } from '@iconify/react';
 import externalLinkFill from '@iconify/icons-eva/external-link-fill';
 import { CarouselControlsPaging2 } from './controls';
 import CopyButton from '../CopyButton';
-import { getTime, reduceHexAddress, chainTypes, getChainIndexFromSymbol } from '../../utils/common';
+import { getTime, reduceHexAddress, chainTypes, getChainIndexFromChain } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -167,7 +167,7 @@ export default function CarouselCustom({ pgsize, detail }) {
 
   const showChainTypes = [...chainTypes];
   showChainTypes[0].name = 'Elastos Smart Chain (ESC)';
-  const chainIndex = getChainIndexFromSymbol(detail.chain);
+  const chainIndex = getChainIndexFromChain(detail.chain);
   const network =
     chainIndex <= showChainTypes.length && chainIndex ? showChainTypes[chainIndex - 1].name : showChainTypes[0].name;
 

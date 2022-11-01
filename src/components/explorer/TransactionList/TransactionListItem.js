@@ -10,7 +10,7 @@ import {
   MethodList,
   getExplorerSrvByNetwork,
   getDateDistance,
-  getChainIndexFromSymbol,
+  getChainIndexFromChain,
   isPasarOrFeeds,
   getIpfsUrl,
   getIPFSTypeFromUrl
@@ -35,7 +35,7 @@ TransactionListItem.propTypes = {
 
 export default function TransactionListItem({ item }) {
   const { contract, chain, tokenId, eventTypeName, transactionHash, timestamp, token } = item;
-  const chainIndex = getChainIndexFromSymbol(chain);
+  const chainIndex = getChainIndexFromChain(chain);
   const explorerSrvUrl = getExplorerSrvByNetwork(chainIndex);
   const methodItem = MethodList.find((el) => el.method === eventTypeName);
   const itemName = token?.name || '';
