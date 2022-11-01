@@ -9,7 +9,7 @@ import LoadingScreen from '../../components/LoadingScreen';
 import CollectibleListItem from '../../components/explorer/CollectibleList/CollectibleListItem';
 import PaperRecord from '../../components/PaperRecord';
 import LoadingWrapper from '../../components/LoadingWrapper';
-import { fetchFrom } from '../../utils/common';
+import { fetchAPIFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -41,23 +41,21 @@ export default function SearchResult() {
   React.useEffect(() => {
     const fetchData = async () => {
       setLoadingCollectibles(true);
-      fetchFrom(`api/v2/sticker/search/${params.key}`)
-        .then((response) => {
-          response.json().then((json) => {
-            setTotalCount(json?.data?.result.length ?? 0);
-            setCollectibles(json?.data ? json?.data?.result : []);
-            setLoadingCollectibles(false);
-          });
-        })
-        .catch((e) => {
-          if (e.code !== e.ABORT_ERR) setLoadingCollectibles(false);
-        });
+      try {
+        const res = await fetchAPIFrom(`api/v1/searchTokens?keyword=${params.key}`, {});
+        const json = await res.json();
+        setTotalCount(json?.data.length ?? 0);
+        setCollectibles(json?.data || []);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingCollectibles(false);
     };
     fetchData();
   }, [params.key]);
 
-  const link2Detail = (tokenId, baseToken) => {
-    navigate(`/explorer/collectible/detail/${[tokenId, baseToken].join('&')}`);
+  const link2Detail = (contract, chain, tokenId) => {
+    navigate(`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`);
   };
 
   return (
@@ -89,7 +87,7 @@ export default function SearchResult() {
                   textAlign: 'center',
                   cursor: 'pointer'
                 }}
-                onClick={() => link2Detail(item.tokenId, item.baseToken)}
+                onClick={() => link2Detail(item.contract, item.chain, item.tokenId)}
               >
                 <CollectibleListItem item={item} />
               </PaperRecord>
