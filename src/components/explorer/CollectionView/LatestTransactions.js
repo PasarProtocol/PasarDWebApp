@@ -11,7 +11,7 @@ import {
   reduceHexAddress,
   chainTypes,
   getDateDistance,
-  getChainIndexFromSymbol,
+  getChainIndexFromChain,
   convertMethodName,
   getExplorerSrvByNetwork
 } from '../../../utils/common';
@@ -25,7 +25,7 @@ export function TransItem({ trans }) {
   let methodItem = MethodList.find((item) => convertMethodName(item.method) === trans.eventTypeName);
   if (!methodItem) methodItem = { color: 'grey', icon: 'tag', detail: [] };
   // scan url
-  const chainIndex = getChainIndexFromSymbol(trans.chain);
+  const chainIndex = getChainIndexFromChain(trans.chain);
   const explorerSrvUrl = getExplorerSrvByNetwork(chainIndex);
   // quote token
   let quoteTokenName = 'ELA';
