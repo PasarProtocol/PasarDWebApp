@@ -9,7 +9,13 @@ import 'react-slideshow-image/dist/styles.css';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import LoadingScreen from '../LoadingScreen';
-import { fetchFrom, getAssetImage } from '../../utils/common';
+import {
+  fetchAPIFrom,
+  getChainIndexFromChain,
+  getIPFSTypeFromUrl,
+  getIpfsUrl,
+  isPasarOrFeeds
+} from '../../utils/common';
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -42,7 +48,7 @@ const CardStyle = styled(Card)({
 });
 
 function CarouselInCollection({ collection }) {
-  const { name, collectiblesOnMarket, token, marketPlace = 1 } = collection;
+  const { name, collectibles, token, chain } = collection;
   const getConfigurableProps = () => ({
     showArrows: false,
     showStatus: false,
@@ -59,12 +65,19 @@ function CarouselInCollection({ collection }) {
     interval: 500,
     transitionTime: 0
   });
+
+  const chainIndex = getChainIndexFromChain(chain);
+
   return (
-    <Link to={`/collections/detail/${marketPlace}${token}`} component={RouterLink}>
+    <Link to={`/collections/detail/${chainIndex}${token}`} component={RouterLink}>
       <BoxStyle className="carousel-box">
         <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
-          {collectiblesOnMarket.slice(0, 5).map((each, index) => {
-            const imageSrc = getAssetImage(each, false);
+          {collectibles.map((each, index) => {
+            // const imageSrc = getAssetImage(each, false);
+            const imageSrc =
+              (isPasarOrFeeds(each.contract)
+                ? getIpfsUrl(each.data.image, getIPFSTypeFromUrl(each.data.image))
+                : each.image) || '/static/broken-image.svg';
             return (
               <Box
                 key={index}
@@ -110,29 +123,39 @@ export default function HomeAssetCarousel() {
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
 
   React.useEffect(() => {
-    setLoadingCollections(true);
-    fetchFrom(`api/v2/sticker/getCollection?sort=0`, {})
-      .then((response) => {
-        response
-          .json()
-          .then((jsonAssets) => {
-            if (Array.isArray(jsonAssets.data)) {
-              const tempCollectionData = jsonAssets.data.filter(
-                (collection) => collection.collectiblesOnMarket.length > 1
-              );
-              setCollections(tempCollectionData.slice(0, 3));
-            }
-            setLoadingCollections(false);
-          })
-          .catch((e) => {
-            console.error(e);
-            setLoadingCollections(false);
-          });
-      })
-      .catch((e) => {
+    const fetchData = async () => {
+      setLoadingCollections(true);
+      try {
+        const res = await fetchAPIFrom(
+          'api/v1/listCollections?pageNum=1&pageSize=10&chain=all&category=all&sort=0',
+          {}
+        );
+        const json = await res.json();
+        const cols = json?.data?.data || [];
+        const rlt = [];
+        let count = 0;
+        while (count < cols.length) {
+          const item = cols[count];
+          if ((item?.items ?? 0) > 0 && rlt.length < 3) {
+            // eslint-disable-next-line no-await-in-loop
+            const resItem = await fetchAPIFrom(
+              `api/v1/getCollectiblesOfCollection?collection=${item.token}&chain=${item.chain}&num=5`,
+              {}
+            );
+            // eslint-disable-next-line no-await-in-loop
+            const jsonItem = await resItem.json();
+            rlt.push({ ...item, collectibles: jsonItem?.data || [] });
+            count += 1;
+          }
+        }
+
+        setCollections(rlt);
+      } catch (e) {
         console.error(e);
-        setLoadingCollections(false);
-      });
+      }
+      setLoadingCollections(false);
+    };
+    fetchData();
   }, []);
 
   const properties = {
