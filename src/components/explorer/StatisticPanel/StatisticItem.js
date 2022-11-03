@@ -95,7 +95,7 @@ StatisticItem.propTypes = {
   index: PropTypes.number,
   children: PropTypes.node,
   title: PropTypes.string,
-  value: PropTypes.string
+  value: PropTypes.any
 };
 StatisticItem.defaultProps = {
   forAddress: false
