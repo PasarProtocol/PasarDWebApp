@@ -33,7 +33,7 @@ import ByToSelect from '../../components/ByToSelect';
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { fetchFrom } from '../../utils/common';
+import { fetchAPIFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ export default function AddressDetail() {
   const [keyword, setKeyword] = React.useState('');
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingTransactions, setLoadingTransactions] = React.useState(false);
-  
+
   React.useEffect(() => {
     const fetchData = async () => {
       controller.abort(); // cancel the previous request
@@ -83,23 +83,22 @@ export default function AddressDetail() {
       const { signal } = newController;
       setAbortController(newController);
 
+      const bytoKey = byto === 0 ? 'By' : 'Or';
       setLoadingTransactions(true);
-      const bytoKey = byto === 0 ? 'By' : 'To';
-      fetchFrom(
-        `api/v2/sticker/getTranDetailsByWalletAddr/${params.address}?pageNum=${page}&pageSize=${showCount}&method=${methods}&timeOrder=${timeOrder}&performer=${bytoKey}&keyword=${keyword}`,
-        { signal }
-      )
-        .then((response) => {
-          response.json().then((jsonTransactions) => {
-            setTotalCount(jsonTransactions.data.total);
-            setPages(Math.ceil(jsonTransactions.data.total / showCount));
-            setTransactions(jsonTransactions.data.results);
-            setLoadingTransactions(false);
-          });
-        })
-        .catch((e) => {
-          if (e.code !== e.ABORT_ERR) setLoadingTransactions(false);
-        });
+      try {
+        const res = await fetchAPIFrom(
+          `api/v1/listTransactionsOfUser?walletAddr=${params.address}&pageNum=${page}&pageSize=${showCount}&eventType=${methods}&performer=${bytoKey}&sort=${timeOrder}&keyword=${keyword}`,
+          { signal }
+        );
+        const json = await res.json();
+        const totalCnt = json?.data?.total ?? 0;
+        setTotalCount(totalCnt);
+        setPages(Math.ceil(totalCnt / showCount));
+        setTransactions(json?.data?.data || []);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingTransactions(false);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
