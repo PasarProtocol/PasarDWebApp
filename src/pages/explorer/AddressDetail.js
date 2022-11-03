@@ -83,7 +83,7 @@ export default function AddressDetail() {
       const { signal } = newController;
       setAbortController(newController);
 
-      const bytoKey = byto === 0 ? 'By' : 'Or';
+      const bytoKey = byto === 0 ? 'By' : 'To';
       setLoadingTransactions(true);
       try {
         const res = await fetchAPIFrom(
