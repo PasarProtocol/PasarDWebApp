@@ -35,9 +35,9 @@ TransactionListItem.propTypes = {
 
 export default function TransactionListItem({ item }) {
   const { eventTypeName, transactionHash, timestamp, token } = item;
-  const contract = item?.contract || item?.token?.contract;
-  const chain = item?.chain || item?.token?.chain;
-  const tokenId = item?.tokenId || item?.token?.tokenId;
+  const contract = item?.token?.contract || item?.contract;
+  const chain = item?.token?.chain || item?.chain;
+  const tokenId = item?.token?.tokenId || item?.tokenId;
   const chainIndex = getChainIndexFromChain(chain);
   const explorerSrvUrl = getExplorerSrvByNetwork(chainIndex);
   const methodItem = MethodList.find((el) => el.method === eventTypeName);
