@@ -48,7 +48,7 @@ const CardStyle = styled(Card)({
 });
 
 function CarouselInCollection({ collection }) {
-  const { name, collectibles, token, chain } = collection;
+  const { name, contract, collectible } = collection;
   const getConfigurableProps = () => ({
     showArrows: false,
     showStatus: false,
@@ -66,18 +66,17 @@ function CarouselInCollection({ collection }) {
     transitionTime: 0
   });
 
-  const chainIndex = getChainIndexFromChain(chain);
+  const chainIndex = getChainIndexFromChain(collectible.chain);
 
   return (
-    <Link to={`/collections/detail/${chainIndex}${token}`} component={RouterLink}>
+    <Link to={`/collections/detail/${chainIndex}${contract}`} component={RouterLink}>
       <BoxStyle className="carousel-box">
         <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
-          {collectibles.map((each, index) => {
-            // const imageSrc = getAssetImage(each, false);
+          {collectible.map((item, index) => {
             const imageSrc =
-              (isPasarOrFeeds(each.contract)
-                ? getIpfsUrl(each.data.image, getIPFSTypeFromUrl(each.data.image))
-                : each.image) || '/static/broken-image.svg';
+              (isPasarOrFeeds(item?.contract)
+                ? getIpfsUrl(item?.data?.image, getIPFSTypeFromUrl(item?.data?.image))
+                : item?.image) || '/static/broken-image.svg';
             return (
               <Box
                 key={index}
@@ -126,30 +125,23 @@ export default function HomeAssetCarousel() {
     const fetchData = async () => {
       setLoadingCollections(true);
       try {
-        const res = await fetchAPIFrom(
-          'api/v1/listCollections?pageNum=1&pageSize=10&chain=all&category=all&sort=0',
-          {}
-        );
+        const res = await fetchAPIFrom('api/v1/getRecentOnSale', {});
         const json = await res.json();
-        const cols = json?.data?.data || [];
-        const rlt = [];
-        let count = 0;
-        while (count < cols.length) {
-          const item = cols[count];
-          if ((item?.items ?? 0) > 0 && rlt.length < 3) {
-            // eslint-disable-next-line no-await-in-loop
-            const resItem = await fetchAPIFrom(
-              `api/v1/getCollectiblesOfCollection?collection=${item.token}&chain=${item.chain}&num=5`,
-              {}
-            );
-            // eslint-disable-next-line no-await-in-loop
-            const jsonItem = await resItem.json();
-            rlt.push({ ...item, collectibles: jsonItem?.data || [] });
-            count += 1;
+        const collectibles = json?.data || [];
+        const cols = collectibles.reduce((acc, item) => {
+          if (!acc.length) {
+            acc = [{ name: item.collectionName, contract: item.contract, collectible: [item] }];
+          } else {
+            const collectionIndex = acc.findIndex((el) => el.contract === item.contract);
+            if (collectionIndex === -1) {
+              acc = [...acc, { name: item.collectionName, contract: item.contract, collectible: [item] }];
+            } else {
+              acc[collectionIndex].collectible.push(item);
+            }
           }
-        }
-
-        setCollections(rlt);
+          return acc;
+        }, {});
+        setCollections(cols);
       } catch (e) {
         console.error(e);
       }
