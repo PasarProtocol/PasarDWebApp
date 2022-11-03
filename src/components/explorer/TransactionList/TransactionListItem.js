@@ -34,7 +34,10 @@ TransactionListItem.propTypes = {
 };
 
 export default function TransactionListItem({ item }) {
-  const { contract, chain, tokenId, eventTypeName, transactionHash, timestamp, token } = item;
+  const { eventTypeName, transactionHash, timestamp, token } = item;
+  const contract = item?.contract || item?.token?.contract;
+  const chain = item?.chain || item?.token?.chain;
+  const tokenId = item?.tokenId || item?.token?.tokenId;
   const chainIndex = getChainIndexFromChain(chain);
   const explorerSrvUrl = getExplorerSrvByNetwork(chainIndex);
   const methodItem = MethodList.find((el) => el.method === eventTypeName);
@@ -43,7 +46,7 @@ export default function TransactionListItem({ item }) {
   const itemImage = token?.image || '';
 
   const imgSrc =
-    (isPasarOrFeeds(item.contract) ? getIpfsUrl(itemThumbnail, getIPFSTypeFromUrl(itemThumbnail)) : itemImage) ||
+    (isPasarOrFeeds(contract) ? getIpfsUrl(itemThumbnail, getIPFSTypeFromUrl(itemThumbnail)) : itemImage) ||
     '/static/broken-image.svg';
   return (
     <RootStyle>
