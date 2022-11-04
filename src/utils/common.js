@@ -358,6 +358,10 @@ export function setAllTokenPrice(setCoinPriceByType) {
   });
   coinTypes.forEach((token, _i) => {
     if (_i < 2) return;
+    if (token.name === 'PASAR') {
+      setCoinPriceByType(_i, 0.1);
+      return;
+    }
     getERC20TokenPrice(token.address).then((res) => {
       if (!res || !res.token) return;
       setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice);
@@ -1100,11 +1104,11 @@ export const chainTypes = [
   }
 ];
 // new
-export const getChainIndexFromChain = (sym) => {
-  if (sym === 'v1') return 1;
-  if (sym === 'ela') return 1;
-  if (sym === 'eth') return 2;
-  if (sym === 'fsn') return 3;
+export const getChainIndexFromChain = (chain) => {
+  if (chain === 'v1') return 1;
+  if (chain === 'ela') return 1;
+  if (chain === 'eth') return 2;
+  if (chain === 'fsn') return 3;
   return 0;
 };
 export const checkValidChain = (chainId) => {
@@ -1163,6 +1167,33 @@ export const getMarketAddressByMarketplaceType = (type) => {
   if (type > 0 && type <= marketAddresses.length) return marketAddresses[type - 1];
   return marketAddresses[0];
 };
+
+// new
+export const getCoinTypeFromTokenEx = (item) => {
+  let coinTypeIndex = 0;
+  if (item) {
+    const { quoteToken = blankAddress, chain = 'ela' } = item;
+    let tempCoinTypes = [];
+    let tempChainType = '';
+    const chainIndex = getChainIndexFromChain(chain);
+    if (chainIndex > 0 && chainIndex <= Object.keys(coinTypesGroup).length) {
+      tempCoinTypes = Object.values(coinTypesGroup)[chainIndex - 1];
+      tempChainType = Object.keys(coinTypesGroup)[chainIndex - 1];
+    } else {
+      tempCoinTypes = coinTypesGroup.ESC;
+      tempChainType = 'ESC';
+    }
+    const startPos = getStartPosOfCoinTypeByChainType(tempChainType);
+    coinTypeIndex = Math.max(
+      tempCoinTypes.findIndex((el) => el.address === quoteToken),
+      0
+    );
+    return { index: coinTypeIndex + startPos, ...tempCoinTypes[coinTypeIndex] };
+  }
+  return { index: coinTypeIndex, ...coinTypesGroup.ESC[coinTypeIndex] };
+};
+
+// deprecated
 export const getCoinTypeFromToken = (item) => {
   let coinTypeIndex = 0;
   if (item) {
