@@ -13,10 +13,10 @@ import StatisticItem from '../explorer/StatisticPanel/StatisticItem';
 import useSettings from '../../hooks/useSettings';
 import {
   dateRangeBeforeDays,
-  getCoinTypeFromToken,
   setAllTokenPrice,
   getTotalCountOfCoinTypes,
-  fetchAPIFrom
+  fetchAPIFrom,
+  getCoinTypeFromTokenEx
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -55,6 +55,7 @@ export default function ChartArea({ by, is4Address }) {
   const [coinPrice, setCoinPrice] = useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const [controller, setAbortController] = useState(new AbortController());
   const baseOptionChart = BaseOptionChart();
+
   const mergeChartOption = (dates) =>
     merge(baseOptionChart, {
       xaxis: {
@@ -77,14 +78,6 @@ export default function ChartArea({ by, is4Address }) {
     });
   const [optionDates, setOptionDates] = useState([]);
   const [chartOptions, setChartOptions] = useState(mergeChartOption([]));
-
-  const setCoinPriceByType = (type, value) => {
-    setCoinPrice((prevState) => {
-      const tempPrice = [...prevState];
-      tempPrice[type] = value;
-      return tempPrice;
-    });
-  };
 
   useEffect(() => {
     setAllTokenPrice(setCoinPriceByType);
@@ -129,8 +122,8 @@ export default function ChartArea({ by, is4Address }) {
         let suburl = '';
         if (by === 'collectible')
           suburl = `getPriceHistoryOfToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}`;
-        // else if (by === 'address')
-        //   suburl = `getTotalRoyaltyandTotalSaleByWalletAddr/${params.address}?type=${volumeType}`;
+        else if (by === 'address')
+          suburl = `getIncomesOfUser?walletAddr=${params.address}&type=${volumeType === 0 ? 2 : 1}`;
         const res = await fetchAPIFrom(`api/v1/${suburl}`, { signal });
         const json = await res.json();
         setVolumeList(json?.data || []);
@@ -148,12 +141,20 @@ export default function ChartArea({ by, is4Address }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoadingVolumeChart, volumeList, coinPrice]);
 
+  const setCoinPriceByType = (type, value) => {
+    setCoinPrice((prevState) => {
+      const tempPrice = [...prevState];
+      tempPrice[type] = value;
+      return tempPrice;
+    });
+  };
+
   const updateChart = (period, volumeList) => {
-    const minLimit = Math.min(...volumeList.map((el) => el?.createTime ?? 0));
+    const minLimit = Math.min(...volumeList.map((el) => (by === 'collectible' ? el?.createTime : el?.timestamp) ?? 0));
     let days = 0;
     switch (period) {
       case 'a':
-        days = Math.ceil((new Date().getTime() - minLimit * 1000) / 1000 / 3600 / 24);
+        days = Math.ceil((new Date().getTime() - minLimit * 1000) / 1000 / 3600 / 24) + 3;
         break;
       case 'y':
         days = 365;
@@ -172,31 +173,35 @@ export default function ChartArea({ by, is4Address }) {
         break;
     }
     const dates = dateRangeBeforeDays(days);
-    const tempValueArray = Array(dates.length).fill(0);
+    const arrRlt = Array(dates.length).fill(0);
     volumeList.forEach((item) => {
-      const coinType = getCoinTypeFromToken(item);
-      let seekDate = format(item.updateTime * 1000, 'yyyy-MM-dd');
-      if (period === 'd' || period === null) seekDate = format(item.updateTime * 1000, 'yyyy-MM-dd HH:00');
+      const coinType = getCoinTypeFromTokenEx(item);
+      const time = by === 'collectible' ? item.updateTime : item.timestamp;
+      const price = by === 'collectible' ? item.price : item.income;
+      let seekDate = format(time * 1000, 'yyyy-MM-dd');
+      if (period === 'd' || period === null) seekDate = format(time * 1000, 'yyyy-MM-dd HH:00');
       const indexOfDate = dates.indexOf(seekDate);
-      const value = item.price ?? 0;
+      const value = price ?? 0;
       if (indexOfDate >= 0)
-        tempValueArray[indexOfDate] = math.round(
-          tempValueArray[indexOfDate] + math.round(value / 10 ** 18, 4) * coinPrice[coinType.index],
+        arrRlt[indexOfDate] = math.round(
+          arrRlt[indexOfDate] + math.round(value / 10 ** 18, 4) * coinPrice[coinType.index],
           4
         );
     });
     setOptionDates(dates);
-    setChartValueArray(tempValueArray);
-    setDataPoint([tempValueArray[0], getUTCdate(dates[0])]);
+    setChartValueArray(arrRlt);
+    setDataPoint([arrRlt[0], getUTCdate(dates[0])]);
   };
 
   const handlePeriod = (_, newPeriod) => {
     setPeriod(newPeriod);
     updateChart(newPeriod, volumeList);
   };
+
   const handleType = (event) => {
     setType(event.target.value);
   };
+
   return (
     <div>
       {is4Address && (
