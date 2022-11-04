@@ -132,7 +132,7 @@ export default function HomeAssetCarousel() {
           if (!acc.length) {
             acc = [{ name: item.collectionName, contract: item.contract, collectible: [item] }];
           } else {
-            const collectionIndex = acc.findIndex((el) => el.contract === item.contract);
+            const collectionIndex = acc.findIndex((el) => el.name === item.collectionName);
             if (collectionIndex === -1) {
               acc = [...acc, { name: item.collectionName, contract: item.contract, collectible: [item] }];
             } else {
