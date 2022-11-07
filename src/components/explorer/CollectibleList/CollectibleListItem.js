@@ -3,7 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { Box, Stack, Link, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CopyButton from '../../CopyButton';
-import { getDateDistance, getIPFSTypeFromUrl, getIpfsUrl, isPasarOrFeeds } from '../../../utils/common';
+import { getDateDistance, getImageFromIPFSUrl } from '../../../utils/common';
 
 CollectibleListItem.propTypes = {
   item: PropTypes.object.isRequired
@@ -14,8 +14,8 @@ const TypographyStyle = styled(Typography)(({ theme }) => ({
   }
 }));
 export default function CollectibleListItem({ item }) {
-  const { contract, name, createTime, royaltyOwner, tokenIdHex, image, data } = item;
-  const imgSrc = isPasarOrFeeds(contract) ? getIpfsUrl(data.thumbnail, getIPFSTypeFromUrl(data.thumbnail)) : image;
+  const { name, createTime, royaltyOwner, tokenIdHex, image, data } = item;
+  const imgSrc = getImageFromIPFSUrl(data?.thumbnail || image);
 
   return (
     <Stack direction="row" alignItems="center" spacing={2} sx={{ p: 2 }}>

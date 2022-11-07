@@ -18,7 +18,7 @@ import TransactionOrderDetail from '../../components/explorer/TransactionList/Tr
 import DateOrderSelect from '../../components/DateOrderSelect';
 import MethodSelect from '../../components/MethodSelect';
 import InlineBox from '../../components/InlineBox';
-import { fetchAPIFrom, isPasarOrFeeds, getIpfsUrl, getIPFSTypeFromUrl } from '../../utils/common';
+import { fetchAPIFrom, getImageFromIPFSUrl } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -93,9 +93,7 @@ export default function CollectibleDetail() {
         }
         setCollectible(collectibleDetail);
         // check if asset is video or not
-        const imgUrl = isPasarOrFeeds(contract)
-          ? getIpfsUrl(collectibleDetail?.data?.image, getIPFSTypeFromUrl(collectibleDetail?.data?.image))
-          : collectibleDetail?.image;
+        const imgUrl = getImageFromIPFSUrl(collectibleDetail?.data?.image || collectibleDetail?.image);
         const resImg = await fetch(imgUrl);
         const contentype = resImg.headers.get('content-type');
         if (contentype.startsWith('video')) {
@@ -167,10 +165,7 @@ export default function CollectibleDetail() {
     else setDetailPageSize(pgsize);
   };
 
-  const imageSrc =
-    (isPasarOrFeeds(contract)
-      ? getIpfsUrl(collectible?.data?.image, getIPFSTypeFromUrl(collectible?.data?.image))
-      : collectible?.image) || '/static/broken-image.svg';
+  const imageSrc = getImageFromIPFSUrl(collectible?.data?.image || collectible?.image);
 
   return (
     <RootStyle title="Collectible | PASAR">

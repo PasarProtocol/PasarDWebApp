@@ -29,9 +29,8 @@ import {
   getIpfsUrl,
   reduceHexAddress,
   fetchAPIFrom,
-  isPasarOrFeeds,
-  getIPFSTypeFromUrl,
-  getChainIndexFromChain
+  getChainIndexFromChain,
+  getImageFromIPFSUrl
 } from '../utils/common';
 // ----------------------------------------------------------------------
 
@@ -163,10 +162,7 @@ export default function Searchbar({ placeholder }) {
         const json = await res.json();
         const rlt = { ...json.data };
         rlt.items = rlt.items.map((item) => {
-          const avatar =
-            (isPasarOrFeeds(item.contract)
-              ? getIpfsUrl(item?.data?.thumbnail, getIPFSTypeFromUrl(item?.data?.thumbnail))
-              : item?.image) || '/static/broken-image.svg';
+          const avatar = getImageFromIPFSUrl(item?.data?.thumbnail || item?.image);
           const objItem = { ...item, avatar };
           return objItem;
         });

@@ -11,9 +11,7 @@ import {
   getExplorerSrvByNetwork,
   getDateDistance,
   getChainIndexFromChain,
-  isPasarOrFeeds,
-  getIpfsUrl,
-  getIPFSTypeFromUrl
+  getImageFromIPFSUrl
 } from '../../../utils/common';
 
 const RootStyle = styled('div')(({ theme }) => ({
@@ -42,12 +40,8 @@ export default function TransactionListItem({ item }) {
   const explorerSrvUrl = getExplorerSrvByNetwork(chainIndex);
   const methodItem = MethodList.find((el) => el.method === eventTypeName);
   const itemName = token?.name || '';
-  const itemThumbnail = token?.data?.thumbnail || '';
-  const itemImage = token?.image || '';
+  const imgSrc = getImageFromIPFSUrl(token?.data?.thumbnail || token?.image);
 
-  const imgSrc =
-    (isPasarOrFeeds(contract) ? getIpfsUrl(itemThumbnail, getIPFSTypeFromUrl(itemThumbnail)) : itemImage) ||
-    '/static/broken-image.svg';
   return (
     <RootStyle>
       {item.event === 'SetApprovalForAll' ? (
