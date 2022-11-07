@@ -5,13 +5,7 @@ import { Box, Stack, Link, Typography, Divider } from '@mui/material';
 import CollectionView from './Template';
 import LoadingScreen from '../../LoadingScreen';
 import CopyButton from '../../CopyButton';
-import {
-  reduceHexAddress,
-  getDateDistance,
-  isPasarOrFeeds,
-  getIpfsUrl,
-  getIPFSTypeFromUrl
-} from '../../../utils/common';
+import { reduceHexAddress, getDateDistance, getImageFromIPFSUrl } from '../../../utils/common';
 // ----------------------------------------------------------------------
 
 CollectibleItem.propTypes = {
@@ -20,9 +14,7 @@ CollectibleItem.propTypes = {
 
 function CollectibleItem({ collectible }) {
   const { tokenId, contract, chain, name, tokenIdHex, createTime, royaltyOwner, image, data } = collectible;
-  const imgSrc =
-    (isPasarOrFeeds(contract) ? getIpfsUrl(data.thumbnail, getIPFSTypeFromUrl(data.thumbnail)) : image) ||
-    '/static/broken-image.svg';
+  const imgSrc = getImageFromIPFSUrl(data?.thumbnail || image);
 
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
