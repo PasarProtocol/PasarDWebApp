@@ -22,15 +22,15 @@ UpdateRoyalties.propTypes = {
   setOpen: PropTypes.func,
   name: PropTypes.string,
   token: PropTypes.any,
-  owners: PropTypes.array,
-  feeRates: PropTypes.array
+  royaltyOwners: PropTypes.array,
+  royaltyFees: PropTypes.array
 };
 
 export default function UpdateRoyalties(props) {
-  const { isOpen, setOpen, name, token, owners = [], feeRates = [] } = props;
-  const originRoyalties = owners.map((address, _i) => {
+  const { isOpen, setOpen, name, token, royaltyOwners = [], royaltyFees = [] } = props;
+  const originRoyalties = royaltyOwners.map((address, _i) => {
     const tempItem = { address, royalties: 0 };
-    if (feeRates[_i]) tempItem.royalties = ((feeRates[_i] * 100) / 10 ** 6).toString();
+    if (royaltyFees[_i]) tempItem.royalties = ((royaltyFees[_i] * 100) / 10 ** 6).toString();
     return tempItem;
   });
   if (originRoyalties.length < 3) originRoyalties.push({ address: '', royalties: '' });
@@ -226,7 +226,6 @@ export default function UpdateRoyalties(props) {
               </Grid>
               <Grid item xs={3}>
                 <TextFieldStyle
-                  // type="number"
                   label="Example: 10"
                   size="small"
                   fullWidth
