@@ -9,13 +9,7 @@ import 'react-slideshow-image/dist/styles.css';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import LoadingScreen from '../LoadingScreen';
-import {
-  fetchAPIFrom,
-  getChainIndexFromChain,
-  getIPFSTypeFromUrl,
-  getIpfsUrl,
-  isPasarOrFeeds
-} from '../../utils/common';
+import { fetchAPIFrom, getChainIndexFromChain, getImageFromIPFSUrl } from '../../utils/common';
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -73,10 +67,7 @@ function CarouselInCollection({ collection }) {
       <BoxStyle className="carousel-box">
         <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
           {collectible.map((item, index) => {
-            const imageSrc =
-              (isPasarOrFeeds(item?.contract)
-                ? getIpfsUrl(item?.data?.image, getIPFSTypeFromUrl(item?.data?.image))
-                : item?.image) || '/static/broken-image.svg';
+            const imageSrc = getImageFromIPFSUrl(item?.data?.image || item?.image);
             return (
               <Box
                 key={index}
