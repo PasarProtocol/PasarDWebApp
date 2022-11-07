@@ -5,7 +5,7 @@ import { Box } from '@mui/material';
 
 import CollectionCard from '../collection/CollectionCard';
 import CollectionCardSkeleton from '../collection/CollectionCardSkeleton';
-import { fetchFrom, collectionTypes } from '../../utils/common';
+import { collectionTypes, fetchAPIFrom } from '../../utils/common';
 // ----------------------------------------------------------------------
 
 export default function FilteredCollectionGrid() {
@@ -39,23 +39,21 @@ export default function FilteredCollectionGrid() {
   };
 
   React.useEffect(() => {
-    setLoadingCollections(true);
-    fetchFrom('api/v2/sticker/getCollection')
-      .then((response) => {
-        response
-          .json()
-          .then((jsonAssets) => {
-            if (Array.isArray(jsonAssets.data)) setCollections(jsonAssets.data);
-            setLoadingCollections(false);
-          })
-          .catch((e) => {
-            console.error(e);
-            setLoadingCollections(false);
-          });
-      })
-      .catch((e) => {
-        if (e.code !== e.ABORT_ERR) setLoadingCollections(false);
-      });
+    const fetchData = async () => {
+      setLoadingCollections(true);
+      try {
+        const res = await fetchAPIFrom(
+          `api/v1/listCollections?pageNum=1&pageSize=10&chain=all&category=all&sort=10`,
+          {}
+        );
+        const json = await res.json();
+        setCollections(json?.data?.data || []);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingCollections(false);
+    };
+    fetchData();
   }, []);
   const loadingSkeletons = Array(3).fill(0);
 
