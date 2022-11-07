@@ -138,6 +138,23 @@ export const getAssetFromObj = (metaObj, isThumbnail, ipfsType = 0) => {
   if (!imgUrl) return '';
   return getIpfsUrl(imgUrl, ipfsType);
 };
+
+export const getImageFromIPFSUrl = (url) => {
+  // pasar:image:xxx
+  // feeds:image:xxx, feeds:imgage:xxx
+  // ipfs://xxx
+  // https://xxxx
+  // no data
+  if (url) {
+    if (url.startsWith('https://')) return url;
+    if (url.startsWith('ipfs://')) return `${PasarIpfs}/ipfs/${url.slice(7)}`;
+    const segments = url.split(':').filter((item) => item);
+    if (segments.length === 3 && (segments[0] === 'pasar' || segments[0] === 'feeds'))
+      return `${PasarIpfs}/ipfs/${segments[2]}`;
+  }
+  return '/static/broken-image.svg';
+};
+
 // deprecated
 export const getAssetImage = (metaObj, isThumbnail, ipfsType = 0) => {
   const { asset, thumbnail, data } = metaObj;
