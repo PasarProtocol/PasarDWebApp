@@ -23,8 +23,10 @@ import {
   chainTypes,
   getChainIndexFromChain,
   isPasarOrFeeds,
-  getIPFSTypeFromUrl
+  getIPFSTypeFromUrl,
+  fetchAPIFrom
 } from '../../utils/common';
+import { queryKycMe } from '../signin-dlg/HiveAPI';
 
 // ----------------------------------------------------------------------
 const avatarStyle = {
@@ -306,8 +308,7 @@ const CollectionCardPaper = (props) => {
     tradeVolume = 0,
     data = {},
     creator = {},
-    dia = 0,
-    collectibles = []
+    dia = 0
   } = info;
   const realData = [tradeVolume, lowestPrice / 1e18, owners];
   const avatar = getIpfsUrl(data?.avatar || '');
@@ -318,7 +319,8 @@ const CollectionCardPaper = (props) => {
   const [didName, setDidName] = React.useState('');
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
-  const [badge] = React.useState({ dia, kyc: false });
+  const [badge, setBadge] = React.useState({ dia, kyc: false });
+  const [collectibles, setCollectibles] = React.useState([]);
   const { setOpenDownloadEssentialDlg, pasarLinkChain } = useSingin();
   const navigate = useNavigate();
 
@@ -328,9 +330,36 @@ const CollectionCardPaper = (props) => {
 
   React.useEffect(() => {
     const fetchData = async () => {
+      try {
+        const res = await fetchAPIFrom(
+          `api/v1/getCollectiblesOfCollection?collection=${token}&chain=${chain}&num=6`,
+          {}
+        );
+        const json = await res.json();
+        setCollectibles(json?.data || []);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    if (chain && token) fetchData();
+  }, [chain, token]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
       if (creator?.did) {
-        const res = await getInfoFromDID(creator.did);
-        setDidName(res?.name || '');
+        try {
+          const res = await getInfoFromDID(creator.did);
+          setDidName(res?.name || '');
+        } catch (e) {
+          console.error(e);
+        }
+        try {
+          const res = await queryKycMe(creator.did);
+          if (res.find_message && res.find_message.items.length) setBadgeFlag('kyc', true);
+          else setBadgeFlag('kyc', false);
+        } catch (e) {
+          console.error(e);
+        }
       }
     };
     fetchData();
@@ -345,21 +374,15 @@ const CollectionCardPaper = (props) => {
         setDidName(name);
       }
     }
-    // else if (owner) {
-    //   getDiaTokenInfo(owner).then((dia) => {
-    //     if (dia !== '0') setBadgeFlag('dia', dia);
-    //     else setBadgeFlag('dia', 0);
-    //   });
-    // }
   }, [isPreview]);
 
-  // const setBadgeFlag = (type, value) => {
-  //   setBadge((prevState) => {
-  //     const tempFlag = { ...prevState };
-  //     tempFlag[type] = value;
-  //     return tempFlag;
-  //   });
-  // };
+  const setBadgeFlag = (type, value) => {
+    setBadge((prevState) => {
+      const tempFlag = { ...prevState };
+      tempFlag[type] = value;
+      return tempFlag;
+    });
+  };
 
   const openPopupMenu = (event) => {
     event.stopPropagation();
