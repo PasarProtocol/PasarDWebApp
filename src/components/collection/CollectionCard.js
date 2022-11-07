@@ -22,9 +22,8 @@ import {
   checkWhetherGeneralCollection,
   chainTypes,
   getChainIndexFromChain,
-  isPasarOrFeeds,
-  getIPFSTypeFromUrl,
-  fetchAPIFrom
+  fetchAPIFrom,
+  getImageFromIPFSUrl
 } from '../../utils/common';
 import { queryKycMe } from '../signin-dlg/HiveAPI';
 
@@ -224,11 +223,8 @@ const CollectionImgBox = (props) => {
               {collectibles.length > 5 && (
                 <Grid container sx={{ py: 2, mx: -2, width: 'calc(100% + 32px)' }}>
                   {collectibles.map((item, _i) => {
-                    const { contract, data, image } = item;
-                    const thumbnail =
-                      (isPasarOrFeeds(contract)
-                        ? getIpfsUrl(data.thumbnail, getIPFSTypeFromUrl(data.thumbnail))
-                        : image) || '/static/broken-image.svg';
+                    const { data, image } = item;
+                    const thumbnail = getImageFromIPFSUrl(data?.thumbnail || image);
                     return (
                       <Grid item sm={4} key={_i} sx={{ height: 80 }}>
                         {_i === 5 ? (
