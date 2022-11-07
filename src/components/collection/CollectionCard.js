@@ -9,7 +9,6 @@ import { styled } from '@mui/material/styles';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { Box, Grid, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip, Popper, Fade } from '@mui/material';
-
 import VolumeIcon from './VolumeIcon';
 import PaperRecord from '../PaperRecord';
 import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
@@ -19,11 +18,12 @@ import useSingin from '../../hooks/useSignin';
 import {
   reduceHexAddress,
   getIpfsUrl,
-  getDiaTokenInfo,
   getInfoFromDID,
-  getAssetImage,
   checkWhetherGeneralCollection,
-  chainTypes
+  chainTypes,
+  getChainIndexFromChain,
+  isPasarOrFeeds,
+  getIPFSTypeFromUrl
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -84,7 +84,7 @@ const TypographyStyle = styled(Typography)({
 });
 
 const CollectionImgBox = (props) => {
-  const { name, background: backgroundImg, avatar, totalCount, realData, collectibles, token, marketPlace } = props;
+  const { name, background: backgroundImg, avatar, items, realData, collectibles, token, chainIndex } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openGroupBox, setOpenGroupBox] = React.useState(false);
   const imageStyle = {
@@ -124,17 +124,17 @@ const CollectionImgBox = (props) => {
           />
         )}
       </Stack>
-      {!!marketPlace && (
-        <Tooltip title={chainTypes[marketPlace - 1].name} arrow enterTouchDelay={0}>
+      {!!chainIndex && (
+        <Tooltip title={chainTypes[chainIndex - 1].name} arrow enterTouchDelay={0}>
           <Box
             className="network"
             sx={{ borderRadius: '100%', overflow: 'hidden', position: 'absolute', left: 8, top: 8, display: 'none' }}
           >
             <Box
               component="img"
-              src={`/static/${chainTypes[marketPlace - 1].icon}`}
+              src={`/static/${chainTypes[chainIndex - 1].icon}`}
               draggable={false}
-              sx={{ background: chainTypes[marketPlace - 1].color, width: 30, height: 30, p: '7px' }}
+              sx={{ background: chainTypes[chainIndex - 1].color, width: 30, height: 30, p: '7px' }}
             />
           </Box>
         </Tooltip>
@@ -178,12 +178,12 @@ const CollectionImgBox = (props) => {
                 {name}
               </Typography>
               <TypographyStyle variant="subtitle2" color="text.secondary" noWrap>
-                {totalCount} items
+                {items} items
               </TypographyStyle>
               <Grid container sx={{ pt: 2 }}>
                 <Grid item sm={4} textAlign="center">
                   <Stack spacing={1} direction="row" justifyContent="center">
-                    <VolumeIcon marketPlace={marketPlace} />
+                    <VolumeIcon chainIndex={chainIndex} />
                     <Typography variant="h6" noWrap>
                       {realData[0].toLocaleString('en-US')}
                     </Typography>
@@ -196,7 +196,7 @@ const CollectionImgBox = (props) => {
                 </Grid>
                 <Grid item sm={4} textAlign="center">
                   <Stack spacing={1} direction="row" justifyContent="center">
-                    <VolumeIcon marketPlace={marketPlace} />
+                    <VolumeIcon chainIndex={chainIndex} />
                     <Typography variant="h6" noWrap>
                       {' '}
                       {realData[1]}{' '}
@@ -222,53 +222,53 @@ const CollectionImgBox = (props) => {
               {collectibles.length > 5 && (
                 <Grid container sx={{ py: 2, mx: -2, width: 'calc(100% + 32px)' }}>
                   {collectibles.map((item, _i) => {
-                    const thumbnail = getAssetImage(item, false);
+                    const { contract, data, image } = item;
+                    const thumbnail =
+                      (isPasarOrFeeds(contract)
+                        ? getIpfsUrl(data.thumbnail, getIPFSTypeFromUrl(data.thumbnail))
+                        : image) || '/static/broken-image.svg';
                     return (
                       <Grid item sm={4} key={_i} sx={{ height: 80 }}>
-                        {
-                          _i === 5 ? (
-                            <Link component={RouterLink} to={`detail/${token}`} alt="" color="origin.main">
-                              <Box sx={{ position: 'relative', background: '#161c24', height: '100%' }}>
-                                <Box
-                                  sx={{
-                                    ...imageStyle,
-                                    width: '100%',
-                                    background: `url(${thumbnail}) no-repeat center`,
-                                    backgroundSize: 'cover',
-                                    opacity: 0.5,
-                                    filter: 'blur(2px)'
-                                  }}
-                                  onError={(e) => (e.target.src = '/static/broken-image.svg')}
-                                />
-                                {/* <Box component="img" src={thumbnail} sx={{height: "100%", maxHeight: 100, opacity: .5, filter: 'blur(2px)'}}/> */}
-                                <Typography
-                                  variant="h6"
-                                  align="center"
-                                  sx={{
-                                    width: '100%',
-                                    top: '50%',
-                                    color: 'white',
-                                    position: 'absolute',
-                                    transform: 'translateY(-50%)'
-                                  }}
-                                >
-                                  + more
-                                </Typography>
-                              </Box>
-                            </Link>
-                          ) : (
-                            <Box
-                              sx={{
-                                ...imageStyle,
-                                width: '100%',
-                                background: `url(${thumbnail}) no-repeat center`,
-                                backgroundSize: 'cover'
-                              }}
-                              onError={(e) => (e.target.src = '/static/broken-image.svg')}
-                            />
-                          )
-                          // <Box component="img" src={thumbnail} sx={{height: "100%", maxHeight: 100}}/>
-                        }
+                        {_i === 5 ? (
+                          <Link component={RouterLink} to={`detail/${token}`} alt="" color="origin.main">
+                            <Box sx={{ position: 'relative', background: '#161c24', height: '100%' }}>
+                              <Box
+                                sx={{
+                                  ...imageStyle,
+                                  width: '100%',
+                                  background: `url(${thumbnail}) no-repeat center`,
+                                  backgroundSize: 'cover',
+                                  opacity: 0.5,
+                                  filter: 'blur(2px)'
+                                }}
+                                onError={(e) => (e.target.src = '/static/broken-image.svg')}
+                              />
+                              <Typography
+                                variant="h6"
+                                align="center"
+                                sx={{
+                                  width: '100%',
+                                  top: '50%',
+                                  color: 'white',
+                                  position: 'absolute',
+                                  transform: 'translateY(-50%)'
+                                }}
+                              >
+                                + more
+                              </Typography>
+                            </Box>
+                          </Link>
+                        ) : (
+                          <Box
+                            sx={{
+                              ...imageStyle,
+                              width: '100%',
+                              background: `url(${thumbnail}) no-repeat center`,
+                              backgroundSize: 'cover'
+                            }}
+                            onError={(e) => (e.target.src = '/static/broken-image.svg')}
+                          />
+                        )}
                       </Grid>
                     );
                   })}
@@ -286,35 +286,39 @@ CollectionImgBox.propTypes = {
   name: PropTypes.string,
   background: PropTypes.any,
   avatar: PropTypes.any,
-  totalCount: PropTypes.number,
+  items: PropTypes.number,
   realData: PropTypes.any,
   collectibles: PropTypes.any,
   token: PropTypes.any,
-  marketPlace: PropTypes.number
+  chainIndex: PropTypes.number
 };
 
 const CollectionCardPaper = (props) => {
   const { info, isPreview, isOnSlider, isOwned = false, openRoyaltiesDlg } = props;
   const {
-    name,
-    uri = '',
-    owner = '',
+    chain,
     token,
-    totalCount = 0,
-    floorPrice = 0,
-    totalOwner = 0,
-    totalPrice = 0,
-    marketPlace = 1,
+    name,
+    owner = '',
+    items = 0,
+    lowestPrice = 0,
+    owners = 0,
+    tradeVolume = 0,
+    data = {},
+    creator = {},
+    dia = 0,
     collectibles = []
   } = info;
-  let { description = '', avatar = '', background = '' } = info;
-  const realData = [totalPrice, floorPrice, totalOwner];
+  const realData = [tradeVolume, lowestPrice / 1e18, owners];
+  const avatar = getIpfsUrl(data?.avatar || '');
+  const background = getIpfsUrl(data?.background || '');
+  const description = data?.description || '';
+  const chainIndex = getChainIndexFromChain(chain);
 
   const [didName, setDidName] = React.useState('');
-  const [metaObj, setMetaObj] = React.useState({});
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
-  const [badge, setBadge] = React.useState({ dia: 0, kyc: false });
+  const [badge] = React.useState({ dia, kyc: false });
   const { setOpenDownloadEssentialDlg, pasarLinkChain } = useSingin();
   const navigate = useNavigate();
 
@@ -323,34 +327,14 @@ const CollectionCardPaper = (props) => {
   }, [token, pasarLinkChain]);
 
   React.useEffect(() => {
-    const metaUri = getIpfsUrl(uri);
-    if (metaUri) {
-      fetch(metaUri)
-        .then((response) => response.json())
-        .then((data) => {
-          setMetaObj(data);
-          if (data.creator) {
-            if (data.creator.name) setDidName(data.creator.name);
-            else if (data.creator.did) {
-              getInfoFromDID(data.creator.did)
-                .then((info) => {
-                  if (info.name) setDidName(info.name);
-                })
-                .catch((e) => {
-                  console.error(e);
-                });
-            }
-          }
-        })
-        .catch(console.log);
-    }
-  }, [uri]);
-
-  if (metaObj.data) {
-    description = metaObj.data.description;
-    avatar = getIpfsUrl(metaObj.data.avatar);
-    background = getIpfsUrl(metaObj.data.background);
-  }
+    const fetchData = async () => {
+      if (creator?.did) {
+        const res = await getInfoFromDID(creator.did);
+        setDidName(res?.name || '');
+      }
+    };
+    fetchData();
+  }, [creator.did]);
 
   React.useEffect(() => {
     if (isPreview) {
@@ -360,22 +344,22 @@ const CollectionCardPaper = (props) => {
         const { name } = user;
         setDidName(name);
       }
-    } else if (owner) {
-      getDiaTokenInfo(owner).then((dia) => {
-        if (dia !== '0') setBadgeFlag('dia', dia);
-        else setBadgeFlag('dia', 0);
-      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [owner]);
+    // else if (owner) {
+    //   getDiaTokenInfo(owner).then((dia) => {
+    //     if (dia !== '0') setBadgeFlag('dia', dia);
+    //     else setBadgeFlag('dia', 0);
+    //   });
+    // }
+  }, [isPreview]);
 
-  const setBadgeFlag = (type, value) => {
-    setBadge((prevState) => {
-      const tempFlag = { ...prevState };
-      tempFlag[type] = value;
-      return tempFlag;
-    });
-  };
+  // const setBadgeFlag = (type, value) => {
+  //   setBadge((prevState) => {
+  //     const tempFlag = { ...prevState };
+  //     tempFlag[type] = value;
+  //     return tempFlag;
+  //   });
+  // };
 
   const openPopupMenu = (event) => {
     event.stopPropagation();
@@ -397,7 +381,7 @@ const CollectionCardPaper = (props) => {
           setOpenDownloadEssentialDlg(true);
           return;
         }
-        navigate(`/collections/edit`, { state: { token, marketPlace } });
+        navigate(`/collections/edit`, { state: { token, chainIndex } });
         break;
       case 'royalties':
         if (
@@ -415,7 +399,8 @@ const CollectionCardPaper = (props) => {
     setOpenPopup(null);
   };
 
-  const imgBoxProps = { avatar, background, name, totalCount, realData, collectibles, token, marketPlace };
+  const imgBoxProps = { avatar, background, name, items, realData, collectibles, token, chainIndex };
+
   return (
     <PaperRecord
       sx={
@@ -533,18 +518,21 @@ CollectionCardPaper.propTypes = {
 
 CollectionCard.propTypes = {
   info: PropTypes.any,
+  isOnSlider: PropTypes.bool,
   isPreview: PropTypes.bool,
   isDragging: PropTypes.bool
 };
 
 export default function CollectionCard(props) {
   const { info, isPreview = false, isDragging = false } = props;
-  const { token, marketPlace = 1 } = info;
+  const { chain, token } = info;
   const [isOpenUpdateRoyalties, setUpdateRoyaltiesOpen] = React.useState(false);
   const navigate = useNavigate();
 
+  const chainIndex = getChainIndexFromChain(chain);
+
   const route2Detail = () => {
-    if (!isDragging) navigate(`/collections/detail/${marketPlace}${token}`);
+    if (!isDragging) navigate(`/collections/detail/${chainIndex}${token}`);
   };
 
   return isPreview ? (
