@@ -1,9 +1,7 @@
-// material
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import { Grid, Container, Stack, Typography, Box } from '@mui/material';
-// components
 import Page from '../../components/Page';
 import CollectionSortSelect from '../../components/CollectionSortSelect';
 import ChainSelect from '../../components/ChainSelect';
@@ -13,7 +11,7 @@ import CollectionCardSkeleton from '../../components/collection/CollectionCardSk
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import useSingin from '../../hooks/useSignin';
-import { fetchFrom, getChainTypeFromId } from '../../utils/common';
+import { chainTypes, fetchAPIFrom, getChainTypeFromId } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -42,12 +40,15 @@ const sortOptions = [
   'Number of Owner: Low to High',
   'Number of Owner: High to Low'
 ];
+
+const categories = ['General', 'Art', 'Collectibles', 'Photography', 'Trading Cards', 'Utility', 'Domains'];
+
 export default function Explorer() {
   const navigate = useNavigate();
   const [collections, setCollections] = React.useState([]);
   const [isLoadingCollections, setLoadingCollections] = React.useState(false);
-  const [orderType, setOrderType] = React.useState(0);
   const [chainType, setChainType] = React.useState(0);
+  const [orderType, setOrderType] = React.useState(0);
   const [category, setCategory] = React.useState(0);
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [needOptionToBelow, setOptionToBelow] = React.useState(false);
@@ -56,38 +57,50 @@ export default function Explorer() {
     useSingin();
 
   React.useEffect(() => {
-    handleResize();
-    controller.abort(); // cancel the previous request
-    const newController = new AbortController();
-    const { signal } = newController;
-    setAbortController(newController);
-    setLoadingCollections(true);
-    fetchFrom(`api/v2/sticker/getCollection?sort=${orderType}&marketPlace=${chainType}&category=${category}`, {
-      signal
-    })
-      .then((response) => {
-        response
-          .json()
-          .then((jsonAssets) => {
-            if (Array.isArray(jsonAssets.data)) setCollections(jsonAssets.data);
-            else setCollections([]);
-            setLoadingCollections(false);
-          })
-          .catch((e) => {
-            console.error(e);
-            setLoadingCollections(false);
-          });
-      })
-      .catch((e) => {
-        if (e.code !== e.ABORT_ERR) setLoadingCollections(false);
-      });
+    const fetchData = async () => {
+      handleResize();
+      controller.abort(); // cancel the previous request
+      const newController = new AbortController();
+      const { signal } = newController;
+      setAbortController(newController);
+      setLoadingCollections(true);
+
+      const paramChain = chainType === 0 ? 'all' : chainTypes[chainType - 1].token.toLowerCase();
+      const paramCategory = chainType === 0 ? 'all' : categories[category - 1].toLowerCase();
+      try {
+        const resCnt = await fetchAPIFrom(
+          `api/v1/listCollections?pageNum=1&pageSize=1&chain=${paramChain}&category=${paramCategory}&sort=${orderType}`,
+          {
+            signal
+          }
+        );
+        const jsonCnt = await resCnt.json();
+        const res = await fetchAPIFrom(
+          `api/v1/listCollections?pageNum=1&pageSize=${
+            jsonCnt?.data?.total ?? 10
+          }&chain=${paramChain}&category=${paramCategory}&sort=${orderType}`,
+          {
+            signal
+          }
+        );
+        const json = await res.json();
+        setCollections(json?.data?.data || []);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingCollections(false);
+    };
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderType, chainType, category]);
-  function handleResize() {
+
+  const handleResize = () => {
     if (sortOptions[orderType].length > 15 && window.outerWidth < 900) setOptionToBelow(true);
     else setOptionToBelow(false);
-  }
+  };
+
   window.addEventListener('resize', handleResize);
+
   const handleNavlink = (e) => {
     const currentChain = getChainTypeFromId(pasarLinkChain);
     const path = e.target.getAttribute('to');
