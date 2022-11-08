@@ -27,7 +27,9 @@ import {
   getDidInfoFromAddress,
   collectionTypes,
   getDiaTokenInfo,
-  getContractAddressInCurrentNetwork
+  getContractAddressInCurrentNetwork,
+  getChainIndexFromChain,
+  getImageFromIPFSUrl
 } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 
@@ -66,21 +68,21 @@ const queryProfileSocials = {
 };
 
 BadgeProfile.propTypes = {
-  type: PropTypes.number,
+  type: PropTypes.number, // 1: collection, 2: user, 3: auction, 4: buyout
   walletAddress: PropTypes.string,
-  collection: PropTypes.any,
-  reservePriceFlag: PropTypes.bool,
-  defaultCollectionType: PropTypes.number
+  collection: PropTypes.object,
+  isReservedAuction: PropTypes.bool,
+  defaultCollectionType: PropTypes.number // 0, 1
 };
 
 export default function BadgeProfile(props) {
-  const { type, walletAddress, collection = {}, reservePriceFlag = false, defaultCollectionType = 0 } = props;
+  const { type, walletAddress, collection = {}, isReservedAuction = false, defaultCollectionType = 0 } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const [didInfo, setDidInfo] = React.useState({ name: '', description: '' });
-  const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [badge, setBadge] = React.useState({ dia: 0, kyc: false });
-  const [socials, setSocials] = React.useState({});
+  const [ownerAvatar, setOwnerAvatar] = React.useState(null);
+  const [ownerSocials, setOwnerSocials] = React.useState({});
   const { pasarLinkChain } = useSingin();
   const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker');
 
@@ -92,7 +94,7 @@ export default function BadgeProfile(props) {
 
   React.useEffect(() => {
     let isMounted = true;
-    if (walletAddress) {
+    if (walletAddress && type === 2) {
       getDidInfoFromAddress(walletAddress).then((info) => {
         if (isMounted) {
           setDidInfo({ name: info.name || '', description: info.description || '' });
@@ -117,18 +119,22 @@ export default function BadgeProfile(props) {
     setAnchorEl(event.currentTarget);
     setOpen(true);
   };
+
   const handlePopoverClose = () => {
     setOpen(false);
   };
 
-  const { avatar, token, marketPlace = 1 } = collection || defaultCollection;
-  let { name, description } = collection || defaultCollection;
+  const { chain, token } = collection || defaultCollection;
+  const chainIndex = getChainIndexFromChain(chain);
+  let name = collection?.name || defaultCollection?.name || '';
   let dispAddress = reduceHexAddress(token);
+  let description = collection?.data?.description || defaultCollection?.description || '';
   if (type === 2) {
     name = didInfo.name || reduceHexAddress(walletAddress);
     dispAddress = didInfo.name ? reduceHexAddress(walletAddress) : '';
     description = didInfo.description;
   }
+  const colAvatar = getImageFromIPFSUrl(collection?.data?.avatar);
 
   const fetchProfileData = (targetDid, didInfo) => {
     queryName(targetDid)
@@ -148,7 +154,7 @@ export default function BadgeProfile(props) {
               content = `${content}${String.fromCharCode(code)}`;
               return content;
             }, '');
-            setAvatarUrl((prevState) => {
+            setOwnerAvatar((prevState) => {
               if (!prevState) return `data:image/png;base64,${base64Content}`;
               return prevState;
             });
@@ -161,7 +167,7 @@ export default function BadgeProfile(props) {
         Object.keys(queryProfileSocials).forEach((field) => {
           queryProfileSocials[field](targetDid).then((res) => {
             if (res.find_message && res.find_message.items.length)
-              setSocials((prevState) => {
+              setOwnerSocials((prevState) => {
                 const tempState = { ...prevState };
                 tempState[field] = res.find_message.items[0].display_name;
                 return tempState;
@@ -209,7 +215,7 @@ export default function BadgeProfile(props) {
                 <Box
                   draggable={false}
                   component="img"
-                  src={avatar}
+                  src={colAvatar}
                   sx={{ width: 24, borderRadius: '100%', p: '2px', background: (theme) => theme.palette.origin.main }}
                 />
               </Box>
@@ -224,15 +230,15 @@ export default function BadgeProfile(props) {
                   overflow: 'hidden'
                 }}
               >
-                <Box draggable={false} component="img" src={avatar} sx={{ width: 26 }} />
+                <Box draggable={false} component="img" src={colAvatar} sx={{ width: 26 }} />
               </Box>
             )}
           </>
         )}
         {type === 2 && (
           <Box sx={{ position: 'relative' }}>
-            {avatarUrl ? (
-              <Avatar alt="user" src={avatarUrl} sx={{ width: 26, height: 26, display: 'inline-flex' }} />
+            {ownerAvatar ? (
+              <Avatar alt="user" src={ownerAvatar} sx={{ width: 26, height: 26, display: 'inline-flex' }} />
             ) : (
               <Jazzicon address={walletAddress} size={26} sx={{ mr: 0 }} />
             )}
@@ -244,14 +250,14 @@ export default function BadgeProfile(props) {
           </Box>
         )}
         {type === 3 && (
-          <Tooltip title={`Reserve Price ${reservePriceFlag ? 'Met' : 'Not Met'}`} arrow enterTouchDelay={0}>
+          <Tooltip title={`Reserve Price ${isReservedAuction ? 'Met' : 'Not Met'}`} arrow enterTouchDelay={0}>
             <Box
               sx={{
                 width: 26,
                 height: 26,
                 borderRadius: 2,
                 p: '5px',
-                backgroundColor: reservePriceFlag ? '#7CB342' : '#D60000',
+                backgroundColor: isReservedAuction ? '#7CB342' : '#D60000',
                 display: 'flex'
               }}
             >
@@ -300,7 +306,7 @@ export default function BadgeProfile(props) {
                   <>
                     {collection ? (
                       <Link
-                        to={`/collections/detail/${marketPlace}${token}`}
+                        to={`/collections/detail/${chainIndex}${token}`}
                         component={RouterLink}
                         color="text.primary"
                       >
@@ -318,8 +324,8 @@ export default function BadgeProfile(props) {
                           <Box
                             draggable={false}
                             component="img"
-                            src={avatar}
-                            sx={{ width: avatar && avatar.startsWith('/static') ? 35 : 60 }}
+                            src={colAvatar}
+                            sx={{ width: colAvatar && colAvatar.startsWith('/static') ? 35 : 60 }}
                           />
                         </Box>
                       </Link>
@@ -328,7 +334,7 @@ export default function BadgeProfile(props) {
                         <Box
                           draggable={false}
                           component="img"
-                          src={avatar}
+                          src={colAvatar}
                           sx={{
                             width: '100%',
                             height: '100%',
@@ -347,14 +353,14 @@ export default function BadgeProfile(props) {
                     component={RouterLink}
                     sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                   >
-                    <RingAvatar avatar={avatarUrl} isImage={!!avatarUrl} address={walletAddress} size={60} />
+                    <RingAvatar avatar={ownerAvatar} isImage={!!ownerAvatar} address={walletAddress} size={60} />
                   </Link>
                 )}
               </Box>
               {type === 1 ? (
                 <>
                   {collection ? (
-                    <Link to={`/collections/detail/${marketPlace}${token}`} component={RouterLink} color="text.primary">
+                    <Link to={`/collections/detail/${chainIndex}${token}`} component={RouterLink} color="text.primary">
                       <Typography variant="h5" sx={{ pt: 2 }}>
                         {name}
                       </Typography>
@@ -410,9 +416,9 @@ export default function BadgeProfile(props) {
                   {description}
                 </Typography>
               )}
-              {type === 2 && Object.keys(socials).length > 0 && (
+              {type === 2 && Object.keys(ownerSocials).length > 0 && (
                 <Box sx={{ pt: 1.5 }}>
-                  <IconLinkButtonGroup {...socials} />
+                  <IconLinkButtonGroup {...ownerSocials} />
                 </Box>
               )}
               {type === 2 && (

@@ -1006,7 +1006,7 @@ export const collectionTypes = [
     shortDescription: 'Pasar default collection',
     description: 'A collection of all items minted using the Pasar Collection Contract',
     token: 2,
-    marketPlace: 1
+    chainIndex: 1
   },
   {
     symbol: 'FSTK',
@@ -1015,7 +1015,7 @@ export const collectionTypes = [
     shortDescription: 'Feeds default collection',
     description: 'A collection of all items minted using the Feeds NFT Stickers Contract',
     token: 1,
-    marketPlace: 1
+    chainIndex: 1
   }
   // {
   //   symbol: 'Bunny',
