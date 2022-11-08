@@ -5,8 +5,6 @@ import { useSnackbar } from 'notistack';
 import { styled } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 import Countdown from 'react-countdown';
-
-// material
 import { Box, Link, IconButton, Menu, MenuItem, Typography, Stack, Tooltip } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
@@ -51,6 +49,7 @@ AssetCard.propTypes = {
   chain: PropTypes.string,
   contract: PropTypes.string,
   tokenId: PropTypes.string,
+  uniqueKey: PropTypes.string,
   name: PropTypes.string,
   orderId: PropTypes.number,
   orderType: PropTypes.number,
@@ -65,7 +64,8 @@ AssetCard.propTypes = {
   bids: PropTypes.number,
   lastBid: PropTypes.number,
   lastBidder: PropTypes.string,
-
+  reservePrice: PropTypes.number,
+  buyoutPrice: PropTypes.number,
   type: PropTypes.number,
   coinUSD: PropTypes.any,
   coinType: PropTypes.object,
@@ -73,16 +73,10 @@ AssetCard.propTypes = {
   isMoreLink: PropTypes.bool,
   isDragging: PropTypes.bool,
   showPrice: PropTypes.bool,
-
-  order: PropTypes.any,
-  status: PropTypes.string,
-  saleType: PropTypes.string,
   myaddress: PropTypes.string,
   updateCount: PropTypes.number,
   handleUpdate: PropTypes.func,
-  defaultCollectionType: PropTypes.number,
-  reservePrice: PropTypes.any,
-  buyoutPrice: PropTypes.any
+  defaultCollectionType: PropTypes.number
 };
 
 export default function AssetCard(props) {
@@ -90,6 +84,7 @@ export default function AssetCard(props) {
     chain,
     contract,
     tokenId,
+    uniqueKey,
     name,
     orderId,
     orderType,
@@ -103,8 +98,8 @@ export default function AssetCard(props) {
     royaltyFee,
     bids,
     lastBid,
-    lastBidder,
-
+    reservePrice,
+    buyoutPrice,
     type,
     coinUSD,
     coinType = {},
@@ -112,16 +107,10 @@ export default function AssetCard(props) {
     isMoreLink,
     isDragging = false,
     showPrice = false,
-
-    order,
-    status, // not on sale / marketbid
-    saleType, // primary / secondary / not on sale
     myaddress,
     updateCount,
     handleUpdate,
-    defaultCollectionType = 0,
-    reservePrice = 0, // reserve
-    buyoutPrice = 0 // buyout
+    defaultCollectionType = 0
   } = props;
   const [collection, setCollection] = React.useState({});
   const [isOpenPopup, setOpenPopup] = React.useState(null);
@@ -136,16 +125,26 @@ export default function AssetCard(props) {
   const [settleOpen, setSettleOrderOpen] = React.useState(false);
   const [auctionEnded, setAuctionEnded] = React.useState(false);
   const [continueAction, setContinueAction] = React.useState('');
+  const [state, setState] = React.useState({ isFirstSale: false, isOnSale: false });
 
   const { diaBalance, setOpenDownloadEssentialDlg, pasarLinkChain } = useSingin();
   const { enqueueSnackbar } = useSnackbar();
 
+  // buynow: 0, onauction: 1, notmet: 2, hasbids: 3, hasended: 4
+  let status = -1;
+  if (orderType === 1 && orderState === 1) status = 0;
+  else if (orderType === 2) {
+    if (orderState === 1) {
+      if (bids > 0) status = 3;
+      else status = 2;
+    } else if (orderState === 2) status = 4;
+  }
   const isListedOwnedByMe =
-    (myaddress === royaltyOwner && saleType === 'Primary Sale') ||
-    (myaddress === tokenOwner && saleType === 'Secondary Sale');
-  const isUnlistedOwnedByMe = myaddress === tokenOwner && saleType === 'Not on sale';
-  const isListedByOthers = myaddress !== royaltyOwner && myaddress !== tokenOwner && saleType !== 'Not on sale';
-  const isUnlistedByOthers = myaddress !== royaltyOwner && myaddress !== tokenOwner && saleType === 'Not on sale';
+    state.isOnSale &&
+    ((myaddress === royaltyOwner && state.isFirstSale) || (myaddress === tokenOwner && !state.isFirstSale));
+  const isUnlistedOwnedByMe = !state.isOnSale && myaddress === tokenOwner;
+  const isListedByOthers = myaddress !== royaltyOwner && myaddress !== tokenOwner && state.isOnSale;
+  const isUnlistedByOthers = myaddress !== royaltyOwner && myaddress !== tokenOwner && !state.isOnSale;
 
   React.useEffect(() => {
     const interval = setInterval(() => checkHasEnded(), 1000);
@@ -155,14 +154,27 @@ export default function AssetCard(props) {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (contract) {
-        const res = await fetchAPIFrom(`api/v1/getCollectionInfo?collection=${contract}&chain=${chain}`);
-        const json = await res.json();
-        setCollection(json?.data || {});
-      }
+      const res = await fetchAPIFrom(`api/v1/getCollectionInfo?collection=${contract}&chain=${chain}`);
+      const json = await res.json();
+      setCollection(json?.data || {});
     };
-    fetchData();
+    if (contract && chain) fetchData();
   }, [chain, contract]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetchAPIFrom('api/v1/checkFirstSale', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify([uniqueKey])
+      });
+      const json = await res.json();
+      setState({ isFirstSale: json?.isFirstSale || false, isOnSale: json?.isOnSale || false });
+    };
+    if (uniqueKey) fetchData();
+  }, [uniqueKey]);
 
   React.useEffect(() => {
     if (continueAction && !disclaimerOpen) {
@@ -230,7 +242,7 @@ export default function AssetCard(props) {
           setOpenDownloadEssentialDlg(true);
           return;
         }
-        if (bids && status === 'MarketBid' && !auctionEnded) {
+        if (status === 3 && !auctionEnded) {
           enqueueSnackbar('Already has been bid', { variant: 'warning' });
           return;
         }
@@ -244,7 +256,7 @@ export default function AssetCard(props) {
           setOpenDownloadEssentialDlg(true);
           return;
         }
-        if (bids && status === 'MarketBid' && !auctionEnded) {
+        if (status === 3 && !auctionEnded) {
           enqueueSnackbar('Already has been bid', { variant: 'warning' });
           return;
         }
@@ -266,7 +278,8 @@ export default function AssetCard(props) {
     setOpenPopup(null);
   };
   const dlgProps = { name, tokenId, orderId, updateCount, handleUpdate, baseToken, v1State: chain === 'v1' };
-  const currentBidPrice = lastBid && bids > 0 && status === 'MarketBid' ? lastBid : 0;
+  const currentBidPrice = lastBid;
+
   return (
     <Box>
       <PaperRecord
@@ -295,10 +308,10 @@ export default function AssetCard(props) {
           <Stack sx={{ flexGrow: 1 }} direction="row" spacing={0.5}>
             <BadgeProfile type={1} collection={collection} defaultCollectionType={defaultCollectionType} />
             {tokenOwner && <BadgeProfile type={2} walletAddress={tokenOwner} />}
-            {!!(reservePrice * 1) && saleType !== 'Not on sale' && (
-              <BadgeProfile type={3} reservePriceFlag={currentBidPrice / 1e18 >= reservePrice / 1e18} />
+            {!!reservePrice && state.isOnSale && (
+              <BadgeProfile type={3} isReservedAuction={currentBidPrice >= reservePrice} />
             )}
-            {!!(buyoutPrice * 1) && saleType !== 'Not on sale' && <BadgeProfile type={4} />}
+            {!!buyoutPrice && state.isOnSale && <BadgeProfile type={4} />}
           </Stack>
           <Box>
             {((type === 1 && myaddress === tokenOwner) ||
@@ -511,14 +524,14 @@ export default function AssetCard(props) {
             <Typography variant="h6" noWrap sx={{ flexGrow: 1, fontSize: { xs: '1rem' } }}>
               {name}
             </Typography>
-            {orderType === 2 && saleType !== 'Not on sale' ? (
+            {orderType === 2 && state.isOnSale ? (
               <Tooltip title={currentBidPrice ? 'Top Bid' : 'Starting Price'} arrow enterTouchDelay={0}>
                 <Typography
                   variant="subtitle2"
                   sx={{ display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em' }}
                   noWrap
                 >
-                  {math.round(currentBidPrice / 1e18, 3) || price} {coinType.name}
+                  {currentBidPrice ?? price} {coinType.name}
                 </Typography>
               </Tooltip>
             ) : (
@@ -531,12 +544,12 @@ export default function AssetCard(props) {
               </Typography>
             )}
           </Stack>
-          {((type === 0 && saleType !== 'Not on sale') ||
-            (type === 0 && saleType === 'Not on sale' && showPrice) ||
+          {((type === 0 && state.isOnSale) ||
+            (type === 0 && !state.isOnSale && showPrice) ||
             type === 1 ||
             (type === 2 && isListedOwnedByMe) ||
             (type === 2 && isListedByOthers) ||
-            (type === 3 && saleType !== 'Not on sale' && !auctionEnded)) && (
+            (type === 3 && state.isOnSale && !auctionEnded)) && (
             <Stack direction="row">
               <Box
                 component="img"
@@ -563,8 +576,7 @@ export default function AssetCard(props) {
               </Typography>
             </Stack>
           )}
-          {((type === 0 && saleType === 'Not on sale' && !showPrice) ||
-            ((type === 2 || type === 3) && isUnlistedByOthers)) && (
+          {((type === 0 && !state.isOnSale && !showPrice) || ((type === 2 || type === 3) && isUnlistedByOthers)) && (
             <Typography variant="h6" sx={{ color: 'origin.main', fontSize: { xs: '1rem' } }} align="center">
               Not on Sale
             </Typography>
@@ -574,7 +586,7 @@ export default function AssetCard(props) {
               Sell
             </StyledButton>
           )}
-          {type === 3 && saleType !== 'Not on sale' && auctionEnded && (
+          {type === 3 && state.isOnSale && auctionEnded && (
             <StyledButton
               variant="contained"
               size="small"
@@ -599,7 +611,7 @@ export default function AssetCard(props) {
         isOpen={updateOpen}
         setOpen={setOpenUpdate}
         {...dlgProps}
-        saleType={saleType}
+        state={state}
         royalties={royaltyFee}
         orderType={orderType}
       />
@@ -611,7 +623,7 @@ export default function AssetCard(props) {
       <SettleOrderDlg
         isOpen={settleOpen}
         setOpen={setSettleOrderOpen}
-        info={{ ...props, lastBid, lastBidder }}
+        info={{ ...props }}
         address={myaddress}
         {...{ updateCount, handleUpdate }}
       />
