@@ -3,17 +3,16 @@ import PropTypes from 'prop-types';
 import { round } from 'mathjs';
 import { Splide, SplideSlide } from '@splidejs/react-splide';
 import '@splidejs/splide/dist/css/splide.min.css';
-// material
 import { Box } from '@mui/material';
 import { MHidden } from '../@material-extend';
 import AssetCard from '../marketplace/AssetCard';
 import AssetCardSkeleton from '../marketplace/AssetCardSkeleton';
 import {
-  fetchFrom,
-  getAssetImage,
   setAllTokenPrice,
-  getCoinTypeFromToken,
-  getTotalCountOfCoinTypes
+  getTotalCountOfCoinTypes,
+  fetchAPIFrom,
+  getCoinTypeFromTokenEx,
+  getImageFromIPFSUrl
 } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -85,7 +84,8 @@ const AssetGroupSlider = (props) => {
       ) : (
         <Splide options={settings}>
           {assets.map((item, index) => {
-            const coinType = getCoinTypeFromToken(item);
+            const coinType = getCoinTypeFromTokenEx(item);
+            const isAuction = item?.orderType === 2;
             return (
               <SplideSlide key={index}>
                 <Box
@@ -98,11 +98,27 @@ const AssetGroupSlider = (props) => {
                 >
                   <AssetCard
                     {...item}
-                    thumbnail={getAssetImage(item, true)}
-                    name={item.name && item.name}
-                    price={round(item.price / 1e18, 3)}
-                    saleType={item.SaleType || item.saleType}
+                    name={item?.name || ''}
+                    thumbnail={getImageFromIPFSUrl(
+                      isAuction
+                        ? item?.token?.data?.thumbnail || item?.token?.image
+                        : item?.data?.thumbnail || item?.image
+                    )}
+                    orderId={(isAuction ? item?.orderId : item?.order?.orderId) ?? 0}
+                    orderType={(isAuction ? item?.orderType : item?.order?.orderType) ?? 0}
+                    orderState={(isAuction ? item?.orderState : item?.order?.orderState) ?? 0}
+                    price={round(((isAuction ? item?.price : item?.order?.price) ?? 0) / 1e18, 3)}
+                    amount={(isAuction ? item?.amount : item?.order?.amount) ?? 0}
+                    baseToken={(isAuction ? item?.baseToken : item?.order?.baseToken) || ''}
+                    endTime={(isAuction ? item?.endTime : item?.order?.endTime) ?? 0}
+                    tokenOwner={(isAuction ? item?.token?.tokenOwner : item?.tokenOwner) || ''}
+                    royaltyOwner={(isAuction ? item?.token?.royaltyOwner : item?.royaltyOwner) || ''}
+                    royaltyFee={(isAuction ? item?.token?.royaltyFee : item?.royaltyFee) / 1 ?? 0}
+                    bids={(isAuction ? item?.bids : item?.order?.bids) ?? 0}
+                    lastBid={(isAuction ? item?.lastBid : item?.order?.lastBid) ?? 0}
+                    lastBidder={(isAuction ? item?.lastBidder : item?.order?.lastBidder) || ''}
                     type={0}
+                    saleType="Primary Sale"
                     isLink={Boolean(true)}
                     coinUSD={coinPrice[coinType.index]}
                     coinType={coinType}
@@ -133,32 +149,43 @@ export default function FilteredAssetGrid(props) {
   const { type } = props;
   const [filteredCollectibles, setFilteredCollectibles] = React.useState([]);
   const [isLoadingCollectibles, setLoadingCollectibles] = React.useState(false);
-  const count = type === 'all' ? 20 : 10;
-  let filterApi = `api/v2/sticker/getDetailedCollectibles?collectionType=&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=${count}`;
-  if (type === 'recent_sold') filterApi = 'api/v2/sticker/getRecentlySold';
-  else if (type === 'live_auction')
-    filterApi = `api/v2/sticker/getDetailedCollectibles?collectionType=&tokenType=&status=On Auction,Has Ended&itemType=All&adult=false&minPrice=&maxPrice=&order=0&keyword=&pageNum=1&pageSize=${count}`;
 
   React.useEffect(() => {
-    setLoadingCollectibles(true);
-    fetchFrom(filterApi)
-      .then((response) => {
-        response
-          .json()
-          .then((jsonAssets) => {
-            if (jsonAssets.data) {
-              setFilteredCollectibles(type === 'recent_sold' ? jsonAssets.data : jsonAssets.data.result);
-            }
-            setLoadingCollectibles(false);
-          })
-          .catch((e) => {
-            console.error(e);
-            setLoadingCollectibles(false);
+    const fetchData = async () => {
+      const count = type === 'all' ? 20 : 10;
+      let colType = '';
+      if (type === 'recent_sold') colType = 'sold';
+      else if (type === 'live_auction') colType = 'auction';
+
+      setLoadingCollectibles(true);
+      let res;
+      try {
+        if (colType === 'auction') {
+          const reqBody = {
+            pageNum: 1,
+            pageSize: 10,
+            chain: 'all',
+            status: [1, 4],
+            type: ''
+          };
+          res = await fetchAPIFrom('api/v1/marketplace', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(reqBody)
           });
-      })
-      .catch((e) => {
-        if (e.code !== e.ABORT_ERR) setLoadingCollectibles(false);
-      });
+        } else {
+          res = await fetchAPIFrom(`api/v1/listCollectibles?type=${colType}&after=0&pageNum=1&pageSize=${count}`, {});
+        }
+        const json = await res.json();
+        setFilteredCollectibles(json?.data?.data || []);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingCollectibles(false);
+    };
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
