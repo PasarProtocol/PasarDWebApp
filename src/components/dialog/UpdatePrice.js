@@ -41,12 +41,12 @@ UpdatePrice.propTypes = {
   setOpen: PropTypes.func,
   name: PropTypes.string,
   orderId: PropTypes.any,
-  saleType: PropTypes.string,
+  state: PropTypes.object,
   orderType: PropTypes.any,
   updateCount: PropTypes.number,
   handleUpdate: PropTypes.func,
   v1State: PropTypes.bool,
-  royalties: PropTypes.string
+  royalties: PropTypes.number
 };
 
 export default function UpdatePrice(props) {
@@ -55,7 +55,7 @@ export default function UpdatePrice(props) {
     setOpen,
     name,
     orderId,
-    saleType,
+    state,
     orderType,
     updateCount,
     handleUpdate,
@@ -90,7 +90,7 @@ export default function UpdatePrice(props) {
     priceValue = removeLeadingZero(priceValue);
     if (!isValidLimitPrice(priceValue)) return;
     setPrice(priceValue);
-    const royaltyFee = saleType === 'Primary Sale' ? 0 : math.round((priceValue * royalties) / 10 ** 6, 4);
+    const royaltyFee = state.isFirstSale ? 0 : math.round((priceValue * royalties) / 10 ** 6, 4);
     setRcvPrice(math.round((priceValue * 98) / 100 - royaltyFee, 3));
   };
 
@@ -217,9 +217,7 @@ export default function UpdatePrice(props) {
               >
                 <Icon icon="eva:info-outline" style={{ marginBottom: -4, fontSize: 18 }} />
               </Tooltip>
-              {saleType !== 'Primary Sale' && royalties * 1 > 0 && (
-                <>,&nbsp;Royalty fee {math.round(royalties / 1e4, 2)}%</>
-              )}
+              {!state.isFirstSale && royalties * 1 > 0 && <>,&nbsp;Royalty fee {math.round(royalties / 1e4, 2)}%</>}
             </Typography>
             <Typography variant="body2" component="div" sx={{ fontWeight: 'normal' }}>
               You will receive
