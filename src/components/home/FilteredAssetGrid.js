@@ -98,6 +98,7 @@ const AssetGroupSlider = (props) => {
                 >
                   <AssetCard
                     {...item}
+                    uniqueKey={(isAuction ? item?.token?.uniqueKey : item?.uniqueKey) || ''}
                     name={item?.name || ''}
                     thumbnail={getImageFromIPFSUrl(
                       isAuction
@@ -114,9 +115,11 @@ const AssetGroupSlider = (props) => {
                     tokenOwner={(isAuction ? item?.token?.tokenOwner : item?.tokenOwner) || ''}
                     royaltyOwner={(isAuction ? item?.token?.royaltyOwner : item?.royaltyOwner) || ''}
                     royaltyFee={(isAuction ? item?.token?.royaltyFee : item?.royaltyFee) / 1 ?? 0}
-                    bids={(isAuction ? item?.bids : item?.order?.bids) ?? 0}
-                    lastBid={(isAuction ? item?.lastBid : item?.order?.lastBid) ?? 0}
+                    bids={(isAuction ? item?.bids : item?.order?.bids) / 1 ?? 0}
+                    lastBid={(isAuction ? item?.lastBid : item?.order?.lastBid) / 1 ?? 0}
                     lastBidder={(isAuction ? item?.lastBidder : item?.order?.lastBidder) || ''}
+                    buyoutPrice={round(((isAuction ? item?.buyoutPrice : item?.order?.buyoutPrice) ?? 0) / 1e18, 3)}
+                    reservePrice={round(((isAuction ? item?.reservePrice : item?.order?.reservePrice) ?? 0) / 1e18, 3)}
                     type={0}
                     saleType="Primary Sale"
                     isLink={Boolean(true)}
