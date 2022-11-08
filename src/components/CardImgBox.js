@@ -9,8 +9,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { Icon } from '@iconify/react';
-
-import { getAssetImage, chainTypes } from '../utils/common';
+import { chainTypes, getImageFromIPFSUrl, getChainIndexFromChain } from '../utils/common';
 import useSettings from '../hooks/useSettings';
 
 const BoxStyle = styled(Box)(({ theme }) => ({
@@ -83,24 +82,27 @@ const LoadingOverlay = () => {
   );
 };
 const CardImgBox = (props) => {
-  const { isMoreLink = false, isLink, thumbnail, marketPlace = 1 } = props;
-  const src = isLink ? getAssetImage(props, true) : thumbnail;
+  const { isMoreLink = false, chain, thumbnail } = props;
+  const src = getImageFromIPFSUrl(thumbnail);
+  const chainIndex = getChainIndexFromChain(chain);
   const imageRef = React.useRef();
   const [isVideo, setIsVideo] = React.useState(false);
   const [videoIsLoaded, setVideoIsLoaded] = React.useState(false);
   const [isAfterLoad, setIsAfterLoad] = React.useState(false);
 
   React.useEffect(() => {
-    fetch(src)
-      .then((response) => {
-        const contentype = response.headers.get('content-type');
+    const fetchData = async () => {
+      try {
+        const res = await fetch(src);
+        const contentype = res.headers.get('content-type');
         if (contentype.startsWith('video')) {
           setIsVideo(true);
         }
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -114,18 +116,9 @@ const CardImgBox = (props) => {
       });
     }
   }, [isVideo]);
+
   const handleResize = () => {
     setIsAfterLoad(true);
-  };
-
-  const handleErrorImage = (e) => {
-    if (e.target.src.indexOf('pasarprotocol.io') >= 0) {
-      e.target.src = getAssetImage(props, true, 1);
-    } else if (e.target.src.indexOf('ipfs.ela') >= 0) {
-      e.target.src = getAssetImage(props, true, 2);
-    } else {
-      e.target.src = '/static/broken-image.svg';
-    }
   };
 
   const imageStyle = {
@@ -138,6 +131,7 @@ const CardImgBox = (props) => {
     themeProp.baseColor = '#333d48';
     themeProp.highlightColor = '#434d58';
   }
+
   return (
     <BoxStyle className="card-img" sx={{ opacity: isMoreLink ? 0.5 : 1 }}>
       {((!isVideo && !isAfterLoad) || (isVideo && !videoIsLoaded)) && (
@@ -157,7 +151,6 @@ const CardImgBox = (props) => {
             }}
             style={{ ...imageStyle }}
             afterLoad={handleResize}
-            onError={handleErrorImage}
           />
         ) : (
           <>
@@ -198,7 +191,7 @@ const CardImgBox = (props) => {
       >
         <Box
           sx={{
-            bgcolor: chainTypes[marketPlace - 1].color,
+            bgcolor: chainTypes[chainIndex - 1].color,
             borderRadius: 2,
             display: 'inline-flex',
             px: '10px',
@@ -206,7 +199,7 @@ const CardImgBox = (props) => {
           }}
         >
           <Typography variant="subtitle2" color="white">
-            {chainTypes[marketPlace - 1].name}
+            {chainTypes[chainIndex - 1].name}
           </Typography>
         </Box>
       </Box>
@@ -217,7 +210,6 @@ export default CardImgBox;
 
 CardImgBox.propTypes = {
   isMoreLink: PropTypes.bool,
-  isLink: PropTypes.bool,
   thumbnail: PropTypes.any,
-  marketPlace: PropTypes.number
+  chain: PropTypes.string
 };
