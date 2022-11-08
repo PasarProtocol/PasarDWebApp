@@ -9,7 +9,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { Icon } from '@iconify/react';
-import { chainTypes, getImageFromIPFSUrl, getChainIndexFromChain } from '../utils/common';
+import { chainTypes, getChainIndexFromChain } from '../utils/common';
 import useSettings from '../hooks/useSettings';
 
 const BoxStyle = styled(Box)(({ theme }) => ({
@@ -83,7 +83,6 @@ const LoadingOverlay = () => {
 };
 const CardImgBox = (props) => {
   const { isMoreLink = false, chain, thumbnail } = props;
-  const src = getImageFromIPFSUrl(thumbnail);
   const chainIndex = getChainIndexFromChain(chain);
   const imageRef = React.useRef();
   const [isVideo, setIsVideo] = React.useState(false);
@@ -93,7 +92,7 @@ const CardImgBox = (props) => {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(src);
+        const res = await fetch(thumbnail);
         const contentype = res.headers.get('content-type');
         if (contentype.startsWith('video')) {
           setIsVideo(true);
@@ -142,7 +141,7 @@ const CardImgBox = (props) => {
       <Box className="img-box" ref={imageRef}>
         {!isVideo ? (
           <LazyLoadImage
-            src={src}
+            src={thumbnail}
             effect="blur"
             wrapperProps={{
               style: {
@@ -155,7 +154,7 @@ const CardImgBox = (props) => {
         ) : (
           <>
             <HoverVideoPlayer
-              videoSrc={src}
+              videoSrc={thumbnail}
               loadingOverlay={<LoadingOverlay />}
               videoId="videoId"
               style={{ width: '100%', height: '100%' }}
