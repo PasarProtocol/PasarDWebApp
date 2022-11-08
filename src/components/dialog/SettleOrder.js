@@ -42,13 +42,8 @@ export default function SettleOrder(props) {
 
   const { isOpen, setOpen, info, address, updateCount: updateCountProfile, handleUpdate } = props;
 
-  let topBuyer = '';
   const seller = info.holder;
-  let currentBid = 0;
-  if (info.listBid && info.listBid.length) {
-    topBuyer = info.listBid[0].buyerAddr;
-    currentBid = info.listBid[0].price;
-  }
+  const { lastBid, lastBidder } = info;
 
   const handleClose = () => {
     setOpen(false);
@@ -190,7 +185,7 @@ export default function SettleOrder(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, chainId, pasarLinkAddress]);
 
-  const price = currentBid / 1e18;
+  const price = lastBid / 1e18;
   const platformFee = math.round((price * 2) / 100, 4);
   const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royalties) / 10 ** 6, 4);
   return (
@@ -218,7 +213,7 @@ export default function SettleOrder(props) {
             <>
               You are about to accept{' '}
               <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-                {`${math.round(currentBid / 1e18, 3)} ELA`}
+                {`${math.round(lastBid / 1e18, 3)} ELA`}
               </Typography>
               <br />
             </>
@@ -230,17 +225,17 @@ export default function SettleOrder(props) {
           <br />
           from{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-            {reduceHexAddress(address === seller ? topBuyer : seller)}
+            {reduceHexAddress(address === seller ? lastBidder : seller)}
           </Typography>
         </Typography>
         <Typography variant="h4" sx={{ mt: 1 }}>
           {address === seller ? 'Top Bid' : 'Your Winning Bid'}
           <br />
-          {math.round(currentBid / 1e18, 3)} ELA
+          {math.round(lastBidder / 1e18, 3)} ELA
         </Typography>
         <Grid container sx={{ mt: 2, display: 'block' }}>
           <Grid item xs={12}>
-            {address === topBuyer && (
+            {address === lastBidder && (
               <Stack direction="row">
                 <Typography variant="body2" display="block" sx={{ flex: 1, mb: 0.5 }}>
                   Wallet Balance
@@ -294,7 +289,7 @@ export default function SettleOrder(props) {
               </Typography>
             </Stack>
           </Grid>
-          {address === topBuyer && (
+          {address === lastBidder && (
             <Grid item xs={12}>
               <Stack direction="row">
                 <Typography variant="body2" display="block" gutterBottom sx={{ flex: 1 }} color="origin.main">
