@@ -143,9 +143,10 @@ export const getImageFromIPFSUrl = (url) => {
   // pasar:image:xxx
   // feeds:image:xxx, feeds:imgage:xxx
   // ipfs://xxx
-  // https://xxxx
+  // https://xxxx blob:http://
   // no data
   if (url) {
+    if (url.startsWith('blob:http')) return url;
     if (url.startsWith('https://')) return url;
     if (url.startsWith('ipfs://')) return `${PasarIpfs}/ipfs/${url.slice(7)}`;
     const segments = url.split(':').filter((item) => item);
