@@ -85,9 +85,10 @@ const TypographyStyle = styled(Typography)({
 });
 
 const CollectionImgBox = (props) => {
-  const { name, background: backgroundImg, avatar, items, realData, collectibles, token, chainIndex } = props;
+  const { name, background: backgroundImg, avatar, items, realData, collectibles, token, chain } = props;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [openGroupBox, setOpenGroupBox] = React.useState(false);
+  const chainIndex = getChainIndexFromChain(chain);
   const imageStyle = {
     display: 'inline-flex',
     height: '100%'
@@ -287,8 +288,8 @@ CollectionImgBox.propTypes = {
   items: PropTypes.number,
   realData: PropTypes.any,
   collectibles: PropTypes.any,
-  token: PropTypes.any,
-  chainIndex: PropTypes.number
+  chain: PropTypes.string,
+  token: PropTypes.any
 };
 
 const CollectionCardPaper = (props) => {
@@ -310,7 +311,6 @@ const CollectionCardPaper = (props) => {
   const avatar = getIpfsUrl(data?.avatar || '');
   const background = getIpfsUrl(data?.background || '');
   const description = data?.description || '';
-  const chainIndex = getChainIndexFromChain(chain);
 
   const [didName, setDidName] = React.useState('');
   const [isOpenPopup, setOpenPopup] = React.useState(null);
@@ -400,7 +400,7 @@ const CollectionCardPaper = (props) => {
           setOpenDownloadEssentialDlg(true);
           return;
         }
-        navigate(`/collections/edit`, { state: { token, chainIndex } });
+        navigate(`/collections/edit`, { state: { token, chain } });
         break;
       case 'royalties':
         if (
@@ -418,7 +418,7 @@ const CollectionCardPaper = (props) => {
     setOpenPopup(null);
   };
 
-  const imgBoxProps = { avatar, background, name, items, realData, collectibles, token, chainIndex };
+  const imgBoxProps = { avatar, background, name, items, realData, collectibles, token, chain };
 
   return (
     <PaperRecord
@@ -548,10 +548,8 @@ export default function CollectionCard(props) {
   const [isOpenUpdateRoyalties, setUpdateRoyaltiesOpen] = React.useState(false);
   const navigate = useNavigate();
 
-  const chainIndex = getChainIndexFromChain(chain);
-
   const route2Detail = () => {
-    if (!isDragging) navigate(`/collections/detail/${chainIndex}${token}`);
+    if (!isDragging) navigate(`/collections/detail/${[chain, token].join('&')}`);
   };
 
   return isPreview ? (

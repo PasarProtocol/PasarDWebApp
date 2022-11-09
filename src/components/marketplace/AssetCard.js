@@ -154,9 +154,13 @@ export default function AssetCard(props) {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const res = await fetchAPIFrom(`api/v1/getCollectionInfo?collection=${contract}&chain=${chain}`);
-      const json = await res.json();
-      setCollection(json?.data || {});
+      try {
+        const res = await fetchAPIFrom(`api/v1/getCollectionInfo?collection=${contract}&chain=${chain}`);
+        const json = await res.json();
+        setCollection(json?.data || {});
+      } catch (e) {
+        console.error(e);
+      }
     };
     if (contract && chain) fetchData();
   }, [chain, contract]);
