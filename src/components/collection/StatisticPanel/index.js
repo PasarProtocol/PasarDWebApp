@@ -1,9 +1,9 @@
 import { memo } from 'react';
 import PropTypes from 'prop-types';
-// material
 import { styled } from '@mui/material/styles';
 import { Grid, Card } from '@mui/material';
 import StatisticItem from './StatisticItem';
+import { getChainIndexFromChain } from '../../../utils/common';
 // ----------------------------------------------------------------------
 const RootStyle = styled(Card)(({ theme }) => ({
   margin: 'auto',
@@ -19,21 +19,28 @@ const RootStyle = styled(Card)(({ theme }) => ({
 }));
 
 const StatisticPanel = (props) => {
-  const { floorPrice = 0, totalCount = 0, totalOwner = 0, totalPrice = 0, marketPlace } = props;
+  const { tradeVolume, items, lowestPrice, owners, chain } = props;
+  const chainIndex = getChainIndexFromChain(chain);
+
   return (
     <RootStyle>
       <Grid container>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="📈 Trading Volume" index={1} value={totalPrice} marketPlace={marketPlace} />
+          <StatisticItem
+            title="📈 Trading Volume"
+            index={1}
+            value={(tradeVolume ?? 0) / 1e18}
+            chainIndex={chainIndex}
+          />
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="🖼 Items" index={2} value={totalCount} />
+          <StatisticItem title="🖼 Items" index={2} value={items ?? 0} />
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="🔻 Floor Price" index={3} value={floorPrice} marketPlace={marketPlace} />
+          <StatisticItem title="🔻 Floor Price" index={3} value={(lowestPrice ?? 0) / 1e18} chainIndex={chainIndex} />
         </Grid>
         <Grid item xs={6} sm={3} md={3}>
-          <StatisticItem title="💪 Owners" index={4} value={totalOwner} />
+          <StatisticItem title="💪 Owners" index={4} value={owners ?? 0} />
         </Grid>
       </Grid>
     </RootStyle>
@@ -41,11 +48,11 @@ const StatisticPanel = (props) => {
 };
 
 StatisticPanel.propTypes = {
-  floorPrice: PropTypes.number,
-  totalCount: PropTypes.number,
-  totalOwner: PropTypes.number,
-  totalPrice: PropTypes.number,
-  marketPlace: PropTypes.number
+  tradeVolume: PropTypes.number,
+  items: PropTypes.number,
+  lowestPrice: PropTypes.number,
+  owners: PropTypes.number,
+  chain: PropTypes.string
 };
 
 export default memo(StatisticPanel);

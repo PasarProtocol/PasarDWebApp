@@ -33,13 +33,13 @@ const RootStyle = styled('div')(({ theme, index }) => {
 StatisticItem.propTypes = {
   index: PropTypes.number,
   value: PropTypes.number,
-  marketPlace: PropTypes.number,
+  chainIndex: PropTypes.number,
   title: PropTypes.string,
   children: PropTypes.node
 };
 
 export default function StatisticItem(props) {
-  const { index, value, marketPlace } = props;
+  const { index, value, chainIndex, title, children } = props;
   const [realData, setRealData] = React.useState(0);
   React.useEffect(() => {
     if (value)
@@ -54,7 +54,7 @@ export default function StatisticItem(props) {
       <Tooltip title={tooltipTitle} arrow disableInteractive enterTouchDelay={0}>
         <Stack spacing={2}>
           <Stack direction="row" spacing={1} justifyContent="center">
-            <VolumeIcon marketPlace={marketPlace} />
+            <VolumeIcon chainIndex={chainIndex} />
             <AnimatedNumber
               component="h2"
               value={realData}
@@ -67,7 +67,7 @@ export default function StatisticItem(props) {
             variant="body"
             sx={{ color: 'text.secondary', display: 'flex', justifyContent: 'center', gap: '6px' }}
           >
-            {props.children} {props.title}
+            {children} {title}
           </Typography>
         </Stack>
       </Tooltip>
