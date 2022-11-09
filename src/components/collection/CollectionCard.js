@@ -17,7 +17,6 @@ import DIABadge from '../badge/DIABadge';
 import useSingin from '../../hooks/useSignin';
 import {
   reduceHexAddress,
-  getInfoFromDID,
   checkWhetherGeneralCollection,
   chainTypes,
   getChainIndexFromChain,
@@ -312,7 +311,7 @@ const CollectionCardPaper = (props) => {
   const background = getImageFromIPFSUrl(data?.background || '');
   const description = data?.description || '';
 
-  const [didName, setDidName] = React.useState('');
+  const [didName, setDidName] = React.useState(creator?.name || '');
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
   const [badge, setBadge] = React.useState({ dia, kyc: false });
@@ -342,23 +341,15 @@ const CollectionCardPaper = (props) => {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (creator?.did) {
-        try {
-          const res = await getInfoFromDID(creator.did);
-          setDidName(res?.name || '');
-        } catch (e) {
-          console.error(e);
-        }
-        try {
-          const res = await queryKycMe(creator.did);
-          if (res.find_message && res.find_message.items.length) setBadgeFlag('kyc', true);
-          else setBadgeFlag('kyc', false);
-        } catch (e) {
-          console.error(e);
-        }
+      try {
+        const res = await queryKycMe(creator.did);
+        if (res.find_message && res.find_message.items.length) setBadgeFlag('kyc', true);
+        else setBadgeFlag('kyc', false);
+      } catch (e) {
+        console.error(e);
       }
     };
-    fetchData();
+    if (creator?.did) fetchData();
   }, [creator.did]);
 
   React.useEffect(() => {
