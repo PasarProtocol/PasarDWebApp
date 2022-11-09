@@ -64,8 +64,7 @@ const RootStyle = styled(Page)(({ theme }) => ({
 const _gasLimit = 5000000;
 export default function EditCollection() {
   const location = useLocation();
-  // const { chain, token } = location.state || {};
-  const { chain = 'ela', token = '0xF63f820F4a0bC6E966D61A4b20d24916713Ebb95' } = location.state || {};
+  const { chain, token } = location.state || {};
   const [isLoadingCollection, setLoadingCollection] = React.useState(false);
   const [collectionName, setCollectionName] = React.useState('');
   const [symbol, setSymbol] = React.useState('');
