@@ -25,8 +25,6 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { create } from 'ipfs-http-client';
 import jwtDecode from 'jwt-decode';
 import { useSnackbar } from 'notistack';
-
-// components
 import Page from '../../components/Page';
 import { UploadSingleFile } from '../../components/upload';
 import TransLoadingButton from '../../components/TransLoadingButton';
@@ -54,9 +52,9 @@ import {
   getChainTypeFromId,
   socialTypes,
   getDiaBalanceDegree,
-  fetchFrom,
   getFilteredGasPrice,
-  getContractAddressInCurrentNetwork
+  getContractAddressInCurrentNetwork,
+  fetchAPIFrom
 } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -126,7 +124,6 @@ export default function CreateCollection() {
   React.useEffect(() => {
     const fetchData = async () => {
       if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') navigate('/marketplace');
-
       if (isInAppBrowser()) setAddress(await window.elastos.getWeb3Provider().address);
       else if (essentialsConnector.getWalletConnectProvider())
         setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
@@ -136,25 +133,20 @@ export default function CreateCollection() {
   }, []);
 
   React.useEffect(() => {
-    if (!address) return;
-    setRecipientRoyaltiesGroup((prevState) => {
-      const tempState = [{ address, royalties: '10' }, ...prevState];
-      return tempState;
-    });
-    fetchFrom(`api/v2/sticker/getCollectionByOwner/${address}`)
-      .then((response) => {
-        response
-          .json()
-          .then((jsonAssets) => {
-            setCollectionCount(jsonAssets.data.length);
-          })
-          .catch((e) => {
-            console.error(e);
-          });
-      })
-      .catch((e) => {
-        console.error(e);
+    const fetchData = async () => {
+      setRecipientRoyaltiesGroup((prevState) => {
+        const tempState = [{ address, royalties: '10' }, ...prevState];
+        return tempState;
       });
+      try {
+        const res = await fetchAPIFrom(`api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${address}`, {});
+        const json = await res.json();
+        setCollectionCount(json?.data?.length ?? 0);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    if (address) fetchData();
   }, [address]);
 
   React.useEffect(() => {
@@ -193,13 +185,11 @@ export default function CreateCollection() {
 
   const handleRecipientRoyaltiesGroup = (key, index, e) => {
     let inputValue = e.target.value;
-
     if (key === 'royalties') {
       if (inputValue.length > 0 && !isNumberString(inputValue)) return;
       if (inputValue < 0 || inputValue > 30) return;
       inputValue = removeLeadingZero(inputValue);
     }
-
     const temp = [...recipientRoyaltiesGroup];
     temp[index][key] = inputValue;
     if (!temp[index].address.length && !temp[index].royalties.length) {
