@@ -23,8 +23,6 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { create } from 'ipfs-http-client';
 import jwtDecode from 'jwt-decode';
 import { useSnackbar } from 'notistack';
-
-// components
 import Page from '../../components/Page';
 import { UploadSingleFile } from '../../components/upload';
 import TransLoadingButton from '../../components/TransLoadingButton';
@@ -35,7 +33,6 @@ import RegisterCollectionDlg from '../../components/dialog/RegisterCollection';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import LoadingScreen from '../../components/LoadingScreen';
 import LoadingWrapper from '../../components/LoadingWrapper';
-
 import { REGISTER_CONTRACT_ABI } from '../../abi/registerABI';
 import { ipfsURL } from '../../config';
 import useOffSetTop from '../../hooks/useOffSetTop';
@@ -43,11 +40,11 @@ import useSingin from '../../hooks/useSignin';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import {
   isInAppBrowser,
-  fetchFrom,
-  getIpfsUrl,
   getFilteredGasPrice,
   socialTypes,
-  getContractAddressInCurrentNetwork
+  getContractAddressInCurrentNetwork,
+  fetchAPIFrom,
+  getImageFromIPFSUrl
 } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -67,12 +64,12 @@ const RootStyle = styled(Page)(({ theme }) => ({
 const _gasLimit = 5000000;
 export default function EditCollection() {
   const location = useLocation();
-  const { token: baseToken, marketPlace } = location.state || {};
+  // const { chain, token } = location.state || {};
+  const { chain = 'ela', token = '0xF63f820F4a0bC6E966D61A4b20d24916713Ebb95' } = location.state || {};
   const [isLoadingCollection, setLoadingCollection] = React.useState(false);
-  const [address, setAddress] = React.useState('');
   const [collectionName, setCollectionName] = React.useState('');
   const [symbol, setSymbol] = React.useState('');
-  const [metaObj, setMetaObj] = React.useState({});
+  const [collection, setCollection] = React.useState({});
   const [description, setDescription] = React.useState('');
   const [category, setCategory] = React.useState('General');
   const [avatarFile, setAvatarFile] = React.useState(null);
@@ -110,42 +107,20 @@ export default function EditCollection() {
       if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') navigate('/marketplace');
 
       setLoadingCollection(true);
-      fetchFrom(`api/v2/sticker/getCollection/${baseToken}?marketPlace=${marketPlace}`)
-        .then((response) => {
-          response
-            .json()
-            .then((jsonAssets) => {
-              setLoadingCollection(false);
-              setCollectionName(jsonAssets.data.name);
-              setSymbol(jsonAssets.data.symbol);
-              const metaUri = getIpfsUrl(jsonAssets.data.uri);
-              if (metaUri) {
-                fetch(metaUri)
-                  .then((response) => response.json())
-                  .then((data) => {
-                    const resObj = data.data;
-                    setMetaObj(resObj);
-                    if (resObj.description) setDescription(resObj.description);
-                    if (resObj.category)
-                      setCategory(`${resObj.category.charAt(0).toUpperCase()}${resObj.category.slice(1)}`);
-                    if (resObj.socials) setSocialUrl(resObj.socials);
-                  })
-                  .catch(console.log);
-              }
-            })
-            .catch((e) => {
-              console.error(e);
-              setLoadingCollection(false);
-            });
-        })
-        .catch((e) => {
-          console.error(e);
-          setLoadingCollection(false);
-        });
-
-      if (isInAppBrowser()) setAddress(await window.elastos.getWeb3Provider().address);
-      else if (essentialsConnector.getWalletConnectProvider())
-        setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
+      try {
+        const res = await fetchAPIFrom(`api/v1/getCollectionInfo?chain=${chain}&collection=${token}`);
+        const json = await res.json();
+        setCollectionName(json?.data?.name || '');
+        setSymbol(json?.data?.symbol || '');
+        setDescription(json?.data?.data?.description);
+        setCollection(json?.data || {});
+        if (json?.data?.data?.category)
+          setCategory(`${json.data.data.category.charAt(0).toUpperCase()}${json.data.data.category.slice(1)}`);
+        if (json?.data?.data?.socials) setSocialUrl(json.data.data.socials);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingCollection(false);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -199,7 +174,7 @@ export default function EditCollection() {
         setOnProgress(false);
       });
       if (!f) {
-        resolve(metaObj[type]);
+        resolve(type === 'avatar' ? collection?.data?.avatar : collection?.data?.description);
         return;
       }
       const reader = new window.FileReader();
@@ -244,14 +219,12 @@ export default function EditCollection() {
         .then((rsp) => {
           // create the metadata object we'll be storing
           creatorObj.signature = rsp.signature;
-          const metaObj = {
-            version: '1',
-            creator: creatorObj,
-            data: dataObj
-          };
-          console.log(metaObj);
           try {
-            const jsonMetaObj = JSON.stringify(metaObj);
+            const jsonMetaObj = JSON.stringify({
+              version: '1',
+              creator: creatorObj,
+              data: dataObj
+            });
             // add the metadata itself as well
             const metaRecv = Promise.resolve(client.add(jsonMetaObj));
             resolve(metaRecv);
@@ -331,7 +304,7 @@ export default function EditCollection() {
               setReadySignForRegister(true);
               console.log(collectionName);
               registerContract.methods
-                .updateTokenInfo(baseToken, collectionName, paramObj._uri)
+                .updateTokenInfo(token, collectionName, paramObj._uri)
                 .send(transactionParams)
                 .on('receipt', (receipt) => {
                   setReadySignForRegister(false);
@@ -391,6 +364,7 @@ export default function EditCollection() {
     else if (!description.length) scrollToRef(descriptionRef);
     else updateCollection();
   };
+
   return (
     <RootStyle title="EditCollection | PASAR">
       <Container maxWidth="lg">
@@ -574,11 +548,14 @@ export default function EditCollection() {
                   <CollectionCard
                     isPreview={Boolean(true)}
                     info={{
-                      collectionName,
-                      description,
-                      owner: address,
-                      avatar: avatarFile ? getUrlfromFile(avatarFile) : getIpfsUrl(metaObj.avatar),
-                      background: backgroundFile ? getUrlfromFile(backgroundFile) : getIpfsUrl(metaObj.background)
+                      ...collection,
+                      data: {
+                        ...collection?.data,
+                        avatar: avatarFile ? getUrlfromFile(avatarFile) : getImageFromIPFSUrl(collection?.data?.avatar),
+                        background: backgroundFile
+                          ? getUrlfromFile(backgroundFile)
+                          : getImageFromIPFSUrl(collection?.data?.background)
+                      }
                     }}
                   />
                 </Grid>
