@@ -25,8 +25,6 @@ import checkCircleIcon from '@iconify-icons/akar-icons/circle-check-fill';
 import { create } from 'ipfs-http-client';
 import jwtDecode from 'jwt-decode';
 import { useSnackbar } from 'notistack';
-
-// components
 import Page from '../../components/Page';
 import { UploadSingleFile } from '../../components/upload';
 import TransLoadingButton from '../../components/TransLoadingButton';
@@ -36,7 +34,6 @@ import { InputStyle, InputLabelStyle, TextFieldStyle } from '../../components/Cu
 import RegisterCollectionDlg from '../../components/dialog/RegisterCollection';
 import NeedMoreDIADlg from '../../components/dialog/NeedMoreDIA';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
-
 import { REGISTER_CONTRACT_ABI } from '../../abi/registerABI';
 import { ipfsURL } from '../../config';
 import useOffSetTop from '../../hooks/useOffSetTop';
@@ -50,8 +47,8 @@ import {
   getChainTypeFromId,
   socialTypes,
   getDiaBalanceDegree,
-  fetchFrom,
-  getContractAddressInCurrentNetwork
+  getContractAddressInCurrentNetwork,
+  fetchAPIFrom
 } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -141,25 +138,20 @@ export default function ImportCollection() {
   }, [isOpenRegCollection]);
 
   React.useEffect(() => {
-    if (!address) return;
-    setRecipientRoyaltiesGroup((prevState) => {
-      const tempState = [{ address, royalties: '10' }, ...prevState];
-      return tempState;
-    });
-    fetchFrom(`api/v2/sticker/getCollectionByOwner/${address}`)
-      .then((response) => {
-        response
-          .json()
-          .then((jsonAssets) => {
-            setCollectionCount(jsonAssets.data.length);
-          })
-          .catch((e) => {
-            console.error(e);
-          });
-      })
-      .catch((e) => {
-        console.error(e);
+    const fetchData = async () => {
+      setRecipientRoyaltiesGroup((prevState) => {
+        const tempState = [{ address, royalties: '10' }, ...prevState];
+        return tempState;
       });
+      try {
+        const res = await fetchAPIFrom(`api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${address}`, {});
+        const json = await res.json();
+        setCollectionCount(json?.data?.length ?? 0);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    if (address) fetchData();
   }, [address]);
 
   const handleInputAddress = (e) => {
