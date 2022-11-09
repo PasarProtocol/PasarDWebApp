@@ -17,7 +17,6 @@ import DIABadge from '../badge/DIABadge';
 import useSingin from '../../hooks/useSignin';
 import {
   reduceHexAddress,
-  getIpfsUrl,
   getInfoFromDID,
   checkWhetherGeneralCollection,
   chainTypes,
@@ -106,6 +105,7 @@ const CollectionImgBox = (props) => {
     onMouseEnter: handlePopoverOpen,
     onMouseLeave: handlePopoverClose
   };
+
   return (
     <Stack sx={{ position: 'relative', height: '120px', mb: '25px' }}>
       <Stack sx={{ height: '100%', overflow: 'hidden' }}>
@@ -308,8 +308,8 @@ const CollectionCardPaper = (props) => {
     dia = 0
   } = info;
   const realData = [tradeVolume, lowestPrice / 1e18, owners];
-  const avatar = getIpfsUrl(data?.avatar || '');
-  const background = getIpfsUrl(data?.background || '');
+  const avatar = getImageFromIPFSUrl(data?.avatar || '');
+  const background = getImageFromIPFSUrl(data?.background || '');
   const description = data?.description || '';
 
   const [didName, setDidName] = React.useState('');
@@ -400,7 +400,7 @@ const CollectionCardPaper = (props) => {
           setOpenDownloadEssentialDlg(true);
           return;
         }
-        navigate(`/collections/edit`, { state: { token, chain } });
+        navigate(`/collections/edit`, { state: { chain, token } });
         break;
       case 'royalties':
         if (
