@@ -30,7 +30,7 @@ import useSingin from '../../hooks/useSignin';
 import BadgeProfile from './BadgeProfile';
 import StyledButton from '../signin-dlg/StyledButton';
 import { auctionOrderType } from '../../config';
-import { getChainTypeFromId, fetchAPIFrom, getChainIndexFromChain } from '../../utils/common';
+import { getChainTypeFromId, fetchAPIFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 const TimeCountBoxStyle = styled(Box)(({ theme }) => ({
@@ -207,6 +207,7 @@ export default function AssetCard(props) {
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);
   };
+
   const handleSell = () => {
     if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
       setOpenDownloadEssentialDlg(true);
@@ -214,6 +215,7 @@ export default function AssetCard(props) {
     }
     handlePutOnAction('sell');
   };
+
   const handleClosePopup = (e) => {
     const chainType = getChainTypeFromId(pasarLinkChain);
     const type = e.target.getAttribute('value');
@@ -466,7 +468,7 @@ export default function AssetCard(props) {
             </Menu>
           </Box>
         </Stack>
-        {orderType === auctionOrderType && !!endTime && status !== 'Not on sale' && (
+        {orderType === auctionOrderType && !!endTime && (status !== -1 || status !== 4) && (
           <TimeCountBoxStyle>
             {auctionEnded ? (
               <Typography variant="subtitle2" sx={{ fontWeight: 'normal' }}>
@@ -489,7 +491,7 @@ export default function AssetCard(props) {
               component={RouterLink}
               to={
                 isMoreLink
-                  ? `/collections/detail/${getChainIndexFromChain(chain)}${baseToken}`
+                  ? `/collections/detail/${[chain, baseToken].join('&')}`
                   : `/marketplace/detail/${[tokenId, baseToken].join('&')}`
               }
               alt=""

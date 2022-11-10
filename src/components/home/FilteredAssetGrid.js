@@ -121,7 +121,6 @@ const AssetGroupSlider = (props) => {
                     buyoutPrice={round(((isAuction ? item?.buyoutPrice : item?.order?.buyoutPrice) ?? 0) / 1e18, 3)}
                     reservePrice={round(((isAuction ? item?.reservePrice : item?.order?.reservePrice) ?? 0) / 1e18, 3)}
                     type={0}
-                    saleType="Primary Sale"
                     isLink={Boolean(true)}
                     coinUSD={coinPrice[coinType.index]}
                     coinType={coinType}
