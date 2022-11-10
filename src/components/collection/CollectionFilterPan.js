@@ -37,27 +37,26 @@ CollectionFilterPan.propTypes = {
   btnGroup: PropTypes.any,
   filterProps: PropTypes.any,
   handleFilter: PropTypes.func,
-  address: PropTypes.string,
-  marketPlace: PropTypes.number
+  token: PropTypes.string,
+  chainIndex: PropTypes.number
 };
 
 export default function CollectionFilterPan(props) {
-  const { sx, btnGroup, filterProps, handleFilter, address, marketPlace = 1 } = props;
+  const { sx, btnGroup, filterProps, handleFilter, token, chainIndex } = props;
   const { range, selectedAttributes = {} } = filterProps;
   const coinTypeClass = Object.values(coinTypesGroup);
-  const coinTypes = marketPlace ? coinTypeClass[marketPlace - 1] : coinTypesGroup.ESC;
-  const [minVal, setMinVal] = React.useState(range ? range.min : '');
-  const [maxVal, setMaxVal] = React.useState(range ? range.max : '');
+  const coinTypes = chainIndex > 0 ? coinTypeClass[chainIndex - 1] : coinTypesGroup.ESC;
+  const [minVal, setMinVal] = React.useState(range?.min || '');
+  const [maxVal, setMaxVal] = React.useState(range?.max || '');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
   const [collectionAttributes, setCollectionAttributes] = React.useState({});
   const [filterAttributes, setFilterAttributes] = React.useState({});
   const [filterTokens, setFilterTokens] = React.useState(coinTypes);
 
   React.useEffect(() => {
-    let isMounted = true;
-    fetchFrom(`api/v2/sticker/getAttributeOfCollection/${address}?marketPlace=${marketPlace}`).then((response) => {
+    fetchFrom(`api/v2/sticker/getAttributeOfCollection/${token}?marketPlace=${chainIndex}`).then((response) => {
       response.json().then((jsonData) => {
-        if (jsonData.data && isMounted) {
+        if (jsonData.data) {
           setCollectionAttributes(jsonData.data);
           const tempData = { ...jsonData.data };
           Object.keys(tempData).forEach((groupName) => {
@@ -67,27 +66,13 @@ export default function CollectionFilterPan(props) {
         }
       });
     });
-    return () => {
-      isMounted = false;
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   React.useEffect(() => {
-    setMinVal(range.min);
-    setMaxVal(range.max);
+    setMinVal(range?.min || '');
+    setMaxVal(range?.max || '');
   }, [range]);
-
-  const searchTokens = (inputStr) => {
-    if (inputStr.length) {
-      setFilterTokens(coinTypes.filter((el) => el.name.toLowerCase().includes(inputStr.toLowerCase())));
-    } else {
-      setFilterTokens(coinTypes);
-    }
-  };
-
-  const selectToken = (address) => {
-    handleFilter('token', address);
-  };
 
   const applyRange = () => {
     const range = { min: minVal, max: maxVal };
@@ -98,9 +83,13 @@ export default function CollectionFilterPan(props) {
     setErrRangeInput(false);
     handleFilter('range', range);
   };
-  const selectAttributes = (groupName, field) => {
-    handleFilter('attributes', { groupName, field });
+
+  const searchTokens = (inputStr) => {
+    if (inputStr.length)
+      setFilterTokens(coinTypes.filter((el) => el.name.toLowerCase().includes(inputStr.toLowerCase())));
+    else setFilterTokens(coinTypes);
   };
+
   const searchAttributes = (inputStr, groupName) => {
     const tempAttributes = { ...filterAttributes };
     if (inputStr.length)
@@ -245,9 +234,7 @@ export default function CollectionFilterPan(props) {
                       {filterTokens.map((el, i) => (
                         <ListItemButton
                           key={i}
-                          onClick={() => {
-                            selectToken(el.address);
-                          }}
+                          onClick={() => handleFilter('token', el.address)}
                           selected={filterProps.selectedTokens.includes(el.address)}
                         >
                           <ListItemIcon>
@@ -305,9 +292,7 @@ export default function CollectionFilterPan(props) {
                             return (
                               <ListItemButton
                                 key={_j}
-                                onClick={() => {
-                                  selectAttributes(groupName, el);
-                                }}
+                                onClick={() => handleFilter('attributes', { groupName, el })}
                                 selected={isSelected}
                               >
                                 <ListItemIcon>
