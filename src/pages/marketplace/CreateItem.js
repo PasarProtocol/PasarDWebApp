@@ -168,13 +168,10 @@ export default function CreateItem() {
   };
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') navigate('/marketplace');
-      setAllTokenPrice(setCoinPriceByType);
-      if (localStorage.getItem('pa-yes') === '1') return;
-      setOpenDisclaimer(true);
-    };
-    fetchData();
+    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') navigate('/marketplace');
+    setAllTokenPrice(setCoinPriceByType);
+    if (localStorage.getItem('pa-yes') === '1') return;
+    setOpenDisclaimer(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -202,10 +199,7 @@ export default function CreateItem() {
   }, [selectedCollection.token, pasarLinkChain]);
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      if (mintype !== 'Multiple') setQuantity(1);
-    };
-    fetchData();
+    if (mintype !== 'Multiple') setQuantity(1);
   }, [mintype]);
 
   React.useEffect(() => {
@@ -263,18 +257,15 @@ export default function CreateItem() {
   };
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      const tempArr = [...files];
-      setPreviewFiles(
-        tempArr.map((file) => {
-          const { preview } = file;
-          return isString(file) ? file : preview;
-        })
-      );
-      setUploadedCount(files.length);
-      if (files.length) setMultiProperties([...Array(files.length)].map(() => [{ type: '', name: '' }]));
-    };
-    fetchData();
+    const tempArr = [...files];
+    setPreviewFiles(
+      tempArr.map((file) => {
+        const { preview } = file;
+        return isString(file) ? file : preview;
+      })
+    );
+    setUploadedCount(files.length);
+    if (files.length) setMultiProperties([...Array(files.length)].map(() => [{ type: '', name: '' }]));
   }, [files]);
 
   const handleDropSingleFile = React.useCallback(
