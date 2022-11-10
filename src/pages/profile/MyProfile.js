@@ -86,7 +86,7 @@ export default function MyProfile() {
   const [collections, setCollections] = React.useState([]);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
   const [isLoadingCollection, setLoadingCollection] = React.useState(false);
-  const [dispmode, setDispmode] = React.useState(
+  const [dispMode, setDispMode] = React.useState(
     sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode
   );
   const [controller, setAbortController] = React.useState(new AbortController());
@@ -310,10 +310,10 @@ export default function MyProfile() {
     fetchData();
   }, [walletAddress, chainType]);
 
-  const handleDispmode = (_, mode) => {
+  const handleDispMode = (_, mode) => {
     if (mode === null) return;
     sessionStorage.setItem('disp-mode', mode);
-    setDispmode(mode);
+    setDispMode(mode);
   };
 
   const handleNavlink = (e) => {
@@ -380,7 +380,7 @@ export default function MyProfile() {
             <Stack spacing={1} pt={1} px="10px">
               <Stack direction="row" sx={{ justifyContent: 'end' }}>
                 <AssetSortSelect selected={order} onChange={setOrder} sx={{ flex: 1 }} />
-                <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                <ToggleButtonGroup value={dispMode} exclusive onChange={handleDispMode} size="small">
                   <ToggleButton value={0}>
                     <GridViewSharpIcon />
                   </ToggleButton>
@@ -426,7 +426,7 @@ export default function MyProfile() {
             <Stack direction="row" sx={{ justifyContent: 'end' }}>
               <AssetSortSelect selected={order} onChange={setOrder} />
               <ChainSelect selected={chainType} onChange={setChainType} />
-              <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+              <ToggleButtonGroup value={dispMode} exclusive onChange={handleDispMode} size="small">
                 <ToggleButton value={0}>
                   <GridViewSharpIcon />
                 </ToggleButton>
@@ -457,7 +457,7 @@ export default function MyProfile() {
                       <AssetGrid
                         assets={group}
                         type={i + 1}
-                        dispmode={dispmode}
+                        dispMode={dispMode}
                         myaddress={myAddress}
                         updateCount={updateCount}
                         handleUpdate={setUpdateCount}
@@ -473,7 +473,7 @@ export default function MyProfile() {
                     <AssetGrid
                       assets={loadingSkeletons}
                       type={i + 1}
-                      dispmode={dispmode}
+                      dispMode={dispMode}
                       myaddress={myAddress}
                       updateCount={updateCount}
                       handleUpdate={setUpdateCount}
