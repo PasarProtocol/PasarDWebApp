@@ -118,7 +118,7 @@ export default function MarketExplorer() {
   const [range, setRange] = React.useState(sessionFilterProps.range || { min: '', max: '' });
   const [adult, setAdult] = React.useState(sessionFilterProps.adult || false);
   const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
-  const [dispmode, setDispmode] = React.useState(
+  const [dispMode, setDispMode] = React.useState(
     sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode
   );
   const [isFilterView, setFilterView] = React.useState(1);
@@ -153,7 +153,7 @@ export default function MarketExplorer() {
     const hypotenuseInch = hypotenuse / 96;
     let tempDefaultDispMode = defaultDispMode;
     if (hypotenuseInch > 12 && hypotenuseInch < 16) tempDefaultDispMode = 1;
-    if (dispmode !== tempDefaultDispMode) setDispmode(tempDefaultDispMode);
+    if (dispMode !== tempDefaultDispMode) setDispMode(tempDefaultDispMode);
   };
   window.addEventListener('resize', handleDispInLaptopSize);
 
@@ -240,10 +240,10 @@ export default function MarketExplorer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, showCount, selectedBtns, selectedCollections, selectedTokens, adult, range, order, chainType, params.key]);
 
-  const handleDispmode = (event, mode) => {
+  const handleDispMode = (event, mode) => {
     if (mode === null) return;
     sessionStorage.setItem('disp-mode', mode);
-    setDispmode(mode);
+    setDispMode(mode);
   };
   const handleBtns = (num) => {
     if (num === rangeBtnId) {
@@ -479,7 +479,7 @@ export default function MarketExplorer() {
                     <Box sx={{ display: 'flex' }}>
                       <AssetSortSelect selected={order} onChange={setOrder} />
                       <ChainSelect selected={chainType} onChange={handleChangeChainType} />
-                      <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                      <ToggleButtonGroup value={dispMode} exclusive onChange={handleDispMode} size="small">
                         <ToggleButton value={0}>
                           <GridViewSharpIcon />
                         </ToggleButton>
@@ -527,7 +527,7 @@ export default function MarketExplorer() {
                       <MHidden width="smDown">
                         <ChainSelect selected={chainType} onChange={handleChangeChainType} />
                       </MHidden>
-                      <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                      <ToggleButtonGroup value={dispMode} exclusive onChange={handleDispMode} size="small">
                         <ToggleButton value={0}>
                           <SquareIcon />
                         </ToggleButton>
@@ -557,7 +557,7 @@ export default function MarketExplorer() {
                     }
                     style={{ padding: '10px' }}
                   >
-                    <AssetGrid {...{ assets: isLoadingAssets ? [...assets, ...loadingSkeletons] : assets, dispmode }} />
+                    <AssetGrid {...{ assets: isLoadingAssets ? [...assets, ...loadingSkeletons] : assets, dispMode }} />
                   </InfiniteScroll>
                 </Box>
               </Box>

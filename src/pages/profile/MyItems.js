@@ -61,7 +61,7 @@ export default function MyItems() {
   const [collections, setCollections] = React.useState([]);
   const [isLoadingCollection, setLoadingCollection] = React.useState(false);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
-  const [dispmode] = React.useState(sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode);
+  const [dispMode] = React.useState(sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode);
   const [orderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(params.type !== undefined ? parseInt(params.type, 10) : 0);
@@ -356,7 +356,7 @@ export default function MyItems() {
                       <AssetGrid
                         assets={group}
                         type={i + 1}
-                        dispmode={dispmode}
+                        dispMode={dispMode}
                         myaddress={myAddress}
                         updateCount={updateCount}
                         handleUpdate={setUpdateCount}
@@ -372,7 +372,7 @@ export default function MyItems() {
                     <AssetGrid
                       assets={loadingSkeletons}
                       type={i + 1}
-                      dispmode={dispmode}
+                      dispmode={dispMode}
                       myaddress={myAddress}
                       updateCount={updateCount}
                       handleUpdate={setUpdateCount}
