@@ -36,7 +36,7 @@ import { MHidden } from '../../components/@material-extend';
 import {
   addTokenToMM,
   callTokenContractMethod,
-  fetchFrom,
+  fetchAPIFrom,
   getERC20TokenPrice,
   getWalletAccounts,
   removeLeadingZero
@@ -327,24 +327,22 @@ export default function Rewards() {
     setStakingTotalAmount(stakingType === 'Stake' ? pasarBalance : stakingState?.currentStaked ?? 0);
   }, [pasarBalance, stakingType, stakingState]);
 
-  const fetchListedItemCount = async (quoteToken) => {
+  const fetchListedItemCount = async () => {
     try {
-      const response = await fetchFrom(
-        `api/v2/sticker/getDetailedCollectibles?collectionType=&tokenType=${quoteToken}&status=All&itemType=All&adult=false&minPrice=&maxPrice=&order=0&marketPlace=1&keyword=&pageNum=1&pageSize=1`
-      );
-      const json = await response.json();
-      return json && json.data && json.data.total ? json.data.total : 0;
+      const res = await fetchAPIFrom('api/v1/getTokensCount');
+      const json = await res.json();
+      return json?.data || { nativeTokenCount: 0, pasarTokenCount: 0, ecoTokenCount: 0, otherTokenCount: 0 };
     } catch (err) {
       console.error(err);
-      return 0;
+      return { nativeTokenCount: 0, pasarTokenCount: 0, ecoTokenCount: 0, otherTokenCount: 0 };
     }
   };
 
   const fetchRewardedUserCount = async () => {
     try {
-      const response = await fetchFrom(`api/v2/sticker/rewardusers`);
-      const json = await response.json();
-      return json && json.data ? json.data : { ecoCount: 0, elaCount: 0, otherCount: 0, pasarCount: 0 };
+      const res = await fetchAPIFrom(`api/v1/getPoolRewards`);
+      const json = await res.json();
+      return json?.data || { ecoCount: 0, elaCount: 0, otherCount: 0, pasarCount: 0 };
     } catch (err) {
       console.error(err);
       return { ecoCount: 0, elaCount: 0, otherCount: 0, pasarCount: 0 };
@@ -367,16 +365,8 @@ export default function Rewards() {
         setPasarBalance(balance);
       }
       // rewards page
-      const poolConfig = await callTokenContractMethod({
-        contractType: 'mining',
-        callType: 'call',
-        methodName: 'config'
-      });
       const rewardedUsers = await fetchRewardedUserCount();
-      const listedNativeCnt = await fetchListedItemCount(blankAddress);
-      const listedPasarCnt = await fetchListedItemCount(PASAR_TOKEN_ADDRESS);
-      const listedEcoCnt = await fetchListedItemCount(poolConfig.ecoToken);
-      const listedOtherCnt = (await fetchListedItemCount('')) - listedNativeCnt - listedPasarCnt - listedEcoCnt;
+      const listedItems = await fetchListedItemCount(blankAddress);
       const currentRatios = await callTokenContractMethod({
         contractType: 'mining',
         callType: 'call',
@@ -387,7 +377,12 @@ export default function Rewards() {
         callType: 'call',
         methodName: 'pendingRewards'
       });
-      setListedItemCnt({ native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt });
+      setListedItemCnt({
+        native: listedItems.elaCount,
+        pasar: listedItems.pasarCount,
+        eco: listedItems.ecoCount,
+        other: listedItems.otherCount
+      });
       setMiningPoolRatio({
         native: parseInt(currentRatios.native, 10) / 1e4,
         pasar: parseInt(currentRatios.pasar, 10) / 1e4,
@@ -404,7 +399,12 @@ export default function Rewards() {
       sessionStorage.setItem(
         'REWARD_POOL',
         JSON.stringify({
-          item: { native: listedNativeCnt, pasar: listedPasarCnt, eco: listedEcoCnt, other: listedOtherCnt },
+          item: {
+            native: listedItems.elaCount,
+            pasar: listedItems.pasarCount,
+            eco: listedItems.ecoCount,
+            other: listedItems.otherCount
+          },
           pool: {
             native: parseInt(currentRatios.native, 10) / 1e4,
             pasar: parseInt(currentRatios.pasar, 10) / 1e4,
