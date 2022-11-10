@@ -25,8 +25,6 @@ import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosBackFill from '@iconify/icons-eva/arrow-ios-back-fill';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
-
-// components
 import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import AssetSortSelect from '../../components/AssetSortSelect';
@@ -38,7 +36,8 @@ import StatisticPanel from '../../components/collection/StatisticPanel';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup';
 import KYCBadge from '../../components/badge/KYCBadge';
 import DIABadge from '../../components/badge/DIABadge';
-import { fetchFrom, getIpfsUrl, getInfoFromDID } from '../../utils/common';
+import { fetchAPIFrom, getImageFromIPFSUrl, getChainIndexFromChain } from '../../utils/common';
+import { queryKycMe } from '../../components/signin-dlg/HiveAPI';
 
 // ----------------------------------------------------------------------
 
@@ -77,6 +76,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
   marginLeft: theme.spacing(1)
 }));
 // ----------------------------------------------------------------------
+
 export default function CollectionDetail() {
   const sessionDispMode = sessionStorage.getItem('disp-mode');
   const sessionFilterProps = JSON.parse(sessionStorage.getItem('filter-props-other')) || {};
@@ -91,17 +91,8 @@ export default function CollectionDetail() {
   const emptyRange = { min: '', max: '' };
   const defaultDispMode = isMobile ? 1 : 0;
 
-  let description = '';
-  let avatar = '';
-  let socials = {};
-
-  // const [isLoadingCollection, setLoadingCollection] = React.useState(true);
-  const [collectionParam, setCollectionParam] = React.useState({
-    marketPlace: params.collection.charAt(0) * 1,
-    address: params.collection.substr(1)
-  });
+  const [chain, token] = params.collection.split('&');
   const [collection, setCollection] = React.useState({});
-  const [metaObj, setMetaObj] = React.useState({});
   const [didName, setDidName] = React.useState('');
   const [assets, setAssets] = React.useState([]);
   const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
@@ -109,8 +100,7 @@ export default function CollectionDetail() {
   const [selectedAttributes, setSelectedAttributes] = React.useState(sessionFilterProps.selectedAttributes || {});
   const [range, setRange] = React.useState(sessionFilterProps.range || { min: '', max: '' });
   const [adult, setAdult] = React.useState(sessionFilterProps.adult || false);
-  // const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
-  const [dispmode, setDispmode] = React.useState(
+  const [dispMode, setDispMode] = React.useState(
     sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode
   );
   const [isFilterView, setFilterView] = React.useState(1);
@@ -130,7 +120,11 @@ export default function CollectionDetail() {
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
   const [showCount] = React.useState(30);
-  const [badge] = React.useState({ dia: 0, kyc: false });
+  const [badge, setBadge] = React.useState({ dia: 0, kyc: false });
+
+  const avatar = getImageFromIPFSUrl(collection?.data?.avatar);
+  const description = collection?.data?.description || '';
+  const socials = collection?.data?.socials || {};
 
   const fetchMoreData = () => {
     if (!loadNext) {
@@ -140,50 +134,28 @@ export default function CollectionDetail() {
   };
 
   React.useEffect(() => {
-    const tempParam = {};
-    tempParam.marketPlace = params.collection.charAt(0) * 1;
-    tempParam.address = params.collection.substr(1);
-    setCollectionParam(tempParam);
-    fetchFrom(`api/v2/sticker/getCollection/${tempParam.address}?marketPlace=${tempParam.marketPlace}`)
-      .then((response) => {
-        response
-          .json()
-          .then((jsonAssets) => {
-            setCollection(jsonAssets.data);
-            const { creatorDid = '', creatorName = '' } = jsonAssets.data;
-            if (creatorName) setDidName(creatorName);
-            else
-              getInfoFromDID(creatorDid)
-                .then((info) => {
-                  if (info.name) setDidName(info.name);
-                })
-                .catch((e) => {
-                  console.error(e);
-                });
-            const metaUri = getIpfsUrl(jsonAssets.data.uri);
-            if (metaUri) {
-              fetch(metaUri)
-                .then((response) => response.json())
-                .then((data) => {
-                  setMetaObj(data);
-                })
-                .catch(console.log);
-            }
-          })
-          .catch((e) => {
+    const fetchData = async () => {
+      try {
+        const res = await fetchAPIFrom(`api/v1/getCollectionInfo?chain=${chain}&collection=${token}`);
+        const json = await res.json();
+        setCollection(json?.data || {});
+        setDidName(json?.data?.creator?.name || '');
+        setBadge({ ...badge, dia: (json?.data?.dia ?? 0) / 1e18 });
+        if (json?.data?.creator?.did) {
+          try {
+            const res = await queryKycMe(json.data.creator.did);
+            if (res.find_message && res.find_message.items.length) setBadge({ ...badge, kyc: true });
+          } catch (e) {
             console.error(e);
-          });
-      })
-      .catch((e) => {
+          }
+        }
+      } catch (e) {
         console.error(e);
-      });
-  }, [params.collection]);
-
-  if (metaObj.data) {
-    avatar = getIpfsUrl(metaObj.data.avatar);
-    description = metaObj.data.description;
-    socials = metaObj.data.socials;
-  }
+      }
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chain, token]);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -191,59 +163,53 @@ export default function CollectionDetail() {
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
-      let statusFilter = btnGroup.status.filter((_, index) => selectedBtns.indexOf(index) >= 0);
-      statusFilter =
-        statusFilter.length === btnGroup.status.length || statusFilter.length === 0 ? 'All' : statusFilter.join(',');
-      let itemTypeFilter = btnGroup.type.filter(
-        (_, index) => selectedBtns.indexOf(index + btnGroup.status.length) >= 0
-      );
-      itemTypeFilter =
-        itemTypeFilter.length === btnGroup.type.length || itemTypeFilter.length === 0
-          ? 'All'
-          : itemTypeFilter[0].toLowerCase();
-      if (itemTypeFilter === 'general') itemTypeFilter = itemTypeFilter.concat(',image');
-      setLoadingAssets(true);
 
+      // let itemTypeFilter = btnGroup.type.filter(
+      //   (_, index) => selectedBtns.indexOf(index + btnGroup.status.length) >= 0
+      // );
+      // itemTypeFilter =
+      //   itemTypeFilter.length === btnGroup.type.length || itemTypeFilter.length === 0
+      //     ? 'All'
+      //     : itemTypeFilter[0].toLowerCase();
+      // if (itemTypeFilter === 'general') itemTypeFilter = itemTypeFilter.concat(',image');
+
+      setLoadingAssets(true);
       const bodyParams = {
-        baseToken: collectionParam.address,
-        attribute: Object.keys(selectedAttributes).length ? selectedAttributes : '',
-        status: statusFilter,
-        itemType: itemTypeFilter,
-        minPrice: range.min !== '' ? range.min * 1e18 : '',
-        maxPrice: range.max !== '' ? range.max * 1e18 : '',
-        order,
-        marketPlace: collectionParam.marketPlace,
-        keyword: params.key ? params.key : '',
         pageNum: page,
         pageSize: showCount,
-        tokenType: selectedTokens.join(',')
+        chain,
+        collection: token,
+        status: selectedBtns.filter((el) => el >= 0 && el <= 4).sort(),
+        sort: order,
+        token: selectedTokens,
+        minPrice: range.min !== '' ? range.min * 1 : '',
+        maxPrice: range.max !== '' ? range.max * 1 : ''
+        // attribute: Object.keys(selectedAttributes).length ? selectedAttributes : '',
+        // itemType: itemTypeFilter
       };
       if (!loadNext) setAssets([]);
-      fetchFrom('api/v2/sticker/getDetailedCollectiblesInCollection', {
-        method: 'POST',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(bodyParams),
-        signal
-      })
-        .then((response) => {
-          response.json().then((jsonAssets) => {
-            if (jsonAssets.data) {
-              setTotalCount(jsonAssets.data.total);
-              setPages(Math.ceil(jsonAssets.data.total / showCount));
-              if (loadNext) setAssets([...assets, ...jsonAssets.data.result]);
-              else setAssets(jsonAssets.data.result);
-            }
-            // setAlreadyMounted(false);
-            setLoadNext(false);
-            setLoadingAssets(false);
-          });
-        })
-        .catch((e) => {
-          if (e.code !== e.ABORT_ERR) setLoadingAssets(false);
+      try {
+        const res = await fetchAPIFrom('api/v1/listCollectibleOfCollection', {
+          method: 'POST',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bodyParams),
+          signal
         });
+        const json = await res.json();
+        const totalCnt = json?.data?.total ?? 0;
+        setTotalCount(totalCnt);
+        setPages(Math.ceil(totalCnt / showCount));
+        if (loadNext) setAssets([...assets, ...(json?.data?.data || [])]);
+        else setAssets(json?.data?.data || []);
+        setLoadNext(false);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingAssets(false);
+
       sessionStorage.setItem(
         'filter-props-other',
         JSON.stringify({ selectedBtns, selectedAttributes, range, selectedTokens, adult, order })
@@ -252,111 +218,104 @@ export default function CollectionDetail() {
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    page,
-    showCount,
-    selectedBtns,
-    selectedAttributes,
-    selectedTokens,
-    adult,
-    range,
-    order,
-    params.key,
-    collectionParam
-  ]);
+  }, [page, showCount, selectedBtns, selectedAttributes, selectedTokens, adult, range, order, params.key]);
 
-  const handleDispmode = (event, mode) => {
+  const changeDispMode = (_, mode) => {
     if (mode === null) return;
     sessionStorage.setItem('disp-mode', mode);
-    setDispmode(mode);
+    setDispMode(mode);
   };
-  const handleBtns = (num) => {
-    if (num === rangeBtnId) {
+
+  // remove selected filter buttons
+  const handleSingleFilterBtn = (btnId) => {
+    if (btnId === rangeBtnId) {
       handleFilter('range', emptyRange);
       return;
     }
-    if (num === adultBtnId) {
+    if (btnId === adultBtnId) {
       handleFilter('adult', false);
       return;
     }
-    const tempBtns = [...selectedBtns];
-    if (tempBtns.includes(num)) {
-      const findIndex = tempBtns.indexOf(num);
-      tempBtns.splice(findIndex, 1);
-    } else tempBtns.push(num);
-    setSelectedBtns(tempBtns);
+    const selBtns = [...selectedBtns];
+    if (selBtns.includes(btnId)) {
+      const findIndex = selBtns.indexOf(btnId);
+      selBtns.splice(findIndex, 1);
+    } else selBtns.push(btnId);
+    setSelectedBtns(selBtns);
   };
-  const handleBtnsMobile = (num) => {
-    if (num === rangeBtnId) handleFilterMobile('range', emptyRange);
-    else if (num === adultBtnId) handleFilterMobile('adult', false);
-    else handleFilterMobile('statype', num);
+
+  const clearAllFilterBtn = () => {
+    setSelectedBtns([]);
+    setRange(emptyRange);
+    setAdult(false);
   };
+
   const setSelectedByValue = (value, btnId) => {
     setSelectedBtns((prevState) => {
-      const tempBtns = [...prevState];
+      const selBtns = [...prevState];
       if (value) {
-        if (!tempBtns.includes(btnId)) {
-          tempBtns.push(btnId);
-          return tempBtns;
+        if (!selBtns.includes(btnId)) {
+          selBtns.push(btnId);
+          return selBtns;
         }
-      } else if (tempBtns.includes(btnId)) {
-        const findIndex = tempBtns.indexOf(btnId);
-        tempBtns.splice(findIndex, 1);
-        return tempBtns;
+      } else if (selBtns.includes(btnId)) {
+        const findIndex = selBtns.indexOf(btnId);
+        selBtns.splice(findIndex, 1);
+        return selBtns;
       }
-      return tempBtns;
+      return selBtns;
     });
   };
+
   const handleSelectedAttributes = (value) => {
     const { groupName, field } = value;
     setSelectedAttributes((prevState) => {
-      const tempAttributes = { ...prevState };
-      const tempSubGroup = tempAttributes[groupName];
-      if (tempSubGroup) {
-        if (tempSubGroup.includes(field)) {
-          const findIndex = tempSubGroup.indexOf(field);
-          tempSubGroup.splice(findIndex, 1);
-          if (!tempSubGroup.length) delete tempAttributes[groupName];
-        } else {
-          tempSubGroup.push(field);
-        }
-      } else {
-        tempAttributes[groupName] = [field];
-      }
-      return tempAttributes;
+      const selAttributes = { ...prevState };
+      const subGroup = selAttributes[groupName];
+      if (subGroup) {
+        if (subGroup.includes(field)) {
+          const findIndex = subGroup.indexOf(field);
+          subGroup.splice(findIndex, 1);
+          if (!subGroup.length) delete selAttributes[groupName];
+        } else subGroup.push(field);
+      } else selAttributes[groupName] = [field];
+      return selAttributes;
     });
   };
-  const handleSelectedTokens = (value) => {
-    setSelectedTokens((prevState) => {
-      const tempTokens = [...prevState];
-      if (!tempTokens.includes(value)) {
-        tempTokens.push(value);
-      } else {
-        const findIndex = tempTokens.indexOf(value);
-        tempTokens.splice(findIndex, 1);
-      }
-      return tempTokens;
-    });
+
+  const handleSingleMobileFilterBtn = (btnId) => {
+    if (btnId === rangeBtnId) handleMobileFilter('range', emptyRange);
+    else if (btnId === adultBtnId) handleMobileFilter('adult', false);
+    else handleMobileFilter('statype', btnId);
   };
 
   const handleFilter = (key, value) => {
     setPage(1);
     switch (key) {
-      case 'statype':
-        handleBtns(value);
+      case 'statype': // status btn
+        handleSingleFilterBtn(value);
         break;
-      case 'selectedBtns':
-        setSelectedBtns(value);
+      case 'token': // quote token
+        setSelectedTokens((prevState) => {
+          const selTokens = [...prevState];
+          if (!selTokens.includes(value)) {
+            selTokens.push(value);
+          } else {
+            const findIndex = selTokens.indexOf(value);
+            selTokens.splice(findIndex, 1);
+          }
+          return selTokens;
+        });
         break;
-      case 'range':
+      case 'range': // price range
         setSelectedByValue(value.min || value.max, rangeBtnId);
         setRange(value);
         break;
-      case 'attributes':
+      case 'attributes': // attribute
         handleSelectedAttributes(value);
         break;
-      case 'token':
-        handleSelectedTokens(value);
+      case 'selectedBtns':
+        setSelectedBtns(value);
         break;
       case 'selectedTokens':
         setSelectedTokens(value);
@@ -372,7 +331,8 @@ export default function CollectionDetail() {
         break;
     }
   };
-  const handleFilterMobile = (key, value) => {
+
+  const handleMobileFilter = (key, value) => {
     const tempForm = { ...filterForm };
     const tempBtns = [...filterForm.selectedBtns];
     tempForm[key] = value;
@@ -427,6 +387,7 @@ export default function CollectionDetail() {
     tempForm.selectedBtns = tempBtns;
     setFilterForm(tempForm);
   };
+
   const applyFilterForm = (e) => {
     const tempForm = { ...filterForm };
     delete tempForm.statype;
@@ -436,11 +397,6 @@ export default function CollectionDetail() {
     Object.keys(tempForm).forEach((key) => handleFilter(key, tempForm[key]));
     setFilterForm(tempForm);
     closeFilter(e);
-  };
-  const handleClearAll = () => {
-    setSelectedBtns([]);
-    setRange(emptyRange);
-    setAdult(false);
   };
 
   const closeFilter = () => {
@@ -537,7 +493,7 @@ export default function CollectionDetail() {
                           color="origin"
                           endIcon={<CloseIcon />}
                           onClick={() => {
-                            handleBtns(nameId);
+                            handleSingleFilterBtn(nameId);
                           }}
                         >
                           {buttonName}
@@ -545,7 +501,7 @@ export default function CollectionDetail() {
                       );
                     })}
                     {selectedBtns.length > 0 && (
-                      <Button color="inherit" onClick={handleClearAll}>
+                      <Button color="inherit" onClick={clearAllFilterBtn}>
                         Clear All
                       </Button>
                     )}
@@ -553,7 +509,7 @@ export default function CollectionDetail() {
                 </Box>
                 <Box sx={{ display: 'flex' }}>
                   <AssetSortSelect selected={order} onChange={setOrder} />
-                  <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                  <ToggleButtonGroup value={dispMode} exclusive onChange={changeDispMode} size="small">
                     <ToggleButton value={0}>
                       <GridViewSharpIcon />
                     </ToggleButton>
@@ -575,6 +531,11 @@ export default function CollectionDetail() {
                 }}
               >
                 <CollectionFilterPan
+                  token={token}
+                  chainIndex={getChainIndexFromChain(chain)}
+                  btnGroup={btnGroup}
+                  filterProps={{ selectedBtns, selectedTokens, selectedAttributes, range, adult, order }}
+                  handleFilter={handleFilter}
                   sx={{
                     position: 'absolute',
                     width: drawerWidth,
@@ -582,13 +543,6 @@ export default function CollectionDetail() {
                     left: drawerWidth * (isFilterView - 1) - 24,
                     transition: 'all ease .5s',
                     p: 1
-                  }}
-                  filterProps={{ selectedBtns, selectedTokens, selectedAttributes, range, adult, order }}
-                  {...{
-                    btnGroup,
-                    handleFilter,
-                    address: collectionParam.address,
-                    marketPlace: collectionParam.marketPlace
                   }}
                 />
               </Box>
@@ -599,7 +553,7 @@ export default function CollectionDetail() {
                 <MHidden width="smUp">
                   <Box sx={{ display: 'flex', p: '10px', pb: 1 }}>
                     <AssetSortSelect selected={order} onChange={setOrder} sx={{ flex: 1 }} />
-                    <ToggleButtonGroup value={dispmode} exclusive onChange={handleDispmode} size="small">
+                    <ToggleButtonGroup value={dispMode} exclusive onChange={changeDispMode} size="small">
                       <ToggleButton value={0}>
                         <SquareIcon />
                       </ToggleButton>
@@ -624,13 +578,14 @@ export default function CollectionDetail() {
                   }
                   style={{ padding: '10px' }}
                 >
-                  <AssetGrid {...{ assets: isLoadingAssets ? [...assets, ...loadingSkeletons] : assets, dispmode }} />
+                  <AssetGrid {...{ assets: isLoadingAssets ? [...assets, ...loadingSkeletons] : assets, dispMode }} />
                 </InfiniteScroll>
               </Box>
             </Box>
           </Stack>
         </Container>
       </Stack>
+
       <MHidden width="mdUp">
         <FilterBtnContainerStyle>
           <Button size="large" variant="contained" color="origin" onClick={closeFilter}>
@@ -640,7 +595,6 @@ export default function CollectionDetail() {
             )}
           </Button>
         </FilterBtnContainerStyle>
-
         <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isFilterView !== 1} onClick={closeFilter} />
         <Box
           sx={{
@@ -681,9 +635,7 @@ export default function CollectionDetail() {
                         variant="outlined"
                         color="origin"
                         endIcon={<CloseIcon />}
-                        onClick={() => {
-                          handleBtnsMobile(nameId);
-                        }}
+                        onClick={() => handleSingleMobileFilterBtn(nameId)}
                         sx={{ mr: 1, mb: 1 }}
                       >
                         {buttonName}
@@ -693,7 +645,7 @@ export default function CollectionDetail() {
                   <Button
                     color="inherit"
                     onClick={() => {
-                      handleFilterMobile('clear_all', null);
+                      handleMobileFilter('clear_all', null);
                     }}
                     sx={{ mb: 1 }}
                   >
@@ -704,12 +656,14 @@ export default function CollectionDetail() {
               </>
             )}
             <CollectionFilterPan
+              token={token}
+              chainIndex={getChainIndexFromChain(chain)}
+              btnGroup={btnGroup}
+              filterProps={filterForm}
+              handleFilter={handleMobileFilter}
               sx={{
                 display: 'contents'
               }}
-              filterProps={filterForm}
-              handleFilter={handleFilterMobile}
-              {...{ btnGroup, address: collectionParam.address, marketPlace: collectionParam.marketPlace }}
             />
             <Divider />
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 2, pr: 1, pl: 2.5 }}>
