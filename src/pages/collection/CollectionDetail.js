@@ -79,7 +79,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 
 export default function CollectionDetail() {
   const sessionDispMode = sessionStorage.getItem('disp-mode');
-  const sessionFilterProps = JSON.parse(sessionStorage.getItem('filter-props-other')) || {};
+  const sessionFilterProps = JSON.parse(sessionStorage.getItem('collection-filter-props')) || {};
   const params = useParams(); // params.collection
   const drawerWidth = 360;
   const btnGroup = {
@@ -163,15 +163,6 @@ export default function CollectionDetail() {
       const { signal } = newController;
       setAbortController(newController);
 
-      // let itemTypeFilter = btnGroup.type.filter(
-      //   (_, index) => selectedBtns.indexOf(index + btnGroup.status.length) >= 0
-      // );
-      // itemTypeFilter =
-      //   itemTypeFilter.length === btnGroup.type.length || itemTypeFilter.length === 0
-      //     ? 'All'
-      //     : itemTypeFilter[0].toLowerCase();
-      // if (itemTypeFilter === 'general') itemTypeFilter = itemTypeFilter.concat(',image');
-
       setLoadingAssets(true);
       const bodyParams = {
         pageNum: page,
@@ -179,13 +170,12 @@ export default function CollectionDetail() {
         chain,
         collection: token,
         status: selectedBtns.filter((el) => el >= 0 && el <= 4).sort(),
-        sort: order,
         token: selectedTokens,
-        minPrice: range.min !== '' ? range.min * 1 : '',
-        maxPrice: range.max !== '' ? range.max * 1 : ''
-        // attribute: Object.keys(selectedAttributes).length ? selectedAttributes : '',
-        // itemType: itemTypeFilter
+        sort: order
       };
+      if (Object.keys(selectedAttributes).length) bodyParams.attribute = selectedAttributes;
+      if (range.min !== '') bodyParams.minPrice = range.min * 1;
+      if (range.max !== '') bodyParams.maxPrice = range.max * 1;
       if (!loadNext) setAssets([]);
       try {
         const res = await fetchAPIFrom('api/v1/listCollectibleOfCollection', {
@@ -210,7 +200,7 @@ export default function CollectionDetail() {
       setLoadingAssets(false);
 
       sessionStorage.setItem(
-        'filter-props-other',
+        'collection-filter-props',
         JSON.stringify({ selectedBtns, selectedAttributes, range, selectedTokens, adult, order })
       );
       setFilterForm({ selectedBtns, selectedAttributes, range, selectedTokens, adult, order });
@@ -266,22 +256,6 @@ export default function CollectionDetail() {
     });
   };
 
-  const handleSelectedAttributes = (value) => {
-    const { groupName, field } = value;
-    setSelectedAttributes((prevState) => {
-      const selAttributes = { ...prevState };
-      const subGroup = selAttributes[groupName];
-      if (subGroup) {
-        if (subGroup.includes(field)) {
-          const findIndex = subGroup.indexOf(field);
-          subGroup.splice(findIndex, 1);
-          if (!subGroup.length) delete selAttributes[groupName];
-        } else subGroup.push(field);
-      } else selAttributes[groupName] = [field];
-      return selAttributes;
-    });
-  };
-
   const handleSingleMobileFilterBtn = (btnId) => {
     if (btnId === rangeBtnId) handleMobileFilter('range', emptyRange);
     else if (btnId === adultBtnId) handleMobileFilter('adult', false);
@@ -311,7 +285,18 @@ export default function CollectionDetail() {
         setRange(value);
         break;
       case 'attributes': // attribute
-        handleSelectedAttributes(value);
+        setSelectedAttributes((prevState) => {
+          const selAttributes = { ...prevState };
+          const arrSubGroup = selAttributes[value.groupName];
+          if (arrSubGroup) {
+            const index = arrSubGroup.indexOf(value.name);
+            if (index >= 0) {
+              arrSubGroup.splice(index, 1);
+              if (!arrSubGroup.length) delete selAttributes[value.groupName];
+            } else arrSubGroup.push(value.name);
+          } else selAttributes[value.groupName] = [value.name];
+          return selAttributes;
+        });
         break;
       case 'selectedBtns':
         setSelectedBtns(value);
@@ -362,19 +347,15 @@ export default function CollectionDetail() {
         tempForm.selectedTokens.splice(findIndex, 1);
       }
     } else if (key === 'attributes') {
-      const { groupName, field } = value;
-      const tempSubGroup = tempForm.selectedAttributes[groupName];
-      if (tempSubGroup) {
-        if (tempSubGroup.includes(field)) {
-          const findIndex = tempSubGroup.indexOf(field);
-          tempSubGroup.splice(findIndex, 1);
-          if (!tempSubGroup.length) delete tempForm.selectedAttributes[groupName];
-        } else {
-          tempSubGroup.push(field);
-        }
-      } else {
-        tempForm.selectedAttributes[groupName] = [field];
-      }
+      const { groupName, name } = value;
+      const arrSubGroup = tempForm.selectedAttributes[groupName];
+      if (arrSubGroup) {
+        const index = arrSubGroup.indexOf(value.name);
+        if (index >= 0) {
+          arrSubGroup.splice(index, 1);
+          if (!arrSubGroup.length) delete tempForm.selectedAttributes[groupName];
+        } else arrSubGroup.push(name);
+      } else tempForm.selectedAttributes[groupName] = [name];
     } else if (key === 'adult') {
       if (value) {
         if (!tempBtns.includes(adultBtnId)) tempBtns.push(adultBtnId);
