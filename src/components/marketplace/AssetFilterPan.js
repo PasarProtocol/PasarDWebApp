@@ -31,7 +31,13 @@ import CustomSwitch from '../custom-switch';
 import SearchBox from '../SearchBox';
 import Scrollbar from '../Scrollbar';
 import StyledButton from '../signin-dlg/StyledButton';
-import { fetchFrom, getIpfsUrl, getCoinTypesGroup4Filter } from '../../utils/common';
+import {
+  getCoinTypesGroup4Filter,
+  fetchAPIFrom,
+  getChainIndexFromChain,
+  coinTypesGroup,
+  getImageFromIPFSUrl
+} from '../../utils/common';
 // ----------------------------------------------------------------------
 const DrawerStyle = styled(Drawer)(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -54,108 +60,67 @@ const AccordionStyle = styled(Accordion)({
 });
 
 AssetFilterPan.propTypes = {
-  sx: PropTypes.any,
-  scrollMaxHeight: PropTypes.string,
+  chain: PropTypes.string,
   btnGroup: PropTypes.any,
   filterProps: PropTypes.any,
-  handleFilter: PropTypes.func
+  handleFilter: PropTypes.func,
+  scrollMaxHeight: PropTypes.string,
+  sx: PropTypes.any
 };
 
 export default function AssetFilterPan(props) {
+  const { chain, btnGroup, filterProps, handleFilter, scrollMaxHeight, sx } = props;
+  const { selectedBtns = [], selectedTokens = [], selectedCollections = [], range } = filterProps;
+  const chainIndex = getChainIndexFromChain(chain);
   const coinTypeClass = getCoinTypesGroup4Filter();
-  const { sx, scrollMaxHeight, btnGroup, filterProps, handleFilter } = props;
-  const { chainType = 0 } = filterProps;
-  const [minVal, setMinVal] = React.useState(filterProps.range ? filterProps.range.min : '');
-  const [maxVal, setMaxVal] = React.useState(filterProps.range ? filterProps.range.max : '');
+  const coinTypes = chainIndex > 0 ? coinTypeClass[chainIndex - 1] : coinTypesGroup.ESC;
+  const [minVal, setMinVal] = React.useState(range?.min || '');
+  const [maxVal, setMaxVal] = React.useState(range?.max || '');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
   const [collections, setCollections] = React.useState([]);
   const [filterCollections, setFilterCollections] = React.useState([]);
-  const [filterTokens, setFilterTokens] = React.useState(coinTypeClass[chainType]);
+  const [filterTokens, setFilterTokens] = React.useState(coinTypes);
   const [controller, setAbortController] = React.useState(new AbortController());
 
   React.useEffect(() => {
-    controller.abort(); // cancel the previous request
-    const newController = new AbortController();
-    const { signal } = newController;
-    setAbortController(newController);
-    fetchFrom(`api/v2/sticker/getCollection?marketPlace=${chainType}`, { signal }).then((response) => {
-      response.json().then((jsonCollections) => {
-        if (!Array.isArray(jsonCollections.data)) return;
+    const fetchData = async () => {
+      controller.abort(); // cancel the previous request
+      const newController = new AbortController();
+      const { signal } = newController;
+      setAbortController(newController);
 
-        const resCollections = [...jsonCollections.data].map((item) => {
-          const tempItem = { ...item, avatar: '' };
-          return tempItem;
-        });
-
-        const allCollections = resCollections.map((collection) => ({
-          ...collection,
-          token: `${collection.marketPlace}-${collection.token}`
-        }));
-        setCollections(allCollections);
-        setFilterCollections(allCollections);
+      const resCnt = await fetchAPIFrom(`api/v1/listCollections?pageNum=1&pageSize=1&chain=${chain}`, {
+        signal
       });
-    });
-    setFilterTokens(coinTypeClass[chainType]);
+      const jsonCnt = await resCnt.json();
+      const res = await fetchAPIFrom(
+        `api/v1/listCollections?pageNum=1&pageSize=${jsonCnt?.data?.total ?? 10}&chain=${chain}`,
+        {
+          signal
+        }
+      );
+      const json = await res.json();
+      const cols = json?.data?.data || [];
+      const resCols = cols.map((item) => {
+        const rlt = {};
+        return {
+          ...rlt,
+          chain: [item?.chain || '', item?.token || ''].join('&'),
+          avatar: getImageFromIPFSUrl(item?.data?.avatar),
+          name: item?.name || ''
+        };
+      });
+      setCollections(resCols);
+      setFilterCollections(resCols);
+    };
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chainType]);
+  }, [chain]);
 
   React.useEffect(() => {
-    collections.forEach((item, _id) => {
-      if (!item.uri || item.avatar) return;
-      const metaUri = getIpfsUrl(item.uri);
-      if (metaUri) {
-        fetch(metaUri)
-          .then((response) => response.json())
-          .then((data) => {
-            setCollections((prevStatus) => {
-              const tempCollections = [...prevStatus];
-              if (!tempCollections[_id]) return;
-              tempCollections[_id].avatar = getIpfsUrl(data.data.avatar);
-              // eslint-disable-next-line consistent-return
-              return tempCollections;
-            });
-            setFilterCollections((prevStatus) => {
-              const tempCollections = [...prevStatus];
-              if (!tempCollections[_id]) return;
-              tempCollections[_id].avatar = getIpfsUrl(data.data.avatar);
-              // eslint-disable-next-line consistent-return
-              return tempCollections;
-            });
-          })
-          .catch(console.log);
-      }
-    });
-  }, [collections]);
-
-  React.useEffect(() => {
-    setMinVal(filterProps.range.min);
-    setMaxVal(filterProps.range.max);
-  }, [filterProps.range]);
-
-  const searchCollections = (inputStr) => {
-    if (inputStr.length) {
-      setFilterCollections(collections.filter((el) => el.name.toLowerCase().includes(inputStr.toLowerCase())));
-    } else {
-      setFilterCollections(collections);
-    }
-  };
-
-  const searchTokens = (inputStr) => {
-    const tempCoinTypes = coinTypeClass[chainType];
-    if (inputStr.length) {
-      setFilterTokens(tempCoinTypes.filter((el) => el.name.toLowerCase().includes(inputStr.toLowerCase())));
-    } else {
-      setFilterTokens(tempCoinTypes);
-    }
-  };
-
-  const selectCollection = (address) => {
-    handleFilter('collection', address);
-  };
-
-  const selectToken = (address) => {
-    handleFilter('token', address);
-  };
+    setMinVal(range?.min || '');
+    setMaxVal(range?.max || '');
+  }, [range]);
 
   const applyRange = () => {
     const range = { min: minVal, max: maxVal };
@@ -166,6 +131,23 @@ export default function AssetFilterPan(props) {
     setErrRangeInput(false);
     handleFilter('range', range);
   };
+
+  const searchCollections = (inputStr) => {
+    if (inputStr.length) {
+      setFilterCollections(collections.filter((el) => el.name.toLowerCase().includes(inputStr.toLowerCase())));
+    } else {
+      setFilterCollections(collections);
+    }
+  };
+
+  const searchTokens = (inputStr) => {
+    if (inputStr.length) {
+      setFilterTokens(coinTypes.filter((el) => el.name.toLowerCase().includes(inputStr.toLowerCase())));
+    } else {
+      setFilterTokens(coinTypes);
+    }
+  };
+
   return (
     <DrawerStyle variant="persistent" open sx={sx}>
       <Scrollbar sx={{ maxHeight: scrollMaxHeight, px: 1 }}>
@@ -180,9 +162,7 @@ export default function AssetFilterPan(props) {
                   {btnGroup.status.map((name, index) => (
                     <Button
                       key={index}
-                      variant={
-                        filterProps.selectedBtns && filterProps.selectedBtns.includes(index) ? 'contained' : 'outlined'
-                      }
+                      variant={selectedBtns.includes(index) ? 'contained' : 'outlined'}
                       color="inherit"
                       onClick={() => handleFilter('statype', index)}
                       sx={{ mr: 1, mb: 1 }}
@@ -291,10 +271,8 @@ export default function AssetFilterPan(props) {
                     {filterCollections.map((el, i) => (
                       <ListItemButton
                         key={i}
-                        onClick={() => {
-                          selectCollection(el.token);
-                        }}
-                        selected={filterProps.selectedCollections.includes(el.token)}
+                        onClick={() => handleFilter('collection', el.key)}
+                        selected={selectedCollections.includes(el.key)}
                       >
                         <ListItemIcon>
                           <Box
@@ -305,13 +283,13 @@ export default function AssetFilterPan(props) {
                               width: 24,
                               height: 24,
                               borderRadius: 2,
-                              p: el.avatar.startsWith('/static') ? 0.5 : 0,
+                              p: (el?.avatar || '').startsWith('/static') ? 0.5 : 0,
                               backgroundColor: 'black'
                             }}
                           />
                         </ListItemIcon>
                         <ListItemText primary={el.name} primaryTypographyProps={{ noWrap: true }} />
-                        {filterProps.selectedCollections.includes(el.token) && <CheckIcon />}
+                        {selectedCollections.includes(el.key) && <CheckIcon />}
                       </ListItemButton>
                     ))}
                   </List>
@@ -328,12 +306,10 @@ export default function AssetFilterPan(props) {
               <AccordionDetails>
                 <Stack spacing={1} direction="row">
                   {btnGroup.type.map((name, index) =>
-                    filterProps.selectedBtns ? (
+                    selectedBtns ? (
                       <Button
                         key={index}
-                        variant={
-                          filterProps.selectedBtns.includes(index + btnGroup.status.length) ? 'contained' : 'outlined'
-                        }
+                        variant={selectedBtns.includes(index + btnGroup.status.length) ? 'contained' : 'outlined'}
                         color="inherit"
                         onClick={() => handleFilter('statype', index + btnGroup.status.length)}
                       >
@@ -371,10 +347,8 @@ export default function AssetFilterPan(props) {
                     {filterTokens.map((el, i) => (
                       <ListItemButton
                         key={i}
-                        onClick={() => {
-                          selectToken(el.address);
-                        }}
-                        selected={filterProps.selectedTokens.includes(el.address)}
+                        onClick={() => handleFilter('token', el.address)}
+                        selected={selectedTokens.includes(el.address)}
                       >
                         <ListItemIcon>
                           <Box
@@ -392,14 +366,14 @@ export default function AssetFilterPan(props) {
                         <ListItemText
                           primary={el.name}
                           primaryTypographyProps={
-                            chainType < 2 && i < 2
+                            chainIndex < 2 && i < 2
                               ? {
                                   sx: { fontWeight: 'bold' }
                                 }
                               : {}
                           }
                         />
-                        {filterProps.selectedTokens.includes(el.address) && <CheckIcon />}
+                        {selectedTokens.includes(el.address) && <CheckIcon />}
                       </ListItemButton>
                     ))}
                   </List>
@@ -416,13 +390,7 @@ export default function AssetFilterPan(props) {
               <AccordionDetails>
                 <FormControlLabel
                   checked={filterProps.adult || false}
-                  control={
-                    <CustomSwitch
-                      onChange={(e) => {
-                        handleFilter('adult', e.target.checked);
-                      }}
-                    />
-                  }
+                  control={<CustomSwitch onChange={(e) => handleFilter('adult', e.target.checked)} />}
                   label={filterProps.adult ? 'On' : 'Off'}
                   labelPlacement="end"
                   sx={{ ml: 2, pr: 2 }}
