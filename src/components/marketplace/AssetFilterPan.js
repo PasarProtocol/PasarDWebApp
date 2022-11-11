@@ -70,7 +70,7 @@ AssetFilterPan.propTypes = {
 
 export default function AssetFilterPan(props) {
   const { chain, btnGroup, filterProps, handleFilter, scrollMaxHeight, sx } = props;
-  const { selectedBtns = [], selectedTokens = [], selectedCollections = [], range } = filterProps;
+  const { selectedBtns = [], selectedTokens = [], selectedCollections = [], range, adult } = filterProps;
   const chainIndex = getChainIndexFromChain(chain);
   const coinTypeClass = getCoinTypesGroup4Filter();
   const coinTypes = chainIndex > 0 ? coinTypeClass[chainIndex - 1] : coinTypesGroup.ESC;
@@ -105,7 +105,7 @@ export default function AssetFilterPan(props) {
         const rlt = {};
         return {
           ...rlt,
-          // key: [item?.chain || '', item?.token || ''].join('&'),
+          key: [item?.chain || '', item?.token || ''].join('&'),
           chain: item?.chain || '',
           token: item?.token || '',
           avatar: getImageFromIPFSUrl(item?.data?.avatar),
@@ -273,14 +273,8 @@ export default function AssetFilterPan(props) {
                     {filterCollections.map((el, i) => (
                       <ListItemButton
                         key={i}
-                        // onClick={() => handleFilter('collection', el.key)}
-                        // selected={selectedCollections.includes(el.key)}
-                        onClick={() => handleFilter('collection', { chain: el.chain, token: el.token })}
-                        selected={
-                          selectedCollections.findIndex(
-                            (item) => item.token === el.token && item.chain === el.chain
-                          ) !== -1
-                        }
+                        onClick={() => handleFilter('collection', { key: el.key, chain: el.chain, token: el.token })}
+                        selected={selectedCollections.findIndex((item) => item.key === el.key) >= 0}
                       >
                         <ListItemIcon>
                           <Box
@@ -297,8 +291,7 @@ export default function AssetFilterPan(props) {
                           />
                         </ListItemIcon>
                         <ListItemText primary={el.name} primaryTypographyProps={{ noWrap: true }} />
-                        {selectedCollections.findIndex((item) => item.token === el.token && item.chain === el.chain) !==
-                          -1 && <CheckIcon />}
+                        {selectedCollections.findIndex((item) => item.key === el.key) >= 0 && <CheckIcon />}
                       </ListItemButton>
                     ))}
                   </List>
@@ -398,9 +391,9 @@ export default function AssetFilterPan(props) {
               </AccordionSummary>
               <AccordionDetails>
                 <FormControlLabel
-                  checked={filterProps.adult || false}
+                  checked={adult || false}
                   control={<CustomSwitch onChange={(e) => handleFilter('adult', e.target.checked)} />}
-                  label={filterProps.adult ? 'On' : 'Off'}
+                  label={adult ? 'On' : 'Off'}
                   labelPlacement="end"
                   sx={{ ml: 2, pr: 2 }}
                 />
