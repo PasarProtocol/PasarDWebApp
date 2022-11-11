@@ -46,7 +46,7 @@ export default function ChooseCollection(props) {
         const chain = chainTypes.find((item) => item.symbol === chainType).token.toLowerCase();
         if (essentialAddress) {
           const res = await fetchAPIFrom(
-            `api/v1/getCollectionsByWalletAddr?chain=${chain}&walletAddr=0x9A754044FbfA95d15b252453c1BB5401320A8386`,
+            `api/v1/getCollectionsByWalletAddr?chain=${chain}&walletAddr=${essentialAddress}`,
             { signal }
           );
           const json = await res.json();
