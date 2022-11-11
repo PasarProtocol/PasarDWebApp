@@ -105,7 +105,9 @@ export default function AssetFilterPan(props) {
         const rlt = {};
         return {
           ...rlt,
-          chain: [item?.chain || '', item?.token || ''].join('&'),
+          // key: [item?.chain || '', item?.token || ''].join('&'),
+          chain: item?.chain || '',
+          token: item?.token || '',
           avatar: getImageFromIPFSUrl(item?.data?.avatar),
           name: item?.name || ''
         };
@@ -271,8 +273,14 @@ export default function AssetFilterPan(props) {
                     {filterCollections.map((el, i) => (
                       <ListItemButton
                         key={i}
-                        onClick={() => handleFilter('collection', el.key)}
-                        selected={selectedCollections.includes(el.key)}
+                        // onClick={() => handleFilter('collection', el.key)}
+                        // selected={selectedCollections.includes(el.key)}
+                        onClick={() => handleFilter('collection', { chain: el.chain, token: el.token })}
+                        selected={
+                          selectedCollections.findIndex(
+                            (item) => item.token === el.token && item.chain === el.chain
+                          ) !== -1
+                        }
                       >
                         <ListItemIcon>
                           <Box
@@ -289,7 +297,8 @@ export default function AssetFilterPan(props) {
                           />
                         </ListItemIcon>
                         <ListItemText primary={el.name} primaryTypographyProps={{ noWrap: true }} />
-                        {selectedCollections.includes(el.key) && <CheckIcon />}
+                        {selectedCollections.findIndex((item) => item.token === el.token && item.chain === el.chain) !==
+                          -1 && <CheckIcon />}
                       </ListItemButton>
                     ))}
                   </List>
