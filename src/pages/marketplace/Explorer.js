@@ -26,8 +26,6 @@ import arrowIosForwardFill from '@iconify/icons-eva/arrow-ios-forward-fill';
 import arrowIosBackFill from '@iconify/icons-eva/arrow-ios-back-fill';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
-
-// components
 import { MHidden } from '../../components/@material-extend';
 import Page from '../../components/Page';
 import ChainSelect from '../../components/ChainSelect';
@@ -38,10 +36,9 @@ import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSignin from '../../hooks/useSignin';
-import { fetchFrom } from '../../utils/common';
+import { chainTypes, fetchAPIFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
-
 const RootStyle = styled(Page)(({ theme }) => ({
   paddingTop: theme.spacing(11),
   paddingBottom: theme.spacing(12),
@@ -93,6 +90,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
   alignItems: 'center',
   marginLeft: theme.spacing(1)
 }));
+
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
   const sessionDispMode = sessionStorage.getItem('disp-mode');
@@ -103,6 +101,7 @@ export default function MarketExplorer() {
     status: ['Buy Now', 'On Auction', 'Not Met', 'Has Bids', 'Has Ended'],
     type: ['General', 'Avatar']
   };
+  const chains = [{ token: 'all' }, ...chainTypes];
   const { openTopAlert } = useSignin();
   const APP_BAR_MOBILE = 72 + (openTopAlert ? 50 : 0);
   const APP_BAR_DESKTOP = 88 + (openTopAlert ? 50 : 0);
@@ -111,6 +110,7 @@ export default function MarketExplorer() {
   const emptyRange = { min: '', max: '' };
   const defaultDispMode = isMobile ? 1 : 0;
   const isOffset = useOffSetTop(20);
+
   const [assets, setAssets] = React.useState([]);
   const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
   const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
@@ -134,7 +134,6 @@ export default function MarketExplorer() {
   const [chainType, setChainType] = React.useState(sessionFilterProps.chainType || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
-
   const [loadNext, setLoadNext] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
@@ -146,6 +145,7 @@ export default function MarketExplorer() {
       setPage(page + 1);
     }
   };
+
   const handleDispInLaptopSize = () => {
     const sessionDispMode = sessionStorage.getItem('disp-mode');
     if (sessionDispMode !== null) return;
@@ -161,75 +161,62 @@ export default function MarketExplorer() {
     handleDispInLaptopSize();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   React.useEffect(() => {
     const fetchData = async () => {
       controller.abort(); // cancel the previous request
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
-      let statusFilter = btnGroup.status.filter((_, index) => selectedBtns.indexOf(index) >= 0);
-      statusFilter =
-        statusFilter.length === btnGroup.status.length || statusFilter.length === 0 ? 'All' : statusFilter.join(',');
-      let itemTypeFilter = btnGroup.type.filter(
-        (_, index) => selectedBtns.indexOf(index + btnGroup.status.length) >= 0
-      );
-      itemTypeFilter =
-        itemTypeFilter.length === btnGroup.type.length || itemTypeFilter.length === 0
-          ? 'All'
-          : itemTypeFilter[0].toLowerCase();
-      if (itemTypeFilter === 'general') itemTypeFilter = itemTypeFilter.concat(',image');
-      setLoadingAssets(true);
-      let collectionTypeStr = '';
-      let chainTypeForCollection = 0;
-      selectedCollections.forEach((collectionAddr) => {
-        collectionTypeStr = collectionTypeStr.concat(collectionTypeStr.length ? ',' : '', collectionAddr.substr(2));
-        if (chainTypeForCollection !== collectionAddr.charAt(0) * 1 && chainTypeForCollection < 3)
-          chainTypeForCollection += collectionAddr.charAt(0) * 1;
-      });
-      chainTypeForCollection %= 3;
 
-      let tokenTypeStr = '';
-      let chainTypeForToken = 0;
-      selectedTokens.forEach((tokenAddr) => {
-        tokenTypeStr = tokenTypeStr.concat(tokenTypeStr.length ? ',' : '', tokenAddr.substr(2));
-        if (chainTypeForToken !== tokenAddr.charAt(0) * 1 && chainTypeForToken < 3)
-          chainTypeForToken += tokenAddr.charAt(0) * 1;
-      });
-      chainTypeForToken %= 3;
+      // let itemTypeFilter = btnGroup.type.filter(
+      //   (_, index) => selectedBtns.indexOf(index + btnGroup.status.length) >= 0
+      // );
+      // itemTypeFilter =
+      //   itemTypeFilter.length === btnGroup.type.length || itemTypeFilter.length === 0
+      //     ? 'All'
+      //     : itemTypeFilter[0].toLowerCase();
+      // if (itemTypeFilter === 'general') itemTypeFilter = itemTypeFilter.concat(',image');
+
+      setLoadingAssets(true);
+      const bodyParams = {
+        pageNum: page,
+        pageSize: showCount,
+        chain: chains[chainType].token.toLowerCase(),
+        status: selectedBtns.filter((el) => el >= 0 && el <= 4).sort(),
+        // sort: order,
+        collection: selectedCollections.map((el) => el.token),
+        token: selectedTokens,
+        adult,
+        minPrice: range.min !== '' ? range.min * 1 : '',
+        maxPrice: range.max !== '' ? range.max * 1 : ''
+        // itemType: itemTypeFilter
+        // `keyword=${params.key ? params.key : ''}&` +
+      };
       if (!loadNext) setAssets([]);
-      fetchFrom(
-        `api/v2/sticker/getDetailedCollectibles?` +
-          `collectionType=${collectionTypeStr}&` +
-          `tokenType=${tokenTypeStr}&` +
-          `status=${statusFilter}&` +
-          `itemType=${itemTypeFilter}&` +
-          `adult=${adult}&` +
-          `minPrice=${range.min !== '' ? range.min * 1e18 : ''}&` +
-          `maxPrice=${range.max !== '' ? range.max * 1e18 : ''}&` +
-          `order=${order}&` +
-          `marketPlace=${chainTypeForCollection || chainTypeForToken || chainType}&` +
-          `keyword=${params.key ? params.key : ''}&` +
-          `pageNum=${page}&` +
-          `pageSize=${showCount}`,
-        { signal }
-      )
-        .then((response) => {
-          response.json().then((json) => {
-            if (json?.data) {
-              const totalCnt = json.data.total ?? 0;
-              setTotalCount(totalCnt);
-              setPages(Math.ceil(totalCnt / showCount));
-              if (loadNext) setAssets([...assets, ...json.data.result]);
-              else setAssets(json.data.result);
-            }
-            setAlreadyMounted(false);
-            setLoadNext(false);
-            setLoadingAssets(false);
-          });
-        })
-        .catch((e) => {
-          if (e.code !== e.ABORT_ERR) setLoadingAssets(false);
+      try {
+        const res = await fetchAPIFrom('api/v1/marketplace', {
+          method: 'POST',
+          cache: 'no-cache',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(bodyParams),
+          signal
         });
+        const json = await res.json();
+        const totalCnt = json.data.total ?? 0;
+        setTotalCount(totalCnt);
+        setPages(Math.ceil(totalCnt / showCount));
+        if (loadNext) setAssets([...assets, ...(json?.data?.data || [])]);
+        else setAssets(json?.data?.data || []);
+        setAlreadyMounted(false);
+        setLoadNext(false);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingAssets(false);
+
       sessionStorage.setItem(
         'filter-props',
         JSON.stringify({ selectedBtns, range, selectedCollections, selectedTokens, adult, order, chainType })
@@ -240,97 +227,104 @@ export default function MarketExplorer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, showCount, selectedBtns, selectedCollections, selectedTokens, adult, range, order, chainType, params.key]);
 
-  const handleDispMode = (event, mode) => {
+  console.log('==============', selectedBtns, selectedTokens, selectedCollections, adult, range);
+
+  const changeDispMode = (event, mode) => {
     if (mode === null) return;
     sessionStorage.setItem('disp-mode', mode);
     setDispMode(mode);
   };
-  const handleBtns = (num) => {
-    if (num === rangeBtnId) {
+
+  const handleSingleFilterBtn = (btnId) => {
+    if (btnId === rangeBtnId) {
       handleFilter('range', emptyRange);
       return;
     }
-    if (num === adultBtnId) {
+    if (btnId === adultBtnId) {
       handleFilter('adult', false);
       return;
     }
-    const tempBtns = [...selectedBtns];
-    if (tempBtns.includes(num)) {
-      const findIndex = tempBtns.indexOf(num);
-      tempBtns.splice(findIndex, 1);
-    } else tempBtns.push(num);
-    setSelectedBtns(tempBtns);
+    const selBtns = [...selectedBtns];
+    if (selBtns.includes(btnId)) {
+      const findIndex = selBtns.indexOf(btnId);
+      selBtns.splice(findIndex, 1);
+    } else selBtns.push(btnId);
+    setSelectedBtns(selBtns);
   };
-  const handleBtnsMobile = (num) => {
-    if (num === rangeBtnId) handleFilterMobile('range', emptyRange);
-    else if (num === adultBtnId) handleFilterMobile('adult', false);
-    else handleFilterMobile('statype', num);
+
+  const clearAllFilterBtn = () => {
+    setSelectedBtns([]);
+    setRange(emptyRange);
+    setAdult(false);
   };
+
   const setSelectedByValue = (value, btnId) => {
     setSelectedBtns((prevState) => {
-      const tempBtns = [...prevState];
+      const selBtns = [...prevState];
       if (value) {
-        if (!tempBtns.includes(btnId)) {
-          tempBtns.push(btnId);
-          return tempBtns;
+        if (!selBtns.includes(btnId)) {
+          selBtns.push(btnId);
+          return selBtns;
         }
-      } else if (tempBtns.includes(btnId)) {
-        const findIndex = tempBtns.indexOf(btnId);
-        tempBtns.splice(findIndex, 1);
-        return tempBtns;
+      } else if (selBtns.includes(btnId)) {
+        const findIndex = selBtns.indexOf(btnId);
+        selBtns.splice(findIndex, 1);
+        return selBtns;
       }
-      return tempBtns;
+      return selBtns;
     });
   };
-  const handleSelectedCollections = (value) => {
-    setSelectedCollections((prevState) => {
-      const tempCollections = [...prevState];
-      if (!tempCollections.includes(value)) {
-        tempCollections.push(value);
-      } else {
-        const findIndex = tempCollections.indexOf(value);
-        tempCollections.splice(findIndex, 1);
-      }
-      return tempCollections;
-    });
-  };
-  const handleSelectedTokens = (value) => {
-    setSelectedTokens((prevState) => {
-      const tempTokens = [...prevState];
-      if (!tempTokens.includes(value)) {
-        tempTokens.push(value);
-      } else {
-        const findIndex = tempTokens.indexOf(value);
-        tempTokens.splice(findIndex, 1);
-      }
-      return tempTokens;
-    });
+
+  const handleSingleMobileFilterBtn = (btnId) => {
+    if (btnId === rangeBtnId) handleMobileFilter('range', emptyRange);
+    else if (btnId === adultBtnId) handleMobileFilter('adult', false);
+    else handleMobileFilter('statype', btnId);
   };
 
   const handleFilter = (key, value) => {
     setPage(1);
     switch (key) {
       case 'statype':
-        handleBtns(value);
+        handleSingleFilterBtn(value);
         break;
-      case 'selectedBtns':
-        setSelectedBtns(value);
+      case 'token':
+        setSelectedTokens((prevState) => {
+          const selTokens = [...prevState];
+          if (!selTokens.includes(value)) {
+            selTokens.push(value);
+          } else {
+            const findIndex = selTokens.indexOf(value);
+            selTokens.splice(findIndex, 1);
+          }
+          return selTokens;
+        });
         break;
       case 'range':
         setSelectedByValue(value.min || value.max, rangeBtnId);
         setRange(value);
         break;
       case 'collection':
-        handleSelectedCollections(value);
+        setSelectedCollections((prevState) => {
+          const selCollections = [...prevState];
+          if (selCollections.findIndex((item) => item.chain === value.chain && item.token === value.token) === -1) {
+            selCollections.push(value);
+          } else {
+            const findIndex = selCollections.findIndex(
+              (item) => item.chain === value.chain && item.token === value.token
+            );
+            selCollections.splice(findIndex, 1);
+          }
+          return selCollections;
+        });
         break;
-      case 'token':
-        handleSelectedTokens(value);
-        break;
-      case 'selectedCollections':
-        setSelectedCollections(value);
+      case 'selectedBtns':
+        setSelectedBtns(value);
         break;
       case 'selectedTokens':
         setSelectedTokens(value);
+        break;
+      case 'selectedCollections':
+        setSelectedCollections(value);
         break;
       case 'adult':
         setSelectedByValue(value, adultBtnId);
@@ -340,7 +334,8 @@ export default function MarketExplorer() {
         break;
     }
   };
-  const handleFilterMobile = (key, value) => {
+
+  const handleMobileFilter = (key, value) => {
     const tempForm = { ...filterForm };
     const tempBtns = [...filterForm.selectedBtns];
     tempForm[key] = value;
@@ -363,19 +358,24 @@ export default function MarketExplorer() {
         const findIndex = tempBtns.indexOf(rangeBtnId);
         tempBtns.splice(findIndex, 1);
       }
-    } else if (key === 'collection') {
-      if (!tempForm.selectedCollections.includes(value)) {
-        tempForm.selectedCollections.push(value);
-      } else {
-        const findIndex = tempForm.selectedCollections.indexOf(value);
-        tempForm.selectedCollections.splice(findIndex, 1);
-      }
     } else if (key === 'token') {
       if (!tempForm.selectedTokens.includes(value)) {
         tempForm.selectedTokens.push(value);
       } else {
         const findIndex = tempForm.selectedTokens.indexOf(value);
         tempForm.selectedTokens.splice(findIndex, 1);
+      }
+    } else if (key === 'collection') {
+      if (
+        tempForm.selectedCollections.findIndex((item) => item.chain === value.chain && item.token === value.token) ===
+        -1
+      ) {
+        tempForm.selectedCollections.push(value);
+      } else {
+        const findIndex = tempForm.selectedCollections.findIndex(
+          (item) => item.chain === value.chain && item.token === value.token
+        );
+        tempForm.selectedCollections.splice(findIndex, 1);
       }
     } else if (key === 'adult') {
       if (value) {
@@ -388,6 +388,7 @@ export default function MarketExplorer() {
     tempForm.selectedBtns = tempBtns;
     setFilterForm(tempForm);
   };
+
   const applyFilterForm = () => {
     const tempForm = { ...filterForm };
     delete tempForm.statype;
@@ -398,20 +399,19 @@ export default function MarketExplorer() {
     setFilterForm(tempForm);
     closeFilter();
   };
-  const handleClearAll = () => {
-    setSelectedBtns([]);
-    setRange(emptyRange);
-    setAdult(false);
-  };
+
   const handleChangeChainType = (type) => {
     setChainType(type);
     setSelectedCollections([]);
     setSelectedTokens([]);
   };
+
   const closeFilter = () => {
     setFilterView(!isFilterView && 1);
   };
+
   const loadingSkeletons = Array(25).fill(null);
+
   return (
     <ScrollManager scrollKey="asset-list-key" isAlreadyMounted={isAlreadyMounted}>
       {() => (
@@ -461,16 +461,14 @@ export default function MarketExplorer() {
                               variant="outlined"
                               color="origin"
                               endIcon={<CloseIcon />}
-                              onClick={() => {
-                                handleBtns(nameId);
-                              }}
+                              onClick={() => handleSingleFilterBtn(nameId)}
                             >
                               {buttonName}
                             </Button>
                           );
                         })}
                         {selectedBtns.length > 0 && (
-                          <Button color="inherit" onClick={handleClearAll}>
+                          <Button color="inherit" onClick={clearAllFilterBtn}>
                             Clear All
                           </Button>
                         )}
@@ -479,7 +477,7 @@ export default function MarketExplorer() {
                     <Box sx={{ display: 'flex' }}>
                       <AssetSortSelect selected={order} onChange={setOrder} />
                       <ChainSelect selected={chainType} onChange={handleChangeChainType} />
-                      <ToggleButtonGroup value={dispMode} exclusive onChange={handleDispMode} size="small">
+                      <ToggleButtonGroup value={dispMode} exclusive onChange={changeDispMode} size="small">
                         <ToggleButton value={0}>
                           <GridViewSharpIcon />
                         </ToggleButton>
@@ -503,6 +501,11 @@ export default function MarketExplorer() {
                   aria-label="mailbox folders"
                 >
                   <AssetFilterPan
+                    chain={chains[chainType].token.toLowerCase()}
+                    btnGroup={btnGroup}
+                    handleFilter={handleFilter}
+                    filterProps={{ selectedBtns, selectedCollections, selectedTokens, range, adult, order }}
+                    scrollMaxHeight={`calc(100vh - ${isOffset ? APP_BAR_MOBILE : APP_BAR_DESKTOP}px - 48px)`}
                     sx={{
                       pt: 3,
                       '& .MuiDrawer-paper': {
@@ -512,9 +515,6 @@ export default function MarketExplorer() {
                         left: drawerWidth * (isFilterView - 1)
                       }
                     }}
-                    scrollMaxHeight={`calc(100vh - ${isOffset ? APP_BAR_MOBILE : APP_BAR_DESKTOP}px - 48px)`}
-                    filterProps={{ selectedBtns, selectedCollections, selectedTokens, range, adult, order, chainType }}
-                    {...{ btnGroup, handleFilter }}
                   />
                 </Box>
                 <Box
@@ -527,7 +527,7 @@ export default function MarketExplorer() {
                       <MHidden width="smDown">
                         <ChainSelect selected={chainType} onChange={handleChangeChainType} />
                       </MHidden>
-                      <ToggleButtonGroup value={dispMode} exclusive onChange={handleDispMode} size="small">
+                      <ToggleButtonGroup value={dispMode} exclusive onChange={changeDispMode} size="small">
                         <ToggleButton value={0}>
                           <SquareIcon />
                         </ToggleButton>
@@ -620,7 +620,7 @@ export default function MarketExplorer() {
                             color="origin"
                             endIcon={<CloseIcon />}
                             onClick={() => {
-                              handleBtnsMobile(nameId);
+                              handleSingleMobileFilterBtn(nameId);
                             }}
                             sx={{ mr: 1, mb: 1 }}
                           >
@@ -631,7 +631,7 @@ export default function MarketExplorer() {
                       <Button
                         color="inherit"
                         onClick={() => {
-                          handleFilterMobile('clear_all', null);
+                          handleMobileFilter('clear_all', null);
                         }}
                         sx={{ mb: 1 }}
                       >
@@ -644,10 +644,11 @@ export default function MarketExplorer() {
                 <Box style={{ display: 'contents' }}>
                   <Scrollbar>
                     <AssetFilterPan
-                      sx={{}}
+                      chain={chains[chainType].token.toLowerCase()}
+                      btnGroup={btnGroup}
+                      handleFilter={handleMobileFilter}
                       filterProps={filterForm}
-                      handleFilter={handleFilterMobile}
-                      {...{ btnGroup }}
+                      sx={{}}
                     />
                   </Scrollbar>
                 </Box>
