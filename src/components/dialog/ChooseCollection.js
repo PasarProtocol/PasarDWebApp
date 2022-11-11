@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useLocation, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   Dialog,
   DialogTitle,
@@ -15,10 +15,9 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { Icon } from '@iconify/react';
 import checkCircleIcon from '@iconify-icons/akar-icons/circle-check-fill';
-
 import StyledButton from '../signin-dlg/StyledButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
-import { reduceHexAddress, isInAppBrowser, fetchFrom, getIpfsUrl, chainTypes } from '../../utils/common';
+import { reduceHexAddress, isInAppBrowser, chainTypes, fetchAPIFrom, getImageFromIPFSUrl } from '../../utils/common';
 
 ChooseCollection.propTypes = {
   isOpen: PropTypes.bool,
@@ -29,8 +28,6 @@ ChooseCollection.propTypes = {
 };
 
 export default function ChooseCollection(props) {
-  const location = useLocation();
-  const { token } = location.state || {};
   const { isOpen, setOpen, handleChoose, setERCtype, chainType } = props;
   const [selectedId, setSelectedId] = React.useState(-1);
   const [collections, setCollections] = React.useState([]);
@@ -46,80 +43,25 @@ export default function ChooseCollection(props) {
         let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0];
         if (isInAppBrowser()) essentialAddress = await window.elastos.getWeb3Provider().address;
 
-        const chainParam = chainTypes.findIndex((item) => item.symbol === chainType) + 1;
-        if (essentialAddress)
-          fetchFrom(`api/v2/sticker/getCollectionByOwner/${essentialAddress}?marketPlace=${chainParam}`, { signal })
-            .then((response) => {
-              response.json().then((jsonCollections) => {
-                if (!jsonCollections.data) return;
-                const resCollections = jsonCollections.data.map((item, index) => {
-                  const tempItem = { ...item, avatar: '', index };
-                  return tempItem;
-                });
-                setCollections(resCollections);
-                resCollections.forEach((item, _i) => {
-                  fetchFrom(
-                    `api/v2/sticker/getTotalCountCollectibles/${item.token}?marketPlace=${item.marketPlace}`
-                  ).then((response) => {
-                    response.json().then((jsonData) => {
-                      setCollections((prevStatus) => {
-                        const tempCollections = [...prevStatus];
-                        tempCollections[_i].items = jsonData.data.total;
-                        return tempCollections;
-                      });
-                    });
-                  });
-
-                  if (!item.uri || item.avatar) return;
-                  const metaUri = getIpfsUrl(item.uri);
-                  if (metaUri) {
-                    fetch(metaUri)
-                      .then((response) => response.json())
-                      .then((data) => {
-                        setCollections((prevStatus) => {
-                          const tempCollections = [...prevStatus];
-                          tempCollections[_i].avatar = getIpfsUrl(data.data.avatar);
-                          return tempCollections;
-                        });
-                      })
-                      .catch(console.log);
-                  }
-                });
-              });
-            })
-            .catch((e) => {
-              console.error(e);
-            });
+        const chain = chainTypes.find((item) => item.symbol === chainType).token.toLowerCase();
+        if (essentialAddress) {
+          const res = await fetchAPIFrom(
+            `api/v1/getCollectionsByWalletAddr?chain=${chain}&walletAddr=0x9A754044FbfA95d15b252453c1BB5401320A8386`,
+            { signal }
+          );
+          const json = await res.json();
+          const cols = json?.data || [];
+          const resCols = cols.map((item, index) => {
+            const rlt = { ...item };
+            return { ...rlt, index, avatar: getImageFromIPFSUrl(rlt?.data?.avatar) };
+          });
+          setCollections(resCols);
+        }
       }
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chainType]);
-
-  React.useEffect(() => {
-    if (token) {
-      const tokenIndex = collections.findIndex((item) => item.token === token);
-      if (tokenIndex >= 0) {
-        setSelectedId(tokenIndex);
-        setERCtype(collections[tokenIndex].is721 ? 0 : 1);
-        const tempCollection = collections[tokenIndex];
-        if (!tempCollection.uri || tempCollection.avatar) {
-          handleChoose(tempCollection);
-        } else {
-          const metaUri = getIpfsUrl(tempCollection.uri);
-          if (metaUri) {
-            fetch(metaUri)
-              .then((response) => response.json())
-              .then((data) => {
-                handleChoose({ ...tempCollection, avatar: getIpfsUrl(data.data.avatar) });
-              })
-              .catch(console.log);
-          }
-        }
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collections.length]);
 
   const choose = () => {
     setERCtype(collections[selectedId].is721 ? 0 : 1);
@@ -127,20 +69,17 @@ export default function ChooseCollection(props) {
     setOpen(false);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   const collectionClasses = [
     { type: 'ERC-721', collections: collections.filter((el) => el.is721) },
     { type: 'ERC-1155', collections: collections.filter((el) => !el.is721) }
   ];
+
   return (
-    <Dialog open={isOpen} onClose={handleClose}>
+    <Dialog open={isOpen} onClose={() => setOpen(false)}>
       <DialogTitle>
         <IconButton
           aria-label="close"
-          onClick={handleClose}
+          onClick={() => setOpen(false)}
           sx={{
             position: 'absolute',
             right: 8,
