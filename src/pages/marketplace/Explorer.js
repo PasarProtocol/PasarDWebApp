@@ -169,14 +169,9 @@ export default function MarketExplorer() {
       const { signal } = newController;
       setAbortController(newController);
 
-      // let itemTypeFilter = btnGroup.type.filter(
-      //   (_, index) => selectedBtns.indexOf(index + btnGroup.status.length) >= 0
-      // );
-      // itemTypeFilter =
-      //   itemTypeFilter.length === btnGroup.type.length || itemTypeFilter.length === 0
-      //     ? 'All'
-      //     : itemTypeFilter[0].toLowerCase();
-      // if (itemTypeFilter === 'general') itemTypeFilter = itemTypeFilter.concat(',image');
+      const itemTypes = btnGroup.type.filter((_, index) => selectedBtns.indexOf(index + btnGroup.status.length) >= 0);
+      const type =
+        itemTypes.length === btnGroup.type.length || itemTypes.length === 0 ? 'all' : itemTypes[0].toLowerCase();
 
       setLoadingAssets(true);
       const bodyParams = {
@@ -184,15 +179,15 @@ export default function MarketExplorer() {
         pageSize: showCount,
         chain: chains[chainType].token.toLowerCase(),
         status: selectedBtns.filter((el) => el >= 0 && el <= 4).sort(),
-        // sort: order,
+        sort: order,
         collection: selectedCollections.map((el) => el.token),
         token: selectedTokens,
+        type,
         adult,
-        minPrice: range.min !== '' ? range.min * 1 : '',
-        maxPrice: range.max !== '' ? range.max * 1 : ''
-        // itemType: itemTypeFilter
-        // `keyword=${params.key ? params.key : ''}&` +
+        keyword: params?.key || ''
       };
+      if (range.min !== '') bodyParams.minPrice = range.min * 1;
+      if (range.max !== '') bodyParams.maxPrice = range.max * 1;
       if (!loadNext) setAssets([]);
       try {
         const res = await fetchAPIFrom('api/v1/marketplace', {
@@ -226,8 +221,6 @@ export default function MarketExplorer() {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, showCount, selectedBtns, selectedCollections, selectedTokens, adult, range, order, chainType, params.key]);
-
-  console.log('==============', selectedBtns, selectedTokens, selectedCollections, adult, range);
 
   const changeDispMode = (event, mode) => {
     if (mode === null) return;
@@ -306,14 +299,9 @@ export default function MarketExplorer() {
       case 'collection':
         setSelectedCollections((prevState) => {
           const selCollections = [...prevState];
-          if (selCollections.findIndex((item) => item.chain === value.chain && item.token === value.token) === -1) {
-            selCollections.push(value);
-          } else {
-            const findIndex = selCollections.findIndex(
-              (item) => item.chain === value.chain && item.token === value.token
-            );
-            selCollections.splice(findIndex, 1);
-          }
+          const index = selCollections.findIndex((item) => item.key === value.key);
+          if (index === -1) selCollections.push(value);
+          else selCollections.splice(index, 1);
           return selCollections;
         });
         break;
@@ -366,17 +354,9 @@ export default function MarketExplorer() {
         tempForm.selectedTokens.splice(findIndex, 1);
       }
     } else if (key === 'collection') {
-      if (
-        tempForm.selectedCollections.findIndex((item) => item.chain === value.chain && item.token === value.token) ===
-        -1
-      ) {
-        tempForm.selectedCollections.push(value);
-      } else {
-        const findIndex = tempForm.selectedCollections.findIndex(
-          (item) => item.chain === value.chain && item.token === value.token
-        );
-        tempForm.selectedCollections.splice(findIndex, 1);
-      }
+      const index = tempForm.selectedCollections.findIndex((item) => item.key === value.key);
+      if (index === -1) tempForm.selectedCollections.push(value);
+      else tempForm.selectedCollections.splice(index, 1);
     } else if (key === 'adult') {
       if (value) {
         if (!tempBtns.includes(adultBtnId)) tempBtns.push(adultBtnId);
