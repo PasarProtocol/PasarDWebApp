@@ -94,7 +94,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
   const sessionDispMode = sessionStorage.getItem('disp-mode');
-  const sessionFilterProps = JSON.parse(sessionStorage.getItem('filter-props')) || {};
+  const sessionFilterProps = JSON.parse(sessionStorage.getItem('marketplace-filter-props')) || {};
   const params = useParams(); // params.key
   const drawerWidth = 360;
   const btnGroup = {
@@ -213,7 +213,7 @@ export default function MarketExplorer() {
       setLoadingAssets(false);
 
       sessionStorage.setItem(
-        'filter-props',
+        'marketplace-filter-props',
         JSON.stringify({ selectedBtns, range, selectedCollections, selectedTokens, adult, order, chainType })
       );
       setFilterForm({ selectedBtns, range, selectedCollections, selectedTokens, adult, order, chainType });
