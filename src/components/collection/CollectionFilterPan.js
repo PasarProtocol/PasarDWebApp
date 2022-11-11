@@ -26,7 +26,7 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import CheckIcon from '@mui/icons-material/Check';
 import SearchBox from '../SearchBox';
 import Scrollbar from '../Scrollbar';
-import { fetchFrom, coinTypesGroup } from '../../utils/common';
+import { coinTypesGroup, fetchAPIFrom, getChainIndexFromChain } from '../../utils/common';
 // ----------------------------------------------------------------------
 const AccordionStyle = styled(Accordion)({
   backgroundColor: 'unset'
@@ -38,12 +38,13 @@ CollectionFilterPan.propTypes = {
   filterProps: PropTypes.any,
   handleFilter: PropTypes.func,
   token: PropTypes.string,
-  chainIndex: PropTypes.number
+  chain: PropTypes.number
 };
 
 export default function CollectionFilterPan(props) {
-  const { sx, btnGroup, filterProps, handleFilter, token, chainIndex } = props;
-  const { range, selectedAttributes = {} } = filterProps;
+  const { sx, btnGroup, filterProps, handleFilter, token, chain } = props;
+  const { selectedBtns = [], selectedTokens = [], range, selectedAttributes = {} } = filterProps;
+  const chainIndex = getChainIndexFromChain(chain);
   const coinTypeClass = Object.values(coinTypesGroup);
   const coinTypes = chainIndex > 0 ? coinTypeClass[chainIndex - 1] : coinTypesGroup.ESC;
   const [minVal, setMinVal] = React.useState(range?.min || '');
@@ -54,18 +55,31 @@ export default function CollectionFilterPan(props) {
   const [filterTokens, setFilterTokens] = React.useState(coinTypes);
 
   React.useEffect(() => {
-    fetchFrom(`api/v2/sticker/getAttributeOfCollection/${token}?marketPlace=${chainIndex}`).then((response) => {
-      response.json().then((jsonData) => {
-        if (jsonData.data) {
-          setCollectionAttributes(jsonData.data);
-          const tempData = { ...jsonData.data };
-          Object.keys(tempData).forEach((groupName) => {
-            tempData[groupName] = Object.keys(tempData[groupName]);
-          });
-          setFilterAttributes(tempData);
-        }
-      });
-    });
+    const fetchData = async () => {
+      const res = await fetchAPIFrom(`api/v1/getAttributesOfCollection?chain=${chain}&collection=${token}`, {});
+      const json = await res.json();
+      if (json?.data) {
+        setCollectionAttributes(json.data);
+        const tempData = { ...json.data };
+        Object.keys(tempData).forEach((groupName) => {
+          tempData[groupName] = Object.keys(tempData[groupName]);
+        });
+        setFilterAttributes(tempData);
+      }
+    };
+    fetchData();
+    // fetchFrom(`api/v2/sticker/getAttributeOfCollection/${token}?marketPlace=${chainIndex}`).then((response) => {
+    //   response.json().then((jsonData) => {
+    //     if (jsonData.data) {
+    //       setCollectionAttributes(jsonData.data);
+    //       const tempData = { ...jsonData.data };
+    //       Object.keys(tempData).forEach((groupName) => {
+    //         tempData[groupName] = Object.keys(tempData[groupName]);
+    //       });
+    //       setFilterAttributes(tempData);
+    //     }
+    //   });
+    // });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -76,7 +90,7 @@ export default function CollectionFilterPan(props) {
 
   const applyRange = () => {
     const range = { min: minVal, max: maxVal };
-    if (minVal > maxVal && maxVal !== '') {
+    if (minVal * 1 > maxVal * 1 && maxVal !== '') {
       setErrRangeInput(true);
       return;
     }
@@ -119,11 +133,7 @@ export default function CollectionFilterPan(props) {
                     {btnGroup.status.map((name, index) => (
                       <Button
                         key={index}
-                        variant={
-                          filterProps.selectedBtns && filterProps.selectedBtns.includes(index)
-                            ? 'contained'
-                            : 'outlined'
-                        }
+                        variant={selectedBtns.includes(index) ? 'contained' : 'outlined'}
                         color="inherit"
                         onClick={() => handleFilter('statype', index)}
                         sx={{ mr: 1, mb: 1 }}
@@ -235,7 +245,7 @@ export default function CollectionFilterPan(props) {
                         <ListItemButton
                           key={i}
                           onClick={() => handleFilter('token', el.address)}
-                          selected={filterProps.selectedTokens.includes(el.address)}
+                          selected={selectedTokens.includes(el.address)}
                         >
                           <ListItemIcon>
                             <Box
@@ -251,7 +261,7 @@ export default function CollectionFilterPan(props) {
                             />
                           </ListItemIcon>
                           <ListItemText primary={el.name} />
-                          {filterProps.selectedTokens.includes(el.address) && <CheckIcon />}
+                          {selectedTokens.includes(el.address) && <CheckIcon />}
                         </ListItemButton>
                       ))}
                     </List>
