@@ -36,7 +36,7 @@ import StatisticPanel from '../../components/collection/StatisticPanel';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup';
 import KYCBadge from '../../components/badge/KYCBadge';
 import DIABadge from '../../components/badge/DIABadge';
-import { fetchAPIFrom, getImageFromIPFSUrl, getChainIndexFromChain } from '../../utils/common';
+import { fetchAPIFrom, getImageFromIPFSUrl } from '../../utils/common';
 import { queryKycMe } from '../../components/signin-dlg/HiveAPI';
 
 // ----------------------------------------------------------------------
@@ -80,7 +80,7 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 export default function CollectionDetail() {
   const sessionDispMode = sessionStorage.getItem('disp-mode');
   const sessionFilterProps = JSON.parse(sessionStorage.getItem('filter-props-other')) || {};
-  const params = useParams(); // params.key
+  const params = useParams(); // params.collection
   const drawerWidth = 360;
   const btnGroup = {
     status: ['Buy Now', 'On Auction', 'Not Met', 'Has Bids', 'Has Ended'],
@@ -115,7 +115,6 @@ export default function CollectionDetail() {
   const [order, setOrder] = React.useState(sessionFilterProps.order || 0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingAssets, setLoadingAssets] = React.useState(false);
-
   const [loadNext, setLoadNext] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
@@ -402,6 +401,7 @@ export default function CollectionDetail() {
   const closeFilter = () => {
     setFilterView(!isFilterView && 1);
   };
+
   const loadingSkeletons = Array(25).fill(null);
 
   return (
@@ -532,7 +532,7 @@ export default function CollectionDetail() {
               >
                 <CollectionFilterPan
                   token={token}
-                  chainIndex={getChainIndexFromChain(chain)}
+                  chain={chain}
                   btnGroup={btnGroup}
                   filterProps={{ selectedBtns, selectedTokens, selectedAttributes, range, adult, order }}
                   handleFilter={handleFilter}
@@ -595,6 +595,7 @@ export default function CollectionDetail() {
             )}
           </Button>
         </FilterBtnContainerStyle>
+
         <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isFilterView !== 1} onClick={closeFilter} />
         <Box
           sx={{
@@ -657,7 +658,7 @@ export default function CollectionDetail() {
             )}
             <CollectionFilterPan
               token={token}
-              chainIndex={getChainIndexFromChain(chain)}
+              chain={chain}
               btnGroup={btnGroup}
               filterProps={filterForm}
               handleFilter={handleMobileFilter}
