@@ -50,8 +50,8 @@ export default function CollectionFilterPan(props) {
   const [minVal, setMinVal] = React.useState(range?.min || '');
   const [maxVal, setMaxVal] = React.useState(range?.max || '');
   const [isErrRangeInput, setErrRangeInput] = React.useState(false);
-  const [collectionAttributes, setCollectionAttributes] = React.useState({});
-  const [filterAttributes, setFilterAttributes] = React.useState({});
+  const [collectionAttributes, setCollectionAttributes] = React.useState({}); // Obj element is obj
+  const [filterAttributes, setFilterAttributes] = React.useState({}); // Obj element is array
   const [filterTokens, setFilterTokens] = React.useState(coinTypes);
 
   React.useEffect(() => {
@@ -59,29 +59,17 @@ export default function CollectionFilterPan(props) {
       const res = await fetchAPIFrom(`api/v1/getAttributesOfCollection?chain=${chain}&collection=${token}`, {});
       const json = await res.json();
       if (json?.data) {
-        setCollectionAttributes(json.data);
-        const tempData = { ...json.data };
-        Object.keys(tempData).forEach((groupName) => {
-          tempData[groupName] = Object.keys(tempData[groupName]);
+        const colAttr = json?.data || {};
+        setCollectionAttributes(colAttr);
+        const attributes = { ...colAttr };
+        Object.keys(attributes).forEach((attrGroupName) => {
+          attributes[attrGroupName] = Object.keys(attributes[attrGroupName]);
         });
-        setFilterAttributes(tempData);
+        setFilterAttributes(attributes);
       }
     };
     fetchData();
-    // fetchFrom(`api/v2/sticker/getAttributeOfCollection/${token}?marketPlace=${chainIndex}`).then((response) => {
-    //   response.json().then((jsonData) => {
-    //     if (jsonData.data) {
-    //       setCollectionAttributes(jsonData.data);
-    //       const tempData = { ...jsonData.data };
-    //       Object.keys(tempData).forEach((groupName) => {
-    //         tempData[groupName] = Object.keys(tempData[groupName]);
-    //       });
-    //       setFilterAttributes(tempData);
-    //     }
-    //   });
-    // });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [chain, token]);
 
   React.useEffect(() => {
     setMinVal(range?.min || '');
@@ -113,7 +101,7 @@ export default function CollectionFilterPan(props) {
     else tempAttributes[groupName] = Object.keys(collectionAttributes[groupName]);
     setFilterAttributes(tempAttributes);
   };
-  const filterGroupNames = Object.keys(filterAttributes);
+  const attributeGroupNames = Object.keys(filterAttributes);
 
   return (
     <Box sx={sx}>
@@ -270,9 +258,9 @@ export default function CollectionFilterPan(props) {
               </AccordionStyle>
               <Divider />
             </Grid>
-            {filterGroupNames.map((groupName, _i) => {
-              const filterGroup = filterAttributes[groupName];
-              const originGroup = collectionAttributes[groupName];
+            {attributeGroupNames.map((groupName, _i) => {
+              const objSubGroupNames = collectionAttributes[groupName]; // obj
+              const arrSubGroupNames = filterAttributes[groupName]; // array
               return (
                 <Grid key={_i} item xs={12} md={12}>
                   <AccordionStyle defaultExpanded={Boolean(true)}>
@@ -286,9 +274,7 @@ export default function CollectionFilterPan(props) {
                       <SearchBox
                         sx={{ width: '100%', mb: 1 }}
                         placeholder="Filter"
-                        onChange={(inStr) => {
-                          searchAttributes(inStr, groupName);
-                        }}
+                        onChange={(inStr) => searchAttributes(inStr, groupName)}
                       />
                       <Scrollbar sx={{ maxHeight: 200 }}>
                         <List
@@ -296,13 +282,13 @@ export default function CollectionFilterPan(props) {
                           component="nav"
                           aria-labelledby="nested-list-subheader"
                         >
-                          {filterGroup.map((el, _j) => {
-                            const selectedSubGroup = selectedAttributes[groupName];
-                            const isSelected = selectedSubGroup && selectedSubGroup.includes(el);
+                          {arrSubGroupNames.map((el, _j) => {
+                            const arrSelectedGroup = selectedAttributes[groupName] || [];
+                            const isSelected = arrSelectedGroup.indexOf(el) >= 0;
                             return (
                               <ListItemButton
                                 key={_j}
-                                onClick={() => handleFilter('attributes', { groupName, el })}
+                                onClick={() => handleFilter('attributes', { groupName, name: el })}
                                 selected={isSelected}
                               >
                                 <ListItemIcon>
@@ -312,7 +298,7 @@ export default function CollectionFilterPan(props) {
                                   />
                                 </ListItemIcon>
                                 <ListItemText primary={el} />
-                                <Typography variant="body2">{originGroup[el]}</Typography>
+                                <Typography variant="body2">{objSubGroupNames[el]}</Typography>
                               </ListItemButton>
                             );
                           })}
