@@ -25,13 +25,7 @@ import {
 
 import { customShadows } from '../theme/shadows';
 import Jazzicon from './Jazzicon';
-import {
-  getIpfsUrl,
-  reduceHexAddress,
-  fetchAPIFrom,
-  getChainIndexFromChain,
-  getImageFromIPFSUrl
-} from '../utils/common';
+import { getIpfsUrl, reduceHexAddress, fetchAPIFrom, getImageFromIPFSUrl } from '../utils/common';
 // ----------------------------------------------------------------------
 
 const APPBAR_MOBILE = 64;
@@ -271,14 +265,13 @@ export default function Searchbar({ placeholder }) {
                           </ListItem>
                           <Divider />
                           {instanceSearchResult.collections.map((item, _i) => {
-                            const { token, chain } = item;
-                            const chainIndex = getChainIndexFromChain(chain);
+                            const { chain, token } = item;
 
                             return (
                               <ListItemButton
                                 key={_i}
                                 component={RouterLink}
-                                to={`/collections/detail/${chainIndex}${token}`}
+                                to={`/collections/detail/${[chain, token].join('&')}`}
                                 onClick={handleLinkClick}
                               >
                                 <ListItemAvatar>
@@ -312,7 +305,7 @@ export default function Searchbar({ placeholder }) {
                             <ListItemButton
                               key={_i}
                               component={RouterLink}
-                              to={`/marketplace/detail/${[item.tokenId, item.baseToken].join('&')}`}
+                              to={`/marketplace/detail/${[item.chain, item.contract, item.tokenId].join('&')}`}
                               // state={{tokenId: item.tokenId, baseToken: item.baseToken}}
                               onClick={handleLinkClick}
                             >

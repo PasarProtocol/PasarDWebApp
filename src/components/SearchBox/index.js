@@ -23,13 +23,7 @@ import {
 } from '@mui/material';
 import { customShadows } from '../../theme/shadows';
 import Jazzicon from '../Jazzicon';
-import {
-  getIpfsUrl,
-  reduceHexAddress,
-  fetchAPIFrom,
-  getChainIndexFromChain,
-  getImageFromIPFSUrl
-} from '../../utils/common';
+import { getIpfsUrl, reduceHexAddress, fetchAPIFrom, getImageFromIPFSUrl } from '../../utils/common';
 
 const ListWrapperStyle = styled(Paper)(({ theme }) => ({
   width: '100%',
@@ -244,13 +238,11 @@ export default function SearchBox(props) {
                     <Divider />
                     {instanceSearchResult.collections.map((item, _i) => {
                       const { token, chain } = item;
-                      const chainIndex = getChainIndexFromChain(chain);
-
                       return (
                         <ListItemButton
                           key={_i}
                           component={RouterLink}
-                          to={`/collections/detail/${chainIndex}${token}`}
+                          to={`/collections/detail/${[chain, token].join('&')}`}
                           onClick={handleLinkClick}
                         >
                           <ListItemAvatar>
@@ -284,7 +276,7 @@ export default function SearchBox(props) {
                       <ListItemButton
                         key={_i}
                         component={RouterLink}
-                        to={`/marketplace/detail/${[item.tokenId, item.contract].join('&')}`}
+                        to={`/marketplace/detail/${[item.chain, item.contract, item.tokenId].join('&')}`}
                         onClick={handleLinkClick}
                       >
                         <ListItemAvatar>

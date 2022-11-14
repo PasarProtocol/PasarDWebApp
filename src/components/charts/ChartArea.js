@@ -42,7 +42,7 @@ const getUTCdate = (date) => {
 };
 export default function ChartArea({ by, is4Address }) {
   const params = useParams(); // params.address
-  const [contract, chain, tokenId] = params.args ? params.args.split('&') : ['', ''];
+  const [chain, contract, tokenId] = params.args ? params.args.split('&') : ['', '', ''];
   const { themeMode } = useSettings();
   const [period, setPeriod] = useState('a');
   const [volumeType, setType] = useState(by === 'address' ? 1 : 0);

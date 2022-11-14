@@ -53,7 +53,7 @@ export default function TransactionListItem({ item }) {
         />
       ) : (
         <Link
-          to={`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`}
+          to={`/explorer/collectible/detail/${[chain, contract, tokenId].join('&')}`}
           component={RouterLink}
           sx={{ borderRadius: 1 }}
         >
@@ -72,7 +72,7 @@ export default function TransactionListItem({ item }) {
             Name
           </Typography>
           <Link
-            to={`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`}
+            to={`/explorer/collectible/detail/${[chain, contract, tokenId].join('&')}`}
             component={RouterLink}
             color="text.secondary"
           >

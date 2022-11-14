@@ -809,7 +809,7 @@ export default function CollectibleDetail() {
                 <Typography variant="subtitle2">Collection</Typography>
                 {collection ? (
                   <Link
-                    to={`/collections/detail/${collection.marketPlace}${collection.token}`}
+                    to={`/collections/detail/${[collection.chain, collection.token].join('&')}`}
                     component={RouterLink}
                     sx={{ color: 'inherit' }}
                   >
@@ -888,7 +888,9 @@ export default function CollectibleDetail() {
               </Typography>
               <AssetDetailInfo detail={collectible} />
               <Button
-                to={`/explorer/collectible/detail/${[collectible.tokenId, collectible.baseToken].join('&')}`}
+                to={`/explorer/collectible/detail/${[collectible.chain, collectible.contract, collectible.tokenId].join(
+                  '&'
+                )}`}
                 size="small"
                 color="inherit"
                 component={RouterLink}
@@ -963,7 +965,11 @@ export default function CollectibleDetail() {
                   creator={{ address: collectible.royaltyOwner, name: didName.creator }}
                 />
                 <Button
-                  to={`/explorer/collectible/detail/${[collectible.tokenId, collectible.baseToken].join('&')}`}
+                  to={`/explorer/collectible/detail/${[
+                    collectible.chain,
+                    collectible.contract,
+                    collectible.tokenId
+                  ].join('&')}`}
                   size="small"
                   color="inherit"
                   component={RouterLink}
@@ -988,7 +994,7 @@ export default function CollectibleDetail() {
                   <Stack direction="row" spacing={2}>
                     <MHidden width="smDown">
                       <Link
-                        to={`/collections/detail/${collection.marketPlace}${collection.token}`}
+                        to={`/collections/detail/${[collection.chain, collection.token].join('&')}`}
                         component={RouterLink}
                         sx={{ display: 'flex', color: 'inherit' }}
                       >
@@ -1008,7 +1014,7 @@ export default function CollectibleDetail() {
                       <Stack direction="row">
                         <MHidden width="smUp">
                           <Link
-                            to={`/collections/detail/${collection.marketPlace}${collection.token}`}
+                            to={`/collections/detail/${[collection.chain, collection.token].join('&')}`}
                             component={RouterLink}
                             sx={{ display: 'flex', color: 'inherit' }}
                           >
