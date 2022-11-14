@@ -90,7 +90,7 @@ const DetailItem = (props) => {
                 'Not on sale'
               ) : (
                 <Link
-                  to={`/marketplace/detail/${[detail.contract, detail.chain, detail.tokenId].join('&')}`}
+                  to={`/marketplace/detail/${[detail.chain, detail.contract, detail.tokenId].join('&')}`}
                   component={RouterLink}
                   color="text.secondary"
                   sx={{ display: 'flex', alignItems: 'center' }}

@@ -28,7 +28,6 @@ import {
   collectionTypes,
   getDiaTokenInfo,
   getContractAddressInCurrentNetwork,
-  getChainIndexFromChain,
   getImageFromIPFSUrl
 } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
@@ -125,7 +124,6 @@ export default function BadgeProfile(props) {
   };
 
   const { chain, token } = collection || defaultCollection;
-  const chainIndex = getChainIndexFromChain(chain);
   let name = collection?.name || defaultCollection?.name || '';
   let dispAddress = reduceHexAddress(token);
   let description = collection?.data?.description || defaultCollection?.description || '';
@@ -306,7 +304,7 @@ export default function BadgeProfile(props) {
                   <>
                     {collection ? (
                       <Link
-                        to={`/collections/detail/${chainIndex}${token}`}
+                        to={`/collections/detail/${[chain, token].join('&')}`}
                         component={RouterLink}
                         color="text.primary"
                       >
@@ -360,7 +358,11 @@ export default function BadgeProfile(props) {
               {type === 1 ? (
                 <>
                   {collection ? (
-                    <Link to={`/collections/detail/${chainIndex}${token}`} component={RouterLink} color="text.primary">
+                    <Link
+                      to={`/collections/detail/${[chain, token].join('&')}`}
+                      component={RouterLink}
+                      color="text.primary"
+                    >
                       <Typography variant="h5" sx={{ pt: 2 }}>
                         {name}
                       </Typography>

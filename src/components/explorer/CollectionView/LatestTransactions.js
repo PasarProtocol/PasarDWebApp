@@ -34,7 +34,7 @@ export function TransItem({ trans }) {
   return (
     <Stack direction="row" spacing={2}>
       <Link
-        href={`/explorer/collectible/detail/${[trans.contract, trans.chain, trans.tokenId].join('&')}`}
+        href={`/explorer/collectible/detail/${[trans.chain, trans.contract, trans.tokenId].join('&')}`}
         underline="none"
         sx={{ borderRadius: 1 }}
       >

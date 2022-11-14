@@ -19,7 +19,7 @@ function CollectibleItem({ collectible }) {
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
       <Link
-        to={`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`}
+        to={`/explorer/collectible/detail/${[chain, contract, tokenId].join('&')}`}
         component={RouterLink}
         sx={{ borderRadius: 1 }}
       >
@@ -33,7 +33,7 @@ function CollectibleItem({ collectible }) {
       </Link>
       <Box sx={{ minWidth: 0, flexGrow: 1 }}>
         <Link
-          to={`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`}
+          to={`/explorer/collectible/detail/${[chain, contract, tokenId].join('&')}`}
           component={RouterLink}
           color="text.primary"
         >

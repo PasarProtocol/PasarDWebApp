@@ -55,7 +55,7 @@ export default function SearchResult() {
   }, [params.key]);
 
   const link2Detail = (contract, chain, tokenId) => {
-    navigate(`/explorer/collectible/detail/${[contract, chain, tokenId].join('&')}`);
+    navigate(`/explorer/collectible/detail/${[chain, contract, tokenId].join('&')}`);
   };
 
   return (

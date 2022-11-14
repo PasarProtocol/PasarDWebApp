@@ -55,7 +55,7 @@ PaperStyle.propTypes = {
 const DefaultPageSize = 5;
 export default function CollectibleDetail() {
   const params = useParams();
-  const [contract, chain, tokenId] = params.args.split('&');
+  const [chain, contract, tokenId] = params.args.split('&');
   const [collectible, setCollectible] = React.useState({});
   const [transRecord, setTransRecord] = React.useState([]);
   const [detailPageSize, setDetailPageSize] = React.useState(DefaultPageSize);

@@ -9,7 +9,7 @@ import 'react-slideshow-image/dist/styles.css';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import LoadingScreen from '../LoadingScreen';
-import { fetchAPIFrom, getChainIndexFromChain, getImageFromIPFSUrl } from '../../utils/common';
+import { fetchAPIFrom, getImageFromIPFSUrl } from '../../utils/common';
 
 const BoxStyle = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -60,10 +60,8 @@ function CarouselInCollection({ collection }) {
     transitionTime: 0
   });
 
-  const chainIndex = getChainIndexFromChain(collectible.chain);
-
   return (
-    <Link to={`/collections/detail/${chainIndex}${contract}`} component={RouterLink}>
+    <Link to={`/collections/detail/${[collectible.chain, contract].join('&')}`} component={RouterLink}>
       <BoxStyle className="carousel-box">
         <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
           {collectible.map((item, index) => {
