@@ -15,31 +15,32 @@ const MenuProps = {
   variant: 'menu'
 };
 const menuItems = [
-  'Last 7 days',
-  'Last 14 days',
-  'Last 30 days',
-  'Last 60 days',
-  'Last 90 days',
-  'Last year',
-  'All time'
+  { index: 0, name: 'Last 7 days', value: 7 },
+  { index: 1, name: 'Last 14 days', value: 14 },
+  { index: 2, name: 'Last 30 days', value: 30 },
+  { index: 3, name: 'Last 60 days', value: 60 },
+  { index: 4, name: 'Last 90 days', value: 90 },
+  { index: 5, name: 'Last year', value: 365 },
+  { index: 6, name: 'All time', value: 0 }
 ];
 
 export default function ActivityPeriodSelect({ selected, onChange, sx = {} }) {
   const handleChange = (event) => {
-    onChange(event.target.value);
+    const index = event.target.value;
+    onChange({ index, value: menuItems[index].value });
   };
   return (
     <Select
-      value={selected}
+      value={selected.index}
       onChange={handleChange}
       inputProps={{ 'aria-label': 'Without label' }}
       size="small"
       sx={{ mr: 1, ...sx }}
       MenuProps={MenuProps}
     >
-      {menuItems.map((type, i) => (
-        <MenuItem key={i} value={i} autoFocus={selected === i}>
-          {type}
+      {menuItems.map((item, i) => (
+        <MenuItem key={i} value={i} autoFocus={selected.index === i}>
+          {item.name}
         </MenuItem>
       ))}
     </Select>
