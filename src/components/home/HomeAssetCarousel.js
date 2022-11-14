@@ -42,7 +42,7 @@ const CardStyle = styled(Card)({
 });
 
 function CarouselInCollection({ collection }) {
-  const { name, contract, collectible } = collection;
+  const { name, chain, contract, collectible } = collection;
   const getConfigurableProps = () => ({
     showArrows: false,
     showStatus: false,
@@ -61,7 +61,7 @@ function CarouselInCollection({ collection }) {
   });
 
   return (
-    <Link to={`/collections/detail/${[collectible.chain, contract].join('&')}`} component={RouterLink}>
+    <Link to={`/collections/detail/${[chain, contract].join('&')}`} component={RouterLink}>
       <BoxStyle className="carousel-box">
         <Carousel {...getConfigurableProps()} animationHandler="fade" swipeable={false}>
           {collectible.map((item, index) => {
@@ -119,11 +119,14 @@ export default function HomeAssetCarousel() {
         const collectibles = json?.data || [];
         const cols = collectibles.reduce((acc, item) => {
           if (!acc.length) {
-            acc = [{ name: item.collectionName, contract: item.contract, collectible: [item] }];
+            acc = [{ name: item.collectionName, chain: item.chain, contract: item.contract, collectible: [item] }];
           } else {
             const collectionIndex = acc.findIndex((el) => el.name === item.collectionName);
             if (collectionIndex === -1) {
-              acc = [...acc, { name: item.collectionName, contract: item.contract, collectible: [item] }];
+              acc = [
+                ...acc,
+                { name: item.collectionName, chain: item.chain, contract: item.contract, collectible: [item] }
+              ];
             } else {
               acc[collectionIndex].collectible.push(item);
             }
