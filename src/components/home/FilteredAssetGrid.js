@@ -85,7 +85,7 @@ const AssetGroupSlider = (props) => {
         <Splide options={settings}>
           {assets.map((item, index) => {
             const coinType = getCoinTypeFromTokenEx(item);
-            const isAuction = item?.orderType === 2;
+            const isOnMarket = type !== 'recent_sold';
             return (
               <SplideSlide key={index}>
                 <Box
@@ -98,34 +98,37 @@ const AssetGroupSlider = (props) => {
                 >
                   <AssetCard
                     {...item}
-                    uniqueKey={(isAuction ? item?.token?.uniqueKey : item?.uniqueKey) || ''}
-                    name={item?.name || ''}
+                    uniqueKey={(isOnMarket ? item?.token?.uniqueKey : item?.uniqueKey) || ''}
+                    name={isOnMarket ? item?.token?.name : item?.name}
+                    chain={isOnMarket ? item?.token?.chain : item?.chain}
+                    contract={isOnMarket ? item?.token?.contract : item?.contract}
+                    tokenId={isOnMarket ? item?.token?.tokenId : item?.tokenId}
                     thumbnail={getImageFromIPFSUrl(
-                      isAuction
+                      isOnMarket
                         ? item?.token?.data?.thumbnail || item?.token?.image
                         : item?.data?.thumbnail || item?.image
                     )}
-                    orderId={(isAuction ? item?.orderId : item?.order?.orderId) ?? 0}
-                    orderType={(isAuction ? item?.orderType : item?.order?.orderType) ?? 0}
-                    orderState={(isAuction ? item?.orderState : item?.order?.orderState) ?? 0}
-                    price={round(((isAuction ? item?.price : item?.order?.price) ?? 0) / 1e18, 3)}
-                    amount={(isAuction ? item?.amount : item?.order?.amount) ?? 0}
-                    baseToken={(isAuction ? item?.baseToken : item?.order?.baseToken) || ''}
-                    endTime={(isAuction ? item?.endTime : item?.order?.endTime) ?? 0}
-                    tokenOwner={(isAuction ? item?.token?.tokenOwner : item?.tokenOwner) || ''}
-                    royaltyOwner={(isAuction ? item?.token?.royaltyOwner : item?.royaltyOwner) || ''}
-                    royaltyFee={(isAuction ? item?.token?.royaltyFee : item?.royaltyFee) / 1 ?? 0}
-                    bids={(isAuction ? item?.bids : item?.order?.bids) / 1 ?? 0}
-                    lastBid={(isAuction ? item?.lastBid : item?.order?.lastBid) / 1 ?? 0}
-                    lastBidder={(isAuction ? item?.lastBidder : item?.order?.lastBidder) || ''}
-                    buyoutPrice={round(((isAuction ? item?.buyoutPrice : item?.order?.buyoutPrice) ?? 0) / 1e18, 3)}
-                    reservePrice={round(((isAuction ? item?.reservePrice : item?.order?.reservePrice) ?? 0) / 1e18, 3)}
+                    orderId={(isOnMarket ? item?.orderId : item?.order?.orderId) ?? 0}
+                    orderType={(isOnMarket ? item?.orderType : item?.order?.orderType) ?? 0}
+                    orderState={(isOnMarket ? item?.orderState : item?.order?.orderState) ?? 0}
+                    price={round(((isOnMarket ? item?.price : item?.order?.price) ?? 0) / 1e18, 3)}
+                    amount={(isOnMarket ? item?.amount : item?.order?.amount) ?? 0}
+                    baseToken={(isOnMarket ? item?.baseToken : item?.order?.baseToken) || ''}
+                    endTime={(isOnMarket ? item?.endTime : item?.order?.endTime) ?? 0}
+                    tokenOwner={(isOnMarket ? item?.token?.tokenOwner : item?.tokenOwner) || ''}
+                    royaltyOwner={(isOnMarket ? item?.token?.royaltyOwner : item?.royaltyOwner) || ''}
+                    royaltyFee={(isOnMarket ? item?.token?.royaltyFee : item?.royaltyFee) / 1 ?? 0}
+                    bids={(isOnMarket ? item?.bids : item?.order?.bids) / 1 ?? 0}
+                    lastBid={(isOnMarket ? item?.lastBid : item?.order?.lastBid) / 1 ?? 0}
+                    lastBidder={(isOnMarket ? item?.lastBidder : item?.order?.lastBidder) || ''}
+                    buyoutPrice={round(((isOnMarket ? item?.buyoutPrice : item?.order?.buyoutPrice) ?? 0) / 1e18, 3)}
+                    reservePrice={round(((isOnMarket ? item?.reservePrice : item?.order?.reservePrice) ?? 0) / 1e18, 3)}
                     type={0}
                     isLink={Boolean(true)}
                     coinUSD={coinPrice[coinType.index]}
                     coinType={coinType}
                     isDragging={isDragging}
-                    showPrice={type === 'recent_sold'}
+                    showPrice={type !== 'recent_sold'}
                   />
                 </Box>
               </SplideSlide>
@@ -155,19 +158,21 @@ export default function FilteredAssetGrid(props) {
   React.useEffect(() => {
     const fetchData = async () => {
       const count = type === 'all' ? 20 : 10;
-      let colType = '';
-      if (type === 'recent_sold') colType = 'sold';
-      else if (type === 'live_auction') colType = 'auction';
+      let status = [];
+      if (type === 'live_auction') status = [1, 4];
 
       setLoadingCollectibles(true);
       let res;
       try {
-        if (colType === 'auction') {
+        if (type === 'recent_sold') {
+          res = await fetchAPIFrom(`api/v1/listCollectibles?type=sold&after=0&pageNum=1&pageSize=${count}`, {});
+        } else {
           const reqBody = {
             pageNum: 1,
-            pageSize: 10,
+            pageSize: count,
             chain: 'all',
-            status: [1, 4],
+            status,
+            sort: 0,
             type: ''
           };
           res = await fetchAPIFrom('api/v1/marketplace', {
@@ -177,8 +182,6 @@ export default function FilteredAssetGrid(props) {
             },
             body: JSON.stringify(reqBody)
           });
-        } else {
-          res = await fetchAPIFrom(`api/v1/listCollectibles?type=${colType}&after=0&pageNum=1&pageSize=${count}`, {});
         }
         const json = await res.json();
         setFilteredCollectibles(json?.data?.data || []);
