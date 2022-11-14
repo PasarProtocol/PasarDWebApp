@@ -4,22 +4,28 @@ import { Link as RouterLink } from 'react-router-dom';
 import * as math from 'mathjs';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { Box, Stack, Accordion, AccordionSummary, AccordionDetails, Typography, Link, Divider } from '@mui/material';
-
 import TabletImgBox from './TabletImgBox';
 import KYCBadge from '../badge/KYCBadge';
-import { getCoinTypeFromToken, getDateDistance, reduceHexAddress } from '../../utils/common';
+import { getCoinTypeFromTokenEx, getDateDistance, reduceHexAddress } from '../../utils/common';
 import { blankAddress } from '../../config';
 // ----------------------------------------------------------------------
 const ActivityAccordion = (props) => {
   const { trans, coinPrice, infoByAddress } = props;
   const [isMoreOpen, setMoreOpen] = React.useState(false);
-  const priceVal = trans.price ? math.round(trans.price / 1e18, 3) : 0;
-  const coinType = getCoinTypeFromToken(trans);
+  let eventName = '';
+  if (trans?.order?.sellerAddr === blankAddress) eventName = 'Minted';
+  else if (trans?.order?.orderType === 1 && trans?.order?.orderState === 1) eventName = 'Listed';
+  else if (trans?.order?.orderType === 1 && trans?.order?.orderState === 2) eventName = 'Sold';
+  const priceVal = math.round((trans?.order?.price ?? 0) / 1e18, 3);
+  const coinType = getCoinTypeFromTokenEx(trans);
   const coinUSD = coinPrice[coinType.index];
 
   const AddressCell = ({ field }) => {
-    const addrstr = trans[field];
-    const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr);
+    // const addrstr = trans[field];
+    // const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr);
+    const order = trans?.order || { buyerAddr: '', sellerAddr: '' };
+    const addrstr = order[field];
+    const dispAddress = (field === 'sellerAddr' ? order?.sellerInfo?.name : '') || reduceHexAddress(addrstr);
     return (
       <Stack direction="row" spacing={1} alignItems="center" display="inline-flex">
         {dispAddress.length > 0 && addrstr !== blankAddress ? (
@@ -83,7 +89,7 @@ const ActivityAccordion = (props) => {
                   component={RouterLink}
                 >
                   <Typography variant="body2" color="text.secondary" display="inline">
-                    {trans.type}
+                    {eventName}
                   </Typography>
                 </Link>
               </Box>
