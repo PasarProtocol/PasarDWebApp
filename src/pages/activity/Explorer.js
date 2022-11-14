@@ -39,8 +39,7 @@ import Scrollbar from '../../components/Scrollbar';
 import { queryName, queryKycMe } from '../../components/signin-dlg/HiveAPI';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSignin from '../../hooks/useSignin';
-
-import { fetchFrom, setAllTokenPrice, getTotalCountOfCoinTypes, getDidInfoFromAddress } from '../../utils/common';
+import { setAllTokenPrice, getTotalCountOfCoinTypes, getDidInfoFromAddress, fetchAPIFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -106,7 +105,7 @@ const COLUMNS = [
   { id: 'marketTime', label: 'Time', minWidth: 170, align: 'center' }
 ];
 const btnGroup = {
-  status: ['Sale', 'Listed', 'Minted']
+  status: ['Sold', 'Listed', 'Minted']
 };
 export default function ActivityExplorer() {
   const sessionDispMode = sessionStorage.getItem('disp-mode');
@@ -140,11 +139,10 @@ export default function ActivityExplorer() {
     ...sessionFilterProps
   });
   const [totalCount, setTotalCount] = React.useState(0);
-  const [period, setPeriod] = React.useState(4);
+  const [period, setPeriod] = React.useState({ index: 4, value: 90 });
   const [controller, setAbortController] = React.useState(new AbortController());
   const [isLoadingActivity, setLoadingActivity] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
-
   const [loadNext, setLoadNext] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState(0);
@@ -156,6 +154,7 @@ export default function ActivityExplorer() {
       setPage(page + 1);
     }
   };
+
   const handleDispInLaptopSize = () => {
     const sessionDispMode = sessionStorage.getItem('disp-mode');
     if (sessionDispMode !== null) return;
@@ -235,42 +234,39 @@ export default function ActivityExplorer() {
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
-      let statusFilter = btnGroup.status.filter((name, index) => selectedBtns.indexOf(index) >= 0);
-      statusFilter = (statusFilter.length === 0 ? btnGroup.status.join(',') : statusFilter.join(',')).toLowerCase();
+      let status = btnGroup.status.filter((_, index) => selectedBtns.indexOf(index) >= 0);
+      status = (status.length === 0 ? btnGroup.status.join(',') : status.join(',')).toLowerCase();
       setLoadingActivity(true);
 
       if (!loadNext) setActivity([]);
-      fetchFrom(
-        `api/v2/sticker/listnft?` +
-          `event=${statusFilter}&` +
-          `duration=${period}&` +
-          `pageNumStr=${page}&` +
-          `pageSizeStr=${showCount}`,
-        { signal }
-      )
-        .then((response) => {
-          response.json().then((jsonAssets) => {
-            if (jsonAssets.data) {
-              setTotalCount(jsonAssets.data.total);
-              setPages(Math.ceil(jsonAssets.data.total / showCount));
-              if (loadNext) setActivity([...activities, ...jsonAssets.data.data]);
-              else setActivity(jsonAssets.data.data);
-              const tempAddressGroup = [...addressGroup];
-              jsonAssets.data.data.forEach((trans) => {
-                tempAddressGroup.push(trans.buyerAddr);
-                tempAddressGroup.push(trans.sellerAddr);
-              });
-              const uniqueAddresses = [...new Set(tempAddressGroup)];
-              setAddressByGroup(uniqueAddresses);
-            }
-            setLoadNext(false);
-            setLoadingActivity(false);
-          });
-        })
-        .catch((e) => {
-          console.error(e);
-          setLoadingActivity(false);
+      const curDate = new Date();
+      curDate.setDate(curDate.getDate() - period.value);
+      const after = period.index === 6 ? period.value : parseInt(curDate.getTime() / 1e3, 10);
+      try {
+        const res = await fetchAPIFrom(
+          `api/v1/listCollectibles?type=${status}&after=${after}&pageNum=${page}&pageSize=${showCount}`,
+          { signal }
+        );
+        const json = await res.json();
+        const totalCnt = json?.data?.total ?? 0;
+        const arrData = json?.data?.data || [];
+        setTotalCount(totalCnt);
+        setPages(Math.ceil(totalCnt / showCount));
+        if (loadNext) setActivity([...activities, ...arrData]);
+        else setActivity(arrData);
+        const resAddressGroup = [...addressGroup];
+        arrData.forEach((item) => {
+          resAddressGroup.push(item?.order?.buyerAddr);
+          resAddressGroup.push(item?.order?.sellerAddr);
         });
+        const uniqueAddresses = [...new Set(resAddressGroup)];
+        setAddressByGroup(uniqueAddresses);
+        setLoadNext(false);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingActivity(false);
+
       sessionStorage.setItem('activity-filter-props', JSON.stringify({ selectedBtns }));
       setFilterForm({ selectedBtns });
     };
@@ -278,23 +274,20 @@ export default function ActivityExplorer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, showCount, selectedBtns, period]);
 
-  const handleBtns = (num) => {
-    const tempBtns = [...selectedBtns];
-    if (tempBtns.includes(num)) {
-      const findIndex = tempBtns.indexOf(num);
-      tempBtns.splice(findIndex, 1);
-    } else tempBtns.push(num);
-    setSelectedBtns(tempBtns);
-  };
-  const handleBtnsMobile = (num) => {
-    handleFilterMobile('eventype', num);
+  const handleSingleFilterBtn = (btnId) => {
+    const selBtns = [...selectedBtns];
+    if (selBtns.includes(btnId)) {
+      const findIndex = selBtns.indexOf(btnId);
+      selBtns.splice(findIndex, 1);
+    } else selBtns.push(btnId);
+    setSelectedBtns(selBtns);
   };
 
   const handleFilter = (key, value) => {
     setPage(1);
     switch (key) {
       case 'eventype':
-        handleBtns(value);
+        handleSingleFilterBtn(value);
         break;
       case 'selectedBtns':
         setSelectedBtns(value);
@@ -303,9 +296,14 @@ export default function ActivityExplorer() {
         break;
     }
   };
-  const handleFilterMobile = (key, value) => {
+
+  const handleSingleMobileFilterBtn = (btnId) => {
+    handleMobileFilter('eventype', btnId);
+  };
+
+  const handleMobileFilter = (key, value) => {
     const tempForm = { ...filterForm };
-    const tempBtns = [...filterForm.selectedBtns];
+    const selBtns = [...filterForm.selectedBtns];
     tempForm[key] = value;
     if (key === 'clear_all') {
       tempForm.selectedBtns = [];
@@ -315,14 +313,15 @@ export default function ActivityExplorer() {
       return;
     }
     if (key === 'eventype') {
-      if (tempBtns.includes(value)) {
-        const findIndex = tempBtns.indexOf(value);
-        tempBtns.splice(findIndex, 1);
-      } else tempBtns.push(value);
+      if (selBtns.includes(value)) {
+        const findIndex = selBtns.indexOf(value);
+        selBtns.splice(findIndex, 1);
+      } else selBtns.push(value);
     }
-    tempForm.selectedBtns = tempBtns;
+    tempForm.selectedBtns = selBtns;
     setFilterForm(tempForm);
   };
+
   const applyFilterForm = (e) => {
     const tempForm = { ...filterForm };
     delete tempForm.statype;
@@ -331,14 +330,18 @@ export default function ActivityExplorer() {
     setFilterForm(tempForm);
     closeFilter(e);
   };
+
   const handleClearAll = () => {
     setSelectedBtns([]);
   };
+
   const closeFilter = (e) => {
     setFilterView(!isFilterView && 1);
     console.error(e);
   };
+
   const loadingSkeletons = Array(10).fill(null);
+
   return (
     <RootStyle title="Activity | PASAR">
       <Stack direction="row">
@@ -373,17 +376,15 @@ export default function ActivityExplorer() {
                     {totalCount.toLocaleString('en')} items
                   </Typography>
                   <Stack spacing={1} sx={{ display: 'inline', pl: 1 }} direction="row">
-                    {selectedBtns.map((nameId, index) => {
-                      const buttonName = [...btnGroup.status][nameId];
+                    {selectedBtns.map((btnId, index) => {
+                      const buttonName = [...btnGroup.status][btnId];
                       return (
                         <Button
                           key={index}
                           variant="outlined"
                           color="origin"
                           endIcon={<CloseIcon />}
-                          onClick={() => {
-                            handleBtns(nameId);
-                          }}
+                          onClick={() => handleSingleFilterBtn(btnId)}
                         >
                           {buttonName}
                         </Button>
@@ -468,7 +469,6 @@ export default function ActivityExplorer() {
                           ))}
                         </TableRow>
                       </TableHead>
-
                       <TableBody>
                         {React.useMemo(
                           () =>
@@ -550,7 +550,7 @@ export default function ActivityExplorer() {
                         color="origin"
                         endIcon={<CloseIcon />}
                         onClick={() => {
-                          handleBtnsMobile(nameId);
+                          handleSingleMobileFilterBtn(nameId);
                         }}
                         sx={{ mr: 1, mb: 1 }}
                       >
@@ -561,7 +561,7 @@ export default function ActivityExplorer() {
                   <Button
                     color="inherit"
                     onClick={() => {
-                      handleFilterMobile('clear_all', null);
+                      handleMobileFilter('clear_all', null);
                     }}
                     sx={{ mb: 1 }}
                   >
@@ -576,7 +576,7 @@ export default function ActivityExplorer() {
                 <ActivityFilterPan
                   sx={{}}
                   filterProps={filterForm}
-                  handleFilter={handleFilterMobile}
+                  handleFilter={handleMobileFilter}
                   {...{ btnGroup }}
                 />
               </Scrollbar>
