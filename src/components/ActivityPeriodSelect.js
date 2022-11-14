@@ -48,7 +48,7 @@ export default function ActivityPeriodSelect({ selected, onChange, sx = {} }) {
 }
 
 ActivityPeriodSelect.propTypes = {
-  selected: PropTypes.number,
+  selected: PropTypes.object,
   onChange: PropTypes.func,
   sx: PropTypes.any
 };

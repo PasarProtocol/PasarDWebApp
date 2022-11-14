@@ -74,7 +74,7 @@ const ActivityAccordion = (props) => {
             <Stack direction="row">
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Link
-                  to={`/collections/detail/${[trans.chain, trans.token].join('&')}`}
+                  to={`/collections/detail/${[trans.chain, trans.contract].join('&')}`}
                   component={RouterLink}
                   sx={{ color: 'inherit', display: 'inline-flex', maxWidth: 'max-content', width: '100%' }}
                 >
