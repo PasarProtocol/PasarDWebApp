@@ -45,17 +45,21 @@ export default function ChooseCollection(props) {
 
         const chain = chainTypes.find((item) => item.symbol === chainType).token.toLowerCase();
         if (essentialAddress) {
-          const res = await fetchAPIFrom(
-            `api/v1/getCollectionsByWalletAddr?chain=${chain}&walletAddr=${essentialAddress}`,
-            { signal }
-          );
-          const json = await res.json();
-          const cols = json?.data || [];
-          const resCols = cols.map((item, index) => {
-            const rlt = { ...item };
-            return { ...rlt, index, avatar: getImageFromIPFSUrl(rlt?.data?.avatar) };
-          });
-          setCollections(resCols);
+          try {
+            const res = await fetchAPIFrom(
+              `api/v1/getCollectionsByWalletAddr?chain=${chain}&walletAddr=${essentialAddress}`,
+              { signal }
+            );
+            const json = await res.json();
+            const cols = json?.data || [];
+            const resCols = cols.map((item, index) => {
+              const rlt = { ...item };
+              return { ...rlt, index, avatar: getImageFromIPFSUrl(rlt?.data?.avatar) };
+            });
+            setCollections(resCols);
+          } catch (e) {
+            console.error(e);
+          }
         }
       }
     };
