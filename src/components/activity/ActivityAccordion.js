@@ -17,9 +17,6 @@ const ActivityAccordion = (props) => {
   const coinType = getCoinTypeFromToken(trans);
   const coinUSD = coinPrice[coinType.index];
 
-  AddressCell.propTypes = {
-    field: PropTypes.any
-  };
   const AddressCell = ({ field }) => {
     const addrstr = trans[field];
     const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr);
@@ -41,6 +38,10 @@ const ActivityAccordion = (props) => {
     );
   };
 
+  AddressCell.propTypes = {
+    field: PropTypes.any
+  };
+
   return (
     <Accordion
       expanded={isMoreOpen}
@@ -55,7 +56,7 @@ const ActivityAccordion = (props) => {
       <AccordionSummary sx={{ '& .MuiAccordionSummary-content': { width: '100%' } }}>
         <Stack direction="row" spacing={1} width="100%" alignItems="center">
           <Link
-            to={`/marketplace/detail/${[trans.tokenId, trans.baseToken].join('&')}`}
+            to={`/marketplace/detail/${[trans.chain, trans.contract, trans.tokenId].join('&')}`}
             component={RouterLink}
             sx={{ color: 'inherit' }}
           >
@@ -67,7 +68,7 @@ const ActivityAccordion = (props) => {
             <Stack direction="row">
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Link
-                  to={`/collections/detail/${trans.marketPlace}${trans.baseToken}`}
+                  to={`/collections/detail/${[trans.chain, trans.token].join('&')}`}
                   component={RouterLink}
                   sx={{ color: 'inherit', display: 'inline-flex', maxWidth: 'max-content', width: '100%' }}
                 >
@@ -78,7 +79,7 @@ const ActivityAccordion = (props) => {
               </Box>
               <Box>
                 <Link
-                  to={`/explorer/collectible/detail/${[trans.tokenId, trans.baseToken].join('&')}`}
+                  to={`/explorer/collectible/detail/${[trans.chain, trans.contract, trans.tokenId].join('&')}`}
                   component={RouterLink}
                 >
                   <Typography variant="body2" color="text.secondary" display="inline">
@@ -90,7 +91,7 @@ const ActivityAccordion = (props) => {
             <Stack direction="row">
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Link
-                  to={`/marketplace/detail/${[trans.tokenId, trans.baseToken].join('&')}`}
+                  to={`/marketplace/detail/${[trans.chain, trans.contract, trans.tokenId].join('&')}`}
                   component={RouterLink}
                   sx={{ color: 'inherit', display: 'inline-flex', maxWidth: 'max-content', width: '100%' }}
                 >

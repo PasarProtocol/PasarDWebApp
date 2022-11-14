@@ -7,14 +7,14 @@ import { Box, Stack, Typography, TableRow, Link, TableCell } from '@mui/material
 
 import TabletImgBox from './TabletImgBox';
 import KYCBadge from '../badge/KYCBadge';
-import { getCoinTypeFromToken, getDateDistance, reduceHexAddress, MethodList } from '../../utils/common';
+import { getDateDistance, reduceHexAddress, MethodList, getCoinTypeFromTokenEx } from '../../utils/common';
 import { blankAddress } from '../../config';
 // ----------------------------------------------------------------------
 
 const EventByType = {
   Minted: 'Mint',
   Listed: 'CreateOrderForSale',
-  Sale: 'BuyOrder'
+  Sold: 'BuyOrder'
 };
 
 const ActivityTableRow = (props) => {
@@ -26,13 +26,16 @@ const ActivityTableRow = (props) => {
         switch (column.id) {
           case 'type':
             {
-              const originEvent = EventByType[trans.type];
-              let methodItem = MethodList.find((item) => item.method === originEvent);
+              let eventName = '';
+              if (trans?.order?.sellerAddr === blankAddress) eventName = 'Minted';
+              else if (trans?.order?.orderType === 1 && trans?.order?.orderState === 1) eventName = 'Listed';
+              else if (trans?.order?.orderType === 1 && trans?.order?.orderState === 2) eventName = 'Sold';
+              let methodItem = MethodList.find((item) => item.method === EventByType[eventName]);
               if (!methodItem) methodItem = { color: 'grey', icon: 'tag', detail: [] };
               cellcontent = (
                 <Stack direction="row" alignItems="center" spacing={2}>
                   <Link
-                    to={`/explorer/collectible/detail/${[trans.tokenId, trans.baseToken].join('&')}`}
+                    to={`/explorer/collectible/detail/${[trans.chain, trans.contract, trans.tokenId].join('&')}`}
                     component={RouterLink}
                   >
                     <Box
@@ -50,10 +53,10 @@ const ActivityTableRow = (props) => {
                     />
                   </Link>
                   <Link
-                    to={`/explorer/collectible/detail/${[trans.tokenId, trans.baseToken].join('&')}`}
+                    to={`/explorer/collectible/detail/${[trans.chain, trans.contract, trans.tokenId].join('&')}`}
                     component={RouterLink}
                   >
-                    <Typography variant="subtitle2">{trans.type}</Typography>
+                    <Typography variant="subtitle2">{eventName}</Typography>
                   </Link>
                 </Stack>
               );
@@ -63,7 +66,7 @@ const ActivityTableRow = (props) => {
             cellcontent = (
               <Stack direction="row" spacing={2}>
                 <Link
-                  to={`/marketplace/detail/${[trans.tokenId, trans.baseToken].join('&')}`}
+                  to={`/marketplace/detail/${[trans.chain, trans.contract, trans.tokenId].join('&')}`}
                   component={RouterLink}
                   sx={{ color: 'inherit' }}
                 >
@@ -73,7 +76,7 @@ const ActivityTableRow = (props) => {
                 </Link>
                 <Stack textAlign="left">
                   <Link
-                    to={`/collections/detail/${trans.marketPlace}${trans.baseToken}`}
+                    to={`/collections/detail/${[trans.chain, trans.contract].join('&')}`}
                     component={RouterLink}
                     sx={{ color: 'inherit' }}
                   >
@@ -82,7 +85,7 @@ const ActivityTableRow = (props) => {
                     </Typography>
                   </Link>
                   <Link
-                    to={`/marketplace/detail/${[trans.tokenId, trans.baseToken].join('&')}`}
+                    to={`/marketplace/detail/${[trans.chain, trans.contract, trans.tokenId].join('&')}`}
                     component={RouterLink}
                     sx={{ color: 'inherit' }}
                   >
@@ -94,8 +97,8 @@ const ActivityTableRow = (props) => {
             break;
           case 'price':
             {
-              const priceVal = trans.price ? math.round(trans.price / 1e18, 3) : 0;
-              const coinType = getCoinTypeFromToken(trans);
+              const priceVal = math.round((trans?.order?.price ?? 0) / 1e18, 3);
+              const coinType = getCoinTypeFromTokenEx(trans);
               const coinUSD = coinPrice[coinType.index];
               cellcontent = (
                 <Stack display="inline-flex" textAlign="left">
@@ -130,8 +133,12 @@ const ActivityTableRow = (props) => {
           case 'buyerAddr':
           case 'sellerAddr':
             {
-              const addrstr = trans[column.id];
-              const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr);
+              // const addrstr = trans[column.id];
+              // const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr);
+              const order = trans?.order || { buyerAddr: '', sellerAddr: '' };
+              const addrstr = order[column.id];
+              const dispAddress =
+                (column.id === 'sellerAddr' ? order?.sellerInfo?.name : '') || reduceHexAddress(addrstr);
               cellcontent = (
                 <Stack direction="row" spacing={1} alignItems="center" display="inline-flex">
                   {dispAddress.length > 0 && addrstr !== blankAddress ? (
@@ -153,7 +160,7 @@ const ActivityTableRow = (props) => {
           case 'marketTime':
             cellcontent = (
               <Typography variant="body2" color="text.secondary">
-                {getDateDistance(trans.marketTime)}
+                {getDateDistance(trans?.order?.updateTime ?? trans?.order?.createTime)}
               </Typography>
             );
             break;
