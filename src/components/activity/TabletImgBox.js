@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@mui/styles';
@@ -8,8 +9,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import { Icon } from '@iconify/react';
-
-import { getAssetImage } from '../../utils/common';
+import { getImageFromIPFSUrl } from '../../utils/common';
 import useSettings from '../../hooks/useSettings';
 
 const BoxStyle = styled(Box)(({ theme }) => ({
@@ -57,6 +57,7 @@ const useStyles = makeStyles({
     }
   }
 });
+
 const LoadingOverlay = () => {
   const classes = useStyles();
   return (
@@ -65,8 +66,9 @@ const LoadingOverlay = () => {
     </Box>
   );
 };
+
 const TabletImgBox = (props) => {
-  const src = getAssetImage(props, true);
+  const src = getImageFromIPFSUrl(props?.data?.image || props?.image);
   const imageRef = React.useRef();
   const [isVideo, setIsVideo] = React.useState(false);
   const [videoIsLoaded, setVideoIsLoaded] = React.useState(false);
@@ -101,13 +103,7 @@ const TabletImgBox = (props) => {
   };
 
   const handleErrorImage = (e) => {
-    if (e.target.src.indexOf('pasarprotocol.io') >= 0) {
-      e.target.src = getAssetImage(props, true, 1);
-    } else if (e.target.src.indexOf('ipfs.ela') >= 0) {
-      e.target.src = getAssetImage(props, true, 2);
-    } else {
-      e.target.src = '/static/broken-image.svg';
-    }
+    e.target.src = '/static/broken-image.svg';
   };
 
   const imageStyle = {
@@ -168,5 +164,10 @@ const TabletImgBox = (props) => {
       </Box>
     </BoxStyle>
   );
+};
+
+TabletImgBox.propTypes = {
+  data: PropTypes.any,
+  image: PropTypes.any
 };
 export default TabletImgBox;
