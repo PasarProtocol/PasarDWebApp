@@ -275,7 +275,7 @@ export default function MyProfile() {
     };
     if (walletAddress) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletAddress, order, chainType]);
+  }, [walletAddress, order, chainType, updateCount]);
 
   React.useEffect(() => {
     const fetchData = async () => {
