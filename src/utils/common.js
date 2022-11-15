@@ -936,7 +936,7 @@ export const MethodList = [
       { description: 'By', field: 'seller', copyable: true, ellipsis: true },
       { description: 'For a value of', field: 'price', copyable: false }
     ],
-    verb: { description: 'Listed for', withPrice: true, subject: 'from' }
+    verb: { description: 'Listed for', withPrice: true, subject: 'seller' }
   },
   {
     method: 'BuyOrder',
