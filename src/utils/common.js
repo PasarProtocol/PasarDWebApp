@@ -460,25 +460,6 @@ export async function checkWhetherGeneralCollection(chainId, contractAddress, co
   }
 }
 
-export function getCredentialInfo(strAddress) {
-  return new Promise((resolve, reject) => {
-    fetchFrom(`api/v2/auth/getCredentials/${strAddress}`)
-      .then((response) => {
-        response
-          .json()
-          .then((jsonData) => {
-            resolve(jsonData.data);
-          })
-          .catch((err) => {
-            reject(err);
-          });
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-}
-
 export function removeLeadingZero(value) {
   return value.replace(/-/g, '').replace(/^0+(?!\.|$)/, '');
 }
