@@ -33,9 +33,9 @@ import {
 import {
   reduceHexAddress,
   getDiaTokenInfo,
-  fetchFrom,
   getDidInfoFromAddress,
-  isInAppBrowser
+  isInAppBrowser,
+  fetchAPIFrom
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -214,71 +214,55 @@ export default function MyItems() {
       return tempFlag;
     });
   };
-  const apiNames = ['getListedCollectiblesByAddress', 'getOwnCollectiblesByAddress', 'getCreatedCollectiblesByAddress'];
+
+  const apiNames = [
+    'getListedCollectiblesByWalletAddr',
+    'getOwnedCollectiblesByWalletAddr',
+    'getMintedCollectiblesByWalletAddr'
+  ];
   const typeNames = ['listed', 'owned', 'minted'];
+
   React.useEffect(() => {
     const fetchData = async () => {
-      if (walletAddress) {
-        getDiaTokenInfo(walletAddress).then((dia) => {
-          if (dia !== '0') setBadgeFlag('dia', dia);
-          else setBadgeFlag('dia', 0);
-        });
-      }
       controller.abort(); // cancel the previous request
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
-
       Array(3)
         .fill(0)
-        .forEach((_, i) => {
+        .forEach(async (_, i) => {
           setLoadingAssetsOfType(i, true);
-          fetchFrom(`api/v2/sticker/${apiNames[i]}/${walletAddress}?orderType=${orderType}`, { signal })
-            .then((response) => {
-              response
-                .json()
-                .then((jsonAssets) => {
-                  setAssetsOfType(i, jsonAssets.data);
-                  setLoadingAssetsOfType(i, false);
-                })
-                .catch((e) => {
-                  console.error(e);
-                  setLoadingAssetsOfType(i, false);
-                });
-            })
-            .catch((e) => {
-              console.error(e);
-              if (e.code !== e.ABORT_ERR) setLoadingAssetsOfType(i, false);
+          try {
+            const res = await fetchAPIFrom(`api/v1/${apiNames[i]}?walletAddr=${walletAddress}&sort=${orderType}`, {
+              signal
             });
+            const json = await res.json();
+            setAssetsOfType(i, json?.data || []);
+          } catch (e) {
+            console.error(e);
+          }
+          setLoadingAssetsOfType(i, false);
         });
+      const resDia = await getDiaTokenInfo(walletAddress);
+      setBadgeFlag('dia', resDia * 1);
     };
-    fetchData();
+    if (walletAddress) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletAddress, orderType, updateCount]);
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (walletAddress) {
-        setLoadingCollection(true);
-        fetchFrom(`api/v2/sticker/getCollectionByOwner/${walletAddress}`)
-          .then((response) => {
-            response
-              .json()
-              .then((jsonAssets) => {
-                setCollections(jsonAssets.data);
-                setLoadingCollection(false);
-              })
-              .catch((e) => {
-                console.error(e);
-                setLoadingCollection(false);
-              });
-          })
-          .catch((e) => {
-            if (e.code !== e.ABORT_ERR) setLoadingCollection(false);
-          });
+      setLoadingCollection(true);
+      try {
+        const res = await fetchAPIFrom(`api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${walletAddress}`, {});
+        const json = await res.json();
+        setCollections(json?.data || []);
+      } catch (e) {
+        console.error(e);
       }
+      setLoadingCollection(false);
     };
-    fetchData();
+    if (walletAddress) fetchData();
   }, [walletAddress]);
 
   const loadingSkeletons = Array(10).fill(null);
