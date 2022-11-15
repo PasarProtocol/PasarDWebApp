@@ -98,21 +98,16 @@ const AssetGroupSlider = (props) => {
                 >
                   <AssetCard
                     {...item}
-                    uniqueKey={(isOnMarket ? item?.token?.uniqueKey : item?.uniqueKey) || ''}
-                    name={isOnMarket ? item?.token?.name : item?.name}
                     chain={isOnMarket ? item?.token?.chain : item?.chain}
                     contract={isOnMarket ? item?.token?.contract : item?.contract}
                     tokenId={isOnMarket ? item?.token?.tokenId : item?.tokenId}
-                    thumbnail={getImageFromIPFSUrl(
-                      isOnMarket
-                        ? item?.token?.data?.thumbnail || item?.token?.image
-                        : item?.data?.thumbnail || item?.image
-                    )}
+                    uniqueKey={(isOnMarket ? item?.token?.uniqueKey : item?.uniqueKey) || ''}
+                    name={isOnMarket ? item?.token?.name : item?.name}
                     orderId={(isOnMarket ? item?.orderId : item?.order?.orderId) ?? 0}
                     orderType={(isOnMarket ? item?.orderType : item?.order?.orderType) ?? 0}
                     orderState={(isOnMarket ? item?.orderState : item?.order?.orderState) ?? 0}
-                    price={round(((isOnMarket ? item?.price : item?.order?.price) ?? 0) / 1e18, 3)}
                     amount={(isOnMarket ? item?.amount : item?.order?.amount) ?? 0}
+                    price={round(((isOnMarket ? item?.price : item?.order?.price) ?? 0) / 1e18, 3)}
                     baseToken={(isOnMarket ? item?.baseToken : item?.order?.baseToken) || ''}
                     endTime={(isOnMarket ? item?.endTime : item?.order?.endTime) ?? 0}
                     tokenOwner={(isOnMarket ? item?.token?.tokenOwner : item?.tokenOwner) || ''}
@@ -121,12 +116,17 @@ const AssetGroupSlider = (props) => {
                     bids={(isOnMarket ? item?.bids : item?.order?.bids) / 1 ?? 0}
                     lastBid={(isOnMarket ? item?.lastBid : item?.order?.lastBid) / 1 ?? 0}
                     lastBidder={(isOnMarket ? item?.lastBidder : item?.order?.lastBidder) || ''}
-                    buyoutPrice={round(((isOnMarket ? item?.buyoutPrice : item?.order?.buyoutPrice) ?? 0) / 1e18, 3)}
                     reservePrice={round(((isOnMarket ? item?.reservePrice : item?.order?.reservePrice) ?? 0) / 1e18, 3)}
+                    buyoutPrice={round(((isOnMarket ? item?.buyoutPrice : item?.order?.buyoutPrice) ?? 0) / 1e18, 3)}
+                    thumbnail={getImageFromIPFSUrl(
+                      isOnMarket
+                        ? item?.token?.data?.thumbnail || item?.token?.image
+                        : item?.data?.thumbnail || item?.image
+                    )}
                     type={0}
-                    isLink={Boolean(true)}
                     coinUSD={coinPrice[coinType.index]}
                     coinType={coinType}
+                    isLink={Boolean(true)}
                     isDragging={isDragging}
                     showPrice={type !== 'recent_sold'}
                   />
