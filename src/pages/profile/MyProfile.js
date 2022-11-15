@@ -1,4 +1,3 @@
-// material
 import React from 'react';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import SwipeableViews from 'react-swipeable-views';
@@ -24,8 +23,6 @@ import { Icon } from '@iconify/react';
 import editIcon from '@iconify-icons/akar-icons/edit';
 import { useWeb3React } from '@web3-react/core';
 import jwtDecode from 'jwt-decode';
-
-// components
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
 import StyledButton from '../../components/signin-dlg/StyledButton';
@@ -57,10 +54,11 @@ import {
 import {
   reduceHexAddress,
   getDiaTokenInfo,
-  fetchFrom,
   getDidInfoFromAddress,
   isInAppBrowser,
-  getChainTypeFromId
+  getChainTypeFromId,
+  fetchAPIFrom,
+  chainTypes
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -113,6 +111,7 @@ export default function MyProfile() {
     telegram: queryTelegram,
     medium: queryMedium
   };
+
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   React.useEffect(() => {
     const fetchData = async () => {
@@ -237,77 +236,64 @@ export default function MyProfile() {
     });
   };
   const apiNames = [
-    'getListedCollectiblesByAddress',
-    'getOwnCollectiblesByAddress',
-    'getBidCollectiblesByAddress',
-    'getCreatedCollectiblesByAddress',
-    'getSoldCollectiblesByAddress'
+    'getListedCollectiblesByWalletAddr',
+    'getOwnedCollectiblesByWalletAddr',
+    'getBidsCollectiblesByWalletAddr',
+    'getMintedCollectiblesByWalletAddr',
+    'getSoldCollectiblesByWalletAddr'
   ];
   const typeNames = ['listed', 'owned', 'bid', 'minted', 'sold'];
+
   React.useEffect(() => {
     const fetchData = async () => {
-      if (walletAddress) {
-        getDiaTokenInfo(walletAddress).then((dia) => {
-          if (dia !== '0') setBadgeFlag('dia', dia);
-          else setBadgeFlag('dia', 0);
-        });
-      }
       controller.abort(); // cancel the previous request
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
 
+      const chain = chainType === 0 ? 'all' : chainTypes[chainType - 1].token.toLowerCase();
       Array(5)
         .fill(0)
-        .forEach((_, i) => {
+        .forEach(async (_, i) => {
           setLoadingAssetsOfType(i, true);
-          fetchFrom(`api/v2/sticker/${apiNames[i]}/${walletAddress}?orderType=${order}&marketPlace=${chainType}`, {
-            signal
-          })
-            .then((response) => {
-              response
-                .json()
-                .then((jsonAssets) => {
-                  setAssetsOfType(i, jsonAssets.data);
-                  setLoadingAssetsOfType(i, false);
-                })
-                .catch((e) => {
-                  console.error(e);
-                  setLoadingAssetsOfType(i, false);
-                });
-            })
-            .catch((e) => {
-              if (e.code !== e.ABORT_ERR) setLoadingAssetsOfType(i, false);
-            });
+          try {
+            const res = await fetchAPIFrom(
+              `api/v1/${apiNames[i]}?walletAddr=${walletAddress}&sort=${order}&chain=${chain}`,
+              {
+                signal
+              }
+            );
+            const json = await res.json();
+            setAssetsOfType(i, json?.data || []);
+          } catch (e) {
+            console.error(e);
+          }
+          setLoadingAssetsOfType(i, false);
         });
+      const resDia = await getDiaTokenInfo(walletAddress);
+      setBadgeFlag('dia', resDia * 1);
     };
-    fetchData();
+    if (walletAddress) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletAddress, order, chainType, updateCount]);
+  }, [walletAddress, order, chainType]);
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (walletAddress) {
-        setLoadingCollection(true);
-        fetchFrom(`api/v2/sticker/getCollectionByOwner/${walletAddress}?marketPlace=${chainType}`)
-          .then((response) => {
-            response
-              .json()
-              .then((jsonAssets) => {
-                setCollections(jsonAssets.data);
-                setLoadingCollection(false);
-              })
-              .catch((e) => {
-                console.error(e);
-                setLoadingCollection(false);
-              });
-          })
-          .catch((e) => {
-            if (e.code !== e.ABORT_ERR) setLoadingCollection(false);
-          });
+      setLoadingCollection(true);
+      const chain = chainType === 0 ? 'all' : chainTypes[chainType - 1].token.toLowerCase();
+      try {
+        const res = await fetchAPIFrom(
+          `api/v1/getCollectionsByWalletAddr?chain=${chain}&walletAddr=${walletAddress}`,
+          {}
+        );
+        const json = await res.json();
+        setCollections(json?.data || []);
+      } catch (e) {
+        console.error(e);
       }
+      setLoadingCollection(false);
     };
-    fetchData();
+    if (walletAddress) fetchData();
   }, [walletAddress, chainType]);
 
   const handleDispMode = (_, mode) => {
