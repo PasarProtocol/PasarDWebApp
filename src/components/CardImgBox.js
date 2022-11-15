@@ -83,7 +83,8 @@ const LoadingOverlay = () => {
 };
 const CardImgBox = (props) => {
   const { isMoreLink = false, chain, thumbnail } = props;
-  const chainIndex = getChainIndexFromChain(chain);
+  let chainIndex = getChainIndexFromChain(chain);
+  if (chainIndex < 1) chainIndex = 1;
   const imageRef = React.useRef();
   const [isVideo, setIsVideo] = React.useState(false);
   const [videoIsLoaded, setVideoIsLoaded] = React.useState(false);
