@@ -46,11 +46,11 @@ import {
   getDiaTokenInfo,
   getElaOnEthTokenInfo,
   getDiaTokenPrice,
-  fetchFrom,
   getTokenPriceInEthereum,
   isInAppBrowser,
   checkValidChain,
-  getChainTypeFromId
+  getChainTypeFromId,
+  fetchAPIFrom
 } from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
 import { creatAndRegister, prepareConnectToHive, downloadAvatar } from './HiveAPI';
@@ -146,20 +146,12 @@ export default function SignInDialog() {
   }, [pasarLinkChain]);
 
   React.useEffect(() => {
-    if (walletAddress)
-      fetchFrom(`api/v2/sticker/checkV1NFTByWallet/${walletAddress}`, {})
-        .then((response) => {
-          response.json().then((jsonResult) => {
-            if (jsonResult.data) {
-              setOpenTopAlert(true);
-            } else {
-              setOpenTopAlert(false);
-            }
-          });
-        })
-        .catch((e) => {
-          console.error(e);
-        });
+    const fetchData = async () => {
+      const res = await fetchAPIFrom(`api/v1/getV1MarketNFTByWalletAddr?walletAddr=${walletAddress}`, {});
+      const json = await res.json();
+      setOpenTopAlert((json?.data || []).length > 0);
+    };
+    if (walletAddress) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletAddress]);
 
