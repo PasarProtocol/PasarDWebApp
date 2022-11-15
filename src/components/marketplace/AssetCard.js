@@ -112,6 +112,7 @@ export default function AssetCard(props) {
     handleUpdate,
     defaultCollectionType = 0
   } = props;
+  
   const [collection, setCollection] = React.useState({});
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [disclaimerOpen, setOpenDisclaimer] = React.useState(false);
@@ -175,7 +176,8 @@ export default function AssetCard(props) {
         body: JSON.stringify([uniqueKey])
       });
       const json = await res.json();
-      setState({ isFirstSale: json?.isFirstSale || false, isOnSale: json?.isOnSale || false });
+      if ((json?.data || []).length)
+        setState({ isFirstSale: json.data[0]?.isFirstSale || false, isOnSale: json.data[0]?.isOnSale || false });
     };
     if (uniqueKey) fetchData();
   }, [uniqueKey]);
@@ -491,8 +493,8 @@ export default function AssetCard(props) {
               component={RouterLink}
               to={
                 isMoreLink
-                  ? `/collections/detail/${[chain, baseToken].join('&')}`
-                  : `/marketplace/detail/${[tokenId, baseToken].join('&')}`
+                  ? `/collections/detail/${[chain, contract].join('&')}`
+                  : `/marketplace/detail/${[chain, contract, tokenId].join('&')}`
               }
               alt=""
               underline="none"
