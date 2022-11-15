@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Box, Stack, Typography, Link } from '@mui/material';
 import CopyButton from '../CopyButton';
 import { getTime, reduceHexAddress } from '../../utils/common';
-import { MAIN_CONTRACT } from '../../config';
 
 // ----------------------------------------------------------------------
 
@@ -17,7 +16,7 @@ const DETAILINFO_TITLE = [
   'Date on Market',
   'Item Type'
 ];
-const DETAILINFO_KEYS = ['tokenIdHex', 'royalties', 'quantity', 'SaleType', 'createTime', 'marketTime', 'type'];
+const DETAILINFO_KEYS = ['tokenIdHex', 'royalties', 'tokenSupply', 'saleType', 'createTime', 'marketTime', 'type'];
 
 // ----------------------------------------------------------------------
 const DetailItem = (props) => {
@@ -78,21 +77,13 @@ export default function AssetDetailInfo({ detail }) {
     key: DETAILINFO_KEYS[index]
   }));
   const creatimestamp = getTime(detail.createTime);
-  const marketimestamp = getTime(detail.marketTime);
-  let dateOnMarket = detail.DateOnMarket;
-  if (dateOnMarket !== 'Not on sale') {
-    const timestamp = getTime(dateOnMarket);
-    dateOnMarket = `${timestamp.date} ${timestamp.time}`;
-  }
-
-  const checkIfHolderIsMarket = Object.values(MAIN_CONTRACT).findIndex((item) => item.market === detail.holder);
+  const marketimestamp = getTime(detail.listedOn);
   const detailInfo = {
     ...detail,
-    royalties: `${(detail.royalties * 100) / 10 ** 6} %`,
+    royalties: `${(detail.royaltyFee * 100) / 10 ** 6} %`,
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
     marketTime: `${marketimestamp.date} ${marketimestamp.time}`,
-    dateOnMarket,
-    holder: checkIfHolderIsMarket < 0 ? detail.holder : detail.royaltyOwner
+    saleType: detail?.isFirstSale ? 'Primary Sale' : 'Secondary Sale'
   };
 
   return (
