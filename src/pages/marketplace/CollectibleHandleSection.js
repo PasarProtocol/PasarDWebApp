@@ -6,7 +6,6 @@ import { round } from 'mathjs';
 import { Box, Stack, Typography, Paper } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { styled } from '@mui/material/styles';
-
 import { MHidden } from '../../components/@material-extend';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import DisclaimerDlg from '../../components/dialog/Disclaimer';
@@ -16,7 +15,7 @@ import SettleOrderDlg from '../../components/dialog/SettleOrder';
 import CancelDlg from '../../components/dialog/CancelSale';
 import Countdown from '../../components/Countdown';
 import useSingin from '../../hooks/useSignin';
-import { getTime, getCoinTypeFromToken, getTotalCountOfCoinTypes, setAllTokenPrice } from '../../utils/common';
+import { getTime, getTotalCountOfCoinTypes, setAllTokenPrice, getCoinTypeFromTokenEx } from '../../utils/common';
 import { auctionOrderType } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -117,12 +116,12 @@ export default function CollectibleHandleSection(props) {
       setTimeout(() => checkHasEnded(), 1000);
     }
   };
-  const coinType = getCoinTypeFromToken(collectible);
+  const coinType = getCoinTypeFromTokenEx(collectible);
   const coinName = coinType.name;
   const coinUSD = coinPrice[coinType.index];
   let statusText = 'On sale for a fixed price of';
-  let priceText = `${round(collectible.Price / 1e18, 3)} ${coinName}`;
-  let usdPriceText = `≈ USD ${round((coinUSD * collectible.Price) / 1e18, 3)}`;
+  let priceText = `${round((collectible?.order?.Price ?? 0) / 1e18, 3)} ${coinName}`;
+  let usdPriceText = `≈ USD ${round((coinUSD * (collectible?.order?.Price ?? 0)) / 1e18, 3)}`;
   let handleField = null;
   const currentBid = collectible.listBid && collectible.listBid.length ? collectible.listBid[0].price : 0;
   let deadline = '';
@@ -139,7 +138,7 @@ export default function CollectibleHandleSection(props) {
         usdPriceText = `≈ USD ${round((coinUSD * currentBid) / 1e18, 3)}`;
       }
 
-      if (address !== collectible.holder)
+      if (address !== collectible.tokenOwner)
         handleField = didSignin ? (
           <Stack direction="row" spacing={1}>
             <StyledButton variant="contained" fullWidth onClick={() => setPlaceBidOpen(true)}>
@@ -156,7 +155,7 @@ export default function CollectibleHandleSection(props) {
             Sign in to Place bid
           </StyledButton>
         );
-      else if (address === collectible.holder && !currentBid && collectible.SaleType !== 'Not on sale')
+      else if (address === collectible.tokenOwner && !currentBid && collectible.SaleType !== 'Not on sale')
         handleField = (
           <StyledButton variant="contained" fullWidth onClick={() => setCancelOpen(true)}>
             Cancel sale
@@ -174,7 +173,7 @@ export default function CollectibleHandleSection(props) {
     } else if (!currentBid || currentBid < collectible.reservePrice) {
       statusText = !currentBid ? 'Starting Price' : 'Top Bid';
       if (currentBid) priceText = `${round(currentBid / 1e18, 3)} ${coinName}`;
-      if (address === collectible.holder && collectible.SaleType !== 'Not on sale')
+      if (address === collectible.tokenOwner && collectible.SaleType !== 'Not on sale')
         handleField = (
           <StyledButton variant="contained" fullWidth onClick={() => setCancelOpen(true)}>
             Cancel sale
@@ -221,13 +220,13 @@ export default function CollectibleHandleSection(props) {
         Go back to Marketplace
       </StyledButton>
     );
-  } else if (address === collectible.holder && collectible.SaleType !== 'Not on sale') {
+  } else if (address === collectible.tokenOwner && collectible.SaleType !== 'Not on sale') {
     handleField = (
       <StyledButton variant="contained" fullWidth onClick={() => setCancelOpen(true)}>
         Cancel sale
       </StyledButton>
     );
-  } else if (address !== collectible.holder) {
+  } else if (address !== collectible.tokenOwner) {
     handleField = didSignin ? (
       <StyledButton variant="contained" fullWidth onClick={handlePurchase}>
         Buy

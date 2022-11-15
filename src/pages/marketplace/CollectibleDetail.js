@@ -58,23 +58,21 @@ import AddressCopyButton from '../../components/AddressCopyButton';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup';
 import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
-import { blankAddress, MAIN_CONTRACT } from '../../config';
 import { queryName, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI';
 import {
   reduceHexAddress,
-  getAssetImage,
   getDiaTokenInfo,
-  fetchFrom,
-  getCoinTypeFromToken,
-  getCollectiblesInCollection4Preview,
   setAllTokenPrice,
   getDidInfoFromAddress,
   isInAppBrowser,
   getTotalCountOfCoinTypes,
   getShortUrl,
-  getIpfsUrl,
   collectionTypes,
-  chainTypes
+  chainTypes,
+  fetchAPIFrom,
+  getImageFromIPFSUrl,
+  getChainIndexFromChain,
+  getCoinTypeFromTokenEx
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -89,6 +87,7 @@ const RootStyle = styled(Page)(({ theme }) => ({
     paddingBottom: theme.spacing(3)
   }
 }));
+
 const SectionSx = {
   border: '1px solid',
   borderColor: 'action.disabledBackground',
@@ -188,7 +187,7 @@ BidStatus.propTypes = {
 // ----------------------------------------------------------------------
 export default function CollectibleDetail() {
   const params = useParams();
-  const [tokenId, baseToken] = params.args.split('&');
+  const [chain, contract, tokenId] = params.args.split('&');
   const [isFullScreen, setFullScreen] = React.useState(false);
   const [isOpenSharePopup, setOpenSharePopup] = React.useState(null);
   const [isOpenMorePopup, setOpenMorePopup] = React.useState(null);
@@ -209,8 +208,6 @@ export default function CollectibleDetail() {
   const [isPropertiesAccordionOpen, setPropertiesAccordionOpen] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const [dispCountInCollection, setDispCountInCollection] = React.useState(3);
-  const [totalCountInCollection, setTotalCountInCollection] = React.useState(0);
-  const [collectionAttributes, setCollectionAttributes] = React.useState({});
   const [isVideo, setIsVideo] = React.useState(false);
   const [videoIsLoaded, setVideoIsLoaded] = React.useState(false);
   const { pasarLinkAddress } = useSingin();
@@ -253,36 +250,6 @@ export default function CollectibleDetail() {
   }
 
   React.useEffect(() => {
-    if (collectible.baseToken) {
-      const assetImageUrl = getAssetImage(collectible, false);
-      setImageUrl(assetImageUrl);
-
-      fetchFrom(
-        `api/v2/sticker/getTotalCountCollectibles/${collectible.baseToken}?marketPlace=${collectible.marketPlace}`
-      ).then((response) => {
-        response.json().then((jsonData) => {
-          if (jsonData.data) setTotalCountInCollection(jsonData.data.total);
-        });
-      });
-      fetchFrom(
-        `api/v2/sticker/getAttributeOfCollection/${collectible.baseToken}?marketPlace=${collectible.marketPlace}`
-      ).then((response) => {
-        response.json().then((jsonData) => {
-          if (jsonData.data) setCollectionAttributes(jsonData.data);
-        });
-      });
-      fetch(assetImageUrl)
-        .then((response) => {
-          const contentype = response.headers.get('content-type');
-          if (contentype.startsWith('video')) {
-            setIsVideo(true);
-          }
-        })
-        .catch(console.log);
-    }
-  }, [collectible]);
-
-  React.useEffect(() => {
     const fetchData = async () => {
       const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
       if (sessionLinkFlag) {
@@ -301,124 +268,125 @@ export default function CollectibleDetail() {
   React.useEffect(() => {
     const fetchData = async () => {
       window.scrollTo(0, 0);
-      const resCollectible = await fetchFrom(`api/v2/sticker/getCollectibleByTokenId/${tokenId}/${baseToken}`);
-      const jsonCollectible = await resCollectible.json();
-      if (jsonCollectible.data) {
+      setLoadingCollectible(true);
+      try {
         try {
-          setCollectible(jsonCollectible.data);
-
-          fetchFrom(
-            `api/v2/sticker/getCollection/${jsonCollectible.data.baseToken}?marketPlace=${jsonCollectible.data.marketPlace}`
-          ).then((response) => {
-            response
-              .json()
-              .then((jsonAssets) => {
-                if (!jsonAssets.data) return;
-                setCollection({ ...jsonAssets.data, description: '', avatar: '', socials: {} });
-                const metaUri = getIpfsUrl(jsonAssets.data.uri);
-                if (metaUri) {
-                  fetch(metaUri)
-                    .then((response) => response.json())
-                    .then((data) => {
-                      setCollection((prevState) => {
-                        const tempState = { ...prevState };
-                        tempState.description = data.data.description;
-                        tempState.avatar = getIpfsUrl(data.data.avatar);
-                        tempState.socials = data.data.socials;
-                        return tempState;
-                      });
-                    })
-                    .catch(console.log);
-                }
-              })
-              .catch((e) => {
-                console.error(e);
-              });
-          });
-          getCollectiblesInCollection4Preview(jsonCollectible.data.baseToken, jsonCollectible.data.marketPlace, 5).then(
-            (res) => {
-              setCollectiblesInCollection(res.filter((item) => item.tokenId !== tokenId));
-            }
+          const res = await fetchAPIFrom(
+            `api/v1/getCollectibleInfo?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}`,
+            {}
           );
-          getDiaTokenInfo(jsonCollectible.data.royaltyOwner).then((dia) => {
-            if (dia !== '0') setBadgeOfUser('creator', 'dia', dia);
-            else setBadgeOfUser('creator', 'dia', 0);
-          });
-          getDiaTokenInfo(jsonCollectible.data.holder).then((dia) => {
-            if (dia !== '0') setBadgeOfUser('owner', 'dia', dia);
-            else setBadgeOfUser('owner', 'dia', 0);
-          });
-          if (jsonCollectible.data.royaltyOwner === jsonCollectible.data.holder) {
-            getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
-              .then((info) => {
-                if (info.name) {
-                  setDidName({ creator: info.name, owner: info.name });
-                  if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') fetchProfileData(info.did, info.name || '');
-                }
-              })
-              .catch((e) => {
-                console.error(e);
-              });
-          } else {
-            getDidInfoFromAddress(jsonCollectible.data.royaltyOwner)
-              .then((info) => {
-                setDidNameOfUser('creator', info.name || '');
-                if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
-                  fetchProfileData(info.did, info.name || '', 'creator');
-              })
-              .catch((e) => {
-                console.error(e);
-              });
-
-            getDidInfoFromAddress(jsonCollectible.data.holder)
-              .then((info) => {
-                setDidNameOfUser('owner', info.name || '');
-                if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
-                  fetchProfileData(info.did, info.name || '', 'owner');
-              })
-              .catch((e) => {
-                console.error(e);
-              });
+          const json = await res.json();
+          let collectibleDetail = json?.data || {};
+          if (collectibleDetail?.uniqueKey) {
+            const resSaleType = await fetchAPIFrom('api/v1/checkFirstSale', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify([collectibleDetail.uniqueKey])
+            });
+            const jsonSaleType = await resSaleType.json();
+            if ((jsonSaleType?.data || []).length)
+              collectibleDetail = { ...collectibleDetail, isFirstSale: json.data[0]?.isFirstSale || false };
           }
-          if (
-            (jsonCollectible.data.properties && Object.keys(jsonCollectible.data.properties).length > 0) ||
-            (jsonCollectible.data.attribute && Object.keys(jsonCollectible.data.attribute).length > 0)
-          )
-            setPropertiesAccordionOpen(true);
+          if (collectibleDetail?.order?.orderId) {
+            const resBid = await fetchAPIFrom(
+              `api/v1/getBidsHistory?chain=${chain}&orderId=${collectibleDetail.order.orderId}`,
+              {}
+            );
+            const jsonBid = await resBid.json();
+            collectibleDetail = { ...collectibleDetail, bidList: jsonBid?.data || [] };
+          }
+          setCollectible(collectibleDetail);
+          const imgUrl = getImageFromIPFSUrl(collectibleDetail?.data?.image || collectibleDetail?.image);
+          setImageUrl(imgUrl);
+          try {
+            const resImg = await fetch(imgUrl);
+            if (resImg.headers.get('content-type').startsWith('video')) setIsVideo(true);
+          } catch (e) {
+            console.error(e);
+          }
+          if ((collectibleDetail?.attributes || []).length) setPropertiesAccordionOpen(true);
           else setPropertiesAccordionOpen(false);
+          try {
+            const creatorDia = await getDiaTokenInfo(collectibleDetail?.royaltyOwner);
+            const ownerDia = await getDiaTokenInfo(collectibleDetail?.tokenOwner);
+            setBadgeOfUser('creator', 'dia', creatorDia * 1);
+            setBadgeOfUser('owner', 'dia', ownerDia * 1);
+          } catch (e) {
+            console.error(e);
+          }
+          try {
+            if (collectibleDetail?.royaltyOwner) {
+              const creatorInfo = await getDidInfoFromAddress(collectibleDetail.royaltyOwner);
+              setDidName({ creator: creatorInfo.name, owner: creatorInfo.name });
+              if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') fetchProfileData(creatorInfo.did);
+            }
+            if (collectibleDetail?.tokenOwner && collectibleDetail.royaltyOwner !== collectibleDetail.tokenOwner) {
+              const ownerInfo = await getDidInfoFromAddress(collectibleDetail.tokenOwner);
+              setDidNameOfUser('owner', ownerInfo.name || '');
+              if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') fetchProfileData(ownerInfo.did, 'owner');
+            }
+          } catch (e) {
+            console.error(e);
+          }
         } catch (e) {
           console.error(e);
         }
+        try {
+          const res = await fetchAPIFrom(`api/v1/getCollectionInfo?chain=${chain}&collection=${contract}`, {});
+          const json = await res.json();
+          const collectionInfo = json?.data || {};
+          setCollection({
+            ...collectionInfo,
+            avatar: getImageFromIPFSUrl(collectionInfo?.data?.avatar),
+            socials: collectionInfo?.data?.socials || []
+          });
+        } catch (e) {
+          console.error(e);
+        }
+        try {
+          const res = await fetchAPIFrom(
+            `api/v1/getCollectiblesOfCollection?collection=${contract}&chain=${chain}&num=4&exceptToken=${tokenId}`,
+            {}
+          );
+          const json = await res.json();
+          setCollectiblesInCollection(json?.data || []);
+        } catch (e) {
+          console.error(e);
+        }
+      } catch (e) {
+        console.error(e);
       }
       setLoadingCollectible(false);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateCount, tokenId]);
+  }, [chain, contract, tokenId]);
 
   React.useEffect(() => {
     const fetchData = async () => {
       setLoadingTransRecord(true);
-      fetchFrom(`api/v2/sticker/getTranDetailsByTokenId?tokenId=${tokenId}&baseToken=${baseToken}&method=&timeOrder=-1`)
-        .then((response) => {
-          response.json().then((jsonTransactions) => {
-            setTransRecord(
-              jsonTransactions.data
-                .filter((trans) => {
-                  const checkIfToIsMarket = Object.values(MAIN_CONTRACT).findIndex((item) => item.market === trans.to);
-                  return !(
-                    (trans.event === 'SafeTransferFrom' || trans.event === 'SafeTransferFromWithMemo') &&
-                    (trans.to === blankAddress || checkIfToIsMarket >= 0)
-                  );
-                })
-                .slice(0, 10)
-            );
-            setLoadingTransRecord(false);
-          });
-        })
-        .catch((e) => {
-          if (e.code !== e.ABORT_ERR) setLoadingTransRecord(false);
-        });
+      try {
+        const res = await fetchAPIFrom(
+          `api/v1/getTransactionsOfToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}&eventType=&sort=-1`,
+          {}
+        );
+        const json = await res.json();
+        const grouped =
+          json?.data?.data.reduce((res, item, id, arr) => {
+            if (id > 0 && item.transactionHash === arr[id - 1].transactionHash) {
+              res[res.length - 1].push(item);
+            } else {
+              res.push(id < arr.length - 1 && item.transactionHash === arr[id + 1].transactionHash ? [item] : item);
+            }
+            return res;
+          }, []) || [];
+        setTransRecord(grouped.slice(0, 10));
+      } catch (e) {
+        console.error(e);
+      }
+      setLoadingTransRecord(false);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -432,7 +400,6 @@ export default function CollectibleDetail() {
           if (type === 'all') setDidName({ creator: displayName, owner: displayName });
           else setDidNameOfUser(type, displayName);
         }
-
         downloadAvatar(targetDid).then((res) => {
           if (res && res.length) {
             const base64Content = res.reduce((content, code) => {
@@ -531,25 +498,15 @@ export default function CollectibleDetail() {
   window.addEventListener('resize', handleResize);
 
   const handleErrorImage = (e) => {
-    if (e.target.src.indexOf('pasarprotocol.io') >= 0) {
-      e.target.src = getAssetImage(collectible, true, 1);
-    } else if (e.target.src.indexOf('ipfs.ela') >= 0) {
-      e.target.src = getAssetImage(collectible, true, 2);
-    } else {
-      e.target.src = '/static/broken-image.svg';
-    }
+    e.target.src = '/static/broken-image.svg';
     setImageUrl(e.target.src);
   };
-  let properties = {};
-  if (collectible && (collectible.properties || collectible.attribute))
-    properties = collectible.properties || collectible.attribute;
 
-  let chainType = 0;
-  if (collectible.marketPlace && collectible.marketPlace <= chainTypes.length) chainType = collectible.marketPlace - 1;
-  else if (!collectible || Object.keys(collectible).length === 0) chainType = -1;
-
+  const properties = collectible?.attributes || [];
+  const chainType = getChainIndexFromChain(chain) - 1;
   const tempChainTypes = [...chainTypes];
   tempChainTypes[0].name = 'Elastos Smart Chain (ESC)';
+
   return (
     <RootStyle title="Collectible | PASAR">
       <ScrollManager scrollKey="asset-detail-key" />
@@ -588,14 +545,12 @@ export default function CollectibleDetail() {
                 loop={Boolean(true)}
                 muted={Boolean(true)}
                 url={imageUrl}
-                onReady={() => {
-                  setVideoIsLoaded(true);
-                }}
+                onReady={() => setVideoIsLoaded(true)}
                 width="100%"
                 height={videoIsLoaded ? 360 : 0}
               />
             )}
-            {address !== collectible.holder &&
+            {address !== collectible.tokenOwner &&
               ((!isVideo && isLoadedImage) || (isVideo && videoIsLoaded)) &&
               !imageUrl.endsWith('broken-image.svg') && (
                 <Box
@@ -609,9 +564,7 @@ export default function CollectibleDetail() {
           <ToolGroupStyle>
             <MFab
               size="small"
-              onClick={() => {
-                setFullScreen(!isFullScreen);
-              }}
+              onClick={() => setFullScreen(!isFullScreen)}
               disabled={
                 (!isVideo && !isLoadedImage) || (isVideo && !videoIsLoaded) || imageUrl.endsWith('broken-image.svg')
               }
@@ -673,7 +626,6 @@ export default function CollectibleDetail() {
               </MenuItem>
             </Menu>
           </ToolGroupStyle>
-
           <Modal
             open={isFullScreen}
             onClose={() => setFullScreen(false)}
@@ -726,7 +678,7 @@ export default function CollectibleDetail() {
                     height="100%"
                   />
                 )}
-                {address !== collectible.holder && ((!isVideo && isLoadedImage) || (isVideo && videoIsLoaded)) && (
+                {address !== collectible.tokenOwner && ((!isVideo && isLoadedImage) || (isVideo && videoIsLoaded)) && (
                   <Box
                     draggable={false}
                     component="img"
@@ -782,7 +734,7 @@ export default function CollectibleDetail() {
                 <Stack direction="row">
                   <Typography variant="body2" component="span" sx={{ display: 'flex', alignItems: 'center' }}>
                     <Link
-                      to={`/profile/others/${collectible.holder}`}
+                      to={`/profile/others/${collectible.tokenOwner}`}
                       component={RouterLink}
                       color="text.primary"
                       sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mr: 1 }}
@@ -790,9 +742,9 @@ export default function CollectibleDetail() {
                       {avatarUrl.owner ? (
                         <Avatar alt="user" src={avatarUrl.owner} sx={{ width: 40, height: 40, mr: 1 }} />
                       ) : (
-                        <Jazzicon address={collectible.holder} />
+                        <Jazzicon address={collectible.tokenOwner} />
                       )}
-                      {didName.owner ? didName.owner : reduceHexAddress(collectible.holder)}
+                      {didName.owner ? didName.owner : reduceHexAddress(collectible.tokenOwner)}
                     </Link>
                     <Stack spacing={0.6} direction="row">
                       {badge.owner.kyc && (
@@ -814,8 +766,8 @@ export default function CollectibleDetail() {
                     sx={{ color: 'inherit' }}
                   >
                     <Stack direction="row">
-                      {collection.avatar ? (
-                        <AvatarStyle draggable={false} component="img" src={collection.avatar} />
+                      {collection?.avatar ? (
+                        <AvatarStyle draggable={false} component="img" src={collection?.avatar} />
                       ) : (
                         <AvatarStyle sx={{ p: 1 }} />
                       )}
@@ -901,22 +853,22 @@ export default function CollectibleDetail() {
               </Button>
             </PaperStyle>
           </Grid>
-          {collectible.listBid && collectible.listBid.length > 0 && (
+          {(collectible?.order?.bids ?? 0) > 0 && (
             <Grid item xs={12}>
               <PaperStyle>
                 <Typography variant="h5" sx={{ mt: 1, mb: 2 }}>
                   Bids
-                  {!!(collectible.reservePrice * 1) && (
+                  {!!((collectible?.order?.reservePrice ?? 0) * 1) && (
                     <>
                       {' '}
                       -{' '}
                       <BidStatus
-                        isReserveMet={collectible.listBid[0].price / 1e18 >= collectible.reservePrice / 1e18}
+                        isReserveMet={collectible.bidList[0].price / 1e18 >= collectible.reservePrice / 1e18}
                       />
                     </>
                   )}
                 </Typography>
-                <BidList dataList={collectible.listBid} coinType={getCoinTypeFromToken(collectible)} />
+                <BidList dataList={collectible.bidList} coinType={getCoinTypeFromTokenEx(collectible)} />
               </PaperStyle>
             </Grid>
           )}
@@ -931,20 +883,15 @@ export default function CollectibleDetail() {
                 </AccordionSummary>
                 <AccordionDetails sx={{ px: '20px' }}>
                   <Grid container spacing={1}>
-                    {Object.keys(properties).map((type, index) => {
-                      let countInTrait = 0;
-                      const typeValue = properties[type];
-                      if (collectionAttributes[type] && collectionAttributes[type][typeValue])
-                        countInTrait = collectionAttributes[type][typeValue];
-                      const percentage = totalCountInCollection
-                        ? round((countInTrait * 100) / totalCountInCollection, 2)
-                        : 0;
-                      return (
-                        <Grid item key={index}>
-                          <Property type={type} name={typeValue} percentage={percentage} />
-                        </Grid>
-                      );
-                    })}
+                    {properties.map((item, index) => (
+                      <Grid item key={index}>
+                        <Property
+                          type={item?.trait_type || ''}
+                          name={item?.value || ''}
+                          percentage={round((item?.percentage ?? 0) * 100, 2)}
+                        />
+                      </Grid>
+                    ))}
                   </Grid>
                 </AccordionDetails>
               </Accordion>
@@ -962,7 +909,7 @@ export default function CollectibleDetail() {
                 <CollectibleHistory
                   isLoading={isLoadingTransRecord}
                   dataList={transRecord}
-                  creator={{ address: collectible.royaltyOwner, name: didName.creator }}
+                  creator={{ address: collectible?.royaltyOwner || '', name: didName?.creator || '' }}
                 />
                 <Button
                   to={`/explorer/collectible/detail/${[
@@ -998,11 +945,11 @@ export default function CollectibleDetail() {
                         component={RouterLink}
                         sx={{ display: 'flex', color: 'inherit' }}
                       >
-                        {collection.avatar ? (
+                        {collection?.avatar ? (
                           <AvatarStyle
                             draggable={false}
                             component="img"
-                            src={collection.avatar}
+                            src={collection?.avatar}
                             sx={{ minWidth: 40 }}
                           />
                         ) : (
@@ -1018,11 +965,11 @@ export default function CollectibleDetail() {
                             component={RouterLink}
                             sx={{ display: 'flex', color: 'inherit' }}
                           >
-                            {collection.avatar ? (
+                            {collection?.avatar ? (
                               <AvatarStyle
                                 draggable={false}
                                 component="img"
-                                src={collection.avatar}
+                                src={collection?.avatar}
                                 sx={{ minWidth: 40 }}
                               />
                             ) : (
@@ -1031,11 +978,11 @@ export default function CollectibleDetail() {
                           </Link>
                         </MHidden>
                         <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center' }}>
-                          {collection.name}
+                          {collection?.name || ''}
                         </Typography>
                       </Stack>
                       <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
-                        {collection.description}
+                        {collection?.data?.description || ''}
                       </Typography>
                       {!!collection.owner && !!collection.token && (
                         <Box>
@@ -1070,12 +1017,12 @@ export default function CollectibleDetail() {
                               gap={1.5}
                             >
                               {collectiblesInCollection.slice(0, dispCountInCollection).map((item, _i) => {
-                                const coinType = getCoinTypeFromToken(item);
+                                const coinType = getCoinTypeFromTokenEx(item);
                                 return (
                                   <AssetCard
                                     key={_i}
                                     {...item}
-                                    thumbnail={getAssetImage(item, true)}
+                                    thumbnail={getImageFromIPFSUrl(item?.data?.image || item?.image)}
                                     price={round(item.price / 1e18, 3)}
                                     saleType={item.SaleType || item.saleType}
                                     type={0}
@@ -1100,7 +1047,7 @@ export default function CollectibleDetail() {
           )}
           <Grid item xs={12}>
             <Link
-              to={`/explorer/collectible/detail/${[collectible.tokenId, collectible.baseToken].join('&')}`}
+              to={`/explorer/collectible/detail/${[chain, contract, tokenId].join('&')}`}
               component={RouterLink}
               underline="none"
             >
