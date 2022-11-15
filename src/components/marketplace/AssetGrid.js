@@ -12,8 +12,8 @@ import {
   getImageFromIPFSUrl
 } from '../../utils/common';
 // ----------------------------------------------------------------------
-const StackedGrid = ({ children, ...props }) => (
-  <Box display="grid" gridTemplateColumns={`repeat(auto-fill, minmax(${props.itemWidth}px, 1fr))`} gap={1.5}>
+const StackedGrid = ({ children, itemWidth }) => (
+  <Box display="grid" gridTemplateColumns={`repeat(auto-fill, minmax(${itemWidth}px, 1fr))`} gap={1.5}>
     {children}
   </Box>
 );
@@ -24,6 +24,7 @@ StackedGrid.propTypes = {
 };
 
 const GridItems = (props) => {
+  const { assets = [], type, myaddress, updateCount, handleUpdate } = props;
   const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const setCoinPriceByType = (type, value) => {
     setCoinPrice((prevState) => {
@@ -39,38 +40,43 @@ const GridItems = (props) => {
 
   return (
     <>
-      {props.assets.map((item, index) => {
+      {assets.map((item, index) => {
         const coinType = getCoinTypeFromTokenEx(item);
-        const isAuction = item?.orderType === 2;
-
+        const isOnMarket = true;
         return item ? (
           <AssetCard
             key={index}
             {...item}
-            uniqueKey={(isAuction ? item?.token?.uniqueKey : item?.uniqueKey) || ''}
-            name={item?.name || ''}
+            chain={isOnMarket ? item?.token?.chain : item?.chain}
+            contract={isOnMarket ? item?.token?.contract : item?.contract}
+            tokenId={isOnMarket ? item?.token?.tokenId : item?.tokenId}
+            uniqueKey={(isOnMarket ? item?.token?.uniqueKey : item?.uniqueKey) || ''}
+            name={isOnMarket ? item?.token?.name : item?.name}
+            orderId={(isOnMarket ? item?.orderId : item?.order?.orderId) ?? 0}
+            orderType={(isOnMarket ? item?.orderType : item?.order?.orderType) ?? 0}
+            orderState={(isOnMarket ? item?.orderState : item?.order?.orderState) ?? 0}
+            amount={(isOnMarket ? item?.amount : item?.order?.amount) ?? 0}
+            price={round(((isOnMarket ? item?.price : item?.order?.price) ?? 0) / 1e18, 3)}
+            baseToken={(isOnMarket ? item?.baseToken : item?.order?.baseToken) || ''}
+            endTime={(isOnMarket ? item?.endTime : item?.order?.endTime) ?? 0}
+            tokenOwner={(isOnMarket ? item?.token?.tokenOwner : item?.tokenOwner) || ''}
+            royaltyOwner={(isOnMarket ? item?.token?.royaltyOwner : item?.royaltyOwner) || ''}
+            royaltyFee={(isOnMarket ? item?.token?.royaltyFee : item?.royaltyFee) / 1 ?? 0}
+            bids={(isOnMarket ? item?.bids : item?.order?.bids) / 1 ?? 0}
+            lastBid={(isOnMarket ? item?.lastBid : item?.order?.lastBid) / 1 ?? 0}
+            lastBidder={(isOnMarket ? item?.lastBidder : item?.order?.lastBidder) || ''}
+            reservePrice={round(((isOnMarket ? item?.reservePrice : item?.order?.reservePrice) ?? 0) / 1e18, 3)}
+            buyoutPrice={round(((isOnMarket ? item?.buyoutPrice : item?.order?.buyoutPrice) ?? 0) / 1e18, 3)}
             thumbnail={getImageFromIPFSUrl(
-              isAuction ? item?.token?.data?.thumbnail || item?.token?.image : item?.data?.thumbnail || item?.image
+              isOnMarket ? item?.token?.data?.thumbnail || item?.token?.image : item?.data?.thumbnail || item?.image
             )}
-            orderId={(isAuction ? item?.orderId : item?.order?.orderId) / 1 ?? 0}
-            orderType={(isAuction ? item?.orderType : item?.order?.orderType) / 1 ?? 0}
-            orderState={(isAuction ? item?.orderState : item?.order?.orderState) / 1 ?? 0}
-            price={round(((isAuction ? item?.price : item?.order?.price) ?? 0) / 1e18, 3)}
-            amount={(isAuction ? item?.amount : item?.order?.amount) / 1 ?? 0}
-            baseToken={(isAuction ? item?.baseToken : item?.order?.baseToken) || ''}
-            endTime={(isAuction ? item?.endTime : item?.order?.endTime) / 1 ?? 0}
-            tokenOwner={(isAuction ? item?.token?.tokenOwner : item?.tokenOwner) || ''}
-            royaltyOwner={(isAuction ? item?.token?.royaltyOwner : item?.royaltyOwner) || ''}
-            royaltyFee={(isAuction ? item?.token?.royaltyFee : item?.royaltyFee) / 1 ?? 0}
-            bids={(isAuction ? item?.bids : item?.order?.bids) / 1 ?? 0}
-            lastBid={(isAuction ? item?.lastBid : item?.order?.lastBid) / 1 ?? 0}
-            lastBidder={(isAuction ? item?.lastBidder : item?.order?.lastBidder) || ''}
-            buyoutPrice={round(((isAuction ? item?.buyoutPrice : item?.order?.buyoutPrice) ?? 0) / 1e18, 3)}
-            reservePrice={round(((isAuction ? item?.reservePrice : item?.order?.reservePrice) ?? 0) / 1e18, 3)}
-            isLink={Boolean(true)}
+            type={type}
             coinUSD={coinPrice[coinType.index]}
             coinType={coinType}
-            {...props}
+            isLink={Boolean(true)}
+            myaddress={myaddress}
+            updateCount={updateCount}
+            handleUpdate={handleUpdate}
           />
         ) : (
           <AssetCardSkeleton key={index} />
@@ -81,7 +87,11 @@ const GridItems = (props) => {
 };
 
 GridItems.propTypes = {
-  assets: PropTypes.any
+  assets: PropTypes.any,
+  type: PropTypes.number,
+  myaddress: PropTypes.string,
+  updateCount: PropTypes.number,
+  handleUpdate: PropTypes.func
 };
 
 AssetGrid.propTypes = {
