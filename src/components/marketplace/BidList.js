@@ -9,11 +9,12 @@ TransItem.propTypes = {
   coinType: PropTypes.any
 };
 function TransItem({ trans, coinType }) {
+  const { buyer = '', price = 0, timestamp = 0 } = trans;
   const [didName, setDidName] = React.useState('');
-  const timeObj = getTime(trans.timestamp);
+  const timeObj = getTime(timestamp);
   React.useEffect(() => {
-    if (trans.buyerAddr) {
-      getDidInfoFromAddress(trans.buyerAddr)
+    if (buyer) {
+      getDidInfoFromAddress(buyer)
         .then((info) => {
           setDidName(info.name);
         })
@@ -21,20 +22,20 @@ function TransItem({ trans, coinType }) {
           console.error(e);
         });
     }
-  }, [trans]);
+  }, [buyer]);
   const coinName = coinType.name;
 
   return (
     <Stack direction="row" spacing={2}>
       <Box sx={{ minWidth: 48, display: 'flex' }}>
-        <Jazzicon address={trans.buyerAddr} size={48} sx={{ mr: 0 }} />
+        <Jazzicon address={buyer} size={48} sx={{ mr: 0 }} />
       </Box>
       <Box sx={{ minWidth: 0, width: '100%' }}>
         <Typography variant="body2" noWrap>
-          {parseFloat((trans.price / 10 ** 18).toFixed(7))} {coinName}
+          {parseFloat((price / 10 ** 18).toFixed(7))} {coinName}
         </Typography>
         <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }}>
-          by {didName || reduceHexAddress(trans.buyerAddr)}
+          by {didName || reduceHexAddress(buyer)}
         </Typography>
       </Box>
       <Box sx={{ whiteSpace: 'nowrap' }}>
@@ -53,12 +54,13 @@ BitList.propTypes = {
 };
 
 export default function BitList(props) {
+  const { dataList = [], coinType } = props;
   return (
     <Stack spacing={2}>
-      {props.dataList.map((trans, index) => (
+      {dataList.map((trans, index) => (
         <Box key={index}>
-          <TransItem trans={trans} coinType={props.coinType} />
-          {index < props.dataList.length - 1 && <Divider sx={{ pb: 2 }} />}
+          <TransItem trans={trans} coinType={coinType} />
+          {index < dataList.length - 1 && <Divider sx={{ pb: 2 }} />}
         </Box>
       ))}
     </Stack>
