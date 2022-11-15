@@ -1314,41 +1314,6 @@ export const getDidInfoFromAddress = (address) =>
       });
   });
 
-export const getCollectiblesInCollection4Preview = (address, marketPlace, count) =>
-  new Promise((resolve, reject) => {
-    const bodyParams = {
-      baseToken: address,
-      status: 'All',
-      itemType: 'All',
-      pageNum: 1,
-      pageSize: count,
-      marketPlace
-    };
-    fetchFrom('api/v2/sticker/getDetailedCollectiblesInCollection', {
-      method: 'POST',
-      cache: 'no-cache',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(bodyParams)
-    })
-      .then((response) => {
-        response
-          .json()
-          .then((jsonAssets) => {
-            if (jsonAssets.data) {
-              resolve(jsonAssets.data.result);
-            } else resolve([]);
-          })
-          .catch((error) => {
-            reject(error);
-          });
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-
 export const getFilteredGasPrice = (_gasPrice) => (_gasPrice * 1 > 20 * 1e9 ? (20 * 1e9).toString() : _gasPrice);
 
 export const getFullUrl = (url) => `${window.location.protocol}//${window.location.host}/${url}`;
