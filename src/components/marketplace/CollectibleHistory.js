@@ -7,8 +7,8 @@ import {
   MethodList,
   reduceHexAddress,
   getDidInfoFromAddress,
-  getCoinTypeFromToken,
-  getDateDistance
+  getDateDistance,
+  getCoinTypeFromTokenEx
 } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
@@ -18,31 +18,38 @@ TransItem.propTypes = {
 function TransItem(props) {
   const { trans, creator } = props;
   const [didName, setDidName] = React.useState('');
-  let methodItem = MethodList.find((item) => item.method === trans.event);
-  if (!methodItem) methodItem = { color: 'grey', icon: 'tag', detail: [] };
+  let methodItem = MethodList.find((item) => item.method === trans.eventTypeName);
+  if (!methodItem)
+    methodItem = {
+      color: 'grey',
+      icon: 'tag',
+      detail: [],
+      verb: { subject: 'to' }
+    };
   const subject = trans[methodItem.verb.subject];
-  const coinType = getCoinTypeFromToken(trans);
+  const coinType = getCoinTypeFromTokenEx(trans);
   const coinName = coinType.name;
 
   React.useEffect(() => {
-    if (subject) {
+    const fetchData = async () => {
       if (subject === creator.address) setDidName(creator.name);
-      else
-        getDidInfoFromAddress(subject)
-          .then((info) => {
-            setDidName(info.name);
-          })
-          .catch((e) => {
-            console.error(e);
-          });
-    }
+      else {
+        try {
+          const res = await getDidInfoFromAddress(subject);
+          setDidName(res.name);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    if (subject) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subject]);
 
   return (
     <Stack direction="row" spacing={2}>
       <Link
-        to={`/explorer/transaction/${trans.tHash}`}
+        to={`/explorer/transaction/${trans.transactionHash}`}
         component={RouterLink}
         underline="none"
         sx={{ borderRadius: 1 }}
@@ -65,7 +72,9 @@ function TransItem(props) {
       <Box sx={{ minWidth: 0, flexGrow: 1 }}>
         <Typography variant="body2" noWrap>
           {methodItem.verb.description}
-          {methodItem.verb.withPrice ? ` ${parseFloat((trans.price / 10 ** 18).toFixed(7))} ${coinName}` : ''}
+          {methodItem.verb.withPrice
+            ? ` ${parseFloat(((trans?.order?.price ?? 0) / 1e18).toFixed(7))} ${coinName}`
+            : ''}
         </Typography>
         <Link to={`/explorer/transaction/detail/${subject}`} component={RouterLink}>
           <Typography variant="body2" sx={{ flexShrink: 0, color: 'text.secondary' }} noWrap>
@@ -89,20 +98,24 @@ CollectibleHistory.propTypes = {
 };
 
 export default function CollectibleHistory(props) {
-  const historyData = props.dataList;
-  historyData.forEach((trans, _i) => {
-    if (trans.event === 'OrderBid' && _i < historyData.length - 1 && historyData[_i + 1].event === 'BuyOrder') {
-      historyData[_i] = historyData[_i + 1];
-      historyData[_i + 1] = trans;
+  const { isLoading, dataList, creator } = props;
+  dataList.forEach((trans, _i) => {
+    if (
+      trans.eventTypeName === 'OrderBid' &&
+      _i < dataList.length - 1 &&
+      dataList[_i + 1].eventTypeName === 'BuyOrder'
+    ) {
+      dataList[_i] = dataList[_i + 1];
+      dataList[_i + 1] = trans;
     }
   });
   return (
     <Stack spacing={2}>
-      {props.isLoading && <LoadingScreen />}
-      {historyData.map((trans, index) => (
+      {isLoading && <LoadingScreen />}
+      {dataList.map((trans, index) => (
         <Box key={index}>
-          <TransItem trans={trans} creator={props.creator} />
-          {index < props.dataList.length - 1 && <Divider sx={{ pb: 2 }} />}
+          <TransItem trans={trans} creator={creator} />
+          {index < dataList.length - 1 && <Divider sx={{ pb: 2 }} />}
         </Box>
       ))}
     </Stack>
