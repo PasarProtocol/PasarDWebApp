@@ -42,7 +42,7 @@ const GridItems = (props) => {
     <>
       {assets.map((item, index) => {
         const coinType = getCoinTypeFromTokenEx(item);
-        const isOnMarket = true;
+        const isOnMarket = Object.keys(item?.token || {}).length > 0;
         return item ? (
           <AssetCard
             key={index}
