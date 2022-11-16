@@ -1,4 +1,4 @@
-import { ServiceEndpoint, HttpClient } from '@elastosfoundation/hive-js-sdk';
+import { ServiceEndpoint } from '@elastosfoundation/hive-js-sdk';
 import { DID, DIDBackend, DefaultDIDAdapter } from '@elastosfoundation/did-js-sdk';
 import { BrowserConnectivitySDKHiveAuthHelper } from './BrowserConnectivitySDKHiveAuthHelper';
 import { DidResolverUrl } from '../../config';
@@ -22,12 +22,16 @@ export const getAppContext = async (did) => {
   return appContext;
 };
 
-export const getRestService = async (did) => {
-  const appContext = await getAppContext(did);
-  const nodeProvider = await appContext.getProviderAddress(did);
-  const serviceEndpoint = new ServiceEndpoint(appContext, nodeProvider);
-  const httpClient = new HttpClient(serviceEndpoint, HttpClient.WITH_AUTHORIZATION, HttpClient.DEFAULT_OPTIONS);
-  return { serviceEndpoint, httpClient };
+export const getServiceEndpoint = async (did, nodeProviderUrl) => {
+  try {
+    const appContext = await getAppContext(did);
+    const nodeProvider = await appContext.getProviderAddress(did);
+    const serviceEndpoint = new ServiceEndpoint(appContext, nodeProviderUrl || nodeProvider);
+    return serviceEndpoint;
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
 };
 
 export const getCredentialsFromDID = (did) =>
