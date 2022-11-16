@@ -6,7 +6,8 @@ RingAvatar.propTypes = {
   size: PropTypes.number,
   outersx: PropTypes.any,
   isImage: PropTypes.bool,
-  avatar: PropTypes.string
+  avatar: PropTypes.string,
+  address: PropTypes.string
 };
 
 export default function RingAvatar(props) {
