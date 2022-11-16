@@ -1287,20 +1287,19 @@ export const getDidInfoFromAddress = (address) =>
       });
   });
 
-export const getDIDFromAddress = async (address) => {
+export const getDIDInfoFromAddress = async (address) => {
   try {
     const res = await fetchAPIFrom(`api/v1/getDidByAddress?address=${address}`, {});
     const json = await res.json();
     if (json?.data?.did) {
       try {
         const info = await getInfoFromDID(json.data.did);
-        return { ...info, ...json.data };
+        return { ...info, did: json.data.did, address: json.data?.address || address };
       } catch (e) {
         console.error(e);
         return { ...json.data };
       }
-    }
-    return { ...json.data };
+    } else return { ...json.data };
   } catch (e) {
     console.error(e);
     return {};
