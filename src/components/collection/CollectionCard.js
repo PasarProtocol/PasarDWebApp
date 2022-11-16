@@ -528,8 +528,9 @@ CollectionCardPaper.propTypes = {
 
 CollectionCard.propTypes = {
   info: PropTypes.any,
-  isOnSlider: PropTypes.bool,
   isPreview: PropTypes.bool,
+  isOnSlider: PropTypes.bool,
+  isOwned: PropTypes.bool,
   isDragging: PropTypes.bool
 };
 
