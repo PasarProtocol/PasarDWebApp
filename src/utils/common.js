@@ -60,19 +60,11 @@ export const reduceHexAddress = (strAddress) => {
   return `${strAddress.substring(0, 6)}...${strAddress.substring(strAddress.length - 3, strAddress.length)}`;
 };
 
-export const fetchFrom = (uri, props = {}) => {
+export const fetchAPIFrom = (uri, props = {}) => {
   const backendURL =
     process.env.REACT_APP_ENV === 'production'
       ? process.env.REACT_APP_BACKEND_URL_PRODUCTION
       : process.env.REACT_APP_BACKEND_URL_TEST;
-  return fetch(`${backendURL}/${uri}`, props);
-};
-
-export const fetchAPIFrom = (uri, props = {}) => {
-  const backendURL =
-    process.env.REACT_APP_ENV === 'production'
-      ? 'https://assist-new.pasarprotocol.io'
-      : 'https://assist-new.pasarprotocol.io';
   return fetch(`${backendURL}/${uri}`, props);
 };
 
@@ -1275,7 +1267,7 @@ export const getInfoFromDID = (did) =>
 
 export const getDidInfoFromAddress = (address) =>
   new Promise((resolve, reject) => {
-    fetchFrom(`api/v2/pasar/getDidByAddress/${address}`)
+    fetchAPIFrom(`api/v1/getDidByAddress?address=${address}`)
       .then((response) => {
         response
           .json()
