@@ -1,4 +1,3 @@
-// material
 import React from 'react';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import SwipeableViews from 'react-swipeable-views';
@@ -33,9 +32,9 @@ import {
 import {
   reduceHexAddress,
   getDiaTokenInfo,
-  getDidInfoFromAddress,
   isInAppBrowser,
-  fetchAPIFrom
+  fetchAPIFrom,
+  getDIDInfoFromAddress
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -83,34 +82,37 @@ export default function MyItems() {
     telegram: queryTelegram,
     medium: queryMedium
   };
+
   React.useEffect(() => {
-    if (params.address && params.address !== myAddress) {
-      setWalletAddress(params.address);
-      getDidInfoFromAddress(params.address)
-        .then((info) => {
-          setDidInfo({ name: info.name || '', description: info.description || '' });
+    const getUserProfile = async () => {
+      if (params.address && params.address !== myAddress) {
+        setWalletAddress(params.address);
+        try {
+          const info = await getDIDInfoFromAddress(params.address);
+          setDidInfo({ name: info?.name || '', description: info?.description || '' });
           if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
-            fetchProfileData(info.did, { name: info.name || '', bio: info.description || '' });
-        })
-        .catch((e) => {
+            await fetchProfileData(info.did, { name: info.name || '', bio: info.description || '' });
+        } catch (e) {
           console.error(e);
-        });
-    } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
-      setWalletAddress(myAddress);
-      const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`;
-      const token = sessionStorage.getItem('PASAR_TOKEN');
-      const user = jwtDecode(token);
-      fetchProfileData(targetDid, user);
-    } else {
-      setWalletAddress(myAddress);
-      setDidInfo({ name: '', description: '' });
-    }
+        }
+      } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+        setWalletAddress(myAddress);
+        const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`;
+        const token = sessionStorage.getItem('PASAR_TOKEN');
+        const user = jwtDecode(token);
+        await fetchProfileData(targetDid, user);
+      } else {
+        setWalletAddress(myAddress);
+        setDidInfo({ name: '', description: '' });
+      }
+    };
+    getUserProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myAddress, params.address]);
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   React.useEffect(() => {
-    const fetchData = async () => {
+    const getMyAddress = async () => {
       if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1') {
         setMyAddress(account);
       } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
@@ -126,92 +128,95 @@ export default function MyItems() {
       }
       // ----------------------------------------------------------
     };
-    fetchData();
+    getMyAddress();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, params.address]);
 
-  const fetchProfileData = (targetDid, didInfo) => {
-    queryName(targetDid)
-      .then((res) => {
-        if (res.find_message && res.find_message.items.length)
-          setDidInfoValue('name', res.find_message.items[0].display_name);
-        else setDidInfoValue('name', didInfo.name);
-
-        queryDescription(targetDid).then((res) => {
-          if (res.find_message && res.find_message.items.length)
-            setDidInfoValue('description', res.find_message.items[0].display_name);
-          else setDidInfoValue('description', didInfo.bio);
+  const fetchProfileData = async (targetDid, didInfo) => {
+    try {
+      const res = await queryName(targetDid);
+      if (res?.find_message && (res?.find_message?.items || []).length)
+        setDidInfoValue('name', res.find_message.items[0].display_name);
+      else setDidInfoValue('name', didInfo?.name || '');
+    } catch (e) {
+      console.error(e);
+    }
+    try {
+      const res = await queryDescription(targetDid);
+      if (res?.find_message && (res?.find_message?.items || []).length)
+        setDidInfoValue('description', res.find_message.items[0].display_name);
+      else setDidInfoValue('description', didInfo?.bio || '');
+    } catch (e) {
+      console.error(e);
+    }
+    try {
+      const res = await downloadAvatar(targetDid);
+      if (res && res.length) {
+        const base64Content = res.reduce((content, code) => {
+          content = `${content}${String.fromCharCode(code)}`;
+          return content;
+        }, '');
+        setAvatarUrl((prevState) => {
+          if (!prevState) return `data:image/png;base64,${base64Content}`;
+          return prevState;
         });
-        downloadAvatar(targetDid).then((res) => {
-          if (res && res.length) {
-            const base64Content = res.reduce((content, code) => {
-              content = `${content}${String.fromCharCode(code)}`;
-              return content;
-            }, '');
-            setAvatarUrl((prevState) => {
-              if (!prevState) return `data:image/png;base64,${base64Content}`;
-              return prevState;
-            });
-          }
-        });
-        queryKycMe(targetDid).then((res) => {
-          if (res.find_message && res.find_message.items.length) setBadgeFlag('kyc', true);
-          else setBadgeFlag('kyc', false);
-        });
-        Object.keys(queryProfileSocials).forEach((field) => {
-          queryProfileSocials[field](targetDid).then((res) => {
-            if (res.find_message && res.find_message.items.length)
-              setSocials((prevState) => {
-                const tempState = { ...prevState };
-                tempState[field] = res.find_message.items[0].display_name;
-                return tempState;
-              });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    try {
+      const res = await queryKycMe(targetDid);
+      if (res?.find_message && (res?.find_message?.items || []).length) setBadgeFlag('kyc', true);
+      else setBadgeFlag('kyc', false);
+    } catch (e) {
+      console.error(e);
+    }
+    try {
+      Object.keys(queryProfileSocials).forEach(async (field) => {
+        const res = await queryProfileSocials[field](targetDid);
+        if (res?.find_message && (res?.find_message?.items || []).length) {
+          setSocials((prevState) => {
+            const curState = { ...prevState };
+            curState[field] = res.find_message.items[0].display_name;
+            return curState;
           });
-        });
-      })
-      .catch((e) => {
-        console.log(e);
+        }
       });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const setDidInfoValue = (field, value) => {
     setDidInfo((prevState) => {
-      const tempState = { ...prevState };
-      tempState[field] = value;
-      return tempState;
+      const curState = { ...prevState };
+      curState[field] = value;
+      return curState;
     });
-  };
-
-  const handleSwitchTab = (_, newValue) => {
-    setTabValue(newValue);
-  };
-
-  const handleSwitchSwiper = (value) => {
-    setTabValue(value);
   };
 
   const setLoadingAssetsOfType = (index, value) => {
     setLoadingAssets((prevState) => {
-      const tempLoadingAssets = [...prevState];
-      tempLoadingAssets[index] = value;
-      return tempLoadingAssets;
+      const curLoadingAssets = [...prevState];
+      curLoadingAssets[index] = value;
+      return curLoadingAssets;
     });
   };
 
   const setAssetsOfType = (index, value) => {
     if (!value) return;
     setAssets((prevState) => {
-      const tempAssets = [...prevState];
-      tempAssets[index] = value;
-      return tempAssets;
+      const curAssets = [...prevState];
+      curAssets[index] = value;
+      return curAssets;
     });
   };
 
   const setBadgeFlag = (type, value) => {
     setBadge((prevState) => {
-      const tempFlag = { ...prevState };
-      tempFlag[type] = value;
-      return tempFlag;
+      const curBadge = { ...prevState };
+      curBadge[type] = value;
+      return curBadge;
     });
   };
 
@@ -228,6 +233,7 @@ export default function MyItems() {
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
+
       Array(3)
         .fill(0)
         .forEach(async (_, i) => {
@@ -243,8 +249,8 @@ export default function MyItems() {
           }
           setLoadingAssetsOfType(i, false);
         });
-      const resDia = await getDiaTokenInfo(walletAddress);
-      setBadgeFlag('dia', resDia * 1);
+      const dia = await getDiaTokenInfo(walletAddress);
+      setBadgeFlag('dia', dia * 1);
     };
     if (walletAddress) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -291,12 +297,12 @@ export default function MyItems() {
                 )}
               </Stack>
             </Stack>
-            {didInfo.name.length > 0 && (
+            {didInfo.name && (
               <Typography variant="subtitle2" noWrap>
                 {reduceHexAddress(walletAddress)}
               </Typography>
             )}
-            {didInfo.description.length > 0 && (
+            {didInfo.description && (
               <Typography variant="subtitle2" noWrap sx={{ color: 'text.secondary' }}>
                 {didInfo.description}
               </Typography>
@@ -312,7 +318,11 @@ export default function MyItems() {
           </Stack>
         </Box>
         <Box sx={{ display: 'flex', position: 'relative', mb: 2, justifyContent: 'center' }} align="center">
-          <Tabs value={tabValue} onChange={handleSwitchTab} TabIndicatorProps={{ style: { background: '#FF5082' } }}>
+          <Tabs
+            value={tabValue}
+            onChange={(_, newValue) => setTabValue(newValue)}
+            TabIndicatorProps={{ style: { background: '#FF5082' } }}
+          >
             <Tab label={`Listed (${assets[0].length})`} value={0} />
             <Tab label={`Owned (${assets[1].length})`} value={1} />
             <Tab label={`Minted (${assets[2].length})`} value={2} />
@@ -327,7 +337,7 @@ export default function MyItems() {
         >
           <SwipeableViews
             index={tabValue}
-            onChangeIndex={handleSwitchSwiper}
+            onChangeIndex={(value) => setTabValue(value)}
             containerStyle={{
               transition: 'transform 0.35s cubic-bezier(0.15, 0.3, 0.25, 1) 0s'
             }}
