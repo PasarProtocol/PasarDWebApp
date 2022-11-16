@@ -1267,14 +1267,14 @@ export const getInfoFromDID = (did) =>
 
 export const getDidInfoFromAddress = (address) =>
   new Promise((resolve, reject) => {
-    fetchAPIFrom(`api/v1/getDidByAddress?address=${address}`)
-      .then((response) => {
-        response
+    fetchAPIFrom(`api/v1/getDidByAddress?address=${address}`, {})
+      .then((res) => {
+        res
           .json()
-          .then((jsonData) => {
-            if (jsonData.data && jsonData.data.did.did)
-              getInfoFromDID(jsonData.data.did.did).then((info) => {
-                resolve({ ...info, did: jsonData.data.did.did });
+          .then((json) => {
+            if (json.data && json.data.did)
+              getInfoFromDID(json.data.did).then((info) => {
+                resolve({ ...info, did: json.data.did });
               });
             else resolve({});
           })
@@ -1286,6 +1286,26 @@ export const getDidInfoFromAddress = (address) =>
         reject(error);
       });
   });
+
+export const getDIDFromAddress = async (address) => {
+  try {
+    const res = await fetchAPIFrom(`api/v1/getDidByAddress?address=${address}`, {});
+    const json = await res.json();
+    if (json?.data?.did) {
+      try {
+        const info = await getInfoFromDID(json.data.did);
+        return { ...info, ...json.data };
+      } catch (e) {
+        console.error(e);
+        return { ...json.data };
+      }
+    }
+    return { ...json.data };
+  } catch (e) {
+    console.error(e);
+    return {};
+  }
+};
 
 export const getFilteredGasPrice = (_gasPrice) => (_gasPrice * 1 > 20 * 1e9 ? (20 * 1e9).toString() : _gasPrice);
 
