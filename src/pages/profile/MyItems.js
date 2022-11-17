@@ -58,7 +58,6 @@ export default function MyItems() {
   const params = useParams(); // params.address
   const navigate = useNavigate();
   const [dispMode] = React.useState(sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode);
-  const [orderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(params.type !== undefined ? parseInt(params.type, 10) : 0);
   const [walletAddress, setWalletAddress] = React.useState(null);
@@ -71,17 +70,17 @@ export default function MyItems() {
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false, false]);
   const [assetCount, setAssetCount] = React.useState([0, 0, 0, 0]);
   const [assets, setAssets] = React.useState([[], [], [], []]);
-  const [loadNext, setLoadNext] = React.useState([false, false, false, false]);
-  const [page, setPage] = React.useState([1, 1, 1, 1]);
+  const [loadNext, setLoadNext] = React.useState(false);
+  const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState([0, 0, 0, 0]);
   const [showCount] = React.useState(10);
   const context = useWeb3React();
   const { account } = context;
 
-  const fetchMoreData = (index) => {
-    if (!loadNext[index]) {
-      setLoadNextOfType(index, true);
-      setPageOfType(index, page[index] + 1);
+  const fetchMoreData = () => {
+    if (!loadNext) {
+      setLoadNext(true);
+      setPage(page + 1);
     }
   };
 
@@ -141,6 +140,18 @@ export default function MyItems() {
     getMyAddress();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, params.address]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const dia = await getDiaTokenInfo(walletAddress);
+        setBadgeFlag('dia', dia * 1);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchData();
+  }, [walletAddress]);
 
   const fetchProfileData = async (targetDid, didInfo) => {
     try {
@@ -213,52 +224,30 @@ export default function MyItems() {
     });
   };
 
-  const setLoadingAssetsOfType = (index, value) => {
-    setLoadingAssets((prevState) => {
-      const curLoadingAssets = [...prevState];
-      curLoadingAssets[index] = value;
-      return curLoadingAssets;
-    });
-  };
-
-  const setAssetsOfType = (index, value) => {
-    if (!value) return;
-    setAssets((prevState) => {
-      const curAssets = [...prevState];
-      curAssets[index] = value;
-      return curAssets;
-    });
-  };
-
-  const setAssetCountOfType = (index, value) => {
-    setAssetCount((prevState) => {
-      const curCount = [...prevState];
-      curCount[index] = value;
-      return curCount;
-    });
-  };
-
-  const setLoadNextOfType = (index, value) => {
-    setLoadNext((prevState) => {
-      const curState = [...prevState];
-      curState[index] = value;
-      return curState;
-    });
-  };
-
-  const setPageOfType = (index, value) => {
-    setPage((prevState) => {
-      const curState = [...prevState];
-      curState[index] = value;
-      return curState;
-    });
-  };
-
-  const setPagesOfType = (index, value) => {
-    setPages((prevState) => {
-      const curState = [...prevState];
-      curState[index] = value;
-      return curState;
+  const setEachOfArray = (type, index, value) => {
+    let setFunction = null;
+    switch (type) {
+      case 'setLoadingAssets':
+        setFunction = setLoadingAssets;
+        break;
+      case 'setAssets':
+        setFunction = setAssets;
+        break;
+      case 'setAssetCount':
+        setFunction = setAssetCount;
+        break;
+      case 'setPages':
+        setFunction = setPages;
+        break;
+      default:
+        setFunction = null;
+        break;
+    }
+    if (setFunction === null) return;
+    setFunction((prevState) => {
+      const nextState = [...prevState];
+      nextState[index] = value;
+      return nextState;
     });
   };
 
@@ -276,37 +265,34 @@ export default function MyItems() {
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
-
       Array(4)
         .fill(0)
         .forEach(async (_, i) => {
-          setLoadingAssetsOfType(i, true);
+          setEachOfArray('setLoadingAssets', i, true);
           if (!loadNext) setAssets([[], [], [], []]);
           try {
             const res = await fetchAPIFrom(
-              `api/v1/${apiNames[i]}?walletAddr=${walletAddress}&chain=all&sort=${orderType}&pageNum=${page[i]}&pageSize=${showCount}`,
+              `api/v1/${apiNames[i]}?walletAddr=${walletAddress}&chain=all&sort=0&pageNum=${page}&pageSize=${showCount}`,
               {
                 signal
               }
             );
             const json = await res.json();
             const totalCnt = json?.data?.total ?? 0;
-            setPagesOfType(i, Math.ceil(totalCnt / showCount));
-            setAssetCountOfType(i, totalCnt);
-            setAssetsOfType(i, json?.data?.data || []);
-            setLoadNextOfType(i, false);
+            setEachOfArray('setPages', i, Math.ceil(totalCnt / showCount));
+            setEachOfArray('setAssetCount', i, totalCnt);
+            if (loadNext) setEachOfArray('setAssets', i, [...assets[i], ...(json?.data?.data || [])]);
+            else setEachOfArray('setAssets', i, json?.data?.data || []);
+            setLoadNext(false);
           } catch (e) {
             console.error(e);
           }
-          setLoadingAssetsOfType(i, false);
+          setEachOfArray('setLoadingAssets', i, false);
         });
-      const dia = await getDiaTokenInfo(walletAddress);
-      setBadgeFlag('dia', dia * 1);
     };
     if (walletAddress) fetchData();
-  }, [walletAddress, orderType, updateCount, loadNext, page, showCount]);
-
-  React.useEffect(() => {}, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletAddress, showCount, page]);
 
   const loadingSkeletons = Array(showCount).fill(null);
 
@@ -383,8 +369,8 @@ export default function MyItems() {
               <Box key={i} sx={{ minHeight: 200, p: '10px' }}>
                 <InfiniteScroll
                   dataLength={tabAssets.length}
-                  next={() => fetchMoreData(i)}
-                  hasMore={page[i] < pages[i]}
+                  next={fetchMoreData}
+                  hasMore={page < pages[i]}
                   loader={<h4>Loading...</h4>}
                   endMessage={
                     !isLoadingAssets[i] &&
@@ -409,7 +395,11 @@ export default function MyItems() {
                 >
                   {i !== 3 ? (
                     <AssetGrid
-                      assets={isLoadingAssets[i] ? [...tabAssets, ...loadingSkeletons] : tabAssets}
+                      assets={
+                        isLoadingAssets[i] && assetCount[i] > tabAssets.length
+                          ? [...tabAssets, ...loadingSkeletons]
+                          : tabAssets
+                      }
                       type={i + 1}
                       dispMode={dispMode}
                       myaddress={myAddress}
@@ -417,13 +407,27 @@ export default function MyItems() {
                       handleUpdate={setUpdateCount}
                     />
                   ) : (
-                    <Grid container spacing={2}>
-                      {(isLoadingAssets[i] ? [...tabAssets, ...loadingSkeletons] : tabAssets).map((info, index) => (
-                        <Grid item key={index} xs={12} sm={6} md={4}>
-                          <CollectionCard info={info} isOwned={myAddress === info.owner} />
+                    <>
+                      {isLoadingAssets[i] ? (
+                        <Grid container spacing={2}>
+                          {Array(3)
+                            .fill(0)
+                            .map((item, index) => (
+                              <Grid item key={index} xs={12} sm={6} md={4}>
+                                <CollectionCardSkeleton key={index} />
+                              </Grid>
+                            ))}
                         </Grid>
-                      ))}
-                    </Grid>
+                      ) : (
+                        <Grid container spacing={2}>
+                          {tabAssets.map((info, index) => (
+                            <Grid item key={index} xs={12} sm={6} md={4}>
+                              <CollectionCard info={info} isOwned={myAddress === info.owner} />
+                            </Grid>
+                          ))}
+                        </Grid>
+                      )}
+                    </>
                   )}
                 </InfiniteScroll>
               </Box>
