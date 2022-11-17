@@ -539,7 +539,7 @@ export default function MyProfile() {
                         </Grid>
                       ) : (
                         <Grid container spacing={2}>
-                          {sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && (
+                          {sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && tabAssets.length && (
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
                               <Stack direction="row" spacing={2}>
                                 <StyledButton variant="contained" onClick={handleNavlink} to="/collections/create">
