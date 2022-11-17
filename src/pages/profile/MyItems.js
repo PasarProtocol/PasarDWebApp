@@ -77,12 +77,7 @@ export default function MyItems() {
   const context = useWeb3React();
   const { account } = context;
 
-  const fetchMoreData = () => {
-    if (!loadNext) {
-      setLoadNext(true);
-      setPage(page + 1);
-    }
-  };
+  // --------------------------------- Profile ------------------------------------- //
 
   const queryProfileSocials = {
     website: queryWebsite,
@@ -145,7 +140,7 @@ export default function MyItems() {
     const fetchData = async () => {
       try {
         const dia = await getDiaTokenInfo(walletAddress);
-        setBadgeFlag('dia', dia * 1);
+        setEachOfObject('setBadge', 'dia', dia * 1);
       } catch (e) {
         console.error(e);
       }
@@ -157,16 +152,16 @@ export default function MyItems() {
     try {
       const res = await queryName(targetDid);
       if (res?.find_message && (res?.find_message?.items || []).length)
-        setDidInfoValue('name', res.find_message.items[0].display_name);
-      else setDidInfoValue('name', didInfo?.name || '');
+        setEachOfObject('setDidInfo', 'name', res.find_message.items[0].display_name);
+      else setEachOfObject('setDidInfo', 'name', didInfo?.name || '');
     } catch (e) {
       console.error(e);
     }
     try {
       const res = await queryDescription(targetDid);
       if (res?.find_message && (res?.find_message?.items || []).length)
-        setDidInfoValue('description', res.find_message.items[0].display_name);
-      else setDidInfoValue('description', didInfo?.bio || '');
+        setEachOfObject('setDidInfo', 'description', res.find_message.items[0].display_name);
+      else setEachOfObject('setDidInfo', 'description', didInfo?.bio || '');
     } catch (e) {
       console.error(e);
     }
@@ -187,8 +182,8 @@ export default function MyItems() {
     }
     try {
       const res = await queryKycMe(targetDid);
-      if (res?.find_message && (res?.find_message?.items || []).length) setBadgeFlag('kyc', true);
-      else setBadgeFlag('kyc', false);
+      if (res?.find_message && (res?.find_message?.items || []).length) setEachOfObject('setBadge', 'kyc', true);
+      else setEachOfObject('setBadge', 'kyc', false);
     } catch (e) {
       console.error(e);
     }
@@ -208,20 +203,34 @@ export default function MyItems() {
     }
   };
 
-  const setDidInfoValue = (field, value) => {
-    setDidInfo((prevState) => {
-      const curState = { ...prevState };
-      curState[field] = value;
-      return curState;
+  const setEachOfObject = (type, index, value) => {
+    let setFunction = null;
+    switch (type) {
+      case 'setDidInfo':
+        setFunction = setDidInfo;
+        break;
+      case 'setBadge':
+        setFunction = setBadge;
+        break;
+      default:
+        setFunction = null;
+        break;
+    }
+    if (setFunction === null) return;
+    setFunction((prevState) => {
+      const nextState = { ...prevState };
+      nextState[index] = value;
+      return nextState;
     });
   };
 
-  const setBadgeFlag = (type, value) => {
-    setBadge((prevState) => {
-      const curBadge = { ...prevState };
-      curBadge[type] = value;
-      return curBadge;
-    });
+  // --------------------------------- Items ------------------------------------- //
+
+  const fetchMoreData = () => {
+    if (!loadNext) {
+      setLoadNext(true);
+      setPage(page + 1);
+    }
   };
 
   const setEachOfArray = (type, index, value) => {
