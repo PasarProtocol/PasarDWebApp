@@ -7,6 +7,7 @@ import { styled } from '@mui/material/styles';
 import { Container, Stack, Typography, Tab, Tabs, Link, Grid, Box, Tooltip } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
 import jwtDecode from 'jwt-decode';
+import InfiniteScroll from 'react-infinite-scroll-component';
 // components
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
@@ -56,10 +57,6 @@ export default function MyItems() {
   const sessionDispMode = sessionStorage.getItem('disp-mode');
   const params = useParams(); // params.address
   const navigate = useNavigate();
-  const [assets, setAssets] = React.useState([[], [], []]);
-  const [collections, setCollections] = React.useState([]);
-  const [isLoadingCollection, setLoadingCollection] = React.useState(false);
-  const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
   const [dispMode] = React.useState(sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode);
   const [orderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
@@ -71,9 +68,22 @@ export default function MyItems() {
   const [updateCount, setUpdateCount] = React.useState(0);
   const [badge, setBadge] = React.useState({ dia: 0, kyc: false });
   const [socials, setSocials] = React.useState({});
-
+  const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false, false]);
+  const [assetCount, setAssetCount] = React.useState([0, 0, 0, 0]);
+  const [assets, setAssets] = React.useState([[], [], [], []]);
+  const [loadNext, setLoadNext] = React.useState([false, false, false, false]);
+  const [page, setPage] = React.useState([1, 1, 1, 1]);
+  const [pages, setPages] = React.useState([0, 0, 0, 0]);
+  const [showCount] = React.useState(10);
   const context = useWeb3React();
   const { account } = context;
+
+  const fetchMoreData = (index) => {
+    if (!loadNext[index]) {
+      setLoadNextOfType(index, true);
+      setPageOfType(index, page[index] + 1);
+    }
+  };
 
   const queryProfileSocials = {
     website: queryWebsite,
@@ -195,6 +205,14 @@ export default function MyItems() {
     });
   };
 
+  const setBadgeFlag = (type, value) => {
+    setBadge((prevState) => {
+      const curBadge = { ...prevState };
+      curBadge[type] = value;
+      return curBadge;
+    });
+  };
+
   const setLoadingAssetsOfType = (index, value) => {
     setLoadingAssets((prevState) => {
       const curLoadingAssets = [...prevState];
@@ -212,20 +230,45 @@ export default function MyItems() {
     });
   };
 
-  const setBadgeFlag = (type, value) => {
-    setBadge((prevState) => {
-      const curBadge = { ...prevState };
-      curBadge[type] = value;
-      return curBadge;
+  const setAssetCountOfType = (index, value) => {
+    setAssetCount((prevState) => {
+      const curCount = [...prevState];
+      curCount[index] = value;
+      return curCount;
+    });
+  };
+
+  const setLoadNextOfType = (index, value) => {
+    setLoadNext((prevState) => {
+      const curState = [...prevState];
+      curState[index] = value;
+      return curState;
+    });
+  };
+
+  const setPageOfType = (index, value) => {
+    setPage((prevState) => {
+      const curState = [...prevState];
+      curState[index] = value;
+      return curState;
+    });
+  };
+
+  const setPagesOfType = (index, value) => {
+    setPages((prevState) => {
+      const curState = [...prevState];
+      curState[index] = value;
+      return curState;
     });
   };
 
   const apiNames = [
     'getListedCollectiblesByWalletAddr',
     'getOwnedCollectiblesByWalletAddr',
-    'getMintedCollectiblesByWalletAddr'
+    'getMintedCollectiblesByWalletAddr',
+    'getCollectionsByWalletAddr'
   ];
-  const typeNames = ['listed', 'owned', 'minted'];
+  const typeNames = ['listed', 'owned', 'minted', 'collections'];
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -234,16 +277,24 @@ export default function MyItems() {
       const { signal } = newController;
       setAbortController(newController);
 
-      Array(3)
+      Array(4)
         .fill(0)
         .forEach(async (_, i) => {
           setLoadingAssetsOfType(i, true);
+          if (!loadNext) setAssets([[], [], [], []]);
           try {
-            const res = await fetchAPIFrom(`api/v1/${apiNames[i]}?walletAddr=${walletAddress}&sort=${orderType}`, {
-              signal
-            });
+            const res = await fetchAPIFrom(
+              `api/v1/${apiNames[i]}?walletAddr=${walletAddress}&chain=all&sort=${orderType}&pageNum=${page[i]}&pageSize=${showCount}`,
+              {
+                signal
+              }
+            );
             const json = await res.json();
-            setAssetsOfType(i, json?.data || []);
+            const totalCnt = json?.data?.total ?? 0;
+            setPagesOfType(i, Math.ceil(totalCnt / showCount));
+            setAssetCountOfType(i, totalCnt);
+            setAssetsOfType(i, json?.data?.data || []);
+            setLoadNextOfType(i, false);
           } catch (e) {
             console.error(e);
           }
@@ -253,25 +304,11 @@ export default function MyItems() {
       setBadgeFlag('dia', dia * 1);
     };
     if (walletAddress) fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletAddress, orderType, updateCount]);
+  }, [walletAddress, orderType, updateCount, loadNext, page, showCount]);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      setLoadingCollection(true);
-      try {
-        const res = await fetchAPIFrom(`api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${walletAddress}`, {});
-        const json = await res.json();
-        setCollections(json?.data || []);
-      } catch (e) {
-        console.error(e);
-      }
-      setLoadingCollection(false);
-    };
-    if (walletAddress) fetchData();
-  }, [walletAddress]);
+  React.useEffect(() => {}, []);
 
-  const loadingSkeletons = Array(10).fill(null);
+  const loadingSkeletons = Array(showCount).fill(null);
 
   return (
     <RootStyle title="MyItems | PASAR">
@@ -323,10 +360,10 @@ export default function MyItems() {
             onChange={(_, newValue) => setTabValue(newValue)}
             TabIndicatorProps={{ style: { background: '#FF5082' } }}
           >
-            <Tab label={`Listed (${assets[0].length})`} value={0} />
-            <Tab label={`Owned (${assets[1].length})`} value={1} />
-            <Tab label={`Minted (${assets[2].length})`} value={2} />
-            <Tab label={`Collections (${collections.length})`} value={3} />
+            <Tab label={`Listed (${assetCount[0]})`} value={0} />
+            <Tab label={`Owned (${assetCount[1]})`} value={1} />
+            <Tab label={`Minted (${assetCount[2]})`} value={2} />
+            <Tab label={`Collections (${assetCount[3]})`} value={3} />
           </Tabs>
         </Box>
         <Box
@@ -342,74 +379,55 @@ export default function MyItems() {
               transition: 'transform 0.35s cubic-bezier(0.15, 0.3, 0.25, 1) 0s'
             }}
           >
-            {assets.map((group, i) => (
+            {assets.map((tabAssets, i) => (
               <Box key={i} sx={{ minHeight: 200, p: '10px' }}>
-                {!isLoadingAssets[i] ? (
-                  <Box component="main">
-                    {group.length > 0 ? (
-                      <AssetGrid
-                        assets={group}
-                        type={i + 1}
-                        dispMode={dispMode}
-                        myaddress={myAddress}
-                        updateCount={updateCount}
-                        handleUpdate={setUpdateCount}
-                      />
-                    ) : (
+                <InfiniteScroll
+                  dataLength={tabAssets.length}
+                  next={() => fetchMoreData(i)}
+                  hasMore={page[i] < pages[i]}
+                  loader={<h4>Loading...</h4>}
+                  endMessage={
+                    !isLoadingAssets[i] &&
+                    !tabAssets.length &&
+                    (i !== 3 ? (
                       <Typography variant="subtitle2" align="center" sx={{ mb: 3 }}>
                         No {typeNames[i]} collectible found!
                       </Typography>
-                    )}
-                  </Box>
-                ) : (
-                  <Box component="main">
+                    ) : (
+                      <Stack sx={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Typography variant="h3" align="center">
+                          {' '}
+                          No Collections Found{' '}
+                        </Typography>
+                        <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>
+                          We could not find any of your collections
+                        </Typography>
+                      </Stack>
+                    ))
+                  }
+                  style={{ padding: '10px' }}
+                >
+                  {i !== 3 ? (
                     <AssetGrid
-                      assets={loadingSkeletons}
+                      assets={isLoadingAssets[i] ? [...tabAssets, ...loadingSkeletons] : tabAssets}
                       type={i + 1}
-                      dispmode={dispMode}
+                      dispMode={dispMode}
                       myaddress={myAddress}
                       updateCount={updateCount}
                       handleUpdate={setUpdateCount}
                     />
-                  </Box>
-                )}
-              </Box>
-            ))}
-            <Box sx={{ minHeight: 200, p: '10px' }}>
-              {!isLoadingCollection ? (
-                <Box component="main">
-                  {collections.length > 0 ? (
+                  ) : (
                     <Grid container spacing={2}>
-                      {collections.map((info, index) => (
+                      {(isLoadingAssets[i] ? [...tabAssets, ...loadingSkeletons] : tabAssets).map((info, index) => (
                         <Grid item key={index} xs={12} sm={6} md={4}>
                           <CollectionCard info={info} isOwned={myAddress === info.owner} />
                         </Grid>
                       ))}
                     </Grid>
-                  ) : (
-                    <Stack sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                      <Typography variant="h3" align="center">
-                        {' '}
-                        No Collections Found{' '}
-                      </Typography>
-                      <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>
-                        We could not find any of your collections
-                      </Typography>
-                    </Stack>
                   )}
-                </Box>
-              ) : (
-                <Grid container spacing={2}>
-                  {Array(3)
-                    .fill(0)
-                    .map((_, index) => (
-                      <Grid item key={index} xs={12} sm={6} md={4}>
-                        <CollectionCardSkeleton key={index} />
-                      </Grid>
-                    ))}
-                </Grid>
-              )}
-            </Box>
+                </InfiniteScroll>
+              </Box>
+            ))}
           </SwipeableViews>
         </Box>
       </Container>
