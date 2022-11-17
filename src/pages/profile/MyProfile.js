@@ -54,11 +54,11 @@ import {
 import {
   reduceHexAddress,
   getDiaTokenInfo,
-  getDidInfoFromAddress,
   isInAppBrowser,
   getChainTypeFromId,
   fetchAPIFrom,
-  chainTypes
+  chainTypes,
+  getDIDInfoFromAddress
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -80,7 +80,6 @@ export default function MyProfile() {
   const sessionDispMode = sessionStorage.getItem('disp-mode');
   const params = useParams(); // params.address
   const navigate = useNavigate();
-  const [assets, setAssets] = React.useState([[], [], [], [], []]);
   const [collections, setCollections] = React.useState([]);
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
   const [isLoadingCollection, setLoadingCollection] = React.useState(false);
@@ -100,9 +99,16 @@ export default function MyProfile() {
   const [badge, setBadge] = React.useState({ dia: 0, kyc: false });
   const [socials, setSocials] = React.useState({});
   const { diaBalance, pasarLinkChain } = useSingin();
-
+  const [assetCount, setAssetCount] = React.useState([0, 0, 0, 0]);
+  const [assets, setAssets] = React.useState([[], [], [], [], []]);
+  const [loadNext, setLoadNext] = React.useState(false);
+  const [page, setPage] = React.useState(1);
+  const [pages, setPages] = React.useState([0, 0, 0, 0]);
+  const [showCount] = React.useState(10);
   const context = useWeb3React();
   const { account } = context;
+
+  // --------------------------------- Profile ------------------------------------- //
 
   const queryProfileSocials = {
     website: queryWebsite,
@@ -114,7 +120,7 @@ export default function MyProfile() {
 
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   React.useEffect(() => {
-    const fetchData = async () => {
+    const getMyAddress = async () => {
       if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1') {
         setMyAddress(account);
         setWalletAddress(account);
@@ -134,81 +140,82 @@ export default function MyProfile() {
       // ----------------------------------------------------------
       if (params.address) {
         setWalletAddress(params.address);
-        getDidInfoFromAddress(params.address)
-          .then((info) => {
-            setDidInfo({ name: info.name || '', description: info.description || '' });
-          })
-          .catch((e) => {
-            console.error(e);
-          });
+        try {
+          const info = await getDIDInfoFromAddress(params.address);
+          setDidInfo({ name: info?.name || '', description: info?.description || '' });
+        } catch (e) {
+          console.error(e);
+        }
       } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
         const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`;
         const token = sessionStorage.getItem('PASAR_TOKEN');
         const user = jwtDecode(token);
-        const { name, bio } = user;
-        queryName(targetDid)
-          .then((res) => {
-            if (res.find_message && res.find_message.items.length)
-              setDidInfoValue('name', res.find_message.items[0].display_name);
-            else setDidInfoValue('name', name);
-
-            queryDescription(targetDid).then((res) => {
-              if (res.find_message && res.find_message.items.length)
-                setDidInfoValue('description', res.find_message.items[0].display_name);
-              else setDidInfoValue('description', bio);
-            });
-            downloadAvatar(targetDid).then((res) => {
-              if (res && res.length) {
-                const base64Content = res.reduce((content, code) => {
-                  content = `${content}${String.fromCharCode(code)}`;
-                  return content;
-                }, '');
-                setAvatarUrl((prevState) => {
-                  if (!prevState) return `data:image/png;base64,${base64Content}`;
-                  return prevState;
-                });
-              }
-            });
-            queryKycMe(targetDid).then((res) => {
-              if (res.find_message && res.find_message.items.length) setBadgeFlag('kyc', true);
-              else setBadgeFlag('kyc', false);
-            });
-            Object.keys(queryProfileSocials).forEach((field) => {
-              queryProfileSocials[field](targetDid).then((res) => {
-                if (res.find_message && res.find_message.items.length)
-                  setSocials((prevState) => {
-                    const tempState = { ...prevState };
-                    tempState[field] = res.find_message.items[0].display_name;
-                    return tempState;
-                  });
-              });
-            });
-          })
-          .catch((e) => {
-            console.log(e);
-          });
+        try {
+          await fetchProfileData(targetDid, user);
+        } catch (e) {
+          console.error(e);
+        }
       } else {
         setDidInfo({ name: '', description: '' });
       }
     };
-    fetchData();
+    getMyAddress();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, params.address]);
 
-  const setDidInfoValue = (field, value) => {
-    setDidInfo((prevState) => {
-      const tempState = { ...prevState };
-      tempState[field] = value;
-      return tempState;
-    });
-  };
-
-  const handleSwitchTab = (_, newValue) => {
-    setTabValue(newValue);
-  };
-
-  const handleSwitchSwiper = (value) => {
-    setTabValue(value);
+  const fetchProfileData = async (targetDid, didInfo) => {
+    try {
+      const res = await queryName(targetDid);
+      if (res?.find_message && (res?.find_message?.items || []).length)
+        setEachOfObject('setDidInfo', 'name', res.find_message.items[0].display_name);
+      else setEachOfObject('setDidInfo', 'name', didInfo?.name || '');
+    } catch (e) {
+      console.error(e);
+    }
+    try {
+      const res = await queryDescription(targetDid);
+      if (res?.find_message && (res?.find_message?.items || []).length)
+        setEachOfObject('setDidInfo', 'description', res.find_message.items[0].display_name);
+      else setEachOfObject('setDidInfo', 'description', didInfo?.bio || '');
+    } catch (e) {
+      console.error(e);
+    }
+    try {
+      const res = await downloadAvatar(targetDid);
+      if (res && res.length) {
+        const base64Content = res.reduce((content, code) => {
+          content = `${content}${String.fromCharCode(code)}`;
+          return content;
+        }, '');
+        setAvatarUrl((prevState) => {
+          if (!prevState) return `data:image/png;base64,${base64Content}`;
+          return prevState;
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    try {
+      const res = await queryKycMe(targetDid);
+      if (res?.find_message && (res?.find_message?.items || []).length) setEachOfObject('setBadge', 'kyc', true);
+      else setEachOfObject('setBadge', 'kyc', false);
+    } catch (e) {
+      console.error(e);
+    }
+    try {
+      Object.keys(queryProfileSocials).forEach(async (field) => {
+        const res = await queryProfileSocials[field](targetDid);
+        if (res?.find_message && (res?.find_message?.items || []).length) {
+          setSocials((prevState) => {
+            const curState = { ...prevState };
+            curState[field] = res.find_message.items[0].display_name;
+            return curState;
+          });
+        }
+      });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const setLoadingAssetsOfType = (index, value) => {
@@ -228,13 +235,54 @@ export default function MyProfile() {
     });
   };
 
-  const setBadgeFlag = (type, value) => {
-    setBadge((prevState) => {
-      const tempFlag = { ...prevState };
-      tempFlag[type] = value;
-      return tempFlag;
+  const setEachOfObject = (type, index, value) => {
+    let setFunction = null;
+    switch (type) {
+      case 'setDidInfo':
+        setFunction = setDidInfo;
+        break;
+      case 'setBadge':
+        setFunction = setBadge;
+        break;
+      default:
+        setFunction = null;
+        break;
+    }
+    if (setFunction === null) return;
+    setFunction((prevState) => {
+      const nextState = { ...prevState };
+      nextState[index] = value;
+      return nextState;
     });
   };
+
+  const setEachOfArray = (type, index, value) => {
+    let setFunction = null;
+    switch (type) {
+      case 'setLoadingAssets':
+        setFunction = setLoadingAssets;
+        break;
+      case 'setAssets':
+        setFunction = setAssets;
+        break;
+      case 'setAssetCount':
+        setFunction = setAssetCount;
+        break;
+      case 'setPages':
+        setFunction = setPages;
+        break;
+      default:
+        setFunction = null;
+        break;
+    }
+    if (setFunction === null) return;
+    setFunction((prevState) => {
+      const nextState = [...prevState];
+      nextState[index] = value;
+      return nextState;
+    });
+  };
+
   const apiNames = [
     'getListedCollectiblesByWalletAddr',
     'getOwnedCollectiblesByWalletAddr',
@@ -271,7 +319,7 @@ export default function MyProfile() {
           setLoadingAssetsOfType(i, false);
         });
       const resDia = await getDiaTokenInfo(walletAddress);
-      setBadgeFlag('dia', resDia * 1);
+      setEachOfObject('setBadge', 'dia', resDia * 1);
     };
     if (walletAddress) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -384,7 +432,7 @@ export default function MyProfile() {
             value={tabValue}
             variant="scrollable"
             scrollButtons="auto"
-            onChange={handleSwitchTab}
+            onChange={(_, newValue) => setTabValue(newValue)}
             TabIndicatorProps={{
               style: { background: '#FF5082' }
             }}
@@ -430,7 +478,7 @@ export default function MyProfile() {
         >
           <SwipeableViews
             index={tabValue}
-            onChangeIndex={handleSwitchSwiper}
+            onChangeIndex={(value) => setTabValue(value)}
             containerStyle={{
               transition: 'transform 0.35s cubic-bezier(0.15, 0.3, 0.25, 1) 0s'
             }}

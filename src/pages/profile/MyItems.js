@@ -104,7 +104,11 @@ export default function MyItems() {
         const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`;
         const token = sessionStorage.getItem('PASAR_TOKEN');
         const user = jwtDecode(token);
-        await fetchProfileData(targetDid, user);
+        try {
+          await fetchProfileData(targetDid, user);
+        } catch (e) {
+          console.error(e);
+        }
       } else {
         setWalletAddress(myAddress);
         setDidInfo({ name: '', description: '' });
