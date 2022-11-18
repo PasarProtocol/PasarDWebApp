@@ -37,7 +37,9 @@ CollectibleHandleSection.propTypes = {
 
 export default function CollectibleHandleSection(props) {
   const navigate = useNavigate();
-  const { collectible, address, onlyHandle = false } = props;
+  const { collectible = {}, address, onlyHandle = false } = props;
+  const { order = {}, bidList = [], tokenOwner, listed = false } = collectible;
+  const { endTime = 0, orderType = 0, price = 0, lastBid = 0, buyoutPrice = 0, reservePrice = 0 } = order;
   const [clickedType, setClickedType] = React.useState('');
   const [didSignin, setSignin] = React.useState(false);
   const [auctionEnded, setAuctionEnded] = React.useState(false);
@@ -52,9 +54,9 @@ export default function CollectibleHandleSection(props) {
 
   const setCoinPriceByType = (type, value) => {
     setCoinPrice((prevState) => {
-      const tempPrice = [...prevState];
-      tempPrice[type] = value;
-      return tempPrice;
+      const curPrice = [...prevState];
+      curPrice[type] = value;
+      return curPrice;
     });
   };
 
@@ -109,8 +111,8 @@ export default function CollectibleHandleSection(props) {
   };
 
   const checkHasEnded = () => {
-    const tempEndTime = collectible.endTime * 1000;
-    if (!tempEndTime || tempEndTime <= Date.now()) setAuctionEnded(true);
+    const endTimeInMS = endTime * 1000;
+    if (!endTimeInMS || endTimeInMS <= Date.now()) setAuctionEnded(true);
     else {
       setAuctionEnded(false);
       setTimeout(() => checkHasEnded(), 1000);
@@ -120,33 +122,33 @@ export default function CollectibleHandleSection(props) {
   const coinName = coinType.name;
   const coinUSD = coinPrice[coinType.index];
   let statusText = 'On sale for a fixed price of';
-  let priceText = `${round((collectible?.order?.Price ?? 0) / 1e18, 3)} ${coinName}`;
-  let usdPriceText = `≈ USD ${round((coinUSD * (collectible?.order?.Price ?? 0)) / 1e18, 3)}`;
+  let priceText = `${round(price / 1e18, 3)} ${coinName}`;
+  let usdPriceText = `≈ USD ${round((coinUSD * price) / 1e18, 3)}`;
   let handleField = null;
-  const currentBid = collectible.listBid && collectible.listBid.length ? collectible.listBid[0].price : 0;
   let deadline = '';
   let auctionTextField = null;
-  if (collectible.orderType === auctionOrderType && collectible.SaleType !== 'Not on sale') {
-    const tempDeadLine = getTime(collectible.endTime);
-    deadline = `${auctionEnded ? 'Ended' : 'Ends'} ${tempDeadLine.date} ${tempDeadLine.time}`;
+
+  if (orderType === auctionOrderType && listed) {
+    const objDeadLine = getTime(endTime);
+    deadline = `${auctionEnded ? 'Ended' : 'Ends'} ${objDeadLine.date} ${objDeadLine.time}`;
     if (!auctionEnded) {
       // not end yet
-      if (!currentBid) statusText = 'Starting Price';
+      if (!lastBid) statusText = 'Starting Price';
       else {
         statusText = 'Current Bid';
-        priceText = `${round(currentBid / 1e18, 3)} ${coinName}`;
-        usdPriceText = `≈ USD ${round((coinUSD * currentBid) / 1e18, 3)}`;
+        priceText = `${round(lastBid / 1e18, 3)} ${coinName}`;
+        usdPriceText = `≈ USD ${round((coinUSD * lastBid) / 1e18, 3)}`;
       }
 
-      if (address !== collectible.tokenOwner)
+      if (address !== tokenOwner)
         handleField = didSignin ? (
           <Stack direction="row" spacing={1}>
             <StyledButton variant="contained" fullWidth onClick={() => setPlaceBidOpen(true)}>
               Place bid
             </StyledButton>
-            {!!(collectible.buyoutPrice * 1) && (
+            {!!(buyoutPrice * 1) && (
               <StyledButton variant="outlined" fullWidth onClick={handlePurchase}>
-                Buy now for {round(collectible.buyoutPrice / 1e18, 3)} {coinName}
+                Buy now for {round(buyoutPrice / 1e18, 3)} {coinName}
               </StyledButton>
             )}
           </Stack>
@@ -155,25 +157,25 @@ export default function CollectibleHandleSection(props) {
             Sign in to Place bid
           </StyledButton>
         );
-      else if (address === collectible.tokenOwner && !currentBid && collectible.SaleType !== 'Not on sale')
+      else if (address === tokenOwner && !lastBid && listed)
         handleField = (
           <StyledButton variant="contained" fullWidth onClick={() => setCancelOpen(true)}>
             Cancel sale
           </StyledButton>
         );
-      else if (collectible.buyoutPrice * 1)
+      else if (buyoutPrice * 1)
         auctionTextField = (
           <Typography variant="h4" component="div" align="center" sx={{ pt: 2 }}>
             Your Buy Now Price:{' '}
             <Typography variant="h4" color="origin.main" sx={{ display: 'inline' }}>
-              {round(collectible.buyoutPrice / 1e18, 3)} {coinName}
+              {round(buyoutPrice / 1e18, 3)} {coinName}
             </Typography>
           </Typography>
         );
-    } else if (!currentBid || currentBid < collectible.reservePrice) {
-      statusText = !currentBid ? 'Starting Price' : 'Top Bid';
-      if (currentBid) priceText = `${round(currentBid / 1e18, 3)} ${coinName}`;
-      if (address === collectible.tokenOwner && collectible.SaleType !== 'Not on sale')
+    } else if (!lastBid || lastBid < reservePrice) {
+      statusText = !lastBid ? 'Starting Price' : 'Top Bid';
+      if (lastBid) priceText = `${round(lastBid / 1e18, 3)} ${coinName}`;
+      if (address === tokenOwner && listed)
         handleField = (
           <StyledButton variant="contained" fullWidth onClick={() => setCancelOpen(true)}>
             Cancel sale
@@ -182,23 +184,23 @@ export default function CollectibleHandleSection(props) {
       else
         auctionTextField = (
           <Typography variant="h4" color="origin.main" align="center" sx={{ pt: 2 }}>
-            {!currentBid ? 'Auction Has Ended' : 'Reserve Price Not Met'}
+            {!lastBid ? 'Auction Has Ended' : 'Reserve Price Not Met'}
           </Typography>
         );
     } else {
       statusText = 'Top Bid';
-      priceText = `${round(currentBid / 1e18, 3)} ${coinName}`;
-      usdPriceText = `≈ USD ${round((coinUSD * currentBid) / 1e18, 3)}`;
-      const topBuyer = collectible.listBid[0].buyerAddr;
-      const seller = collectible.listBid[0].sellerAddr;
+      priceText = `${round(lastBid / 1e18, 3)} ${coinName}`;
+      usdPriceText = `≈ USD ${round((coinUSD * lastBid) / 1e18, 3)}`;
+      const topBuyer = bidList[0].buyerAddr;
+      const seller = bidList[0].sellerAddr;
 
-      if (address === seller && collectible.SaleType !== 'Not on sale')
+      if (address === seller && listed)
         handleField = (
           <StyledButton variant="contained" fullWidth onClick={() => setSettleOrderOpen(true)}>
             Accept Bid
           </StyledButton>
         );
-      else if (address === topBuyer && collectible.SaleType !== 'Not on sale') {
+      else if (address === topBuyer && listed) {
         statusText = 'You Won!';
         handleField = (
           <StyledButton variant="contained" fullWidth onClick={() => setSettleOrderOpen(true)}>
@@ -212,7 +214,7 @@ export default function CollectibleHandleSection(props) {
           </Typography>
         );
     }
-  } else if (collectible.SaleType === 'Not on sale') {
+  } else if (!listed) {
     statusText = 'This item is currently';
     priceText = 'Not on Sale';
     handleField = (
@@ -220,13 +222,13 @@ export default function CollectibleHandleSection(props) {
         Go back to Marketplace
       </StyledButton>
     );
-  } else if (address === collectible.tokenOwner && collectible.SaleType !== 'Not on sale') {
+  } else if (address === tokenOwner && listed) {
     handleField = (
       <StyledButton variant="contained" fullWidth onClick={() => setCancelOpen(true)}>
         Cancel sale
       </StyledButton>
     );
-  } else if (address !== collectible.tokenOwner) {
+  } else if (address !== tokenOwner) {
     handleField = didSignin ? (
       <StyledButton variant="contained" fullWidth onClick={handlePurchase}>
         Buy
@@ -237,13 +239,14 @@ export default function CollectibleHandleSection(props) {
       </StyledButton>
     );
   }
+
   return (
     <>
       {onlyHandle ? (
         <MHidden width="smUp">{handleField !== null && <StickyPaperStyle>{handleField}</StickyPaperStyle>}</MHidden>
       ) : (
         <>
-          {collectible.orderType === auctionOrderType && collectible.SaleType !== 'Not on sale' ? (
+          {orderType === auctionOrderType && listed ? (
             <Box>
               <Stack direction="row">
                 <Box sx={{ flexGrow: 1 }}>
@@ -263,7 +266,7 @@ export default function CollectibleHandleSection(props) {
                       {deadline}
                     </Typography>
                   </Stack>
-                  <Countdown deadline={collectible.endTime * 1000} />
+                  <Countdown deadline={endTime * 1000} />
                 </Box>
               </Stack>
               {auctionTextField}
@@ -277,7 +280,7 @@ export default function CollectibleHandleSection(props) {
               <Typography variant="h3" color="origin.main">
                 {priceText}
               </Typography>
-              {collectible.SaleType !== 'Not on sale' && (
+              {listed && (
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   {usdPriceText}
                 </Typography>
@@ -294,7 +297,7 @@ export default function CollectibleHandleSection(props) {
       <PlaceBidDlg
         isOpen={isOpenPlaceBid}
         setOpen={setPlaceBidOpen}
-        info={{ ...collectible, currentBid }}
+        info={{ ...collectible, lastBid }}
         coinType={coinType}
       />
       <SettleOrderDlg isOpen={isOpenSettleOrder} setOpen={setSettleOrderOpen} info={collectible} address={address} />

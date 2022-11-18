@@ -1023,8 +1023,6 @@ export default function CollectibleDetail() {
                                     key={_i}
                                     {...item}
                                     thumbnail={getImageFromIPFSUrl(item?.data?.image || item?.image)}
-                                    price={round(item.price / 1e18, 3)}
-                                    saleType={item.SaleType || item.saleType}
                                     type={0}
                                     isLink={Boolean(true)}
                                     coinUSD={coinPrice[coinType.index]}
