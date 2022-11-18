@@ -11,11 +11,11 @@ import {
   MethodList,
   reduceHexAddress,
   getTime,
-  getCoinTypeFromToken,
   getMarketAddressByMarketplaceType,
   getExplorerSrvByNetwork,
   chainTypes,
-  getChainIndexFromChain
+  getChainIndexFromChain,
+  getCoinTypeFromToken
 } from '../../../utils/common';
 import { v1marketContract } from '../../../config';
 

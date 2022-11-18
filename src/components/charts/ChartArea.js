@@ -16,7 +16,7 @@ import {
   setAllTokenPrice,
   getTotalCountOfCoinTypes,
   fetchAPIFrom,
-  getCoinTypeFromTokenEx
+  getCoinTypeFromToken
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -175,7 +175,7 @@ export default function ChartArea({ by, is4Address }) {
     const dates = dateRangeBeforeDays(days);
     const arrRlt = Array(dates.length).fill(0);
     volumeList.forEach((item) => {
-      const coinType = getCoinTypeFromTokenEx(item);
+      const coinType = getCoinTypeFromToken(item);
       const time = by === 'collectible' ? item.updateTime : item.timestamp;
       const price = by === 'collectible' ? item.price : item.income;
       let seekDate = format(time * 1000, 'yyyy-MM-dd');

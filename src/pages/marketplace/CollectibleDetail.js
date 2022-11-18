@@ -72,7 +72,7 @@ import {
   fetchAPIFrom,
   getImageFromIPFSUrl,
   getChainIndexFromChain,
-  getCoinTypeFromTokenEx
+  getCoinTypeFromToken
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -868,7 +868,7 @@ export default function CollectibleDetail() {
                     </>
                   )}
                 </Typography>
-                <BidList dataList={collectible.bidList} coinType={getCoinTypeFromTokenEx(collectible)} />
+                <BidList dataList={collectible.bidList} coinType={getCoinTypeFromToken(collectible)} />
               </PaperStyle>
             </Grid>
           )}
@@ -1017,7 +1017,7 @@ export default function CollectibleDetail() {
                               gap={1.5}
                             >
                               {collectiblesInCollection.slice(0, dispCountInCollection).map((item, _i) => {
-                                const coinType = getCoinTypeFromTokenEx(item);
+                                const coinType = getCoinTypeFromToken(item);
                                 return (
                                   <AssetCard
                                     key={_i}

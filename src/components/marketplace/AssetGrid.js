@@ -8,7 +8,7 @@ import AssetCardSkeleton from './AssetCardSkeleton';
 import {
   setAllTokenPrice,
   getTotalCountOfCoinTypes,
-  getCoinTypeFromTokenEx,
+  getCoinTypeFromToken,
   getImageFromIPFSUrl
 } from '../../utils/common';
 // ----------------------------------------------------------------------
@@ -41,7 +41,7 @@ const GridItems = (props) => {
   return (
     <>
       {assets.map((item, index) => {
-        const coinType = getCoinTypeFromTokenEx(item);
+        const coinType = getCoinTypeFromToken(item);
         const isOnMarket = Object.keys(item?.token || {}).length > 0;
         return item ? (
           <AssetCard
