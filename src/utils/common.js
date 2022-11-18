@@ -897,7 +897,7 @@ export const MethodList = [
       { description: 'Collectible removed from marketplace →', field: 'marketplace', copyable: true, ellipsis: true },
       { description: 'By', field: 'seller', copyable: true, ellipsis: true }
     ],
-    verb: { description: 'Removed', withPrice: false, subject: 'from' }
+    verb: { description: 'Removed', withPrice: false, subject: 'sellerAddr' }
   },
   {
     method: 'ChangeOrderPrice',
