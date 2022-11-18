@@ -28,9 +28,9 @@ const GridItems = (props) => {
   const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const setCoinPriceByType = (type, value) => {
     setCoinPrice((prevState) => {
-      const tempPrice = [...prevState];
-      tempPrice[type] = value;
-      return tempPrice;
+      const curState = [...prevState];
+      curState[type] = value;
+      return curState;
     });
   };
 
@@ -70,11 +70,11 @@ const GridItems = (props) => {
             thumbnail={getImageFromIPFSUrl(
               isOnMarket ? item?.token?.data?.thumbnail || item?.token?.image : item?.data?.thumbnail || item?.image
             )}
-            showPrice={Boolean(true)}
             type={type}
             coinUSD={coinPrice[coinType.index]}
             coinType={coinType}
             isLink={Boolean(true)}
+            showPrice={Boolean(true)}
             myaddress={myaddress}
             updateCount={updateCount}
             handleUpdate={handleUpdate}

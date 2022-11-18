@@ -66,6 +66,7 @@ AssetCard.propTypes = {
   lastBidder: PropTypes.string,
   reservePrice: PropTypes.number,
   buyoutPrice: PropTypes.number,
+  thumbnail: PropTypes.string,
   type: PropTypes.number,
   coinUSD: PropTypes.any,
   coinType: PropTypes.object,
