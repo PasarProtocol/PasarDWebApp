@@ -70,6 +70,7 @@ const GridItems = (props) => {
             thumbnail={getImageFromIPFSUrl(
               isOnMarket ? item?.token?.data?.thumbnail || item?.token?.image : item?.data?.thumbnail || item?.image
             )}
+            showPrice={Boolean(true)}
             type={type}
             coinUSD={coinPrice[coinType.index]}
             coinType={coinType}
