@@ -7,6 +7,7 @@ import { styled } from '@mui/material/styles';
 import { Container, Stack, Typography, Tab, Tabs, Link, Grid, Box, Tooltip } from '@mui/material';
 import { useWeb3React } from '@web3-react/core';
 import jwtDecode from 'jwt-decode';
+import InfiniteScroll from 'react-infinite-scroll-component';
 // components
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../../components/signin-dlg/connectors';
@@ -56,12 +57,7 @@ export default function MyItems() {
   const sessionDispMode = sessionStorage.getItem('disp-mode');
   const params = useParams(); // params.address
   const navigate = useNavigate();
-  const [assets, setAssets] = React.useState([[], [], []]);
-  const [collections, setCollections] = React.useState([]);
-  const [isLoadingCollection, setLoadingCollection] = React.useState(false);
-  const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
   const [dispMode] = React.useState(sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode);
-  const [orderType] = React.useState(0);
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(params.type !== undefined ? parseInt(params.type, 10) : 0);
   const [walletAddress, setWalletAddress] = React.useState(null);
@@ -71,9 +67,17 @@ export default function MyItems() {
   const [updateCount, setUpdateCount] = React.useState(0);
   const [badge, setBadge] = React.useState({ dia: 0, kyc: false });
   const [socials, setSocials] = React.useState({});
-
+  const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false, false]);
+  const [assetCount, setAssetCount] = React.useState([0, 0, 0, 0]);
+  const [assets, setAssets] = React.useState([[], [], [], []]);
+  const [loadNext, setLoadNext] = React.useState(false);
+  const [page, setPage] = React.useState(1);
+  const [pages, setPages] = React.useState([0, 0, 0, 0]);
+  const [showCount] = React.useState(30);
   const context = useWeb3React();
   const { account } = context;
+
+  // --------------------------------- Profile ------------------------------------- //
 
   const queryProfileSocials = {
     website: queryWebsite,
@@ -100,7 +104,11 @@ export default function MyItems() {
         const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`;
         const token = sessionStorage.getItem('PASAR_TOKEN');
         const user = jwtDecode(token);
-        await fetchProfileData(targetDid, user);
+        try {
+          await fetchProfileData(targetDid, user);
+        } catch (e) {
+          console.error(e);
+        }
       } else {
         setWalletAddress(myAddress);
         setDidInfo({ name: '', description: '' });
@@ -132,20 +140,32 @@ export default function MyItems() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, params.address]);
 
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const dia = await getDiaTokenInfo(walletAddress);
+        setEachOfObject('setBadge', 'dia', dia * 1);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchData();
+  }, [walletAddress]);
+
   const fetchProfileData = async (targetDid, didInfo) => {
     try {
       const res = await queryName(targetDid);
       if (res?.find_message && (res?.find_message?.items || []).length)
-        setDidInfoValue('name', res.find_message.items[0].display_name);
-      else setDidInfoValue('name', didInfo?.name || '');
+        setEachOfObject('setDidInfo', 'name', res.find_message.items[0].display_name);
+      else setEachOfObject('setDidInfo', 'name', didInfo?.name || '');
     } catch (e) {
       console.error(e);
     }
     try {
       const res = await queryDescription(targetDid);
       if (res?.find_message && (res?.find_message?.items || []).length)
-        setDidInfoValue('description', res.find_message.items[0].display_name);
-      else setDidInfoValue('description', didInfo?.bio || '');
+        setEachOfObject('setDidInfo', 'description', res.find_message.items[0].display_name);
+      else setEachOfObject('setDidInfo', 'description', didInfo?.bio || '');
     } catch (e) {
       console.error(e);
     }
@@ -166,8 +186,8 @@ export default function MyItems() {
     }
     try {
       const res = await queryKycMe(targetDid);
-      if (res?.find_message && (res?.find_message?.items || []).length) setBadgeFlag('kyc', true);
-      else setBadgeFlag('kyc', false);
+      if (res?.find_message && (res?.find_message?.items || []).length) setEachOfObject('setBadge', 'kyc', true);
+      else setEachOfObject('setBadge', 'kyc', false);
     } catch (e) {
       console.error(e);
     }
@@ -187,45 +207,70 @@ export default function MyItems() {
     }
   };
 
-  const setDidInfoValue = (field, value) => {
-    setDidInfo((prevState) => {
-      const curState = { ...prevState };
-      curState[field] = value;
-      return curState;
+  const setEachOfObject = (type, index, value) => {
+    let setFunction = null;
+    switch (type) {
+      case 'setDidInfo':
+        setFunction = setDidInfo;
+        break;
+      case 'setBadge':
+        setFunction = setBadge;
+        break;
+      default:
+        setFunction = null;
+        break;
+    }
+    if (setFunction === null) return;
+    setFunction((prevState) => {
+      const nextState = { ...prevState };
+      nextState[index] = value;
+      return nextState;
     });
   };
 
-  const setLoadingAssetsOfType = (index, value) => {
-    setLoadingAssets((prevState) => {
-      const curLoadingAssets = [...prevState];
-      curLoadingAssets[index] = value;
-      return curLoadingAssets;
-    });
+  // --------------------------------- Items ------------------------------------- //
+
+  const fetchMoreData = () => {
+    if (!loadNext) {
+      setLoadNext(true);
+      setPage(page + 1);
+    }
   };
 
-  const setAssetsOfType = (index, value) => {
-    if (!value) return;
-    setAssets((prevState) => {
-      const curAssets = [...prevState];
-      curAssets[index] = value;
-      return curAssets;
-    });
-  };
-
-  const setBadgeFlag = (type, value) => {
-    setBadge((prevState) => {
-      const curBadge = { ...prevState };
-      curBadge[type] = value;
-      return curBadge;
+  const setEachOfArray = (type, index, value) => {
+    let setFunction = null;
+    switch (type) {
+      case 'setLoadingAssets':
+        setFunction = setLoadingAssets;
+        break;
+      case 'setAssets':
+        setFunction = setAssets;
+        break;
+      case 'setAssetCount':
+        setFunction = setAssetCount;
+        break;
+      case 'setPages':
+        setFunction = setPages;
+        break;
+      default:
+        setFunction = null;
+        break;
+    }
+    if (setFunction === null) return;
+    setFunction((prevState) => {
+      const nextState = [...prevState];
+      nextState[index] = value;
+      return nextState;
     });
   };
 
   const apiNames = [
     'getListedCollectiblesByWalletAddr',
     'getOwnedCollectiblesByWalletAddr',
-    'getMintedCollectiblesByWalletAddr'
+    'getMintedCollectiblesByWalletAddr',
+    'getCollectionsByWalletAddr'
   ];
-  const typeNames = ['listed', 'owned', 'minted'];
+  const typeNames = ['listed', 'owned', 'minted', 'collections'];
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -233,45 +278,36 @@ export default function MyItems() {
       const newController = new AbortController();
       const { signal } = newController;
       setAbortController(newController);
-
-      Array(3)
+      Array(4)
         .fill(0)
         .forEach(async (_, i) => {
-          setLoadingAssetsOfType(i, true);
+          setEachOfArray('setLoadingAssets', i, true);
+          if (!loadNext) setAssets([[], [], [], []]);
           try {
-            const res = await fetchAPIFrom(`api/v1/${apiNames[i]}?walletAddr=${walletAddress}&sort=${orderType}`, {
-              signal
-            });
+            const res = await fetchAPIFrom(
+              `api/v1/${apiNames[i]}?walletAddr=${walletAddress}&chain=all&sort=0&pageNum=${page}&pageSize=${showCount}`,
+              {
+                signal
+              }
+            );
             const json = await res.json();
-            setAssetsOfType(i, json?.data || []);
+            const totalCnt = json?.data?.total ?? 0;
+            setEachOfArray('setPages', i, Math.ceil(totalCnt / showCount));
+            setEachOfArray('setAssetCount', i, totalCnt);
+            if (loadNext) setEachOfArray('setAssets', i, [...assets[i], ...(json?.data?.data || [])]);
+            else setEachOfArray('setAssets', i, json?.data?.data || []);
+            setLoadNext(false);
           } catch (e) {
             console.error(e);
           }
-          setLoadingAssetsOfType(i, false);
+          setEachOfArray('setLoadingAssets', i, false);
         });
-      const dia = await getDiaTokenInfo(walletAddress);
-      setBadgeFlag('dia', dia * 1);
     };
     if (walletAddress) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletAddress, orderType, updateCount]);
+  }, [walletAddress, showCount, page]);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      setLoadingCollection(true);
-      try {
-        const res = await fetchAPIFrom(`api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${walletAddress}`, {});
-        const json = await res.json();
-        setCollections(json?.data || []);
-      } catch (e) {
-        console.error(e);
-      }
-      setLoadingCollection(false);
-    };
-    if (walletAddress) fetchData();
-  }, [walletAddress]);
-
-  const loadingSkeletons = Array(10).fill(null);
+  const loadingSkeletons = Array(showCount).fill(null);
 
   return (
     <RootStyle title="MyItems | PASAR">
@@ -323,10 +359,10 @@ export default function MyItems() {
             onChange={(_, newValue) => setTabValue(newValue)}
             TabIndicatorProps={{ style: { background: '#FF5082' } }}
           >
-            <Tab label={`Listed (${assets[0].length})`} value={0} />
-            <Tab label={`Owned (${assets[1].length})`} value={1} />
-            <Tab label={`Minted (${assets[2].length})`} value={2} />
-            <Tab label={`Collections (${collections.length})`} value={3} />
+            <Tab label={`Listed (${assetCount[0]})`} value={0} />
+            <Tab label={`Owned (${assetCount[1]})`} value={1} />
+            <Tab label={`Minted (${assetCount[2]})`} value={2} />
+            <Tab label={`Collections (${assetCount[3]})`} value={3} />
           </Tabs>
         </Box>
         <Box
@@ -342,74 +378,73 @@ export default function MyItems() {
               transition: 'transform 0.35s cubic-bezier(0.15, 0.3, 0.25, 1) 0s'
             }}
           >
-            {assets.map((group, i) => (
+            {assets.map((tabAssets, i) => (
               <Box key={i} sx={{ minHeight: 200, p: '10px' }}>
-                {!isLoadingAssets[i] ? (
-                  <Box component="main">
-                    {group.length > 0 ? (
-                      <AssetGrid
-                        assets={group}
-                        type={i + 1}
-                        dispMode={dispMode}
-                        myaddress={myAddress}
-                        updateCount={updateCount}
-                        handleUpdate={setUpdateCount}
-                      />
-                    ) : (
+                <InfiniteScroll
+                  dataLength={tabAssets.length}
+                  next={fetchMoreData}
+                  hasMore={page < pages[i]}
+                  loader={<h4>Loading...</h4>}
+                  endMessage={
+                    !isLoadingAssets[i] &&
+                    !tabAssets.length &&
+                    (i !== 3 ? (
                       <Typography variant="subtitle2" align="center" sx={{ mb: 3 }}>
                         No {typeNames[i]} collectible found!
                       </Typography>
-                    )}
-                  </Box>
-                ) : (
-                  <Box component="main">
+                    ) : (
+                      <Stack sx={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Typography variant="h3" align="center">
+                          {' '}
+                          No Collections Found{' '}
+                        </Typography>
+                        <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>
+                          We could not find any of your collections
+                        </Typography>
+                      </Stack>
+                    ))
+                  }
+                  style={{ padding: '10px' }}
+                >
+                  {i !== 3 ? (
                     <AssetGrid
-                      assets={loadingSkeletons}
+                      assets={
+                        isLoadingAssets[i] && assetCount[i] > tabAssets.length
+                          ? [...tabAssets, ...loadingSkeletons]
+                          : tabAssets
+                      }
                       type={i + 1}
-                      dispmode={dispMode}
+                      dispMode={dispMode}
                       myaddress={myAddress}
                       updateCount={updateCount}
                       handleUpdate={setUpdateCount}
                     />
-                  </Box>
-                )}
+                  ) : (
+                    <>
+                      {isLoadingAssets[i] ? (
+                        <Grid container spacing={2}>
+                          {Array(3)
+                            .fill(0)
+                            .map((item, index) => (
+                              <Grid item key={index} xs={12} sm={6} md={4}>
+                                <CollectionCardSkeleton key={index} />
+                              </Grid>
+                            ))}
+                        </Grid>
+                      ) : (
+                        <Grid container spacing={2}>
+                          {tabAssets.map((info, index) => (
+                            <Grid item key={index} xs={12} sm={6} md={4}>
+                              <CollectionCard info={info} isOwned={myAddress === info.owner} />
+                            </Grid>
+                          ))}
+                        </Grid>
+                      )}
+                    </>
+                  )}
+                </InfiniteScroll>
               </Box>
             ))}
-            <Box sx={{ minHeight: 200, p: '10px' }}>
-              {!isLoadingCollection ? (
-                <Box component="main">
-                  {collections.length > 0 ? (
-                    <Grid container spacing={2}>
-                      {collections.map((info, index) => (
-                        <Grid item key={index} xs={12} sm={6} md={4}>
-                          <CollectionCard info={info} isOwned={myAddress === info.owner} />
-                        </Grid>
-                      ))}
-                    </Grid>
-                  ) : (
-                    <Stack sx={{ justifyContent: 'center', alignItems: 'center' }}>
-                      <Typography variant="h3" align="center">
-                        {' '}
-                        No Collections Found{' '}
-                      </Typography>
-                      <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>
-                        We could not find any of your collections
-                      </Typography>
-                    </Stack>
-                  )}
-                </Box>
-              ) : (
-                <Grid container spacing={2}>
-                  {Array(3)
-                    .fill(0)
-                    .map((_, index) => (
-                      <Grid item key={index} xs={12} sm={6} md={4}>
-                        <CollectionCardSkeleton key={index} />
-                      </Grid>
-                    ))}
-                </Grid>
-              )}
-            </Box>
           </SwipeableViews>
         </Box>
       </Container>
