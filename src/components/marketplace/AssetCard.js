@@ -112,7 +112,7 @@ export default function AssetCard(props) {
     handleUpdate,
     defaultCollectionType = 0
   } = props;
-  
+
   const [collection, setCollection] = React.useState({});
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [disclaimerOpen, setOpenDisclaimer] = React.useState(false);
@@ -144,8 +144,8 @@ export default function AssetCard(props) {
     state.isOnSale &&
     ((myaddress === royaltyOwner && state.isFirstSale) || (myaddress === tokenOwner && !state.isFirstSale));
   const isUnlistedOwnedByMe = !state.isOnSale && myaddress === tokenOwner;
-  const isListedByOthers = myaddress !== royaltyOwner && myaddress !== tokenOwner && state.isOnSale;
-  const isUnlistedByOthers = myaddress !== royaltyOwner && myaddress !== tokenOwner && !state.isOnSale;
+  const isListedByOthers = state.isOnSale && myaddress !== royaltyOwner && myaddress !== tokenOwner;
+  const isUnlistedByOthers = !state.isOnSale && myaddress !== royaltyOwner && myaddress !== tokenOwner;
 
   React.useEffect(() => {
     const interval = setInterval(() => checkHasEnded(), 1000);
@@ -204,10 +204,6 @@ export default function AssetCard(props) {
     const tempEndTime = endTime * 1000;
     if (!tempEndTime) return;
     if (!auctionEnded && tempEndTime <= Date.now()) setAuctionEnded(true);
-  };
-
-  const openPopupMenu = (event) => {
-    setOpenPopup(event.currentTarget);
   };
 
   const handleSell = () => {
@@ -286,7 +282,6 @@ export default function AssetCard(props) {
     setOpenPopup(null);
   };
   const dlgProps = { name, tokenId, orderId, updateCount, handleUpdate, baseToken, v1State: chain === 'v1' };
-  const currentBidPrice = lastBid;
 
   return (
     <Box>
@@ -316,10 +311,8 @@ export default function AssetCard(props) {
           <Stack sx={{ flexGrow: 1 }} direction="row" spacing={0.5}>
             <BadgeProfile type={1} collection={collection} defaultCollectionType={defaultCollectionType} />
             {tokenOwner && <BadgeProfile type={2} walletAddress={tokenOwner} />}
-            {!!reservePrice && state.isOnSale && (
-              <BadgeProfile type={3} isReservedAuction={currentBidPrice >= reservePrice} />
-            )}
-            {!!buyoutPrice && state.isOnSale && <BadgeProfile type={4} />}
+            {state.isOnSale && !!reservePrice && <BadgeProfile type={3} isReservedAuction={lastBid >= reservePrice} />}
+            {state.isOnSale && !!buyoutPrice && <BadgeProfile type={4} />}
           </Stack>
           <Box>
             {((type === 1 && myaddress === tokenOwner) ||
@@ -328,16 +321,13 @@ export default function AssetCard(props) {
                 color="inherit"
                 size="small"
                 sx={{ p: 0 }}
-                onClick={isLink ? openPopupMenu : () => {}}
+                onClick={isLink ? (event) => setOpenPopup(event.currentTarget) : () => {}}
                 disabled={
                   !(
                     sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' &&
-                    ((type === 1 &&
-                      myaddress === tokenOwner &&
-                      (auctionEnded || (!auctionEnded && !currentBidPrice))) ||
+                    ((type === 1 && myaddress === tokenOwner && (auctionEnded || (!auctionEnded && !lastBid))) ||
                       (type === 2 &&
-                        ((isListedOwnedByMe && (auctionEnded || (!auctionEnded && !currentBidPrice))) ||
-                          isUnlistedOwnedByMe)))
+                        ((isListedOwnedByMe && (auctionEnded || (!auctionEnded && !lastBid))) || isUnlistedOwnedByMe)))
                   )
                 }
               >
@@ -373,7 +363,7 @@ export default function AssetCard(props) {
                 <div>
                   {!auctionEnded ? (
                     <>
-                      {!currentBidPrice && (
+                      {!lastBid && (
                         <div>
                           <MenuItem value="update" onClick={handleClosePopup}>
                             <LocalOfferOutlinedIcon />
@@ -388,7 +378,7 @@ export default function AssetCard(props) {
                     </>
                   ) : (
                     <>
-                      {!currentBidPrice || currentBidPrice < reservePrice ? (
+                      {!lastBid || lastBid < reservePrice ? (
                         <div>
                           <MenuItem value="cancel" onClick={handleClosePopup}>
                             <CancelOutlinedIcon />
@@ -413,7 +403,7 @@ export default function AssetCard(props) {
                   <div>
                     {!auctionEnded ? (
                       <>
-                        {!currentBidPrice && (
+                        {!lastBid && (
                           <div>
                             <MenuItem value="update" onClick={handleClosePopup}>
                               <LocalOfferOutlinedIcon />
@@ -428,7 +418,7 @@ export default function AssetCard(props) {
                       </>
                     ) : (
                       <>
-                        {!currentBidPrice || currentBidPrice < reservePrice ? (
+                        {!lastBid || lastBid < reservePrice ? (
                           <div>
                             <MenuItem value="cancel" onClick={handleClosePopup}>
                               <CancelOutlinedIcon />
@@ -532,14 +522,14 @@ export default function AssetCard(props) {
             <Typography variant="h6" noWrap sx={{ flexGrow: 1, fontSize: { xs: '1rem' } }}>
               {name}
             </Typography>
-            {orderType === 2 && state.isOnSale ? (
-              <Tooltip title={currentBidPrice ? 'Top Bid' : 'Starting Price'} arrow enterTouchDelay={0}>
+            {orderType === auctionOrderType && state.isOnSale ? (
+              <Tooltip title={lastBid ? 'Top Bid' : 'Starting Price'} arrow enterTouchDelay={0}>
                 <Typography
                   variant="subtitle2"
                   sx={{ display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em' }}
                   noWrap
                 >
-                  {currentBidPrice ?? price} {coinType.name}
+                  {lastBid ?? price} {coinType.name}
                 </Typography>
               </Tooltip>
             ) : (

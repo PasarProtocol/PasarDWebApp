@@ -103,7 +103,7 @@ export default function MyProfile() {
   const [loadNext, setLoadNext] = React.useState(false);
   const [page, setPage] = React.useState(1);
   const [pages, setPages] = React.useState([0, 0, 0, 0, 0, 0]);
-  const [showCount] = React.useState(10);
+  const [showCount] = React.useState(30);
   const context = useWeb3React();
   const { account } = context;
 

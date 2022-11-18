@@ -133,6 +133,6 @@ export const ApplicationDID = ApplicationDIDForMain
 export const trustedProviders = [
   "did:elastos:iqjN3CLRjd7a4jGCZe6B3isXyeLy7KKDuK" // Trinity Tech KYC
 ]
-export const auctionOrderType = '2'
+export const auctionOrderType = 2
 
 export const tokenConf = { diaDecimals: 18, diaValue: 0.01, nPPM: 1000000, PPM: 1000000 }
