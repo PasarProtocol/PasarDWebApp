@@ -26,7 +26,7 @@ function TransItem(props) {
       detail: [],
       verb: { subject: 'to' }
     };
-  const subject = trans[methodItem.verb.subject];
+  const subject = trans[methodItem.verb.subject] || trans?.order[methodItem.verb.subject];
   const coinType = getCoinTypeFromToken(trans);
   const coinName = coinType.name;
 

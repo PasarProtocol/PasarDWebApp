@@ -82,7 +82,7 @@ export default function AssetDetailInfo({ detail }) {
     ...detail,
     royalties: `${(detail.royaltyFee * 100) / 10 ** 6} %`,
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
-    marketTime: `${marketimestamp.date} ${marketimestamp.time}`,
+    marketTime: detail.listed ? `${marketimestamp.date} ${marketimestamp.time}` : 'Not on Sale',
     saleType: detail?.isFirstSale ? 'Primary Sale' : 'Secondary Sale'
   };
 
