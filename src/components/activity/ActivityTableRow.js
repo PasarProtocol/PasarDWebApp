@@ -7,7 +7,7 @@ import { Box, Stack, Typography, TableRow, Link, TableCell } from '@mui/material
 
 import TabletImgBox from './TabletImgBox';
 import KYCBadge from '../badge/KYCBadge';
-import { getDateDistance, reduceHexAddress, MethodList, getCoinTypeFromTokenEx } from '../../utils/common';
+import { getDateDistance, reduceHexAddress, MethodList, getCoinTypeFromToken } from '../../utils/common';
 import { blankAddress } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -98,7 +98,7 @@ const ActivityTableRow = (props) => {
           case 'price':
             {
               const priceVal = math.round((trans?.order?.price ?? 0) / 1e18, 3);
-              const coinType = getCoinTypeFromTokenEx(trans);
+              const coinType = getCoinTypeFromToken(trans);
               const coinUSD = coinPrice[coinType.index];
               cellcontent = (
                 <Stack display="inline-flex" textAlign="left">

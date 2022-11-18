@@ -114,23 +114,6 @@ export const getIpfsUrl = (uri, ipfsType = 0) => {
   return `${ipfsUrl}/ipfs/${tempUri}`;
 };
 
-export const getIPFSTypeFromUrl = (url) => {
-  if (!url) return '';
-  const temp = url.split(':').filter((item) => item);
-  if (temp.length === 3 && (temp[0] === 'pasar' || temp[0] === 'feeds')) return 0;
-  if (url.includes('ipfs.ela')) return 1;
-  return 2;
-};
-// new
-export const getAssetFromObj = (metaObj, isThumbnail, ipfsType = 0) => {
-  const { image, data, contract } = metaObj;
-  if (!image && !data) return '';
-  const originalUrl = (isThumbnail ? data?.thumbnail : data?.image) || '';
-  const imgUrl = isPasarOrFeeds(contract) ? originalUrl : image;
-  if (!imgUrl) return '';
-  return getIpfsUrl(imgUrl, ipfsType);
-};
-
 export const getImageFromIPFSUrl = (url) => {
   // pasar:image:xxx
   // feeds:image:xxx, feeds:imgage:xxx
@@ -146,22 +129,6 @@ export const getImageFromIPFSUrl = (url) => {
       return `${PasarIpfs}/ipfs/${segments[2]}`;
   }
   return '/static/broken-image.svg';
-};
-
-// deprecated
-export const getAssetImage = (metaObj, isThumbnail, ipfsType = 0) => {
-  const { asset, thumbnail, data } = metaObj;
-
-  if (!asset && !thumbnail && !data) return '';
-
-  let imgUrl = asset;
-  if (data && data.thumbnail && data.image) imgUrl = isThumbnail ? data.thumbnail : data.image;
-  else if (asset || thumbnail) {
-    const imgUrl = isThumbnail ? thumbnail : asset;
-    if (!imgUrl) return '';
-  }
-  if (!imgUrl) return '';
-  return getIpfsUrl(imgUrl, ipfsType);
 };
 
 export const getCollectionTypeFromImageUrl = (metaObj) => {
@@ -1160,7 +1127,7 @@ export const getMarketAddressByMarketplaceType = (type) => {
 };
 
 // new
-export const getCoinTypeFromTokenEx = (item) => {
+export const getCoinTypeFromToken = (item) => {
   let coinTypeIndex = 0;
   if (item) {
     const { quoteToken = blankAddress, chain = 'ela' } = item;
@@ -1184,29 +1151,6 @@ export const getCoinTypeFromTokenEx = (item) => {
   return { index: coinTypeIndex, ...coinTypesGroup.ESC[coinTypeIndex] };
 };
 
-// deprecated
-export const getCoinTypeFromToken = (item) => {
-  let coinTypeIndex = 0;
-  if (item) {
-    const { quoteToken = blankAddress, marketPlace = 1 } = item;
-    let tempCoinTypes = [];
-    let tempChainType = '';
-    if (marketPlace > 0 && marketPlace <= Object.keys(coinTypesGroup).length) {
-      tempCoinTypes = Object.values(coinTypesGroup)[marketPlace - 1];
-      tempChainType = Object.keys(coinTypesGroup)[marketPlace - 1];
-    } else {
-      tempCoinTypes = coinTypesGroup.ESC;
-      tempChainType = 'ESC';
-    }
-    const startPos = getStartPosOfCoinTypeByChainType(tempChainType);
-    coinTypeIndex = Math.max(
-      tempCoinTypes.findIndex((el) => el.address === quoteToken),
-      0
-    );
-    return { index: coinTypeIndex + startPos, ...tempCoinTypes[coinTypeIndex] };
-  }
-  return { index: coinTypeIndex, ...coinTypesGroup.ESC[coinTypeIndex] };
-};
 export const sendIpfsDidJson = async () => {
   const client = create(`${PasarIpfs}/`);
   // create the metadata object we'll be storing

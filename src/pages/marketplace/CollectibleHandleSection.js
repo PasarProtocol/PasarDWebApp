@@ -15,7 +15,7 @@ import SettleOrderDlg from '../../components/dialog/SettleOrder';
 import CancelDlg from '../../components/dialog/CancelSale';
 import Countdown from '../../components/Countdown';
 import useSingin from '../../hooks/useSignin';
-import { getTime, getTotalCountOfCoinTypes, setAllTokenPrice, getCoinTypeFromTokenEx } from '../../utils/common';
+import { getTime, getTotalCountOfCoinTypes, setAllTokenPrice, getCoinTypeFromToken } from '../../utils/common';
 import { auctionOrderType } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -116,7 +116,7 @@ export default function CollectibleHandleSection(props) {
       setTimeout(() => checkHasEnded(), 1000);
     }
   };
-  const coinType = getCoinTypeFromTokenEx(collectible);
+  const coinType = getCoinTypeFromToken(collectible);
   const coinName = coinType.name;
   const coinUSD = coinPrice[coinType.index];
   let statusText = 'On sale for a fixed price of';

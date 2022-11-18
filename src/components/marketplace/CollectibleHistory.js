@@ -8,7 +8,7 @@ import {
   reduceHexAddress,
   getDidInfoFromAddress,
   getDateDistance,
-  getCoinTypeFromTokenEx
+  getCoinTypeFromToken
 } from '../../utils/common';
 // ----------------------------------------------------------------------
 TransItem.propTypes = {
@@ -27,7 +27,7 @@ function TransItem(props) {
       verb: { subject: 'to' }
     };
   const subject = trans[methodItem.verb.subject];
-  const coinType = getCoinTypeFromTokenEx(trans);
+  const coinType = getCoinTypeFromToken(trans);
   const coinName = coinType.name;
 
   React.useEffect(() => {

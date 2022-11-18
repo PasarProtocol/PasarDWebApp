@@ -11,7 +11,7 @@ import {
   setAllTokenPrice,
   getTotalCountOfCoinTypes,
   fetchAPIFrom,
-  getCoinTypeFromTokenEx,
+  getCoinTypeFromToken,
   getImageFromIPFSUrl
 } from '../../utils/common';
 // ----------------------------------------------------------------------
@@ -84,7 +84,7 @@ const AssetGroupSlider = (props) => {
       ) : (
         <Splide options={settings}>
           {assets.map((item, index) => {
-            const coinType = getCoinTypeFromTokenEx(item);
+            const coinType = getCoinTypeFromToken(item);
             const isOnMarket = type !== 'recent_sold';
             return (
               <SplideSlide key={index}>
