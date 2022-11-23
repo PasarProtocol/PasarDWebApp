@@ -27,7 +27,7 @@ const ActivityTableRow = (props) => {
           case 'type':
             {
               let eventName = '';
-              if (trans?.order?.sellerAddr === blankAddress) eventName = 'Minted';
+              if (!trans.order) eventName = 'Minted';
               else if (trans?.order?.orderType === 1 && trans?.order?.orderState === 1) eventName = 'Listed';
               else if (trans?.order?.orderType === 1 && trans?.order?.orderState === 2) eventName = 'Sold';
               let methodItem = MethodList.find((item) => item.method === EventByType[eventName]);
@@ -135,7 +135,7 @@ const ActivityTableRow = (props) => {
             {
               // const addrstr = trans[column.id];
               // const dispAddress = infoByAddress[addrstr] ? infoByAddress[addrstr].name : reduceHexAddress(addrstr);
-              const order = trans?.order || { buyerAddr: '', sellerAddr: '' };
+              const order = trans?.order || { buyerAddr: trans.royaltyOwner, sellerAddr: '' };
               const addrstr = order[column.id];
               const dispAddress =
                 (column.id === 'sellerAddr' ? order?.sellerInfo?.name : '') || reduceHexAddress(addrstr);
@@ -160,7 +160,7 @@ const ActivityTableRow = (props) => {
           case 'marketTime':
             cellcontent = (
               <Typography variant="body2" color="text.secondary">
-                {getDateDistance(trans?.order?.updateTime ?? trans?.order?.createTime)}
+                {getDateDistance(!trans?.order ? trans.createTime : trans.order.updateTime)}
               </Typography>
             );
             break;
