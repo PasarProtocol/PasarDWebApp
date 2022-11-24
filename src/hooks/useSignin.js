@@ -3,6 +3,6 @@ import { SigninContext } from '../contexts/SigninContext';
 
 // ----------------------------------------------------------------------
 
-const useSignin = () => useContext(SigninContext);
+const useSignIn = () => useContext(SigninContext);
 
-export default useSignin;
+export default useSignIn;

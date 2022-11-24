@@ -12,7 +12,7 @@ import {
   getTotalCountOfCoinTypes,
   fetchAPIFrom,
   getCoinTypeFromToken,
-  getImageFromIPFSUrl
+  getImageFromIPFSUrl, setAllTokenPrice2
 } from '../../utils/common';
 // ----------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ const AssetGroupSlider = (props) => {
   };
 
   React.useEffect(() => {
-    setAllTokenPrice(setCoinPriceByType);
+    setAllTokenPrice2(setCoinPriceByType);
   }, []);
 
   const loadingSkeletons = Array(10).fill(0);

@@ -325,6 +325,35 @@ export function getTokenPriceInEthereum() {
   });
 }
 
+export function setAllTokenPrice2(setCoinPriceByType) {
+  const fetchCoinPrice = async () => {
+    const res = await fetchAPIFrom('api/v1/price');
+    const tokenPrice = await res.json();
+    setCoinPriceByType(0, tokenPrice.ELA);
+    setCoinPriceByType(coinTypes.length, tokenPrice.ETH);
+    setCoinPriceByType(coinTypes.length + coinTypesForEthereum.length, tokenPrice.FSN);
+
+    const res2 = await fetchAPIFrom('api/v1/getQuotedTokensRate');
+    const data = await res2.json();
+    const tokenRates = data.data;
+    const tokenRatesMap = {}
+    tokenRates.forEach((tokenRate) => {
+      if(!tokenRatesMap[tokenRate.chain]) {
+        tokenRatesMap[tokenRate.chain] = {}
+      }
+      tokenRatesMap[tokenRate.chain][tokenRate.token] = tokenRate.rate;
+    });
+
+    coinTypes.forEach((coin, index) => {
+      if(coin.name === 'ELA') {
+        return;
+      }
+      setCoinPriceByType(index, tokenRatesMap.ela[coin.address.toLowerCase()] * tokenPrice.ELA);
+    })
+  }
+  fetchCoinPrice();
+}
+
 export function setAllTokenPrice(setCoinPriceByType) {
   getCoinUSD().then((res) => {
     setCoinPriceByType(0, res);

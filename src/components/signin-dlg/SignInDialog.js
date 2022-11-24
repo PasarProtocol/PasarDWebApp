@@ -52,7 +52,7 @@ import {
   getChainTypeFromId,
   fetchAPIFrom
 } from '../../utils/common';
-import useSingin from '../../hooks/useSignin';
+import useSignIn from '../../hooks/useSignin';
 import { creatAndRegister, prepareConnectToHive, downloadAvatar } from './HiveAPI';
 import { DidResolverUrl, firebaseConfig } from '../../config';
 
@@ -78,7 +78,7 @@ export default function SignInDialog() {
     setPasarLinkAddress,
     setDiaBalance,
     setPasarLinkChain
-  } = useSingin();
+  } = useSignIn();
 
   let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
   const context = useWeb3React();
@@ -552,7 +552,7 @@ export default function SignInDialog() {
   };
   // ----------------------------------- //
 
-  const handleClickOpenSinginDlg = async () => {
+  const handleClickOpenSignInDlg = async () => {
     if (isInAppBrowser()) {
       if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession()) {
         await signOutWithEssentials();
@@ -785,7 +785,7 @@ export default function SignInDialog() {
         </>
       ) : (
         <div style={{ minWidth: 79 }}>
-          <Button id="signin" variant="contained" onClick={handleClickOpenSinginDlg}>
+          <Button id="signin" variant="contained" onClick={handleClickOpenSignInDlg}>
             Sign In
           </Button>
 
