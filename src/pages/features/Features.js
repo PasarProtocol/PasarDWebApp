@@ -15,8 +15,9 @@ import Page from '../../components/Page';
 import DIABadge from '../../components/badge/DIABadge';
 import StyledButton from '../../components/signin-dlg/StyledButton';
 import CarouselFeatures from '../../components/carousel/CarouselFeatures';
-import { getDiaTokenPrice, getDiaBalanceDegree } from '../../utils/common';
+import {getDiaBalanceDegree, getERC20TokenPrice} from '../../utils/common';
 import useSingin from '../../hooks/useSignin';
+import {mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS} from "../../config";
 // ----------------------------------------------------------------------
 
 const RootStyle = styled(Page)(({ theme }) => ({
@@ -134,15 +135,7 @@ export default function Features() {
   const degree = getDiaBalanceDegree(diaBalance, pasarLinkChain);
 
   React.useEffect(() => {
-    getDiaTokenPrice()
-      .then((res) => {
-        if (!res || !res.token) return;
-        setDiaUSD(math.round(res.token.derivedELA * res.bundle.elaPrice, 2));
-      })
-      .catch((e) => {
-        console.error(e);
-        setDiaUSD(0);
-      });
+    getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS).then((res) => {setDiaUSD(math.round(res, 2))});
   }, []);
 
   const featureArray = [

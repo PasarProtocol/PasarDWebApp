@@ -13,7 +13,7 @@ import StatisticItem from '../explorer/StatisticPanel/StatisticItem';
 import useSettings from '../../hooks/useSettings';
 import {
   dateRangeBeforeDays,
-  setAllTokenPrice,
+  
   getTotalCountOfCoinTypes,
   fetchAPIFrom,
   getCoinTypeFromToken, setAllTokenPrice2

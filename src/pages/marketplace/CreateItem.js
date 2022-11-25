@@ -74,7 +74,7 @@ import {
   getChainTypeFromId,
   getContractAddressInCurrentNetwork,
   getTotalCountOfCoinTypes,
-  setAllTokenPrice,
+  
   getStartPosOfCoinTypeByChainType, setAllTokenPrice2
 } from '../../utils/common';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';

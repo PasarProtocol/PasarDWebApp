@@ -62,7 +62,7 @@ import { queryName, queryKycMe, downloadAvatar } from '../../components/signin-d
 import {
   reduceHexAddress,
   getDiaTokenInfo,
-  setAllTokenPrice,
+  
   getDidInfoFromAddress,
   isInAppBrowser,
   getTotalCountOfCoinTypes,

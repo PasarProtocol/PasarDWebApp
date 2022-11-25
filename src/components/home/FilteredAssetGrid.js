@@ -8,7 +8,7 @@ import { MHidden } from '../@material-extend';
 import AssetCard from '../marketplace/AssetCard';
 import AssetCardSkeleton from '../marketplace/AssetCardSkeleton';
 import {
-  setAllTokenPrice,
+  
   getTotalCountOfCoinTypes,
   fetchAPIFrom,
   getCoinTypeFromToken,

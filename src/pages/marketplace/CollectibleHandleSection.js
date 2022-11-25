@@ -18,7 +18,7 @@ import useSingin from '../../hooks/useSignin';
 import {
   getTime,
   getTotalCountOfCoinTypes,
-  setAllTokenPrice,
+  
   getCoinTypeFromToken,
   setAllTokenPrice2
 } from '../../utils/common';

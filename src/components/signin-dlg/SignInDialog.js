@@ -45,16 +45,15 @@ import {
   getCoinUSD,
   getDiaTokenInfo,
   getElaOnEthTokenInfo,
-  getDiaTokenPrice,
   getTokenPriceInEthereum,
   isInAppBrowser,
   checkValidChain,
   getChainTypeFromId,
-  fetchAPIFrom
+  fetchAPIFrom, getERC20TokenPrice
 } from '../../utils/common';
 import useSignIn from '../../hooks/useSignin';
 import { creatAndRegister, prepareConnectToHive, downloadAvatar } from './HiveAPI';
-import { DidResolverUrl, firebaseConfig } from '../../config';
+import {DidResolverUrl, firebaseConfig, mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS} from '../../config';
 
 // Initialize Firebase
 if (firebaseConfig.apiKey) {
@@ -218,36 +217,12 @@ export default function SignInDialog() {
       if (sessionLinkFlag) {
         // when connected
         if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
-          getDiaTokenPrice()
-            .then((res) => {
-              if (!res || !res.token) return;
-              setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
-            })
-            .catch((e) => {
-              console.error(e);
-              setDiaUSD(0);
-            });
+          setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS))
         } else if (sessionLinkFlag === '2') {
           if (isInAppBrowser()) {
-            getDiaTokenPrice()
-              .then((res) => {
-                if (!res || !res.token) return;
-                setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
-              })
-              .catch((e) => {
-                console.error(e);
-                setDiaUSD(0);
-              });
+            setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS))
           } else if (essentialsConnector.getWalletConnectProvider()) {
-            getDiaTokenPrice()
-              .then((res) => {
-                if (!res || !res.token) return;
-                setDiaUSD(res.token.derivedELA * res.bundle.elaPrice);
-              })
-              .catch((e) => {
-                console.error(e);
-                setDiaUSD(0);
-              });
+            setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS))
           }
         }
       }

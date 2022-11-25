@@ -251,78 +251,90 @@ export function hash(string) {
 }
 
 export async function getCoinUSD() {
-  return new Promise((resolve) => {
-    getERC20TokenPrice(blankAddress)
-      .then((result) => {
-        if (result.bundle.elaPrice) resolve(result.bundle.elaPrice);
-        else resolve(0);
-      })
-      .catch((e) => {
-        console.error(e);
-        resolve(0);
-      });
-  });
+  // return new Promise((resolve) => {
+  //   getERC20TokenPrice(blankAddress)
+  //     .then((result) => {
+  //       if (result.bundle.elaPrice) resolve(result.bundle.elaPrice);
+  //       else resolve(0);
+  //     })
+  //     .catch((e) => {
+  //       console.error(e);
+  //       resolve(0);
+  //     });
+  // });
+  const response = await fetchAPIFrom('api/v1/price');
+  return (await response.json()).data;
 }
 
-export function getDiaTokenPrice() {
-  return getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS);
+export async function getERC20TokenPrice(tokenAddress) {
+  // return new Promise((resolve, reject) => {
+  //   const walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
+  //
+  //   walletConnectWeb3.eth
+  //     .getBlockNumber()
+  //     .then((blocknum) => {
+  //       const graphQLParams = {
+  //         query: `query tokenPriceData { token(id: "${tokenAddress.toLowerCase()}", block: {number: ${blocknum}}) { derivedELA } bundle(id: "1", block: {number: ${blocknum}}) { elaPrice } }`,
+  //         variables: null,
+  //         operationName: 'tokenPriceData'
+  //       };
+  //       axios({
+  //         method: 'POST',
+  //         url: 'https://api.glidefinance.io/subgraphs/name/glide/exchange',
+  //         headers: {
+  //           'content-type': 'application/json',
+  //           accept: 'application/json'
+  //         },
+  //         data: graphQLParams
+  //       }).then((response) => {
+  //         try {
+  //           resolve(response.data.data);
+  //         } catch (error) {
+  //           reject(error);
+  //         }
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       reject(error);
+  //     });
+  // });
+  try {
+    const res2 = await fetchAPIFrom('api/v1/getQuotedTokensRate');
+    const data = await res2.json();
+    for(let i = 0; i < data.data.length; i+=1) {
+      if (data.data[i].token === tokenAddress.toLowerCase()) {
+        return data.data[i].price;
+      }
+    }
+  } catch (e) {
+    return 0;
+  }
 }
 
-export function getERC20TokenPrice(tokenAddress) {
-  return new Promise((resolve, reject) => {
-    const walletConnectWeb3 = new Web3(new Web3.providers.HttpProvider(rpcURL));
-
-    walletConnectWeb3.eth
-      .getBlockNumber()
-      .then((blocknum) => {
-        const graphQLParams = {
-          query: `query tokenPriceData { token(id: "${tokenAddress.toLowerCase()}", block: {number: ${blocknum}}) { derivedELA } bundle(id: "1", block: {number: ${blocknum}}) { elaPrice } }`,
-          variables: null,
-          operationName: 'tokenPriceData'
-        };
-        axios({
-          method: 'POST',
-          url: 'https://api.glidefinance.io/subgraphs/name/glide/exchange',
-          headers: {
-            'content-type': 'application/json',
-            accept: 'application/json'
-          },
-          data: graphQLParams
-        }).then((response) => {
-          try {
-            resolve(response.data.data);
-          } catch (error) {
-            reject(error);
-          }
-        });
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-}
-
-export function getTokenPriceInEthereum() {
-  return new Promise((resolve) => {
-    const url =
-      // 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=elastos,ethereum,fsn&order=market_cap_desc&per_page=6&page=1&sparkline=false';
-      'https://api.coingecko.com/api/v3/simple/price?ids=elastos,ethereum,fsn&vs_currencies=usd';
-    // 'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD';
-    // 'https://api.coinstats.app/public/v1/coins/ethereum?currency=USD';
-    axios
-      .get(url)
-      .then((res) => {
-        const ret = [0, 0, 0];
-        if (res?.data?.ethereum?.usd) ret[0] = res.data.ethereum.usd;
-        if (res?.data?.elastos?.usd) ret[1] = res.data.elastos.usd;
-        if (res?.data?.fsn?.usd) ret[2] = res.data.fsn.usd;
-        resolve(ret);
-      })
-      .catch((e) => {
-        console.error(e);
-        resolve([0, 0, 0]);
-      });
-  });
+export async function getTokenPriceInEthereum() {
+  // return new Promise((resolve) => {
+  //   const url =
+  //     // 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=elastos,ethereum,fsn&order=market_cap_desc&per_page=6&page=1&sparkline=false';
+  //     'https://api.coingecko.com/api/v3/simple/price?ids=elastos,ethereum,fsn&vs_currencies=usd';
+  //   // 'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD';
+  //   // 'https://api.coinstats.app/public/v1/coins/ethereum?currency=USD';
+  //   axios
+  //     .get(url)
+  //     .then((res) => {
+  //       const ret = [0, 0, 0];
+  //       if (res?.data?.ethereum?.usd) ret[0] = res.data.ethereum.usd;
+  //       if (res?.data?.elastos?.usd) ret[1] = res.data.elastos.usd;
+  //       if (res?.data?.fsn?.usd) ret[2] = res.data.fsn.usd;
+  //       resolve(ret);
+  //     })
+  //     .catch((e) => {
+  //       console.error(e);
+  //       resolve([0, 0, 0]);
+  //     });
+  // });
+    const response = await fetchAPIFrom('api/v1/price');
+    const data = await response.json();
+    return [data.ETH, data.ELA, data.FSN];
 }
 
 export function setAllTokenPrice2(setCoinPriceByType) {
@@ -341,44 +353,44 @@ export function setAllTokenPrice2(setCoinPriceByType) {
       if(!tokenRatesMap[tokenRate.chain]) {
         tokenRatesMap[tokenRate.chain] = {}
       }
-      tokenRatesMap[tokenRate.chain][tokenRate.token] = tokenRate.rate;
+      tokenRatesMap[tokenRate.chain][tokenRate.token] = tokenRate.price;
     });
 
     coinTypes.forEach((coin, index) => {
       if(coin.name === 'ELA') {
         return;
       }
-      setCoinPriceByType(index, tokenRatesMap.ela[coin.address.toLowerCase()] * tokenPrice.ELA);
+      setCoinPriceByType(index, tokenRatesMap.ela[coin.address.toLowerCase()]);
     })
   }
   fetchCoinPrice();
 }
 
-export function setAllTokenPrice(setCoinPriceByType) {
-  getCoinUSD().then((res) => {
-    setCoinPriceByType(0, res);
-  });
-  getDiaTokenPrice().then((res) => {
-    if (!res || !res.token) return;
-    setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice);
-  });
-  coinTypes.forEach((token, _i) => {
-    if (_i < 2) return;
-    if (token.name === 'PASAR') {
-      setCoinPriceByType(_i, 0.1);
-      return;
-    }
-    getERC20TokenPrice(token.address).then((res) => {
-      if (!res || !res.token) return;
-      setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice);
-    });
-  });
-  getTokenPriceInEthereum().then((res) => {
-    res.forEach((value, _i) => {
-      setCoinPriceByType(coinTypes.length + _i, value);
-    });
-  });
-}
+// export function setAllTokenPrice(setCoinPriceByType) {
+//   getCoinUSD().then((res) => {
+//     setCoinPriceByType(0, res);
+//   });
+//   getDiaTokenPrice().then((res) => {
+//     if (!res || !res.token) return;
+//     setCoinPriceByType(1, res.token.derivedELA * res.bundle.elaPrice);
+//   });
+//   coinTypes.forEach((token, _i) => {
+//     if (_i < 2) return;
+//     if (token.name === 'PASAR') {
+//       setCoinPriceByType(_i, 0.1);
+//       return;
+//     }
+//     getERC20TokenPrice(token.address).then((res) => {
+//       if (!res || !res.token) return;
+//       setCoinPriceByType(_i, res.token.derivedELA * res.bundle.elaPrice);
+//     });
+//   });
+//   getTokenPriceInEthereum().then((res) => {
+//     res.forEach((value, _i) => {
+//       setCoinPriceByType(coinTypes.length + _i, value);
+//     });
+//   });
+// }
 export function getDiaTokenInfo(strAddress, connectProvider = null) {
   return getERC20TokenBalance(DIA_CONTRACT_ADDRESS, strAddress, connectProvider);
 }

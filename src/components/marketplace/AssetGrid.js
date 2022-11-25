@@ -6,7 +6,7 @@ import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
 import AssetCardSkeleton from './AssetCardSkeleton';
 import {
-  setAllTokenPrice,
+  
   getTotalCountOfCoinTypes,
   getCoinTypeFromToken,
   getImageFromIPFSUrl, setAllTokenPrice2

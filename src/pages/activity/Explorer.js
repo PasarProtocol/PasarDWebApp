@@ -40,7 +40,7 @@ import { queryName, queryKycMe } from '../../components/signin-dlg/HiveAPI';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSignin from '../../hooks/useSignin';
 import {
-  setAllTokenPrice,
+  
   getTotalCountOfCoinTypes,
   getDidInfoFromAddress,
   fetchAPIFrom,

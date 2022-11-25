@@ -352,8 +352,7 @@ export default function Rewards() {
   React.useEffect(() => {
     const fetchData = async () => {
       const resPasarPrice = await getERC20TokenPrice(PASAR_TOKEN_ADDRESS);
-      if (!resPasarPrice || !resPasarPrice.token) setPASARToUSD(0);
-      else setPASARToUSD(resPasarPrice.token.derivedELA * resPasarPrice.bundle.elaPrice);
+      setPASARToUSD(resPasarPrice);
       const accounts = await getWalletAccounts();
       if (accounts.length) {
         const balance = await callTokenContractMethod({
