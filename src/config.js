@@ -66,9 +66,9 @@ const addressForProduction = {
 const addressForTest = {
   MAIN_CONTRACT: {
     ESC: {
-      sticker: "0x3748c352cF8B3e8c6CF6800F315072a2C1fD3F82",
-      market: "0x6a02E1942A6201C47BBd3246fF2b044a2536aB43",
-      register: "0x26CB562A77eB0610D3d1e6Fc5e856B5bcc93Fb8b"
+      sticker: "0x32496388d7c0CDdbF4e12BDc84D39B9E42ee4CB0",
+      market: "0x19088c509C390F996802B90bdc4bFe6dc3F5AAA7",
+      register: "0x2b304ffC302b402785294629674A8C2b64cEF897"
     },
     ETH: {
       sticker: "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961",
