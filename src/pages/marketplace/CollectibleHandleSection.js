@@ -15,7 +15,13 @@ import SettleOrderDlg from '../../components/dialog/SettleOrder';
 import CancelDlg from '../../components/dialog/CancelSale';
 import Countdown from '../../components/Countdown';
 import useSingin from '../../hooks/useSignin';
-import { getTime, getTotalCountOfCoinTypes, setAllTokenPrice, getCoinTypeFromToken } from '../../utils/common';
+import {
+  getTime,
+  getTotalCountOfCoinTypes,
+  setAllTokenPrice,
+  getCoinTypeFromToken,
+  setAllTokenPrice2
+} from '../../utils/common';
 import { auctionOrderType } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -61,7 +67,7 @@ export default function CollectibleHandleSection(props) {
   };
 
   React.useEffect(() => {
-    setAllTokenPrice(setCoinPriceByType);
+    setAllTokenPrice2(setCoinPriceByType);
   }, []);
 
   React.useEffect(() => {

@@ -72,7 +72,7 @@ import {
   fetchAPIFrom,
   getImageFromIPFSUrl,
   getChainIndexFromChain,
-  getCoinTypeFromToken
+  getCoinTypeFromToken, setAllTokenPrice2
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -230,7 +230,7 @@ export default function CollectibleDetail() {
   };
 
   React.useEffect(() => {
-    setAllTokenPrice(setCoinPriceByType);
+    setAllTokenPrice2(setCoinPriceByType);
   }, []);
 
   React.useEffect(() => {

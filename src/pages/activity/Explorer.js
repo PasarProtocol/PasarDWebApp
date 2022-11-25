@@ -39,7 +39,13 @@ import Scrollbar from '../../components/Scrollbar';
 import { queryName, queryKycMe } from '../../components/signin-dlg/HiveAPI';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSignin from '../../hooks/useSignin';
-import { setAllTokenPrice, getTotalCountOfCoinTypes, getDidInfoFromAddress, fetchAPIFrom } from '../../utils/common';
+import {
+  setAllTokenPrice,
+  getTotalCountOfCoinTypes,
+  getDidInfoFromAddress,
+  fetchAPIFrom,
+  setAllTokenPrice2
+} from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -176,7 +182,7 @@ export default function ActivityExplorer() {
 
   React.useEffect(() => {
     handleDispInLaptopSize();
-    setAllTokenPrice(setCoinPriceByType);
+    setAllTokenPrice2(setCoinPriceByType);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

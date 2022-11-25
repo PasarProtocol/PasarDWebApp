@@ -75,7 +75,7 @@ import {
   getContractAddressInCurrentNetwork,
   getTotalCountOfCoinTypes,
   setAllTokenPrice,
-  getStartPosOfCoinTypeByChainType
+  getStartPosOfCoinTypeByChainType, setAllTokenPrice2
 } from '../../utils/common';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
@@ -169,7 +169,7 @@ export default function CreateItem() {
 
   React.useEffect(() => {
     if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') navigate('/marketplace');
-    setAllTokenPrice(setCoinPriceByType);
+    setAllTokenPrice2(setCoinPriceByType);
     if (localStorage.getItem('pa-yes') === '1') return;
     setOpenDisclaimer(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps

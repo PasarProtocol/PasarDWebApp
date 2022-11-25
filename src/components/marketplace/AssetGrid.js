@@ -9,7 +9,7 @@ import {
   setAllTokenPrice,
   getTotalCountOfCoinTypes,
   getCoinTypeFromToken,
-  getImageFromIPFSUrl
+  getImageFromIPFSUrl, setAllTokenPrice2
 } from '../../utils/common';
 // ----------------------------------------------------------------------
 const StackedGrid = ({ children, itemWidth }) => (
@@ -35,7 +35,7 @@ const GridItems = (props) => {
   };
 
   React.useEffect(() => {
-    setAllTokenPrice(setCoinPriceByType);
+    setAllTokenPrice2(setCoinPriceByType);
   }, []);
 
   return (

@@ -16,7 +16,7 @@ import {
   setAllTokenPrice,
   getTotalCountOfCoinTypes,
   fetchAPIFrom,
-  getCoinTypeFromToken
+  getCoinTypeFromToken, setAllTokenPrice2
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -80,7 +80,7 @@ export default function ChartArea({ by, is4Address }) {
   const [chartOptions, setChartOptions] = useState(mergeChartOption([]));
 
   useEffect(() => {
-    setAllTokenPrice(setCoinPriceByType);
+    setAllTokenPrice2(setCoinPriceByType);
   }, []);
 
   useEffect(() => {
