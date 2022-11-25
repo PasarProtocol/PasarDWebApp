@@ -13,7 +13,6 @@ import {
   MAIN_CONTRACT,
   v1marketContract as V1_MARKET_CONTRACT_ADDRESS,
   diaContract as DIA_CONTRACT_ADDRESS,
-  mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS,
   welaContract as WELA_CONTRACT_ADDRESS,
   glideContract as GLIDE_CONTRACT_ADDRESS,
   elkContract as ELK_CONTRACT_ADDRESS,
@@ -263,7 +262,7 @@ export async function getCoinUSD() {
   //     });
   // });
   const response = await fetchAPIFrom('api/v1/price');
-  return (await response.json()).data;
+  return (await response.json()).ELA;
 }
 
 export async function getERC20TokenPrice(tokenAddress) {

@@ -390,14 +390,8 @@ export const uploadAvatar = async (imgBase64) => {
 
 // download avatar
 export const downloadAvatar = async (targetDid) => {
-  try {
-    const data = await downloadImageScripting(targetDid, AVATAR, AVATAR_REMOTE_PATH);
-    return data;
-  } catch (error) {
-    console.log(`download avatar error: ${error}`);
-    return '';
-    // throw error
-  }
+  const data = await downloadImageScripting(targetDid, AVATAR, AVATAR_REMOTE_PATH);
+  return data;
 };
 
 export const downloadImageScripting = async (targetDid, scriptName, remotePath) => {

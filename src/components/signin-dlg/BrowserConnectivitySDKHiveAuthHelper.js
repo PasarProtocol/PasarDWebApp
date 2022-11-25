@@ -17,7 +17,7 @@ import { ApplicationDID } from '../../config';
  * This authentication flow is for the connectivity SDK.
  */
 export class BrowserConnectivitySDKHiveAuthHelper {
-  #didAccess;
+  didAccess;
 
   constructor(didResolverUrl) {
     try {

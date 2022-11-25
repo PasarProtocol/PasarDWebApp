@@ -95,7 +95,7 @@ export default function BadgeProfile(props) {
     let isMounted = true;
     if (walletAddress && type === 2) {
       getDidInfoFromAddress(walletAddress).then((info) => {
-        if (isMounted) {
+        if (isMounted && info.did) {
           setDidInfo({ name: info.name || '', description: info.description || '' });
           if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
             fetchProfileData(info.did, { name: info.name || '', bio: info.description || '' });
