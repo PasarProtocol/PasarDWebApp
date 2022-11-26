@@ -5,7 +5,7 @@ import { WalletLinkConnector } from "@web3-react/walletlink-connector";
 const RPC_URL_1 =
   "https://mainnet.infura.io/v3/e2d4593179fa4120a217d136a0518efc";
 const RPC_URL_4 =
-  "https://ropsten.infura.io/v3/e2d4593179fa4120a217d136a0518efc";
+  "https://goerli.infura.io/v3/02505ed478e64ee481a74236dc9e91f1";
 const RPC_URL_20 =
   "https://api.elastos.io/eth";
 const RPC_URL_21 =

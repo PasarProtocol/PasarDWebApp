@@ -71,9 +71,9 @@ const addressForTest = {
       register: "0x2b304ffC302b402785294629674A8C2b64cEF897"
     },
     ETH: {
-      sticker: "0xed1978c53731997f4DAfBA47C9b07957Ef6F3961",
-      market: "0x61EAE56bc110249648fB9eAe7eA4cfa185e0A498",
-      register: "0xC1d40312232ec4b308E69713A98c3A2b21c8F5E0"
+      sticker: "0xAB5bB5FcEFc9703814AF68077387BC09Be12190b",
+      market: "0x7d797f3564073FFF8E75D9D5Be57EBC01512b554",
+      register: "0x2C8615B32cf6535Eb38DD076aD822E7c2362a4c7"
     },
     FSN: {
       sticker: blankAddress,
