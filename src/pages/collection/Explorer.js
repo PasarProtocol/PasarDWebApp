@@ -66,7 +66,7 @@ export default function Explorer() {
       setLoadingCollections(true);
 
       const paramChain = chainType === 0 ? 'all' : chainTypes[chainType - 1].token.toLowerCase();
-      const paramCategory = chainType === 0 ? 'all' : categories[category - 1].toLowerCase();
+      const paramCategory = category === 0 ? 'all' : categories[category - 1].toLowerCase();
       try {
         const resCnt = await fetchAPIFrom(
           `api/v1/listCollections?pageNum=1&pageSize=1&chain=${paramChain}&category=${paramCategory}&sort=${orderType}`,
