@@ -180,7 +180,7 @@ export default function MarketExplorer() {
         chain: chains[chainType].token.toLowerCase(),
         status: selectedBtns.filter((el) => el >= 0 && el <= 4).sort(),
         sort: order,
-        collection: selectedCollections.map((el) => el.token),
+        collection: selectedCollections.map((el) => `${el.chain}-${el.token}`),
         token: selectedTokens,
         type,
         adult,
