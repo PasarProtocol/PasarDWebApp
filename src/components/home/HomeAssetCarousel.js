@@ -132,7 +132,7 @@ export default function HomeAssetCarousel() {
             }
           }
           return acc;
-        }, {});
+        }, []);
         setCollections(cols);
       } catch (e) {
         console.error(e);
