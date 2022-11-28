@@ -17,14 +17,14 @@ CancelSale.propTypes = {
   setOpen: PropTypes.func,
   name: PropTypes.string,
   orderId: PropTypes.any,
-  OrderId: PropTypes.string,
+  order: PropTypes.any,
   updateCount: PropTypes.number,
   handleUpdate: PropTypes.func,
   v1State: PropTypes.bool
 };
 
 export default function CancelSale(props) {
-  const { isOpen, setOpen, name, orderId, OrderId, updateCount, handleUpdate, v1State = false } = props;
+  const { isOpen, setOpen, name, orderId, updateCount, handleUpdate, v1State = false, order } = props;
   const [onProgress, setOnProgress] = React.useState(false);
   const { updateCount: updateCount2, setUpdateCount } = useAuctionDlg();
   const { enqueueSnackbar } = useSnackbar();
@@ -88,8 +88,7 @@ export default function CancelSale(props) {
 
   const cancelSale = async () => {
     setOnProgress(true);
-    const _orderId = orderId !== undefined ? orderId : OrderId;
-    console.log('orderId:', _orderId);
+    const _orderId = orderId !== undefined ? orderId : order.orderId;
     await callCancelOrder(_orderId);
   };
   return (

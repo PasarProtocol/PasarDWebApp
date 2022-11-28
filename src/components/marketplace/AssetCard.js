@@ -127,7 +127,7 @@ export default function AssetCard(props) {
   const [settleOpen, setSettleOrderOpen] = React.useState(false);
   const [auctionEnded, setAuctionEnded] = React.useState(false);
   const [continueAction, setContinueAction] = React.useState('');
-  const [state, setState] = React.useState({ isFirstSale: false, isOnSale: false });
+  const [state, setState] = React.useState({ isFirstSale: false, isOnSale: orderState === 1 });
 
   const { diaBalance, setOpenDownloadEssentialDlg, pasarLinkChain } = useSingin();
   const { enqueueSnackbar } = useSnackbar();
@@ -142,8 +142,7 @@ export default function AssetCard(props) {
     } else if (orderState === 2) status = 4;
   }
   const isListedOwnedByMe =
-    state.isOnSale &&
-    ((myaddress === royaltyOwner && state.isFirstSale) || (myaddress === tokenOwner && !state.isFirstSale));
+    state.isOnSale && myaddress === tokenOwner;
   const isUnlistedOwnedByMe = !state.isOnSale && myaddress === tokenOwner;
   const isListedByOthers = state.isOnSale && myaddress !== royaltyOwner && myaddress !== tokenOwner;
   const isUnlistedByOthers = !state.isOnSale && myaddress !== royaltyOwner && myaddress !== tokenOwner;
@@ -167,21 +166,21 @@ export default function AssetCard(props) {
     if (contract && chain) fetchData();
   }, [chain, contract]);
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetchAPIFrom('api/v1/checkFirstSale', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify([uniqueKey])
-      });
-      const json = await res.json();
-      if ((json?.data || []).length)
-        setState({ isFirstSale: json.data[0]?.isFirstSale || false, isOnSale: json.data[0]?.isOnSale || false });
-    };
-    if (uniqueKey) fetchData();
-  }, [uniqueKey]);
+  // React.useEffect(() => {
+  //   const fetchData = async () => {
+  //     const res = await fetchAPIFrom('api/v1/checkFirstSale', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify([uniqueKey])
+  //     });
+  //     const json = await res.json();
+  //     if ((json?.data || []).length)
+  //       setState({ isFirstSale: json.data[0]?.isFirstSale || false, isOnSale: json.data[0]?.isOnSale || false });
+  //   };
+  //   if (uniqueKey) fetchData();
+  // }, [uniqueKey]);
 
   React.useEffect(() => {
     if (continueAction && !disclaimerOpen) {

@@ -6,7 +6,7 @@ import { Box } from '@mui/material';
 import AssetCard from './AssetCard';
 import AssetCardSkeleton from './AssetCardSkeleton';
 import {
-  
+
   getTotalCountOfCoinTypes,
   getCoinTypeFromToken,
   getImageFromIPFSUrl, setAllTokenPrice2
@@ -57,7 +57,7 @@ const GridItems = (props) => {
             orderState={(isOnMarket ? item?.orderState : item?.order?.orderState) ?? 0}
             amount={(isOnMarket ? item?.amount : item?.order?.amount) ?? 0}
             price={round(((isOnMarket ? item?.price : item?.order?.price) ?? 0) / 1e18, 3)}
-            baseToken={(isOnMarket ? item?.baseToken : item?.order?.baseToken) || ''}
+            baseToken={(item.baseToken ? item.baseToken : item.contract) || ''}
             endTime={(isOnMarket ? item?.endTime : item?.order?.endTime) ?? 0}
             tokenOwner={(isOnMarket ? item?.token?.tokenOwner : item?.tokenOwner) || ''}
             royaltyOwner={(isOnMarket ? item?.token?.royaltyOwner : item?.royaltyOwner) || ''}
