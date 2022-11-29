@@ -44,9 +44,11 @@ export default function Purchase(props) {
   const { isOpen, setOpen, info, coinType = {} } = props;
   const { v1State = false } = info;
 
+  console.log('Purchase info', info);
+
   const coinBalance = balanceArray[coinType.index];
   const coinName = coinType.name;
-  let priceInfo = info.Price;
+  let priceInfo = info.order.price;
   if (info.orderType === auctionOrderType && info.buyoutPrice) priceInfo = info.buyoutPrice;
   const handleClose = () => {
     setOpen(false);
@@ -233,7 +235,7 @@ export default function Purchase(props) {
     } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
       const buyerDidUri = await sendIpfsDidJson();
       console.log('didUri:', buyerDidUri);
-      callBuyOrder(info.OrderId, buyerDidUri, buyPrice);
+      callBuyOrder(info.order.orderId, buyerDidUri, buyPrice);
     }
   };
 
@@ -273,7 +275,7 @@ export default function Purchase(props) {
 
   const price = priceInfo / 1e18;
   const platformFee = math.round((price * 2) / 100, 4);
-  const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royalties) / 10 ** 6, 4);
+  const royalties = math.round((price * info.royaltyFee) / 10 ** 6, 4);
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <DialogTitle>
@@ -302,7 +304,7 @@ export default function Purchase(props) {
           <br />
           from{' '}
           <Typography variant="h5" sx={{ display: 'inline', color: 'text.primary' }}>
-            {reduceHexAddress(info.holder)}
+            {reduceHexAddress(info.tokenOwner)}
           </Typography>
           <br />
           for{' '}
