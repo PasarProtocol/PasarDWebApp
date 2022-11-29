@@ -341,6 +341,7 @@ export function setAllTokenPrice2(setCoinPriceByType) {
     const res = await fetchAPIFrom('api/v1/price');
     const tokenPrice = await res.json();
     setCoinPriceByType(0, tokenPrice.ELA);
+    setCoinPriceByType(10, tokenPrice.ELA);
     setCoinPriceByType(coinTypes.length, tokenPrice.ETH);
     setCoinPriceByType(coinTypes.length + coinTypesForEthereum.length, tokenPrice.FSN);
 
@@ -361,6 +362,7 @@ export function setAllTokenPrice2(setCoinPriceByType) {
       }
       setCoinPriceByType(index, tokenRatesMap.ela[coin.address.toLowerCase()]);
     })
+    setCoinPriceByType(2, 0.1);
   }
   fetchCoinPrice();
 }

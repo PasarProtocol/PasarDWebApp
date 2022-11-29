@@ -1008,7 +1008,7 @@ export default function CollectibleDetail() {
                             </Box>
                           </Tooltip>
                         )}
-                        {collectiblesInCollection.length > 2 && (
+                        {collectiblesInCollection.length > 0 ? (
                           <Stack direction="column" spacing={1} sx={{ width: '100%' }}>
                             <Typography variant="subtitle2">More from this collection</Typography>
                             <Box
@@ -1035,7 +1035,7 @@ export default function CollectibleDetail() {
                               })}
                             </Box>
                           </Stack>
-                        )}
+                        ) : (<Typography variant="subtitle2">No other collectibles in this collection</Typography>)}
                       </Stack>
                     </Stack>
                   </Stack>
