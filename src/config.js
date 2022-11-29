@@ -122,7 +122,7 @@ export const DidResolverUrl = 'https://api.elastos.io/eid'
 
 export const { MAIN_CONTRACT, feedsContract, v1marketContract, diaContract, welaContract, glideContract,
   elkContract, ethUsdcContract, bunnyContract, bnbBusdContract, elaOnEthContract, pasarVestingContract, pasarStakingContract, pasarMiningContract, pasarERC20Contract, blockchain } = process.env.REACT_APP_ENV === "production" ? addressForProduction : addressForTest
-export const mainDiaContract = addressForProduction.diaContract
+export const mainDiaContract = process.env.REACT_APP_ENV === "production" ? addressForProduction.diaContract: addressForTest.diaContract;
 
 export const ipfsURL = process.env.REACT_APP_ENV === "production" ? process.env.REACT_APP_IPFS_URL_PRODUCTION : process.env.REACT_APP_IPFS_URL_TEST
 export const rpcURL = process.env.REACT_APP_ENV === "production" ? rpcUrlForMain : rpcUrlForTest
