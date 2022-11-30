@@ -42,10 +42,8 @@ export default function Purchase(props) {
   const { pasarLinkAddress, pasarLinkChain } = useSingin();
   const { library, chainId, account } = context;
   const { isOpen, setOpen, info, coinType = {} } = props;
-  const { v1State = false } = info;
-
-  console.log('Purchase info', info);
-
+  const orderChain = info.order?.chain ? info.order.chain : info.chain;
+  const v1State = orderChain === 'v1';
   const coinBalance = balanceArray[coinType.index];
   const coinName = coinType.name;
   let priceInfo = info.order.price;

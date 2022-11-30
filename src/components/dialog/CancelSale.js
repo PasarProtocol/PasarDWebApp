@@ -24,11 +24,12 @@ CancelSale.propTypes = {
 };
 
 export default function CancelSale(props) {
-  const { isOpen, setOpen, name, orderId, updateCount, handleUpdate, v1State = false, order } = props;
+  const { isOpen, setOpen, name, orderId, updateCount, handleUpdate, order } = props;
   const [onProgress, setOnProgress] = React.useState(false);
   const { updateCount: updateCount2, setUpdateCount } = useAuctionDlg();
   const { enqueueSnackbar } = useSnackbar();
   const { pasarLinkChain } = useSignin();
+  const v1State = order?.chain === 'v1';
 
   const handleClose = () => {
     setOpen(false);
