@@ -307,8 +307,8 @@ const CollectionCardPaper = (props) => {
     dia = 0
   } = info;
   const realData = [tradeVolume, lowestPrice / 1e18, owners];
-  const avatar = getImageFromIPFSUrl(data?.avatar || '');
-  const background = getImageFromIPFSUrl(data?.background || '');
+  const avatar = getImageFromIPFSUrl(data?.avatar || info.avatar);
+  const background = getImageFromIPFSUrl(data?.background || info.background);
   const description = data?.description || '';
 
   const [didName, setDidName] = React.useState(creator?.name || '');
