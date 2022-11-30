@@ -46,7 +46,7 @@ export default function Purchase(props) {
   const v1State = orderChain === 'v1';
   const coinBalance = balanceArray[coinType.index];
   const coinName = coinType.name;
-  let priceInfo = info.order.price;
+  let priceInfo = info.order?.price ? info.order.price : info.price;
   if (info.orderType === auctionOrderType && info.buyoutPrice) priceInfo = info.buyoutPrice;
   const handleClose = () => {
     setOpen(false);
