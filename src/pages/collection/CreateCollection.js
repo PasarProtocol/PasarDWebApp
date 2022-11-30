@@ -139,9 +139,9 @@ export default function CreateCollection() {
         return tempState;
       });
       try {
-        const res = await fetchAPIFrom(`api/v1/getCollectionsByWalletAddr?chain=all&walletAddr=${address}`, {});
+        const res = await fetchAPIFrom(`api/v1/getCollectionsByWalletAddr?pageNum=1&pageSize=1&chain=all&walletAddr=${address}`, {});
         const json = await res.json();
-        setCollectionCount(json?.data?.length ?? 0);
+        setCollectionCount(json?.data.total ?? 0);
       } catch (e) {
         console.error(e);
       }

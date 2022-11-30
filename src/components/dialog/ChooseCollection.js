@@ -47,11 +47,11 @@ export default function ChooseCollection(props) {
         if (essentialAddress) {
           try {
             const res = await fetchAPIFrom(
-              `api/v1/getCollectionsByWalletAddr?chain=${chain}&walletAddr=${essentialAddress}`,
+              `api/v1/getCollectionsByWalletAddr?pageNum=1&pageSize=30&chain=${chain}&walletAddr=${essentialAddress}`,
               { signal }
             );
             const json = await res.json();
-            const cols = json?.data || [];
+            const cols = json?.data.data || [];
             const resCols = cols.map((item, index) => {
               const rlt = { ...item };
               return { ...rlt, index, avatar: getImageFromIPFSUrl(rlt?.data?.avatar) };
