@@ -111,8 +111,8 @@ export default function SignInDialog() {
             ? await window.elastos.getWeb3Provider().address
             : essentialsConnector.getWalletConnectProvider().wc.accounts[0]
         );
-        const mydid = sessionStorage.getItem('PASAR_DID');
-        getAvatarUrl(mydid);
+        // const mydid = sessionStorage.getItem('PASAR_DID');
+        // getAvatarUrl(mydid);
         setActivatingConnector(essentialsConnector);
       } else if (sessionLinkFlag === '3') {
         setActivatingConnector(walletconnect);
@@ -475,21 +475,21 @@ export default function SignInDialog() {
 
         // HIVE START
         // TODO: IMPROVE HIVE LOGIN
-        prepareConnectToHive()
-          .then((res) => {
-            creatAndRegister(true);
-            console.log(res);
-          })
-          .catch((error) => {
-            console.log('Register scripting error: ', error);
-          });
+        // prepareConnectToHive()
+        //   .then((res) => {
+        //     creatAndRegister(true);
+        //     console.log(res);
+        //   })
+        //   .catch((error) => {
+        //     console.log('Register scripting error: ', error);
+        //   });
         // HIVE END
         let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0];
         if (isInAppBrowser()) essentialAddress = await window.elastos.getWeb3Provider().address;
         setWalletAddress(essentialAddress);
         setActivatingConnector(essentialsConnector);
         setSigninEssentialSuccess(true);
-        getAvatarUrl(did);
+        // getAvatarUrl(did);
 
         if (afterSigninPath) {
           setOpenSigninEssentialDlg(false);
