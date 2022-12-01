@@ -1115,14 +1115,14 @@ export const checkValidChain = (chainId) => {
   if (
     chainId &&
     ((process.env.REACT_APP_ENV === 'production' && chainId !== 20 && chainId !== 1 && chainId !== 32659) ||
-      (process.env.REACT_APP_ENV !== 'production' && chainId !== 21 && chainId !== 3 && chainId !== 46688))
+      (process.env.REACT_APP_ENV !== 'production' && chainId !== 21 && chainId !== 5 && chainId !== 46688))
   )
     return false;
   return true;
 };
 export const getChainTypeFromId = (chainId) => {
   if (chainId === 20 || chainId === 21) return 'ESC';
-  if (chainId === 1 || chainId === 3) return 'ETH';
+  if (chainId === 1 || chainId === 5) return 'ETH';
   if (chainId === 32659 || chainId === 46688) return 'FSN';
   return '';
 };
