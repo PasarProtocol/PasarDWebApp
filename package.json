@@ -39,7 +39,7 @@
     "@auth0/auth0-spa-js": "^1.18.0",
     "@elastosfoundation/did-js-sdk": "^2.2.9",
     "@elastosfoundation/elastos-connectivity-sdk-js": "^1.0.23",
-    "@elastosfoundation/essentials-connector-client-browser": "1.0.41",
+    "@elastosfoundation/essentials-connector-client-browser": "1.0.42",
     "@elastosfoundation/hive-js-sdk": "^2.9.5",
     "@emotion/cache": "^11.4.0",
     "@emotion/react": "^11.4.1",

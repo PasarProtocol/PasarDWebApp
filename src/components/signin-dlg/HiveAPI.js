@@ -451,8 +451,8 @@ export const creatAndRegister = async (isForce) => {
     try {
       if (localVersion === '') {
         const result = await queryPasarScriptingFromDB();
-        lasterVersion = result[0].laster_version;
-        preVersion = result[0].pre_version;
+        lasterVersion = result[0]?.laster_version;
+        preVersion = result[0]?.pre_version;
       }
     } catch (error) {
       if (error.code === 404) {

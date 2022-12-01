@@ -593,6 +593,7 @@ export default function SignInDialog() {
       setActivatingConnector(null);
       setWalletAddress(null);
       navigate('/marketplace');
+      window.location.reload();
     }
   };
 

@@ -110,7 +110,7 @@ const NetworkExplorerServer = {
   },
   TestNet: {
     ESC: "https://esc-testnet.elastos.io",
-    ETH: "https://ropsten.etherscan.io",
+    ETH: "https://goerli.etherscan.io",
     FSN: "https://blocks.fusionnetwork.io/#!/transaction"
   }
 }
