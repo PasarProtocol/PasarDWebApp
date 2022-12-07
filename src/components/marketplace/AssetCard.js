@@ -166,21 +166,21 @@ export default function AssetCard(props) {
     if (contract && chain) fetchData();
   }, [chain, contract]);
 
-  // React.useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await fetchAPIFrom('api/v1/checkFirstSale', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       },
-  //       body: JSON.stringify([uniqueKey])
-  //     });
-  //     const json = await res.json();
-  //     if ((json?.data || []).length)
-  //       setState({ isFirstSale: json.data[0]?.isFirstSale || false, isOnSale: json.data[0]?.isOnSale || false });
-  //   };
-  //   if (uniqueKey) fetchData();
-  // }, [uniqueKey]);
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetchAPIFrom('api/v1/checkFirstSale', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify([uniqueKey])
+      });
+      const json = await res.json();
+      if ((json?.data || []).length)
+        setState({ isFirstSale: json.data[0]?.isFirstSale || false, isOnSale: json.data[0]?.isOnSale || false });
+    };
+    if (uniqueKey) fetchData();
+  }, [uniqueKey]);
 
   React.useEffect(() => {
     if (continueAction && !disclaimerOpen) {

@@ -284,22 +284,26 @@ export default function SignInDialog() {
             });
           } else if (essentialsConnector.getWalletConnectProvider()) {
             const essentialProvider = essentialsConnector.getWalletConnectProvider();
-            getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-              .then((dia) => {
-                setDiaBalance(dia);
-              })
-              .catch((e) => {
-                console.error(e);
-                setDiaBalance(0);
-              });
-            getElaOnEthTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-              .then((ela) => {
-                setElaOnEthBalance(ela);
-              })
-              .catch((e) => {
-                console.error(e);
-                setElaOnEthBalance(0);
-              });
+            if(essentialProvider.chainId === 20 || essentialProvider.chainId === 21) {
+              getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
+                  .then((dia) => {
+                    setDiaBalance(dia);
+                  })
+                  .catch((e) => {
+                    console.error(e);
+                    setDiaBalance(0);
+                  });
+            }
+            if(essentialProvider.chainId === 1 || essentialProvider.chainId === 5) {
+              getElaOnEthTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
+                  .then((ela) => {
+                    setElaOnEthBalance(ela);
+                  })
+                  .catch((e) => {
+                    console.error(e);
+                    setElaOnEthBalance(0);
+                  });
+            }
             getBalance(essentialProvider).then((res) => {
               setBalance(math.round(res / 1e18, 4));
             });
@@ -413,12 +417,12 @@ export default function SignInDialog() {
       console.log('loged in');
       if (currentConnector === injected) {
         sessionLinkFlag = '1';
-        sessionStorage.setItem('PASAR_LINK_ADDRESS', 1);
-        setPasarLinkAddress(1);
+        sessionStorage.setItem('PASAR_LINK_ADDRESS', sessionLinkFlag);
+        setPasarLinkAddress(sessionLinkFlag);
       } else if (currentConnector === walletconnect) {
         sessionLinkFlag = '3';
-        sessionStorage.setItem('PASAR_LINK_ADDRESS', 3);
-        setPasarLinkAddress(3);
+        sessionStorage.setItem('PASAR_LINK_ADDRESS', sessionLinkFlag);
+        setPasarLinkAddress(sessionLinkFlag);
       }
       setActivatingConnector(currentConnector);
       setWalletAddress(await currentConnector.getAccount());
@@ -469,8 +473,8 @@ export default function SignInDialog() {
         sessionStorage.setItem('PASAR_TOKEN', token);
         sessionStorage.setItem('PASAR_DID', did);
         sessionLinkFlag = '2';
-        sessionStorage.setItem('PASAR_LINK_ADDRESS', 2);
-        setPasarLinkAddress(2);
+        sessionStorage.setItem('PASAR_LINK_ADDRESS', sessionLinkFlag);
+        setPasarLinkAddress(sessionLinkFlag);
         setOpenSigninDlg(false);
 
         // HIVE START
@@ -524,6 +528,7 @@ export default function SignInDialog() {
     } catch (error) {
       console.log('Error while disconnecting the wallet', error);
     }
+    window.location.reload();
   };
   // ----------------------------------- //
 
