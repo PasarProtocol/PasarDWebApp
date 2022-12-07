@@ -130,6 +130,21 @@ export const getImageFromIPFSUrl = (url) => {
   return '/static/broken-image.svg';
 };
 
+export const getHiveHubImageFromIPFSUrl = (url) => {
+  if (url) {
+    const segments = url.split(':').filter((item) => item);
+    if (segments.length === 3) {
+      if(segments[2] === "undefined") {
+        return `${PasarIpfs}/ipfs/QmPEWCF6kNL1Bs1gSWJAqqitbwWMEWvLQGaezJgENYkS48`;
+      }
+      if((segments[0] === 'pasar' || segments[0] === 'feeds')) {
+        return `${PasarIpfs}/ipfs/${segments[2]}`;
+      }
+    }
+  }
+  return '/static/broken-image.svg';
+};
+
 export const getCollectionTypeFromImageUrl = (metaObj) => {
   const { asset, tokenJsonVersion, data } = metaObj;
   let cid = asset;

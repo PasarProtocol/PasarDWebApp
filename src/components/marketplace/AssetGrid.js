@@ -9,7 +9,7 @@ import {
 
   getTotalCountOfCoinTypes,
   getCoinTypeFromToken,
-  getImageFromIPFSUrl, setAllTokenPrice2
+  getImageFromIPFSUrl, setAllTokenPrice2, getHiveHubImageFromIPFSUrl
 } from '../../utils/common';
 // ----------------------------------------------------------------------
 const StackedGrid = ({ children, itemWidth }) => (
@@ -67,7 +67,7 @@ const GridItems = (props) => {
             lastBidder={(isOnMarket ? item?.lastBidder : item?.order?.lastBidder) || ''}
             reservePrice={round(((isOnMarket ? item?.reservePrice : item?.order?.reservePrice) ?? 0) / 1e18, 3)}
             buyoutPrice={round(((isOnMarket ? item?.buyoutPrice : item?.order?.buyoutPrice) ?? 0) / 1e18, 3)}
-            thumbnail={getImageFromIPFSUrl(
+            thumbnail={ (item.type === 'FeedsChannel' || item.type === 'HiveNode') ? getHiveHubImageFromIPFSUrl(item.data.avatar): getImageFromIPFSUrl(
               isOnMarket ? item?.token?.data?.thumbnail || item?.token?.image : item?.data?.thumbnail || item?.image
             )}
             type={type}

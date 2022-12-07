@@ -72,7 +72,7 @@ import {
   fetchAPIFrom,
   getImageFromIPFSUrl,
   getChainIndexFromChain,
-  getCoinTypeFromToken, setAllTokenPrice2
+  getCoinTypeFromToken, setAllTokenPrice2, getHiveHubImageFromIPFSUrl
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -298,7 +298,9 @@ export default function CollectibleDetail() {
             collectibleDetail = { ...collectibleDetail, bidList: jsonBid?.data || [] };
           }
           setCollectible(collectibleDetail);
-          const imgUrl = getImageFromIPFSUrl(collectibleDetail?.data?.image || collectibleDetail?.image);
+          const imgUrl = (collectibleDetail.type === 'FeedsChannel' || collectibleDetail.type === 'HiveNode')
+              ? getHiveHubImageFromIPFSUrl(collectibleDetail.data.avatar)
+              : getImageFromIPFSUrl(collectibleDetail?.data?.image || collectibleDetail?.image);
           setImageUrl(imgUrl);
           try {
             const resImg = await fetch(imgUrl);
@@ -1022,7 +1024,7 @@ export default function CollectibleDetail() {
                                   <AssetCard
                                     key={_i}
                                     {...item}
-                                    thumbnail={getImageFromIPFSUrl(item?.data?.image || item?.image)}
+                                    thumbnail={ (item.type === 'FeedsChannel' || item.type === 'HiveNode') ? getHiveHubImageFromIPFSUrl(item.data.avatar): getImageFromIPFSUrl(item?.data?.image || item?.image)}
                                     type={0}
                                     isLink={Boolean(true)}
                                     coinUSD={coinPrice[coinType.index]}
