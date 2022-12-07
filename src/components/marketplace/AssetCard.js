@@ -529,7 +529,7 @@ export default function AssetCard(props) {
                   sx={{ display: 'inline-table', alignItems: 'center', fontWeight: 'normal', fontSize: '0.925em' }}
                   noWrap
                 >
-                  {lastBid ?? price} {coinType.name}
+                  {lastBid / 1e18 ?? price} {coinType.name}
                 </Typography>
               </Tooltip>
             ) : (
