@@ -63,7 +63,7 @@ export default function PlaceBid(props) {
   const { isOpen, setOpen, info, coinType = {} } = props;
   const coinBalance = balanceArray[coinType.index];
   const coinName = coinType.name;
-  const targetPrice = isBuynow ? math.round(info.buyoutPrice / 1e18, 3) : bidPrice;
+  const targetPrice = isBuynow ? math.round(info.order.buyoutPrice / 1e18, 3) : bidPrice;
   const actionText = isBuynow ? 'Buy NFT' : 'Bid NFT';
 
   const handleClose = () => {
@@ -77,7 +77,7 @@ export default function PlaceBid(props) {
     if (priceValue < 0) return;
     priceValue = removeLeadingZero(priceValue);
     if (!isValidLimitPrice(priceValue)) return;
-    if (!!(info.buyoutPrice * 1) && priceValue >= info.buyoutPrice / 1e18) setBuynow(true);
+    if (!!(info.order.buyoutPrice * 1) && priceValue >= info.order.buyoutPrice / 1e18) setBuynow(true);
     else setBuynow(false);
     setBidPrice(priceValue);
   };
@@ -244,9 +244,9 @@ export default function PlaceBid(props) {
   const bidNft = async () => {
     if (!bidPrice) {
       enqueueSnackbar('Bid amount is required', { variant: 'warning' });
-    } else if (bidPrice <= info.currentBid / 1e18 && info.currentBid) {
+    } else if (bidPrice <= info.order.lastBid / 1e18 && info.order.lastBid) {
       enqueueSnackbar('Your Bid amount must be higher than Current Bid', { variant: 'warning' });
-    } else if (bidPrice < info.Price / 1e18) {
+    } else if (bidPrice < info.order.price / 1e18) {
       enqueueSnackbar('Your Bid amount cannot be lower than Starting Price', { variant: 'warning' });
     } else {
       setOnProgress(true);
@@ -255,11 +255,11 @@ export default function PlaceBid(props) {
         sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
         sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'
       ) {
-        callEthBidOrder(info.OrderId, bidPriceStr);
+        callEthBidOrder(info.order.orderId, bidPriceStr);
       } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
         const biderDidUri = await sendIpfsDidJson();
         console.log('didUri:', biderDidUri);
-        callBidOrder(info.OrderId, biderDidUri, bidPriceStr);
+        callBidOrder(info.order.orderId, biderDidUri, bidPriceStr);
       }
     }
   };
@@ -297,9 +297,9 @@ export default function PlaceBid(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, chainId, pasarLinkAddress, pasarLinkChain]);
 
-  const price = Math.max(info.Price / 1e18, targetPrice);
+  const price = Math.max(info.order.price / 1e18, targetPrice);
   const platformFee = math.round((price * 2) / 100, 4);
-  const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royalties) / 10 ** 6, 4);
+  const royalties = info.isFirstSale === 'Primary Sale' ? 0 : math.round((price * info.royaltyFee) / 10 ** 6, 4);
   const TypographyStyle = { display: 'inline', lineHeight: 1.1 };
   return (
     <Dialog open={isOpen} onClose={handleClose}>
@@ -333,7 +333,7 @@ export default function PlaceBid(props) {
           <br />
           from{' '}
           <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>
-            {reduceHexAddress(info.holder)}
+            {reduceHexAddress(info.tokenOwner)}
           </Typography>
           {isBuynow && (
             <>
@@ -346,10 +346,10 @@ export default function PlaceBid(props) {
           )}
         </Typography>
         <Typography variant="h6" sx={{ ...TypographyStyle, color: 'origin.main', fontWeight: 'normal' }}>
-          {info.currentBid ? 'Current Bid:' : 'Starting Price:'}
+          {info.order.lastBid ? 'Current Bid:' : 'Starting Price:'}
         </Typography>{' '}
         <Typography variant="h6" sx={{ ...TypographyStyle, color: 'text.primary' }}>
-          {math.round((info.currentBid || info.Price) / 1e18, 3)} {coinName}
+          {math.round((info.order.lastBid || info.order.price) / 1e18, 3)} {coinName}
         </Typography>
         <Grid container sx={{ pt: 2, pb: 3 }}>
           <Grid item xs={12}>
@@ -375,7 +375,7 @@ export default function PlaceBid(props) {
             <Divider />
             {isBuynow && (
               <Typography variant="body2" display="block" color="red" gutterBottom>
-                Your bid is equal or higher than the Buy Now price - {math.round(info.buyoutPrice / 1e18, 3)} {coinName}
+                Your bid is equal or higher than the Buy Now price - {math.round(info.order.buyoutPrice / 1e18, 3)} {coinName}
               </Typography>
             )}
           </Grid>
@@ -446,11 +446,11 @@ export default function PlaceBid(props) {
             </Stack>
           </Grid>
         </Grid>
-        {Math.max(targetPrice, info.Price / 1e18) <= coinBalance ? (
+        {Math.max(targetPrice, info.order.price / 1e18) <= coinBalance ? (
           <>
             <Box component="div" sx={{ width: 'fit-content', m: 'auto', py: 2 }}>
               <TransLoadingButton loading={onProgress} onClick={bidNft}>
-                {isBuynow ? `Buy Now for ${math.round(info.buyoutPrice / 1e18, 3)} ${coinName}` : 'Bid'}
+                {isBuynow ? `Buy Now for ${math.round(info.order.buyoutPrice / 1e18, 3)} ${coinName}` : 'Bid'}
               </TransLoadingButton>
             </Box>
             <Typography variant="body2" display="block" color="red" gutterBottom align="center">
