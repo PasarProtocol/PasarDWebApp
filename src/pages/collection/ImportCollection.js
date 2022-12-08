@@ -403,6 +403,7 @@ export default function ImportCollection() {
                   setReadySignForRegister(false);
                   console.log('receipt', receipt);
                   resolve(true);
+                  setTimeout(() => {navigate('/profile/myitem/5');}, 2000)
                 })
                 .on('error', (error) => {
                   console.error('error', error);

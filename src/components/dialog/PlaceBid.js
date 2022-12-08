@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
+import {useNavigate} from "react-router-dom";
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { ERC20_CONTRACT_ABI } from '../../abi/erc20ABI';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
@@ -65,6 +66,7 @@ export default function PlaceBid(props) {
   const coinName = coinType.name;
   const targetPrice = isBuynow ? math.round(info.order.buyoutPrice / 1e18, 3) : bidPrice;
   const actionText = isBuynow ? 'Buy NFT' : 'Bid NFT';
+  const navigate = useNavigate()
 
   const handleClose = () => {
     setOpen(false);
@@ -140,6 +142,7 @@ export default function PlaceBid(props) {
                         setTimeout(() => {
                           setUpdateCount(updateCount + 1);
                         }, 1000);
+                        setTimeout(() => {navigate('/profile/myitem/2');}, 2000)
                       })
                       .catch((error) => {
                         console.log(error);

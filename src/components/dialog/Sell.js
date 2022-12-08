@@ -18,6 +18,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
 import { Icon } from '@iconify/react';
+import {useNavigate} from "react-router-dom";
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
@@ -57,6 +58,7 @@ export default function Sell(props) {
   const [onProgress, setOnProgress] = React.useState(false);
   const [isOnValidation, setOnValidation] = React.useState(false);
   const { diaBalance, pasarLinkChain } = useSingin();
+  const navigate = useNavigate();
 
   const handleClose = () => {
     setOpen(false);
@@ -166,6 +168,7 @@ export default function Sell(props) {
           }, 3000);
           enqueueSnackbar('Sell NFT success!', { variant: 'success' });
           setOpen(false);
+          setTimeout(() => {navigate('/profile/myitem/0');window.location.reload()}, 2000)
         } else {
           enqueueSnackbar('Sell NFT error!', { variant: 'error' });
           setOnProgress(false);

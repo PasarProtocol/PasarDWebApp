@@ -437,6 +437,7 @@ export default function CreateCollection() {
                   setBaseToken(paramObj._address);
                   console.log('receipt', receipt);
                   resolve(true);
+                  setTimeout(() => {navigate('/profile/myitem/5');}, 2000)
                 })
                 .on('error', (error) => {
                   console.error('error', error);

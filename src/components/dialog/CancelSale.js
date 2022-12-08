@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import {useNavigate} from "react-router-dom";
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { v1marketContract as V1_MARKET_CONTRACT_ADDRESS } from '../../config';
 import TransLoadingButton from '../TransLoadingButton';
@@ -30,6 +31,7 @@ export default function CancelSale(props) {
   const { enqueueSnackbar } = useSnackbar();
   const { pasarLinkChain } = useSignin();
   const v1State = order?.chain === 'v1';
+  const navigate = useNavigate();
 
   const handleClose = () => {
     setOpen(false);
@@ -91,6 +93,7 @@ export default function CancelSale(props) {
     setOnProgress(true);
     const _orderId = orderId !== undefined ? orderId : order.orderId;
     await callCancelOrder(_orderId);
+    setTimeout(() => {navigate('/profile/myitem/0');}, 2000)
   };
   return (
     <Dialog open={isOpen} onClose={handleClose}>

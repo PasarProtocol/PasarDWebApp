@@ -74,7 +74,7 @@ import {
   getChainTypeFromId,
   getContractAddressInCurrentNetwork,
   getTotalCountOfCoinTypes,
-  
+
   getStartPosOfCoinTypeByChainType, setAllTokenPrice2
 } from '../../utils/common';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
@@ -1004,7 +1004,7 @@ export default function CreateItem() {
         if (success) {
           enqueueSnackbar('Mint token success!', { variant: 'success' });
           setTimeout(() => {
-            navigate('/marketplace');
+            navigate('/profile/myitem/3');
           }, 3000);
         } else enqueueSnackbar('Mint token error!', { variant: 'warning' });
         setOnProgress(false);
