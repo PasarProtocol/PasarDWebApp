@@ -277,18 +277,18 @@ export default function CollectibleDetail() {
           );
           const json = await res.json();
           let collectibleDetail = json?.data || {};
-          // if (collectibleDetail?.uniqueKey) {
-          //   const resSaleType = await fetchAPIFrom('api/v1/checkFirstSale', {
-          //     method: 'POST',
-          //     headers: {
-          //       'Content-Type': 'application/json'
-          //     },
-          //     body: JSON.stringify([collectibleDetail.uniqueKey])
-          //   });
-          //   const jsonSaleType = await resSaleType.json();
-          //   if ((jsonSaleType?.data || []).length)
-          //     collectibleDetail = { ...collectibleDetail, isFirstSale: json.data[0]?.isFirstSale || false };
-          // }
+          if (collectibleDetail?.uniqueKey) {
+            const resSaleType = await fetchAPIFrom('api/v1/checkFirstSale', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify([collectibleDetail.uniqueKey])
+            });
+            const jsonSaleType = await resSaleType.json();
+            if ((jsonSaleType?.data || []).length)
+              collectibleDetail = { ...collectibleDetail, isFirstSale: jsonSaleType.data[0]?.isFirstSale || false };
+          }
           if (collectibleDetail?.order?.orderId) {
             const resBid = await fetchAPIFrom(
               `api/v1/getBidsHistory?chain=${chain}&orderId=${collectibleDetail.order.orderId}`,

@@ -71,6 +71,7 @@ AssetDetailInfo.propTypes = {
 };
 
 export default function AssetDetailInfo({ detail }) {
+  console.log(detail);
   const infoItems = DETAILINFO_TITLE.map((title, index) => ({
     title,
     icon: DETAILINFO_ICONS[index],
@@ -83,7 +84,8 @@ export default function AssetDetailInfo({ detail }) {
     royalties: `${(detail.royaltyFee * 100) / 10 ** 6} %`,
     createTime: `${creatimestamp.date} ${creatimestamp.time}`,
     marketTime: detail.listed ? `${marketimestamp.date} ${marketimestamp.time}` : 'Not on Sale',
-    saleType: detail?.isFirstSale ? 'Primary Sale' : 'Secondary Sale'
+    // eslint-disable-next-line no-nested-ternary
+    saleType: detail.listed ? (detail?.isFirstSale ? 'Primary Sale' : 'Secondary Sale') : 'Not on Sale'
   };
 
   return (
