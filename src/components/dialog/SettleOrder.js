@@ -42,7 +42,7 @@ export default function SettleOrder(props) {
 
   const { isOpen, setOpen, info, address, updateCount: updateCountProfile, handleUpdate } = props;
 
-  const seller = info.holder;
+  const seller = info.sellerAddr;
   const { lastBid, lastBidder } = info;
 
   const handleClose = () => {
@@ -187,7 +187,7 @@ export default function SettleOrder(props) {
 
   const price = lastBid / 1e18;
   const platformFee = math.round((price * 2) / 100, 4);
-  const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royalties) / 10 ** 6, 4);
+  const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royaltyFee) / 10 ** 6, 4);
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <DialogTitle>
@@ -231,7 +231,7 @@ export default function SettleOrder(props) {
         <Typography variant="h4" sx={{ mt: 1 }}>
           {address === seller ? 'Top Bid' : 'Your Winning Bid'}
           <br />
-          {math.round(lastBidder / 1e18, 3)} ELA
+          {math.round(lastBid / 1e18, 3)} ELA
         </Typography>
         <Grid container sx={{ mt: 2, display: 'block' }}>
           <Grid item xs={12}>

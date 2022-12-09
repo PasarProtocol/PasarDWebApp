@@ -63,8 +63,8 @@ const GridItems = (props) => {
             royaltyOwner={(isOnMarket ? item?.token?.royaltyOwner : item?.royaltyOwner) || ''}
             royaltyFee={(isOnMarket ? item?.token?.royaltyFee : item?.royaltyFee) / 1 ?? 0}
             bids={(isOnMarket ? item?.bids : item?.order?.bids) / 1 ?? 0}
-            lastBid={(isOnMarket ? item?.lastBid : item?.order?.lastBid) / 1 ?? 0}
-            lastBidder={(isOnMarket ? item?.lastBidder : item?.order?.lastBidder) || ''}
+            lastBid={(item?.lastBid ? item?.lastBid : item?.order?.lastBid) / 1 ?? 0}
+            lastBidder={(item?.lastBidder ? item?.lastBidder : item?.order?.lastBidder) || ''}
             reservePrice={round(((isOnMarket ? item?.reservePrice : item?.order?.reservePrice) ?? 0) / 1e18, 3)}
             buyoutPrice={round(((isOnMarket ? item?.buyoutPrice : item?.order?.buyoutPrice) ?? 0) / 1e18, 3)}
             thumbnail={ (item.type === 'FeedsChannel' || item.type === 'HiveNode') ? getHiveHubImageFromIPFSUrl(item.data.avatar): getImageFromIPFSUrl(
