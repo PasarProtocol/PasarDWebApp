@@ -71,7 +71,6 @@ AssetDetailInfo.propTypes = {
 };
 
 export default function AssetDetailInfo({ detail }) {
-  console.log(detail);
   const infoItems = DETAILINFO_TITLE.map((title, index) => ({
     title,
     icon: DETAILINFO_ICONS[index],
