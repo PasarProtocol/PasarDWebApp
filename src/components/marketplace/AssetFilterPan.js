@@ -263,6 +263,7 @@ export default function AssetFilterPan(props) {
                   sx={{ width: '100%', mb: 1 }}
                   placeholder="Search collections"
                   onChange={searchCollections}
+                  getSearchKeyFromURL={false}
                 />
                 <Scrollbar sx={{ maxHeight: 200 }}>
                   <List

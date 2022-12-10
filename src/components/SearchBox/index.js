@@ -79,7 +79,7 @@ const ListItemTextStyle = styled(ListItemText)({
 const defaultPlaceHolder = 'Search name, description, address and token ID';
 // ----------------------------------------------------------------------
 export default function SearchBox(props) {
-  const { sx, onChange, needbgcolor = false, needAutocomplete = false } = props;
+  const { sx, onChange, needbgcolor = false, needAutocomplete = false, getSearchKeyFromURL = true } = props;
   const { placeholder } = props;
   const params = useParams(); // params.key
   const navigate = useNavigate();
@@ -192,7 +192,7 @@ export default function SearchBox(props) {
     >
       <SearchStyle
         inputRef={ref}
-        defaultValue={params.key}
+        defaultValue={getSearchKeyFromURL ? params.key : placeholder}
         placeholder={placeholder}
         onKeyPress={handleChange}
         onChange={determineClose}
