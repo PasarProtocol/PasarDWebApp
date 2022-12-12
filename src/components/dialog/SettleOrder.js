@@ -83,7 +83,7 @@ export default function SettleOrder(props) {
                         setOpen(false);
                         setOnProgress(false);
 
-                        setTimeout(() => {navigate('/profile/myitem/1')}, 2000);
+                        setTimeout(() => {navigate('/profile/myitem/1');window.location.reload()}, 2000);
                         setTimeout(() => {
                           setUpdateCount(updateCount + 1);
                         }, 1000);

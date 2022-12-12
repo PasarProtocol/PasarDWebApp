@@ -78,7 +78,7 @@ export default function DeleteItem(props) {
         if(location.pathname === '/profile/myitem/1') {
           setTimeout(() => {window.location.reload()}, 2000);
         } else {
-          setTimeout(() => {navigate('/profile/myitem/1')}, 2000);
+          setTimeout(() => {navigate('/profile/myitem/1');window.location.reload()}, 2000);
         }
       })
       .on('confirmation', (confirmationNumber, receipt) => {

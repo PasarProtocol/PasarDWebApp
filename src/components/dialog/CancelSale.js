@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { v1marketContract as V1_MARKET_CONTRACT_ADDRESS } from '../../config';
 import TransLoadingButton from '../TransLoadingButton';
@@ -32,6 +32,7 @@ export default function CancelSale(props) {
   const { pasarLinkChain } = useSignin();
   const v1State = order?.chain === 'v1';
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleClose = () => {
     setOpen(false);
@@ -78,9 +79,11 @@ export default function CancelSale(props) {
           }, 1000);
         enqueueSnackbar('Cancel sale Success!', { variant: 'success' });
         setOpen(false);
-        setTimeout(() => {
-          navigate('/profile')
-        }, 2000)
+        if(location.pathname.startsWith('/profile')) {
+          setTimeout(() => {window.location.reload()}, 2000);
+        } else {
+          setTimeout(() => {navigate('/profile')}, 2000);
+        }
       })
       .on('confirmation', (confirmationNumber, receipt) => {
         console.log('confirmation', confirmationNumber, receipt);

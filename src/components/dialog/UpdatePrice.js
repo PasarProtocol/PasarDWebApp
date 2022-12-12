@@ -74,8 +74,6 @@ export default function UpdatePrice(props) {
   const { diaBalance, pasarLinkChain } = useSignin();
   const navigate = useNavigate()
   const location = useLocation();
-  console.log(location);
-
   const handleClose = () => {
     setOpen(false);
     setOnProgress(false);
