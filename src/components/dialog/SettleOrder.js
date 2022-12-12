@@ -6,6 +6,7 @@ import { useWeb3React } from '@web3-react/core';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box, Grid, Stack, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
+import {useNavigate} from "react-router-dom";
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
@@ -41,6 +42,7 @@ export default function SettleOrder(props) {
   const { library, chainId, account } = context;
 
   const { isOpen, setOpen, info, address, updateCount: updateCountProfile, handleUpdate } = props;
+  const navigate = useNavigate()
 
   const seller = info.sellerAddr;
   const { lastBid, lastBidder } = info;
@@ -80,6 +82,8 @@ export default function SettleOrder(props) {
                         enqueueSnackbar('Settle auction order success!', { variant: 'success' });
                         setOpen(false);
                         setOnProgress(false);
+
+                        setTimeout(() => {navigate('/profile/myitem/1')}, 2000);
                         setTimeout(() => {
                           setUpdateCount(updateCount + 1);
                         }, 1000);
@@ -133,6 +137,7 @@ export default function SettleOrder(props) {
         enqueueSnackbar('Settle auction order success!', { variant: 'success' });
         setOnProgress(false);
         setOpen(false);
+        setTimeout(() => {navigate('/profile/myitem/1')}, 2000);
         setTimeout(() => {
           setUpdateCount(updateCount + 1);
         }, 1000);
