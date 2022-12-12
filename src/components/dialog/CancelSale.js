@@ -78,6 +78,9 @@ export default function CancelSale(props) {
           }, 1000);
         enqueueSnackbar('Cancel sale Success!', { variant: 'success' });
         setOpen(false);
+        setTimeout(() => {
+          navigate('/profile')
+        }, 2000)
       })
       .on('confirmation', (confirmationNumber, receipt) => {
         console.log('confirmation', confirmationNumber, receipt);
@@ -93,7 +96,6 @@ export default function CancelSale(props) {
     setOnProgress(true);
     const _orderId = orderId !== undefined ? orderId : order.orderId;
     await callCancelOrder(_orderId);
-    setTimeout(() => {navigate('/profile/myitem/0');}, 2000)
   };
   return (
     <Dialog open={isOpen} onClose={handleClose}>

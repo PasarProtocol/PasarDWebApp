@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Link, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { blankAddress } from '../../config';
 import {
@@ -33,6 +33,7 @@ export default function DeleteItem(props) {
   const { enqueueSnackbar } = useSnackbar();
   const { pasarLinkChain } = useSingin();
   const navigate = useNavigate()
+  const location = useLocation();
 
   const handleClose = () => {
     setOpen(false);
@@ -74,9 +75,11 @@ export default function DeleteItem(props) {
         }, 3000);
         enqueueSnackbar('Burn NFT success!', { variant: 'success' });
         setOpen(false);
-        setTimeout(() => {
-          navigate('/profile/myitem/3');
-        }, 2000);
+        if(location.pathname === '/profile/myitem/1') {
+          setTimeout(() => {window.location.reload()}, 2000);
+        } else {
+          setTimeout(() => {navigate('/profile/myitem/1')}, 2000);
+        }
       })
       .on('confirmation', (confirmationNumber, receipt) => {
         console.log('confirmation', confirmationNumber, receipt);

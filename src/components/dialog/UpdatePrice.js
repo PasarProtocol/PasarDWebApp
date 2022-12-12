@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink, useLocation, useNavigate} from 'react-router-dom';
 import * as math from 'mathjs';
 import {
   Dialog,
@@ -72,6 +72,9 @@ export default function UpdatePrice(props) {
   const [isOnValidation, setOnValidation] = React.useState(false);
 
   const { diaBalance, pasarLinkChain } = useSignin();
+  const navigate = useNavigate()
+  const location = useLocation();
+  console.log(location);
 
   const handleClose = () => {
     setOpen(false);
@@ -124,15 +127,18 @@ export default function UpdatePrice(props) {
       }
     )
       .then((success) => {
-        console.log(success);
         setTimeout(() => {
           handleUpdate(updateCount + 1);
         }, 3000);
         enqueueSnackbar('Update price success!', { variant: 'success' });
         setOpen(false);
+        if(location.pathname.startsWith('/profile')) {
+          setTimeout(() => {window.location.reload()}, 2000);
+        } else {
+          setTimeout(() => {navigate('/profile/myitem/1')}, 2000);
+        }
       })
       .catch((e) => {
-        console.error(e);
         enqueueSnackbar('Update price error!', { variant: 'error' });
         setOnProgress(false);
       });
