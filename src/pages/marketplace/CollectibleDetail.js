@@ -291,7 +291,7 @@ export default function CollectibleDetail() {
           }
           if (collectibleDetail?.order?.orderId) {
             const resBid = await fetchAPIFrom(
-              `api/v1/getBidsHistory?chain=${chain}&orderId=${collectibleDetail.order.orderId}`,
+              `api/v1/getBidsHistory?chain=${chain === 'v1'? 'esc' : chain}&orderId=${collectibleDetail.order.orderId}`,
               {}
             );
             const jsonBid = await resBid.json();
