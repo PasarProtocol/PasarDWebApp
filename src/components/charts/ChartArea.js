@@ -13,7 +13,7 @@ import StatisticItem from '../explorer/StatisticPanel/StatisticItem';
 import useSettings from '../../hooks/useSettings';
 import {
   dateRangeBeforeDays,
-  
+
   getTotalCountOfCoinTypes,
   fetchAPIFrom,
   getCoinTypeFromToken, setAllTokenPrice2
@@ -121,7 +121,7 @@ export default function ChartArea({ by, is4Address }) {
       try {
         let suburl = '';
         if (by === 'collectible')
-          suburl = `getPriceHistoryOfToken?baseToken=${contract}&chain=${chain}&tokenId=${tokenId}`;
+          suburl = `getPriceHistoryOfToken?baseToken=${contract}&chain=${chain === 'v1' ? 'ela' : chain}&tokenId=${tokenId}`;
         else if (by === 'address')
           suburl = `getIncomesOfUser?walletAddr=${params.address}&type=${volumeType === 0 ? 2 : 1}`;
         const res = await fetchAPIFrom(`api/v1/${suburl}`, { signal });
