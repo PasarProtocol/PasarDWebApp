@@ -78,6 +78,7 @@ const GridItems = (props) => {
             myaddress={myaddress}
             updateCount={updateCount}
             handleUpdate={handleUpdate}
+            orderChain={item.chain}
           />
         ) : (
           <AssetCardSkeleton key={index} />

@@ -77,6 +77,7 @@ AssetCard.propTypes = {
   myaddress: PropTypes.string,
   updateCount: PropTypes.number,
   handleUpdate: PropTypes.func,
+  orderChain: PropTypes.string,
   defaultCollectionType: PropTypes.number
 };
 
@@ -111,6 +112,7 @@ export default function AssetCard(props) {
     myaddress,
     updateCount,
     handleUpdate,
+    orderChain,
     defaultCollectionType = 0
   } = props;
 
@@ -281,7 +283,7 @@ export default function AssetCard(props) {
     }
     setOpenPopup(null);
   };
-  const dlgProps = { name, tokenId, orderId, updateCount, handleUpdate, baseToken, v1State: chain === 'v1' };
+  const dlgProps = { name, tokenId, orderId, updateCount, handleUpdate, baseToken, v1State: orderChain === 'v1' };
 
   return (
     <Box>
