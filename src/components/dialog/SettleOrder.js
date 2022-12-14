@@ -137,7 +137,7 @@ export default function SettleOrder(props) {
         enqueueSnackbar('Settle auction order success!', { variant: 'success' });
         setOnProgress(false);
         setOpen(false);
-        setTimeout(() => {navigate('/profile/myitem/1')}, 2000);
+        setTimeout(() => {navigate('/profile/myitem/1'); window.location.reload()}, 2000);
         setTimeout(() => {
           setUpdateCount(updateCount + 1);
         }, 1000);
