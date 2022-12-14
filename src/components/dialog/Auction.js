@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import {Link as RouterLink, useNavigate} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Web3 from 'web3';
 import { addDays } from 'date-fns';
@@ -72,6 +72,7 @@ export default function Auction(props) {
   const { enqueueSnackbar } = useSnackbar();
   const { pasarLinkChain, diaBalance } = useSignin();
   const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -214,6 +215,7 @@ export default function Auction(props) {
             }, 3000);
             enqueueSnackbar('Auction success!', { variant: 'success' });
             setOpen(false);
+            setTimeout(() => {navigate('/profile/myitem/1'); window.location.reload()}, 2000);
           } else {
             enqueueSnackbar('Auction error!', { variant: 'error' });
             setOnProgress(false);
