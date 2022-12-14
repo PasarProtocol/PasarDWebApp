@@ -215,7 +215,7 @@ export default function Auction(props) {
             }, 3000);
             enqueueSnackbar('Auction success!', { variant: 'success' });
             setOpen(false);
-            setTimeout(() => {navigate('/profile/myitem/1'); window.location.reload()}, 2000);
+            setTimeout(() => {navigate('/profile/myitem/0'); window.location.reload()}, 2000);
           } else {
             enqueueSnackbar('Auction error!', { variant: 'error' });
             setOnProgress(false);

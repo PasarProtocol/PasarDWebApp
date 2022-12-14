@@ -933,7 +933,7 @@ export const MethodList = [
       { description: 'By', field: 'seller', copyable: true, ellipsis: true },
       { description: 'For a value of', field: 'price', copyable: false }
     ],
-    verb: { description: 'Listed for', withPrice: true, subject: 'seller' }
+    verb: { description: 'Listed for', withPrice: true, subject: 'sellerAddr' }
   },
   {
     method: 'BuyOrder',
@@ -944,7 +944,7 @@ export const MethodList = [
       { description: 'By', field: 'buyer', copyable: true, ellipsis: true },
       { description: 'For a value of', field: 'price', copyable: false }
     ],
-    verb: { description: 'Purchased for', withPrice: true, subject: 'to' }
+    verb: { description: 'Purchased for', withPrice: true, subject: 'buyerAddr' }
   },
   {
     method: 'CancelOrder',
@@ -965,7 +965,7 @@ export const MethodList = [
       { description: 'By', field: 'from', copyable: true, ellipsis: true },
       { description: 'From initial value of', field: 'data.oldPrice', copyable: false }
     ],
-    verb: { description: 'Updated to', withPrice: true, subject: 'from' }
+    verb: { description: 'Updated to', withPrice: true, subject: 'sellerAddr' }
   },
   {
     method: 'OrderBid',
@@ -973,10 +973,10 @@ export const MethodList = [
     icon: 'auction',
     detail: [
       { description: 'Bid placed on collectible →', field: 'marketplace', copyable: true, ellipsis: true },
-      { description: 'By', field: 'to', copyable: true, ellipsis: true },
+      { description: 'By', field: 'buyerAddr', copyable: true, ellipsis: true },
       { description: 'For a value of', field: 'price', copyable: false }
     ],
-    verb: { description: 'Bid', withPrice: true, subject: 'to' }
+    verb: { description: 'Bid', withPrice: true, subject: 'buyerAddr' }
   },
   {
     method: 'OrderForAuction',
@@ -984,10 +984,10 @@ export const MethodList = [
     icon: 'marketplace-auction',
     detail: [
       { description: 'Collectible put up for auction →', field: 'marketplace', copyable: true, ellipsis: true },
-      { description: 'By', field: 'from', copyable: true, ellipsis: true },
+      { description: 'By', field: 'sellerAddr', copyable: true, ellipsis: true },
       { description: 'For a starting price of', field: 'price', copyable: false }
     ],
-    verb: { description: 'Put up for auction for a starting price of', withPrice: true, subject: 'from' }
+    verb: { description: 'Put up for auction for a starting price of', withPrice: true, subject: 'sellerAddr' }
   }
 ];
 // new

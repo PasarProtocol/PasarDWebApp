@@ -112,7 +112,7 @@ export default function TransactionOrderDetail({ isAlone, item, noSummary }) {
           <Grid container>
             <Grid item xs={12} sm={isAlone ? 8 : 12}>
               {methodItem.detail.map((el, index) => {
-                let value = item[el.field];
+                let value = item[el.field] || item.order[el.field];
                 // if (el.field && el.field.startsWith('data.') && item.data) value = item.data[el.field.substring(5)];
                 if (el.field && !el.copyable) value = parseFloat((value / 10 ** 18).toFixed(7));
                 if (el.field === 'marketplace') value = chain === 'v1' ? v1marketContract : marketContractAddress;
