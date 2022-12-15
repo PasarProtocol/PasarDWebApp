@@ -283,7 +283,7 @@ export default function AssetCard(props) {
     }
     setOpenPopup(null);
   };
-  const dlgProps = { name, tokenId, orderId, updateCount, handleUpdate, baseToken, v1State: orderChain === 'v1' };
+  const dlgProps = { name, tokenId, orderId, updateCount, handleUpdate, baseToken, v1State: orderChain === 'v1', is721: collection.is721, chain };
 
   return (
     <Box>

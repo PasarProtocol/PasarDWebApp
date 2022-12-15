@@ -6,6 +6,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
 import {useLocation, useNavigate} from "react-router-dom";
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
+import { TOKEN_721_ABI } from '../../abi/token721ABI';
+import { TOKEN_1155_ABI } from '../../abi/token1155ABI';
 import { blankAddress } from '../../config';
 import {
   reduceHexAddress,
@@ -23,12 +25,14 @@ DeleteItem.propTypes = {
   name: PropTypes.string,
   tokenId: PropTypes.string,
   baseToken: PropTypes.string,
+  is721: PropTypes.bool,
+  chain: PropTypes.string,
   updateCount: PropTypes.number,
   handleUpdate: PropTypes.func
 };
 
 export default function DeleteItem(props) {
-  const { isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate } = props;
+  const { isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate, is721, chain } = props;
   const [onProgress, setOnProgress] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const { pasarLinkChain } = useSingin();
@@ -47,7 +51,7 @@ export default function DeleteItem(props) {
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
     const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker');
-    const contractAbi = STICKER_CONTRACT_ABI;
+    const contractAbi = is721 ? TOKEN_721_ABI : STICKER_CONTRACT_ABI;
     const contractAddress = baseToken || PasarContractAddress;
     const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
 
@@ -62,9 +66,13 @@ export default function DeleteItem(props) {
       value: 0
     };
 
-    stickerContract.methods
-      .burn(_id, _value)
-      .send(transactionParams)
+    let methodEvent;
+    if(is721) {
+      methodEvent = stickerContract.methods.burn(_id);
+    } else {
+      methodEvent = stickerContract.methods.burn(_id, _value);
+    }
+      methodEvent.send(transactionParams)
       .on('transactionHash', (hash) => {
         console.log('transactionHash', hash);
       })
