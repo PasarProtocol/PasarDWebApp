@@ -300,7 +300,7 @@ export default function PlaceBid(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, chainId, pasarLinkAddress, pasarLinkChain]);
 
-  const price = Math.max(info.order?.price / 1e18, targetPrice);
+  const price = Math.max(info.order?.price / 10**18, targetPrice);
   const platformFee = math.round((price * 2) / 100, 4);
   const royalties = info.isFirstSale === 'Primary Sale' ? 0 : math.round((price * info.royaltyFee) / 10 ** 6, 4);
   const TypographyStyle = { display: 'inline', lineHeight: 1.1 };
@@ -434,7 +434,7 @@ export default function PlaceBid(props) {
                 Seller will get
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {price - platformFee - royalties} {coinName}
+                {(price * 10**18 - platformFee * 10**18 - royalties* 10**18)/10**18} {coinName}
               </Typography>
             </Stack>
           </Grid>

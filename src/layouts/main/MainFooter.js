@@ -182,7 +182,7 @@ export default function MainFooter({ hidden, isContainerXl }) {
                   ❤️
                 </span>
               </Link>{' '}
-              v2 - {generatedGitInfo.gitCommitHash}
+              v2.1 - {generatedGitInfo.gitCommitHash}
             </CopyRight>
           </Grid>
           <Grid item xs={12} md={6}>
