@@ -360,6 +360,7 @@ SearchBox.propTypes = {
   placeholder: PropTypes.string,
   sx: PropTypes.object,
   needAutocomplete: PropTypes.bool,
+  getSearchKeyFromURL: PropTypes.bool,
   needbgcolor: PropTypes.bool
 };
 SearchBox.defaultProps = {

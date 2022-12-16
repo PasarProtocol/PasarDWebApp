@@ -1,4 +1,3 @@
-import axios from 'axios';
 import Web3 from 'web3';
 import * as math from 'mathjs';
 import { createHash } from 'crypto';
@@ -134,10 +133,10 @@ export const getHiveHubImageFromIPFSUrl = (url) => {
   if (url) {
     const segments = url.split(':').filter((item) => item);
     if (segments.length === 3) {
-      if(segments[2] === "undefined") {
+      if (segments[2] === 'undefined') {
         return `${PasarIpfs}/ipfs/QmPEWCF6kNL1Bs1gSWJAqqitbwWMEWvLQGaezJgENYkS48`;
       }
-      if((segments[0] === 'pasar' || segments[0] === 'feeds')) {
+      if (segments[0] === 'pasar' || segments[0] === 'feeds') {
         return `${PasarIpfs}/ipfs/${segments[2]}`;
       }
     }
@@ -315,11 +314,12 @@ export async function getERC20TokenPrice(tokenAddress) {
   try {
     const res2 = await fetchAPIFrom('api/v1/getQuotedTokensRate');
     const data = await res2.json();
-    for(let i = 0; i < data.data.length; i+=1) {
+    for (let i = 0; i < data.data.length; i += 1) {
       if (data.data[i].token === tokenAddress.toLowerCase()) {
         return data.data[i].price;
       }
     }
+    return 0;
   } catch (e) {
     return 0;
   }
@@ -346,9 +346,9 @@ export async function getTokenPriceInEthereum() {
   //       resolve([0, 0, 0]);
   //     });
   // });
-    const response = await fetchAPIFrom('api/v1/price');
-    const data = await response.json();
-    return [data.ETH, data.ELA, data.FSN];
+  const response = await fetchAPIFrom('api/v1/price');
+  const data = await response.json();
+  return [data.ETH, data.ELA, data.FSN];
 }
 
 export function setAllTokenPrice2(setCoinPriceByType) {
@@ -363,22 +363,22 @@ export function setAllTokenPrice2(setCoinPriceByType) {
     const res2 = await fetchAPIFrom('api/v1/getQuotedTokensRate');
     const data = await res2.json();
     const tokenRates = data.data;
-    const tokenRatesMap = {}
+    const tokenRatesMap = {};
     tokenRates.forEach((tokenRate) => {
-      if(!tokenRatesMap[tokenRate.chain]) {
-        tokenRatesMap[tokenRate.chain] = {}
+      if (!tokenRatesMap[tokenRate.chain]) {
+        tokenRatesMap[tokenRate.chain] = {};
       }
       tokenRatesMap[tokenRate.chain][tokenRate.token] = tokenRate.price;
     });
 
     coinTypes.forEach((coin, index) => {
-      if(coin.name === 'ELA') {
+      if (coin.name === 'ELA') {
         return;
       }
       setCoinPriceByType(index, tokenRatesMap.ela[coin.address.toLowerCase()]);
-    })
+    });
     setCoinPriceByType(2, 0.1);
-  }
+  };
   fetchCoinPrice();
 }
 

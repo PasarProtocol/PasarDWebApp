@@ -7,7 +7,6 @@ import { useSnackbar } from 'notistack';
 import {useLocation, useNavigate} from "react-router-dom";
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { TOKEN_721_ABI } from '../../abi/token721ABI';
-import { TOKEN_1155_ABI } from '../../abi/token1155ABI';
 import { blankAddress } from '../../config';
 import {
   reduceHexAddress,
@@ -26,13 +25,13 @@ DeleteItem.propTypes = {
   tokenId: PropTypes.string,
   baseToken: PropTypes.string,
   is721: PropTypes.bool,
-  chain: PropTypes.string,
+  // chain: PropTypes.string,
   updateCount: PropTypes.number,
   handleUpdate: PropTypes.func
 };
 
 export default function DeleteItem(props) {
-  const { isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate, is721, chain } = props;
+  const { isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate, is721 } = props;
   const [onProgress, setOnProgress] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const { pasarLinkChain } = useSingin();

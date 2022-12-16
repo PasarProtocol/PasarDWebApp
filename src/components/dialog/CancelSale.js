@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { v1marketContract as V1_MARKET_CONTRACT_ADDRESS } from '../../config';
 import TransLoadingButton from '../TransLoadingButton';
@@ -20,8 +20,7 @@ CancelSale.propTypes = {
   orderId: PropTypes.any,
   order: PropTypes.any,
   updateCount: PropTypes.number,
-  handleUpdate: PropTypes.func,
-  v1State: PropTypes.bool
+  handleUpdate: PropTypes.func
 };
 
 export default function CancelSale(props) {
@@ -79,10 +78,14 @@ export default function CancelSale(props) {
           }, 1000);
         enqueueSnackbar('Cancel sale Success!', { variant: 'success' });
         setOpen(false);
-        if(location.pathname.startsWith('/profile')) {
-          setTimeout(() => {window.location.reload()}, 2000);
+        if (location.pathname.startsWith('/profile')) {
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
         } else {
-          setTimeout(() => {navigate('/profile')}, 2000);
+          setTimeout(() => {
+            navigate('/profile');
+          }, 2000);
         }
       })
       .on('confirmation', (confirmationNumber, receipt) => {

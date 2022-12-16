@@ -49,11 +49,12 @@ import {
   isInAppBrowser,
   checkValidChain,
   getChainTypeFromId,
-  fetchAPIFrom, getERC20TokenPrice
+  fetchAPIFrom,
+  getERC20TokenPrice
 } from '../../utils/common';
 import useSignIn from '../../hooks/useSignin';
-import { creatAndRegister, prepareConnectToHive, downloadAvatar } from './HiveAPI';
-import {DidResolverUrl, firebaseConfig, mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS} from '../../config';
+// import { creatAndRegister, prepareConnectToHive, downloadAvatar } from './HiveAPI';
+import { DidResolverUrl, firebaseConfig, mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS } from '../../config';
 
 // Initialize Firebase
 if (firebaseConfig.apiKey) {
@@ -123,21 +124,21 @@ export default function SignInDialog() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionLinkFlag, activatingConnector, account, chainId]);
 
-  const getAvatarUrl = (did) => {
-    const targetDid = `did:elastos:${did}`;
-    downloadAvatar(targetDid).then((res) => {
-      if (res && res.length) {
-        const base64Content = res.reduce((content, code) => {
-          content = `${content}${String.fromCharCode(code)}`;
-          return content;
-        }, '');
-        setAvatarUrl((prevState) => {
-          if (!prevState) return `data:image/png;base64,${base64Content}`;
-          return prevState;
-        });
-      }
-    });
-  };
+  // const getAvatarUrl = (did) => {
+  //   const targetDid = `did:elastos:${did}`;
+  //   downloadAvatar(targetDid).then((res) => {
+  //     if (res && res.length) {
+  //       const base64Content = res.reduce((content, code) => {
+  //         content = `${content}${String.fromCharCode(code)}`;
+  //         return content;
+  //       }, '');
+  //       setAvatarUrl((prevState) => {
+  //         if (!prevState) return `data:image/png;base64,${base64Content}`;
+  //         return prevState;
+  //       });
+  //     }
+  //   });
+  // };
 
   React.useEffect(() => {
     const currentChainType = getChainTypeFromId(pasarLinkChain);
@@ -217,12 +218,12 @@ export default function SignInDialog() {
       if (sessionLinkFlag) {
         // when connected
         if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
-          setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS))
+          setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS));
         } else if (sessionLinkFlag === '2') {
           if (isInAppBrowser()) {
-            setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS))
+            setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS));
           } else if (essentialsConnector.getWalletConnectProvider()) {
-            setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS))
+            setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS));
           }
         }
       }
@@ -284,25 +285,25 @@ export default function SignInDialog() {
             });
           } else if (essentialsConnector.getWalletConnectProvider()) {
             const essentialProvider = essentialsConnector.getWalletConnectProvider();
-            if(essentialProvider.chainId === 20 || essentialProvider.chainId === 21) {
+            if (essentialProvider.chainId === 20 || essentialProvider.chainId === 21) {
               getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-                  .then((dia) => {
-                    setDiaBalance(dia);
-                  })
-                  .catch((e) => {
-                    console.error(e);
-                    setDiaBalance(0);
-                  });
+                .then((dia) => {
+                  setDiaBalance(dia);
+                })
+                .catch((e) => {
+                  console.error(e);
+                  setDiaBalance(0);
+                });
             }
-            if(essentialProvider.chainId === 1 || essentialProvider.chainId === 5) {
+            if (essentialProvider.chainId === 1 || essentialProvider.chainId === 5) {
               getElaOnEthTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-                  .then((ela) => {
-                    setElaOnEthBalance(ela);
-                  })
-                  .catch((e) => {
-                    console.error(e);
-                    setElaOnEthBalance(0);
-                  });
+                .then((ela) => {
+                  setElaOnEthBalance(ela);
+                })
+                .catch((e) => {
+                  console.error(e);
+                  setElaOnEthBalance(0);
+                });
             }
             getBalance(essentialProvider).then((res) => {
               setBalance(math.round(res / 1e18, 4));
