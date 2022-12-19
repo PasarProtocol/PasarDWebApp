@@ -169,7 +169,7 @@ export default function MainFooter({ hidden, isContainerXl }) {
         >
           <Grid item xs={12} md={6}>
             <CopyRight textAlign="left">
-              Pasar Protocol 2021 |{' '}
+              Pasar Protocol 2023 |{' '}
               <Link
                 onClick={() => {
                   setOpenDonate(true);
