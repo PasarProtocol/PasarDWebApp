@@ -190,9 +190,9 @@ export default function SettleOrder(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, chainId, pasarLinkAddress]);
 
-  const price = lastBid / 1e18;
-  const platformFee = math.round((price * 2) / 100, 4);
-  const royalties = info.SaleType === 'Primary Sale' ? 0 : math.round((price * info.royaltyFee) / 10 ** 6, 4);
+  const price = lastBid;
+  const platformFee = (price * 2) / 100;
+  const royalties = info.SaleType === 'Primary Sale' ? 0 : (price * info.royaltyFee) / 10 ** 6;
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <DialogTitle>
@@ -264,7 +264,7 @@ export default function SettleOrder(props) {
                 Platform fee 2%
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {platformFee} ELA
+                {platformFee/10**18} ELA
               </Typography>
             </Stack>
           </Grid>
@@ -274,7 +274,7 @@ export default function SettleOrder(props) {
                 Creator will get (royalties)
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {royalties} ELA
+                {royalties/10**18} ELA
               </Typography>
             </Stack>
           </Grid>
@@ -290,7 +290,7 @@ export default function SettleOrder(props) {
                 </Typography>
               )}
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {price - platformFee - royalties} ELA
+                {(price - platformFee - royalties)/10**18} ELA
               </Typography>
             </Stack>
           </Grid>
@@ -301,7 +301,7 @@ export default function SettleOrder(props) {
                   You will pay
                 </Typography>
                 <Typography variant="body2" display="block" gutterBottom align="right">
-                  {price} ELA
+                  {price/10**18} ELA
                 </Typography>
               </Stack>
             </Grid>

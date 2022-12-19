@@ -26,7 +26,8 @@ import arrowIosBackFill from '@iconify/icons-eva/arrow-ios-back-fill';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useWeb3React } from '@web3-react/core';
 import { isUndefined } from 'lodash';
-import firebase from 'firebase/app';
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
 
 import { DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
 import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
@@ -58,8 +59,8 @@ import { DidResolverUrl, firebaseConfig, mainDiaContract as DIA_CONTRACT_MAIN_AD
 
 // Initialize Firebase
 if (firebaseConfig.apiKey) {
-  const app = firebase.initializeApp(firebaseConfig);
-  firebase.analytics(app);
+  const app = initializeApp(firebaseConfig);
+  getAnalytics(app);
 }
 
 export default function SignInDialog() {

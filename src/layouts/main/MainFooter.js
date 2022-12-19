@@ -169,7 +169,7 @@ export default function MainFooter({ hidden, isContainerXl }) {
         >
           <Grid item xs={12} md={6}>
             <CopyRight textAlign="left">
-              Pasar Protocol 2021 |{' '}
+              Pasar Protocol 2023 |{' '}
               <Link
                 onClick={() => {
                   setOpenDonate(true);
@@ -182,7 +182,7 @@ export default function MainFooter({ hidden, isContainerXl }) {
                   ❤️
                 </span>
               </Link>{' '}
-              v2 - {generatedGitInfo.gitCommitHash}
+              v2.1 - {generatedGitInfo.gitCommitHash}
             </CopyRight>
           </Grid>
           <Grid item xs={12} md={6}>
