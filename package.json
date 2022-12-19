@@ -94,7 +94,7 @@
     "draftjs-to-html": "^0.9.1",
     "emoji-mart": "^3.0.0",
     "ethers": "^5.5.3",
-    "firebase": "^8.10.1",
+    "firebase": "^9.9.1",
     "formik": "^2.2.9",
     "framer-motion": "^4.1.17",
     "gif-me-duration": "^1.0.8",
