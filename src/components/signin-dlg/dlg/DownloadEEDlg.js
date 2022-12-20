@@ -9,11 +9,12 @@ import StyledButton from '../StyledButton';
 
 DownloadEEDlg.propTypes = {
   open: PropTypes.bool,
+  isMMUser: PropTypes.bool,
   onClick: PropTypes.func
 };
 
 export default function DownloadEEDlg(props) {
-  const { open, onClick } = props;
+  const { open, isMMUser = false, onClick } = props;
   return (
     <Dialog open={open} onClose={() => onClick('close')}>
       <DialogTitle>
@@ -34,11 +35,18 @@ export default function DownloadEEDlg(props) {
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
           Download Essentials
         </Typography>
-        <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
-          Get Elastos Essentials now to kickstart your journey!
-          <br />
-          It is your gateway to Web3.0!
-        </Typography>
+        {isMMUser ? (
+          <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
+            A DID is required in order to create or {open === true ? 'sell items' : 'import collections'} on Pasar. Get
+            your own DID by downloading the Elastos Essentials mobile app now!
+          </Typography>
+        ) : (
+          <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
+            Get Elastos Essentials now to kickstart your journey!
+            <br />
+            It is your gateway to Web3.0!
+          </Typography>
+        )}
         <Typography variant="body2" display="block" gutterBottom align="center" sx={{ mt: 4 }}>
           Web3.0 super wallet with Decentralized Identifier (DID)
         </Typography>
