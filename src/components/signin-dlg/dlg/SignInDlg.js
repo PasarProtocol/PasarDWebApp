@@ -5,11 +5,12 @@ import StyledButton from '../StyledButton';
 
 SignInDlg.propTypes = {
   open: PropTypes.bool,
+  isMMUser: PropTypes.bool,
   onClick: PropTypes.func
 };
 
 export default function SignInDlg(props) {
-  const { open, onClick } = props;
+  const { open, isMMUser = false, onClick } = props;
   return (
     <Dialog open={open} onClose={() => onClick('close')}>
       <DialogTitle>
@@ -67,27 +68,31 @@ export default function SignInDlg(props) {
                 Elastos Essentials
               </StyledButton>
             </Grid>
-            <Grid item xs={12} sx={{ pt: '8px !important' }}>
-              <Typography variant="body2" display="block" gutterBottom align="center">
-                Just basic wallet and no DID
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sx={{ pt: '8px !important' }}>
-              <StyledButton
-                variant="contained"
-                startIcon={
-                  <Avatar
-                    alt="metamask"
-                    src="/static/metamask.svg"
-                    sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
-                  />
-                }
-                fullWidth
-                onClick={() => onClick('MM')}
-              >
-                MetaMask
-              </StyledButton>
-            </Grid>
+            {!isMMUser && (
+              <>
+                <Grid item xs={12} sx={{ pt: '8px !important' }}>
+                  <Typography variant="body2" display="block" gutterBottom align="center">
+                    Just basic wallet and no DID
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sx={{ pt: '8px !important' }}>
+                  <StyledButton
+                    variant="contained"
+                    startIcon={
+                      <Avatar
+                        alt="metamask"
+                        src="/static/metamask.svg"
+                        sx={{ width: 24, height: 24, backgroundColor: 'white', p: '5px' }}
+                      />
+                    }
+                    fullWidth
+                    onClick={() => onClick('MM')}
+                  >
+                    MetaMask
+                  </StyledButton>
+                </Grid>
+              </>
+            )}
             <Grid item xs={12}>
               <StyledButton variant="outlined" fullWidth onClick={() => onClick('download')}>
                 I don’t have a wallet
