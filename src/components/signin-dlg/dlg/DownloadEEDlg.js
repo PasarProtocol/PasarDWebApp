@@ -7,12 +7,12 @@ import AppleIcon from '@mui/icons-material/Apple';
 import arrowIosBackFill from '@iconify/icons-eva/arrow-ios-back-fill';
 import StyledButton from '../StyledButton';
 
-DownloadDlg.propTypes = {
+DownloadEEDlg.propTypes = {
   open: PropTypes.bool,
   onClick: PropTypes.func
 };
 
-export default function DownloadDlg(props) {
+export default function DownloadEEDlg(props) {
   const { open, onClick } = props;
   return (
     <Dialog open={open} onClose={() => onClick('close')}>
