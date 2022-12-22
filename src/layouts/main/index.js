@@ -9,7 +9,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import MainNavbar from './MainNavbar';
 import MainFooter from './MainFooter';
 import useSettings from '../../hooks/useSettings';
-import useSingin from '../../hooks/useSignin';
+import useSignin from '../../hooks/useSignin';
 
 // ----------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ const BodyStyle = styled('div')(({ theme, footerhidden }) =>
 export default function MainLayout() {
   const { themeMode } = useSettings();
   const { pathname } = useLocation();
-  const { openTopAlert } = useSingin();
+  const { openTopAlert } = useSignin();
   const isHome = pathname === '/';
   const isContainerXl = isHome || pathname === '/collections';
   const isFooterHiddenPage =
