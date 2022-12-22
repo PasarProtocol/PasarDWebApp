@@ -5,12 +5,12 @@ import StyledButton from '../StyledButton';
 
 SignInDlg.propTypes = {
   open: PropTypes.bool,
-  isMMUser: PropTypes.bool,
+  noDID: PropTypes.bool,
   onClick: PropTypes.func
 };
 
 export default function SignInDlg(props) {
-  const { open, isMMUser = false, onClick } = props;
+  const { open, noDID = false, onClick } = props;
   return (
     <Dialog open={open} onClose={() => onClick('close')}>
       <DialogTitle>
@@ -68,7 +68,7 @@ export default function SignInDlg(props) {
                 Elastos Essentials
               </StyledButton>
             </Grid>
-            {!isMMUser && (
+            {!noDID && (
               <>
                 <Grid item xs={12} sx={{ pt: '8px !important' }}>
                   <Typography variant="body2" display="block" gutterBottom align="center">
