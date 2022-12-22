@@ -9,12 +9,12 @@ import StyledButton from '../StyledButton';
 
 DownloadEEDlg.propTypes = {
   open: PropTypes.bool,
-  isMMUser: PropTypes.bool,
+  noDID: PropTypes.bool,
   onClick: PropTypes.func
 };
 
 export default function DownloadEEDlg(props) {
-  const { open, isMMUser = false, onClick } = props;
+  const { open, noDID = false, onClick } = props;
   return (
     <Dialog open={open} onClose={() => onClick('close')}>
       <DialogTitle>
@@ -35,7 +35,7 @@ export default function DownloadEEDlg(props) {
         <Typography variant="h3" component="div" sx={{ color: 'text.primary' }} align="center">
           Download Essentials
         </Typography>
-        {isMMUser ? (
+        {noDID ? (
           <Typography variant="p" component="div" sx={{ color: 'text.secondary' }} align="center">
             A DID is required in order to create or {open === true ? 'sell items' : 'import collections'} on Pasar. Get
             your own DID by downloading the Elastos Essentials mobile app now!

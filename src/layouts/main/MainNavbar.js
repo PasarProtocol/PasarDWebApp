@@ -15,7 +15,7 @@ import { MHidden } from '../../components/@material-extend';
 import SearchBox from '../../components/SearchBox';
 import Searchbar from '../../components/Searchbar';
 import NetworkCircle from '../../components/NetworkCircle';
-import SignInDialog from '../../components/signin-dlg/SignInDialog';
+import SignInButton from '../../components/signin-dlg/SignInButton';
 //
 import MenuDesktop from './MenuDesktop';
 import MenuMobile from './MenuMobile';
@@ -138,7 +138,7 @@ export default function MainNavbar() {
           <MHidden width="mdDown">
             <MenuDesktop isOffset={isOffset} navConfig={navConfig} />
           </MHidden>
-          <SignInDialog />
+          <SignInButton />
           {!!sessionLinkFlag && <NetworkCircle />}
           <MHidden width="mdDown">
             <Button
