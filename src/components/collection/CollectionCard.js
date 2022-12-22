@@ -341,6 +341,8 @@ const CollectionCardPaper = (props) => {
 
   React.useEffect(() => {
     const fetchData = async () => {
+      if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2')
+        return
       try {
         const res = await queryKycMe(creator.did);
         if (res.find_message && res.find_message.items.length) setBadgeFlag('kyc', true);

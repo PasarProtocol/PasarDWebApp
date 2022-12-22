@@ -51,7 +51,7 @@ export default function useInitializeEE() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletConnectProvider]);
 
-  const showChainErrorSnackBar = async () => {
+  const showChainErrorSnackBar = () => {
     enqueueSnackbar('Wrong network, only Elastos Smart Chain is supported', {
       variant: 'error',
       anchorOrigin: { horizontal: 'right', vertical: 'top' }
