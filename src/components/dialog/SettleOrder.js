@@ -6,12 +6,12 @@ import { useWeb3React } from '@web3-react/core';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Box, Grid, Stack, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import {
   reduceHexAddress,
@@ -33,16 +33,16 @@ SettleOrder.propTypes = {
 };
 
 export default function SettleOrder(props) {
-  const [balance, setBalance] = React.useState(0);
-  const { enqueueSnackbar } = useSnackbar();
-  const [onProgress, setOnProgress] = React.useState(false);
+  const navigate = useNavigate();
   const context = useWeb3React();
-  const { pasarLinkAddress, pasarLinkChain } = useSingin();
-  const { updateCount, setUpdateCount } = useAuctionDlg();
   const { library, chainId, account } = context;
+  const { user, wallet } = useUserContext();
+  const { updateCount, setUpdateCount } = useAuctionDlg();
+  const { enqueueSnackbar } = useSnackbar();
+  const [balance, setBalance] = React.useState(0);
+  const [onProgress, setOnProgress] = React.useState(false);
 
   const { isOpen, setOpen, info, address, updateCount: updateCountProfile, handleUpdate } = props;
-  const navigate = useNavigate()
 
   const seller = info.sellerAddr;
   const { lastBid, lastBidder } = info;
@@ -58,7 +58,7 @@ export default function SettleOrder(props) {
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
-        const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+        const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
         const pasarContract = new ethers.Contract(MarketContractAddress, PASAR_CONTRACT_ABI, signer);
         signer
           .getAddress()
@@ -83,7 +83,10 @@ export default function SettleOrder(props) {
                         setOpen(false);
                         setOnProgress(false);
 
-                        setTimeout(() => {navigate('/profile/myitem/0');window.location.reload()}, 2000);
+                        setTimeout(() => {
+                          navigate('/profile/myitem/0');
+                          window.location.reload();
+                        }, 2000);
                         setTimeout(() => {
                           setUpdateCount(updateCount + 1);
                         }, 1000);
@@ -129,7 +132,7 @@ export default function SettleOrder(props) {
   };
 
   const callSettleOrder = (_orderId) => {
-    callContractMethod('settleAuctionOrder', 0, pasarLinkChain, {
+    callContractMethod('settleAuctionOrder', 0, wallet?.chainId, {
       _orderId
     })
       .then((success) => {
@@ -137,7 +140,10 @@ export default function SettleOrder(props) {
         enqueueSnackbar('Settle auction order success!', { variant: 'success' });
         setOnProgress(false);
         setOpen(false);
-        setTimeout(() => {navigate('/profile/myitem/0'); window.location.reload()}, 2000);
+        setTimeout(() => {
+          navigate('/profile/myitem/0');
+          window.location.reload();
+        }, 2000);
         setTimeout(() => {
           setUpdateCount(updateCount + 1);
         }, 1000);
@@ -188,7 +194,7 @@ export default function SettleOrder(props) {
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, chainId, pasarLinkAddress]);
+  }, [account, chainId, user?.link]);
 
   const price = lastBid;
   const platformFee = (price * 2) / 100;
@@ -264,7 +270,7 @@ export default function SettleOrder(props) {
                 Platform fee 2%
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {platformFee/10**18} ELA
+                {platformFee / 10 ** 18} ELA
               </Typography>
             </Stack>
           </Grid>
@@ -274,7 +280,7 @@ export default function SettleOrder(props) {
                 Creator will get (royalties)
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {royalties/10**18} ELA
+                {royalties / 10 ** 18} ELA
               </Typography>
             </Stack>
           </Grid>
@@ -290,7 +296,7 @@ export default function SettleOrder(props) {
                 </Typography>
               )}
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {(price - platformFee - royalties)/10**18} ELA
+                {(price - platformFee - royalties) / 10 ** 18} ELA
               </Typography>
             </Stack>
           </Grid>
@@ -301,7 +307,7 @@ export default function SettleOrder(props) {
                   You will pay
                 </Typography>
                 <Typography variant="body2" display="block" gutterBottom align="right">
-                  {price/10**18} ELA
+                  {price / 10 ** 18} ELA
                 </Typography>
               </Stack>
             </Grid>

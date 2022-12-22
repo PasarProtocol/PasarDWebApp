@@ -74,14 +74,14 @@ import {
   getChainTypeFromId,
   getContractAddressInCurrentNetwork,
   getTotalCountOfCoinTypes,
-
-  getStartPosOfCoinTypeByChainType, setAllTokenPrice2
+  getStartPosOfCoinTypeByChainType,
+  setAllTokenPrice2
 } from '../../utils/common';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import convert from '../../utils/image-file-resize';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useMintDlg from '../../hooks/useMintDlg';
-import useSignin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import { PATH_PAGE } from '../../routes/paths';
 // ----------------------------------------------------------------------
 
@@ -143,9 +143,9 @@ export default function CreateItem() {
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setCurrent, setTotalSteps } = useMintDlg();
-  const { diaBalance, pasarLinkChain } = useSignin();
+  const { wallet } = useUserContext();
   const { enqueueSnackbar } = useSnackbar();
-  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain);
+  const coinTypes = getCoinTypesInCurrentNetwork(wallet?.chainId);
 
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
@@ -176,9 +176,8 @@ export default function CreateItem() {
   }, []);
 
   React.useEffect(() => {
-    // console.log(pasarLinkChain)
     setCoinType(0);
-    const currentChain = getChainTypeFromId(pasarLinkChain);
+    const currentChain = getChainTypeFromId(wallet?.chainId);
     setChainType(currentChain);
     if (currentChain === 'ESC') handleClickCollection('PSRC');
     else if (currentChain === 'ETH') handleClickCollection('PSREC');
@@ -189,14 +188,14 @@ export default function CreateItem() {
       setPutOnSale(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pasarLinkChain]);
+  }, [wallet?.chainId]);
 
   React.useEffect(() => {
     if (selectedCollection.token) {
-      checkWhetherGeneralCollection(pasarLinkChain, selectedCollection.token).then(setIsGeneralCollection);
+      checkWhetherGeneralCollection(wallet?.chainId, selectedCollection.token).then(setIsGeneralCollection);
       setCollection('Choose');
     }
-  }, [selectedCollection.token, pasarLinkChain]);
+  }, [selectedCollection.token, wallet?.chainId]);
 
   React.useEffect(() => {
     if (mintype !== 'Multiple') setQuantity(1);
@@ -487,14 +486,14 @@ export default function CreateItem() {
         reject(new Error());
         return;
       }
-      const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+      const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
       const walletConnectWeb3 = new Web3(
         isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider()
       );
       walletConnectWeb3.eth
         .getAccounts()
         .then((accounts) => {
-          let baseAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker');
+          let baseAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'sticker');
           let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, baseAddress);
           if (collection === 'FSTK') {
             baseAddress = FEEDS_CONTRACT_ADDRESS;
@@ -570,7 +569,7 @@ export default function CreateItem() {
                               setCurrent(3);
                               console.log('setApprovalForAll-receipt', receipt);
                               if (saletype === 'FixedPrice')
-                                callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
+                                callContractMethod('createOrderForSale', coinType, wallet?.chainId, {
                                   ...paramObj,
                                   ...commonArgs,
                                   _price: BigInt(price * 1e18).toString()
@@ -582,7 +581,7 @@ export default function CreateItem() {
                                     reject(error);
                                   });
                               else
-                                callContractMethod('createOrderForAuction', coinType, pasarLinkChain, {
+                                callContractMethod('createOrderForAuction', coinType, wallet?.chainId, {
                                   ...paramObj,
                                   ...commonArgs,
                                   _minPrice: BigInt(price * 1e18).toString(),
@@ -603,7 +602,7 @@ export default function CreateItem() {
                               reject(error);
                             });
                         } else if (saletype === 'FixedPrice')
-                          callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
+                          callContractMethod('createOrderForSale', coinType, wallet?.chainId, {
                             ...paramObj,
                             ...commonArgs,
                             _price: BigInt(price * 1e18).toString()
@@ -615,7 +614,7 @@ export default function CreateItem() {
                               reject(error);
                             });
                         else
-                          callContractMethod('createOrderForAuction', coinType, pasarLinkChain, {
+                          callContractMethod('createOrderForAuction', coinType, wallet?.chainId, {
                             ...paramObj,
                             ...commonArgs,
                             _minPrice: BigInt(price * 1e18).toString(),
@@ -656,14 +655,14 @@ export default function CreateItem() {
         reject(new Error());
         return;
       }
-      const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+      const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
       const walletConnectWeb3 = new Web3(
         isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider()
       );
       walletConnectWeb3.eth
         .getAccounts()
         .then((accounts) => {
-          let baseAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker');
+          let baseAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'sticker');
           let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, baseAddress);
           if (collection === 'FSTK') {
             baseAddress = FEEDS_CONTRACT_ADDRESS;
@@ -737,7 +736,7 @@ export default function CreateItem() {
                                   setOpenAccessDlg(false);
                                   setCurrent(3);
                                   console.log('setApprovalForAll-receipt', receipt);
-                                  callContractMethod('createOrderForSaleBatch', coinType, pasarLinkChain, {
+                                  callContractMethod('createOrderForSaleBatch', coinType, wallet?.chainId, {
                                     ...paramObj,
                                     ...commonArgs,
                                     _price: BigInt(price * 1e18).toString()
@@ -755,7 +754,7 @@ export default function CreateItem() {
                                   reject(error);
                                 });
                             }
-                            callContractMethod('createOrderForSaleBatch', coinType, pasarLinkChain, {
+                            callContractMethod('createOrderForSaleBatch', coinType, wallet?.chainId, {
                               ...paramObj,
                               ...commonArgs,
                               _price: BigInt(price * 1e18).toString()
@@ -1118,7 +1117,7 @@ export default function CreateItem() {
       return obj;
     }, []);
 
-  const DiaDegree = getDiaBalanceDegree(diaBalance, pasarLinkChain);
+  const DiaDegree = getDiaBalanceDegree(wallet?.diaBalance ?? 0, wallet?.chainId);
   const handleMintAction = () => {
     setOnValidation(true);
     if (!collection) {
@@ -1126,12 +1125,12 @@ export default function CreateItem() {
       return;
     }
     if (isPutOnSale) {
-      const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+      const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
       const walletConnectWeb3 = new Web3(
         isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider()
       );
       walletConnectWeb3.eth.getAccounts().then((accounts) => {
-        const baseAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker');
+        const baseAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'sticker');
         let stickerContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, baseAddress);
         if (collection === 'FSTK') {
           stickerContract = new walletConnectWeb3.eth.Contract(FEEDS_CONTRACT_ABI, FEEDS_CONTRACT_ADDRESS);
@@ -2078,13 +2077,13 @@ export default function CreateItem() {
       <NeedBuyDIADlg
         isOpen={buyDIAOpen}
         setOpen={setOpenBuyDIA}
-        balance={diaBalance}
+        balance={wallet?.diaBalance ?? 0}
         actionText="mint NFT from dedicated collection"
       />
       <NeedMoreDIADlg
         isOpen={moreDIAOpen}
         setOpen={setOpenMoreDIA}
-        balance={diaBalance}
+        balance={wallet?.diaBalance ?? 0}
         actionText="mint and sell more tokens in batch"
       />
     </RootStyle>

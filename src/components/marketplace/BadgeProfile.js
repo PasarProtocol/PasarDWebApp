@@ -30,7 +30,7 @@ import {
   getContractAddressInCurrentNetwork,
   getImageFromIPFSUrl
 } from '../../utils/common';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 
 // ----------------------------------------------------------------------
 
@@ -82,8 +82,8 @@ export default function BadgeProfile(props) {
   const [badge, setBadge] = React.useState({ dia: 0, kyc: false });
   const [ownerAvatar, setOwnerAvatar] = React.useState(null);
   const [ownerSocials, setOwnerSocials] = React.useState({});
-  const { pasarLinkChain } = useSingin();
-  const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker');
+  const { wallet } = useUserContext();
+  const PasarContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'sticker');
 
   const defaultCollection = {
     ...collectionTypes[defaultCollectionType],

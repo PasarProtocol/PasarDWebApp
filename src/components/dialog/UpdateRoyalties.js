@@ -15,7 +15,7 @@ import {
   isInAppBrowser,
   getFilteredGasPrice
 } from '../../utils/common';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 
 UpdateRoyalties.propTypes = {
   isOpen: PropTypes.bool,
@@ -28,6 +28,8 @@ UpdateRoyalties.propTypes = {
 
 export default function UpdateRoyalties(props) {
   const { isOpen, setOpen, name, token, royaltyOwners = [], royaltyFees = [] } = props;
+  const { enqueueSnackbar } = useSnackbar();
+  const { wallet } = useUserContext();
   const originRoyalties = royaltyOwners.map((address, _i) => {
     const tempItem = { address, royalties: 0 };
     if (royaltyFees[_i]) tempItem.royalties = ((royaltyFees[_i] * 100) / 10 ** 6).toString();
@@ -37,8 +39,6 @@ export default function UpdateRoyalties(props) {
   const [recipientRoyaltiesGroup, setRecipientRoyaltiesGroup] = React.useState(originRoyalties);
   const [onProgress, setOnProgress] = React.useState(false);
   const [isOnValidation, setOnValidation] = React.useState(false);
-  const { enqueueSnackbar } = useSnackbar();
-  const { pasarLinkChain } = useSingin();
 
   const handleClose = () => {
     setOpen(false);
@@ -62,7 +62,7 @@ export default function UpdateRoyalties(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
-    const RegContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'register');
+    const RegContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'register');
     console.log(RegContractAddress);
     const registerContract = new walletConnectWeb3.eth.Contract(REGISTER_CONTRACT_ABI, RegContractAddress);
     const _gasPrice = await walletConnectWeb3.eth.getGasPrice();

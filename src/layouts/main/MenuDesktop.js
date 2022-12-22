@@ -8,7 +8,7 @@ import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { styled } from '@mui/material/styles';
 import { Box, Link, Grid, List, Stack, Popover, ListItem, ListSubheader, Tooltip, Badge } from '@mui/material';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 
 // ----------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ MenuDesktopItem.propTypes = {
 
 function MenuDesktopItem(props) {
   const { item, isOpen, isOffset, onOpen, onClose } = props;
-  const { setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin();
+  const { user, setOpenSignInDlg, setOpenDownloadEEDlg, setNavigationPath } = useUserContext();
   const { title, path, children } = item;
 
   if (children) {
@@ -183,14 +183,13 @@ function MenuDesktopItem(props) {
   }
 
   const openSignin = (path) => {
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3')
-      setOpenDownloadEssentialDlg(true);
-    else setOpenSigninEssentialDlg(true);
-    setAfterSigninPath(path);
+    if (user?.link === '1' || user?.link === '3') setOpenDownloadEEDlg(true);
+    else setOpenSignInDlg(true);
+    setNavigationPath(path);
   };
 
   if (path.startsWith('/create')) {
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && essentialsConnector.hasWalletConnectSession())
+    if (user?.link === '2' && essentialsConnector.hasWalletConnectSession())
       return (
         <LinkStyle
           to={path}

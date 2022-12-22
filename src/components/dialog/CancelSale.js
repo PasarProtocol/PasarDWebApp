@@ -11,7 +11,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { isInAppBrowser, getFilteredGasPrice, getContractAddressInCurrentNetwork } from '../../utils/common';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
-import useSignin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 
 CancelSale.propTypes = {
   isOpen: PropTypes.bool,
@@ -28,7 +28,7 @@ export default function CancelSale(props) {
   const [onProgress, setOnProgress] = React.useState(false);
   const { updateCount: updateCount2, setUpdateCount } = useAuctionDlg();
   const { enqueueSnackbar } = useSnackbar();
-  const { pasarLinkChain } = useSignin();
+  const { wallet } = useUserContext();
   const v1State = order?.chain === 'v1';
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,7 +44,7 @@ export default function CancelSale(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
-    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+    const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
     const contractAbi = PASAR_CONTRACT_ABI;
     const contractAddress = !v1State ? MarketContractAddress : V1_MARKET_CONTRACT_ADDRESS;
     const pasarContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);

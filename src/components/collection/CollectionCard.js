@@ -14,7 +14,7 @@ import PaperRecord from '../PaperRecord';
 import UpdateRoyaltiesDlg from '../dialog/UpdateRoyalties';
 import KYCBadge from '../badge/KYCBadge';
 import DIABadge from '../badge/DIABadge';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import {
   reduceHexAddress,
   checkWhetherGeneralCollection,
@@ -306,6 +306,8 @@ const CollectionCardPaper = (props) => {
     creator = {},
     dia = 0
   } = info;
+  const navigate = useNavigate();
+  const { wallet, setOpenDownloadEEDlg } = useUserContext();
   const realData = [tradeVolume, lowestPrice / 1e18, owners];
   const avatar = getImageFromIPFSUrl(data?.avatar || info.avatar);
   const background = getImageFromIPFSUrl(data?.background || info.background);
@@ -316,12 +318,10 @@ const CollectionCardPaper = (props) => {
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
   const [badge, setBadge] = React.useState({ dia, kyc: false });
   const [collectibles, setCollectibles] = React.useState([]);
-  const { setOpenDownloadEssentialDlg, pasarLinkChain } = useSingin();
-  const navigate = useNavigate();
 
   React.useEffect(() => {
-    checkWhetherGeneralCollection(pasarLinkChain, token).then(setIsGeneralCollection);
-  }, [token, pasarLinkChain]);
+    checkWhetherGeneralCollection(wallet?.chainId, token).then(setIsGeneralCollection);
+  }, [token, wallet?.chainId]);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -341,8 +341,7 @@ const CollectionCardPaper = (props) => {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if(sessionStorage.getItem('PASAR_LINK_ADDRESS')!=='2')
-        return
+      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') return;
       try {
         const res = await queryKycMe(creator.did);
         if (res.find_message && res.find_message.items.length) setBadgeFlag('kyc', true);
@@ -390,7 +389,7 @@ const CollectionCardPaper = (props) => {
           sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
           sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'
         ) {
-          setOpenDownloadEssentialDlg(true);
+          setOpenDownloadEEDlg(true);
           return;
         }
         navigate(`/collections/edit`, { state: { chain, token } });
@@ -400,7 +399,7 @@ const CollectionCardPaper = (props) => {
           sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
           sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'
         ) {
-          setOpenDownloadEssentialDlg(true);
+          setOpenDownloadEEDlg(true);
           return;
         }
         if (openRoyaltiesDlg) openRoyaltiesDlg(true);

@@ -4,7 +4,7 @@ import { Button, Menu, MenuItem, Box } from '@mui/material';
 import { Icon } from '@iconify/react';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { getCoinTypesInCurrentNetwork } from '../../utils/common';
-import useSignin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 
 CoinSelect.propTypes = {
   selected: PropTypes.number,
@@ -13,8 +13,8 @@ CoinSelect.propTypes = {
 
 export default function CoinSelect({ selected, onChange }) {
   const [isOpenPopup, setOpenPopup] = React.useState(null);
-  const { pasarLinkChain } = useSignin();
-  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain);
+  const { wallet } = useUserContext();
+  const coinTypes = getCoinTypesInCurrentNetwork(wallet?.chainId);
 
   const openPopupMenu = (event) => {
     setOpenPopup(event.currentTarget);

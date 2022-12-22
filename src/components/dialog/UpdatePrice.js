@@ -33,7 +33,7 @@ import {
   getDiaBalanceDegree
 } from '../../utils/common';
 import { auctionOrderType } from '../../config';
-import useSignin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import { PATH_PAGE } from '../../routes/paths';
 
 UpdatePrice.propTypes = {
@@ -62,6 +62,9 @@ export default function UpdatePrice(props) {
     v1State = false,
     royalties
   } = props;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { wallet } = useUserContext();
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [price, setPrice] = React.useState('');
@@ -71,9 +74,6 @@ export default function UpdatePrice(props) {
   const [coinType, setCoinType] = React.useState(0);
   const [isOnValidation, setOnValidation] = React.useState(false);
 
-  const { diaBalance, pasarLinkChain } = useSignin();
-  const navigate = useNavigate();
-  const location = useLocation();
   const handleClose = () => {
     setOpen(false);
     setOnProgress(false);
@@ -115,7 +115,7 @@ export default function UpdatePrice(props) {
     callContractMethod(
       orderType === auctionOrderType ? 'changeAuctionOrderPrice' : 'changeSaleOrderPrice',
       coinType,
-      pasarLinkChain,
+      wallet?.chainId,
       {
         _orderId,
         _price,
@@ -160,8 +160,8 @@ export default function UpdatePrice(props) {
     callChangeOrderPrice(orderId, _updatedPrice, _reservePrice, _buyoutPrice);
   };
 
-  const DiaDegree = getDiaBalanceDegree(diaBalance, pasarLinkChain);
-  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain);
+  const DiaDegree = getDiaBalanceDegree(wallet?.diaBalance ?? 0, wallet?.chainId);
+  const coinTypes = getCoinTypesInCurrentNetwork(wallet?.chainId);
 
   return (
     <Dialog open={isOpen} onClose={handleClose}>

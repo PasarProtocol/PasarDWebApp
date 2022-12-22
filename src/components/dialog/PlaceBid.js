@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { PASAR_CONTRACT_ABI } from '../../abi/pasarABI';
 import { ERC20_CONTRACT_ABI } from '../../abi/erc20ABI';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
@@ -27,7 +27,6 @@ import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinTypeLabel from '../CoinTypeLabel';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
-import useSingin from '../../hooks/useSignin';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import {
   reduceHexAddress,
@@ -41,6 +40,7 @@ import {
   getContractAddressInCurrentNetwork
 } from '../../utils/common';
 import { blankAddress } from '../../config';
+import { useUserContext } from '../../contexts/UserContext';
 
 PlaceBid.propTypes = {
   isOpen: PropTypes.bool,
@@ -57,7 +57,7 @@ export default function PlaceBid(props) {
   const [isBuynow, setBuynow] = React.useState(false);
 
   const context = useWeb3React();
-  const { pasarLinkAddress, pasarLinkChain } = useSingin();
+  const { user, wallet } = useUserContext();
   const { updateCount, setUpdateCount } = useAuctionDlg();
 
   const { library, chainId, account } = context;
@@ -66,7 +66,7 @@ export default function PlaceBid(props) {
   const coinName = coinType.name;
   const targetPrice = isBuynow ? math.round(info.order.buyoutPrice / 1e18, 3) : bidPrice;
   const actionText = isBuynow ? 'Buy NFT' : 'Bid NFT';
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleClose = () => {
     setOpen(false);
@@ -89,7 +89,7 @@ export default function PlaceBid(props) {
       const { ethereum } = window;
 
       if (ethereum) {
-        const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+        const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const pasarContract = new ethers.Contract(MarketContractAddress, PASAR_CONTRACT_ABI, signer);
@@ -142,7 +142,9 @@ export default function PlaceBid(props) {
                         setTimeout(() => {
                           setUpdateCount(updateCount + 1);
                         }, 1000);
-                        setTimeout(() => {navigate('/profile/myitem/2');}, 2000)
+                        setTimeout(() => {
+                          navigate('/profile/myitem/2');
+                        }, 2000);
                       })
                       .catch((error) => {
                         console.log(error);
@@ -186,7 +188,7 @@ export default function PlaceBid(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
-    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+    const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
     const pasarContract = new walletConnectWeb3.eth.Contract(PASAR_CONTRACT_ABI, MarketContractAddress);
     if (coinType.address !== blankAddress) {
       const erc20Contract = new walletConnectWeb3.eth.Contract(ERC20_CONTRACT_ABI, coinType.address);
@@ -280,27 +282,27 @@ export default function PlaceBid(props) {
       setBalanceArray(Array(getTotalCountOfCoinTypes()).fill(0));
       if (sessionLinkFlag) {
         if (sessionLinkFlag === '1' && library)
-          getBalanceByAllCoinTypes(library.provider, pasarLinkChain, setBalanceByCoinType);
+          getBalanceByAllCoinTypes(library.provider, wallet?.chainId, setBalanceByCoinType);
         else if (sessionLinkFlag === '2') {
           if (isInAppBrowser()) {
             const elastosWeb3Provider = await window.elastos.getWeb3Provider();
-            getBalanceByAllCoinTypes(elastosWeb3Provider, pasarLinkChain, setBalanceByCoinType);
+            getBalanceByAllCoinTypes(elastosWeb3Provider, wallet?.chainId, setBalanceByCoinType);
           } else if (essentialsConnector.getWalletConnectProvider()) {
             getBalanceByAllCoinTypes(
               essentialsConnector.getWalletConnectProvider(),
-              pasarLinkChain,
+              wallet?.chainId,
               setBalanceByCoinType
             );
           }
         } else if (sessionLinkFlag === '3')
-          getBalanceByAllCoinTypes(walletconnect.getProvider(), pasarLinkChain, setBalanceByCoinType);
+          getBalanceByAllCoinTypes(walletconnect.getProvider(), wallet?.chainId, setBalanceByCoinType);
       }
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, chainId, pasarLinkAddress, pasarLinkChain]);
+  }, [account, chainId, user?.link, wallet?.chainId]);
 
-  const price = Math.max(info.order?.price / 10**18, targetPrice);
+  const price = Math.max(info.order?.price / 10 ** 18, targetPrice);
   const platformFee = math.round((price * 2) / 100, 4);
   const royalties = info.isFirstSale === 'Primary Sale' ? 0 : math.round((price * info.royaltyFee) / 10 ** 6, 4);
   const TypographyStyle = { display: 'inline', lineHeight: 1.1 };
@@ -378,7 +380,8 @@ export default function PlaceBid(props) {
             <Divider />
             {isBuynow && (
               <Typography variant="body2" display="block" color="red" gutterBottom>
-                Your bid is equal or higher than the Buy Now price - {math.round(info.order.buyoutPrice / 1e18, 3)} {coinName}
+                Your bid is equal or higher than the Buy Now price - {math.round(info.order.buyoutPrice / 1e18, 3)}{' '}
+                {coinName}
               </Typography>
             )}
           </Grid>
@@ -434,7 +437,7 @@ export default function PlaceBid(props) {
                 Seller will get
               </Typography>
               <Typography variant="body2" display="block" gutterBottom align="right" sx={{ color: 'text.secondary' }}>
-                {(price * 10**18 - platformFee * 10**18 - royalties* 10**18)/10**18} {coinName}
+                {(price * 10 ** 18 - platformFee * 10 ** 18 - royalties * 10 ** 18) / 10 ** 18} {coinName}
               </Typography>
             </Stack>
           </Grid>

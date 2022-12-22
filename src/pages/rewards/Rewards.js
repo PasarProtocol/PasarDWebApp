@@ -41,7 +41,7 @@ import {
   getWalletAccounts,
   removeLeadingZero
 } from '../../utils/common';
-import useSignin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import {
   blankAddress,
   pasarERC20Contract as PASAR_TOKEN_ADDRESS,
@@ -208,7 +208,7 @@ const AmountProgressType = ['25%', '50%', '75%', 'Max'];
 
 export default function Rewards() {
   const { enqueueSnackbar } = useSnackbar();
-  const { setOpenSigninEssentialDlg } = useSignin();
+  const { setOpenSignInDlg } = useUserContext();
   const [tabValue, setTabValue] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
   const [operAmount, setOperAmount] = React.useState(0);
@@ -652,7 +652,7 @@ export default function Rewards() {
   const handleStake = async (type, amount) => {
     const accounts = await getWalletAccounts();
     if (!(accounts && accounts.length)) {
-      setOpenSigninEssentialDlg(true);
+      setOpenSignInDlg(true);
       return;
     }
     const stakingInfo = await callTokenContractMethod({
@@ -710,7 +710,7 @@ export default function Rewards() {
   const handleWithdrawStakingReward = async () => {
     const isSignedIn = await checkIfSignedOrNot();
     if (!isSignedIn) {
-      setOpenSigninEssentialDlg(true);
+      setOpenSignInDlg(true);
       return;
     }
     try {
@@ -730,7 +730,7 @@ export default function Rewards() {
   const handleWithdrawMiningReward = async (name) => {
     const isSignedIn = await checkIfSignedOrNot();
     if (!isSignedIn) {
-      setOpenSigninEssentialDlg(true);
+      setOpenSignInDlg(true);
       return;
     }
     try {

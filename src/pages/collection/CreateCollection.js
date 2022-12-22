@@ -42,8 +42,7 @@ import { TOKEN_721_ABI } from '../../abi/token721ABI';
 import { TOKEN_1155_ABI } from '../../abi/token1155ABI';
 import { blankAddress, diaContract as DIA_TOKEN_ADDRESS, ipfsURL, tokenConf } from '../../config';
 import useOffSetTop from '../../hooks/useOffSetTop';
-import useSingin from '../../hooks/useSignin';
-
+import { useUserContext } from '../../contexts/UserContext';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import {
   isInAppBrowser,
@@ -78,6 +77,8 @@ const tokenStandard = {
 };
 const _gasLimit = 5000000;
 export default function CreateCollection() {
+  const { wallet } = useUserContext();
+  const { enqueueSnackbar } = useSnackbar();
   const [address, setAddress] = React.useState('');
   const [name, setName] = React.useState('');
   const [symbol, setSymbol] = React.useState('');
@@ -113,13 +114,11 @@ export default function CreateCollection() {
   const uploadBackgroundRef = React.useRef();
   const descriptionRef = React.useRef();
 
-  const { diaBalance, pasarLinkChain } = useSingin();
-  const { enqueueSnackbar } = useSnackbar();
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
   const APP_BAR_DESKTOP = 88;
   const navigate = useNavigate();
-  const chainType = getChainTypeFromId(pasarLinkChain);
+  const chainType = getChainTypeFromId(wallet?.chainId);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -139,7 +138,10 @@ export default function CreateCollection() {
         return tempState;
       });
       try {
-        const res = await fetchAPIFrom(`api/v1/getCollectionsByWalletAddr?pageNum=1&pageSize=1&chain=all&walletAddr=${address}`, {});
+        const res = await fetchAPIFrom(
+          `api/v1/getCollectionsByWalletAddr?pageNum=1&pageSize=1&chain=all&walletAddr=${address}`,
+          {}
+        );
         const json = await res.json();
         setCollectionCount(json?.data.total ?? 0);
       } catch (e) {
@@ -407,7 +409,7 @@ export default function CreateCollection() {
         return;
       }
 
-      const RegContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'register');
+      const RegContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'register');
       const walletConnectWeb3 = new Web3(
         isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider()
       );
@@ -437,7 +439,9 @@ export default function CreateCollection() {
                   setBaseToken(paramObj._address);
                   console.log('receipt', receipt);
                   resolve(true);
-                  setTimeout(() => {navigate('/profile/myitem/5');}, 2000)
+                  setTimeout(() => {
+                    navigate('/profile/myitem/5');
+                  }, 2000);
                 })
                 .on('error', (error) => {
                   console.error('error', error);
@@ -495,7 +499,7 @@ export default function CreateCollection() {
     window.scrollTo({ top: ref.current.offsetTop - fixedHeight, behavior: 'smooth' });
   };
   const handleCreateAction = () => {
-    const degree = getDiaBalanceDegree(diaBalance, pasarLinkChain);
+    const degree = getDiaBalanceDegree(wallet?.diaBalance ?? 0, wallet?.chainId);
     setOnValidation(true);
     if (!name.length) scrollToRef(nameRef);
     else if (!symbol.length) scrollToRef(symbolRef);
@@ -837,7 +841,7 @@ export default function CreateCollection() {
       <NeedMoreDIADlg
         isOpen={moreDIAOpen}
         setOpen={setOpenMoreDIA}
-        balance={diaBalance}
+        balance={wallet?.diaBalance ?? 0}
         actionText="create more collections"
       />
     </RootStyle>

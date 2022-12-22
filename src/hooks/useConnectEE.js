@@ -6,7 +6,6 @@ import { getAnalytics } from 'firebase/analytics';
 import { isInAppBrowser } from '../utils/common';
 import { essentialsConnector, isUsingEssentialsConnector } from '../components/signin-dlg/EssentialConnectivity';
 import { firebaseConfig, DidResolverUrl } from '../config';
-import { useUserContext } from '../contexts/UserContext';
 
 if (firebaseConfig.apiKey) {
   const app = initializeApp(firebaseConfig);
@@ -14,8 +13,6 @@ if (firebaseConfig.apiKey) {
 }
 
 export default function useConnectEE() {
-  const { user, setUser } = useUserContext();
-
   const signInWithEssentials = async () => {
     const didAccess = new DID.DIDAccess();
     let presentation;
@@ -60,7 +57,7 @@ export default function useConnectEE() {
       sessionStorage.setItem('PASAR_DID', did);
       sessionStorage.setItem('PASAR_ADDRESS', walletAddress);
       sessionStorage.setItem('PASAR_TOKEN', token);
-      setUser({ ...user, link: '2', did, token, address: walletAddress });
+      const user = { link: '2', did, token, address: walletAddress };
       return user;
     }
     return undefined;

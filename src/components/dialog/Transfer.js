@@ -34,7 +34,7 @@ import {
 } from '../../utils/common';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 
 Transfer.propTypes = {
   isOpen: PropTypes.bool,
@@ -54,7 +54,7 @@ export default function Transfer(props) {
   const [isOpenAdvanced, setOpenAdvanced] = React.useState(false);
   const [memo, setMemo] = React.useState('');
   const [isOnValidation, setOnValidation] = React.useState(false);
-  const { pasarLinkChain } = useSingin();
+  const { user, wallet } = useUserContext();
   const collectionABIs = [TOKEN_721_ABI, TOKEN_1155_ABI];
 
   const handleClose = () => {
@@ -67,9 +67,9 @@ export default function Transfer(props) {
   };
 
   const callSafeTransferFrom = (_to, _id, _value) => {
-    const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker');
+    const PasarContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'sticker');
     let walletConnectProvider = Web3.givenProvider;
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+    if (user?.link === '2')
       walletConnectProvider = isInAppBrowser()
         ? window.elastos.getWeb3Provider()
         : essentialsConnector.getWalletConnectProvider();

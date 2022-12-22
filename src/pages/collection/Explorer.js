@@ -10,7 +10,7 @@ import CollectionCard from '../../components/collection/CollectionCard';
 import CollectionCardSkeleton from '../../components/collection/CollectionCardSkeleton';
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import StyledButton from '../../components/signin-dlg/StyledButton';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import { chainTypes, fetchAPIFrom, getChainTypeFromId } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -53,8 +53,7 @@ export default function Explorer() {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [needOptionToBelow, setOptionToBelow] = React.useState(false);
   const [controller, setAbortController] = React.useState(new AbortController());
-  const { diaBalance, setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath, pasarLinkChain } =
-    useSingin();
+  const { user, wallet, setOpenSignInDlg, setOpenDownloadEEDlg, setNavigationPath } = useUserContext();
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -102,17 +101,16 @@ export default function Explorer() {
   window.addEventListener('resize', handleResize);
 
   const handleNavlink = (e) => {
-    const currentChain = getChainTypeFromId(pasarLinkChain);
+    const currentChain = getChainTypeFromId(wallet?.chainId);
     const path = e.target.getAttribute('to');
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
-      if (currentChain !== 'ESC' || diaBalance >= 0.01) navigate(path);
+    if (user?.link === '2') {
+      if (currentChain !== 'ESC' || (wallet?.diaBalance ?? 0) >= 0.01) navigate(path);
       else setOpenBuyDIA(true);
       return;
     }
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3')
-      setOpenDownloadEssentialDlg(1);
-    else setOpenSigninEssentialDlg(true);
-    setAfterSigninPath(path);
+    if (user?.link === '1' || user?.link === '3') setOpenDownloadEEDlg(true);
+    else setOpenSignInDlg(true);
+    setNavigationPath(path);
   };
 
   const loadingSkeletons = Array(3).fill(null);
@@ -185,7 +183,12 @@ export default function Explorer() {
           )}
         </Grid>
       </Container>
-      <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance} actionText="create collections" />
+      <NeedBuyDIADlg
+        isOpen={buyDIAOpen}
+        setOpen={setOpenBuyDIA}
+        balance={wallet?.diaBalance ?? 0}
+        actionText="create collections"
+      />
     </RootStyle>
   );
 }

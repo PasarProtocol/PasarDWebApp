@@ -38,14 +38,8 @@ import ActivityTableRow from '../../components/activity/ActivityTableRow';
 import Scrollbar from '../../components/Scrollbar';
 import { queryName, queryKycMe } from '../../components/signin-dlg/HiveAPI';
 import useOffSetTop from '../../hooks/useOffSetTop';
-import useSignin from '../../hooks/useSignin';
-import {
-  
-  getTotalCountOfCoinTypes,
-  getDidInfoFromAddress,
-  fetchAPIFrom,
-  setAllTokenPrice2
-} from '../../utils/common';
+import { useUserContext } from '../../contexts/UserContext';
+import { getTotalCountOfCoinTypes, getDidInfoFromAddress, fetchAPIFrom, setAllTokenPrice2 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
 
@@ -124,7 +118,7 @@ export default function ActivityExplorer() {
     btnFilterByParam.push(btnId);
   }
   const drawerWidth = 360;
-  const { openTopAlert } = useSignin();
+  const { openTopAlert } = useUserContext();
   const APP_BAR_MOBILE = 72 + (openTopAlert ? 50 : 0);
   const APP_BAR_DESKTOP = 88 + (openTopAlert ? 50 : 0);
   const emptyRange = { min: '', max: '' };

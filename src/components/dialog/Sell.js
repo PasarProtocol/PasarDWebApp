@@ -18,13 +18,13 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
 import { Icon } from '@iconify/react';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import TransLoadingButton from '../TransLoadingButton';
 import CoinSelect from '../marketplace/CoinSelect';
 import { InputStyle, InputLabelStyle } from '../CustomInput';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import {
   removeLeadingZero,
   callContractMethod,
@@ -57,7 +57,7 @@ export default function Sell(props) {
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [isOnValidation, setOnValidation] = React.useState(false);
-  const { diaBalance, pasarLinkChain } = useSingin();
+  const { wallet } = useUserContext();
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -106,7 +106,7 @@ export default function Sell(props) {
                   .send(transactionParams)
                   .on('receipt', (receipt) => {
                     console.log('setApprovalForAll-receipt', receipt);
-                    callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
+                    callContractMethod('createOrderForSale', coinType, wallet?.chainId, {
                       _id: tokenId,
                       _amount: 1,
                       _price,
@@ -125,7 +125,7 @@ export default function Sell(props) {
                     reject(error);
                   });
               else
-                callContractMethod('createOrderForSale', coinType, pasarLinkChain, {
+                callContractMethod('createOrderForSale', coinType, wallet?.chainId, {
                   _id: tokenId,
                   _amount: 1,
                   _price,
@@ -149,8 +149,8 @@ export default function Sell(props) {
   const putOnSale = async () => {
     setOnValidation(true);
     if (!(price * 1)) return;
-    const chainType = getChainTypeFromId(pasarLinkChain);
-    if (chainType === 'ESC' && coinType !== 0 && diaBalance * 1 === 0) {
+    const chainType = getChainTypeFromId(wallet?.chainId);
+    if (chainType === 'ESC' && coinType !== 0 && (wallet?.diaBalance ?? 0) * 1 === 0) {
       enqueueSnackbar('Sorry, you need to hold a minimum of 0.01 DIA to sell nft via other ERC20 tokens.', {
         variant: 'warning'
       });
@@ -159,7 +159,7 @@ export default function Sell(props) {
     setOnProgress(true);
     const didUri = await sendIpfsDidJson();
     const sellPrice = BigInt(price * 1e18).toString();
-    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+    const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
     callSetApprovalForAllAndSell(MarketContractAddress, true, sellPrice, didUri)
       .then((result) => {
         if (result) {
@@ -168,7 +168,10 @@ export default function Sell(props) {
           }, 3000);
           enqueueSnackbar('Sell NFT success!', { variant: 'success' });
           setOpen(false);
-          setTimeout(() => {navigate('/profile/myitem/0');window.location.reload()}, 2000)
+          setTimeout(() => {
+            navigate('/profile/myitem/0');
+            window.location.reload();
+          }, 2000);
         } else {
           enqueueSnackbar('Sell NFT error!', { variant: 'error' });
           setOnProgress(false);
@@ -181,7 +184,8 @@ export default function Sell(props) {
       });
   };
 
-  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain);
+  const coinTypes = getCoinTypesInCurrentNetwork(wallet?.chainId);
+
   return (
     <Dialog open={isOpen} onClose={handleClose}>
       <DialogTitle>

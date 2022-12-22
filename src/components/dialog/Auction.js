@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link as RouterLink, useNavigate} from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Web3 from 'web3';
 import { addDays } from 'date-fns';
@@ -43,7 +43,7 @@ import {
   getContractAddressInCurrentNetwork,
   getCoinTypesInCurrentNetwork
 } from '../../utils/common';
-import useSignin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import { PATH_PAGE } from '../../routes/paths';
 
 Auction.propTypes = {
@@ -70,8 +70,8 @@ export default function Auction(props) {
   const [coinType, setCoinType] = React.useState(0);
 
   const { enqueueSnackbar } = useSnackbar();
-  const { pasarLinkChain, diaBalance } = useSignin();
-  const coinTypes = getCoinTypesInCurrentNetwork(pasarLinkChain);
+  const { wallet } = useUserContext();
+  const coinTypes = getCoinTypesInCurrentNetwork(wallet?.chainId);
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -145,7 +145,7 @@ export default function Auction(props) {
                   .send(transactionParams)
                   .on('receipt', (receipt) => {
                     console.log('setApprovalForAll-receipt', receipt);
-                    callContractMethod('createOrderForAuction', coinType, pasarLinkChain, {
+                    callContractMethod('createOrderForAuction', coinType, wallet?.chainId, {
                       _id: tokenId,
                       _amount: 1,
                       _baseAddress: baseToken,
@@ -167,7 +167,7 @@ export default function Auction(props) {
                     reject(error);
                   });
               else
-                callContractMethod('createOrderForAuction', coinType, pasarLinkChain, {
+                callContractMethod('createOrderForAuction', coinType, wallet?.chainId, {
                   _id: tokenId,
                   _amount: 1,
                   _baseAddress: baseToken,
@@ -206,7 +206,7 @@ export default function Auction(props) {
       const _startingPrice = BigInt(startingPrice * 1e18).toString();
       const _reservePrice = BigInt(reservePrice * 1e18).toString();
       const _buyoutPrice = BigInt(buyoutPrice * 1e18).toString();
-      const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+      const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
       callSetApprovalForAllAndAuction(MarketContractAddress, _startingPrice, _reservePrice, _buyoutPrice, didUri)
         .then((result) => {
           if (result) {
@@ -215,7 +215,10 @@ export default function Auction(props) {
             }, 3000);
             enqueueSnackbar('Auction success!', { variant: 'success' });
             setOpen(false);
-            setTimeout(() => {navigate('/profile/myitem/0'); window.location.reload()}, 2000);
+            setTimeout(() => {
+              navigate('/profile/myitem/0');
+              window.location.reload();
+            }, 2000);
           } else {
             enqueueSnackbar('Auction error!', { variant: 'error' });
             setOnProgress(false);
@@ -228,7 +231,7 @@ export default function Auction(props) {
         });
     }
   };
-  const DiaDegree = getDiaBalanceDegree(diaBalance, pasarLinkChain);
+  const DiaDegree = getDiaBalanceDegree(wallet?.diaBalance ?? 0, wallet?.chainId);
 
   const TypographyStyle = { display: 'inline', lineHeight: 1.1 };
   return (

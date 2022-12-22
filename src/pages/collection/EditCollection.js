@@ -36,7 +36,7 @@ import LoadingWrapper from '../../components/LoadingWrapper';
 import { REGISTER_CONTRACT_ABI } from '../../abi/registerABI';
 import { ipfsURL } from '../../config';
 import useOffSetTop from '../../hooks/useOffSetTop';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import {
   isInAppBrowser,
@@ -63,6 +63,8 @@ const RootStyle = styled(Page)(({ theme }) => ({
 // ----------------------------------------------------------------------
 const _gasLimit = 5000000;
 export default function EditCollection() {
+  const { wallet } = useUserContext();
+  const { enqueueSnackbar } = useSnackbar();
   const location = useLocation();
   const { chain, token } = location.state || {};
   const [isLoadingCollection, setLoadingCollection] = React.useState(false);
@@ -94,8 +96,6 @@ export default function EditCollection() {
   const uploadBackgroundRef = React.useRef();
   const descriptionRef = React.useRef();
 
-  const { pasarLinkChain } = useSingin();
-  const { enqueueSnackbar } = useSnackbar();
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
   const APP_BAR_DESKTOP = 88;
@@ -279,7 +279,7 @@ export default function EditCollection() {
         return;
       }
 
-      const RegContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'register');
+      const RegContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'register');
       const walletConnectWeb3 = new Web3(
         isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider()
       );

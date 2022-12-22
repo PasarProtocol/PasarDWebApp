@@ -15,7 +15,7 @@ import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { walletconnect } from '../signin-dlg/connectors';
 import TransLoadingButton from '../TransLoadingButton';
 import StyledButton from '../signin-dlg/StyledButton';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import {
   reduceHexAddress,
   getContractAddressInCurrentNetwork,
@@ -39,7 +39,7 @@ export default function Purchase(props) {
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const context = useWeb3React();
-  const { pasarLinkAddress, pasarLinkChain } = useSingin();
+  const { user, wallet } = useUserContext();
   const { library, chainId, account } = context;
   const { isOpen, setOpen, info, coinType = {} } = props;
   const orderChain = info.order?.chain ? info.order.chain : info.chain;
@@ -57,7 +57,7 @@ export default function Purchase(props) {
       const { ethereum } = window;
 
       if (ethereum) {
-        const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+        const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
         const contractAddress = !v1State ? MarketContractAddress : V1_MARKET_CONTRACT_ADDRESS;
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
@@ -160,7 +160,7 @@ export default function Purchase(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
-    const MarketContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'market');
+    const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
     const contractAbi = PASAR_CONTRACT_ABI;
     const contractAddress = !v1State ? MarketContractAddress : V1_MARKET_CONTRACT_ADDRESS;
 
@@ -251,25 +251,25 @@ export default function Purchase(props) {
       setBalanceArray(Array(getTotalCountOfCoinTypes()).fill(0));
       if (sessionLinkFlag) {
         if (sessionLinkFlag === '1' && library)
-          getBalanceByAllCoinTypes(library.provider, pasarLinkChain, setBalanceByCoinType);
+          getBalanceByAllCoinTypes(library.provider, wallet?.chainId, setBalanceByCoinType);
         else if (sessionLinkFlag === '2') {
           if (isInAppBrowser()) {
             const elastosWeb3Provider = await window.elastos.getWeb3Provider();
-            getBalanceByAllCoinTypes(elastosWeb3Provider, pasarLinkChain, setBalanceByCoinType);
+            getBalanceByAllCoinTypes(elastosWeb3Provider, wallet?.chainId, setBalanceByCoinType);
           } else if (essentialsConnector.getWalletConnectProvider()) {
             getBalanceByAllCoinTypes(
               essentialsConnector.getWalletConnectProvider(),
-              pasarLinkChain,
+              wallet?.chainId,
               setBalanceByCoinType
             );
           }
         } else if (sessionLinkFlag === '3')
-          getBalanceByAllCoinTypes(walletconnect.getProvider(), pasarLinkChain, setBalanceByCoinType);
+          getBalanceByAllCoinTypes(walletconnect.getProvider(), wallet?.chainId, setBalanceByCoinType);
       }
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, chainId, pasarLinkAddress, pasarLinkChain]);
+  }, [account, chainId, user?.link, wallet?.chainId]);
 
   const price = priceInfo / 1e18;
   const platformFee = math.round((price * 2) / 100, 4);

@@ -56,13 +56,12 @@ import { walletconnect } from '../../components/signin-dlg/connectors';
 import ScrollManager from '../../components/ScrollManager';
 import AddressCopyButton from '../../components/AddressCopyButton';
 import IconLinkButtonGroup from '../../components/collection/IconLinkButtonGroup';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import useAuctionDlg from '../../hooks/useAuctionDlg';
 import { queryName, queryKycMe, downloadAvatar } from '../../components/signin-dlg/HiveAPI';
 import {
   reduceHexAddress,
   getDiaTokenInfo,
-
   getDidInfoFromAddress,
   isInAppBrowser,
   getTotalCountOfCoinTypes,
@@ -72,7 +71,9 @@ import {
   fetchAPIFrom,
   getImageFromIPFSUrl,
   getChainIndexFromChain,
-  getCoinTypeFromToken, setAllTokenPrice2, getHiveHubImageFromIPFSUrl
+  getCoinTypeFromToken,
+  setAllTokenPrice2,
+  getHiveHubImageFromIPFSUrl
 } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -186,6 +187,8 @@ BidStatus.propTypes = {
 
 // ----------------------------------------------------------------------
 export default function CollectibleDetail() {
+  const { user } = useUserContext();
+  const { updateCount } = useAuctionDlg();
   const params = useParams();
   const [chain, contract, tokenId] = params.args.split('&');
   const [isFullScreen, setFullScreen] = React.useState(false);
@@ -210,8 +213,6 @@ export default function CollectibleDetail() {
   const [dispCountInCollection, setDispCountInCollection] = React.useState(3);
   const [isVideo, setIsVideo] = React.useState(false);
   const [videoIsLoaded, setVideoIsLoaded] = React.useState(false);
-  const { pasarLinkAddress } = useSingin();
-  const { updateCount } = useAuctionDlg();
 
   const imageRef = React.useRef();
   const imageBoxRef = React.useRef();
@@ -251,19 +252,17 @@ export default function CollectibleDetail() {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-      if (sessionLinkFlag) {
-        if (sessionLinkFlag === '1') setAddress(account);
-        if (sessionLinkFlag === '2') {
+      if (user?.link) {
+        if (user.link === '1') setAddress(account);
+        else if (user.link === '2') {
           if (isInAppBrowser()) setAddress(await window.elastos.getWeb3Provider().address);
           else if (essentialsConnector.getWalletConnectProvider())
             setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
-        }
-        if (sessionLinkFlag === '3') walletconnect.getAccount().then(setAddress);
+        } else if (user.link === '3') walletconnect.getAccount().then(setAddress);
       }
     };
     fetchData();
-  }, [account, pasarLinkAddress]);
+  }, [account, user?.link]);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -291,14 +290,17 @@ export default function CollectibleDetail() {
           }
           if (collectibleDetail?.order?.orderId) {
             const resBid = await fetchAPIFrom(
-              `api/v1/getBidsHistory?chain=${chain === 'v1'? 'ela' : chain}&orderId=${collectibleDetail.order.orderId}`,
+              `api/v1/getBidsHistory?chain=${chain === 'v1' ? 'ela' : chain}&orderId=${
+                collectibleDetail.order.orderId
+              }`,
               {}
             );
             const jsonBid = await resBid.json();
             collectibleDetail = { ...collectibleDetail, bidList: jsonBid?.data || [] };
           }
           setCollectible(collectibleDetail);
-          const imgUrl = (collectibleDetail.type === 'FeedsChannel' || collectibleDetail.type === 'HiveNode')
+          const imgUrl =
+            collectibleDetail.type === 'FeedsChannel' || collectibleDetail.type === 'HiveNode'
               ? getHiveHubImageFromIPFSUrl(collectibleDetail.data.avatar)
               : getImageFromIPFSUrl(collectibleDetail?.data?.image || collectibleDetail?.image);
           setImageUrl(imgUrl);
@@ -322,12 +324,12 @@ export default function CollectibleDetail() {
             if (collectibleDetail?.royaltyOwner) {
               const creatorInfo = await getDidInfoFromAddress(collectibleDetail.royaltyOwner);
               setDidName({ creator: creatorInfo.name, owner: creatorInfo.name });
-              if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') fetchProfileData(creatorInfo.did);
+              if (user?.link === '2') fetchProfileData(creatorInfo.did);
             }
             if (collectibleDetail?.tokenOwner && collectibleDetail.royaltyOwner !== collectibleDetail.tokenOwner) {
               const ownerInfo = await getDidInfoFromAddress(collectibleDetail.tokenOwner);
               setDidNameOfUser('owner', ownerInfo.name || '');
-              if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') fetchProfileData(ownerInfo.did, 'owner');
+              if (user?.link === '2') fetchProfileData(ownerInfo.did, 'owner');
             }
           } catch (e) {
             console.error(e);
@@ -1024,7 +1026,11 @@ export default function CollectibleDetail() {
                                   <AssetCard
                                     key={_i}
                                     {...item}
-                                    thumbnail={ (item.type === 'FeedsChannel' || item.type === 'HiveNode') ? getHiveHubImageFromIPFSUrl(item.data.avatar): getImageFromIPFSUrl(item?.data?.image || item?.image)}
+                                    thumbnail={
+                                      item.type === 'FeedsChannel' || item.type === 'HiveNode'
+                                        ? getHiveHubImageFromIPFSUrl(item.data.avatar)
+                                        : getImageFromIPFSUrl(item?.data?.image || item?.image)
+                                    }
                                     type={0}
                                     isLink={Boolean(true)}
                                     coinUSD={coinPrice[coinType.index]}
@@ -1037,7 +1043,9 @@ export default function CollectibleDetail() {
                               })}
                             </Box>
                           </Stack>
-                        ) : (<Typography variant="subtitle2">No other collectibles in this collection</Typography>)}
+                        ) : (
+                          <Typography variant="subtitle2">No other collectibles in this collection</Typography>
+                        )}
                       </Stack>
                     </Stack>
                   </Stack>

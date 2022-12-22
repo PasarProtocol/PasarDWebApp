@@ -10,11 +10,7 @@ import Web3 from 'web3';
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { useSnackbar } from 'notistack';
-
-import { DID } from '@elastosfoundation/elastos-connectivity-sdk-js';
-import { VerifiablePresentation, DefaultDIDAdapter, DIDBackend } from '@elastosfoundation/did-js-sdk';
-import jwt from 'jsonwebtoken';
-import { essentialsConnector, initConnectivitySDK, isUsingEssentialsConnector } from './EssentialConnectivity';
+import { essentialsConnector, initConnectivitySDK } from './EssentialConnectivity';
 import { MFab } from '../@material-extend';
 import { injected, walletconnect, resetWalletConnector } from './connectors';
 import CopyButton from '../CopyButton';
@@ -35,7 +31,6 @@ import {
   getERC20TokenPrice
 } from '../../utils/common';
 import { useUserContext } from '../../contexts/UserContext';
-import useSignIn from '../../hooks/useSignin';
 import useConnectEE from '../../hooks/useConnectEE';
 // import { creatAndRegister, prepareConnectToHive, downloadAvatar } from './HiveAPI';
 import { DidResolverUrl, firebaseConfig, mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS } from '../../config';
@@ -50,39 +45,35 @@ if (firebaseConfig.apiKey) {
 
 export default function SignInButton() {
   const {
-    openSigninEssential,
-    openDownloadEssential,
-    afterSigninPath,
-    diaBalance,
-    pasarLinkChain,
+    user,
+    openTopAlert,
+    openSignInDlg,
+    openDownloadEEDlg,
+    navigationPath,
+    wallet,
+    elaConnectivityService,
+    setUser,
     setOpenTopAlert,
-    setOpenSigninEssentialDlg,
-    setOpenDownloadEssentialDlg,
+    setOpenSignInDlg,
+    setOpenDownloadEEDlg,
+    setNavigationPath,
+    setWallet,
     setOpenCredentials,
-    setAfterSigninPath,
-    setSigninEssentialSuccess,
-    setPasarLinkAddress,
-    setDiaBalance,
-    setPasarLinkChain
-  } = useSignIn();
-  const { user, setUser } = useUserContext();
+    setElastosConnectivityService
+  } = useUserContext();
 
   // let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
   const { activate, active, library, chainId, account } = useWeb3React();
   const { isConnectedEE, signInWithEssentials, signOutWithEssentials } = useConnectEE();
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [openSignInDlg, setOpenSignInDlg] = useState(false);
-  const [openDownloadEEDlg, setOpenDownloadEEDlg] = useState(false);
   const [activatingConnector, setActivatingConnector] = useState(null);
   const [openAccountPopup, setOpenAccountPopup] = useState(null);
-  const [walletAddress, setWalletAddress] = useState(null);
   const [balance, setBalance] = useState(0);
   const [elaOnEthBalance, setElaOnEthBalance] = useState(0);
   const [coinUSD, setCoinUSD] = React.useState(0);
   const [diaUSD, setDiaUSD] = React.useState(0);
   const [avatarUrl, setAvatarUrl] = React.useState(null);
   const [tokenPricesInETH, setTokenPricesInETH] = React.useState([0, 0]);
-
   const [chainType, setChainType] = React.useState('ESC');
   const navigate = useNavigate();
 
@@ -92,16 +83,57 @@ export default function SignInButton() {
   initConnectivitySDK();
 
   React.useEffect(() => {
-    const handleEEAccountsChanged = (accounts) => {
-      console.log('===Account Changed: ', accounts);
-      if (accounts.length) setWalletAddress(accounts[0]);
+    const handleEEAccountsChanged = async (accounts) => {
+      console.log('Account Changed: ', accounts);
+      if (accounts.length) {
+        setWallet((prev) => {
+          const current = { ...prev };
+          const [address] = accounts;
+          current.address = address;
+          return current;
+        });
+        try {
+          const dia = await getDiaTokenInfo(accounts[0], walletConnectProvider);
+          setWallet((prev) => {
+            const current = { ...prev };
+            current.diaBalance = dia;
+            return current;
+          });
+        } catch (e) {
+          console.error(e);
+          setWallet((prev) => {
+            const current = { ...prev };
+            current.diaBalance = 0;
+            return current;
+          });
+        }
+        try {
+          const elaOnEth = await getElaOnEthTokenInfo(accounts[0], walletConnectProvider);
+          setElaOnEthBalance(elaOnEth);
+        } catch (e) {
+          console.error(e);
+          setElaOnEthBalance(0);
+        }
+        try {
+          const balance = await getBalance(walletConnectProvider);
+          setBalance(math.round(balance / 1e18, 4));
+        } catch (e) {
+          console.error(e);
+          setBalance(0);
+        }
+      }
     };
     const handleEEChainChanged = (chainId) => {
-      console.log('===ChainId Changed', chainId);
+      console.log('ChainId Changed', chainId);
+      setWallet((prev) => {
+        const current = { ...prev };
+        current.chainId = chainId;
+        return current;
+      });
       if (chainId && !checkValidChain(chainId)) setOpenSnackbar(true);
     };
     const handleEEDisconnect = (code, reason) => {
-      console.log('===Disconnect code: ', code, ', reason: ', reason);
+      console.log('Disconnect code: ', code, ', reason: ', reason);
       signOutWithEssentials();
     };
     const handleEEError = (code, reason) => {
@@ -177,62 +209,13 @@ export default function SignInButton() {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const res = await fetchAPIFrom(`api/v1/getV1MarketNFTByWalletAddr?walletAddr=${walletAddress}`, {});
+      const res = await fetchAPIFrom(`api/v1/getV1MarketNFTByWalletAddr?walletAddr=${wallet.address}`, {});
       const json = await res.json();
       setOpenTopAlert((json?.data || []).length > 0);
     };
-    if (walletAddress) fetchData();
+    if (wallet?.address) fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletAddress]);
-
-  // React.useEffect(() => {
-  //   // EE
-  //   const handleEEAccountsChanged = (accounts) => {
-  //     if (accounts.length && walletAddress) {
-  //       setWalletAddress(accounts[0]);
-  //       getDiaTokenInfo(accounts[0], walletConnectProvider)
-  //         .then((dia) => {
-  //           setDiaBalance(dia);
-  //         })
-  //         .catch((e) => {
-  //           console.error(e);
-  //           setDiaBalance(0);
-  //         });
-  //       getElaOnEthTokenInfo(accounts[0], walletConnectProvider)
-  //         .then((ela) => {
-  //           setElaOnEthBalance(ela);
-  //         })
-  //         .catch((e) => {
-  //           console.error(e);
-  //           setElaOnEthBalance(0);
-  //         });
-  //       getBalance(walletConnectProvider).then((res) => {
-  //         setBalance(math.round(res / 1e18, 4));
-  //       });
-  //     }
-  //   };
-  //   const handleEEChainChanged = (chainId) => {
-  //     setPasarLinkChain(chainId);
-  //     if (!checkValidChain(chainId)) setOpenSnackbar(true);
-  //   };
-  //   const handleEEDisconnect = (code, reason) => {
-  //     console.log('Disconnect code: ', code, ', reason: ', reason);
-  //     signOutWithEssentials();
-  //   };
-  //   const handleEEError = (code, reason) => {
-  //     console.error(code, reason);
-  //   };
-
-  //   // Subscribe to accounts change
-  //   walletConnectProvider.on('accountsChanged', handleEEAccountsChanged);
-  //   // Subscribe to chainId change
-  //   walletConnectProvider.on('chainChanged', handleEEChainChanged);
-  //   // Subscribe to session disconnection
-  //   walletConnectProvider.on('disconnect', handleEEDisconnect);
-  //   // Subscribe to session disconnection
-  //   walletConnectProvider.on('error', handleEEError);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, []);
+  }, [wallet?.address]);
 
   // React.useEffect(() => {
   //   const fetchData = async () => {
@@ -433,88 +416,6 @@ export default function SignInButton() {
   // }, [essentialsConnector.hasWalletConnectSession(), active]);
 
   // ----------------------------------------- //
-
-  // ------------ EE Connect ------------ //
-  // if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') initConnectivitySDK();
-
-  // const signInWithEssentialss = async () => {
-  //   initConnectivitySDK();
-  //   const didAccess = new DID.DIDAccess();
-  //   try {
-  //     const presentation = await didAccess.requestCredentials({
-  //       claims: [
-  //         DID.simpleIdClaim('Your avatar', 'avatar', false),
-  //         DID.simpleIdClaim('Your name', 'name', false),
-  //         DID.simpleIdClaim('Your description', 'description', false)
-  //       ]
-  //     });
-  //     if (presentation) {
-  //       const did = presentation.getHolder().getMethodSpecificId() || '';
-  //       DIDBackend.initialize(new DefaultDIDAdapter(DidResolverUrl));
-  //       // verify
-  //       const vp = VerifiablePresentation.parse(JSON.stringify(presentation.toJSON()));
-  //       const sDid = vp.getHolder().toString();
-  //       if (!sDid) {
-  //         console.log('Unable to extract owner DID from the presentation');
-  //         return;
-  //       }
-  //       // Optional name
-  //       const userName = vp.getCredential(`name`);
-  //       const name = userName ? userName.getSubject().getProperty('name') : '';
-  //       // Optional bio
-  //       const bioCredential = vp.getCredential(`description`);
-  //       const bio = bioCredential ? bioCredential.getSubject().getProperty('description') : '';
-  //       const user = { sDid, bio, name };
-  //       // succeed
-  //       const token = jwt.sign(user, 'pasar', { expiresIn: 60 * 60 * 24 * 7 });
-  //       sessionStorage.setItem('PASAR_TOKEN', token);
-  //       sessionStorage.setItem('PASAR_DID', did);
-  //       sessionLinkFlag = '2';
-  //       sessionStorage.setItem('PASAR_LINK_ADDRESS', sessionLinkFlag);
-  //       setPasarLinkAddress(sessionLinkFlag);
-  //       setOpenSignInDlg(false);
-  //       let essentialAddress = essentialsConnector.getWalletConnectProvider().wc.accounts[0];
-  //       if (isInAppBrowser()) essentialAddress = await window.elastos.getWeb3Provider().address;
-  //       setWalletAddress(essentialAddress);
-  //       setActivatingConnector(essentialsConnector);
-  //       setSigninEssentialSuccess(true);
-  //       // getAvatarUrl(did);
-
-  //       if (afterSigninPath) {
-  //         setOpenSigninEssentialDlg(false);
-  //         navigate(afterSigninPath);
-  //         setAfterSigninPath(null);
-  //       }
-  //     } else {
-  //       // console.log('User closed modal');
-  //     }
-  //   } catch (e) {
-  //     try {
-  //       await essentialsConnector.getWalletConnectProvider().disconnect();
-  //     } catch (e) {
-  //       console.log('Error while trying to disconnect wallet connect session', e);
-  //     }
-  //   }
-  // };
-  // const signOutWithEssentialss = async () => {
-  //   sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-  //   sessionStorage.removeItem('PASAR_TOKEN');
-  //   sessionStorage.removeItem('PASAR_DID');
-  //   sessionStorage.removeItem('KYCedProof');
-  //   sessionStorage.removeItem('REWARD_USER');
-  //   try {
-  //     setSigninEssentialSuccess(false);
-  //     setActivatingConnector(null);
-  //     setWalletAddress(null);
-  //     if (isUsingEssentialsConnector() && essentialsConnector.hasWalletConnectSession())
-  //       await essentialsConnector.disconnectWalletConnect();
-  //     if (isInAppBrowser() && (await window.elastos.getWeb3Provider().isConnected()))
-  //       await window.elastos.getWeb3Provider().disconnect();
-  //   } catch (error) {
-  //     console.log('Error while disconnecting the wallet', error);
-  //   }
-  //   window.location.reload();
-  // };
   // ----------------------------------- //
 
   // const handleClickOpenDownloadEssentialDlg = () => {
@@ -557,8 +458,16 @@ export default function SignInButton() {
       else if (currentConnector === walletconnect) linkType = '3';
       sessionStorage.setItem('PASAR_LINK_ADDRESS', linkType);
       setActivatingConnector(currentConnector);
-      setPasarLinkAddress(linkType);
-      setWalletAddress(retAddress);
+      setUser((prev) => {
+        const current = { ...prev };
+        current.link = linkType;
+        return current;
+      });
+      setWallet((prev) => {
+        const current = { ...prev };
+        current.address = retAddress;
+        return current;
+      });
       setOpenSignInDlg(false);
     }
   };
@@ -568,15 +477,22 @@ export default function SignInButton() {
       if (isConnectedEE) await signOutWithEssentials(false);
       const objUser = await signInWithEssentials();
       if (objUser) {
-        setPasarLinkAddress(objUser?.link);
-        setWalletAddress(objUser?.address);
+        setUser((prev) => {
+          const current = { ...prev };
+          current.link = objUser?.link;
+          return current;
+        });
+        setWallet((prev) => {
+          const current = { ...prev };
+          current.address = objUser?.address;
+          return current;
+        });
         setActivatingConnector(essentialsConnector);
         setOpenSignInDlg(false);
-        setSigninEssentialSuccess(true);
-        if (afterSigninPath) {
-          setOpenSigninEssentialDlg(false);
-          navigate(afterSigninPath);
-          setAfterSigninPath(null);
+        if (navigationPath) {
+          setOpenSignInDlg(false);
+          navigate(navigationPath);
+          setNavigationPath(null);
         }
       }
     } catch (e) {
@@ -586,10 +502,14 @@ export default function SignInButton() {
 
   const disconnectWallet = async () => {
     try {
-      await signOutWithEssentials(true);
-      setSigninEssentialSuccess(false);
+      await activatingConnector.deactivate();
+      await activate(null);
       setActivatingConnector(null);
-      setWalletAddress(null);
+      setWallet((prev) => {
+        const current = { ...prev };
+        current.address = '';
+        return current;
+      });
     } catch (e) {
       console.error(e);
     }
@@ -600,7 +520,7 @@ export default function SignInButton() {
     if (type === 'EE') {
       await connectToEE();
     } else if (type === 'MM') {
-      // await connectToWallet('MM');
+      await connectToWallet('MM');
     } else if (type === 'download') {
       setOpenDownloadEEDlg(true);
     } else if (type === 'close') {
@@ -631,9 +551,12 @@ export default function SignInButton() {
       if (user?.link === '1' || user?.link === '3') await disconnectWallet();
       else if (user?.link === '2') await signOutWithEssentials();
       await activate(null);
-      setSigninEssentialSuccess(false);
       setActivatingConnector(null);
-      setWalletAddress(null);
+      setWallet((prev) => {
+        const current = { ...prev };
+        current.address = '';
+        return current;
+      });
       navigate('/marketplace');
       window.location.reload();
     }
@@ -641,7 +564,7 @@ export default function SignInButton() {
 
   let totalBalance = 0;
   if (chainType === 'ESC')
-    totalBalance = math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * diaBalance, 2), 2);
+    totalBalance = math.round(math.round(coinUSD * balance, 2) + math.round(diaUSD * (wallet?.diaBalance ?? 0), 2), 2);
   else if (chainType === 'ETH')
     totalBalance = math.round(
       math.round(tokenPricesInETH[0] * balance, 2) + math.round(tokenPricesInETH[1] * elaOnEthBalance, 2),
@@ -656,8 +579,8 @@ export default function SignInButton() {
         icon: 'badges/diamond.svg',
         symbol: 'DIA',
         name: 'Diamond (ESC)',
-        balance: diaBalance,
-        balanceUSD: diaUSD * diaBalance
+        balance: wallet?.diaBalance ?? 0,
+        balanceUSD: diaUSD * (wallet?.diaBalance ?? 0)
       }
     ],
     ETH: [
@@ -683,13 +606,13 @@ export default function SignInButton() {
 
   return (
     <>
-      {walletAddress ? (
+      {wallet?.address ? (
         <>
           <MFab id="signin" size="small" onClick={handleOpenAccountMenu} onMouseEnter={handleOpenAccountMenu}>
             <RingAvatar
               avatar={avatarUrl}
               isImage={!!avatarUrl}
-              address={walletAddress}
+              address={wallet?.address || ''}
               size={30}
               outersx={{
                 p: '3px',
@@ -711,7 +634,8 @@ export default function SignInButton() {
           >
             <Box sx={{ px: 2, py: '6px' }}>
               <Typography variant="h6">
-                {reduceHexAddress(walletAddress)} <CopyButton text={walletAddress} sx={{ mt: '-3px' }} />
+                {reduceHexAddress(wallet?.address || '')}{' '}
+                <CopyButton text={wallet?.address || ''} sx={{ mt: '-3px' }} />
               </Typography>
               {user?.did ? (
                 <Typography variant="body2" color="text.secondary">

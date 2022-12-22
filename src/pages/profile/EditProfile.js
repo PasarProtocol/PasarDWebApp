@@ -50,7 +50,7 @@ import {
   downloadAvatar
 } from '../../components/signin-dlg/HiveAPI';
 import { isInAppBrowser, getDiaTokenInfo, reduceHexAddress } from '../../utils/common';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import { DidResolverUrl } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ export default function EditProfile() {
   const [updateState, setUpdateState] = React.useState(false);
   const [didInfo, setDidInfo] = React.useState({ name: '', description: '' });
 
-  const { elaConnectivityService, setElastosConnectivityService } = useSingin();
+  const { user, elaConnectivityService, setElastosConnectivityService } = useUserContext();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -123,7 +123,7 @@ export default function EditProfile() {
       const connectivityService = new ElastosConnectivityService();
       setElastosConnectivityService(connectivityService);
 
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') navigate('/profile');
+      if (user?.link !== '2') navigate('/profile');
       else {
         const strWalletAddress = isInAppBrowser()
           ? await window.elastos.getWeb3Provider().address

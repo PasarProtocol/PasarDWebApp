@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Link, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSnackbar } from 'notistack';
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 import { STICKER_CONTRACT_ABI } from '../../abi/stickerABI';
 import { TOKEN_721_ABI } from '../../abi/token721ABI';
 import { blankAddress } from '../../config';
@@ -16,7 +16,7 @@ import {
 } from '../../utils/common';
 import TransLoadingButton from '../TransLoadingButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 
 DeleteItem.propTypes = {
   isOpen: PropTypes.bool,
@@ -34,8 +34,8 @@ export default function DeleteItem(props) {
   const { isOpen, setOpen, name, baseToken, tokenId, updateCount, handleUpdate, is721 } = props;
   const [onProgress, setOnProgress] = React.useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const { pasarLinkChain } = useSingin();
-  const navigate = useNavigate()
+  const { wallet } = useUserContext();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const handleClose = () => {
@@ -49,7 +49,7 @@ export default function DeleteItem(props) {
     const walletConnectWeb3 = new Web3(walletConnectProvider);
     const accounts = await walletConnectWeb3.eth.getAccounts();
 
-    const PasarContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'sticker');
+    const PasarContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'sticker');
     const contractAbi = is721 ? TOKEN_721_ABI : STICKER_CONTRACT_ABI;
     const contractAddress = baseToken || PasarContractAddress;
     const stickerContract = new walletConnectWeb3.eth.Contract(contractAbi, contractAddress);
@@ -66,12 +66,13 @@ export default function DeleteItem(props) {
     };
 
     let methodEvent;
-    if(is721) {
+    if (is721) {
       methodEvent = stickerContract.methods.burn(_id);
     } else {
       methodEvent = stickerContract.methods.burn(_id, _value);
     }
-      methodEvent.send(transactionParams)
+    methodEvent
+      .send(transactionParams)
       .on('transactionHash', (hash) => {
         console.log('transactionHash', hash);
       })
@@ -82,10 +83,15 @@ export default function DeleteItem(props) {
         }, 3000);
         enqueueSnackbar('Burn NFT success!', { variant: 'success' });
         setOpen(false);
-        if(location.pathname === '/profile/myitem/1') {
-          setTimeout(() => {window.location.reload()}, 2000);
+        if (location.pathname === '/profile/myitem/1') {
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
         } else {
-          setTimeout(() => {navigate('/profile/myitem/1');window.location.reload()}, 2000);
+          setTimeout(() => {
+            navigate('/profile/myitem/1');
+            window.location.reload();
+          }, 2000);
         }
       })
       .on('confirmation', (confirmationNumber, receipt) => {

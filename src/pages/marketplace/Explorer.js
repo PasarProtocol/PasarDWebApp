@@ -35,7 +35,7 @@ import AssetGrid from '../../components/marketplace/AssetGrid';
 import Scrollbar from '../../components/Scrollbar';
 import ScrollManager from '../../components/ScrollManager';
 import useOffSetTop from '../../hooks/useOffSetTop';
-import useSignin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import { chainTypes, fetchAPIFrom } from '../../utils/common';
 
 // ----------------------------------------------------------------------
@@ -102,7 +102,7 @@ export default function MarketExplorer() {
     type: ['General', 'Avatar']
   };
   const chains = [{ token: 'all' }, ...chainTypes];
-  const { openTopAlert } = useSignin();
+  const { openTopAlert } = useUserContext();
   const APP_BAR_MOBILE = 72 + (openTopAlert ? 50 : 0);
   const APP_BAR_DESKTOP = 88 + (openTopAlert ? 50 : 0);
   const rangeBtnId = 10;

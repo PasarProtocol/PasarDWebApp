@@ -5,13 +5,14 @@ import { useSnackbar } from 'notistack';
 import { Dialog, DialogTitle, DialogContent, IconButton, Typography, Grid, Box, Avatar } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import StyledButton from '../signin-dlg/StyledButton';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import ElastosConnectivityService from '../../utils/elastosConnectivityService';
 import TransLoadingButton from '../TransLoadingButton';
 import { DidResolverUrl } from '../../config';
 
 export default function Credentials() {
-  const { openCredentials, elaConnectivityService, setOpenCredentials, setElastosConnectivityService } = useSingin();
+  const { openCredentials, elaConnectivityService, setOpenCredentials, setElastosConnectivityService } =
+    useUserContext();
 
   React.useEffect(() => {
     const connectivityService = new ElastosConnectivityService();

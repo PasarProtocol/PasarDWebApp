@@ -37,7 +37,7 @@ import { essentialsConnector } from '../../components/signin-dlg/EssentialConnec
 import { REGISTER_CONTRACT_ABI } from '../../abi/registerABI';
 import { ipfsURL } from '../../config';
 import useOffSetTop from '../../hooks/useOffSetTop';
-import useSignin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import { requestSigndataOnTokenID } from '../../utils/elastosConnectivityService';
 import {
   isInAppBrowser,
@@ -111,7 +111,7 @@ export default function ImportCollection() {
   const uploadBackgroundRef = React.useRef();
   const descriptionRef = React.useRef();
 
-  const { diaBalance, pasarLinkChain } = useSignin();
+  const { wallet } = useUserContext();
   const { enqueueSnackbar } = useSnackbar();
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
@@ -367,7 +367,7 @@ export default function ImportCollection() {
         return;
       }
 
-      const RegContractAddress = getContractAddressInCurrentNetwork(pasarLinkChain, 'register');
+      const RegContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'register');
       const walletConnectWeb3 = new Web3(
         isInAppBrowser() ? window.elastos.getWeb3Provider() : essentialsConnector.getWalletConnectProvider()
       );
@@ -403,7 +403,9 @@ export default function ImportCollection() {
                   setReadySignForRegister(false);
                   console.log('receipt', receipt);
                   resolve(true);
-                  setTimeout(() => {navigate('/profile/myitem/5');}, 2000)
+                  setTimeout(() => {
+                    navigate('/profile/myitem/5');
+                  }, 2000);
                 })
                 .on('error', (error) => {
                   console.error('error', error);
@@ -452,8 +454,8 @@ export default function ImportCollection() {
     window.scrollTo({ top: ref.current.offsetTop - fixedHeight, behavior: 'smooth' });
   };
   const handleImportAction = () => {
-    const chainType = getChainTypeFromId(pasarLinkChain);
-    const degree = getDiaBalanceDegree(diaBalance, pasarLinkChain);
+    const chainType = getChainTypeFromId(wallet?.chainId);
+    const degree = getDiaBalanceDegree(wallet?.diaBalance ?? 0, wallet?.chainId);
     setOnValidation(true);
     if (!contractAddress.length || !autoLoaded || (collectionInfo.owner !== address && autoLoaded))
       scrollToRef(contractRef);
@@ -788,7 +790,7 @@ export default function ImportCollection() {
       <NeedMoreDIADlg
         isOpen={moreDIAOpen}
         setOpen={setOpenMoreDIA}
-        balance={diaBalance}
+        balance={wallet?.diaBalance ?? 0}
         actionText="import more collections"
       />
     </RootStyle>

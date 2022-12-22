@@ -1,19 +1,19 @@
 import React from 'react';
 import { Paper, Tooltip, Box } from '@mui/material';
 import { chainTypes, getChainTypeFromId } from '../utils/common';
-import useSignin from '../hooks/useSignin';
+import { useUserContext } from '../contexts/UserContext';
 
 const NetworkCircle = () => {
   const [chainType, setChainType] = React.useState('ESC');
   const [chainIndex, setChainIndex] = React.useState(0);
-  const { pasarLinkChain } = useSignin();
+  const { wallet } = useUserContext();
 
   React.useEffect(() => {
-    if (!pasarLinkChain) return;
-    const currentChain = getChainTypeFromId(pasarLinkChain);
+    if (!wallet?.chainId) return;
+    const currentChain = getChainTypeFromId(wallet?.chainId);
     setChainType(currentChain);
     if (currentChain) setChainIndex(chainTypes.findIndex((item) => item.symbol === currentChain));
-  }, [pasarLinkChain]);
+  }, [wallet?.chainId]);
 
   let networkName = 'Unsupported network';
   if (chainType) {

@@ -3,7 +3,21 @@ import PropTypes from 'prop-types';
 
 const initialState = {
   user: {},
-  setUser: () => {}
+  openTopAlert: false,
+  openSignInDlg: false,
+  openDownloadEEDlg: false,
+  navigationPath: null,
+  wallet: {},
+  openCredentials: false,
+  elaConnectivityService: null,
+  setUser: () => {},
+  setOpenTopAlert: () => {},
+  setOpenSignInDlg: () => {},
+  setOpenDownloadEEDlg: () => {},
+  setNavigationPath: () => {},
+  setWallet: () => {},
+  setOpenCredentials: () => {},
+  setElastosConnectivityService: () => {}
 };
 
 const UserContext = createContext(initialState);
@@ -17,16 +31,36 @@ function UserContextProvider({ children }) {
     link: sessionStorage.getItem('PASAR_LINK_ADDRESS'),
     did: sessionStorage.getItem('PASAR_DID'),
     token: sessionStorage.getItem('PASAR_TOKEN'),
-    address: sessionStorage.getItem('PASAR_ADDRESS'),
     kycedProof: sessionStorage.getItem('KYCedProof')
   });
+  const [openTopAlert, setOpenTopAlert] = useState(false);
+  const [openSignInDlg, setOpenSignInDlg] = useState(false);
+  const [openDownloadEEDlg, setOpenDownloadEEDlg] = useState(false);
+  const [navigationPath, setNavigationPath] = useState(null);
+  const [wallet, setWallet] = useState({ address: '', chainId: 0, diaBalance: 0 });
+  const [openCredentials, setOpenCredentials] = useState(false);
+  const [elaConnectivityService, setElastosConnectivityService] = useState(null);
 
   return (
     <UserContext.Provider
       // eslint-disable-next-line react/jsx-no-constructed-context-values
       value={{
         user,
-        setUser
+        openTopAlert,
+        openSignInDlg,
+        openDownloadEEDlg,
+        navigationPath,
+        wallet,
+        openCredentials,
+        elaConnectivityService,
+        setUser,
+        setOpenTopAlert,
+        setOpenSignInDlg,
+        setOpenDownloadEEDlg,
+        setNavigationPath,
+        setWallet,
+        setOpenCredentials,
+        setElastosConnectivityService
       }}
     >
       {children}

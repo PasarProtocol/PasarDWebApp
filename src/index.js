@@ -29,7 +29,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { Web3ReactProvider } from '@web3-react/core';
 import { Web3Provider } from '@ethersproject/providers';
-import { SigninProvider } from './contexts/SigninContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { UserContextProvider } from './contexts/UserContext';
 import App from './App';
@@ -44,15 +43,13 @@ const getLibrary = (provider) => {
 ReactDOM.render(
   <HelmetProvider>
     <SettingsProvider>
-      <SigninProvider>
-        <BrowserRouter>
-          <UserContextProvider>
-            <Web3ReactProvider getLibrary={getLibrary}>
-              <App />
-            </Web3ReactProvider>
-          </UserContextProvider>
-        </BrowserRouter>
-      </SigninProvider>
+      <BrowserRouter>
+        <UserContextProvider>
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <App />
+          </Web3ReactProvider>
+        </UserContextProvider>
+      </BrowserRouter>
     </SettingsProvider>
   </HelmetProvider>,
   document.getElementById('root')

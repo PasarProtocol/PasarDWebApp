@@ -7,9 +7,9 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import CloseIcon from '@mui/icons-material/Close';
 // hooks
+import { useUserContext } from '../../contexts/UserContext';
 import useOffSetTop from '../../hooks/useOffSetTop';
 import useSettings from '../../hooks/useSettings';
-import useSignin from '../../hooks/useSignin';
 // components
 import { MHidden } from '../../components/@material-extend';
 import SearchBox from '../../components/SearchBox';
@@ -53,14 +53,13 @@ const ToolbarShadowStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function MainNavbar() {
-  const { openTopAlert, setOpenTopAlert } = useSignin();
+  const { user, openTopAlert, setOpenTopAlert } = useUserContext();
   const isOffset = useOffSetTop(40);
   const { pathname } = useLocation();
   const { themeMode, changeMode } = useSettings();
   const isLight = themeMode === 'light';
   const isExplorer = pathname === '/explorer';
   const isHome = pathname === '' || pathname === '/';
-  const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
 
   return (
     <AppBar sx={{ boxShadow: 0, bgcolor: 'transparent' }}>
@@ -139,7 +138,7 @@ export default function MainNavbar() {
             <MenuDesktop isOffset={isOffset} navConfig={navConfig} />
           </MHidden>
           <SignInButton />
-          {!!sessionLinkFlag && <NetworkCircle />}
+          {!!user?.link && <NetworkCircle />}
           <MHidden width="mdDown">
             <Button
               variant="outlined"

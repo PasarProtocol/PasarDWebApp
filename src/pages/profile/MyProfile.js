@@ -40,7 +40,7 @@ import CollectionCardSkeleton from '../../components/collection/CollectionCardSk
 import NeedBuyDIADlg from '../../components/dialog/NeedBuyDIA';
 import ChainSelect from '../../components/ChainSelect';
 import AssetSortSelect from '../../components/AssetSortSelect';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import {
   queryName,
   queryDescription,
@@ -96,7 +96,7 @@ export default function MyProfile() {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [badge, setBadge] = React.useState({ dia: 0, kyc: false });
   const [socials, setSocials] = React.useState({});
-  const { diaBalance, pasarLinkChain } = useSingin();
+  const { wallet } = useUserContext();
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
   const [assetCount, setAssetCount] = React.useState([0, 0, 0, 0, 0, 0]);
   const [assets, setAssets] = React.useState([[], [], [], [], [], []]);
@@ -337,9 +337,9 @@ export default function MyProfile() {
   };
 
   const handleNavlink = (e) => {
-    const currentChain = getChainTypeFromId(pasarLinkChain);
+    const currentChain = getChainTypeFromId(wallet?.chainId);
     const path = e.target.getAttribute('to');
-    if (currentChain !== 'ESC' || diaBalance >= 0.01) navigate(path);
+    if (currentChain !== 'ESC' || (wallet?.diaBalance ?? 0) >= 0.01) navigate(path);
     else setOpenBuyDIA(true);
   };
   const loadingSkeletons = Array(showCount).fill(null);
@@ -566,7 +566,12 @@ export default function MyProfile() {
           </SwipeableViews>
         </Box>
       </Container>
-      <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance} actionText="create collections" />
+      <NeedBuyDIADlg
+        isOpen={buyDIAOpen}
+        setOpen={setOpenBuyDIA}
+        balance={wallet?.diaBalance ?? 0}
+        actionText="create collections"
+      />
     </RootStyle>
   );
 }

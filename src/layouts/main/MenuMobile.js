@@ -31,7 +31,7 @@ import ModeSwitch from '../../components/mode-switch';
 import { MIconButton, MFab } from '../../components/@material-extend';
 import { essentialsConnector } from '../../components/signin-dlg/EssentialConnectivity';
 import DonateDlg from '../../components/dialog/Donate';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import useSettings from '../../hooks/useSettings';
 import { isInAppBrowser } from '../../utils/common';
 import { PATH_DOCS } from '../../routes/paths';
@@ -66,7 +66,7 @@ MenuMobileItem.propTypes = {
 
 function MenuMobileItem(props) {
   const { item, isOpen, onOpen } = props;
-  const { setOpenSigninEssentialDlg, setOpenDownloadEssentialDlg, setAfterSigninPath } = useSingin();
+  const { user, setOpenSignInDlg, setOpenDownloadEEDlg, setNavigationPath } = useUserContext();
   const { title, path, icon, children } = item;
   const navigate = useNavigate();
 
@@ -96,18 +96,18 @@ function MenuMobileItem(props) {
   }
 
   const openSignin = async (path) => {
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
-      setOpenDownloadEssentialDlg(true);
-    } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+    if (user?.link === '1' || user?.link === '3') {
+      setOpenDownloadEEDlg(true);
+    } else if (user?.link === '2') {
       const connectedInApp = await window.elastos.getWeb3Provider();
       if (isInAppBrowser() && connectedInApp) navigate(path);
-      else setOpenSigninEssentialDlg(true);
-    } else setOpenSigninEssentialDlg(true);
-    setAfterSigninPath(path);
+      else setOpenSignInDlg(true);
+    } else setOpenSignInDlg(true);
+    setNavigationPath(path);
   };
 
   if (path.startsWith('/create')) {
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && essentialsConnector.hasWalletConnectSession())
+    if (user?.link === '2' && essentialsConnector.hasWalletConnectSession())
       return (
         <ListItemStyle
           to={path}

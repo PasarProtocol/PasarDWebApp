@@ -26,7 +26,7 @@ import NeedBuyDIADlg from '../dialog/NeedBuyDIA';
 import AuctionDlg from '../dialog/Auction';
 import SettleOrderDlg from '../dialog/SettleOrder';
 import CardImgBox from '../CardImgBox';
-import useSingin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 import BadgeProfile from './BadgeProfile';
 import StyledButton from '../signin-dlg/StyledButton';
 import { auctionOrderType } from '../../config';
@@ -115,7 +115,9 @@ export default function AssetCard(props) {
     orderChain,
     defaultCollectionType = 0
   } = props;
-
+  
+  const { enqueueSnackbar } = useSnackbar();
+  const { user, wallet, setOpenDownloadEEDlg } = useUserContext();
   const [collection, setCollection] = React.useState({});
   const [isOpenPopup, setOpenPopup] = React.useState(null);
   const [disclaimerOpen, setOpenDisclaimer] = React.useState(false);
@@ -131,9 +133,6 @@ export default function AssetCard(props) {
   const [continueAction, setContinueAction] = React.useState('');
   const [state, setState] = React.useState({ isFirstSale: false, isOnSale: orderState === 1 });
 
-  const { diaBalance, setOpenDownloadEssentialDlg, pasarLinkChain } = useSingin();
-  const { enqueueSnackbar } = useSnackbar();
-
   // buynow: 0, onauction: 1, notmet: 2, hasbids: 3, hasended: 4
   let status = -1;
   if (orderType === 1 && orderState === 1) status = 0;
@@ -143,8 +142,7 @@ export default function AssetCard(props) {
       else status = 2;
     } else if (orderState === 2) status = 4;
   }
-  const isListedOwnedByMe =
-    state.isOnSale && myaddress === tokenOwner;
+  const isListedOwnedByMe = state.isOnSale && myaddress === tokenOwner;
   const isUnlistedOwnedByMe = !state.isOnSale && myaddress === tokenOwner;
   const isListedByOthers = state.isOnSale && myaddress !== royaltyOwner && myaddress !== tokenOwner;
   const isUnlistedByOthers = !state.isOnSale && myaddress !== royaltyOwner && myaddress !== tokenOwner;
@@ -209,43 +207,34 @@ export default function AssetCard(props) {
   };
 
   const handleSell = () => {
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
-      setOpenDownloadEssentialDlg(true);
+    if (user?.link === '1' || user?.link === '3') {
+      setOpenDownloadEEDlg(true);
       return;
     }
     handlePutOnAction('sell');
   };
 
   const handleClosePopup = (e) => {
-    const chainType = getChainTypeFromId(pasarLinkChain);
+    const chainType = getChainTypeFromId(wallet?.chainId);
     const type = e.target.getAttribute('value');
     switch (type) {
       case 'sell':
-        if (
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'
-        ) {
-          setOpenDownloadEssentialDlg(true);
+        if (user?.link === '1' || user?.link === '3') {
+          setOpenDownloadEEDlg(true);
           return;
         }
         handlePutOnAction('sell');
         break;
       case 'auction':
-        if (
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'
-        ) {
-          setOpenDownloadEssentialDlg(true);
+        if (user?.link === '1' || user?.link === '3') {
+          setOpenDownloadEEDlg(true);
           return;
         }
         handlePutOnAction('auction');
         break;
       case 'update':
-        if (
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'
-        ) {
-          setOpenDownloadEssentialDlg(true);
+        if (user?.link === '1' || user?.link === '3') {
+          setOpenDownloadEEDlg(true);
           return;
         }
         if (status === 3 && !auctionEnded) {
@@ -255,11 +244,8 @@ export default function AssetCard(props) {
         setOpenUpdate(true);
         break;
       case 'cancel':
-        if (
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'
-        ) {
-          setOpenDownloadEssentialDlg(true);
+        if (user?.link === '1' || user?.link === '3') {
+          setOpenDownloadEEDlg(true);
           return;
         }
         if (status === 3 && !auctionEnded) {
@@ -275,7 +261,7 @@ export default function AssetCard(props) {
         setOpenDelete(true);
         break;
       case 'transfer':
-        if (chainType !== 'ESC' || diaBalance >= 0.01) setOpenTransfer(true);
+        if (chainType !== 'ESC' || (wallet?.diaBalance ?? 0) >= 0.01) setOpenTransfer(true);
         else setOpenBuyDIA(true);
         break;
       default:
@@ -283,7 +269,17 @@ export default function AssetCard(props) {
     }
     setOpenPopup(null);
   };
-  const dlgProps = { name, tokenId, orderId, updateCount, handleUpdate, baseToken, v1State: orderChain === 'v1', is721: collection.is721, chain };
+  const dlgProps = {
+    name,
+    tokenId,
+    orderId,
+    updateCount,
+    handleUpdate,
+    baseToken,
+    v1State: orderChain === 'v1',
+    is721: collection.is721,
+    chain
+  };
 
   return (
     <Box>
@@ -326,7 +322,7 @@ export default function AssetCard(props) {
                 onClick={isLink ? (event) => setOpenPopup(event.currentTarget) : () => {}}
                 disabled={
                   !(
-                    sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' &&
+                    user?.link === '2' &&
                     ((type === 1 && myaddress === tokenOwner && (auctionEnded || (!auctionEnded && !lastBid))) ||
                       (type === 2 &&
                         ((isListedOwnedByMe && (auctionEnded || (!auctionEnded && !lastBid))) || isUnlistedOwnedByMe)))
@@ -361,7 +357,7 @@ export default function AssetCard(props) {
                   </MenuItem>
                 </div>
               )}
-              {type === 1 && myaddress === tokenOwner && sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && (
+              {type === 1 && myaddress === tokenOwner && user?.link === '2' && (
                 <div>
                   {!auctionEnded ? (
                     <>
@@ -400,7 +396,7 @@ export default function AssetCard(props) {
                 </div>
               )}
               {(type === 2 || type === 3) &&
-                sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' &&
+                user?.link === '2' &&
                 ((isListedOwnedByMe && (
                   <div>
                     {!auctionEnded ? (
@@ -618,7 +614,7 @@ export default function AssetCard(props) {
       <CancelDlg isOpen={cancelOpen} setOpen={setOpenCancel} {...dlgProps} />
       <DeleteDlg isOpen={deleteOpen} setOpen={setOpenDelete} {...dlgProps} />
       <TransferDlg isOpen={transferOpen} setOpen={setOpenTransfer} {...dlgProps} />
-      <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={diaBalance} />
+      <NeedBuyDIADlg isOpen={buyDIAOpen} setOpen={setOpenBuyDIA} balance={wallet?.diaBalance ?? 0} />
       <AuctionDlg isOpen={auctionOpen} setOpen={setOpenAuction} {...dlgProps} />
       <SettleOrderDlg
         isOpen={settleOpen}

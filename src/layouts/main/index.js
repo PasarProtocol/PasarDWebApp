@@ -4,12 +4,10 @@ import PropTypes from 'prop-types';
 import { Box, Fab, Zoom, useScrollTrigger } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-// material
-// components
 import MainNavbar from './MainNavbar';
 import MainFooter from './MainFooter';
 import useSettings from '../../hooks/useSettings';
-import useSignin from '../../hooks/useSignin';
+import { useUserContext } from '../../contexts/UserContext';
 
 // ----------------------------------------------------------------------
 
@@ -58,7 +56,7 @@ const BodyStyle = styled('div')(({ theme, footerhidden }) =>
 export default function MainLayout() {
   const { themeMode } = useSettings();
   const { pathname } = useLocation();
-  const { openTopAlert } = useSignin();
+  const { openTopAlert } = useUserContext();
   const isHome = pathname === '/';
   const isContainerXl = isHome || pathname === '/collections';
   const isFooterHiddenPage =

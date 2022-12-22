@@ -14,14 +14,8 @@ import PlaceBidDlg from '../../components/dialog/PlaceBid';
 import SettleOrderDlg from '../../components/dialog/SettleOrder';
 import CancelDlg from '../../components/dialog/CancelSale';
 import Countdown from '../../components/Countdown';
-import useSingin from '../../hooks/useSignin';
-import {
-  getTime,
-  getTotalCountOfCoinTypes,
-  
-  getCoinTypeFromToken,
-  setAllTokenPrice2
-} from '../../utils/common';
+import { useUserContext } from '../../contexts/UserContext';
+import { getTime, getTotalCountOfCoinTypes, getCoinTypeFromToken, setAllTokenPrice2 } from '../../utils/common';
 import { auctionOrderType } from '../../config';
 // ----------------------------------------------------------------------
 
@@ -43,6 +37,7 @@ CollectibleHandleSection.propTypes = {
 
 export default function CollectibleHandleSection(props) {
   const navigate = useNavigate();
+  const { user } = useUserContext();
   const { collectible = {}, address, onlyHandle = false } = props;
   const { order = {}, bidList = [], tokenOwner, listed = false } = collectible;
   const { endTime = 0, orderType = 0, price = 0, lastBid = 0, buyoutPrice = 0, reservePrice = 0 } = order;
@@ -56,7 +51,6 @@ export default function CollectibleHandleSection(props) {
   const [isOpenCancel, setCancelOpen] = React.useState(false);
   const [continuePurchase, setContinuePurchase] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
-  const { pasarLinkAddress } = useSingin();
 
   const setCoinPriceByType = (type, value) => {
     setCoinPrice((prevState) => {
@@ -72,9 +66,8 @@ export default function CollectibleHandleSection(props) {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-      setSignin(!!sessionLinkFlag);
-      if (clickedType && !!sessionLinkFlag) {
+      setSignin(!!user?.link);
+      if (clickedType && !!user?.link) {
         setClickedType('');
         if (clickedType === 'buy') setTimeout(handlePurchase, 300);
         else if (clickedType === 'bid')
@@ -85,7 +78,7 @@ export default function CollectibleHandleSection(props) {
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pasarLinkAddress]);
+  }, [user?.link]);
 
   React.useEffect(() => {
     checkHasEnded();
