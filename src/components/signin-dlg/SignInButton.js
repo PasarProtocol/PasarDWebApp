@@ -125,12 +125,15 @@ export default function SignInButton() {
     };
     const handleEEChainChanged = (chainId) => {
       console.log('ChainId Changed', chainId);
-      setWallet((prev) => {
-        const current = { ...prev };
-        current.chainId = chainId;
-        return current;
-      });
-      if (chainId && !checkValidChain(chainId)) setOpenSnackbar(true);
+      if (chainId) {
+        setWallet((prev) => {
+          const current = { ...prev };
+          current.chainId = chainId;
+          return current;
+        });
+        setChainType(getChainTypeFromId(chainId));
+        if (!checkValidChain(chainId)) setOpenSnackbar(true);
+      }
     };
     const handleEEDisconnect = (code, reason) => {
       console.log('Disconnect code: ', code, ', reason: ', reason);
@@ -143,7 +146,15 @@ export default function SignInButton() {
       const inAppProvider = window.elastos.getWeb3Provider();
       const inAppWeb3 = new Web3(inAppProvider);
       inAppWeb3.eth.getChainId().then((chainId) => {
-        if (chainId && !checkValidChain(chainId)) setOpenSnackbar(true);
+        if (chainId) {
+          setWallet((prev) => {
+            const current = { ...prev };
+            current.chainId = chainId;
+            return current;
+          });
+          setChainType(getChainTypeFromId(chainId));
+          if (!checkValidChain(chainId)) setOpenSnackbar(true);
+        }
       });
     } else {
       walletConnectProvider.on('accountsChanged', handleEEAccountsChanged);
@@ -169,14 +180,8 @@ export default function SignInButton() {
   //       await activate(injected);
   //       setWalletAddress(await injected.getAccount());
   //     } else if (sessionLinkFlag === '2') {
-  //       setWalletAddress(
-  //         isInAppBrowser()
-  //           ? await window.elastos.getWeb3Provider().address
-  //           : essentialsConnector.getWalletConnectProvider().wc.accounts[0]
-  //       );
   //       // const mydid = sessionStorage.getItem('PASAR_DID');
   //       // getAvatarUrl(mydid);
-  //       setActivatingConnector(essentialsConnector);
   //     } else if (sessionLinkFlag === '3') {
   //       setActivatingConnector(walletconnect);
   //       await activate(walletconnect);
@@ -201,11 +206,6 @@ export default function SignInButton() {
   //     }
   //   });
   // };
-
-  // React.useEffect(() => {
-  //   const currentChainType = getChainTypeFromId(pasarLinkChain);
-  //   if (pasarLinkChain) setChainType(currentChainType);
-  // }, [pasarLinkChain]);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -417,23 +417,6 @@ export default function SignInButton() {
 
   // ----------------------------------------- //
   // ----------------------------------- //
-
-  // const handleClickOpenDownloadEssentialDlg = () => {
-  //   setOpenSigninEssentialDlg(false);
-  //   setOpenDownloadEssentialDlg(true);
-  // };
-  // const handleGoBackEssential = () => {
-  //   setOpenSigninEssentialDlg(true);
-  //   setOpenDownloadEssentialDlg(false);
-  // };
-
-  // const handleCloseSigninEssentialDlg = () => {
-  //   setOpenSigninEssentialDlg(false);
-  // };
-  // const handleCloseDownloadEssentialDlg = () => {
-  //   setOpenDownloadEssentialDlg(false);
-  // };
-
   // ====================== ====================== ====================== //
   const handleClickSignInButton = async () => {
     if (isInAppBrowser()) await connectToEE();
