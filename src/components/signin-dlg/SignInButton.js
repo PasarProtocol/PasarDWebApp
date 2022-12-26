@@ -135,14 +135,14 @@ export default function SignInButton() {
       }
       setActivatingConnector(connector);
       await activate(connector);
-      const walletAddress = await injected.getAccount();
+      const walletAddress = await connector.getAccount();
       setWallet((prev) => {
         const current = { ...prev };
         current.address = walletAddress;
         return current;
       });
     };
-    if (user?.link && !activatingConnector) initializeWalletConnection();
+    if ((user?.link === '1' || user?.link === '3') && !activatingConnector) initializeWalletConnection();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activatingConnector, user.link]);
 
@@ -217,8 +217,8 @@ export default function SignInButton() {
         setUser((prev) => {
           const current = { ...prev };
           current.credentials = credentials;
-          current.didDoc = didDoc;
-          current.avatar = avatar;
+          // current.didDoc = didDoc;
+          // current.avatar = avatar;
           return current;
         });
       } catch (e) {
