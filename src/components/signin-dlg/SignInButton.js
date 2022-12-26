@@ -82,7 +82,7 @@ export default function SignInButton() {
   React.useEffect(() => {
     const handleEEAccountsChanged = async (accounts) => {
       console.log('Account Changed: ', accounts);
-      if (accounts.length) {
+      if (user?.link && accounts.length) {
         setWallet((prev) => {
           const current = { ...prev };
           const [address] = accounts;
@@ -122,7 +122,7 @@ export default function SignInButton() {
     };
     const handleEEChainChanged = (chainId) => {
       console.log('ChainId Changed', chainId);
-      if (chainId) {
+      if (user?.link && chainId) {
         setWallet((prev) => {
           const current = { ...prev };
           current.chainId = chainId;
@@ -134,7 +134,7 @@ export default function SignInButton() {
     };
     const handleEEDisconnect = (code, reason) => {
       console.log('Disconnect code: ', code, ', reason: ', reason);
-      signOutWithEssentials();
+      signOutWithEssentials(true);
     };
     const handleEEError = (code, reason) => {
       console.error(code, reason);
@@ -226,6 +226,7 @@ export default function SignInButton() {
     if (user?.link) fetchData();
   }, [user?.link]);
 
+  console.log('====', user, wallet);
   // React.useEffect(() => {
   //   const fetchData = async () => {
   //     initializeWalletConnection();
@@ -521,7 +522,7 @@ export default function SignInButton() {
       setOpenCredentials(true);
     } else if (e.target.getAttribute('value') === 'signout') {
       if (user?.link === '1' || user?.link === '3') await disconnectWallet();
-      else if (user?.link === '2') await signOutWithEssentials();
+      else if (user?.link === '2') await signOutWithEssentials(true);
       await activate(null);
       setActivatingConnector(null);
       setWallet((prev) => {

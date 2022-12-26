@@ -63,7 +63,7 @@ export default function useConnectEE() {
     return undefined;
   };
 
-  const signOutWithEssentials = async (pageRefresh = true) => {
+  const signOutWithEssentials = async (pageRefresh = false) => {
     console.log('Signing out user. Deleting session info');
     sessionStorage.removeItem('PASAR_LINK_ADDRESS');
     sessionStorage.removeItem('PASAR_DID');

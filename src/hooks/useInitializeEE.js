@@ -22,7 +22,7 @@ export default function useInitializeEE() {
     };
     const handleEEDisconnect = (code, reason) => {
       console.log('Disconnect code: ', code, ', reason: ', reason);
-      signOutWithEssentials();
+      signOutWithEssentials(true);
     };
     const handleEEError = (code, reason) => {
       console.error(code, reason);
