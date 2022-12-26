@@ -217,8 +217,8 @@ export default function SignInButton() {
         setUser((prev) => {
           const current = { ...prev };
           current.credentials = credentials;
-          // current.didDoc = didDoc;
-          // current.avatar = avatar;
+          current.didDoc = didDoc;
+          current.avatar = avatar;
           return current;
         });
       } catch (e) {
