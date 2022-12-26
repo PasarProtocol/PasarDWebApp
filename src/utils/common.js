@@ -27,8 +27,7 @@ import {
   ipfsURL as PasarIpfs,
   rpcURL,
   ExplorerServer,
-  feedsContract,
-  DidResolverUrl
+  feedsContract
 } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { V1_PASAR_CONTRACT_ABI } from '../abi/pasarV1ABI';
@@ -1266,36 +1265,6 @@ export const getInfoFromDID = (did) =>
         reject(error);
       });
   });
-
-export const getDIDDocumentFromDID = (did) =>
-  new Promise((resolve, reject) => {
-    DIDBackend.initialize(new DefaultDIDAdapter(DidResolverUrl));
-    const didObj = new DID(did);
-    didObj
-      .resolve(true)
-      .then((didDoc) => {
-        if (!didDoc) resolve({});
-        resolve(didDoc);
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-
-export const getCredentialsFromDIDDoc = (didDoc) => {
-  if (!didDoc || !Object.keys(didDoc).length) return undefined;
-  try {
-    const credentials = didDoc.getCredentials();
-    const properties = credentials.reduce((props, c) => {
-      props[c.id.fragment] = c.subject.properties[c.id.fragment];
-      return props;
-    }, {});
-    return properties;
-  } catch (err) {
-    console.error(err);
-    return undefined;
-  }
-};
 
 export const getDidInfoFromAddress = (address) =>
   new Promise((resolve, reject) => {

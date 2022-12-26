@@ -31,7 +31,10 @@ function UserContextProvider({ children }) {
     link: sessionStorage.getItem('PASAR_LINK_ADDRESS'),
     did: sessionStorage.getItem('PASAR_DID'),
     token: sessionStorage.getItem('PASAR_TOKEN'),
-    kycedProof: sessionStorage.getItem('KYCedProof')
+    kycedProof: sessionStorage.getItem('KYCedProof'),
+    avatar: '',
+    didDoc: undefined,
+    credentials: {}
   });
   const [openTopAlert, setOpenTopAlert] = useState(false);
   const [openSignInDlg, setOpenSignInDlg] = useState(false);

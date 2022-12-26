@@ -9,7 +9,6 @@ import { useWeb3React } from '@web3-react/core';
 import Web3 from 'web3';
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
-import { useSnackbar } from 'notistack';
 import { essentialsConnector, initConnectivitySDK } from './EssentialConnectivity';
 import { MFab } from '../@material-extend';
 import { injected, walletconnect, resetWalletConnector } from './connectors';
@@ -30,10 +29,17 @@ import {
   fetchAPIFrom,
   getERC20TokenPrice
 } from '../../utils/common';
+import {
+  getDIDDocumentFromDID,
+  getCredentialsFromDIDDoc,
+  getHiveAvatarUrlFromDIDAvatarCredential,
+  fetchHiveScriptPictureToDataUrl
+} from './LoadCredentials';
 import { useUserContext } from '../../contexts/UserContext';
 import useConnectEE from '../../hooks/useConnectEE';
 // import { creatAndRegister, prepareConnectToHive, downloadAvatar } from './HiveAPI';
-import { DidResolverUrl, firebaseConfig, mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS } from '../../config';
+import { downloadAvatar } from './HiveAPI';
+import { firebaseConfig, mainDiaContract as DIA_CONTRACT_MAIN_ADDRESS } from '../../config';
 import SignInDlg from './dlg/SignInDlg';
 import DownloadEEDlg from './dlg/DownloadEEDlg';
 
@@ -59,7 +65,6 @@ export default function SignInButton() {
     setOpenCredentials
   } = useUserContext();
 
-  // let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
   const { activate, active, library, chainId, account } = useWeb3React();
   const { isConnectedEE, signInWithEssentials, signOutWithEssentials } = useConnectEE();
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -92,7 +97,7 @@ export default function SignInButton() {
       signOutWithEssentials(true);
     };
     const handleEEError = (code, reason) => {
-      console.error(code, reason);
+      console.error('EE Error code: ', code, ', reason: ', reason);
     };
     if (isInAppBrowser()) {
       const inAppProvider = window.elastos.getWeb3Provider();
@@ -119,6 +124,7 @@ export default function SignInButton() {
   }, [walletConnectProvider]);
 
   // ------------ Track MM, WC Connection ------------ //
+  // reactivate connector after page refresh
   React.useEffect(() => {
     const initializeWalletConnection = async () => {
       let connector = null;
@@ -155,7 +161,7 @@ export default function SignInButton() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.link, chainId, account]);
 
-  // listen for disconnect from essentials / wallet connect
+  // handle disconnect from wallet
   React.useEffect(() => {
     const fetchData = async () => {
       if (user?.link === '1' && activatingConnector === injected && !active) disconnect();
@@ -163,7 +169,7 @@ export default function SignInButton() {
       //   if (isInAppBrowser()) {
       //     if (!(await window.elastos.getWeb3Provider().isConnected())) disconnect();
       //   } else if (!essentialsConnector.hasWalletConnectSession()) disconnect();
-      // } 
+      // }
       else if (
         user?.link === '3' &&
         activatingConnector === walletconnect &&
@@ -175,8 +181,9 @@ export default function SignInButton() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
+  // ------------ Common ------------ //
   React.useEffect(() => {
-    const fetchData = async () => {
+    const fetchCoinPrice = async () => {
       const ela2usd = await getCoinUSD();
       const token2eth = await getTokenPriceInEthereum();
       const dia2usd = await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS);
@@ -184,39 +191,61 @@ export default function SignInButton() {
       setTokenPricesInETH(token2eth);
       setDiaUSD(dia2usd);
     };
-    if (user?.link) fetchData();
+    if (user?.link) fetchCoinPrice();
   }, [user?.link]);
 
   React.useEffect(() => {
-    const getV1NFT = async (walletAddress) => {
+    const fetchV1NFT = async (walletAddress) => {
       const res = await fetchAPIFrom(`api/v1/getV1MarketNFTByWalletAddr?walletAddr=${walletAddress}`, {});
       const json = await res.json();
       setOpenTopAlert((json?.data || []).length > 0);
     };
-    if (wallet?.address) getV1NFT(wallet.address);
+    if (wallet?.address) fetchV1NFT(wallet.address);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallet?.address]);
 
-    // const getAvatarUrl = (did) => {
-  //   const targetDid = `did:elastos:${did}`;
-  //   downloadAvatar(targetDid).then((res) => {
-  //     if (res && res.length) {
-  //       const base64Content = res.reduce((content, code) => {
-  //         content = `${content}${String.fromCharCode(code)}`;
-  //         return content;
-  //       }, '');
-  //       setAvatarUrl((prevState) => {
-  //         if (!prevState) return `data:image/png;base64,${base64Content}`;
-  //         return prevState;
-  //       });
-  //     }
-  //   });
-  // };
-  console.log('====', user, wallet, balance, coinUSD, diaUSD, tokenPricesInETH);
-  // console.log('=====+++', user.link, chainId, active, account);
+  React.useEffect(() => {
+    const getUserInfo = async (did) => {
+      let avatar = null;
+      try {
+        const didDoc = await getDIDDocumentFromDID(did);
+        const credentials = getCredentialsFromDIDDoc(didDoc);
+        if (did && credentials && credentials?.avatar) {
+          const hiveAvatarUrl = getHiveAvatarUrlFromDIDAvatarCredential(credentials.avatar);
+          avatar = await fetchHiveScriptPictureToDataUrl(hiveAvatarUrl, did);
+        }
+        setUser((prev) => {
+          const current = { ...prev };
+          current.credentials = credentials;
+          current.didDoc = didDoc;
+          current.avatar = avatar;
+          return current;
+        });
+      } catch (e) {
+        console.error(e);
+      }
+      try {
+        const avatarInfo = await downloadAvatar(did);
+        if (avatarInfo && avatarInfo.length) {
+          const base64Content = avatarInfo.reduce((content, code) => {
+            content = `${content}${String.fromCharCode(code)}`;
+            return content;
+          }, '');
+          const avatarImg = `data:image/png;base64,${base64Content}`;
+          setAvatarUrl((prevState) => {
+            if (!prevState) return avatarImg || avatar;
+            return prevState;
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    if (user?.did) getUserInfo(`did:elastos:${user.did}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.did]);
 
   // ----------------------------------------- //
-  // ----------------------------------- //
   const handleAccountChanged = async (walletAddress, walletProvider) => {
     setWallet((prev) => {
       const current = { ...prev };

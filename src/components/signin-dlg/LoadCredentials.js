@@ -53,6 +53,7 @@ export const getCredentialsFromDID = (did) =>
         reject(error);
       });
   });
+
 export const getDIDDocumentFromDID = (did) =>
   new Promise((resolve, reject) => {
     DIDBackend.initialize(new DefaultDIDAdapter(DidResolverUrl));
@@ -67,6 +68,21 @@ export const getDIDDocumentFromDID = (did) =>
         reject(error);
       });
   });
+
+export const getCredentialsFromDIDDoc = (didDoc) => {
+  if (!didDoc || !Object.keys(didDoc).length) return undefined;
+  try {
+    const credentials = didDoc.getCredentials();
+    const properties = credentials.reduce((props, c) => {
+      props[c.id.fragment] = c.subject.properties[c.id.fragment];
+      return props;
+    }, {});
+    return properties;
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+};
 
 export const getVault = async (did) => {
   const instBCSHAH = new BrowserConnectivitySDKHiveAuthHelper(DidResolverUrl);
@@ -90,6 +106,7 @@ export const rawImageToBase64DataUrl = (rawImg) => {
 };
 
 export const getHiveAvatarUrlFromDIDAvatarCredential = (avatarCredentialSubject) => {
+  if (!avatarCredentialSubject) return null;
   if (avatarCredentialSubject.type && avatarCredentialSubject.type === 'elastoshive') {
     if (avatarCredentialSubject.data && avatarCredentialSubject['content-type']) {
       return avatarCredentialSubject.data;
