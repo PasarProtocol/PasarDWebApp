@@ -27,7 +27,8 @@ import {
   ipfsURL as PasarIpfs,
   rpcURL,
   ExplorerServer,
-  feedsContract
+  feedsContract,
+  DidResolverUrl
 } from '../config';
 import { PASAR_CONTRACT_ABI } from '../abi/pasarABI';
 import { V1_PASAR_CONTRACT_ABI } from '../abi/pasarV1ABI';
@@ -264,19 +265,14 @@ export function hash(string) {
 }
 
 export async function getCoinUSD() {
-  // return new Promise((resolve) => {
-  //   getERC20TokenPrice(blankAddress)
-  //     .then((result) => {
-  //       if (result.bundle.elaPrice) resolve(result.bundle.elaPrice);
-  //       else resolve(0);
-  //     })
-  //     .catch((e) => {
-  //       console.error(e);
-  //       resolve(0);
-  //     });
-  // });
-  const response = await fetchAPIFrom('api/v1/price');
-  return (await response.json()).ELA;
+  try {
+    const res = await fetchAPIFrom('api/v1/price');
+    const json = await res.json();
+    return json?.ELA ?? 0;
+  } catch (e) {
+    console.error(e);
+    return 0;
+  }
 }
 
 export async function getERC20TokenPrice(tokenAddress) {
@@ -346,9 +342,14 @@ export async function getTokenPriceInEthereum() {
   //       resolve([0, 0, 0]);
   //     });
   // });
-  const response = await fetchAPIFrom('api/v1/price');
-  const data = await response.json();
-  return [data.ETH, data.ELA, data.FSN];
+  try {
+    const res = await fetchAPIFrom('api/v1/price');
+    const json = await res.json();
+    return [json?.ETH ?? 0, json?.ELA ?? 0, json?.FSN ?? 0];
+  } catch (e) {
+    console.error(e);
+    return [0, 0, 0];
+  }
 }
 
 export function setAllTokenPrice2(setCoinPriceByType) {
@@ -1265,6 +1266,36 @@ export const getInfoFromDID = (did) =>
         reject(error);
       });
   });
+
+export const getDIDDocumentFromDID = (did) =>
+  new Promise((resolve, reject) => {
+    DIDBackend.initialize(new DefaultDIDAdapter(DidResolverUrl));
+    const didObj = new DID(did);
+    didObj
+      .resolve(true)
+      .then((didDoc) => {
+        if (!didDoc) resolve({});
+        resolve(didDoc);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+
+export const getCredentialsFromDIDDoc = (didDoc) => {
+  if (!didDoc || !Object.keys(didDoc).length) return undefined;
+  try {
+    const credentials = didDoc.getCredentials();
+    const properties = credentials.reduce((props, c) => {
+      props[c.id.fragment] = c.subject.properties[c.id.fragment];
+      return props;
+    }, {});
+    return properties;
+  } catch (err) {
+    console.error(err);
+    return undefined;
+  }
+};
 
 export const getDidInfoFromAddress = (address) =>
   new Promise((resolve, reject) => {
