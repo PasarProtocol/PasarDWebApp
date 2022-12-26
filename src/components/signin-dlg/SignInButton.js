@@ -75,65 +75,20 @@ export default function SignInButton() {
   const navigate = useNavigate();
 
   const [walletConnectProvider] = useState(essentialsConnector.getWalletConnectProvider());
-  const { enqueueSnackbar } = useSnackbar();
-
   initConnectivitySDK();
 
+  // ------------ Track EE Connection ------------ //
   React.useEffect(() => {
     const handleEEAccountsChanged = async (accounts) => {
-      console.log('Account Changed: ', accounts);
-      if (user?.link && accounts.length) {
-        setWallet((prev) => {
-          const current = { ...prev };
-          const [address] = accounts;
-          current.address = address;
-          return current;
-        });
-        try {
-          const dia = await getDiaTokenInfo(accounts[0], walletConnectProvider);
-          setWallet((prev) => {
-            const current = { ...prev };
-            current.diaBalance = dia;
-            return current;
-          });
-        } catch (e) {
-          console.error(e);
-          setWallet((prev) => {
-            const current = { ...prev };
-            current.diaBalance = 0;
-            return current;
-          });
-        }
-        try {
-          const elaOnEth = await getElaOnEthTokenInfo(accounts[0], walletConnectProvider);
-          setElaOnEthBalance(elaOnEth);
-        } catch (e) {
-          console.error(e);
-          setElaOnEthBalance(0);
-        }
-        try {
-          const balance = await getBalance(walletConnectProvider);
-          setBalance(math.round(balance / 1e18, 4));
-        } catch (e) {
-          console.error(e);
-          setBalance(0);
-        }
-      }
+      console.log('EE Account Changed: ', accounts);
+      if (user?.link && accounts.length) handleAccountChanged(accounts[0], walletConnectProvider);
     };
     const handleEEChainChanged = (chainId) => {
-      console.log('ChainId Changed', chainId);
-      if (user?.link && chainId) {
-        setWallet((prev) => {
-          const current = { ...prev };
-          current.chainId = chainId;
-          return current;
-        });
-        setChainType(getChainTypeFromId(chainId));
-        if (!checkValidChain(chainId)) setOpenSnackbar(true);
-      }
+      console.log('EE ChainId Changed', chainId);
+      if (user?.link && chainId) handleChainIdChanged(chainId);
     };
     const handleEEDisconnect = (code, reason) => {
-      console.log('Disconnect code: ', code, ', reason: ', reason);
+      console.log('EE Disconnect code: ', code, ', reason: ', reason);
       signOutWithEssentials(true);
     };
     const handleEEError = (code, reason) => {
@@ -143,16 +98,9 @@ export default function SignInButton() {
       const inAppProvider = window.elastos.getWeb3Provider();
       const inAppWeb3 = new Web3(inAppProvider);
       inAppWeb3.eth.getChainId().then((chainId) => {
-        if (chainId) {
-          setWallet((prev) => {
-            const current = { ...prev };
-            current.chainId = chainId;
-            return current;
-          });
-          setChainType(getChainTypeFromId(chainId));
-          if (!checkValidChain(chainId)) setOpenSnackbar(true);
-        }
+        if (chainId) handleChainIdChanged(chainId);
       });
+      if (inAppProvider?.address) handleAccountChanged(inAppProvider.address, inAppProvider);
     } else {
       walletConnectProvider.on('accountsChanged', handleEEAccountsChanged);
       walletConnectProvider.on('chainChanged', handleEEChainChanged);
@@ -170,25 +118,86 @@ export default function SignInButton() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletConnectProvider]);
 
-  // const initializeWalletConnection = React.useCallback(async () => {
-  //   if (sessionLinkFlag && !activatingConnector) {
-  //     if (sessionLinkFlag === '1') {
-  //       setActivatingConnector(injected);
-  //       await activate(injected);
-  //       setWalletAddress(await injected.getAccount());
-  //     } else if (sessionLinkFlag === '2') {
-  //       // const mydid = sessionStorage.getItem('PASAR_DID');
-  //       // getAvatarUrl(mydid);
-  //     } else if (sessionLinkFlag === '3') {
-  //       setActivatingConnector(walletconnect);
-  //       await activate(walletconnect);
-  //       setWalletAddress(await walletconnect.getAccount());
-  //     }
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [sessionLinkFlag, activatingConnector, account, chainId]);
+  // ------------ Track MM, WC Connection ------------ //
+  React.useEffect(() => {
+    const initializeWalletConnection = async () => {
+      let connector = null;
+      if (user.link === '1') {
+        connector = injected;
+      } else if (user.link === '3') {
+        connector = walletconnect;
+      }
+      setActivatingConnector(connector);
+      await activate(connector);
+      const walletAddress = await injected.getAccount();
+      setWallet((prev) => {
+        const current = { ...prev };
+        current.address = walletAddress;
+        return current;
+      });
+    };
+    if (user?.link && !activatingConnector) initializeWalletConnection();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activatingConnector, user.link]);
 
-  // const getAvatarUrl = (did) => {
+  // handle account / chainId changed
+  React.useEffect(() => {
+    if (user?.link === '1' || user?.link === '3') {
+      if (chainId) {
+        console.log('Wallet ChainId Changed', chainId);
+        handleChainIdChanged(chainId);
+      }
+      if (account) {
+        console.log('Wallet Account Changed: ', account);
+        handleAccountChanged(account, library.provider);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.link, chainId, account]);
+
+  // listen for disconnect from essentials / wallet connect
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (user?.link === '1' && activatingConnector === injected && !active) disconnect();
+      // else if (user?.link === '2' && activatingConnector === essentialsConnector) {
+      //   if (isInAppBrowser()) {
+      //     if (!(await window.elastos.getWeb3Provider().isConnected())) disconnect();
+      //   } else if (!essentialsConnector.hasWalletConnectSession()) disconnect();
+      // } 
+      else if (
+        user?.link === '3' &&
+        activatingConnector === walletconnect &&
+        !walletconnect.walletConnectProvider.connected
+      )
+        disconnect();
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const ela2usd = await getCoinUSD();
+      const token2eth = await getTokenPriceInEthereum();
+      const dia2usd = await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS);
+      setCoinUSD(ela2usd);
+      setTokenPricesInETH(token2eth);
+      setDiaUSD(dia2usd);
+    };
+    if (user?.link) fetchData();
+  }, [user?.link]);
+
+  React.useEffect(() => {
+    const getV1NFT = async (walletAddress) => {
+      const res = await fetchAPIFrom(`api/v1/getV1MarketNFTByWalletAddr?walletAddr=${walletAddress}`, {});
+      const json = await res.json();
+      setOpenTopAlert((json?.data || []).length > 0);
+    };
+    if (wallet?.address) getV1NFT(wallet.address);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wallet?.address]);
+
+    // const getAvatarUrl = (did) => {
   //   const targetDid = `did:elastos:${did}`;
   //   downloadAvatar(targetDid).then((res) => {
   //     if (res && res.length) {
@@ -203,217 +212,59 @@ export default function SignInButton() {
   //     }
   //   });
   // };
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetchAPIFrom(`api/v1/getV1MarketNFTByWalletAddr?walletAddr=${wallet.address}`, {});
-      const json = await res.json();
-      setOpenTopAlert((json?.data || []).length > 0);
-    };
-    if (wallet?.address) fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wallet?.address]);
-
-  React.useEffect(() => {
-    const fetchData = async () => {
-      const ela2usd = await getCoinUSD();
-      const token2eth = await getTokenPriceInEthereum();
-      const dia2usd = await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS);
-      setCoinUSD(ela2usd);
-      setTokenPricesInETH(token2eth);
-      setDiaUSD(dia2usd);
-    };
-    if (user?.link) fetchData();
-  }, [user?.link]);
-
-  console.log('====', user, wallet);
-  // React.useEffect(() => {
-  //   const fetchData = async () => {
-  //     initializeWalletConnection();
-  //   };
-  //   fetchData();
-  // }, [sessionLinkFlag]);
-
-  // React.useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (chainId) {
-  //       setPasarLinkChain(chainId);
-  //       if (!checkValidChain(chainId)) setOpenSnackbar(true);
-  //     }
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-  //     if (sessionLinkFlag) {
-  //       // when connected
-  //       if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
-  //         getDiaTokenInfo(account, library.provider)
-  //           .then((dia) => {
-  //             setDiaBalance(dia);
-  //           })
-  //           .catch((e) => {
-  //             console.error(e);
-  //             setDiaBalance(0);
-  //           });
-  //         getElaOnEthTokenInfo(account, library.provider)
-  //           .then((ela) => {
-  //             setElaOnEthBalance(ela);
-  //           })
-  //           .catch((e) => {
-  //             console.error(e);
-  //             setElaOnEthBalance(0);
-  //           });
-  //         getBalance(library.provider).then((res) => {
-  //           setBalance(math.round(res / 1e18, 4));
-  //         });
-  //       } else if (sessionLinkFlag === '2') {
-  //         if (isInAppBrowser()) {
-  //           const elastosWeb3Provider = await window.elastos.getWeb3Provider();
-  //           getDiaTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
-  //             .then((dia) => {
-  //               setDiaBalance(dia);
-  //             })
-  //             .catch((e) => {
-  //               console.error(e);
-  //               setDiaBalance(0);
-  //             });
-  //           getElaOnEthTokenInfo(elastosWeb3Provider.address, elastosWeb3Provider)
-  //             .then((ela) => {
-  //               setElaOnEthBalance(ela);
-  //             })
-  //             .catch((e) => {
-  //               console.error(e);
-  //               setElaOnEthBalance(0);
-  //             });
-  //           getBalance(elastosWeb3Provider).then((res) => {
-  //             setBalance(math.round(res / 1e18, 4));
-  //           });
-  //         } else if (essentialsConnector.getWalletConnectProvider()) {
-  //           const essentialProvider = essentialsConnector.getWalletConnectProvider();
-  //           if (essentialProvider.chainId === 20 || essentialProvider.chainId === 21) {
-  //             getDiaTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-  //               .then((dia) => {
-  //                 setDiaBalance(dia);
-  //               })
-  //               .catch((e) => {
-  //                 console.error(e);
-  //                 setDiaBalance(0);
-  //               });
-  //           }
-  //           if (essentialProvider.chainId === 1 || essentialProvider.chainId === 5) {
-  //             getElaOnEthTokenInfo(essentialProvider.wc.accounts[0], essentialProvider)
-  //               .then((ela) => {
-  //                 setElaOnEthBalance(ela);
-  //               })
-  //               .catch((e) => {
-  //                 console.error(e);
-  //                 setElaOnEthBalance(0);
-  //               });
-  //           }
-  //           getBalance(essentialProvider).then((res) => {
-  //             setBalance(math.round(res / 1e18, 4));
-  //           });
-  //         }
-  //       }
-  //     }
-  //   };
-  //   fetchData();
-  // }, [sessionLinkFlag, account, active, chainId, activatingConnector, chainType]);
-
-  // // listen for disconnect from essentials / wallet connect
-  // React.useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (sessionLinkFlag === '1' && activatingConnector === injected && !active) {
-  //       setOpenAccountPopup(null);
-  //       await activate(null);
-  //       if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1') {
-  //         try {
-  //           await activatingConnector.deactivate();
-  //         } catch (e) {
-  //           console.log('injected connector deactive error: ', e);
-  //         }
-  //       }
-  //       sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-  //       setPasarLinkChain(1);
-  //       setActivatingConnector(null);
-  //       setWalletAddress(null);
-  //       navigate('/marketplace');
-  //       window.location.reload();
-  //     } else if (sessionLinkFlag === '2' && activatingConnector === essentialsConnector) {
-  //       if (isInAppBrowser()) {
-  //         if (!(await window.elastos.getWeb3Provider().isConnected())) {
-  //           setOpenAccountPopup(null);
-  //           await activate(null);
-  //           window.elastos
-  //             .getWeb3Provider()
-  //             .disconnect()
-  //             .then((res) => {
-  //               console.log(res);
-  //             })
-  //             .catch((e) => {
-  //               console.log(e);
-  //             });
-  //           sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-  //           sessionStorage.removeItem('PASAR_TOKEN');
-  //           sessionStorage.removeItem('PASAR_DID');
-  //           sessionStorage.removeItem('KYCedProof');
-  //           setPasarLinkChain(1);
-  //           setActivatingConnector(null);
-  //           setWalletAddress(null);
-  //           navigate('/marketplace');
-  //           window.location.reload();
-  //         }
-  //       } else if (!essentialsConnector.hasWalletConnectSession()) {
-  //         setOpenAccountPopup(null);
-  //         await activate(null);
-  //         essentialsConnector
-  //           .disconnectWalletConnect()
-  //           .then((res) => {
-  //             console.log(res);
-  //           })
-  //           .catch((e) => {
-  //             console.log(e);
-  //           });
-  //         sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-  //         sessionStorage.removeItem('PASAR_TOKEN');
-  //         sessionStorage.removeItem('PASAR_DID');
-  //         setPasarLinkChain(1);
-  //         setActivatingConnector(null);
-  //         setWalletAddress(null);
-  //         navigate('/marketplace');
-  //         window.location.reload();
-  //       }
-  //     } else if (sessionLinkFlag === '3') {
-  //       if (activatingConnector === walletconnect && !walletconnect.walletConnectProvider.connected) {
-  //         setOpenAccountPopup(null);
-  //         await activate(null);
-  //         if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
-  //           try {
-  //             await activatingConnector.deactivate();
-  //           } catch (e) {
-  //             console.log('walletconnect deactive error: ', e);
-  //           }
-  //         }
-  //         sessionStorage.removeItem('PASAR_LINK_ADDRESS');
-  //         setPasarLinkChain(1);
-  //         setActivatingConnector(null);
-  //         setWalletAddress(null);
-  //         navigate('/marketplace');
-  //         window.location.reload();
-  //       }
-  //     }
-  //   };
-  //   fetchData();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [essentialsConnector.hasWalletConnectSession(), active]);
+  console.log('====', user, wallet, balance, coinUSD, diaUSD, tokenPricesInETH);
+  // console.log('=====+++', user.link, chainId, active, account);
 
   // ----------------------------------------- //
   // ----------------------------------- //
-  // ====================== ====================== ====================== //
-  const handleClickSignInButton = async () => {
-    if (isInAppBrowser()) await connectToEE();
-    else setOpenSignInDlg(true);
+  const handleAccountChanged = async (walletAddress, walletProvider) => {
+    setWallet((prev) => {
+      const current = { ...prev };
+      current.address = walletAddress;
+      return current;
+    });
+    try {
+      const dia = await getDiaTokenInfo(walletAddress, walletProvider);
+      setWallet((prev) => {
+        const current = { ...prev };
+        current.diaBalance = dia;
+        return current;
+      });
+    } catch (e) {
+      console.error(e);
+      setWallet((prev) => {
+        const current = { ...prev };
+        current.diaBalance = 0;
+        return current;
+      });
+    }
+    try {
+      const elaOnEth = await getElaOnEthTokenInfo(walletAddress, walletProvider);
+      setElaOnEthBalance(elaOnEth);
+    } catch (e) {
+      console.error(e);
+      setElaOnEthBalance(0);
+    }
+    try {
+      const balance = await getBalance(walletProvider);
+      setBalance(math.round(balance / 1e18, 4));
+    } catch (e) {
+      console.error(e);
+      setBalance(0);
+    }
   };
 
-  // ------------ MM, WC Connect ------------ //
+  const handleChainIdChanged = (chainId) => {
+    setWallet((prev) => {
+      const current = { ...prev };
+      current.chainId = chainId;
+      return current;
+    });
+    setChainType(getChainTypeFromId(chainId));
+    if (!checkValidChain(chainId)) setOpenSnackbar(true);
+  };
+  // ====================== ====================== ====================== //
+  // ------------ MM, WC Connection ------------ //
   const connectToWallet = async (wallet) => {
     let currentConnector = null;
     if (wallet === 'MM') {
@@ -430,6 +281,9 @@ export default function SignInButton() {
       if (currentConnector === injected) linkType = '1';
       else if (currentConnector === walletconnect) linkType = '3';
       sessionStorage.setItem('PASAR_LINK_ADDRESS', linkType);
+      sessionStorage.setItem('PASAR_DID', null);
+      sessionStorage.setItem('PASAR_ADDRESS', retAddress);
+      sessionStorage.setItem('PASAR_TOKEN', null);
       setActivatingConnector(currentConnector);
       setUser((prev) => {
         const current = { ...prev };
@@ -445,6 +299,28 @@ export default function SignInButton() {
     }
   };
 
+  const disconnectWallet = async () => {
+    sessionStorage.removeItem('PASAR_LINK_ADDRESS');
+    sessionStorage.removeItem('PASAR_DID');
+    sessionStorage.removeItem('PASAR_ADDRESS');
+    sessionStorage.removeItem('PASAR_TOKEN');
+    sessionStorage.removeItem('KYCedProof');
+    sessionStorage.removeItem('REWARD_USER');
+    try {
+      await activatingConnector.deactivate();
+      await activate(null);
+      setActivatingConnector(null);
+      setWallet((prev) => {
+        const current = { ...prev };
+        current.address = '';
+        return current;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // ------------ EE Connection ------------ //
   const connectToEE = async () => {
     try {
       if (isConnectedEE) await signOutWithEssentials(false);
@@ -473,19 +349,25 @@ export default function SignInButton() {
     }
   };
 
-  const disconnectWallet = async () => {
-    try {
-      await activatingConnector.deactivate();
-      await activate(null);
-      setActivatingConnector(null);
-      setWallet((prev) => {
-        const current = { ...prev };
-        current.address = '';
-        return current;
-      });
-    } catch (e) {
-      console.error(e);
-    }
+  const disconnect = async () => {
+    setOpenAccountPopup(null);
+    if (user?.link === '1' || user?.link === '3') await disconnectWallet();
+    else if (user?.link === '2') await signOutWithEssentials(true);
+    await activate(null);
+    setActivatingConnector(null);
+    setWallet((prev) => {
+      const current = { ...prev };
+      current.address = '';
+      return current;
+    });
+    navigate('/marketplace');
+    window.location.reload();
+  };
+
+  // ====================== Dlgs ====================== //
+  const handleClickSignInButton = async () => {
+    if (isInAppBrowser()) await connectToEE();
+    else setOpenSignInDlg(true);
   };
 
   // ---------- SignInDlg ------------ //
@@ -517,22 +399,10 @@ export default function SignInButton() {
   };
 
   const handleCloseAccountMenu = async (e) => {
-    setOpenAccountPopup(null);
     if (e.target.getAttribute('value') === 'credentials') {
+      setOpenAccountPopup(null);
       setOpenCredentials(true);
-    } else if (e.target.getAttribute('value') === 'signout') {
-      if (user?.link === '1' || user?.link === '3') await disconnectWallet();
-      else if (user?.link === '2') await signOutWithEssentials(true);
-      await activate(null);
-      setActivatingConnector(null);
-      setWallet((prev) => {
-        const current = { ...prev };
-        current.address = '';
-        return current;
-      });
-      navigate('/marketplace');
-      window.location.reload();
-    }
+    } else if (e.target.getAttribute('value') === 'signout') disconnect();
   };
 
   let totalBalance = 0;
