@@ -46,20 +46,17 @@ if (firebaseConfig.apiKey) {
 export default function SignInButton() {
   const {
     user,
-    openTopAlert,
     openSignInDlg,
     openDownloadEEDlg,
     navigationPath,
     wallet,
-    elaConnectivityService,
     setUser,
     setOpenTopAlert,
     setOpenSignInDlg,
     setOpenDownloadEEDlg,
     setNavigationPath,
     setWallet,
-    setOpenCredentials,
-    setElastosConnectivityService
+    setOpenCredentials
   } = useUserContext();
 
   // let sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
@@ -217,29 +214,21 @@ export default function SignInButton() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallet?.address]);
 
+  React.useEffect(() => {
+    const fetchData = async () => {
+      const ela2usd = await getCoinUSD();
+      const token2eth = await getTokenPriceInEthereum();
+      const dia2usd = await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS);
+      setCoinUSD(ela2usd);
+      setTokenPricesInETH(token2eth);
+      setDiaUSD(dia2usd);
+    };
+    if (user?.link) fetchData();
+  }, [user?.link]);
+
   // React.useEffect(() => {
   //   const fetchData = async () => {
   //     initializeWalletConnection();
-  //     getCoinUSD().then((res) => {
-  //       setCoinUSD(res);
-  //     });
-  //     getTokenPriceInEthereum().then((res) => {
-  //       setTokenPricesInETH(res);
-  //     });
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //     sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
-  //     if (sessionLinkFlag) {
-  //       // when connected
-  //       if ((sessionLinkFlag === '1' || sessionLinkFlag === '3') && library) {
-  //         setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS));
-  //       } else if (sessionLinkFlag === '2') {
-  //         if (isInAppBrowser()) {
-  //           setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS));
-  //         } else if (essentialsConnector.getWalletConnectProvider()) {
-  //           setDiaUSD(await getERC20TokenPrice(DIA_CONTRACT_MAIN_ADDRESS));
-  //         }
-  //       }
-  //     }
   //   };
   //   fetchData();
   // }, [sessionLinkFlag]);
