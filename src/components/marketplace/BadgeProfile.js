@@ -76,6 +76,7 @@ BadgeProfile.propTypes = {
 
 export default function BadgeProfile(props) {
   const { type, walletAddress, collection = {}, isReservedAuction = false, defaultCollectionType = 0 } = props;
+  const { user } = useUserContext;
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const [didInfo, setDidInfo] = React.useState({ name: '', description: '' });
@@ -97,8 +98,7 @@ export default function BadgeProfile(props) {
       getDidInfoFromAddress(walletAddress).then((info) => {
         if (isMounted && info.did) {
           setDidInfo({ name: info.name || '', description: info.description || '' });
-          if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
-            fetchProfileData(info.did, { name: info.name || '', bio: info.description || '' });
+          if (user?.link === '2') fetchProfileData(info.did, { name: info.name || '', bio: info.description || '' });
         }
       });
 

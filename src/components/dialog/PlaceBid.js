@@ -243,7 +243,7 @@ export default function PlaceBid(props) {
         setOnProgress(false);
       });
 
-    // callContractMethod('buyOrder', {'_orderId': _orderId, '_didUri': _didUri})
+    // callContractMethod(user?.link, 'buyOrder', {'_orderId': _orderId, '_didUri': _didUri})
   };
 
   const bidNft = async () => {
@@ -256,13 +256,10 @@ export default function PlaceBid(props) {
     } else {
       setOnProgress(true);
       const bidPriceStr = BigInt(targetPrice * 1e18).toString();
-      if (
-        sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
-        sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'
-      ) {
+      if (user?.link === '1' || user?.link === '3') {
         callEthBidOrder(info.order?.orderId, bidPriceStr);
-      } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
-        const biderDidUri = await sendIpfsDidJson();
+      } else if (user?.link === '2') {
+        const biderDidUri = await sendIpfsDidJson(user?.did, user?.token, user?.kycedProof || '');
         console.log('didUri:', biderDidUri);
         callBidOrder(info.order?.orderId, biderDidUri, bidPriceStr);
       }
@@ -278,7 +275,7 @@ export default function PlaceBid(props) {
   };
   React.useEffect(() => {
     const fetchData = async () => {
-      const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+      const sessionLinkFlag = user?.link;
       setBalanceArray(Array(getTotalCountOfCoinTypes()).fill(0));
       if (sessionLinkFlag) {
         if (sessionLinkFlag === '1' && library)

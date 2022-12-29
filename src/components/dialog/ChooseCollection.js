@@ -18,6 +18,7 @@ import checkCircleIcon from '@iconify-icons/akar-icons/circle-check-fill';
 import StyledButton from '../signin-dlg/StyledButton';
 import { essentialsConnector } from '../signin-dlg/EssentialConnectivity';
 import { reduceHexAddress, isInAppBrowser, chainTypes, fetchAPIFrom, getImageFromIPFSUrl } from '../../utils/common';
+import { useUserContext } from '../../contexts/UserContext';
 
 ChooseCollection.propTypes = {
   isOpen: PropTypes.bool,
@@ -29,13 +30,14 @@ ChooseCollection.propTypes = {
 
 export default function ChooseCollection(props) {
   const { isOpen, setOpen, handleChoose, setERCtype, chainType } = props;
+  const { user } = useUserContext();
   const [selectedId, setSelectedId] = React.useState(-1);
   const [collections, setCollections] = React.useState([]);
   const [controller, setAbortController] = React.useState(new AbortController());
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+      if (user?.link === '2') {
         controller.abort(); // cancel the previous request
         const newController = new AbortController();
         const { signal } = newController;

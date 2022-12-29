@@ -57,7 +57,7 @@ export default function Sell(props) {
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [isOnValidation, setOnValidation] = React.useState(false);
-  const { wallet } = useUserContext();
+  const { user, wallet } = useUserContext();
   const navigate = useNavigate();
 
   const handleClose = () => {
@@ -106,7 +106,7 @@ export default function Sell(props) {
                   .send(transactionParams)
                   .on('receipt', (receipt) => {
                     console.log('setApprovalForAll-receipt', receipt);
-                    callContractMethod('createOrderForSale', coinType, wallet?.chainId, {
+                    callContractMethod(user?.link, 'createOrderForSale', coinType, wallet?.chainId, {
                       _id: tokenId,
                       _amount: 1,
                       _price,
@@ -125,7 +125,7 @@ export default function Sell(props) {
                     reject(error);
                   });
               else
-                callContractMethod('createOrderForSale', coinType, wallet?.chainId, {
+                callContractMethod(user?.link, 'createOrderForSale', coinType, wallet?.chainId, {
                   _id: tokenId,
                   _amount: 1,
                   _price,
@@ -157,7 +157,7 @@ export default function Sell(props) {
       return;
     }
     setOnProgress(true);
-    const didUri = await sendIpfsDidJson();
+    const didUri = await sendIpfsDidJson(user?.did, user?.token, user?.kycedProof || '');
     const sellPrice = BigInt(price * 1e18).toString();
     const MarketContractAddress = getContractAddressInCurrentNetwork(wallet?.chainId, 'market');
     callSetApprovalForAllAndSell(MarketContractAddress, true, sellPrice, didUri)

@@ -132,7 +132,7 @@ export default function SettleOrder(props) {
   };
 
   const callSettleOrder = (_orderId) => {
-    callContractMethod('settleAuctionOrder', 0, wallet?.chainId, {
+    callContractMethod(user?.link, 'settleAuctionOrder', 0, wallet?.chainId, {
       _orderId
     })
       .then((success) => {
@@ -162,14 +162,13 @@ export default function SettleOrder(props) {
 
   const settleOrder = async () => {
     setOnProgress(true);
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3')
-      callEthSettleOrder(info.orderId || info.OrderId);
-    else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') callSettleOrder(info.orderId || info.OrderId);
+    if (user?.link === '1' || user?.link === '3') callEthSettleOrder(info.orderId || info.OrderId);
+    else if (user?.link === '2') callSettleOrder(info.orderId || info.OrderId);
   };
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+      const sessionLinkFlag = user?.link;
       if (sessionLinkFlag) {
         if (sessionLinkFlag === '1' && library)
           getBalance(library.provider).then((res) => {

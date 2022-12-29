@@ -77,7 +77,7 @@ const tokenStandard = {
 };
 const _gasLimit = 5000000;
 export default function CreateCollection() {
-  const { wallet } = useUserContext();
+  const { user, wallet } = useUserContext();
   const { enqueueSnackbar } = useSnackbar();
   const [address, setAddress] = React.useState('');
   const [name, setName] = React.useState('');
@@ -122,7 +122,7 @@ export default function CreateCollection() {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') navigate('/marketplace');
+      if (user?.link !== '2') navigate('/marketplace');
       if (isInAppBrowser()) setAddress(await window.elastos.getWeb3Provider().address);
       else if (essentialsConnector.getWalletConnectProvider())
         setAddress(essentialsConnector.getWalletConnectProvider().wc.accounts[0]);
@@ -258,13 +258,11 @@ export default function CreateCollection() {
       });
 
       // create the metadata object we'll be storing
-      const did = sessionStorage.getItem('PASAR_DID') || '';
-      const token = sessionStorage.getItem('PASAR_TOKEN');
-      const user = jwtDecode(token);
-      const { name, bio } = user;
-      const proof = sessionStorage.getItem('KYCedProof') || '';
+      const userInfo = jwtDecode(user?.token || '');
+      const { name, bio } = userInfo;
+      const proof = user?.KYCedProof || '';
       const creatorObj = {
-        did: `did:elastos:${did}`,
+        did: `did:elastos:${user?.did || ''}`,
         name: name || '',
         description: bio || ''
       };
@@ -336,7 +334,7 @@ export default function CreateCollection() {
         setOnProgress(false);
       });
 
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') {
+      if (user?.link !== '2') {
         reject(new Error());
         return;
       }
@@ -404,7 +402,7 @@ export default function CreateCollection() {
         setCurrent(1);
       });
 
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') {
+      if (user?.link !== '2') {
         reject(new Error());
         return;
       }

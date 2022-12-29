@@ -38,6 +38,7 @@ import KYCBadge from '../../components/badge/KYCBadge';
 import DIABadge from '../../components/badge/DIABadge';
 import { fetchAPIFrom, getImageFromIPFSUrl } from '../../utils/common';
 import { queryKycMe } from '../../components/signin-dlg/HiveAPI';
+import { useUserContext } from '../../contexts/UserContext';
 
 // ----------------------------------------------------------------------
 
@@ -78,8 +79,8 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function CollectionDetail() {
-  const sessionDispMode = sessionStorage.getItem('disp-mode');
-  const sessionFilterProps = JSON.parse(sessionStorage.getItem('collection-filter-props')) || {};
+  const { user, setUser } = useUserContext();
+  const sessionFilterProps = JSON.parse(user?.collectionFilterProps) || {};
   const params = useParams(); // params.collection
   const drawerWidth = 360;
   const btnGroup = {
@@ -100,9 +101,7 @@ export default function CollectionDetail() {
   const [selectedAttributes, setSelectedAttributes] = React.useState(sessionFilterProps.selectedAttributes || {});
   const [range, setRange] = React.useState(sessionFilterProps.range || { min: '', max: '' });
   const [adult, setAdult] = React.useState(sessionFilterProps.adult || false);
-  const [dispMode, setDispMode] = React.useState(
-    sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode
-  );
+  const [dispMode, setDispMode] = React.useState(parseInt(user?.dispMode ?? defaultDispMode, 10));
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({
     selectedBtns: sessionFilterProps.selectedBtns || [],
@@ -199,11 +198,14 @@ export default function CollectionDetail() {
       }
       setLoadingAssets(false);
 
-      sessionStorage.setItem(
-        'collection-filter-props',
-        JSON.stringify({ selectedBtns, selectedAttributes, range, selectedTokens, adult, order })
-      );
-      setFilterForm({ selectedBtns, selectedAttributes, range, selectedTokens, adult, order });
+      const updatedFilterProps = { selectedBtns, selectedAttributes, range, selectedTokens, adult, order };
+      sessionStorage.setItem('collection-filter-props', JSON.stringify(updatedFilterProps));
+      setUser((prev) => {
+        const current = { ...prev };
+        current.collectionFilterProps = JSON.stringify(updatedFilterProps);
+        return current;
+      });
+      setFilterForm(updatedFilterProps);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -212,6 +214,11 @@ export default function CollectionDetail() {
   const changeDispMode = (_, mode) => {
     if (mode === null) return;
     sessionStorage.setItem('disp-mode', mode);
+    setUser((prev) => {
+      const current = { ...prev };
+      current.dispMode = mode;
+      return current;
+    });
     setDispMode(mode);
   };
 

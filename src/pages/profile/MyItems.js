@@ -37,6 +37,7 @@ import {
   fetchAPIFrom,
   getDIDInfoFromAddress
 } from '../../utils/common';
+import { useUserContext } from '../../contexts/UserContext';
 
 // ----------------------------------------------------------------------
 
@@ -53,11 +54,11 @@ const RootStyle = styled(Page)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 export default function MyItems() {
-  const defaultDispMode = isMobile ? 1 : 0;
-  const sessionDispMode = sessionStorage.getItem('disp-mode');
   const params = useParams(); // params.address
+  const { user } = useUserContext();
+  const defaultDispMode = isMobile ? 1 : 0;
   const navigate = useNavigate();
-  const [dispMode] = React.useState(sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode);
+  const [dispMode] = React.useState(parseInt(user?.dispMode ?? defaultDispMode, 10));
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(params.type !== undefined ? parseInt(params.type, 10) : 0);
   const [walletAddress, setWalletAddress] = React.useState(null);
@@ -94,18 +95,16 @@ export default function MyItems() {
         try {
           const info = await getDIDInfoFromAddress(params.address);
           setDidInfo({ name: info?.name || '', description: info?.description || '' });
-          if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2')
+          if (user?.link === '2')
             await fetchProfileData(info.did, { name: info.name || '', bio: info.description || '' });
         } catch (e) {
           console.error(e);
         }
-      } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+      } else if (user?.link === '2') {
         setWalletAddress(myAddress);
-        const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`;
-        const token = sessionStorage.getItem('PASAR_TOKEN');
-        const user = jwtDecode(token);
+        const userInfo = jwtDecode(user?.token || '');
         try {
-          await fetchProfileData(targetDid, user);
+          await fetchProfileData(`did:elastos:${user?.did}`, userInfo);
         } catch (e) {
           console.error(e);
         }
@@ -121,14 +120,14 @@ export default function MyItems() {
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   React.useEffect(() => {
     const getMyAddress = async () => {
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1') {
+      if (user?.link === '1') {
         setMyAddress(account);
-      } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+      } else if (user?.link === '2') {
         const strWalletAddress = isInAppBrowser()
           ? await window.elastos.getWeb3Provider().address
           : essentialsConnector.getWalletConnectProvider().wc.accounts[0];
         setMyAddress(strWalletAddress);
-      } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
+      } else if (user?.link === '3') {
         const strWalletAddress = await walletconnect.getAccount();
         setMyAddress(strWalletAddress);
       } else if (!params.address) {

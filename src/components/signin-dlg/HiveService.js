@@ -5,10 +5,9 @@ import { getAppContext } from './LoadCredentials';
 let hiveVault;
 let scriptRunners = {};
 
-const createVault = async () => {
+const createVault = async (did) => {
   try {
-    const pasarDid = sessionStorage.getItem('PASAR_DID');
-    const userDid = `did:elastos:${pasarDid}`;
+    const userDid = `did:elastos:${did}`;
     const context = await getAppContext(userDid);
     const hiveVault = new Vault(context);
 

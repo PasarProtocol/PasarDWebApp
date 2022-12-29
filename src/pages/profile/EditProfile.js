@@ -135,7 +135,7 @@ export default function EditProfile() {
           else setBadgeFlag('dia', 0);
         });
 
-        const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`;
+        const targetDid = `did:elastos:${user?.did}`;
         queryName(targetDid)
           .then((res) => {
             if (res.find_message && res.find_message.items.length) {
@@ -265,7 +265,7 @@ export default function EditProfile() {
         }
 
         // Make sure the holder of this presentation is the currently authentified user
-        if (sessionStorage.getItem('PASAR_DID') !== presentationDID) {
+        if (user?.did !== presentationDID) {
           stopProvide('Presentation not issued by the currently authenticated user');
           return;
         }

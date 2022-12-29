@@ -307,7 +307,7 @@ const CollectionCardPaper = (props) => {
     dia = 0
   } = info;
   const navigate = useNavigate();
-  const { wallet, setOpenDownloadEEDlg } = useUserContext();
+  const { user, wallet, setOpenDownloadEEDlg } = useUserContext();
   const realData = [tradeVolume, lowestPrice / 1e18, owners];
   const avatar = getImageFromIPFSUrl(data?.avatar || info.avatar);
   const background = getImageFromIPFSUrl(data?.background || info.background);
@@ -341,7 +341,7 @@ const CollectionCardPaper = (props) => {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') return;
+      if (user?.link !== '2') return;
       try {
         const res = await queryKycMe(creator.did);
         if (res.find_message && res.find_message.items.length) setBadgeFlag('kyc', true);
@@ -351,17 +351,18 @@ const CollectionCardPaper = (props) => {
       }
     };
     if (creator?.did) fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [creator.did]);
 
   React.useEffect(() => {
     if (isPreview) {
-      const token = sessionStorage.getItem('PASAR_TOKEN');
-      if (token) {
-        const user = jwtDecode(token);
+      if (user?.token) {
+        const user = jwtDecode(user.token);
         const { name } = user;
         setDidName(name);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPreview]);
 
   const setBadgeFlag = (type, value) => {
@@ -385,20 +386,14 @@ const CollectionCardPaper = (props) => {
         navigate(`/create`, { state: { token } });
         break;
       case 'edit':
-        if (
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'
-        ) {
+        if (user?.link === '1' || user?.link === '3') {
           setOpenDownloadEEDlg(true);
           return;
         }
         navigate(`/collections/edit`, { state: { chain, token } });
         break;
       case 'royalties':
-        if (
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' ||
-          sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3'
-        ) {
+        if (user?.link === '1' || user?.link === '3') {
           setOpenDownloadEEDlg(true);
           return;
         }

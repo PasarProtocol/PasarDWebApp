@@ -102,6 +102,7 @@ const ercAbiArr = [TOKEN_721_ABI, TOKEN_1155_ABI];
 export default function CreateItem() {
   const location = useLocation();
   const { token: baseToken } = location.state || {};
+  const { user, wallet } = useUserContext();
   const [mintype, setMintType] = React.useState('Single');
   const [itemtype, setItemType] = React.useState('General');
   const [saletype, setSaleType] = React.useState('FixedPrice');
@@ -143,7 +144,6 @@ export default function CreateItem() {
   const [isGeneralCollection, setIsGeneralCollection] = React.useState(false);
   const [coinPrice, setCoinPrice] = React.useState(Array(getTotalCountOfCoinTypes()).fill(0));
   const { isOpenMint, setOpenMintDlg, setOpenAccessDlg, setReadySignForMint, setCurrent, setTotalSteps } = useMintDlg();
-  const { wallet } = useUserContext();
   const { enqueueSnackbar } = useSnackbar();
   const coinTypes = getCoinTypesInCurrentNetwork(wallet?.chainId);
 
@@ -168,7 +168,7 @@ export default function CreateItem() {
   };
 
   React.useEffect(() => {
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') navigate('/marketplace');
+    if (user?.link !== '2') navigate('/marketplace');
     setAllTokenPrice2(setCoinPriceByType);
     if (localStorage.getItem('pa-yes') === '1') return;
     setOpenDisclaimer(true);
@@ -482,7 +482,7 @@ export default function CreateItem() {
         cancelAction();
       });
 
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') {
+      if (user?.link !== '2') {
         reject(new Error());
         return;
       }
@@ -569,7 +569,7 @@ export default function CreateItem() {
                               setCurrent(3);
                               console.log('setApprovalForAll-receipt', receipt);
                               if (saletype === 'FixedPrice')
-                                callContractMethod('createOrderForSale', coinType, wallet?.chainId, {
+                                callContractMethod(user?.link, 'createOrderForSale', coinType, wallet?.chainId, {
                                   ...paramObj,
                                   ...commonArgs,
                                   _price: BigInt(price * 1e18).toString()
@@ -581,7 +581,7 @@ export default function CreateItem() {
                                     reject(error);
                                   });
                               else
-                                callContractMethod('createOrderForAuction', coinType, wallet?.chainId, {
+                                callContractMethod(user?.link, 'createOrderForAuction', coinType, wallet?.chainId, {
                                   ...paramObj,
                                   ...commonArgs,
                                   _minPrice: BigInt(price * 1e18).toString(),
@@ -602,7 +602,7 @@ export default function CreateItem() {
                               reject(error);
                             });
                         } else if (saletype === 'FixedPrice')
-                          callContractMethod('createOrderForSale', coinType, wallet?.chainId, {
+                          callContractMethod(user?.link, 'createOrderForSale', coinType, wallet?.chainId, {
                             ...paramObj,
                             ...commonArgs,
                             _price: BigInt(price * 1e18).toString()
@@ -614,7 +614,7 @@ export default function CreateItem() {
                               reject(error);
                             });
                         else
-                          callContractMethod('createOrderForAuction', coinType, wallet?.chainId, {
+                          callContractMethod(user?.link, 'createOrderForAuction', coinType, wallet?.chainId, {
                             ...paramObj,
                             ...commonArgs,
                             _minPrice: BigInt(price * 1e18).toString(),
@@ -651,7 +651,7 @@ export default function CreateItem() {
         cancelAction();
       });
 
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') {
+      if (user?.link !== '2') {
         reject(new Error());
         return;
       }
@@ -736,7 +736,7 @@ export default function CreateItem() {
                                   setOpenAccessDlg(false);
                                   setCurrent(3);
                                   console.log('setApprovalForAll-receipt', receipt);
-                                  callContractMethod('createOrderForSaleBatch', coinType, wallet?.chainId, {
+                                  callContractMethod(user?.link, 'createOrderForSaleBatch', coinType, wallet?.chainId, {
                                     ...paramObj,
                                     ...commonArgs,
                                     _price: BigInt(price * 1e18).toString()
@@ -754,7 +754,7 @@ export default function CreateItem() {
                                   reject(error);
                                 });
                             }
-                            callContractMethod('createOrderForSaleBatch', coinType, wallet?.chainId, {
+                            callContractMethod(user?.link, 'createOrderForSaleBatch', coinType, wallet?.chainId, {
                               ...paramObj,
                               ...commonArgs,
                               _price: BigInt(price * 1e18).toString()
@@ -833,13 +833,11 @@ export default function CreateItem() {
       }
 
       // create the metadata object we'll be storing
-      const did = sessionStorage.getItem('PASAR_DID') || '';
-      const token = sessionStorage.getItem('PASAR_TOKEN');
-      const user = jwtDecode(token);
-      const { name, bio } = user;
-      const proof = sessionStorage.getItem('KYCedProof') || '';
+      const userInfo = jwtDecode(user?.token || '');
+      const { name, bio } = userInfo;
+      const proof = user?.KYCedProof || '';
       const creatorObj = {
-        did: `did:elastos:${did}`,
+        did: `did:elastos:${user?.did}`,
         name: name || '',
         description: bio || ''
       };
@@ -897,14 +895,12 @@ export default function CreateItem() {
         cancelAction();
       });
       // create the metadata object we'll be storing
-      const did = sessionStorage.getItem('PASAR_DID') || '';
-      const token = sessionStorage.getItem('PASAR_TOKEN');
-      const user = jwtDecode(token);
-      const { name, bio } = user;
-      const proof = sessionStorage.getItem('KYCedProof') || '';
+      const userInfo = jwtDecode(user?.token || '');
+      const { name, bio } = userInfo;
+      const proof = user?.KYCedProof || '';
       const didObj = {
         version: '2',
-        did: `did:elastos:${did}`,
+        did: `did:elastos:${user?.did}`,
         name: name || '',
         description: bio || ''
       };

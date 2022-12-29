@@ -63,7 +63,7 @@ const RootStyle = styled(Page)(({ theme }) => ({
 // ----------------------------------------------------------------------
 const _gasLimit = 5000000;
 export default function EditCollection() {
-  const { wallet } = useUserContext();
+  const { user, wallet } = useUserContext();
   const { enqueueSnackbar } = useSnackbar();
   const location = useLocation();
   const { chain, token } = location.state || {};
@@ -103,7 +103,7 @@ export default function EditCollection() {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') navigate('/marketplace');
+      if (user?.link !== '2') navigate('/marketplace');
 
       setLoadingCollection(true);
       try {
@@ -198,13 +198,11 @@ export default function EditCollection() {
       });
 
       // create the metadata object we'll be storing
-      const did = sessionStorage.getItem('PASAR_DID') || '';
-      const token = sessionStorage.getItem('PASAR_TOKEN');
-      const user = jwtDecode(token);
-      const { name, bio } = user;
-      const proof = sessionStorage.getItem('KYCedProof') || '';
+      const userInfo = jwtDecode(user?.token || '');
+      const { name, bio } = userInfo;
+      const proof = user?.KYCedProof || '';
       const creatorObj = {
-        did: `did:elastos:${did}`,
+        did: `did:elastos:${user?.did}`,
         name: name || '',
         description: bio || ''
       };
@@ -274,7 +272,7 @@ export default function EditCollection() {
         setOnProgress(false);
       });
 
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') {
+      if (user?.link !== '2') {
         reject(new Error());
         return;
       }

@@ -93,8 +93,8 @@ const FilterBtnBadgeStyle = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 export default function MarketExplorer() {
-  const sessionDispMode = sessionStorage.getItem('disp-mode');
-  const sessionFilterProps = JSON.parse(sessionStorage.getItem('marketplace-filter-props')) || {};
+  const { user, setUser, openTopAlert } = useUserContext();
+  const sessionFilterProps = JSON.parse(user?.marketplaceFilterProps) || {};
   const params = useParams(); // params.key
   const drawerWidth = 360;
   const btnGroup = {
@@ -102,7 +102,6 @@ export default function MarketExplorer() {
     type: ['General', 'Avatar']
   };
   const chains = [{ token: 'all' }, ...chainTypes];
-  const { openTopAlert } = useUserContext();
   const APP_BAR_MOBILE = 72 + (openTopAlert ? 50 : 0);
   const APP_BAR_DESKTOP = 88 + (openTopAlert ? 50 : 0);
   const rangeBtnId = 10;
@@ -110,7 +109,6 @@ export default function MarketExplorer() {
   const emptyRange = { min: '', max: '' };
   const defaultDispMode = isMobile ? 1 : 0;
   const isOffset = useOffSetTop(20);
-
   const [assets, setAssets] = React.useState([]);
   const [selectedCollections, setSelectedCollections] = React.useState(sessionFilterProps.selectedCollections || []);
   const [selectedTokens, setSelectedTokens] = React.useState(sessionFilterProps.selectedTokens || []);
@@ -118,9 +116,7 @@ export default function MarketExplorer() {
   const [range, setRange] = React.useState(sessionFilterProps.range || { min: '', max: '' });
   const [adult, setAdult] = React.useState(sessionFilterProps.adult || false);
   const [isAlreadyMounted, setAlreadyMounted] = React.useState(true);
-  const [dispMode, setDispMode] = React.useState(
-    sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode
-  );
+  const [dispMode, setDispMode] = React.useState(parseInt(user?.dispMode ?? defaultDispMode, 10));
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({
     selectedBtns: sessionFilterProps.selectedBtns || [],
@@ -147,8 +143,7 @@ export default function MarketExplorer() {
   };
 
   const handleDispInLaptopSize = () => {
-    const sessionDispMode = sessionStorage.getItem('disp-mode');
-    if (sessionDispMode !== null) return;
+    if (user?.dispMode !== null) return;
     const hypotenuse = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
     const hypotenuseInch = hypotenuse / 96;
     let tempDefaultDispMode = defaultDispMode;
@@ -212,11 +207,14 @@ export default function MarketExplorer() {
       }
       setLoadingAssets(false);
 
-      sessionStorage.setItem(
-        'marketplace-filter-props',
-        JSON.stringify({ selectedBtns, range, selectedCollections, selectedTokens, adult, order, chainType })
-      );
-      setFilterForm({ selectedBtns, range, selectedCollections, selectedTokens, adult, order, chainType });
+      const updatedFilterProps = { selectedBtns, range, selectedCollections, selectedTokens, adult, order, chainType };
+      sessionStorage.setItem('marketplace-filter-props', JSON.stringify(updatedFilterProps));
+      setUser((prev) => {
+        const current = { ...prev };
+        current.marketplaceFilterProps = JSON.stringify(updatedFilterProps);
+        return current;
+      });
+      setFilterForm(updatedFilterProps);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -225,6 +223,11 @@ export default function MarketExplorer() {
   const changeDispMode = (event, mode) => {
     if (mode === null) return;
     sessionStorage.setItem('disp-mode', mode);
+    setUser((prev) => {
+      const current = { ...prev };
+      current.dispMode = mode;
+      return current;
+    });
     setDispMode(mode);
   };
 

@@ -108,8 +108,8 @@ const btnGroup = {
   status: ['Sold', 'Listed', 'Minted']
 };
 export default function ActivityExplorer() {
-  const sessionDispMode = sessionStorage.getItem('disp-mode');
-  const sessionFilterProps = JSON.parse(sessionStorage.getItem('activity-filter-props')) || {};
+  const { user, setUser, openTopAlert } = useUserContext();
+  const sessionFilterProps = JSON.parse(user?.activityFilterProps) || {};
   const location = useLocation();
   const { type = '' } = location.state || {};
   const btnFilterByParam = [];
@@ -118,7 +118,6 @@ export default function ActivityExplorer() {
     btnFilterByParam.push(btnId);
   }
   const drawerWidth = 360;
-  const { openTopAlert } = useUserContext();
   const APP_BAR_MOBILE = 72 + (openTopAlert ? 50 : 0);
   const APP_BAR_DESKTOP = 88 + (openTopAlert ? 50 : 0);
   const emptyRange = { min: '', max: '' };
@@ -130,9 +129,7 @@ export default function ActivityExplorer() {
   const [selectedBtns, setSelectedBtns] = React.useState([
     ...new Set([...(sessionFilterProps.selectedBtns || []), ...btnFilterByParam])
   ]);
-  const [dispmode, setDispmode] = React.useState(
-    sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode
-  );
+  const [dispMode, setDispMode] = React.useState(parseInt(user?.dispMode ?? defaultDispMode, 10));
   const [isFilterView, setFilterView] = React.useState(1);
   const [filterForm, setFilterForm] = React.useState({
     selectedBtns: sessionFilterProps.selectedBtns || [],
@@ -156,13 +153,12 @@ export default function ActivityExplorer() {
   };
 
   const handleDispInLaptopSize = () => {
-    const sessionDispMode = sessionStorage.getItem('disp-mode');
-    if (sessionDispMode !== null) return;
+    if (user?.dispMode !== null) return;
     const hypotenuse = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
     const hypotenuseInch = hypotenuse / 96;
     let tempDefaultDispMode = defaultDispMode;
     if (hypotenuseInch > 12 && hypotenuseInch < 16) tempDefaultDispMode = 1;
-    if (dispmode !== tempDefaultDispMode) setDispmode(tempDefaultDispMode);
+    if (dispMode !== tempDefaultDispMode) setDispMode(tempDefaultDispMode);
   };
   window.addEventListener('resize', handleDispInLaptopSize);
 
@@ -191,7 +187,7 @@ export default function ActivityExplorer() {
                 tempInfo[addr] = { name: info.name };
                 return tempInfo;
               });
-              if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') fetchProfileData(info.did, addr);
+              if (user?.link === '2') fetchProfileData(info.did, addr);
             }
           })
           .catch((e) => {
@@ -267,8 +263,14 @@ export default function ActivityExplorer() {
       }
       setLoadingActivity(false);
 
-      sessionStorage.setItem('activity-filter-props', JSON.stringify({ selectedBtns }));
-      setFilterForm({ selectedBtns });
+      const updatedFilterProps = { selectedBtns };
+      sessionStorage.setItem('activity-filter-props', JSON.stringify(updatedFilterProps));
+      setUser((prev) => {
+        const current = { ...prev };
+        current.activityFilterProps = JSON.stringify(updatedFilterProps);
+        return current;
+      });
+      setFilterForm(updatedFilterProps);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps

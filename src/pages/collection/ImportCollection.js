@@ -111,7 +111,7 @@ export default function ImportCollection() {
   const uploadBackgroundRef = React.useRef();
   const descriptionRef = React.useRef();
 
-  const { wallet } = useUserContext();
+  const { user, wallet } = useUserContext();
   const { enqueueSnackbar } = useSnackbar();
   const isOffset = useOffSetTop(40);
   const APP_BAR_MOBILE = 64;
@@ -120,7 +120,7 @@ export default function ImportCollection() {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') navigate('/marketplace');
+      if (user?.link !== '2') navigate('/marketplace');
 
       if (isInAppBrowser()) setAddress(await window.elastos.getWeb3Provider().address);
       else if (essentialsConnector.getWalletConnectProvider())
@@ -272,13 +272,11 @@ export default function ImportCollection() {
       });
 
       // create the metadata object we'll be storing
-      const did = sessionStorage.getItem('PASAR_DID') || '';
-      const token = sessionStorage.getItem('PASAR_TOKEN');
-      const user = jwtDecode(token);
-      const { name, bio } = user;
-      const proof = sessionStorage.getItem('KYCedProof') || '';
+      const userInfo = jwtDecode(user?.token || '');
+      const { name, bio } = userInfo;
+      const proof = user?.KYCedProof || '';
       const creatorObj = {
-        did: `did:elastos:${did}`,
+        did: `did:elastos:${user?.did}`,
         name: name || '',
         description: bio || ''
       };
@@ -362,7 +360,7 @@ export default function ImportCollection() {
         setOnProgress(false);
       });
 
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') {
+      if (user?.link !== '2') {
         reject(new Error());
         return;
       }

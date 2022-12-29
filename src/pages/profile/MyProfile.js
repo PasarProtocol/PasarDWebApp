@@ -78,12 +78,10 @@ const RootStyle = styled(Page)(({ theme }) => ({
 // ----------------------------------------------------------------------
 export default function MyProfile() {
   const defaultDispMode = isMobile ? 1 : 0;
-  const sessionDispMode = sessionStorage.getItem('disp-mode');
   const params = useParams(); // params.address
   const navigate = useNavigate();
-  const [dispMode, setDispMode] = React.useState(
-    sessionDispMode !== null ? parseInt(sessionDispMode, 10) : defaultDispMode
-  );
+  const { user, wallet, setUser } = useUserContext();
+  const [dispMode, setDispMode] = React.useState(parseInt(user?.dispMode ?? defaultDispMode, 10));
   const [controller, setAbortController] = React.useState(new AbortController());
   const [tabValue, setTabValue] = React.useState(params.type !== undefined ? parseInt(params.type, 10) : 0);
   const [walletAddress, setWalletAddress] = React.useState(null);
@@ -96,7 +94,6 @@ export default function MyProfile() {
   const [buyDIAOpen, setOpenBuyDIA] = React.useState(false);
   const [badge, setBadge] = React.useState({ dia: 0, kyc: false });
   const [socials, setSocials] = React.useState({});
-  const { wallet } = useUserContext();
   const [isLoadingAssets, setLoadingAssets] = React.useState([false, false, false]);
   const [assetCount, setAssetCount] = React.useState([0, 0, 0, 0, 0, 0]);
   const [assets, setAssets] = React.useState([[], [], [], [], [], []]);
@@ -120,16 +117,16 @@ export default function MyProfile() {
   // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
   React.useEffect(() => {
     const getMyAddress = async () => {
-      if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1') {
+      if (user?.link === '1') {
         setMyAddress(account);
         setWalletAddress(account);
-      } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
+      } else if (user?.link === '2') {
         const strWalletAddress = isInAppBrowser()
           ? await window.elastos.getWeb3Provider().address
           : essentialsConnector.getWalletConnectProvider().wc.accounts[0];
         setMyAddress(strWalletAddress);
         setWalletAddress(strWalletAddress);
-      } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
+      } else if (user?.link === '3') {
         const strWalletAddress = await walletconnect.getAccount();
         setMyAddress(strWalletAddress);
         setWalletAddress(strWalletAddress);
@@ -145,12 +142,10 @@ export default function MyProfile() {
         } catch (e) {
           console.error(e);
         }
-      } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
-        const targetDid = `did:elastos:${sessionStorage.getItem('PASAR_DID')}`;
-        const token = sessionStorage.getItem('PASAR_TOKEN');
-        const user = jwtDecode(token);
+      } else if (user?.link === '2') {
+        const userInfo = jwtDecode(user?.token || '');
         try {
-          await fetchProfileData(targetDid, user);
+          await fetchProfileData(`did:elastos:${user?.did}`, userInfo);
         } catch (e) {
           console.error(e);
         }
@@ -333,6 +328,11 @@ export default function MyProfile() {
   const handleDispMode = (_, mode) => {
     if (mode === null) return;
     sessionStorage.setItem('disp-mode', mode);
+    setUser((prev) => {
+      const current = { ...prev };
+      current.dispMode = mode;
+      return current;
+    });
     setDispMode(mode);
   };
 
@@ -368,10 +368,10 @@ export default function MyProfile() {
                 )}
               </Stack>
             </Stack>
-            {(didInfo.name.length > 0 || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') && (
+            {(didInfo.name.length > 0 || user?.link === '2') && (
               <Stack direction="row" spacing={1} sx={{ justifyContent: 'center', mt: 1.5 }}>
                 {didInfo.name.length > 0 && <AddressCopyButton address={walletAddress} />}
-                {sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && (
+                {user?.link === '2' && (
                   <Button
                     variant="outlined"
                     component={RouterLink}
@@ -492,7 +492,7 @@ export default function MyProfile() {
                         <Typography variant="subtitle2" align="center" sx={{ color: 'text.secondary', mb: 3 }}>
                           We could not find any of your collections
                         </Typography>
-                        {sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && (
+                        {user?.link === '2' && (
                           <>
                             <StyledButton
                               variant="contained"
@@ -539,7 +539,7 @@ export default function MyProfile() {
                         </Grid>
                       ) : (
                         <Grid container spacing={2}>
-                          {sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2' && tabAssets.length && (
+                          {user?.link === '2' && tabAssets.length && (
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'end' }}>
                               <Stack direction="row" spacing={2}>
                                 <StyledButton variant="contained" onClick={handleNavlink} to="/collections/create">

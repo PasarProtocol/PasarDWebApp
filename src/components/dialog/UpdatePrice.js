@@ -64,7 +64,7 @@ export default function UpdatePrice(props) {
   } = props;
   const navigate = useNavigate();
   const location = useLocation();
-  const { wallet } = useUserContext();
+  const { user, wallet } = useUserContext();
   const { enqueueSnackbar } = useSnackbar();
   const [onProgress, setOnProgress] = React.useState(false);
   const [price, setPrice] = React.useState('');
@@ -113,6 +113,7 @@ export default function UpdatePrice(props) {
 
   const callChangeOrderPrice = async (_orderId, _price, _reservePrice, _buyoutPrice) => {
     callContractMethod(
+      user?.link,
       orderType === auctionOrderType ? 'changeAuctionOrderPrice' : 'changeSaleOrderPrice',
       coinType,
       wallet?.chainId,

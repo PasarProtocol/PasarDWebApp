@@ -70,7 +70,7 @@ export default function Auction(props) {
   const [coinType, setCoinType] = React.useState(0);
 
   const { enqueueSnackbar } = useSnackbar();
-  const { wallet } = useUserContext();
+  const { user, wallet } = useUserContext();
   const coinTypes = getCoinTypesInCurrentNetwork(wallet?.chainId);
   const navigate = useNavigate();
 
@@ -145,7 +145,7 @@ export default function Auction(props) {
                   .send(transactionParams)
                   .on('receipt', (receipt) => {
                     console.log('setApprovalForAll-receipt', receipt);
-                    callContractMethod('createOrderForAuction', coinType, wallet?.chainId, {
+                    callContractMethod(user?.link, 'createOrderForAuction', coinType, wallet?.chainId, {
                       _id: tokenId,
                       _amount: 1,
                       _baseAddress: baseToken,
@@ -167,7 +167,7 @@ export default function Auction(props) {
                     reject(error);
                   });
               else
-                callContractMethod('createOrderForAuction', coinType, wallet?.chainId, {
+                callContractMethod(user?.link, 'createOrderForAuction', coinType, wallet?.chainId, {
                   _id: tokenId,
                   _amount: 1,
                   _baseAddress: baseToken,
@@ -202,7 +202,7 @@ export default function Auction(props) {
       enqueueSnackbar('Reserve price must be less than Buy Now price.', { variant: 'warning' });
     else {
       setOnProgress(true);
-      const didUri = await sendIpfsDidJson();
+      const didUri = await sendIpfsDidJson(user?.did, user?.token, user?.kycedProof || '');
       const _startingPrice = BigInt(startingPrice * 1e18).toString();
       const _reservePrice = BigInt(reservePrice * 1e18).toString();
       const _buyoutPrice = BigInt(buyoutPrice * 1e18).toString();

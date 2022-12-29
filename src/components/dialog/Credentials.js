@@ -11,7 +11,7 @@ import TransLoadingButton from '../TransLoadingButton';
 import { DidResolverUrl } from '../../config';
 
 export default function Credentials() {
-  const { openCredentials, elaConnectivityService, setOpenCredentials, setElastosConnectivityService } =
+  const { user, openCredentials, elaConnectivityService, setUser, setOpenCredentials, setElastosConnectivityService } =
     useUserContext();
 
   React.useEffect(() => {
@@ -71,7 +71,7 @@ export default function Credentials() {
     }
 
     // Make sure the holder of this presentation is the currently authentified user
-    if (sessionStorage.getItem('PASAR_DID') !== presentationDID) {
+    if (user?.did !== presentationDID) {
       stopProvide('Presentation not issued by the currently authenticated user');
       return;
     }
@@ -94,6 +94,11 @@ export default function Credentials() {
     const vpBuffer = Buffer.from(kycVerifiablePresentation.serialize());
     const encodedPresentation = bs58.encode(vpBuffer);
     sessionStorage.setItem('KYCedProof', encodedPresentation);
+    setUser((prev) => {
+      const current = { ...prev };
+      current.kycedProof = encodedPresentation;
+      return current;
+    });
     setIsSuccess(true);
     setOnProgress(false);
   };

@@ -207,16 +207,16 @@ ClaimCard.propTypes = {
 const AmountProgressType = ['25%', '50%', '75%', 'Max'];
 
 export default function Rewards() {
+  const { user, setUser, setOpenSignInDlg } = useUserContext();
   const { enqueueSnackbar } = useSnackbar();
-  const { setOpenSignInDlg } = useUserContext();
   const [tabValue, setTabValue] = React.useState(0);
   const [stakingType, setStakingType] = React.useState('Stake');
   const [operAmount, setOperAmount] = React.useState(0);
   const [amountProgress, setAmountProgress] = React.useState(0);
   const [stakingTotalAmount, setStakingTotalAmount] = React.useState(0);
   const [stakingSettleAmount, setStakingSettleAmount] = React.useState(0);
-  const cachedPool = JSON.parse(sessionStorage.getItem('REWARD_POOL'));
-  const cachedUser = JSON.parse(sessionStorage.getItem('REWARD_USER'));
+  const cachedPool = JSON.parse(user?.rewardPool);
+  const cachedUser = JSON.parse(user?.rewardUser);
   const [PASARToUSD, setPASARToUSD] = React.useState(0.01);
   const [miningReward, setMiningReward] = React.useState(
     cachedUser?.mining
@@ -353,9 +353,9 @@ export default function Rewards() {
     const fetchData = async () => {
       const resPasarPrice = await getERC20TokenPrice(PASAR_TOKEN_ADDRESS);
       setPASARToUSD(resPasarPrice);
-      const accounts = await getWalletAccounts();
+      const accounts = await getWalletAccounts(user?.link);
       if (accounts.length) {
-        const balance = await callTokenContractMethod({
+        const balance = await callTokenContractMethod(user?.link, {
           contractType: 'token',
           callType: 'call',
           methodName: 'balanceOf',
@@ -366,12 +366,12 @@ export default function Rewards() {
       // rewards page
       const rewardedUsers = await fetchRewardedUserCount();
       const listedItems = await fetchListedItemCount(blankAddress);
-      const currentRatios = await callTokenContractMethod({
+      const currentRatios = await callTokenContractMethod(user?.link, {
         contractType: 'mining',
         callType: 'call',
         methodName: 'getCurrentRatios'
       });
-      const nextMiningReward = await callTokenContractMethod({
+      const nextMiningReward = await callTokenContractMethod(user?.link, {
         contractType: 'mining',
         callType: 'call',
         methodName: 'pendingRewards'
@@ -395,32 +395,35 @@ export default function Rewards() {
         eco: parseInt(nextMiningReward.eco, 10) / 1e18,
         other: parseInt(nextMiningReward.other, 10) / 1e18
       });
-      sessionStorage.setItem(
-        'REWARD_POOL',
-        JSON.stringify({
-          item: {
-            native: listedItems.elaCount,
-            pasar: listedItems.pasarCount,
-            eco: listedItems.ecoCount,
-            other: listedItems.otherCount
-          },
-          pool: {
-            native: parseInt(currentRatios.native, 10) / 1e4,
-            pasar: parseInt(currentRatios.pasar, 10) / 1e4,
-            eco: parseInt(currentRatios.eco, 10) / 1e4,
-            other: parseInt(currentRatios.other, 10) / 1e4
-          },
-          user: rewardedUsers,
-          next: {
-            native: parseInt(nextMiningReward.native, 10) / 1e18,
-            pasar: parseInt(nextMiningReward.pasar, 10) / 1e18,
-            eco: parseInt(nextMiningReward.eco, 10) / 1e18,
-            other: parseInt(nextMiningReward.other, 10) / 1e18
-          }
-        })
-      );
+      const updatedPool = {
+        item: {
+          native: listedItems.elaCount,
+          pasar: listedItems.pasarCount,
+          eco: listedItems.ecoCount,
+          other: listedItems.otherCount
+        },
+        pool: {
+          native: parseInt(currentRatios.native, 10) / 1e4,
+          pasar: parseInt(currentRatios.pasar, 10) / 1e4,
+          eco: parseInt(currentRatios.eco, 10) / 1e4,
+          other: parseInt(currentRatios.other, 10) / 1e4
+        },
+        user: rewardedUsers,
+        next: {
+          native: parseInt(nextMiningReward.native, 10) / 1e18,
+          pasar: parseInt(nextMiningReward.pasar, 10) / 1e18,
+          eco: parseInt(nextMiningReward.eco, 10) / 1e18,
+          other: parseInt(nextMiningReward.other, 10) / 1e18
+        }
+      };
+      sessionStorage.setItem('REWARD_POOL', JSON.stringify(updatedPool));
+      setUser((prev) => {
+        const current = { ...prev };
+        current.rewardPool = JSON.stringify(updatedPool);
+        return current;
+      });
       if (accounts.length) {
-        const accountRewards = await callTokenContractMethod({
+        const accountRewards = await callTokenContractMethod(user?.link, {
           contractType: 'mining',
           callType: 'call',
           methodName: 'accountRewards',
@@ -472,7 +475,7 @@ export default function Rewards() {
           }
         ]);
         // staking page
-        const stakingInfo = await callTokenContractMethod({
+        const stakingInfo = await callTokenContractMethod(user?.link, {
           contractType: 'staking',
           callType: 'call',
           methodName: 'getUserInfo',
@@ -488,7 +491,7 @@ export default function Rewards() {
         // get APR
         const days = 360;
         const currentTime = parseInt(
-          await callTokenContractMethod({
+          await callTokenContractMethod(user?.link, {
             contractType: 'staking',
             callType: 'call',
             methodName: 'getCurrentTime'
@@ -498,7 +501,7 @@ export default function Rewards() {
         const rewardTime = parseInt(currentTime + days * 3600 * 24, 10);
         const rewardTotal =
           parseInt(
-            await callTokenContractMethod({
+            await callTokenContractMethod(user?.link, {
               contractType: 'staking',
               callType: 'call',
               methodName: 'totalRewardAtTime',
@@ -507,7 +510,7 @@ export default function Rewards() {
             10
           ) -
           parseInt(
-            await callTokenContractMethod({
+            await callTokenContractMethod(user?.link, {
               contractType: 'staking',
               callType: 'call',
               methodName: 'totalRewardAtTime',
@@ -523,64 +526,67 @@ export default function Rewards() {
         const APR = parseInt(rate, 10) / 1000000;
         setStakingAPR((APR * 100).toFixed(4));
 
-        sessionStorage.setItem(
-          'REWARD_USER',
-          JSON.stringify({
-            mining: {
-              all: {
-                total: accountRewards.all.total / 1e18,
-                withdrawable: accountRewards.all.withdrawable / 1e18,
-                withdrawn: accountRewards.all.withdrawn / 1e18
-              },
-              buyer: {
-                total: accountRewards.buyer.total / 1e18,
-                withdrawable: accountRewards.buyer.withdrawable / 1e18,
-                withdrawn: accountRewards.buyer.withdrawn / 1e18
-              },
-              seller: {
-                total: accountRewards.seller.total / 1e18,
-                withdrawable: accountRewards.seller.withdrawable / 1e18,
-                withdrawn: accountRewards.seller.withdrawn / 1e18
-              },
-              creator: {
-                total: accountRewards.creator.total / 1e18,
-                withdrawable: accountRewards.creator.withdrawable / 1e18,
-                withdrawn: accountRewards.creator.withdrawn / 1e18
-              }
+        const updatedUser = {
+          mining: {
+            all: {
+              total: accountRewards.all.total / 1e18,
+              withdrawable: accountRewards.all.withdrawable / 1e18,
+              withdrawn: accountRewards.all.withdrawn / 1e18
             },
-            staking: {
-              currentStaked: stakingInfo.currentStaked / 1e18,
-              rewardWithdrawable: stakingInfo.rewardWithdrawable / 1e18,
-              rewardWithdrawn: stakingInfo.rewardWithdrawn / 1e18,
-              rewardFeePaid: stakingInfo.rewardFeePaid / 1e18,
-              feeEndTime: stakingInfo.feeEndTime
+            buyer: {
+              total: accountRewards.buyer.total / 1e18,
+              withdrawable: accountRewards.buyer.withdrawable / 1e18,
+              withdrawn: accountRewards.buyer.withdrawn / 1e18
             },
-            claim: [
-              {
-                title: 'BUYERS',
-                action: 'Buy',
-                name: 'buyer',
-                amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(4),
-                price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(4)
-              },
-              {
-                title: 'SELLERS',
-                action: 'Sell',
-                name: 'seller',
-                amount: (accountRewards.seller.withdrawable / 1e18).toFixed(4),
-                price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(4)
-              },
-              {
-                title: 'CREATORS',
-                action: 'Create',
-                name: 'creator',
-                amount: (accountRewards.creator.withdrawable / 1e18).toFixed(4),
-                price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(4)
-              }
-            ],
-            apr: (APR * 100).toFixed(4)
-          })
-        );
+            seller: {
+              total: accountRewards.seller.total / 1e18,
+              withdrawable: accountRewards.seller.withdrawable / 1e18,
+              withdrawn: accountRewards.seller.withdrawn / 1e18
+            },
+            creator: {
+              total: accountRewards.creator.total / 1e18,
+              withdrawable: accountRewards.creator.withdrawable / 1e18,
+              withdrawn: accountRewards.creator.withdrawn / 1e18
+            }
+          },
+          staking: {
+            currentStaked: stakingInfo.currentStaked / 1e18,
+            rewardWithdrawable: stakingInfo.rewardWithdrawable / 1e18,
+            rewardWithdrawn: stakingInfo.rewardWithdrawn / 1e18,
+            rewardFeePaid: stakingInfo.rewardFeePaid / 1e18,
+            feeEndTime: stakingInfo.feeEndTime
+          },
+          claim: [
+            {
+              title: 'BUYERS',
+              action: 'Buy',
+              name: 'buyer',
+              amount: (accountRewards.buyer.withdrawable / 1e18).toFixed(4),
+              price: ((accountRewards.buyer.withdrawable / 1e18) * PASARToUSD).toFixed(4)
+            },
+            {
+              title: 'SELLERS',
+              action: 'Sell',
+              name: 'seller',
+              amount: (accountRewards.seller.withdrawable / 1e18).toFixed(4),
+              price: ((accountRewards.seller.withdrawable / 1e18) * PASARToUSD).toFixed(4)
+            },
+            {
+              title: 'CREATORS',
+              action: 'Create',
+              name: 'creator',
+              amount: (accountRewards.creator.withdrawable / 1e18).toFixed(4),
+              price: ((accountRewards.creator.withdrawable / 1e18) * PASARToUSD).toFixed(4)
+            }
+          ],
+          apr: (APR * 100).toFixed(4)
+        };
+        sessionStorage.setItem('REWARD_USER', JSON.stringify(updatedUser));
+        setUser((prev) => {
+          const current = { ...prev };
+          current.rewardUser = JSON.stringify(updatedUser);
+          return current;
+        });
       } else {
         setMiningReward({
           all: {
@@ -642,20 +648,20 @@ export default function Rewards() {
       setReloadPage(!reloadPage);
     }, 10 * 1000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabValue, reloadPage, sessionStorage.getItem('PASAR_LINK_ADDRESS')]);
+  }, [tabValue, reloadPage, user?.link]);
 
   const checkIfSignedOrNot = async () => {
-    const accounts = await getWalletAccounts();
+    const accounts = await getWalletAccounts(user?.link);
     return accounts && !!accounts.length;
   };
 
   const handleStake = async (type, amount) => {
-    const accounts = await getWalletAccounts();
+    const accounts = await getWalletAccounts(user?.link);
     if (!(accounts && accounts.length)) {
       setOpenSignInDlg(true);
       return;
     }
-    const stakingInfo = await callTokenContractMethod({
+    const stakingInfo = await callTokenContractMethod(user?.link, {
       contractType: 'staking',
       callType: 'call',
       methodName: 'getUserInfo',
@@ -677,7 +683,7 @@ export default function Rewards() {
       return;
     }
     try {
-      const allowance = await callTokenContractMethod({
+      const allowance = await callTokenContractMethod(user?.link, {
         contractType: 'token',
         callType: 'call',
         methodName: 'allowance',
@@ -685,7 +691,7 @@ export default function Rewards() {
         spender: STAKING_CONTRACT_ADDRESS
       });
       if (allowance < stakingAmount) {
-        await callTokenContractMethod({
+        await callTokenContractMethod(user?.link, {
           contractType: 'token',
           callType: 'send',
           methodName: 'approve',
@@ -693,7 +699,7 @@ export default function Rewards() {
           amount: BigInt(stakingAmount).toString()
         });
       }
-      await callTokenContractMethod({
+      await callTokenContractMethod(user?.link, {
         contractType: 'staking',
         callType: 'send',
         methodName: 'stake',
@@ -714,7 +720,7 @@ export default function Rewards() {
       return;
     }
     try {
-      await callTokenContractMethod({
+      await callTokenContractMethod(user?.link, {
         contractType: 'staking',
         callType: 'send',
         methodName: 'withdraw'
@@ -734,7 +740,7 @@ export default function Rewards() {
       return;
     }
     try {
-      await callTokenContractMethod({
+      await callTokenContractMethod(user?.link, {
         contractType: 'mining',
         callType: 'send',
         methodName: 'withdrawRewardByName',

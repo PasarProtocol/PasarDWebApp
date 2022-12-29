@@ -435,11 +435,10 @@ const queryPasarScriptingFromDB = async () => {
   }
 };
 
-export const creatAndRegister = async (isForce) => {
+export const creatAndRegister = async (did, isForce) => {
   let lasterVersion = '';
   let preVersion = '';
-  const pasarDid = sessionStorage.getItem('PASAR_DID');
-  const userDid = `did:elastos:${pasarDid}`;
+  const userDid = `did:elastos:${did}`;
   if (userDid === 'did:elastos:') {
     return;
   }

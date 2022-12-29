@@ -228,10 +228,10 @@ export default function Purchase(props) {
   const buyNft = async () => {
     setOnProgress(true);
     const buyPrice = BigInt(priceInfo).toString();
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '1' || sessionStorage.getItem('PASAR_LINK_ADDRESS') === '3') {
+    if (user?.link === '1' || user?.link === '3') {
       callEthBuyOrder(info.OrderId, buyPrice);
-    } else if (sessionStorage.getItem('PASAR_LINK_ADDRESS') === '2') {
-      const buyerDidUri = await sendIpfsDidJson();
+    } else if (user?.link === '2') {
+      const buyerDidUri = await sendIpfsDidJson(user?.did, user?.token, user?.kycedProof || '');
       console.log('didUri:', buyerDidUri);
       callBuyOrder(info.order.orderId, buyerDidUri, buyPrice);
     }
@@ -247,7 +247,7 @@ export default function Purchase(props) {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      const sessionLinkFlag = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+      const sessionLinkFlag = user?.link;
       setBalanceArray(Array(getTotalCountOfCoinTypes()).fill(0));
       if (sessionLinkFlag) {
         if (sessionLinkFlag === '1' && library)

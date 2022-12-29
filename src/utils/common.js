@@ -503,9 +503,9 @@ export function getShortUrl(url) {
   });
 }
 
-export function callContractMethod(type, coinType, chainId, paramObj) {
+export function callContractMethod(linkType, type, coinType, chainId, paramObj) {
   return new Promise((resolve, reject) => {
-    if (sessionStorage.getItem('PASAR_LINK_ADDRESS') !== '2') {
+    if (linkType !== '2') {
       reject(new Error());
       return;
     }
@@ -654,9 +654,8 @@ export function callContractMethod(type, coinType, chainId, paramObj) {
   });
 }
 
-export const callTokenContractMethod = (param) =>
+export const callTokenContractMethod = (linkType, param) =>
   new Promise((resolve, reject) => {
-    const linkType = sessionStorage.getItem('PASAR_LINK_ADDRESS');
     let walletConnectProvider;
     if (linkType === '2')
       walletConnectProvider = isInAppBrowser()
@@ -783,8 +782,7 @@ export const callTokenContractMethod = (param) =>
     }
   });
 
-export const getWalletAccounts = async () => {
-  const linkType = sessionStorage.getItem('PASAR_LINK_ADDRESS');
+export const getWalletAccounts = async (linkType) => {
   let walletConnectProvider;
   if (linkType === '2')
     walletConnectProvider = isInAppBrowser()
@@ -1208,14 +1206,11 @@ export const getCoinTypeFromToken = (item) => {
   return { index: coinTypeIndex, ...coinTypesGroup.ESC[coinTypeIndex] };
 };
 
-export const sendIpfsDidJson = async () => {
+export const sendIpfsDidJson = async (did, token, proof) => {
   const client = create(`${PasarIpfs}/`);
   // create the metadata object we'll be storing
-  const did = sessionStorage.getItem('PASAR_DID') || '';
-  const token = sessionStorage.getItem('PASAR_TOKEN');
-  const user = jwtDecode(token);
-  const { name, bio } = user;
-  const proof = sessionStorage.getItem('KYCedProof') || '';
+  const userInfo = jwtDecode(token || '');
+  const { name, bio } = userInfo;
   const didObj = {
     version: '2',
     did: `did:elastos:${did}`,
