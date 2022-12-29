@@ -32,6 +32,12 @@ function UserContextProvider({ children }) {
     did: sessionStorage.getItem('PASAR_DID'),
     token: sessionStorage.getItem('PASAR_TOKEN'),
     kycedProof: sessionStorage.getItem('KYCedProof'),
+    dispMode: sessionStorage.getItem('disp-mode'),
+    marketplaceFilterProps: sessionStorage.getItem('marketplace-filter-props'),
+    collectionFilterProps: sessionStorage.getItem('collection-filter-props'),
+    activityFilterProps: sessionStorage.getItem('activity-filter-props'),
+    rewardPool: sessionStorage.getItem('REWARD_POOL'),
+    rewardUser: sessionStorage.getItem('REWARD_USER'),
     avatar: '',
     didDoc: undefined,
     credentials: {}

@@ -55,7 +55,6 @@ export default function useConnectEE() {
         : essentialsConnector.getWalletConnectProvider().wc.accounts[0];
       sessionStorage.setItem('PASAR_LINK_ADDRESS', '2');
       sessionStorage.setItem('PASAR_DID', did);
-      sessionStorage.setItem('PASAR_ADDRESS', walletAddress);
       sessionStorage.setItem('PASAR_TOKEN', token);
       const user = { link: '2', did, token, address: walletAddress };
       return user;
@@ -67,7 +66,6 @@ export default function useConnectEE() {
     console.log('Signing out user. Deleting session info');
     sessionStorage.removeItem('PASAR_LINK_ADDRESS');
     sessionStorage.removeItem('PASAR_DID');
-    sessionStorage.removeItem('PASAR_ADDRESS');
     sessionStorage.removeItem('PASAR_TOKEN');
     sessionStorage.removeItem('KYCedProof');
     sessionStorage.removeItem('REWARD_USER');

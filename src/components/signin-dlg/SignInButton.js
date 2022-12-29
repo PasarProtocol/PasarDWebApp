@@ -311,7 +311,6 @@ export default function SignInButton() {
       else if (currentConnector === walletconnect) linkType = '3';
       sessionStorage.setItem('PASAR_LINK_ADDRESS', linkType);
       sessionStorage.setItem('PASAR_DID', null);
-      sessionStorage.setItem('PASAR_ADDRESS', retAddress);
       sessionStorage.setItem('PASAR_TOKEN', null);
       setActivatingConnector(currentConnector);
       setUser((prev) => {
@@ -331,7 +330,6 @@ export default function SignInButton() {
   const disconnectWallet = async () => {
     sessionStorage.removeItem('PASAR_LINK_ADDRESS');
     sessionStorage.removeItem('PASAR_DID');
-    sessionStorage.removeItem('PASAR_ADDRESS');
     sessionStorage.removeItem('PASAR_TOKEN');
     sessionStorage.removeItem('KYCedProof');
     sessionStorage.removeItem('REWARD_USER');
